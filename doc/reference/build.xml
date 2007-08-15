@@ -1,0 +1,17 @@
+<project name="Documentation" default="all.doc" basedir=".">
+
+    <!-- Use the core Hibernate3 doc build system -->
+    <import file="../../../common/common-build.xml"/>
+    <import file="${hibernate-cvs.doc.reference}/build.xml"/>
+
+
+    <target name="all.doc" depends="clean">
+
+        <!-- TRANSLATOR: Duplicate this call for your language -->
+        <antcall target="lang.all">
+            <param name="docname" value="hibernate_validator"/>
+            <param name="lang" value="en"/>
+        </antcall>
+    </target>
+
+</project>
