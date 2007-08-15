@@ -1,0 +1,23 @@
+Hibernate Validator Changelog
+=============================
+
+3.0.0.GA (19-03-2007)
+---------------------
+
+Initial release as a standalone product (see Hibernate Annotations changelog for previous informations)
+
+** Bug
+    * [HV-2] - Deprecate String support for both @Past and @Future validating Strings
+    * [HV-3] - @Email fail on empty strings
+    * [HV-7] - Two level @Valid annotation doesn't work
+
+
+** Improvement
+    * [HV-5] - Multiple validators of the same type per element (John Gilbert)
+
+** New Feature
+    * [HV-1] - Make ClassValidator independent of Hibernate Annotations
+    * [HV-6] - @EAN
+    * [HV-8] - Make Validator support pure JavaPersistence players
+    * [HV-9] - @Digits(integerDigits, fractionalDigits)
+    * [HV-10] - @CreditCardNumber for Hibernate Validator
