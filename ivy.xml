@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="1.3"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation=
+                  "http://www.jayasoft.org/misc/ivy/ivy.xsd">
+    <info organisation="org.hibernate" module="validator"/>
+    <configurations>
+        <conf name="core" description="Core module dependencies"/>
+        <conf name="test" visibility="private" description="Dependencies needed for testing purposes"/>
+    </configurations>
+    <publications>
+        <artifact name="hibernate-validator" conf="core"/>
+    </publications>
+    <dependencies>
+		<dependency name="jpa-api" rev="1.0.0.GA" conf="core->default"/>
+        <dependency name="commons-annotations" rev="3.0.0.GA" conf="core->core"/>
+        <dependency name="annotations" rev="3.3.0.GA" conf="test->core"/>
+        <dependency name="entitymanager" rev="3.3.1.GA" conf="test->core"/>
+    </dependencies>
+</ivy-module>
