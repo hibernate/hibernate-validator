@@ -540,7 +540,7 @@ public class ClassValidator<T> implements Serializable {
 		return value;
 	}
 
-	public String getPropertyName(XMember member) {
+	private String getPropertyName(XMember member) {
 		//Do no try to cache the result in a map, it's actually much slower (2.x time)
 		String propertyName;
 		if ( XProperty.class.isAssignableFrom( member.getClass() ) ) {
