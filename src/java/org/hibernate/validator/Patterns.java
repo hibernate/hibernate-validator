@@ -11,7 +11,7 @@ import static java.lang.annotation.ElementType.FIELD;
 /**
  * The annotated element must follow the list of regexp patterns
  *
- * @author Gavin King
+ * @author Emmanuel Bernard
  */
 @Documented
 @Target({METHOD, FIELD})
