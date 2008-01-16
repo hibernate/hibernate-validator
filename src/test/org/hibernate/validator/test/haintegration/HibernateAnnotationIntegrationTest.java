@@ -76,13 +76,48 @@ public class HibernateAnnotationIntegrationTest extends HANTestCase {
 			if ( tx != null ) tx.rollback();
 			s.close();
 		}
+
+		a = new Address();
+		Address.blacklistedZipCode = "3232";
+		a.setId( 12 );
+		a.setCountry( "Country" );
+		a.setLine1( "Line 1" );
+		a.setZip( "12345" );
+		a.setState( "NY" );
 		s = openSession();
 		tx = s.beginTransaction();
+		s.persist( a );
+		tx.commit();
+
+		a.setState( "WAYTOOLONG" );
+		s = openSession();
+		tx = s.beginTransaction();
+		try {
+			s.merge( a );
+			tx.commit();
+			fail( "bean should have been validated" );
+		}
+		catch (InvalidStateException e) {
+			//success
+			assertEquals( 1, e.getInvalidValues().length );
+			assertTrue( "Environment.MESSAGE_INTERPOLATOR_CLASS does not work",
+					e.getInvalidValues()[0].getMessage().startsWith( "prefix_")
+			);
+		}
+		finally {
+			if ( tx != null ) tx.rollback();
+			s.close();
+		}
+
+		s = openSession();
+		tx = s.beginTransaction();
+		a.setId( 13 );
 		a.setCountry( "Country" );
 		a.setLine1( "Line 1" );
 		a.setZip( "4343" );
 		a.setState( "NY" );
 		s.persist( a );
+		s.flush();
 		a.setState( "TOOLONG" );
 		try {
 			s.flush();
@@ -92,7 +127,11 @@ public class HibernateAnnotationIntegrationTest extends HANTestCase {
 			assertEquals( 1, e.getInvalidValues().length );
 		}
 		finally {
-			if ( tx != null ) tx.rollback();
+			s.clear();
+			for (Object o : s.createCriteria( Address.class  ).list() ) {
+				s.delete( o );
+			}
+			tx.commit();
 			s.close();
 		}
 	}
