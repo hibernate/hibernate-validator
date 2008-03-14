@@ -227,19 +227,6 @@
 
             <entry>none</entry>
           </row>
-
-          <row>
-            <entry>@Digits</entry>
-
-            <entry>property (numeric or string representation of a
-            numeric)</entry>
-
-            <entry>check whether the property is a number having up to
-            <literal>integerDigits</literal> integer digits and
-            <literal>fractionalDigits</literal> fractonal digits</entry>
-
-            <entry>define column precision and scale</entry>
-          </row>
         </tbody>
       </tgroup>
     </table>
