@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="common-build" default="dist">
+<project name="common-build" default="dist"
+        xmlns:artifact="urn:maven-artifact-ant">
 	<description>Common properties and targets for the HibernateExt project</description>
 
 	<!-- my.basedir property can be used to refer to files/directories relatively to the common-build.xml file -->
@@ -39,39 +40,15 @@
 	<property name="javac.source" value="1.4"/>
 	<property name="javac.target" value="1.4"/>
 
+    <property name="pom.file" value="pom.xml"/>
+    <property name="src.jar" value="${build.dir}/src.jar"/>
 
-	<!-- set Hibernate core related properties -->
-    <property name="hibernate-core.home" location="${common-build.basedir}/../hibernate-3.2"/>
-    <property name="hibernate-core.jar" location="${hibernate-core.home}/hibernate3.jar"/>
-    <property name="hibernate-core.lib.dir" location="${hibernate-core.home}/lib"/>
-    <property name="hibernate-core.jdbc.dir" location="${hibernate-core.home}/lib"/>  <!-- for some reason jdbc.dir is renamed to lib instead of jdbc when doing a dist of hibernate3 -->
-    <property name="hibernate-core.doc.api" location="${hibernate-core.home}/doc/api"/>
-    <property name="hibernate-cvs.doc.reference" location="${common-build.basedir}/../core/doc/reference"/>
+    <!-- build related properties -->
+    <property name="build.lib.dir" value="${lib.dir}/build"/>
 
-	<!--
-	Explicitly define tasks from ant..
-	Unfortunately, checkstyle-a<path id="lib.class.path">
-    	<path location="${hibernate-core.jar}"></path>
-        <fileset dir="${hibernate-core.lib.dir}">
-            <include name="*.jar"/>
-        </fileset>
-        <fileset dir="${lib.dir}">
-            <include name="*.jar"/>
-        </fileset>
-        <pathelement path="${clover.jar}"/>
-    </path>ll.jar contains it's own version of ANTLR, so ANTLR cannot be in the classpath.
-	-->
-	<!-- Emmanuel: Removed antlr, shouldn't be useful in Ext package...
-    taskdef name="antlr" classname="org.apache.tools.ant.taskdefs.optional.ANTLR">
-		<classpath>
-			<pathelement location="${hibernate-core.lib.dir}/antlr-2.7.2.jar"/>
-			<pathelement location="${hibernate-core.lib.dir}/ant-antlr-1.6.1.jar"/>
-		</classpath>
-	</taskdef -->
-   
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath>
-			<fileset dir="${hibernate-core.lib.dir}">
+			<fileset dir="${common-build.basedir}/lib/build"> <!-- ${build.lib.dir} fails in reference doc build -->
 			    <include name="junit-*.jar"/>
                 <include name="ant-junit-*.jar"/>
 			</fileset>
@@ -80,18 +57,31 @@
 
 	<taskdef name="junitreport" classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator">
         <classpath>
-            <fileset dir="${hibernate-core.lib.dir}">
+            <fileset dir="${common-build.basedir}/lib/build"> <!-- ${build.lib.dir} fails in reference doc build -->                 
                 <include name="junit-*.jar"/>
                 <include name="ant-junit-*.jar"/>
             </fileset>
         </classpath>
 	</taskdef>
 
+    <!-- ivy load -->
+	<property name="ivy.jar.dir" value="${common-build.basedir}/ivy" />
+    <property name="ivy.conf.dir" value="${common-build.basedir}" />
+	<path id="ivy.lib.path">
+		<fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+	</path>
+	<taskdef resource="fr/jayasoft/ivy/ant/antlib.xml"
+			  uri="antlib:fr.jayasoft.ivy.ant" classpathref="ivy.lib.path"/>
+    
+    <!-- maven task load -->
+    <path id="maven-ant-tasks.path" path="${ivy.jar.dir}/maven-ant-tasks.jar" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="urn:maven-artifact-ant"
+             classpathref="maven-ant-tasks.path" />
+
+    <artifact:remoteRepository id="offline.repository.jboss.org" url="file://${offline.repository.jboss.org}" />
+
     <path id="lib.class.path">
-    	<path location="${hibernate-core.jar}"></path>
-        <fileset dir="${hibernate-core.lib.dir}">
-            <include name="*.jar"/>
-        </fileset>
         <fileset dir="${lib.dir}">
             <include name="*.jar"/>
         </fileset>
@@ -196,9 +186,6 @@
             	<include name="lgpl.txt"/>
             </fileset>
         </copy>
-
-	    	<available file="${hibernate-core.jar}" type="file" property="hibernate-core.jar.available"/>
-    		<fail unless="hibernate-core.jar.available" message="Cannot locate hibernate-core.jar: ${hibernate-core.jar}"/>
     </target>
 
     <target name="compile" depends="init" description="Compile the Java source code">
@@ -337,7 +324,7 @@
         	windowtitle="${Name} API Documentation"
         	Overview="${doc.api.dir}/package.html"
         	doctitle="${Name} API Documentation"
-        	stylesheetfile="${hibernate-core.doc.api}/jdstyle.css"
+        	stylesheetfile="${doc.api.dir}/jdstyle.css"
         	link="${javadoc}">
         	<packageset dir="${src.dir}" defaultexcludes="yes" >
 		      <include name="**/*" />
@@ -468,5 +455,29 @@
 			description="Create a patch">
 		<cvs command="-q diff -u -N" output="patch.txt"/>
 	</target>
+
+    <!-- maven deploy: to be used by the subbuild and delcare deps on jar -->
+    <target name="deploy" depends="jar">
+        <fail unless="offline.repository.jboss.org" message="offline.repository.jboss.org must be defined"/>
+        <jar jarfile="${src.jar}" basedir="${src.dir}">
+          <include name="**/*.java" />
+          <exclude name="**/test/*.java" />
+          <!-- patternset refid="meta.files" / -->
+        </jar>
+
+        <artifact:pom id="maven.project" file="${pom.file}" />
+
+        <artifact:install file="${jar.file.name}">
+            <pom refid="maven.project"/>
+        </artifact:install>
+
+        <artifact:deploy file="${jar.file.name}">
+          <pom refid="maven.project" />
+          <remoteRepository refId="offline.repository.jboss.org">
+          </remoteRepository>
+          <attach file="${src.jar}" classifier="sources" />
+            <attach file="${jar.file.name}" classifier="" />
+        </artifact:deploy>
+    </target>
 
 </project>

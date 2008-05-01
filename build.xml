@@ -121,8 +121,8 @@
 	</target -->
 
     <target name="get.deps.core" depends="init" description="retrieve the core dependencies">
-        <ivy:resolve conf="core" />
-        <ivy:retrieve pattern="${ivy.dep.dir}/core/[artifact].[ext]" conf="core" />
+        <ivy:resolve conf="default" />
+        <ivy:retrieve pattern="${ivy.dep.dir}/core/[artifact].[ext]" conf="default" />
     </target>
 
     <target name="compile" depends="init,get.deps.core" description="Compile the Java source code">
@@ -241,7 +241,7 @@
             <attribute name="Implementation-URL" value="http://validator.hibernate.org"/>
 		</manifest>
 		<antcall target="common-build.jar"/>
-        <ivy:resolve conf="core"/>
+        <ivy:resolve conf="default"/>
         <ivy:publish artifactspattern="${dist.dir}/[artifact].[ext]"
             resolver="local"
             pubrevision="latest"
@@ -275,11 +275,17 @@
                 <include name="*.jar"/>
             </fileset>
         </copy>
+        
         <mkdir dir="${dist.lib.dir}/test"/>
         <copy todir="${dist.lib.dir}/test" failonerror="false">
 			<fileset dir="${ivy.dep.dir}/test">
                 <include name="*.jar"/>
             </fileset>
+        </copy>
+
+        <mkdir dir="${dist.lib.dir}/build"/>
+        <copy todir="${dist.lib.dir}/build" failonerror="false">
+			<fileset file="${lib.dir}/build/*.jar"/>
         </copy>
 
         <copy file="${basedir}/build.properties.dist" tofile="${dist.dir}/build.properties" failonerror="false">

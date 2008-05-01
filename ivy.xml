@@ -5,16 +5,33 @@
                   "http://www.jayasoft.org/misc/ivy/ivy.xsd">
     <info organisation="org.hibernate" module="validator"/>
     <configurations>
-        <conf name="core" description="Core module dependencies"/>
+        <conf name="default" description="Core module dependencies"/>
         <conf name="test" visibility="private" description="Dependencies needed for testing purposes"/>
     </configurations>
     <publications>
         <artifact name="hibernate-validator" conf="core"/>
     </publications>
     <dependencies>
-		<dependency name="jpa-api" rev="1.0.0.GA" conf="core->default"/>
-        <dependency name="commons-annotations" rev="3.0.0.GA" conf="core->core"/>
-        <dependency name="annotations" rev="3.3.0.GA" conf="test->core"/>
-        <dependency name="entitymanager" rev="3.3.1.GA" conf="test->core"/>
+        <!-- compile time dependencies -->
+        <dependency name="ejb3-persistence" rev="1.0.2.GA" conf="default->default"/>
+        <dependency name="commons-annotations" rev="latest" conf="default->default"/>
+        <dependency org="org.hibernate" name="hibernate-core" rev="3.3.0.CR1" conf="default->default"/>
+        <dependency org="commons-logging" name="commons-logging" rev="1.0.4" conf="default->default"/>
+
+        <!-- transitive dependencies -->
+        <dependency org="org.slf4j" name="slf4j-api" rev="1.4.2" conf="test->default"/>
+        <dependency org="antlr" name="antlr" rev="2.7.6" conf="test->default"/>
+        <dependency org="commons-collections" name="commons-collections" rev="3.1" conf="test->default"/>
+        <dependency org="dom4j" name="dom4j" rev="1.6.1" conf="test->default"/>
+
+        <!-- test deps -->
+        <dependency name="annotations" rev="latest" conf="test->default"/>
+        <dependency name="entitymanager" rev="latest" conf="test->default"/>
+        <dependency org="cglib" name="cglib" rev="2.1_3" conf="test->default"/>
+        <dependency org="asm" name="asm" rev="1.5.3" conf="test->default"/>
+        <dependency org="asm" name="asm-attrs" rev="1.5.3" conf="test->default"/>
+        <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.4.2" conf="test->default"/>
+        <dependency org="log4j" name="log4j" rev="1.2.14" conf="test->default"/>
+        <dependency org="junit" name="junit" rev="3.8.1" conf="test->default"/>
     </dependencies>
 </ivy-module>

@@ -2,7 +2,7 @@
 
     <!-- Use the core Hibernate3 doc build system -->
     <import file="../../common-build.xml"/>
-    <import file="${hibernate-cvs.doc.reference}/build.xml"/>
+    <import file="docbook-common-build.xml"/>
 
 
     <target name="all.doc" depends="clean">
