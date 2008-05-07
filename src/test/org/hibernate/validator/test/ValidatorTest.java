@@ -2,6 +2,11 @@
 package org.hibernate.validator.test;
 
 import java.io.Serializable;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Locale;
@@ -129,6 +134,47 @@ public class ValidatorTest extends TestCase {
 		else if ( loc.toString().startsWith( "fr" ) ) {
 			String message = invalidValues[0].getMessage();
 			String message2 ="la longueur doit être entre 0 et 2"; 
+			assertEquals( message2, message );
+		}
+		else if ( loc.toString().startsWith( "da" ) ) {
+			assertEquals( "længden skal være mellem 0 og 2", invalidValues[0].getMessage() );
+		}
+		else {
+			// if default not found then it must be english
+			assertEquals( "length must be between 0 and 2", invalidValues[0].getMessage() );
+		}
+	}
+
+	public void testSerialization() throws Exception {
+
+		Tv tv = new Tv();
+		tv.serial = "FS";
+		tv.name = "TooLong";
+		tv.expDate = new Date( new Date().getTime() + 1000 * 60 * 60 * 24 * 10 );
+		ClassValidator<Tv> classValidator = new ClassValidator<Tv>( Tv.class );
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		ObjectOutput out = new ObjectOutputStream( stream );
+		out.writeObject( classValidator );
+		out.close();
+		byte[] serialized = stream.toByteArray();
+		stream.close();
+		ByteArrayInputStream byteIn = new ByteArrayInputStream( serialized );
+		ObjectInputStream in = new ObjectInputStream( byteIn );
+		classValidator  = (ClassValidator<Tv>) in.readObject();
+		in.close();
+		byteIn.close();
+
+
+		InvalidValue[] invalidValues = classValidator.getInvalidValues( tv );
+		assertEquals( 1, invalidValues.length );
+		Locale loc = Locale.getDefault();
+		if ( loc.toString().startsWith( "en" ) ) {
+			assertEquals( "length must be between 0 and 2", invalidValues[0].getMessage() );
+		}
+		else if ( loc.toString().startsWith( "fr" ) ) {
+			String message = invalidValues[0].getMessage();
+			String message2 ="la longueur doit être entre 0 et 2";
 			assertEquals( message2, message );
 		}
 		else if ( loc.toString().startsWith( "da" ) ) {

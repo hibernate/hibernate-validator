@@ -39,7 +39,7 @@ import org.hibernate.annotations.common.reflection.XMethod;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.util.IdentitySet;
-import org.hibernate.validator.interpolator.DefaultMessageInterpolatorAggerator;
+import org.hibernate.validator.interpolator.DefaultMessageInterpolatorAggregator;
 
 
 /**
@@ -77,7 +77,7 @@ public class ClassValidator<T> implements Serializable {
 	private transient List<Validator> memberValidators;
 	private transient List<XMember> memberGetters;
 	private transient List<XMember> childGetters;
-	private transient DefaultMessageInterpolatorAggerator defaultInterpolator;
+	private transient DefaultMessageInterpolatorAggregator defaultInterpolator;
 	private transient MessageInterpolator userInterpolator;
 	private static final Filter GET_ALL_FILTER = new Filter() {
 		public boolean returnStatic() {
@@ -192,7 +192,7 @@ public class ClassValidator<T> implements Serializable {
 		memberValidators = new ArrayList<Validator>();
 		memberGetters = new ArrayList<XMember>();
 		childGetters = new ArrayList<XMember>();
-		defaultInterpolator = new DefaultMessageInterpolatorAggerator();
+		defaultInterpolator = new DefaultMessageInterpolatorAggregator();
 		defaultInterpolator.initialize( messageBundle, defaultMessageBundle );
 
 		//build the class hierarchy to look for members in
