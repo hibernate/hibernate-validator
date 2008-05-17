@@ -9,17 +9,16 @@
         <conf name="test" visibility="private" description="Dependencies needed for testing purposes"/>
     </configurations>
     <publications>
-        <artifact name="hibernate-validator" conf="core"/>
+        <artifact name="hibernate-validator" conf="default"/>
     </publications>
     <dependencies>
         <!-- compile time dependencies -->
         <dependency name="ejb3-persistence" rev="1.0.2.GA" conf="default->default"/>
         <dependency name="commons-annotations" rev="latest" conf="default->default"/>
         <dependency org="org.hibernate" name="hibernate-core" rev="3.3.0.CR1" conf="default->default"/>
-        <dependency org="commons-logging" name="commons-logging" rev="1.0.4" conf="default->default"/>
+        <dependency org="org.slf4j" name="slf4j-api" rev="1.4.2" conf="default->default"/>
 
         <!-- transitive dependencies -->
-        <dependency org="org.slf4j" name="slf4j-api" rev="1.4.2" conf="test->default"/>
         <dependency org="antlr" name="antlr" rev="2.7.6" conf="test->default"/>
         <dependency org="commons-collections" name="commons-collections" rev="3.1" conf="test->default"/>
         <dependency org="dom4j" name="dom4j" rev="1.6.1" conf="test->default"/>

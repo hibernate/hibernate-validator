@@ -23,8 +23,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.AssertionFailure;
 import org.hibernate.Hibernate;
 import org.hibernate.MappingException;
@@ -40,6 +38,8 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.util.IdentitySet;
 import org.hibernate.validator.interpolator.DefaultMessageInterpolatorAggregator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -50,7 +50,7 @@ import org.hibernate.validator.interpolator.DefaultMessageInterpolatorAggregator
  */
 public class ClassValidator<T> implements Serializable {
 	//TODO Define magic number
-	private static Log log = LogFactory.getLog( ClassValidator.class );
+	private static final Logger log = LoggerFactory.getLogger( ClassValidator.class );
 	private static final InvalidValue[] EMPTY_INVALID_VALUE_ARRAY = new InvalidValue[]{};
 	private static final String DEFAULT_VALIDATOR_MESSAGE = "org.hibernate.validator.resources.DefaultValidatorMessages";
 	private static final String VALIDATOR_MESSAGE = "ValidatorMessages";
@@ -164,7 +164,7 @@ public class ClassValidator<T> implements Serializable {
 			);
 		}
 		catch (MissingResourceException e) {
-			log.trace( "ResourceBundle " + VALIDATOR_MESSAGE + " not found in thread context classloader" );
+			log.trace( "ResourceBundle {} not found in thread context classloader", VALIDATOR_MESSAGE );
 			//then use the Validator Framework classloader
 			try {
 				rb = ResourceBundle.getBundle(
@@ -175,7 +175,8 @@ public class ClassValidator<T> implements Serializable {
 			}
 			catch (MissingResourceException ee) {
 				log.debug(
-						"ResourceBundle ValidatorMessages not found in Validator classloader. Delegate to " + DEFAULT_VALIDATOR_MESSAGE
+						"ResourceBundle ValidatorMessages not found in Validator classloader. Delegate to {}",
+						DEFAULT_VALIDATOR_MESSAGE
 				);
 				//the user did not override the default ValidatorMessages
 				rb = null;
@@ -312,7 +313,7 @@ public class ClassValidator<T> implements Serializable {
 			validatorPresent = validatorPresent || agrValidPresent;
 		}
 		if ( validatorPresent && !member.isTypeResolved() ) {
-			log.warn( "Original type of property " + member + " is unbound and has been approximated." );
+			log.warn( "Original type of property {} is unbound and has been approximated.", member );
 		}
 	}
 

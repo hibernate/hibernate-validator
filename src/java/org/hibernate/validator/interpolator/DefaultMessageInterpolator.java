@@ -12,11 +12,11 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.util.StringHelper;
 import org.hibernate.validator.MessageInterpolator;
 import org.hibernate.validator.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resource bundle based interpolator
@@ -25,7 +25,7 @@ import org.hibernate.validator.Validator;
  * @author Emmanuel Bernard
  */
 public class DefaultMessageInterpolator implements MessageInterpolator, Serializable {
-	private static Log log = LogFactory.getLog( DefaultMessageInterpolator.class );
+	private static final Logger log = LoggerFactory.getLogger( DefaultMessageInterpolator.class );
 	private Map<String, Object> annotationParameters = new HashMap<String, Object>();
 	private transient ResourceBundle messageBundle;
 	private transient ResourceBundle defaultMessageBundle;
@@ -52,11 +52,11 @@ public class DefaultMessageInterpolator implements MessageInterpolator, Serializ
 			}
 			catch (IllegalAccessException e) {
 				//really should not happen, but we degrade nicely
-				log.warn( "Unable to access " + StringHelper.qualify( clazz.toString(), method.getName() ) );
+				log.warn( "Unable to access {}", StringHelper.qualify( clazz.toString(), method.getName() ) );
 			}
 			catch (InvocationTargetException e) {
 				//really should not happen, but we degrade nicely
-				log.warn( "Unable to access " + StringHelper.qualify( clazz.toString(), method.getName() ) );
+				log.warn( "Unable to access {}", StringHelper.qualify( clazz.toString(), method.getName() ) );
 			}
 		}
 		annotationMessage = (String) annotationParameters.get( "message" );

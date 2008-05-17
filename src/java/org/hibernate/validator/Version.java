@@ -1,8 +1,8 @@
 //$Id: $
 package org.hibernate.validator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hibernate Vaildator version
@@ -11,10 +11,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Version {
 	public static final String VERSION = "3.0.0.GA";
-	private static Log log = LogFactory.getLog( Version.class );
+	private static Logger log = LoggerFactory.getLogger( Version.class );
 
 	static {
-		log.info( "Hibernate Validator " + VERSION );
+		log.info( "Hibernate Validator {}", VERSION );
 	}
 
 	public static void touch() {
