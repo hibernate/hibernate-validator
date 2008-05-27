@@ -25,7 +25,7 @@
 	<!-- Name of project and version, used to create filenames -->
 	<property name="Name" value="Hibernate Validator"/>
 	<property name="name" value="hibernate-validator"/>
-	<property name="version" value="3.0.0.GA"/>
+	<property name="version" value="3.1.0.CR1"/>
 	<property name="javadoc.packagenames" value="org.hibernate.validator.*"/>
 	<property name="copy.test" value="true"/>
 	<property name="javac.source" value="1.5"/>
@@ -266,6 +266,11 @@
 				<include name="common-build.xml"/>
 			</fileset>
 		</copy>
+        <copy todir="${dist.dir}/ivy" failonerror="false">
+            <fileset dir="${ivy.jar.dir}">
+                <include name="**/*.*"/>
+            </fileset>
+        </copy>
 
         <!-- copy dependencies -->
         <copy todir="${dist.lib.dir}" failonerror="false">
@@ -287,6 +292,11 @@
         <copy todir="${dist.lib.dir}/build" failonerror="false">
 			<fileset file="${lib.dir}/build/*.jar"/>
         </copy>
+
+        <!-- ivy uses the module name without hibernate- (to mimic the directory names). Revert the situation -->
+        <move file="${dist.lib.dir}/commons-annotations.jar" tofile="${dist.lib.dir}/hibernate-commons-annotations.jar"/>
+        <move file="${dist.lib.dir}/test/annotations.jar" tofile="${dist.lib.dir}/test/hibernate-annotations.jar"/>
+        <move file="${dist.lib.dir}/test/entitymanager.jar" tofile="${dist.lib.dir}/test/hibernate-entitymanager.jar"/>
 
         <copy file="${basedir}/build.properties.dist" tofile="${dist.dir}/build.properties" failonerror="false">
 		</copy>
