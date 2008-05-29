@@ -294,9 +294,12 @@
         </copy>
 
         <!-- ivy uses the module name without hibernate- (to mimic the directory names). Revert the situation -->
-        <move file="${dist.lib.dir}/commons-annotations.jar" tofile="${dist.lib.dir}/hibernate-commons-annotations.jar"/>
-        <move file="${dist.lib.dir}/test/annotations.jar" tofile="${dist.lib.dir}/test/hibernate-annotations.jar"/>
-        <move file="${dist.lib.dir}/test/entitymanager.jar" tofile="${dist.lib.dir}/test/hibernate-entitymanager.jar"/>
+        <move file="${dist.lib.dir}/commons-annotations.jar" tofile="${dist.lib.dir}/hibernate-commons-annotations.jar"
+              failonerror="false"/>
+        <move file="${dist.lib.dir}/test/annotations.jar" tofile="${dist.lib.dir}/test/hibernate-annotations.jar"
+              failonerror="false"/>
+        <move file="${dist.lib.dir}/test/entitymanager.jar" tofile="${dist.lib.dir}/test/hibernate-entitymanager.jar"
+              failonerror="false"/>
 
         <copy file="${basedir}/build.properties.dist" tofile="${dist.dir}/build.properties" failonerror="false">
 		</copy>
