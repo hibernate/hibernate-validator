@@ -24,13 +24,14 @@ public class DigitsTest extends HANTestCase {
 		car.insurances = new String[] { "random" };
 		car.length = new BigDecimal(10.2);
 		car.gallons = 100.3;
+		car.mpg = "EFG";
 		ClassValidator<Car> classValidator = new ClassValidator<Car>( Car.class );
 		InvalidValue[] invalidValues = classValidator.getInvalidValues( car );
-		assertEquals( 2, invalidValues.length );
+		assertEquals( 3, invalidValues.length );
 		car.length = new BigDecimal(1.223); //more than 2
 		car.gallons = 10.300; //1 digit really so not invalid
 		invalidValues = classValidator.getInvalidValues( car );
-		assertEquals( 1, invalidValues.length );
+		assertEquals( 2, invalidValues.length );
 	}
 
 	public void testApply() throws Exception {

@@ -24,5 +24,7 @@ public class Car {
 	@Digits(integerDigits = 1, fractionalDigits = 2)
 	public BigDecimal length;
 	@Digits(integerDigits = 2, fractionalDigits = 1)
-	public Double gallons; 
+	public Double gallons;
+	@Digits(integerDigits = 2, fractionalDigits = 1)
+	public String mpg;
 }
