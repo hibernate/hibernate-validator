@@ -36,8 +36,13 @@ public class PastValidator implements Validator<Past>, PropertyConstraint, Seria
 		}
 	}
 
+//  ANSI SQL does not allow the use of current_date on check constraints :(
+//	public void apply(Property property) {
+//		Column col = (Column) property.getColumnIterator().next();
+//		col.setCheckConstraint( col.getName() + " < current_date" );
+//	}
+
+	//TODO Keep it here for ABI compatibility. Should be removed whe moving to Bean Validation
 	public void apply(Property property) {
-		Column col = (Column) property.getColumnIterator().next();
-		col.setCheckConstraint( col.getName() + " < current_date" );
 	}
 }
