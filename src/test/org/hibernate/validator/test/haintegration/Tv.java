@@ -1,4 +1,4 @@
-//$Id: Tv.java 10384 2006-08-31 04:10:44Z epbernard $
+//$Id$
 package org.hibernate.validator.test.haintegration;
 
 import java.util.Date;

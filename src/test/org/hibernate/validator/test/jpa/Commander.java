@@ -1,4 +1,4 @@
-//$Id: $
+//$Id$
 package org.hibernate.validator.test.jpa;
 
 import javax.persistence.Embeddable;

@@ -1,4 +1,4 @@
-//$Id: Address.java 9755 2006-04-17 19:44:22Z epbernard $
+//$Id$
 package org.hibernate.validator.test.haintegration;
 
 import javax.persistence.Entity;

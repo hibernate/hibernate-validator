@@ -1,4 +1,4 @@
-//$Id: $
+//$Id$
 package org.hibernate.validator.test.haintegration;
 
 import org.hibernate.validator.MessageInterpolator;

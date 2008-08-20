@@ -1,4 +1,4 @@
-//$Id: $
+//$Id$
 package org.hibernate.validator.event;
 
 import java.lang.ref.WeakReference;

@@ -1,4 +1,4 @@
-//$Id: VenusianPk.java 7797 2005-08-10 10:40:48Z epbernard $
+//$Id$
 package org.hibernate.validator.test.haintegration;
 
 import java.io.Serializable;

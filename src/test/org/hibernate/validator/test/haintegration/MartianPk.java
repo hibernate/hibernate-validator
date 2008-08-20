@@ -1,4 +1,4 @@
-//$Id: MartianPk.java 8593 2005-11-17 18:12:11Z epbernard $
+//$Id$
 package org.hibernate.validator.test.haintegration;
 
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-//$Id: $
+//$Id$
 package org.hibernate.validator.test;
 
 import org.hibernate.validator.Patterns;

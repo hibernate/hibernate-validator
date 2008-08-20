@@ -1,4 +1,4 @@
-//$Id: $
+//$Id$
 package org.hibernate.validator.test.collections;
 
 import org.hibernate.validator.NotNull;
