@@ -1,6 +1,16 @@
 Hibernate Validator Changelog
 =============================
 
+3.1.0.CR2 (20-08-2008)
+----------------------
+
+** Bug
+    * [HV-15] - @Past validation annotation generates incorrect DDL for Oracle 8.x
+    * [HV-53] - AssertTrue and AssertFalse not compatible with null values
+    * [HV-65] - @Past cannot use current_date as per the ANSI SQL spec
+    * [HV-66] - 3.1.0.CR1 incompatible with Hibernate 3.3.0
+
+
 3.1.0.CR1 (27-05-2008)
 ----------------------
 

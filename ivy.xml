@@ -14,8 +14,8 @@
     <dependencies>
         <!-- compile time dependencies -->
         <dependency name="ejb3-persistence" rev="1.0.2.GA" conf="default->default"/>
-        <dependency name="commons-annotations" rev="3.1.0.CR1" conf="default->default"/>
-        <dependency org="org.hibernate" name="hibernate-core" rev="3.3.0.CR1" conf="default->default"/>
+        <dependency name="commons-annotations" rev="3.1.0.GA" conf="default->default"/>                        
+        <dependency org="org.hibernate" name="hibernate-core" rev="3.3.0.SP1" conf="default->default"/>
         <dependency org="org.slf4j" name="slf4j-api" rev="1.4.2" conf="default->default"/>
 
         <!-- transitive dependencies -->
@@ -26,7 +26,7 @@
         <!-- test deps -->
         <dependency name="annotations" rev="3.4.0.CR1" conf="test->default"/>
         <dependency name="entitymanager" rev="3.4.0.CR1" conf="test->default"/>
-        <dependency org="cglib" name="cglib" rev="2.1_3" conf="test->default"/>
+        <dependency org="javassist" name="javassist" rev="3.4.GA" conf="default->default"/>
         <dependency org="asm" name="asm" rev="1.5.3" conf="test->default"/>
         <dependency org="asm" name="asm-attrs" rev="1.5.3" conf="test->default"/>
         <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.4.2" conf="test->default"/>
