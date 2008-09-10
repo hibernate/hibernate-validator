@@ -25,7 +25,7 @@
 	<!-- Name of project and version, used to create filenames -->
 	<property name="Name" value="Hibernate Validator"/>
 	<property name="name" value="hibernate-validator"/>
-	<property name="version" value="3.1.0.CR2"/>
+	<property name="version" value="3.1.0.GA"/>
 	<property name="javadoc.packagenames" value="org.hibernate.validator.*"/>
 	<property name="copy.test" value="true"/>
 	<property name="javac.source" value="1.5"/>
