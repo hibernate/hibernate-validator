@@ -1,0 +1,57 @@
+Hibernate Validator Changelog
+=============================
+
+3.1.0.GA (10-09-2008)
+----------------------
+
+
+3.1.0.CR2 (20-08-2008)
+----------------------
+
+** Bug
+    * [HV-15] - @Past validation annotation generates incorrect DDL for Oracle 8.x
+    * [HV-53] - AssertTrue and AssertFalse not compatible with null values
+    * [HV-65] - @Past cannot use current_date as per the ANSI SQL spec
+    * [HV-66] - 3.1.0.CR1 incompatible with Hibernate 3.3.0
+
+
+3.1.0.CR1 (27-05-2008)
+----------------------
+
+** Bug
+    * [HV-14] - Minor typo in regular expression in class EmailValidator
+    * [HV-48] - There is no DefaultValidatorMessage_en leading to no message loaded when locale is explicit and the system default is not en
+
+
+** Improvement
+    * [HV-57] - Move to slf4j
+
+** New Feature
+    * [HV-54] - Add pom
+    * [HV-55] - Make build independent of Hibernate Core structure
+    * [HV-56] - Move to Hibernate Core 3.3
+
+** Patch
+    * [HV-36] - DefaultValidatorMessages_ja.properties
+
+
+3.0.0.GA (19-03-2007)
+---------------------
+
+Initial release as a standalone product (see Hibernate Annotations changelog for previous informations)
+
+** Bug
+    * [HV-2] - Deprecate String support for both @Past and @Future validating Strings
+    * [HV-3] - @Email fail on empty strings
+    * [HV-7] - Two level @Valid annotation doesn't work
+
+
+** Improvement
+    * [HV-5] - Multiple validators of the same type per element (John Gilbert)
+
+** New Feature
+    * [HV-1] - Make ClassValidator independent of Hibernate Annotations
+    * [HV-6] - @EAN
+    * [HV-8] - Make Validator support pure JavaPersistence players
+    * [HV-9] - @Digits(integerDigits, fractionalDigits)
+    * [HV-10] - @CreditCardNumber for Hibernate Validator
