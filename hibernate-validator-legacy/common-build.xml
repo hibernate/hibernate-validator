@@ -11,10 +11,13 @@
     <property file="${common-build.basedir}/build.properties"/>
     <property file="${user.home}/.ant.properties"/>
 
-    <property name="src.dir" location="src/java"/>
-    <property name="test.dir" location="src/test"/>
+    <property name="src.dir" location="src/main/java"/>
+    <property name="resources.dir" location="src/main/resources"/>
+    <property name="test.dir" location="src/test/java"/>
+    <property name="test.resources.dir" location="src/test/resources"/>
     <property name="lib.dir" location="lib"/>
-    <property name="build.dir" location="build"/>
+    <property name="build.dir" location="target"/>
+    <property name="test.output" location="${build.dir}/test-reports"/>
     <property name="classes.dir" location="${build.dir}/classes"/>
     <property name="testclasses.dir" location="${build.dir}/testclasses"/>   
 	<property name="dist.target.dir" location="target"/>
@@ -44,7 +47,7 @@
     <property name="src.jar" value="${build.dir}/src.jar"/>
 
     <!-- build related properties -->
-    <property name="build.lib.dir" value="${lib.dir}/build"/>
+    <property name="build.lib.dir" value="${lib.dir}/target"/>
 
 	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath>
@@ -123,6 +126,7 @@
      
      <path id="testsrc.path">
 		<pathelement location="${test.dir}"/>
+        <pathelement location="${test.resources.dir}"/> 
 	</path>	
     
     <!-- Clover -->     
@@ -188,25 +192,7 @@
         </copy>
     </target>
 
-    <target name="compile" depends="init" description="Compile the Java source code">
-        <available
-            classname="org.eclipse.core.launcher.Main"
-            property="build.compiler"
-            value="org.eclipse.jdt.core.JDTCompilerAdapter"
-            classpath="${java.class.path}"/>
-        <javac
-        	target="${javac.target}"
-            source="${javac.source}"
-            srcdir="${src.dir}"
-            destdir="${classes.dir}"
-            classpathref="lib.class.path"
-            debug="${javac.debug}"
-            optimize="${javac.optimize}"
-            nowarn="on">
-        </javac>
-    </target>
-
-	<target name="compiletest" depends="compile" description="Compile the tests">
+	<target name="compiletest" depends="compile,get.deps.test,test-resources" description="Compile the tests">
 		<available
 			classname="org.eclipse.core.launcher.Main"
 			property="build.compiler"
@@ -223,6 +209,26 @@
 			<src refid="testsrc.path"/>
 		</javac>
 	</target>
+
+    <target name="test-resources" description="Copies test resources">
+            <mkdir dir="${testclasses.dir}"/>
+            <copy todir="${testclasses.dir}" overwrite="true">
+                    <fileset dir="${test.resources.dir}">
+                            <include name="*.properties"/>
+                            <include name="*.xml"/>
+                    </fileset>
+            </copy>
+    </target>
+
+    <target name="resources" description="Copies resources">
+            <mkdir dir="${classes.dir}"/>
+            <copy todir="${classes.dir}" overwrite="true">
+                    <fileset dir="${resources.dir}">
+                            <include name="**/*.properties"/>
+                            <include name="**/*.xml"/>
+                    </fileset>
+            </copy>
+    </target>
 
     <target name="instrument" depends="compiletest"
 			description="Instrument the persistent classes"> <!-- depends="jar" -->
@@ -241,14 +247,6 @@
 				<exclude name="**/*Tests.class"/>
 			</fileset>
 		</instrument>
-
-		<!-- jar jarfile="${build.dir}/instrumented-classes.jar">
-			<fileset dir="${testclasses.dir}">
-				<include name="org/hibernate/test/**/*.class"/>
-				<exclude name="org/hibernate/test/**/*Test.class"/>
-			</fileset>
-		</jar -->
-
 	</target>
 
     <target name="copytest" description="Copy tests to dist dir" if="copy.test" >
@@ -303,7 +301,7 @@
     <target name="jar" depends="compile" description="Build the distribution .jar file">
         <mkdir dir="${dist.dir}"/>
         <jar filesetmanifest="merge" jarfile="${jar.file.name}" basedir="${classes.dir}"/>
-    </target>
+    </target>    
 
     <target name="jartest" depends="compiletest" description="Build the distribution .jar file">
         <mkdir dir="${dist.dir}"/>
@@ -330,8 +328,6 @@
 		      <include name="**/*" />
 		    </packageset>
         </javadoc>
-
-
     </target>
 
 
@@ -377,12 +373,12 @@
     </target>
 
     <target name="junit" depends="compiletest">
-        <mkdir dir="test_output"/>
+        <mkdir dir="${test.output}"/>
         <junit printsummary="yes" haltonfailure="yes" forkmode="once">
             <classpath refid="junit.classpath"/>
             <formatter type="plain"/>
             <formatter type="xml"/>
-            <batchtest fork="yes" todir="test_output" haltonfailure="no">
+            <batchtest fork="yes" todir="${test.output}" haltonfailure="no">
             	<fileset refid="junit.batchtestset"/>
             </batchtest>
         </junit>
@@ -390,12 +386,12 @@
 
 	<!-- Run a single unit test. -->
 	<target name="junitsingle" depends="compiletest" description="Run a single test suite (requires testname and jdbc.driver properties)">
-		<mkdir dir="test_output"/>
+		<mkdir dir="${test.output}"/>
 		<junit printsummary="yes" fork="yes" haltonfailure="yes">
 			<classpath refid="junit.classpath"/>
 			<formatter type="plain"/>
 			<formatter type="xml"/>
-			<test fork="yes" todir="test_output" haltonfailure="no" name="${testname}"/>
+			<test fork="yes" todir="${test.output}" haltonfailure="no" name="${testname}"/>
 		</junit>
 	</target>
 
@@ -416,11 +412,11 @@
 	</target>
 
     <target name="junitreport" depends="">
-        <junitreport todir="./test_output">
-            <fileset dir="test_output">
+        <junitreport todir="${test.output}">
+            <fileset dir="${test.output}">
                 <include name="TEST-*.xml"/>
             </fileset>
-            <report format="frames" todir="./test_output"/>
+            <report format="frames" todir="./${test.output}"/>
         </junitreport>
     </target>
 
@@ -432,7 +428,6 @@
 		</java>
 	</target>
 
- 
     <target name="checkstyle" description="Check coding style">
            <taskdef resource="checkstyletask.properties">
                 <classpath>
@@ -444,7 +439,7 @@
             </taskdef>
 
         <checkstyle config="${common-build.basedir}/checkstyle_checks.xml">
-			<fileset dir="${src.dir}">
+			<fileset dir="src/main/java">
 				<include name="**/*.java"/>
 			</fileset>
 			<formatter type="plain"/>

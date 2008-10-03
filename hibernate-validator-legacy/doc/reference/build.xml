@@ -1,7 +1,7 @@
 <project name="Documentation" default="all.doc" basedir=".">
 
     <!-- Use the core Hibernate3 doc build system -->
-    <import file="../../common-build.xml"/>
+    <!--import file="../../common-build.xml"/-->
     <import file="docbook-common-build.xml"/>
 
 

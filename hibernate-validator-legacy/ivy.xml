@@ -24,8 +24,8 @@
         <dependency org="dom4j" name="dom4j" rev="1.6.1" conf="test->default"/>
 
         <!-- test deps -->
-        <dependency name="annotations" rev="3.4.0.CR1" conf="test->default"/>
-        <dependency name="entitymanager" rev="3.4.0.CR1" conf="test->default"/>
+        <dependency name="annotations" rev="3.4.0.GA" conf="test->default"/>
+        <dependency name="entitymanager" rev="3.4.0.GA" conf="test->default"/>
         <dependency org="javassist" name="javassist" rev="3.4.GA" conf="default->default"/>
         <dependency org="asm" name="asm" rev="1.5.3" conf="test->default"/>
         <dependency org="asm" name="asm-attrs" rev="1.5.3" conf="test->default"/>
