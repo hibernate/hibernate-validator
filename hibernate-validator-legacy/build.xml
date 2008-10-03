@@ -148,13 +148,6 @@
             <attribute name="Implementation-URL" value="http://validator.hibernate.org"/>
         </manifest>
         <antcall target="common-build.jar"/>
-        <ivy:resolve conf="default"/>
-        <ivy:publish artifactspattern="${dist.dir}/[artifact].[ext]"
-                     resolver="local"
-                     pubrevision="latest"
-                     pubdate="${now}"
-                     status="integration"
-                />
     </target>
 
     <!-- Some of this can probably be moved to common-build... -->

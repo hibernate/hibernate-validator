@@ -48,6 +48,7 @@
     <modules>
         <module>validation-api</module>
         <module>hibernate-validator</module>
+        <module>hibernate-validator-legacy</module>
     </modules>
 
     <dependencyManagement>

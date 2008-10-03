@@ -16,11 +16,11 @@
     <property name="test.dir" location="src/test/java"/>
     <property name="test.resources.dir" location="src/test/resources"/>
     <property name="lib.dir" location="lib"/>
-    <property name="build.dir" location="target"/>
+    <property name="build.dir" location="${basedir}/target"/>
     <property name="test.output" location="${build.dir}/test-reports"/>
     <property name="classes.dir" location="${build.dir}/classes"/>
     <property name="testclasses.dir" location="${build.dir}/testclasses"/>   
-	<property name="dist.target.dir" location="target"/>
+	<property name="dist.target.dir" location="${basedir}/target"/>
     <property name="dist.dir" location="${dist.target.dir}/${name}"/>
     <property name="instrumenttest.out.dir" value="instrumenttestout"/>
     <property name="doc.dir" location="doc"/>
