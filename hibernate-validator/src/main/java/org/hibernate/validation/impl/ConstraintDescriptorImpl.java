@@ -82,6 +82,11 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 		return parameters;
 	}
 
+	public Set<ConstraintDescriptor> getComposingConstraints() {
+		//FIXME implement
+		return Collections.emptySet();
+	}
+
 	private Map<String, Object> getAnnotationParameters(Annotation annotation) {
 		Method[] declaredMethods = annotation.annotationType().getDeclaredMethods();
 		Map<String, Object> parameters = new HashMap<String, Object>( declaredMethods.length );
