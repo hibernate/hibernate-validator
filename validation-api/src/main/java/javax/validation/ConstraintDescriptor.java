@@ -29,6 +29,10 @@ import java.util.Set;
  */
 public interface ConstraintDescriptor {
 	/**
+	 * Returns the annotation describing the constraint declaration.
+	 * If a composing constraint, parameter values are reflecting
+	 * the overridden parameters form the main constraint
+	 *
 	 * @return The annotation for this constraint.
 	 */
 	Annotation getAnnotation();
@@ -44,8 +48,22 @@ public interface ConstraintDescriptor {
 	Constraint getConstraintImplementation();
 
 	/**
+	 * Returns a map containing the annotation paramter names as keys and the annotation parameter values
+	 * as value.
+	 * If a composing constraint, parameter values are reflecting
+	 * the overridden parameters form the main constraint
+	 *
 	 * @return Returns a map containing the annotation paramter names as keys and the annotation parameter values
 	 *         as value.
 	 */
 	Map<String, Object> getParameters();
+
+	/**
+	 * Return a set of ConstraintDescriptors. Each ConstraintDescriptor describes a composing
+	 * constraint. ConstraintDescriptor instances of composing constraints reflect overridden
+	 * parameter values in #getParameters() and #getAnnotation() 
+	 *
+	 * @return a set of ConstraintDescriptor object or an empty set
+	 */
+	Set<ConstraintDescriptor> getComposingConstraints();
 }
