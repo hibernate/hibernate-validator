@@ -1,6 +1,11 @@
 package javax.validation;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Target;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.FIELD;
 
 /**
  * Mark a parameter as overriding the parameter of a composing constraint.
@@ -8,6 +13,7 @@ import java.lang.annotation.Annotation;
  *
  * @author Emmanuel Bernard
  */
+@Retention(RUNTIME)
 public @interface OverridesParameter {
 	/**
 	 * constraint type the parameter is overriding
@@ -15,7 +21,8 @@ public @interface OverridesParameter {
 	Class<? extends Annotation> constraint();
 
 	/**
-	 * name of constraint parameter overridden  
+	 * name of constraint parameter overridden
+	 * Defaults to the name of the parameter hosting the annotation  
 	 */
 	String parameter();
 

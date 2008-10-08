@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
+import javax.validation.ReportAsSingleInvalidConstraint;
 
 /**
  * Describe a single constraint.
@@ -36,10 +37,11 @@ import javax.validation.ValidationException;
  * @author Emmanuel Bernard
  */
 public class ConstraintDescriptorImpl implements ConstraintDescriptor {
-	private Annotation annotation;
-	private Constraint constraintImplementation;
-	private Set<String> contexts;
-	private Map<String, Object> parameters;
+	private final Annotation annotation;
+	private final Constraint constraintImplementation;
+	private final Set<String> contexts;
+	private final Map<String, Object> parameters;
+	private final boolean isReportAsSingleInvalidConstraint;
 
 
 	public ConstraintDescriptorImpl(Annotation annotation, String[] contexts, Constraint validator) {
@@ -51,6 +53,9 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 		this.contexts.addAll( Arrays.asList( contexts ) );
 		this.constraintImplementation = validator;
 		this.parameters = getAnnotationParameters( annotation );
+		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
+				ReportAsSingleInvalidConstraint.class
+		);
 	}
 
 	/**
@@ -85,6 +90,10 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	public Set<ConstraintDescriptor> getComposingConstraints() {
 		//FIXME implement
 		return Collections.emptySet();
+	}
+
+	public boolean isReportAsSingleInvalidConstraint() {
+		return isReportAsSingleInvalidConstraint;
 	}
 
 	private Map<String, Object> getAnnotationParameters(Annotation annotation) {

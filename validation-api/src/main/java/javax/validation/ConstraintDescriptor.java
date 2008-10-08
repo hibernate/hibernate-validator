@@ -31,7 +31,7 @@ public interface ConstraintDescriptor {
 	/**
 	 * Returns the annotation describing the constraint declaration.
 	 * If a composing constraint, parameter values are reflecting
-	 * the overridden parameters form the main constraint
+	 * the overridden parameters from the main constraint
 	 *
 	 * @return The annotation for this constraint.
 	 */
@@ -66,4 +66,9 @@ public interface ConstraintDescriptor {
 	 * @return a set of ConstraintDescriptor object or an empty set
 	 */
 	Set<ConstraintDescriptor> getComposingConstraints();
+
+	/**
+	 * @return true if the constraint is annotated with @ReportAsSingleInvalidConstraint
+	 */
+	boolean isReportAsSingleInvalidConstraint();
 }
