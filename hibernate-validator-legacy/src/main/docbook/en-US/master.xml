@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+  ~ indicated by the @author tags or express copyright attribution
+  ~ statements applied by the authors.  All third-party contributions are
+  ~ distributed under license by Red Hat Middleware LLC.
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use, modify,
+  ~ copy, or redistribute it subject to the terms and conditions of the GNU
+  ~ Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this distribution; if not, write to:
+  ~ Free Software Foundation, Inc.
+  ~ 51 Franklin Street, Fifth Floor
+  ~ Boston, MA  02110-1301  USA
+  -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+        <!ENTITY versionNumber "3.1.0.GA">
+        <!ENTITY copyrightYear "2004">
+        <!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
+]>
+
+<book lang="en">
+    <bookinfo>
+        <title>Hibernate Validator</title>
+        <subtitle>Reference Guide</subtitle>
+        <releaseinfo>&versionNumber;</releaseinfo>
+        <productnumber>&versionNumber;</productnumber>
+        <issuenum>1</issuenum>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/hibernate_logo_a.png" format="png" />
+          </imageobject>
+        </mediaobject> 
+        <copyright>
+            <year>&copyrightYear;</year>
+            <holder>&copyrightHolder;</holder>
+        </copyright>
+        <!-- include translators... -->
+    </bookinfo>
+
+  <toc/>
+
+  <preface id="preface" revision="2">
+    <title>Preface</title>
+
+    <para>Annotations are a very convenient and elegant way to specify
+    invariant constraints for a domain model. You can, for example, express
+    that a property should never be null, that the account balance should be
+    strictly positive, etc. These domain model constraints are declared in the
+    bean itself by annotating its properties. A validator can then read them
+    and check for constraint violations. The validation mechanism can be
+    executed in different layers in your application without having to
+    duplicate any of these rules (presentation layer, data access layer).
+    Following the DRY principle, Hibernate Validator has been designed for
+    that purpose.</para>
+
+    <para>Hibernate Validator works at two levels. First, it is able to check
+    in-memory instances of a class for constraint violations. Second, it can
+    apply the constraints to the Hibernate metamodel and incorporate them into
+    the generated database schema.</para>
+
+    <para>Each constraint annotation is associated to a validator
+    implementation responsible for checking the constraint on the entity
+    instance. A validator can also (optionally) apply the constraint to the
+    Hibernate metamodel, allowing Hibernate to generate DDL that expresses the
+    constraint. With the appropriate event listener, you can execute the
+    checking operation on inserts and updates done by Hibernate. Hibernate
+    Validator is not limited to use with Hibernate. You can easily use it
+    anywhere in your application as well as with any Java Persistence provider
+    (entity listener provided).</para>
+
+    <para>When checking instances at runtime, Hibernate Validator returns
+    information about constraint violations in an array of
+    <classname>InvalidValue</classname> s. Among other information, the
+    <classname>InvalidValue</classname> contains an error description message
+    that can embed the parameter values bundle with the annotation (eg. length
+    limit), and message strings that may be externalized to a
+    <classname>ResourceBundle</classname> .</para>
+  </preface>
+
+  <xi:include href="modules/defineconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/checkconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</book>

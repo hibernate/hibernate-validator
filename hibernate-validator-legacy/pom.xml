@@ -1,15 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>hibernate-validator-legacy</artifactId>
     <packaging>jar</packaging>
     <name>Hibernate Validator (legacy)</name>
@@ -27,6 +25,7 @@
     <scm>
         <url>http://anonhibernate.labs.jboss.com/trunk/HibernateExt/validator</url>
     </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -43,7 +42,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.4.2</version>
         </dependency>
-
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>ejb3-persistence</artifactId>
@@ -62,7 +60,6 @@
             <version>3.4.0.GA</version>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
@@ -81,7 +78,7 @@
             <version>1.5.3</version>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.4.2</version>
@@ -93,7 +90,7 @@
             <version>1.2.14</version>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
@@ -111,6 +108,95 @@
             <version>1.8.0.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>dist</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dist.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>                            
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-javadoc</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jboss.maven.plugins</groupId>
+                        <artifactId>maven-jdocbook-plugin</artifactId>
+                        <version>2.1.0</version>
+                        <extensions>true</extensions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.hibernate</groupId>
+                                <artifactId>hibernate-jdocbook-style</artifactId>
+                                <version>1.0.2</version>
+                                <type>jdocbook-style</type>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <sourceDocumentName>master.xml</sourceDocumentName>
+                            <sourceDirectory>${basedir}/src/main/docbook/en-US</sourceDirectory>
+                            <masterTranslation>en-US</masterTranslation>
+                            <imageResource>
+                                <directory>${basedir}/src/main/docbook/en-US/images</directory>
+                            </imageResource>
+                            <formats>
+                                <format>
+                                    <formatName>pdf</formatName>
+                                    <stylesheetResource>classpath:/xslt/hibernate/pdf/main-pdf.xsl</stylesheetResource>
+                                    <finalName>hibernate-validator-legacy-guide.pdf</finalName>
+                                </format>
+                                <format>
+                                    <formatName>html_single</formatName>
+                                    <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl
+                                    </stylesheetResource>
+                                    <finalName>index.html</finalName>
+                                </format>
+                                <format>
+                                    <formatName>html</formatName>
+                                    <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl
+                                    </stylesheetResource>
+                                    <finalName>index.html</finalName>
+                                </format>
+                            </formats>
+                            <options>
+                                <xincludeSupported>true</xincludeSupported>
+                                <localeSeparator>-</localeSeparator>
+                                <useRelativeImageUris>true</useRelativeImageUris>
+                            </options>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-doc</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>resources</goal>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
