@@ -28,18 +28,14 @@
 
     <dependencySets>
         <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/dist/lib/runtime</outputDirectory>
             <scope>runtime</scope>
-            <excludes>
-                <exclude>org.hibernate:hibernate-validator-legacy</exclude>
-            </excludes>
         </dependencySet>
         <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/dist/lib/test</outputDirectory>
             <scope>test</scope>
-            <excludes>
-                <exclude>org.hibernate:hibernate-validator-legacy</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
 
