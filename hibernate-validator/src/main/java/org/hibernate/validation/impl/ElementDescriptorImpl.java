@@ -33,15 +33,13 @@ import javax.validation.ElementDescriptor;
  * @todo Handle problem in descirbing cyclic dependecies for propertyPath
  */
 public class ElementDescriptorImpl implements ElementDescriptor {
-	private final ElementType elementType;
 	private final Class returnType;
 	private final boolean cascaded;
 	private final List<ConstraintDescriptor> constraintDescriptors = new ArrayList<ConstraintDescriptor>();
 	private final String propertyPath;
 
 
-	public ElementDescriptorImpl(ElementType elementType, Class returnType, boolean cascaded, String propertyPath) {
-		this.elementType = elementType;
+	public ElementDescriptorImpl(Class returnType, boolean cascaded, String propertyPath) {
 		this.returnType = returnType;
 		this.cascaded = cascaded;
 		this.propertyPath = propertyPath;
@@ -53,17 +51,10 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 
 	/**
 	 * {@inheritDoc}
-	 */
-	public ElementType getElementType() {
-		return elementType;
-	}
-
-	/**
-	 * {@inheritDoc}
 	 *
 	 * @todo Generic type or regular type?
 	 */
-	public Class getReturnType() {
+	public Class getType() {
 		return returnType;
 	}
 

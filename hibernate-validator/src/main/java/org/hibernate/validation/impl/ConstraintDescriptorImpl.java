@@ -39,12 +39,12 @@ import javax.validation.ReportAsSingleInvalidConstraint;
 public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	private final Annotation annotation;
 	private final Constraint constraintImplementation;
+	private final Class<? extends Constraint> constraintClass;
 	private final Set<String> contexts;
 	private final Map<String, Object> parameters;
 	private final boolean isReportAsSingleInvalidConstraint;
 
-
-	public ConstraintDescriptorImpl(Annotation annotation, String[] contexts, Constraint validator) {
+	public ConstraintDescriptorImpl(Annotation annotation, String[] contexts, Constraint validator, Class<? extends Constraint> constraintClass) {
 		this.annotation = annotation;
 		if ( contexts.length == 0 ) {
 			contexts = new String[] { "default" };
@@ -56,6 +56,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
 				ReportAsSingleInvalidConstraint.class
 		);
+		this.constraintClass = constraintClass;
 	}
 
 	/**
@@ -72,12 +73,17 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 		return contexts;
 	}
 
+	public Class<? extends Constraint> getContstraintClass() {
+		return constraintClass;
+	}
+
 	public boolean isInGroups(String group) {
 		return contexts.contains( group );
 	}
 
 	/**
 	 * Return the constraint implementation routine
+	 * //FIXME should we get rid of that and call the ConstraintFactory each time??
 	 */
 	public Constraint getConstraintImplementation() {
 		return constraintImplementation;

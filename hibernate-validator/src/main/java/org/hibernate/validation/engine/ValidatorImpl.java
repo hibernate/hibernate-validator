@@ -173,7 +173,8 @@ public class ValidatorImpl<T> implements Validator<T> {
 				continue;
 			}
 
-			Object value = metaData.getValue( context.peekValidatedObject() );
+			final Object leafBeanInstance = context.peekValidatedObject();
+			Object value = metaData.getValue( leafBeanInstance );
 			ContextImpl contextImpl = new ContextImpl(constraintDescriptor);
 
 			if ( !constraintDescriptor.getConstraintImplementation().isValid( value, contextImpl ) ) {
@@ -181,12 +182,13 @@ public class ValidatorImpl<T> implements Validator<T> {
 					String message = messageResolver.interpolate(
 							error.getMessage(),
 							constraintDescriptor,
-							context.peekValidatedObject()
+							leafBeanInstance
 					);
 					InvalidConstraintImpl<T> failingConstraint = new InvalidConstraintImpl<T>(
 							message,
 							context.getRootBean(),
 							metaDataProvider.getBeanClass(),
+							leafBeanInstance,
 							value,
 							context.peekPropertyPath(), //FIXME use error.getProperty()
 							context.getCurrentGroup()
@@ -319,6 +321,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 								message,
 								object,
 								( Class<T> ) object.getClass(),
+								object,
 								wrapper.value,
 								propertyIter.getOriginalProperty(), //FIXME use error.getProperty()
 								group
@@ -378,6 +381,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 						);
 						InvalidConstraintImpl<T> failingConstraint = new InvalidConstraintImpl<T>(
 								message,
+								null,
 								null,
 								null,
 								object,
@@ -507,7 +511,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 		return metaDataProvider.getConstraintMetaDataList().size() > 0;
 	}
 
-	public ElementDescriptor getBeanConstraints() {
+	public ElementDescriptor getConstraintsForBean() {
 		return metaDataProvider.getBeanDescriptor();
 	}
 

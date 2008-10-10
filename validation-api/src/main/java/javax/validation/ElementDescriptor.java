@@ -27,17 +27,13 @@ import java.util.List;
  * @author Hardy Ferentschik
  */
 public interface ElementDescriptor {
-	/**
-	 * @return The element type.
-	 */
-	ElementType getElementType();
 
 	/**
 	 * @return Statically defined returned type.
 	 *
 	 * @todo should it be Type or even completly removed
 	 */
-	Class getReturnType();
+	Class getType();
 
 	/**
 	 * @return Returns <code>true</code> if the association is cascaded, <code>false</code> otherwise.

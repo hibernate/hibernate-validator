@@ -39,6 +39,21 @@ public interface InvalidConstraint<T> {
 	T getRootBean();
 
 	/**
+	 * If a bean constraint, the bean instance the constraint is applied on
+	 * If a property constraint, the bean instance hosting the property the constraint is applied on
+	 * 
+	 * @return the leaf bean the constraint is applied on or null if Validator#validateValue is used
+	 */
+	Object getLeafBean();
+
+	/**
+	 * @return the property path to the value from <code>rootBean</code>
+	 *         <code>null</code> if the value is the <code>rootBean<code> itself.
+	 */
+	String getPropertyPath();
+
+
+	/**
 	 * @return the bean type being validated.
 	 */
 	Class<T> getBeanClass();
@@ -49,14 +64,10 @@ public interface InvalidConstraint<T> {
 	Object getValue();
 
 	/**
-	 * @return the property path to the value from <code>rootBean</code>
-	 *         <code>null</code> if the value is the <code>rootBean<code> itself.
-	 */
-	String getPropertyPath();
-
-	/**
 	 * @return the list of groups that the triggered constraint applies on and which also are
 	 *         within the list of groups requested for validation.
+	 *
+	 * TODO: considering removal, if you think it's important, speak up
 	 */
 	Set<String> getGroups();
 }

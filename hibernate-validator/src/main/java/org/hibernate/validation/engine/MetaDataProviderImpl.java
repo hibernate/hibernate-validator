@@ -108,7 +108,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	 * for this validator and create meta data.
 	 */
 	private void createMetaData() {
-		beanDescriptor = new ElementDescriptorImpl( ElementType.TYPE, beanClass, false, "" );
+		beanDescriptor = new ElementDescriptorImpl( beanClass, false, "" );
 		List<Class> classes = new ArrayList<Class>();
 		computeClassHierarchy( beanClass, classes );
 		for ( Class current : classes ) {
@@ -286,7 +286,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 			throw new ValidationException( "Unable to intialize " + constraintValidator.value(), e );
 		}
 
-		return new ConstraintDescriptorImpl( annotation, groups, constraint );
+		return new ConstraintDescriptorImpl( annotation, groups, constraint, constraintValidator.value() );
 	}
 
 	private <A extends Annotation> String getMessage(A annotation) {
@@ -387,7 +387,6 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 			ElementDescriptorImpl elementDescriptor = ( ElementDescriptorImpl ) propertyDescriptors.get( methodName );
 			if ( elementDescriptor == null ) {
 				elementDescriptor = new ElementDescriptorImpl(
-						ElementType.METHOD,
 						method.getReturnType(),
 						method.isAnnotationPresent( Valid.class ),
 						methodName
@@ -420,7 +419,6 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 			ElementDescriptorImpl elementDescriptor = ( ElementDescriptorImpl ) propertyDescriptors.get( fieldName );
 			if ( elementDescriptor == null ) {
 				elementDescriptor = new ElementDescriptorImpl(
-						ElementType.FIELD,
 						field.getType(),
 						field.isAnnotationPresent( Valid.class ),
 						fieldName

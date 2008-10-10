@@ -43,9 +43,9 @@ public interface ConstraintDescriptor {
 	Set<String> getGroups();
 
 	/**
-	 * @return The actual constraint implementation.
+	 * @return the constraint implementation class
 	 */
-	Constraint getConstraintImplementation();
+	Class<? extends Constraint> getContstraintClass();
 
 	/**
 	 * Returns a map containing the annotation paramter names as keys and the annotation parameter values

@@ -32,9 +32,10 @@ public class InvalidConstraintImpl<T> implements InvalidConstraint<T> {
 	private Object value;
 	private String propertyPath;
 	private HashSet<String> groups;
+	private Object leafBeanInstance;
 
 
-	public InvalidConstraintImpl(String message, T rootBean, Class<T> beanClass, Object value, String propertyPath, String group) {
+	public InvalidConstraintImpl(String message, T rootBean, Class<T> beanClass, Object leafBeanInstance, Object value, String propertyPath, String group) {
 		this.message = message;
 		this.rootBean = rootBean;
 		this.beanClass = beanClass;
@@ -42,6 +43,7 @@ public class InvalidConstraintImpl<T> implements InvalidConstraint<T> {
 		this.propertyPath = propertyPath;
 		groups = new HashSet<String>();
 		groups.add( group );
+		this.leafBeanInstance = leafBeanInstance;
 	}
 
 	/**
@@ -56,6 +58,10 @@ public class InvalidConstraintImpl<T> implements InvalidConstraint<T> {
 	 */
 	public T getRootBean() {
 		return rootBean;
+	}
+
+	public Object getLeafBean() {
+		return leafBeanInstance;
 	}
 
 	/**
