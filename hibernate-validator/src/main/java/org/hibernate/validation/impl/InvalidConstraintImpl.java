@@ -92,11 +92,6 @@ public class InvalidConstraintImpl<T> implements InvalidConstraint<T> {
 		return groups;
 	}
 
-	public void addParent(T parentBean, String parentProperty) {
-		this.propertyPath = parentProperty + "." + propertyPath;
-		this.rootBean = parentBean;
-	}
-
 	public void addGroups(Set<String> groupSet) {
 		groups.addAll( groupSet );
 	}

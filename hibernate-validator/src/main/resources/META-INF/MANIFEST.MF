@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: ${user.name}
+Build-Jdk: ${java.version}
+Implementation-Title: ${pom.artifactId}
+Implementation-Vendor: ${pom.groupId}
+Implementation-Vendor-Id: ${pom.groupId}
+Implementation-Version: ${pom.version}
+Specification-Title: Bean Validation

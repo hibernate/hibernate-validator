@@ -14,8 +14,8 @@
     <name>Hibernate Validator</name>
     <distributionManagement>
         <site>
-          <id>local</id>
-          <url>file:///Users/hardy/Sites/${artifactId}</url>
+            <id>local</id>
+            <url>file:///Users/hardy/Sites/${artifactId}</url>
         </site>
     </distributionManagement>
     <dependencies>
@@ -34,13 +34,17 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
 </project>

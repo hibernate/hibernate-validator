@@ -36,6 +36,7 @@ import javax.validation.MessageResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validation.Version;
+import org.hibernate.validation.ValidatorConstants;
 import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 import org.hibernate.validation.impl.ConstraintFactoryImpl;
 import org.hibernate.validation.impl.InvalidConstraintImpl;
@@ -52,14 +53,7 @@ import org.hibernate.validation.util.PropertyIterator;
  */
 public class ValidatorImpl<T> implements Validator<T> {
 
-	/**
-	 * The default group/sequence name when no group parameter is passed to validate().
-	 *
-	 * @todo Is it correct to use this default string and if so is this the correct place to define it?
-	 */
-	private static final String DEFAULT_GROUP_NAME = "default";
-
-	private static final Set<Class> INDEXABLE_CLASS = new HashSet<Class>();
+    private static final Set<Class> INDEXABLE_CLASS = new HashSet<Class>();
 
 	static {
 		INDEXABLE_CLASS.add( Integer.class );
@@ -135,7 +129,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 
 		// if no group is specified use the default
 		if ( groups.size() == 0 ) {
-			groups = Arrays.asList( DEFAULT_GROUP_NAME );
+			groups = Arrays.asList( ValidatorConstants.DEFAULT_GROUP_NAME );
 		}
 
 		List<String> expandedGroups;
@@ -293,7 +287,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 
 		// if no group is specified use the default
 		if ( groups.length == 0 ) {
-			groups = new String[] { DEFAULT_GROUP_NAME };
+			groups = new String[] { ValidatorConstants.DEFAULT_GROUP_NAME };
 		}
 
 		List<String> expandedGroups;
@@ -356,7 +350,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 
 		// if no group is specified use the default
 		if ( groups.length == 0 ) {
-			groups = new String[] { DEFAULT_GROUP_NAME };
+			groups = new String[] { ValidatorConstants.DEFAULT_GROUP_NAME };
 		}
 
 		List<String> expandedGroups;

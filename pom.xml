@@ -103,7 +103,7 @@
                                 <Implementation-Vendor>${pom.groupId}</Implementation-Vendor>
                                 <Implementation-Vendor-Id>${pom.groupId}</Implementation-Vendor-Id>
                                 <Implementation-URL>${pom.url}</Implementation-URL>
-                                <Specification-Title>Bean Validation"</Specification-Title>
+                                <Specification-Title>Bean Validation</Specification-Title>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -159,7 +159,7 @@
     </licenses>
 
     <scm>
-        <connection>scm:https://svn.jboss.org/repos/beancheck/ri/trunk</connection>
+        <connection>scm:https://svn.jboss.org/repos/hibernate/validator/trunk</connection>
         <url>http://fisheye.jboss.org/browse/Fixme</url>
     </scm>
 
