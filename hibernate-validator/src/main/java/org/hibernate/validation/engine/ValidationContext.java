@@ -1,4 +1,4 @@
-// $Id: ValidationContext.java 105 2008-09-29 12:37:32Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -32,7 +32,7 @@ import org.hibernate.validation.util.IdentitySet;
  * At the same time it keeps track of the currently validated object, the current group and property path.
  * The way the validation works at the moment the validated object and the property path have to be processed
  * in a stack fashion.
- *
+ * <p/>
  * all sort of information needed  Introduced to reduce the parameters passed around between the different
  * validate methdods in <code>ValidatorImpl</code>.
  *

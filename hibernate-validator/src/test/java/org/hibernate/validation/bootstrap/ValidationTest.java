@@ -1,4 +1,4 @@
-// $Id: ValidationTest.java 115 2008-10-01 15:33:10Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors

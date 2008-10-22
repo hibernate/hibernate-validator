@@ -1,4 +1,4 @@
-// $Id: PropertyIteratorTest.java 112 2008-09-30 08:08:50Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors

@@ -1,4 +1,4 @@
-// $Id: NotEmptyConstraintTest.java 110 2008-09-29 23:46:37Z epbernard $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
