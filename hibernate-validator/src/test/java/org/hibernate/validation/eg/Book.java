@@ -19,10 +19,10 @@ package org.hibernate.validation.eg;
 
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.Length;
 import org.hibernate.validation.constraints.NotEmpty;
-import org.hibernate.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik

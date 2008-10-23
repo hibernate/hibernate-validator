@@ -24,16 +24,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
+import javax.validation.constraints.NotNull;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
 
 import org.hibernate.validation.constraints.Length;
-import org.hibernate.validation.constraints.NotNull;
 import org.hibernate.validation.constraints.NotNullConstraint;
-import org.hibernate.validation.util.LoggerFactory;
 
 /**
  * Tests for message resolution.
@@ -41,7 +39,6 @@ import org.hibernate.validation.util.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ResourceBundleMessageResolverTest {
-	private static final Logger log = LoggerFactory.make();
 
 	private ResourceBundleMessageResolver resolver;
 	private NotNull notNull;

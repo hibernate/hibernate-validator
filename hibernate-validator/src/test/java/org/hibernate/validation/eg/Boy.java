@@ -17,7 +17,8 @@
 */
 package org.hibernate.validation.eg;
 
-import org.hibernate.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
+
 
 /**
  * @author Hardy Ferentschik

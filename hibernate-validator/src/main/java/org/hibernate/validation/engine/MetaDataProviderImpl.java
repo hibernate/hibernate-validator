@@ -247,10 +247,22 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 		constraintCandidates.addAll( Arrays.asList( annotations ) );
 
 		for ( Annotation constraintCandiate : constraintCandidates ) {
-			ConstraintValidator constraintValidator = constraintCandiate.annotationType()
-					.getAnnotation( ConstraintValidator.class );
-			if ( constraintValidator != null ) {
-				final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( constraintCandiate );
+
+			if ( ReflectionHelper.isBuiltInConstraintAnnotation( constraintCandiate ) ) {
+				Class constraintClass = ReflectionHelper.getBuiltInConstraint( constraintCandiate );
+				final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor(
+						constraintCandiate, constraintClass
+				);
+				constraintDescriptors.add( constraintDescriptor );
+				continue;
+			}
+
+			if ( ReflectionHelper.isConstraintAnnotation( constraintCandiate ) ) {
+				ConstraintValidator constraintValidator = constraintCandiate.annotationType()
+						.getAnnotation( ConstraintValidator.class );
+				final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor(
+						constraintCandiate, constraintValidator.value()
+				);
 				constraintDescriptors.add( constraintDescriptor );
 			}
 		}
@@ -258,9 +270,8 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(A annotation) {
-		getMessage( annotation ); // called to make sure there is a message
-		String[] groups = getGroups( annotation );
+	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(A annotation, Class constraintClass) {
+		String[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", String[].class );
 		for ( String groupName : groups ) {
 			if ( groupSequences.containsKey( groupName ) ) {
 				throw new ValidationException( groupName + " is illegally used as group and sequence name." );
@@ -268,50 +279,22 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 		}
 
 		Constraint<A> constraint;
-		ConstraintValidator constraintValidator = annotation.annotationType()
-				.getAnnotation( ConstraintValidator.class );
 		try {
 			//unchecked
-			constraint = constraintFactory.getInstance( constraintValidator.value() );
+			constraint = constraintFactory.getInstance( constraintClass );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to instantiate " + constraintValidator.value(), e );
+			throw new ValidationException( "Unable to instantiate " + constraintClass, e );
 		}
 
 		try {
 			constraint.initialize( annotation );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to intialize " + constraintValidator.value(), e );
+			throw new ValidationException( "Unable to intialize " + constraint.getClass().getName(), e );
 		}
 
-		return new ConstraintDescriptorImpl( annotation, groups, constraint, constraintValidator.value() );
-	}
-
-	private <A extends Annotation> String getMessage(A annotation) {
-		try {
-			Method m = annotation.getClass().getMethod( "message" );
-			return ( String ) m.invoke( annotation );
-		}
-		catch ( NoSuchMethodException e ) {
-			throw new ValidationException( "Constraint annotation has to define message element." );
-		}
-		catch ( Exception e ) {
-			throw new ValidationException( "Unable to get message from " + annotation.getClass().getName() );
-		}
-	}
-
-	private <A extends Annotation> String[] getGroups(A annotation) {
-		try {
-			Method m = annotation.getClass().getMethod( "groups" );
-			return ( String[] ) m.invoke( annotation );
-		}
-		catch ( NoSuchMethodException e ) {
-			throw new ValidationException( "Constraint annotation has to define groups element." );
-		}
-		catch ( Exception e ) {
-			throw new ValidationException( "Unable to get groups from " + annotation.getClass().getName() );
-		}
+		return new ConstraintDescriptorImpl( annotation, groups, constraint, constraintClass );
 	}
 
 	/**

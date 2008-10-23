@@ -1,3 +1,20 @@
+// $Id$
+/*
+* JBoss, Home of Professional Open Source
+* Copyright 2008, Red Hat Middleware LLC, and individual contributors
+* by the @authors tag. See the copyright.txt in the distribution for a
+* full listing of individual contributors.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* http://www.apache.org/licenses/LICENSE-2.0
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package javax.validation.constraints;
 
 import java.lang.annotation.Target;
@@ -12,11 +29,12 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
  * The annotated element size must be between the specified boundaries (included).
  *
  * Supported types are:
- *   - <code>String</code> (string length is evaludated)
- *   - <code>Collection</code> (collection size is evaluated)
- *   - Array (array length is evaludated)
+ * <ul>
+ * <li><code>String</code> (string length is evaludated)</li>
+ * <li><code>Collection</code> (collection size is evaluated)</li>
+ * <li>Array (array length is evaludated)</li>
  *
- * Null elements are considered valid
+ * <code>null</code> elements are considered valid.
  *
  * @author Emmanuel Bernard
  */
@@ -24,7 +42,7 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 @Retention(RUNTIME)
 @Documented
 public @interface Size {
-	String message() default "{constraint.min}";
+	String message() default "{validator.min}";
 	String[] groups() default {};
 
 	/**

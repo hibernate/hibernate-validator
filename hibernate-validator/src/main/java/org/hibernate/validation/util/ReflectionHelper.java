@@ -18,6 +18,7 @@
 package org.hibernate.validation.util;
 
 import java.beans.Introspector;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -28,12 +29,16 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Iterator;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validation.constraints.NotNullConstraint;
 
 /**
  * Some reflection utility methods.
@@ -42,7 +47,88 @@ import javax.validation.ValidationException;
  */
 public class ReflectionHelper {
 
+	/**
+	 * Private constructor in order to avoid instantiation.
+	 */
 	private ReflectionHelper() {
+	}
+
+
+	/**
+	 * @todo Maybe move into another class
+	 * @todo Read mappings for example from a resource file
+	 */
+	public static Class getBuiltInConstraint(Annotation annotation) {
+		if ( annotation instanceof NotNull ) {
+			return NotNullConstraint.class;
+		}
+		else {
+			return null;
+		}
+	}
+
+	public static boolean isBuiltInConstraintAnnotation(Annotation annotation) {
+		boolean isBuiltInConstraintAnnotation = false;
+
+		String packageName = annotation.annotationType().getPackage().getName();
+		if ( "javax.validation.constraints".equals( packageName ) ) {
+			isBuiltInConstraintAnnotation = true;
+		}
+		return isBuiltInConstraintAnnotation;
+	}
+
+	public static boolean isConstraintAnnotation(Annotation annotation) {
+		boolean isConstraintAnnotation = true;
+
+		ConstraintValidator constraintValidator = annotation.annotationType()
+				.getAnnotation( ConstraintValidator.class );
+		if ( constraintValidator == null ) {
+			isConstraintAnnotation = false;
+			return isConstraintAnnotation;
+		}
+
+		try {
+			getAnnotationParameter( annotation, "message", String.class );
+		} 	catch ( Exception e ) {
+			throw new ValidationException( "Constraint annotation has to define message element." );
+		}
+
+		try {
+			getAnnotationParameter( annotation, "groups", String[].class );
+		}
+		catch ( Exception e ) {
+			throw new ValidationException( "Constraint annotation has to define groups element." );
+		}
+
+		return isConstraintAnnotation;
+	}
+
+
+	@SuppressWarnings("unchecked")
+	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
+		try {
+			Method m = annotation.getClass().getMethod( parameterName );
+			Object o = m.invoke( annotation );
+			if ( o.getClass().getName().equals( type.getName() ) ) {
+				return ( T ) o;
+			}
+			else {
+				String msg = "Wrong parameter type. Expected: " + type.getName() + " Actual: " + o.getClass().getName();
+				throw new ValidationException( msg );
+			}
+		}
+		catch ( NoSuchMethodException e ) {
+			String msg = "The specified annotation defines no parameter '" + parameterName + "'.";
+			throw new ValidationException( msg, e );
+		}
+		catch ( IllegalAccessException e ) {
+			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
+			throw new ValidationException( msg, e );
+		}
+		catch ( InvocationTargetException e ) {
+			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
+			throw new ValidationException( msg, e );
+		}
 	}
 
 	/**
@@ -233,20 +319,20 @@ public class ReflectionHelper {
 	 * @return <code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.
 	 */
 	private static boolean isCollectionClass(Class<?> clazz) {
-        Class[] interfaces = clazz.getInterfaces();
+		Class[] interfaces = clazz.getInterfaces();
 
-        for ( Class interfaceClass : interfaces) {
-            if (interfaceClass == Collection.class
-				|| interfaceClass == java.util.List.class
-				|| interfaceClass == java.util.Set.class
-				|| interfaceClass == java.util.Map.class
-				|| interfaceClass == java.util.SortedSet.class // extension to the specs
-				|| interfaceClass == java.util.SortedMap.class) { // extension to the specs)
-                return true;
-            }
-        }
+		for ( Class interfaceClass : interfaces ) {
+			if ( interfaceClass == Collection.class
+					|| interfaceClass == java.util.List.class
+					|| interfaceClass == java.util.Set.class
+					|| interfaceClass == java.util.Map.class
+					|| interfaceClass == java.util.SortedSet.class // extension to the specs
+					|| interfaceClass == java.util.SortedMap.class ) { // extension to the specs)
+				return true;
+			}
+		}
 
-        return false;
+		return false;
 	}
 
 	/**
@@ -256,8 +342,9 @@ public class ReflectionHelper {
 	 * either a collection or array.
 	 * @param index The index. The index does not have to be numerical. <code>value</code> could also be a map in which
 	 * case the index could also be a string key.
+	 *
 	 * @return The indexed value or <code>null</code> if <code>value</code> is <code>null</code> or not a collection or array.
-	 * <code>null</code> is also returned in case the index does not exist.
+	 *         <code>null</code> is also returned in case the index does not exist.
 	 */
 	public static Object getIndexedValue(Object value, String index) {
 		if ( value == null ) {

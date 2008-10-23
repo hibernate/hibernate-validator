@@ -27,6 +27,10 @@ import javax.validation.ValidationException;
  * @author Emmanuel Bernard
  */
 public class ConstraintFactoryImpl implements ConstraintFactory {
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	public <T extends Constraint> T getInstance(Class<T> key) {
 		try {
 			return key.newInstance();

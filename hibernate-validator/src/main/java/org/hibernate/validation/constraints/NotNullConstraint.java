@@ -19,6 +19,7 @@ package org.hibernate.validation.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Context;
+import javax.validation.constraints.NotNull;
 
 /**
  * Validate that the object is not <code>null</code>.

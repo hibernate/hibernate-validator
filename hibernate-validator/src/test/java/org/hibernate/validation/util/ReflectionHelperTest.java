@@ -17,16 +17,24 @@
 */
 package org.hibernate.validation.util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.ValidationException;
+import javax.validation.constraints.NotNull;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
 /**
+ * Tests for the <code>ReflectionHelper</code>.
+ *
  * @author Hardy Ferentschik
  */
 public class ReflectionHelperTest {
@@ -41,14 +49,14 @@ public class ReflectionHelperTest {
 		assertEquals( "We should be able to retrieve the indexed object", testObject, value );
 
 		// try to get to the value by integer index
-	    value = ReflectionHelper.getIndexedValue( map, "0" );
+		value = ReflectionHelper.getIndexedValue( map, "0" );
 		assertEquals( "We should be able to retrieve the indexed object", testObject, value );
 
 		value = ReflectionHelper.getIndexedValue( map, "foo" );
-		assertNull("A non existent index should return the null value", value);
+		assertNull( "A non existent index should return the null value", value );
 
 		value = ReflectionHelper.getIndexedValue( map, "2" );
-		assertNull("A non existent index should return the null value", value);
+		assertNull( "A non existent index should return the null value", value );
 	}
 
 	@Test
@@ -61,12 +69,50 @@ public class ReflectionHelperTest {
 		assertEquals( "We should be able to retrieve the indexed object", testObject, value );
 
 		value = ReflectionHelper.getIndexedValue( list, "2" );
-		assertNull("A non existent index should return the null value", value);
+		assertNull( "A non existent index should return the null value", value );
 	}
 
 	@Test
 	public void testGetIndexedValueForNull() {
 		Object value = ReflectionHelper.getIndexedValue( null, "0" );
 		assertNull( value );
+	}
+
+	@Test
+	public void testGetMessageParamter() {
+		NotNull testAnnotation = new NotNull() {
+			public String message() {
+				return "test";
+			}
+
+			public String[] groups() {
+				return new String[] { "default" };
+			}
+
+			public Class<? extends Annotation> annotationType() {
+				return this.getClass();
+			}
+		};
+		String message = ReflectionHelper.getAnnotationParameter( testAnnotation, "message", String.class );
+		assertEquals( "Wrong message", "test", message );
+
+		String[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", String[].class );
+		assertEquals( "Wrong message", "default", group[0] );
+
+		try {
+			ReflectionHelper.getAnnotationParameter( testAnnotation, "message", Integer.class );
+			fail();
+		}
+		catch ( ValidationException e ) {
+			assertTrue( "Wrong exception message", e.getMessage().startsWith( "Wrong parameter type." ) );
+		}
+
+		try {
+			ReflectionHelper.getAnnotationParameter( testAnnotation, "foo", Integer.class );
+			fail();
+		}
+		catch ( ValidationException e ) {
+			assertTrue( "Wrong exception message", e.getMessage().startsWith( "The specified annotation defines no parameter" ) );
+		}
 	}
 }
