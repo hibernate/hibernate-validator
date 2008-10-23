@@ -18,7 +18,6 @@
 package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -69,7 +68,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	/**
 	 * List of constraints.
 	 */
-	private List<ValidatorMetaData> constraintMetaDataList = new ArrayList<ValidatorMetaData>();
+	private List<MetaConstraint> metaConstraintList = new ArrayList<MetaConstraint>();
 
 	/**
 	 * List of cascaded fields.
@@ -119,7 +118,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	/**
 	 * Get all superclasses and interfaces recursively.
 	 *
-	 * @param clazz The class to start the seatch with.
+	 * @param clazz The class to start the search with.
 	 * @param classes List of classes to which to add all found super classes and interfaces.
 	 */
 	private void computeClassHierarchy(Class clazz, List<Class> classes) {
@@ -195,11 +194,11 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 
 	private void initFieldConstraints(Class clazz) {
 		for ( Field field : clazz.getDeclaredFields() ) {
-			List<ConstraintDescriptorImpl> fieldMetadata = getFieldLevelMetadata( field );
+			List<ConstraintDescriptorImpl> fieldMetadata = findFieldLevelConstraints( field );
 			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
 				ReflectionHelper.setAccessibility( field );
-				ValidatorMetaData metaData = new ValidatorMetaData( field, constraintDescription );
-				constraintMetaDataList.add( metaData );
+				MetaConstraint metaConstraint = new MetaConstraint( field, constraintDescription );
+				metaConstraintList.add( metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
 				cascadedFields.add( field );
@@ -209,11 +208,11 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 
 	private void initMethodConstraints(Class clazz) {
 		for ( Method method : clazz.getDeclaredMethods() ) {
-			List<ConstraintDescriptorImpl> methodMetadata = getMethodLevelMetadata( method );
+			List<ConstraintDescriptorImpl> methodMetadata = findMethodLevelConstraints( method );
 			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
 				ReflectionHelper.setAccessibility( method );
-				ValidatorMetaData metaData = new ValidatorMetaData( method, constraintDescription );
-				constraintMetaDataList.add( metaData );
+				MetaConstraint metaConstraint = new MetaConstraint( method, constraintDescription );
+				metaConstraintList.add( metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
 				cascadedMethods.add( method );
@@ -222,10 +221,10 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	}
 
 	private void initClassConstraints(Class clazz) {
-		List<ConstraintDescriptorImpl> classMetadata = getClassLevelMetadata( clazz );
+		List<ConstraintDescriptorImpl> classMetadata = findClassLevelConstraints( clazz );
 		for ( ConstraintDescriptorImpl constraintDescription : classMetadata ) {
-			ValidatorMetaData metaData = new ValidatorMetaData( clazz, constraintDescription );
-			constraintMetaDataList.add( metaData );
+			MetaConstraint metaConstraint = new MetaConstraint( clazz, constraintDescription );
+			metaConstraintList.add( metaConstraint );
 		}
 	}
 
@@ -350,7 +349,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	 *
 	 * @todo inject XML data here, probably externalizing the process
 	 */
-	private List<ConstraintDescriptorImpl> getClassLevelMetadata(Class beanClass) {
+	private List<ConstraintDescriptorImpl> findClassLevelConstraints(Class beanClass) {
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
 		for ( Annotation annotation : beanClass.getAnnotations() ) {
 			metadata.addAll( findConstraintAnnotations( annotation ) );
@@ -371,7 +370,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	 *
 	 * @todo inject XML data here, probably externalizing the process
 	 */
-	private List<ConstraintDescriptorImpl> getMethodLevelMetadata(Method method) {
+	private List<ConstraintDescriptorImpl> findMethodLevelConstraints(Method method) {
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
 		for ( Annotation annotation : method.getAnnotations() ) {
 			metadata.addAll( findConstraintAnnotations( annotation ) );
@@ -408,7 +407,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	 *
 	 * @todo inject XML data here, probably externalizing the process
 	 */
-	private List<ConstraintDescriptorImpl> getFieldLevelMetadata(Field field) {
+	private List<ConstraintDescriptorImpl> findFieldLevelConstraints(Field field) {
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
 		for ( Annotation annotation : field.getAnnotations() ) {
 			metadata.addAll( findConstraintAnnotations( annotation ) );
@@ -457,8 +456,8 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 		return groupSequences;
 	}
 
-	public List<ValidatorMetaData> getConstraintMetaDataList() {
-		return constraintMetaDataList;
+	public List<MetaConstraint> getConstraintMetaDataList() {
+		return metaConstraintList;
 	}
 
 	public Map<String, ElementDescriptor> getPropertyDescriptors() {

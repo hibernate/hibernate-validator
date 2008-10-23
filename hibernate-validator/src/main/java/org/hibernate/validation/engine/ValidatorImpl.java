@@ -158,9 +158,9 @@ public class ValidatorImpl<T> implements Validator<T> {
 	 * @param context The current validation context.
 	 */
 	private void validateConstraints(ValidationContext<T> context) {
-		for ( ValidatorMetaData metaData : metaDataProvider.getConstraintMetaDataList() ) {
-			ConstraintDescriptorImpl constraintDescriptor = metaData.getDescriptor();
-			context.pushProperty( metaData.getPropertyName() );
+		for ( MetaConstraint metaConstraint : metaDataProvider.getConstraintMetaDataList() ) {
+			ConstraintDescriptorImpl constraintDescriptor = metaConstraint.getDescriptor();
+			context.pushProperty( metaConstraint.getPropertyName() );
 
 			if ( !context.needsValidation( constraintDescriptor.getGroups() ) ) {
 				context.popProperty();
@@ -168,7 +168,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 			}
 
 			final Object leafBeanInstance = context.peekValidatedObject();
-			Object value = metaData.getValue( leafBeanInstance );
+			Object value = metaConstraint.getValue( leafBeanInstance );
 			ContextImpl contextImpl = new ContextImpl(constraintDescriptor);
 
 			if ( !constraintDescriptor.getConstraintImplementation().isValid( value, contextImpl ) ) {
@@ -414,10 +414,10 @@ public class ValidatorImpl<T> implements Validator<T> {
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
-			List<ValidatorMetaData> metaDataList = validator.getMetaDataProvider().getConstraintMetaDataList();
-			for ( ValidatorMetaData metaData : metaDataList ) {
-				ConstraintDescriptor constraintDescriptor = metaData.getDescriptor();
-				if ( metaData.getPropertyName().equals( propertyIter.getHead() ) ) {
+			List<MetaConstraint> metaConstraintList = validator.getMetaDataProvider().getConstraintMetaDataList();
+			for ( MetaConstraint metaConstraint : metaConstraintList ) {
+				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
+				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
 					matchingConstraintDescriptor = ( ConstraintDescriptorImpl ) constraintDescriptor;
 				}
 			}
@@ -453,12 +453,12 @@ public class ValidatorImpl<T> implements Validator<T> {
 
 		// bottom out - there is only one token left
 		if ( !propertyIter.hasNext() ) {
-			List<ValidatorMetaData> metaDataList = validator.getMetaDataProvider().getConstraintMetaDataList();
-			for ( ValidatorMetaData metaData : metaDataList ) {
-				ConstraintDescriptor constraintDescriptor = metaData.getDescriptor();
-				if ( metaData.getPropertyName().equals( propertyIter.getHead() ) ) {
+			List<MetaConstraint> metaConstraintList = validator.getMetaDataProvider().getConstraintMetaDataList();
+			for ( MetaConstraint metaConstraint : metaConstraintList ) {
+				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
+				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
 					return new DesrciptorValueWrapper(
-							( ConstraintDescriptorImpl ) constraintDescriptor, metaData.getValue( value )
+							( ConstraintDescriptorImpl ) constraintDescriptor, metaConstraint.getValue( value )
 					);
 				}
 			}

@@ -65,7 +65,7 @@ public interface MetaDataProvider<T> {
 	 * @return A list of <code>ValidatorMetaData</code> instances encapsulating the information of all the constraints
 	 *         defined on the bean.
 	 */
-	List<ValidatorMetaData> getConstraintMetaDataList();
+	List<MetaConstraint> getConstraintMetaDataList();
 
 	/**
 	 * @return A map keying the property name of a constraint to its <code>ElementDescriptor</code>.

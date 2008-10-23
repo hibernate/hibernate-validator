@@ -26,5 +26,11 @@ package javax.validation;
  * @author Hardy Ferentschik
  */
 public interface ConstraintFactory {
+
+	/**
+	 * @param key The class of the constraint to instantiate.
+	 *
+	 * @return An constraint instance of the specified class.
+	 */
 	<T extends Constraint> T getInstance(Class<T> key);
 }

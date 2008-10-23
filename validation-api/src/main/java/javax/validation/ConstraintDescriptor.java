@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Describes a single constraint.
+ * Describes a single constraint and its composing constraints.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -48,10 +48,10 @@ public interface ConstraintDescriptor {
 	Class<? extends Constraint> getContstraintClass();
 
 	/**
-	 * Returns a map containing the annotation paramter names as keys and the annotation parameter values
+	 * Returns a map containing the annotation parameter names as keys and the annotation parameter values
 	 * as value.
-	 * If a composing constraint, parameter values are reflecting
-	 * the overridden parameters form the main constraint
+	 * If this constraint is used as part of a composed constraint, parameter values are reflecting
+	 * the overridden parameters form the main constraint.
 	 *
 	 * @return Returns a map containing the annotation paramter names as keys and the annotation parameter values
 	 *         as value.
@@ -59,11 +59,11 @@ public interface ConstraintDescriptor {
 	Map<String, Object> getParameters();
 
 	/**
-	 * Return a set of ConstraintDescriptors. Each ConstraintDescriptor describes a composing
-	 * constraint. ConstraintDescriptor instances of composing constraints reflect overridden
-	 * parameter values in #getParameters() and #getAnnotation() 
+	 * Return a set of composing <code>ConstraintDescriptor</code>s where each descriptor describes a composing
+	 * constraint. <code>ConstraintDescriptor</code> instances of composing constraints reflect overridden
+	 * parameter values in {@link #getParameters()}  and {@link #getAnnotation()}.
 	 *
-	 * @return a set of ConstraintDescriptor object or an empty set
+	 * @return a set of <code>ConstraintDescriptor<code> objects or an empty set in case there are no composing constraints.
 	 */
 	Set<ConstraintDescriptor> getComposingConstraints();
 
