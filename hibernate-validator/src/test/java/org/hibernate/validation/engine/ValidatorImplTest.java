@@ -38,8 +38,6 @@ import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.eg.Dictonary;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.EnglishDictonary;
-import org.hibernate.validation.eg.Female;
-import org.hibernate.validation.eg.Male;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.Unconstraint;
 
@@ -50,37 +48,6 @@ import org.hibernate.validation.eg.Unconstraint;
  */
 public class ValidatorImplTest {
 
-	/**
-	 * JSR 303: Constraint definition properties - message (2.1.1.1)
-	 */
-	@Test
-	public void testConstraintWithNoMessage() {
-		try {
-			new ValidatorImpl<Male>( Male.class );
-			fail();
-		}
-		catch ( ValidationException e ) {
-			assertEquals(
-					"Wrong error message", "Constraint annotation has to define message element.", e.getMessage()
-			);
-		}
-	}
-
-	/**
-	 * JSR 303: Constraint definition properties - groups (2.1.1.2)
-	 */
-	@Test
-	public void testConstraintWithNoGroups() {
-		try {
-			new ValidatorImpl<Female>( Female.class );
-			fail();
-		}
-		catch ( ValidationException e ) {
-			assertEquals(
-					"Wrong error message", "Constraint annotation has to define groups element.", e.getMessage()
-			);
-		}
-	}
 
 	/**
 	 * JSR 303: Requirements on classes to be validates (3.1)
@@ -101,12 +68,12 @@ public class ValidatorImplTest {
 	}
 
 
-	@Test( expected = IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testNullParamterToValidatorImplConstructor() {
-		new ValidatorImpl<Unconstraint>( null);
+		new ValidatorImpl<Unconstraint>( null );
 	}
 
-	@Test	
+	@Test
 	public void testUnconstraintClass() {
 		Validator<Unconstraint> validator = new ValidatorImpl<Unconstraint>( Unconstraint.class );
 		assertTrue( "There should be no constraints", !validator.hasConstraints() );

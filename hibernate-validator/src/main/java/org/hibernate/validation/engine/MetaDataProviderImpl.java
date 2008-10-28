@@ -239,29 +239,30 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	private <A extends Annotation> List<ConstraintDescriptorImpl> findConstraintAnnotations(A annotation) {
 		List<ConstraintDescriptorImpl> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl>();
 
-		List<Annotation> constraintCandidates = new ArrayList<Annotation>();
-		constraintCandidates.add( annotation );
+		List<Annotation> constraints = new ArrayList<Annotation>();
+		if ( ReflectionHelper.isConstraintAnnotation( annotation ) ||
+				ReflectionHelper.isBuiltInConstraintAnnotation( annotation) ) {
+			constraints.add( annotation );
+		}
 
 		// check if we have a multi value constraint
-		Annotation[] annotations = getMultiValueConstraintsCandidates( annotation );
-		constraintCandidates.addAll( Arrays.asList( annotations ) );
+		constraints.addAll( ReflectionHelper.getMultiValueConstraints( annotation ) );
 
-		for ( Annotation constraintCandiate : constraintCandidates ) {
-
-			if ( ReflectionHelper.isBuiltInConstraintAnnotation( constraintCandiate ) ) {
-				Class constraintClass = ReflectionHelper.getBuiltInConstraint( constraintCandiate );
+		for ( Annotation constraint : constraints ) {
+			if ( ReflectionHelper.isBuiltInConstraintAnnotation( constraint ) ) {
+				Class constraintClass = ReflectionHelper.getBuiltInConstraint( constraint );
 				final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor(
-						constraintCandiate, constraintClass
+						constraint, constraintClass
 				);
 				constraintDescriptors.add( constraintDescriptor );
 				continue;
 			}
 
-			if ( ReflectionHelper.isConstraintAnnotation( constraintCandiate ) ) {
-				ConstraintValidator constraintValidator = constraintCandiate.annotationType()
+			if ( ReflectionHelper.isConstraintAnnotation( constraint ) ) {
+				ConstraintValidator constraintValidator = constraint.annotationType()
 						.getAnnotation( ConstraintValidator.class );
 				final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor(
-						constraintCandiate, constraintValidator.value()
+						constraint, constraintValidator.value()
 				);
 				constraintDescriptors.add( constraintDescriptor );
 			}
@@ -295,31 +296,6 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 		}
 
 		return new ConstraintDescriptorImpl( annotation, groups, constraint, constraintClass );
-	}
-
-	/**
-	 * Checks whether the given annotation has a value parameter which returns an array of annotations.
-	 *
-	 * @param annotation the annotation to check.
-	 *
-	 * @return The list of potential constraint annotations or the empty array.
-	 *
-	 * @todo Not only check that the return type of value is an array, but an array of annotaitons. Need to check syntax.
-	 */
-	private <A extends Annotation> Annotation[] getMultiValueConstraintsCandidates(A annotation) {
-		try {
-			Method m = annotation.getClass().getMethod( "value" );
-			Class returnType = m.getReturnType();
-			if ( returnType.isArray() ) {
-				return ( Annotation[] ) m.invoke( annotation );
-			}
-			else {
-				return new Annotation[0];
-			}
-		}
-		catch ( Exception e ) {
-			return new Annotation[0];
-		}
 	}
 
 	/**

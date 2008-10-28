@@ -34,9 +34,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
+
+import org.slf4j.Logger;
 
 import org.hibernate.validation.constraints.NotNullConstraint;
 
@@ -46,6 +49,8 @@ import org.hibernate.validation.constraints.NotNullConstraint;
  * @author Hardy Ferentschik
  */
 public class ReflectionHelper {
+
+	private static final Logger log = LoggerFactory.make();
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -67,6 +72,13 @@ public class ReflectionHelper {
 		}
 	}
 
+	/**
+	 * Checks whether the given annotation is a builtin constraint annotation defined as defined by the specs.
+	 *
+	 * @param annotation the annotation to check
+	 *
+	 * @return <code>true</code> if the annotation is a builtin constraint, <code>false</code> otherwise.
+	 */
 	public static boolean isBuiltInConstraintAnnotation(Annotation annotation) {
 		boolean isBuiltInConstraintAnnotation = false;
 
@@ -77,30 +89,77 @@ public class ReflectionHelper {
 		return isBuiltInConstraintAnnotation;
 	}
 
+	/**
+	 * Checks whehter the specified annotation is a valid constraint annotation. A constraint annotations has to
+	 * fulfill the following conditions:
+	 * <ul>
+	 * <li>Has to contain a <code>ConstraintValidator</code> implementation.</li>
+	 * <li>Defines a message parameter.</li>
+	 * <li>Defines a group parameter.</li>
+	 * </ul>
+	 *
+	 * @param annotation The annotation to test.
+	 *
+	 * @return <code>true</code> if the annotation fulfills the above condtions, <code>false</code> otherwise.
+	 */
 	public static boolean isConstraintAnnotation(Annotation annotation) {
-		boolean isConstraintAnnotation = true;
 
 		ConstraintValidator constraintValidator = annotation.annotationType()
 				.getAnnotation( ConstraintValidator.class );
 		if ( constraintValidator == null ) {
-			isConstraintAnnotation = false;
-			return isConstraintAnnotation;
+			return false;
 		}
 
 		try {
 			getAnnotationParameter( annotation, "message", String.class );
-		} 	catch ( Exception e ) {
-			throw new ValidationException( "Constraint annotation has to define message element." );
+		}
+		catch ( Exception e ) {
+			String msg = annotation.annotationType().getName() + " contains ConstraintValidator annotation, but does " +
+					"not contain a message parameter. Annotation is getting ignored.";
+			log.warn( msg );
+			return false;
 		}
 
 		try {
 			getAnnotationParameter( annotation, "groups", String[].class );
 		}
 		catch ( Exception e ) {
-			throw new ValidationException( "Constraint annotation has to define groups element." );
+			String msg = annotation.annotationType().getName() + " contains ConstraintValidator annotation, but does " +
+					"not contain a groups parameter. Annotation is getting ignored.";
+			log.warn( msg );
+			return false;
 		}
 
-		return isConstraintAnnotation;
+		return true;
+	}
+
+	/**
+	 * Checks whether a given annotation is a multi value constraint and returns the contained constraints if so.
+	 *
+	 * @param annotation the annotation to check.
+	 *
+	 * @return A list of constraint annotations or the empty list if <code>annotation</code> is not a multi constraint
+	 *         annotation.
+	 *
+	 */
+	public static <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
+		List<Annotation> annotationList = new ArrayList<Annotation>();
+		try {
+			Method m = annotation.getClass().getMethod( "value" );
+			Class returnType = m.getReturnType();
+			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+				Annotation[] annotations = ( Annotation[] ) m.invoke( annotation );
+				for (Annotation a : annotations) {
+					if( isConstraintAnnotation( a ) || isBuiltInConstraintAnnotation( a )) {
+						annotationList.add( a );
+					}
+				}
+			}
+		}
+		catch ( Exception e ) {
+			// ignore
+		}
+		return annotationList;
 	}
 
 
