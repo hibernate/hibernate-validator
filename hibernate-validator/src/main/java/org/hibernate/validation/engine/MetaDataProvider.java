@@ -23,6 +23,8 @@ import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Map;
 import javax.validation.ElementDescriptor;
+import javax.validation.BeanDescriptor;
+import javax.validation.PropertyDescriptor;
 
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
@@ -39,7 +41,7 @@ public interface MetaDataProvider<T> {
 	/**
 	 * @return an instance of <code>ElementDescriptor</code> describing the bean this meta data applies for.
 	 */
-	ElementDescriptor getBeanDescriptor();
+	BeanDescriptor getBeanDescriptor();
 
 	/**
 	 * @return A list of all cascaded fields (fields annotated with &#064;Valid).
@@ -73,7 +75,7 @@ public interface MetaDataProvider<T> {
 	 * @todo Maybe needs to be removed since this data structure is ambigious. There could be conflicts between field and
 	 * methods.
 	 */
-	Map<String, ElementDescriptor> getPropertyDescriptors();
+	Map<String, PropertyDescriptor> getPropertyDescriptors();
 
 	ElementDescriptor getPropertyDescriptors(String property);
 }

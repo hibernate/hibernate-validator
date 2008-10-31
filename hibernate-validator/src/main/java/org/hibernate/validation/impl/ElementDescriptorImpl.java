@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ElementDescriptor;
+import javax.validation.BeanDescriptor;
+import javax.validation.PropertyDescriptor;
 
 /**
  * Describe a validated element (class, field or property).
@@ -32,7 +34,8 @@ import javax.validation.ElementDescriptor;
  * @todo Should returnType be renamed to type?
  * @todo Handle problem in descirbing cyclic dependecies for propertyPath
  */
-public class ElementDescriptorImpl implements ElementDescriptor {
+//FIXME I implement both interfaces on the same object as a quick hack, we need to fix that.
+public class ElementDescriptorImpl implements PropertyDescriptor, BeanDescriptor {
 	private final Class returnType;
 	private final boolean cascaded;
 	private final List<ConstraintDescriptor> constraintDescriptors = new ArrayList<ConstraintDescriptor>();
@@ -75,7 +78,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getPropertyPath() {
+	public String getPropertyName() {
 		return propertyPath;
 	}
 }

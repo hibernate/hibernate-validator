@@ -26,12 +26,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.BeanDescriptor;
 import javax.validation.Constraint;
 import javax.validation.ConstraintFactory;
 import javax.validation.ConstraintValidator;
-import javax.validation.ElementDescriptor;
 import javax.validation.GroupSequence;
 import javax.validation.GroupSequences;
+import javax.validation.PropertyDescriptor;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
@@ -84,7 +85,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	 * Maps field and method names to their <code>ElementDescriptorImpl</code>.
 	 * FIXME This model is problematic as you can have conflicting names for fields and methods
 	 */
-	private Map<String, ElementDescriptor> propertyDescriptors = new HashMap<String, ElementDescriptor>();
+	private Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<String, PropertyDescriptor>();
 
 	/**
 	 * Factory to create acutal constraint instances from the annotated fields/method/class.
@@ -392,7 +393,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 		return beanClass;
 	}
 
-	public ElementDescriptor getBeanDescriptor() {
+	public BeanDescriptor getBeanDescriptor() {
 		return beanDescriptor;
 	}
 
@@ -419,11 +420,11 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 		return metaConstraintList;
 	}
 
-	public Map<String, ElementDescriptor> getPropertyDescriptors() {
+	public Map<String, PropertyDescriptor> getPropertyDescriptors() {
 		return propertyDescriptors;
 	}
 
-	public ElementDescriptor getPropertyDescriptors(String property) {
+	public PropertyDescriptor getPropertyDescriptors(String property) {
 		return propertyDescriptors.get( property );
 	}
 }

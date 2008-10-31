@@ -33,23 +33,11 @@ public interface ElementDescriptor {
 	 *
 	 * @todo should it be Type or even completly removed
 	 */
-	Class getType();
-
-	/**
-	 * @return Returns <code>true</code> if the association is cascaded, <code>false</code> otherwise.
-	 */
-	boolean isCascaded();
+	Class<?> getType();
 
 	/**
 	 * @return All the constraint descriptors for this element.
 	 */
 	List<ConstraintDescriptor> getConstraintDescriptors();
-
-	/**
-	 * @return Property path from the root entity validated.
-	 *
-	 * @todo there is a problem in describing cyclic dependencies
-	 */
-	String getPropertyPath();
 
 }

@@ -34,6 +34,8 @@ import javax.validation.ElementDescriptor;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
 import javax.validation.Validator;
+import javax.validation.PropertyDescriptor;
+import javax.validation.BeanDescriptor;
 
 import org.hibernate.validation.Version;
 import org.hibernate.validation.ValidatorConstants;
@@ -505,18 +507,17 @@ public class ValidatorImpl<T> implements Validator<T> {
 		return metaDataProvider.getConstraintMetaDataList().size() > 0;
 	}
 
-	public ElementDescriptor getConstraintsForBean() {
+	public BeanDescriptor getConstraintsForBean() {
 		return metaDataProvider.getBeanDescriptor();
 	}
 
-	public ElementDescriptor getConstraintsForProperty(String propertyName) {
+	public PropertyDescriptor getConstraintsForProperty(String propertyName) {
 		return metaDataProvider.getPropertyDescriptors().get( propertyName );
 	}
 
-	public String[] getValidatedProperties() {
-		return metaDataProvider.getPropertyDescriptors()
-				.keySet()
-				.toArray( new String[metaDataProvider.getPropertyDescriptors().size()] );
+	public Set<String> getValidatedProperties() {
+		return Collections.unmodifiableSet( metaDataProvider.getPropertyDescriptors()
+				.keySet() );
 	}
 
 	public MetaDataProvider<T> getMetaDataProvider() {

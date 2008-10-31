@@ -76,17 +76,17 @@ public interface Validator<T> extends Serializable {
 	/**
 	 * return the class level constraints
 	 */
-	ElementDescriptor getConstraintsForBean();
+	BeanDescriptor getConstraintsForBean();
 
 	/**
 	 * return the property level constraints for a given propertyName
 	 * or null if either the property does not exist or has no constraint
 	 */
-	ElementDescriptor getConstraintsForProperty(String propertyName);
+	PropertyDescriptor getConstraintsForProperty(String propertyName);
 
 	/**
 	 * return the property names having at least a constraint defined
 	 */
-	String[] getValidatedProperties();
+	Set<String> getValidatedProperties();
 
 }
