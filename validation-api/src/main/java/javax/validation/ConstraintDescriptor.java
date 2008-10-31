@@ -45,7 +45,7 @@ public interface ConstraintDescriptor {
 	/**
 	 * @return the constraint implementation class
 	 */
-	Class<? extends Constraint> getContstraintClass();
+	Class<? extends Constraint> getConstraintClass();
 
 	/**
 	 * Returns a map containing the annotation parameter names as keys and the annotation parameter values

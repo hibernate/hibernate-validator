@@ -78,7 +78,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<? extends Constraint> getContstraintClass() {
+	public Class<? extends Constraint> getConstraintClass() {
 		return constraintClass;
 	}
 
