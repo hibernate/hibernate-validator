@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
-import javax.validation.ReportAsSingleInvalidConstraint;
+import javax.validation.ReportAsViolationFromComposingConstraint;
 import javax.validation.ValidationException;
 
 /**
@@ -55,7 +55,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 		this.constraintImplementation = validator;
 		this.parameters = getAnnotationParameters( annotation );
 		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
-				ReportAsSingleInvalidConstraint.class
+				ReportAsViolationFromComposingConstraint.class
 		);
 		this.constraintClass = constraintClass;
 	}
@@ -114,7 +114,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isReportAsSingleInvalidConstraint() {
+	public boolean ReportAsViolationFromComposingConstraint() {
 		return isReportAsSingleInvalidConstraint;
 	}
 

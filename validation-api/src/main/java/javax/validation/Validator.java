@@ -29,44 +29,41 @@ import java.util.Set;
  */
 public interface Validator<T> extends Serializable {
 	/**
-	 * validate all constraints on object (unless shortcut)
+	 * validate all constraints on object
 	 *
 	 * @param object object to validate
-	 * @param groups group name(s) targeted for validation (default to <code>default</code>
+	 * @param groups group name(s) targeted for validation (default to &lt;code&gt;default&lt;/code&gt;)
 	 *
-	 * @return array of invalid constrains or an empty array if none.
+	 * @return constraint violations or an empty Set if none
 	 *
-	 * @throws IllegalArgumentException e if object is <code>null</code>.
+	 * @throws IllegalArgumentException e if object is null
 	 */
 	Set<ConstraintViolation<T>> validate(T object, String... groups);
 
 	/**
-	 * validate all constraints on propertyname property of object (unless shortcut)
-	 * <p/>
+	 * validate all constraints on &lt;code&gt;propertyName&lt;/code&gt; property of object
 	 *
 	 * @param object object to validate
 	 * @param propertyName property to validate
-	 * @param groups group name(s) targeted for validation (default to <code>default</code>
+	 * @param groups group name(s) targeted for validation (default to &lt;code&gt;default&lt;/code&gt;)
 	 *
-	 * @return array of invalid constrains or an empty array if none
+	 * @return constraint violations or an empty Set if none
 	 *
-	 * @throws IllegalArgumentException e if object is  <code>null</code>.
-	 * @todo Do we keep this method?
+	 * @throws IllegalArgumentException e if object is null
 	 */
 	Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups);
 
 	/**
-	 * Validates all constraints on propertyname property if the property value is value (unless shortcut)
+	 * validate all constraints on <code>propertyName</code> property
+	 * if the property value is <code>value</code>
 	 * <p/>
+	 * TODO express limitations of ConstraintViolation in this case
 	 *
 	 * @param propertyName property to validate
 	 * @param value property value to validate
-	 * @param groups group name(s) targeted for validation (default to <code>default</code>
+	 * @param groups group name(s) targeted for validation (default to <code>default</code>)
 	 *
-	 * @return array of invalid constrains or an empty array if none
-	 *
-	 * @todo Do we keep this method?
-	 * @todo express limitations of InvalidConstraint in this case.
+	 * @return constraint violations or an empty Set if none
 	 */
 	Set<ConstraintViolation<T>> validateValue(String propertyName, Object value, String... groups);
 
@@ -85,7 +82,7 @@ public interface Validator<T> extends Serializable {
 	 * return the property level constraints for a given propertyName
 	 * or null if either the property does not exist or has no constraint
 	 */
-	ElementDescriptor getConstraintsForProperty(String propertyName);	
+	ElementDescriptor getConstraintsForProperty(String propertyName);
 
 	/**
 	 * return the property names having at least a constraint defined

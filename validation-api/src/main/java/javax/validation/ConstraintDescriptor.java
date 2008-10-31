@@ -70,5 +70,5 @@ public interface ConstraintDescriptor {
 	/**
 	 * @return true if the constraint is annotated with @ReportAsSingleInvalidConstraint
 	 */
-	boolean isReportAsSingleInvalidConstraint();
+	boolean ReportAsViolationFromComposingConstraint();
 }

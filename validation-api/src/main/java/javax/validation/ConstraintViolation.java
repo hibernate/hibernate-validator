@@ -20,7 +20,8 @@ package javax.validation;
 import java.util.Set;
 
 /**
- * Describe a constraint validation defect.
+ * Describe a constraint violation. This object describe the error context as
+ * well as the message describing the violation.
  *
  * @author Emmanuel Bernard
  * @todo add pointers to the metadata?

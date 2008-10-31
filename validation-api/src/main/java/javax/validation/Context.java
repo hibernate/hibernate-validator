@@ -7,8 +7,8 @@ package javax.validation;
  */
 public interface Context {
 	/**
-	 * Disable default error message and default InvalidConstraint object generation.
-	 * Useful to set a different error message or generate an InvalidConstraint based on
+	 * Disable default error message and default ConstraintViolation object generation.
+	 * Useful to set a different error message or generate an ConstraintViolation based on
 	 * a different property
 	 *
 	 * @see #addError(String)
@@ -25,13 +25,13 @@ public interface Context {
 	/**
 	 * Add a new unexpanded error message.
 	 * <p/>
-	 * If isValid returns false, an InvalidConstraint object will be built per error message
+	 * If isValid returns false, a ConstraintViolation object will be built per error message
 	 * including the default one unless #disableDefaultErrorMEssage() has been called.
 	 * <p/>
-	 * Aside from the error message, InvalidConstraint objects generated from such a call
+	 * Aside from the error message, ConstraintViolation objects generated from such a call
 	 * contains the same contextual information (root bean, path and so on)
 	 * <p/>
-	 * This method can be called multiple time. One InvalidConstraint instance per call is created.
+	 * This method can be called multiple time. One ConstraintViolation instance per call is created.
 	 *
 	 * @param message new unexpanded error message
 	 */
@@ -40,13 +40,13 @@ public interface Context {
 	/**
 	 * Add a new unexpanded error message to a given sub property.
 	 * <p/>
-	 * If isValid returns false, an InvalidConstraint object will be built per error message including the default one
+	 * If isValid returns false, a ConstraintViolation object will be built per error message including the default one
 	 * if null apply to the current property or the bean the constraint is applied on, otherwise apply to the <code>property</code> named
 	 * <p/>
 	 * TODO exception or swallowed when bean-level instance is not present?
 	 *
 	 * @param message new unexpanded error message
-	 * @param property property name the InvalidConstraint is targeting
+	 * @param property property name the ConstraintViolation is targeting
 	 *
 	 * @throws ValidationException when the property is not present on the bean level object
 	 */
