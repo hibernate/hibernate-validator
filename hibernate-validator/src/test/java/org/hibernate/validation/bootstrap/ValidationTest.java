@@ -23,7 +23,7 @@ import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintFactory;
-import javax.validation.InvalidConstraint;
+import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
@@ -81,13 +81,13 @@ public class ValidationTest {
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
 
-		Set<InvalidConstraint<Customer>> invalidConstraints = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, invalidConstraints.size() );
+		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 
 		customer.setLastName( "Doe" );
 
-		invalidConstraints = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 0, invalidConstraints.size() );
+		constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
 
 
@@ -104,10 +104,10 @@ public class ValidationTest {
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
 
-		Set<InvalidConstraint<Customer>> invalidConstraints = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, invalidConstraints.size() );
-		InvalidConstraint<Customer> constraint = invalidConstraints.iterator().next();
-		assertEquals( "Wrong message", "may not be null", constraint.getMessage() );
+		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 
 		//FIXME nothing guarantee that a builder can be reused
 		// now we modify the builder, get a new factory and valiator and try again
@@ -120,10 +120,10 @@ public class ValidationTest {
 		);
 		factory = builder.build();
 		validator = factory.getValidator( Customer.class );
-		invalidConstraints = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, invalidConstraints.size() );
-		constraint = invalidConstraints.iterator().next();
-		assertEquals( "Wrong message", "my custom message", constraint.getMessage() );
+		constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		constraintViolation = constraintViolations.iterator().next();
+		assertEquals( "Wrong message", "my custom message", constraintViolation.getMessage() );
 	}
 
 	@Test
@@ -138,10 +138,10 @@ public class ValidationTest {
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
 
-		Set<InvalidConstraint<Customer>> invalidConstraints = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, invalidConstraints.size() );
-		InvalidConstraint<Customer> constraint = invalidConstraints.iterator().next();
-		assertEquals( "Wrong message", "may not be null", constraint.getMessage() );
+		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 
 		//FIXME nothing guarantee that a builder can be reused
 		// now we modify the builder, get a new factory and valiator and try again
@@ -157,8 +157,8 @@ public class ValidationTest {
 		);
 		factory = builder.build();
 		validator = factory.getValidator( Customer.class );
-		invalidConstraints = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 0, invalidConstraints.size() );
+		constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
 
 	@Test

@@ -38,7 +38,7 @@ public interface Validator<T> extends Serializable {
 	 *
 	 * @throws IllegalArgumentException e if object is <code>null</code>.
 	 */
-	Set<InvalidConstraint<T>> validate(T object, String... groups);
+	Set<ConstraintViolation<T>> validate(T object, String... groups);
 
 	/**
 	 * validate all constraints on propertyname property of object (unless shortcut)
@@ -53,7 +53,7 @@ public interface Validator<T> extends Serializable {
 	 * @throws IllegalArgumentException e if object is  <code>null</code>.
 	 * @todo Do we keep this method?
 	 */
-	Set<InvalidConstraint<T>> validateProperty(T object, String propertyName, String... groups);
+	Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups);
 
 	/**
 	 * Validates all constraints on propertyname property if the property value is value (unless shortcut)
@@ -68,7 +68,7 @@ public interface Validator<T> extends Serializable {
 	 * @todo Do we keep this method?
 	 * @todo express limitations of InvalidConstraint in this case.
 	 */
-	Set<InvalidConstraint<T>> validateValue(String propertyName, Object value, String... groups);
+	Set<ConstraintViolation<T>> validateValue(String propertyName, Object value, String... groups);
 
 	/**
 	 * return true if at least one constraint declaration is present for the given bean

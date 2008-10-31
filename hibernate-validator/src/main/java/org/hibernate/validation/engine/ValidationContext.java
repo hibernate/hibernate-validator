@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.hibernate.validation.impl.InvalidConstraintImpl;
+import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.util.IdentitySet;
 
 /**
@@ -55,7 +55,7 @@ public class ValidationContext<T> {
 	/**
 	 * A list of all failing constraints so far.
 	 */
-	private final List<InvalidConstraintImpl<T>> failingConstraints;
+	private final List<ConstraintViolationImpl<T>> failingConstraintViolations;
 
 	/**
 	 * The current property path.
@@ -82,7 +82,7 @@ public class ValidationContext<T> {
 		validatedobjectStack.push( object );
 		processedObjects = new HashMap<String, IdentitySet>();
 		propertyPath = "";
-		failingConstraints = new ArrayList<InvalidConstraintImpl<T>>();
+		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 	}
 
 	public Object peekValidatedObject() {
@@ -125,18 +125,18 @@ public class ValidationContext<T> {
 		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
 	}
 
-	public void addConstraintFailure(InvalidConstraintImpl<T> failingConstraint) {
-		int i = failingConstraints.indexOf( failingConstraint );
+	public void addConstraintFailure(ConstraintViolationImpl<T> failingConstraintViolation) {
+		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
 		if ( i == -1 ) {
-			failingConstraints.add( failingConstraint );
+			failingConstraintViolations.add( failingConstraintViolation );
 		}
 		else {
-			failingConstraints.get( i ).addGroups( failingConstraint.getGroups() );
+			failingConstraintViolations.get( i ).addGroups( failingConstraintViolation.getGroups() );
 		}
 	}
 
-	public List<InvalidConstraintImpl<T>> getFailingConstraints() {
-		return failingConstraints;
+	public List<ConstraintViolationImpl<T>> getFailingConstraints() {
+		return failingConstraintViolations;
 	}
 
 	/**

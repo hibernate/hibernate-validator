@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintFactory;
 import javax.validation.ElementDescriptor;
-import javax.validation.InvalidConstraint;
+import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
 import javax.validation.Validator;
 
@@ -39,7 +39,7 @@ import org.hibernate.validation.Version;
 import org.hibernate.validation.ValidatorConstants;
 import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 import org.hibernate.validation.impl.ConstraintFactoryImpl;
-import org.hibernate.validation.impl.InvalidConstraintImpl;
+import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.impl.ResourceBundleMessageResolver;
 import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.PropertyIterator;
@@ -66,7 +66,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private final List<InvalidConstraintImpl<T>> EMPTY_CONSTRAINTS_LIST = Collections.EMPTY_LIST;
+	private final List<ConstraintViolationImpl<T>> EMPTY_CONSTRAINTS_LIST = Collections.EMPTY_LIST;
 
 	/**
 	 * A map for caching validators for cascaded entities.
@@ -100,14 +100,14 @@ public class ValidatorImpl<T> implements Validator<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<InvalidConstraint<T>> validate(T object, String... groups) {
+	public Set<ConstraintViolation<T>> validate(T object, String... groups) {
 		if ( object == null ) {
 			throw new IllegalArgumentException( "Validation of a null object" );
 		}
 
 		ValidationContext<T> context = new ValidationContext<T>( object );
-		List<InvalidConstraintImpl<T>> list = validate( context, Arrays.asList( groups ) );
-		return new HashSet<InvalidConstraint<T>>( list );
+		List<ConstraintViolationImpl<T>> list = validate( context, Arrays.asList( groups ) );
+		return new HashSet<ConstraintViolation<T>>( list );
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 	 * @todo Currently we iterate the cascaded fields multiple times. Maybe we should change to an approach where we iterate the object graph only once.
 	 * @todo Context root bean can be a different object than the current Validator<T> hence two different generics variables
 	 */
-	private List<InvalidConstraintImpl<T>> validate(ValidationContext<T> context, List<String> groups) {
+	private List<ConstraintViolationImpl<T>> validate(ValidationContext<T> context, List<String> groups) {
 		if ( context.peekValidatedObject() == null ) {
 			return EMPTY_CONSTRAINTS_LIST;
 		}
@@ -178,7 +178,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 							constraintDescriptor,
 							leafBeanInstance
 					);
-					InvalidConstraintImpl<T> failingConstraint = new InvalidConstraintImpl<T>(
+					ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 							message,
 							context.getRootBean(),
 							metaDataProvider.getBeanClass(),
@@ -187,7 +187,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 							context.peekPropertyPath(), //FIXME use error.getProperty()
 							context.getCurrentGroup()
 					);
-					context.addConstraintFailure( failingConstraint );
+					context.addConstraintFailure( failingConstraintViolation );
 				}
 			}
 			context.popProperty();
@@ -271,14 +271,14 @@ public class ValidatorImpl<T> implements Validator<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<InvalidConstraint<T>> validateProperty(T object, String propertyName, String... groups) {
-		List<InvalidConstraintImpl<T>> failingConstraints = new ArrayList<InvalidConstraintImpl<T>>();
-		validateProperty( object, new PropertyIterator( propertyName ), failingConstraints, groups );
-		return new HashSet<InvalidConstraint<T>>( failingConstraints );
+	public Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups) {
+		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		validateProperty( object, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
+		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
 
-	private void validateProperty(T object, PropertyIterator propertyIter, List<InvalidConstraintImpl<T>> failingConstraints, String... groups) {
+	private void validateProperty(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, String... groups) {
 		DesrciptorValueWrapper wrapper = getConstraintDescriptorAndValueForPath( this, propertyIter, object );
 
 		if ( wrapper == null ) {
@@ -311,7 +311,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 								wrapper.descriptor,
 								wrapper.value
 						);
-						InvalidConstraintImpl<T> failingConstraint = new InvalidConstraintImpl<T>(
+						ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 								message,
 								object,
 								( Class<T> ) object.getClass(),
@@ -320,11 +320,11 @@ public class ValidatorImpl<T> implements Validator<T> {
 								propertyIter.getOriginalProperty(), //FIXME use error.getProperty()
 								group
 						);
-						addFailingConstraint( failingConstraints, failingConstraint );
+						addFailingConstraint( failingConstraintViolations, failingConstraintViolation );
 					}
 				}
 
-				if ( isGroupSequence && failingConstraints.size() > 0 ) {
+				if ( isGroupSequence && failingConstraintViolations.size() > 0 ) {
 					break;
 				}
 			}
@@ -334,14 +334,14 @@ public class ValidatorImpl<T> implements Validator<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<InvalidConstraint<T>> validateValue(String propertyName, Object value, String... groups) {
-		List<InvalidConstraintImpl<T>> failingConstraints = new ArrayList<InvalidConstraintImpl<T>>();
-		validateValue( value, new PropertyIterator( propertyName ), failingConstraints, groups );
-		return new HashSet<InvalidConstraint<T>>( failingConstraints );
+	public Set<ConstraintViolation<T>> validateValue(String propertyName, Object value, String... groups) {
+		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		validateValue( value, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
+		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
 
-	private void validateValue(Object object, PropertyIterator propertyIter, List<InvalidConstraintImpl<T>> failingConstraints, String... groups) {
+	private void validateValue(Object object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, String... groups) {
 		ConstraintDescriptorImpl constraintDescriptor = getConstraintDescriptorForPath( this, propertyIter );
 
 		if ( constraintDescriptor == null ) {
@@ -373,7 +373,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 								constraintDescriptor,
 								object
 						);
-						InvalidConstraintImpl<T> failingConstraint = new InvalidConstraintImpl<T>(
+						ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 								message,
 								null,
 								null,
@@ -382,11 +382,11 @@ public class ValidatorImpl<T> implements Validator<T> {
 								propertyIter.getOriginalProperty(),  //FIXME use error.getProperty()
 								""
 						);
-						addFailingConstraint( failingConstraints, failingConstraint );
+						addFailingConstraint( failingConstraintViolations, failingConstraintViolation );
 					}
 				}
 
-				if ( isGroupSequence && failingConstraints.size() > 0 ) {
+				if ( isGroupSequence && failingConstraintViolations.size() > 0 ) {
 					break;
 				}
 			}
@@ -487,13 +487,13 @@ public class ValidatorImpl<T> implements Validator<T> {
 	}
 
 
-	private void addFailingConstraint(List<InvalidConstraintImpl<T>> failingConstraints, InvalidConstraintImpl<T> failingConstraint) {
-		int i = failingConstraints.indexOf( failingConstraint );
+	private void addFailingConstraint(List<ConstraintViolationImpl<T>> failingConstraintViolations, ConstraintViolationImpl<T> failingConstraintViolation) {
+		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
 		if ( i == -1 ) {
-			failingConstraints.add( failingConstraint );
+			failingConstraintViolations.add( failingConstraintViolation );
 		}
 		else {
-			failingConstraints.get( i ).addGroups( failingConstraint.getGroups() );
+			failingConstraintViolations.get( i ).addGroups( failingConstraintViolation.getGroups() );
 		}
 	}
 
