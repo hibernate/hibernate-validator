@@ -40,10 +40,10 @@ public interface Constraint<A extends Annotation> {
 	 * Implement the validation constraint
 	 *
 	 * @param object object to validate
-	 * @param validationContext context in which the constraint implementation is evaluated
+	 * @param constraintContext context in which the constraint implementation is evaluated
 	 *
 	 * @return true if object pass the constraint
 	 */
-	boolean isValid(Object object, ConstraintContext validationContext);
+	boolean isValid(Object object, ConstraintContext constraintContext);
 }
  
