@@ -74,7 +74,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getValue() {
+	public Object getInvalidValue() {
 		return value;
 	}
 

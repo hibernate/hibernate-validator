@@ -120,7 +120,7 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "may not be empty", constraintViolation.getMessage() );
 		assertEquals( "Wrong bean class", Book.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getValue() );
+		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "title", constraintViolation.getPropertyPath() );
 
 		book.setTitle( "Hibernate Persistence with JPA" );
@@ -132,7 +132,7 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "length must be between 0 and 30", constraintViolation.getMessage() );
 		assertEquals( "Wrong bean class", Book.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", book.getSubtitle(), constraintViolation.getValue() );
+		assertEquals( "Wrong value", book.getSubtitle(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "subtitle", constraintViolation.getPropertyPath() );
 
 		book.setSubtitle( "Revised Edition" );
@@ -144,7 +144,7 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "length must be between 0 and 20", constraintViolation.getMessage() );
 		assertEquals( "Wrong bean class", Author.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", author.getCompany(), constraintViolation.getValue() );
+		assertEquals( "Wrong value", author.getCompany(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "author.company", constraintViolation.getPropertyPath() );
 
 		author.setCompany( "JBoss" );
@@ -175,7 +175,7 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 		assertEquals( "Wrong bean class", Book.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getValue() );
+		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "title", constraintViolation.getPropertyPath() );
 
 		book.setTitle( "Hibernate Persistence with JPA" );
@@ -316,7 +316,7 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 		assertEquals( "Wrong bean class", Order.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", customer, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", order1.getOrderNumber(), constraintViolation.getValue() );
+		assertEquals( "Wrong value", order1.getOrderNumber(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "orderList[0].orderNumber", constraintViolation.getPropertyPath() );
 
 	}
@@ -366,7 +366,7 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "may not be empty", constraintViolation.getMessage() );
 		assertEquals( "Wrong bean class", Actor.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", clint, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", morgan.getLastName(), constraintViolation.getValue() );
+		assertEquals( "Wrong value", morgan.getLastName(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "playedWith[0].playedWith[1].lastName", constraintViolation.getPropertyPath() );
 	}
 
@@ -386,7 +386,7 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 		assertEquals( "Wrong bean class", null, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", null, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", order.getOrderNumber(), constraintViolation.getValue() );
+		assertEquals( "Wrong value", order.getOrderNumber(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "orderList[0].orderNumber", constraintViolation.getPropertyPath() );
 
 		constraintViolations = validator.validateValue( "orderList[0].orderNumber", "1234" );

@@ -62,7 +62,7 @@ public interface ConstraintViolation<T> {
 	/**
 	 * @return the value failing to pass the constraint.
 	 */
-	Object getValue();
+	Object getInvalidValue();
 
 	/**
 	 * @return the list of groups that the triggered constraint applies on and which also are
