@@ -68,7 +68,7 @@ public interface ConstraintDescriptor {
 	Set<ConstraintDescriptor> getComposingConstraints();
 
 	/**
-	 * @return true if the constraint is annotated with @ReportAsSingleInvalidConstraint
+	 * @return true if the constraint is annotated with @ReportAsViolationFromCompositeConstraint
 	 */
-	boolean ReportAsViolationFromComposingConstraint();
+	boolean isReportAsViolationFromCompositeConstraint();
 }
