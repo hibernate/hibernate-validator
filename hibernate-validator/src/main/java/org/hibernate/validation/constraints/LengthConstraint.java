@@ -20,7 +20,7 @@ package org.hibernate.validation.constraints;
 import javax.validation.Constraint;
 import javax.validation.StandardConstraint;
 import javax.validation.StandardConstraintDescriptor;
-import javax.validation.Context;
+import javax.validation.ConstraintContext;
 
 /**
  * Check that a string's length is between min and max.
@@ -37,7 +37,7 @@ public class LengthConstraint implements Constraint<Length>, StandardConstraint 
 		max = parameters.max();
 	}
 
-	public boolean isValid(Object value, Context context) {
+	public boolean isValid(Object value, ConstraintContext constraintContext) {
 		if ( value == null ) {
 			return true;
 		}

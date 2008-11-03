@@ -18,7 +18,7 @@
 package org.hibernate.validation.constraints;
 
 import javax.validation.Constraint;
-import javax.validation.Context;
+import javax.validation.ConstraintContext;
 
 /**
  * @author Hardy Ferentschik
@@ -29,7 +29,7 @@ public class NotEmptyConstraint implements Constraint<NotEmpty> {
 	public void initialize(NotEmpty parameters) {
 	}
 
-	public boolean isValid(Object object, Context context) {
+	public boolean isValid(Object object, ConstraintContext constraintContext) {
 		if ( object == null ) {
 			return true;
 		}

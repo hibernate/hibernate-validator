@@ -18,7 +18,7 @@
 package org.hibernate.validation.eg.constraint;
 
 import javax.validation.Constraint;
-import javax.validation.Context;
+import javax.validation.ConstraintContext;
 
 /**
  * @author Hardy Ferentschik
@@ -28,7 +28,7 @@ public class NoMessageConstraint implements Constraint<NoMessage> {
 	public void initialize(NoMessage parameters) {
 	}
 
-	public boolean isValid(Object object, Context context) {
+	public boolean isValid(Object object, ConstraintContext constraintContext) {
 		return false;
 	}
 }

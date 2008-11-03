@@ -31,7 +31,7 @@ import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorBuilder;
 import javax.validation.ValidatorFactory;
-import javax.validation.Context;
+import javax.validation.ConstraintContext;
 import javax.validation.bootstrap.SpecializedBuilderFactory;
 import javax.validation.spi.ValidationProvider;
 
@@ -237,7 +237,7 @@ public class ValidationTest {
 
 	class BadlyBehavedNotNullConstraint extends NotNullConstraint {
 		@Override
-		public boolean isValid(Object object, Context context) {
+		public boolean isValid(Object object, ConstraintContext constraintContext) {
 			return true;
 		}
 	}

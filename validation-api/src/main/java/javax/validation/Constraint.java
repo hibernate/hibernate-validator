@@ -44,6 +44,6 @@ public interface Constraint<A extends Annotation> {
 	 *
 	 * @return true if object pass the constraint
 	 */
-	boolean isValid(Object object, Context validationContext);
+	boolean isValid(Object object, ConstraintContext validationContext);
 }
  

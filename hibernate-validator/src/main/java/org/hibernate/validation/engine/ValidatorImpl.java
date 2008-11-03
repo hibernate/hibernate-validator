@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintFactory;
-import javax.validation.ElementDescriptor;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
 import javax.validation.Validator;
@@ -171,10 +170,10 @@ public class ValidatorImpl<T> implements Validator<T> {
 
 			final Object leafBeanInstance = context.peekValidatedObject();
 			Object value = metaConstraint.getValue( leafBeanInstance );
-			ContextImpl contextImpl = new ContextImpl(constraintDescriptor);
+			ConstraintContextImpl contextImpl = new ConstraintContextImpl(constraintDescriptor);
 
 			if ( !constraintDescriptor.getConstraintImplementation().isValid( value, contextImpl ) ) {
-				for ( ContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
+				for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
 					String message = messageResolver.interpolate(
 							error.getMessage(),
 							constraintDescriptor,
@@ -304,10 +303,10 @@ public class ValidatorImpl<T> implements Validator<T> {
 					continue;
 				}
 
-				ContextImpl contextImpl = new ContextImpl(wrapper.descriptor);
+				ConstraintContextImpl contextImpl = new ConstraintContextImpl(wrapper.descriptor);
 				if ( !wrapper.descriptor.getConstraintImplementation().isValid( wrapper.value, contextImpl ) ) {
 
-					for ( ContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
+					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
 						String message = messageResolver.interpolate(
 								error.getMessage(),
 								wrapper.descriptor,
@@ -367,9 +366,9 @@ public class ValidatorImpl<T> implements Validator<T> {
 					continue;
 				}
 
-				ContextImpl contextImpl = new ContextImpl(constraintDescriptor);
+				ConstraintContextImpl contextImpl = new ConstraintContextImpl(constraintDescriptor);
 				if ( !constraintDescriptor.getConstraintImplementation().isValid( object, contextImpl ) ) {
-					for ( ContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
+					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
 						String message = messageResolver.interpolate(
 								error.getMessage(),
 								constraintDescriptor,

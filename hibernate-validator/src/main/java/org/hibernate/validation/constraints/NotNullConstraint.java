@@ -18,7 +18,7 @@
 package org.hibernate.validation.constraints;
 
 import javax.validation.Constraint;
-import javax.validation.Context;
+import javax.validation.ConstraintContext;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -31,7 +31,7 @@ public class NotNullConstraint implements Constraint<NotNull> {
 	public void initialize(NotNull parameters) {
 	}
 
-	public boolean isValid(Object object, Context context) {
+	public boolean isValid(Object object, ConstraintContext constraintContext) {
 		return object != null;
 	}
 }
