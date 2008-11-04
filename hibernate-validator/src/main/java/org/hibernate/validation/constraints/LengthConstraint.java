@@ -18,8 +18,6 @@
 package org.hibernate.validation.constraints;
 
 import javax.validation.Constraint;
-import javax.validation.StandardConstraint;
-import javax.validation.StandardConstraintDescriptor;
 import javax.validation.ConstraintContext;
 
 /**
@@ -28,7 +26,7 @@ import javax.validation.ConstraintContext;
  * @author Emmanuel Bernard
  * @author Gavin King
  */
-public class LengthConstraint implements Constraint<Length>, StandardConstraint {
+public class LengthConstraint implements Constraint<Length> {
 	private int min;
 	private int max;
 
@@ -49,16 +47,4 @@ public class LengthConstraint implements Constraint<Length>, StandardConstraint 
 		return length >= min && length <= max;
 	}
 
-	public StandardConstraintDescriptor getStandardConstraints() {
-		return new StandardConstraintDescriptor() {
-			public Integer getLength() {
-				if ( max == Integer.MAX_VALUE ) {
-					return null;
-				}
-				else {
-					return max;
-				}
-			}
-		};
-	}
 }
