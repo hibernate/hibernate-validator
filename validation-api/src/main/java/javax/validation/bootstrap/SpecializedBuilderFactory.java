@@ -1,10 +1,10 @@
 package javax.validation.bootstrap;
 
 import javax.validation.ValidationProviderResolver;
-import javax.validation.ValidatorBuilder;
+import javax.validation.ValidatorFactoryBuilder;
 
 /**
- * Build implementations of builderType, the specific ValidationBuilder sub interface uniquely identifying
+ * Build implementations of builderType, the specific ValidatorFactoryBuilder sub interface uniquely identifying
  * a provider.
  * <p/>
  * The requested provider is the first provider suitable for T (as defined in
@@ -14,7 +14,7 @@ import javax.validation.ValidatorBuilder;
  *
  * @author Emmanuel Bernard
  */
-public interface SpecializedBuilderFactory<T extends ValidatorBuilder<T>> {
+public interface SpecializedBuilderFactory<T extends ValidatorFactoryBuilder<T>> {
 
 	/**
 	 * Optionally define the provider resolver implementation used.
@@ -28,9 +28,9 @@ public interface SpecializedBuilderFactory<T extends ValidatorBuilder<T>> {
 
 	/**
 	 * Determine the provider implementation suitable for builderType and delegate the creation
-	 * of this specific ValidatorBuilder subclass to the provider.
+	 * of this specific ValidatorFactoryBuilder subclass to the provider.
 	 *
-	 * @return a ValidatorBuilder sub interface implementation
+	 * @return a ValidatorFactoryBuilder sub interface implementation
 	 */
-	public T getValidatorBuilder();
+	public T getBuilder();
 }

@@ -1,11 +1,11 @@
 package javax.validation.bootstrap;
 
 import javax.validation.ValidationProviderResolver;
-import javax.validation.ValidatorBuilder;
+import javax.validation.ValidatorFactoryBuilder;
 
 /**
  * Defines the state used to bootstrap Bean Validation and create an appropriate
- * ValidatorBuilder
+ * ValidatorFactoryBuilder
  *
  * @author Emmanuel Bernard
  */
@@ -23,13 +23,13 @@ public interface GenericBuilderFactory {
 	GenericBuilderFactory providerResolver(ValidationProviderResolver resolver);
 
 	/**
-	 * Returns a generic ValidatorBuilder implementation.
+	 * Returns a generic ValidatorFactoryBuilder implementation.
 	 * At this stage the provider used to build the ValidationFactory is not defined.
 	 * <p/>
-	 * The ValidatorBuilder implementation is provided by the first provider returned
+	 * The ValidatorFactoryBuilder implementation is provided by the first provider returned
 	 * by the ValidationProviderResolver strategy.
 	 *
-	 * @return a ValidatorBuilder implementation compliant with the bootstrap state
+	 * @return a ValidatorFactoryBuilder implementation compliant with the bootstrap state
 	 */
-	ValidatorBuilder<?> getValidatorBuilder();
+	ValidatorFactoryBuilder<?> getBuilder();
 }

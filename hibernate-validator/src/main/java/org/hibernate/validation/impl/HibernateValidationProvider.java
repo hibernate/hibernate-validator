@@ -18,13 +18,13 @@
 package org.hibernate.validation.impl;
 
 import javax.validation.ValidationException;
-import javax.validation.ValidatorBuilder;
+import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.spi.ValidatorBuilderImplementor;
 import javax.validation.spi.BootstrapState;
 
-import org.hibernate.validation.HibernateValidatorBuilder;
+import org.hibernate.validation.HibernateValidatorFactoryBuilder;
 
 /**
  * Default implementation of <code>ValidationProvider</code> within Hibernate validator.
@@ -37,23 +37,23 @@ public class HibernateValidationProvider implements ValidationProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isSuitable(Class<? extends ValidatorBuilder<?>> builderClass) {
-		return builderClass == HibernateValidatorBuilder.class;
+	public boolean isSuitable(Class<? extends ValidatorFactoryBuilder<?>> builderClass) {
+		return builderClass == HibernateValidatorFactoryBuilder.class;
 	}
 
-	public <T extends ValidatorBuilder<T>> T createSpecializedValidatorBuilder(BootstrapState state, Class<T> builderClass) {
+	public <T extends ValidatorFactoryBuilder<T>> T createSpecializedValidatorFactoryBuilder(BootstrapState state, Class<T> builderClass) {
 		if ( ! isSuitable( builderClass ) ) {
-			throw new ValidationException("Illegal call to createSpecializedValidatorBuilder() for a non suitable provider");
+			throw new ValidationException("Illegal call to createSpecializedValidatorFactoryBuilder() for a non suitable provider");
 		}
 		//cast protected  by isSuitable call
-		return builderClass.cast( new ValidatorBuilderImpl( this ) );
+		return builderClass.cast( new ValidatorFactoryBuilderImpl( this ) );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public ValidatorBuilder<?> createGenericValidatorBuilder(BootstrapState state) {
-		return new ValidatorBuilderImpl( state );
+	public ValidatorFactoryBuilder<?> createGenericValidatorFactoryBuilder(BootstrapState state) {
+		return new ValidatorFactoryBuilderImpl( state );
 	}
 
 	/**

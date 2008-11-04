@@ -17,7 +17,7 @@
 */
 package javax.validation.spi;
 
-import javax.validation.ValidatorBuilder;
+import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.ValidatorFactory;
 
 /**
@@ -33,14 +33,14 @@ public interface ValidationProvider {
 	/**
 	 * @param builderClass targeted builder class.
 	 *
-	 * @return <code>true</code> if <code>builderClass</code> is the Bean Validation Provider sub interface for ValidatorBuilder
+	 * @return <code>true</code> if <code>builderClass</code> is the Bean Validation Provider sub interface for ValidatorFactoryBuilder
 	 *         This sub interface uniquely identify a provider.
 	 */
-	boolean isSuitable(Class<? extends ValidatorBuilder<?>> builderClass);
+	boolean isSuitable(Class<? extends ValidatorFactoryBuilder<?>> builderClass);
 
 	/**
-	 * Returns a ValidatorBuilder instance implementing the <code>builderType</code> interface.
-	 * The ValidatorBuilder instance uses the current provider (<code>this</code>) to build
+	 * Returns a ValidatorFactoryBuilder instance implementing the <code>builderType</code> interface.
+	 * The ValidatorFactoryBuilder instance uses the current provider (<code>this</code>) to build
 	 * the ValidatorFactory instance.
 	 * <p/>
 	 * This method can only be called on providers returning true on <code>#issuitable(builderType)</code>
@@ -50,12 +50,12 @@ public interface ValidationProvider {
 	 *
 	 * @return specific validator builder implementation
 	 */
-	<T extends ValidatorBuilder<T>> T createSpecializedValidatorBuilder(BootstrapState state, Class<T> builderClass);
+	<T extends ValidatorFactoryBuilder<T>> T createSpecializedValidatorFactoryBuilder(BootstrapState state, Class<T> builderClass);
 
 	/**
-	 * Returns a ValidatorBuilder instance. This instance is not bound to
+	 * Returns a ValidatorFactoryBuilder instance. This instance is not bound to
 	 * use the current provider. The choice of provider follows the algorithm described
-	 * in {@link javax.validation.ValidatorBuilder}
+	 * in {@link javax.validation.ValidatorFactoryBuilder}
 	 * <p/>
 	 * The ValidationProviderResolver used is provided by <code>state</code>.
 	 * If null, the default ValidationProviderResolver is used.
@@ -64,7 +64,7 @@ public interface ValidationProvider {
 	 *
 	 * @return validator builder implementation
 	 */
-	ValidatorBuilder<?> createGenericValidatorBuilder(BootstrapState state);
+	ValidatorFactoryBuilder<?> createGenericValidatorFactoryBuilder(BootstrapState state);
 
 	/**
 	 * Build a ValidatorFactory using the current provider implementation. The ValidationFactory

@@ -29,7 +29,7 @@ import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
-import javax.validation.ValidatorBuilder;
+import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.ValidatorFactory;
 import javax.validation.ConstraintContext;
 import javax.validation.bootstrap.SpecializedBuilderFactory;
@@ -41,11 +41,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.HibernateValidatorBuilder;
+import org.hibernate.validation.HibernateValidatorFactoryBuilder;
 import org.hibernate.validation.constraints.NotNullConstraint;
 import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.impl.ConstraintFactoryImpl;
-import org.hibernate.validation.impl.ValidatorBuilderImpl;
+import org.hibernate.validation.impl.ValidatorFactoryBuilderImpl;
 import org.hibernate.validation.impl.ValidatorFactoryImpl;
 import org.hibernate.validation.impl.HibernateValidationProvider;
 
@@ -58,21 +58,21 @@ public class ValidationTest {
 
 	@Test
 	public void testBootstrapAsServiceWithBuilder() {
-		HibernateValidatorBuilder builder = Validation
-				.builderType( HibernateValidatorBuilder.class )
-				.getValidatorBuilder();
+		HibernateValidatorFactoryBuilder builder = Validation
+				.builderType( HibernateValidatorFactoryBuilder.class )
+				.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
 	}
 
 	@Test
 	public void testBootstrapAsServiceDefault() {
-		ValidatorBuilder<?> builder = Validation.getValidatorBuilder();
+		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
 	}
 
 	@Test
 	public void testGetCustomerValiator() {
-		ValidatorBuilder<?> builder = Validation.getValidatorBuilder();
+		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
 
 		ValidatorFactory factory = builder.build();
@@ -95,7 +95,7 @@ public class ValidationTest {
 	public void testCustomMessageResolver() {
 
 		// first try with the default message resolver
-		ValidatorBuilder<?> builder = Validation.getValidatorBuilder();
+		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
 
 		ValidatorFactory factory = builder.build();
@@ -129,7 +129,7 @@ public class ValidationTest {
 	@Test
 	public void testCustomConstraintFactory() {
 
-		ValidatorBuilder<?> builder = Validation.getValidatorBuilder();
+		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
 
 		ValidatorFactory factory = builder.build();
@@ -173,10 +173,10 @@ public class ValidationTest {
 		};
 
 
-		HibernateValidatorBuilder builder = Validation
-					.builderType( HibernateValidatorBuilder.class )
+		HibernateValidatorFactoryBuilder builder = Validation
+					.builderType( HibernateValidatorFactoryBuilder.class )
 					.providerResolver( resolver )
-					.getValidatorBuilder();
+					.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
 	}
 
@@ -192,10 +192,10 @@ public class ValidationTest {
 		};
 
 
-		ValidatorBuilder<?> builder = Validation
+		ValidatorFactoryBuilder<?> builder = Validation
 			        .defineBootstrapState()
 					.providerResolver( resolver )
-					.getValidatorBuilder();
+					.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
 	}
 
@@ -208,27 +208,27 @@ public class ValidationTest {
 			}
 		};
 
-		final SpecializedBuilderFactory<HibernateValidatorBuilder> specializedBuilderFactory =
+		final SpecializedBuilderFactory<HibernateValidatorFactoryBuilder> specializedBuilderFactory =
 				Validation
-						.builderType(HibernateValidatorBuilder.class)
+						.builderType( HibernateValidatorFactoryBuilder.class)
 						.providerResolver( resolver );
 
 		try {
-			specializedBuilderFactory.getValidatorBuilder();
+			specializedBuilderFactory.getBuilder();
 			fail();
 		}
 		catch ( ValidationException e ) {
 			assertEquals(
 					"Wrong error message",
-					"Unable to find provider: interface org.hibernate.validation.HibernateValidatorBuilder",
+					"Unable to find provider: interface org.hibernate.validation.HibernateValidatorFactoryBuilder",
 					e.getMessage()
 			);
 		}
 	}
 
-	private void assertDefaultBuilderAndFactory(ValidatorBuilder builder) {
+	private void assertDefaultBuilderAndFactory(ValidatorFactoryBuilder builder) {
 		assertNotNull( builder );
-		assertTrue( builder instanceof ValidatorBuilderImpl );
+		assertTrue( builder instanceof ValidatorFactoryBuilderImpl );
 
 		ValidatorFactory factory = builder.build();
 		assertNotNull( factory );

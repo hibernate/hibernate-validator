@@ -29,7 +29,7 @@ import javax.validation.spi.ValidationProvider;
  * <li>
  * The easiest approach is to use the default Bean Validation provider.
  * <pre>
- * ValidatorFactory factory = Validation.getValidatorBuilder().build();
+ * ValidatorFactory factory = Validation.getBuilder().build();
  * </pre>
  * In this case {@link  javax.validation.bootstrap.DefaultValidationProviderResolver  DefaultValidationProviderResolver}
  * will be used to locate available providers.
@@ -45,10 +45,10 @@ import javax.validation.spi.ValidationProvider;
  * The second bootstrap approach allows to choose a custom <code>ValidationProviderResolver</code>. The chosen
  * <code>ValidationProvider</code> is then determined in the same way as in the default bootstrapping case (see above).
  * <pre>
- * ValidatorBuilder&lt?&gt; builder = Validation
+ * ValidatorFactoryBuilder&lt?&gt; builder = Validation
  *    .defineBootstrapState()
  *    .providerResolver( new MyResolverStrategy() )
- *    .getValidatorBuilder();
+ *    .getBuilder();
  * ValidatorFactory factory = builder.build();
  * </pre>
  * </li>
@@ -56,14 +56,14 @@ import javax.validation.spi.ValidationProvider;
  * <p/>
  * <li>
  * The third approach allows you to specify explicitly and in a type safe fashion the expected provider by
- * using its specific <code>ValidatorBuilder</code> sub-interface.
+ * using its specific <code>ValidatorFactoryBuilder</code> sub-interface.
  *
  * Optionally you can choose a custom <code>ValidationProviderResolver</code>.
  * <pre>
- * ACMEValidatorBuilder builder = Validation
- *    .builderType(ACMEValidatorBuilder.class)
+ * ACMEValidatorFactoryBuilder builder = Validation
+ *    .builderType(ACMEValidatorFactoryBuilder.class)
  *    .providerResolver( new MyResolverStrategy() )  // optionally set the provider resolver
- *    .getValidatorBuilder();
+ *    .getBuilder();
  * ValidatorFactory factory = builder.build();
  * </pre>
  * </li>
@@ -86,61 +86,61 @@ import javax.validation.spi.ValidationProvider;
 public class Validation {
 
 	/**
-	 * Build a <code>ValidatorBuilder</code>. The actual provider choice is given by the XML configuration. If the
+	 * Build a <code>ValidatorFactoryBuilder</code>. The actual provider choice is given by the XML configuration. If the
 	 * XML configuration does not exsist the default is taken.
 	 * <p/>
 	 * The provider list is resolved using the {@link  javax.validation.bootstrap.DefaultValidationProviderResolver  DefaultValidationProviderResolver}.
 	 *
-	 * @return <code>ValidatorBuilder</code> instance.
+	 * @return <code>ValidatorFactoryBuilder</code> instance.
 	 */
-	public static ValidatorBuilder<?> getValidatorBuilder() {
-		return defineBootstrapState().getValidatorBuilder();
+	public static ValidatorFactoryBuilder<?> getBuilder() {
+		return defineBootstrapState().getBuilder();
 	}
 
 	/**
-	 * Build a <code>ValidatorBuilder</code>. The provider list is resolved using the strategy provided to the bootstrap state.
+	 * Build a <code>ValidatorFactoryBuilder</code>. The provider list is resolved using the strategy provided to the bootstrap state.
 	 * <pre>
-	 * ValidatorBuilder&lt?&gt; builder = Validation
+	 * ValidatorFactoryBuilder&lt?&gt; builder = Validation
 	 *    .defineBootstrapState()
 	 *    .providerResolver( new MyResolverStrategy() )
-	 *    .getValidatorBuilder();
+	 *    .getBuilder();
 	 * ValidatorFactory factory = builder.build();
 	 * </pre>
 	 * The actual provider choice is given by the XML configuration. If the XML configuration does not exsist the first
 	 * available provider will be returned.
 	 *
-	 * @return instance building a generic <code>ValidatorBuilder</code> compliant with the bootstrap state provided.
+	 * @return instance building a generic <code>ValidatorFactoryBuilder</code> compliant with the bootstrap state provided.
 	 */
 	public static GenericBuilderFactory defineBootstrapState() {
 		return new GenericBuilderFactoryImpl();
 	}
 
 	/**
-	 * Build a <code>ValidatorBuilder</code> for a particular provider implementation.
+	 * Build a <code>ValidatorFactoryBuilder</code> for a particular provider implementation.
 	 * Optionally override the provider resolution strategy used to determine the provider.
 	 * <p/>
 	 * Used by applications targeting a specific provider programmatically.
 	 * <p/>
 	 * <pre>
-	 * ACMEValidatorBuilder builder = Validation.builderType(ACMEValidatorBuilder.class)
+	 * ACMEValidatorFactoryBuilder builder = Validation.builderType(ACMEValidatorFactoryBuilder.class)
 	 *     .providerResolver( new MyResolverStrategy() )
 	 *     .build();
 	 * </pre>,
-	 * where <code>ACMEValidatorBuilder</code> is the <code>ValidatorBuiler</code> sub interface uniquely identifying
+	 * where <code>ACMEValidatorFactoryBuilder</code> is the <code>ValidatorFactoryBuilder</code> sub interface uniquely identifying
 	 * the ACME Bean Validation provider.
 	 *
-	 * @param builderType the <code>ValidatorBuilder</code> sub interface uniquely defining the targeted provider.
+	 * @param builderType the <code>ValidatorFactoryBuilder</code> sub interface uniquely defining the targeted provider.
 	 *
-	 * @return instance building a provider specific <code>ValidatorBuilder</code> sub interface implementation.
+	 * @return instance building a provider specific <code>ValidatorFactoryBuilder</code> sub interface implementation.
 	 *
-	 * @see #getValidatorBuilder()
+	 * @see #getBuilder()
 	 */
-	public static <T extends ValidatorBuilder<T>> SpecializedBuilderFactory<T> builderType(Class<T> builderType) {
+	public static <T extends ValidatorFactoryBuilder<T>> SpecializedBuilderFactory<T> builderType(Class<T> builderType) {
 		return new SpecializedBuilderFactoryImpl<T>( builderType );
 	}
 
 	//private class, not exposed
-	private static class SpecializedBuilderFactoryImpl<T extends ValidatorBuilder<T>>
+	private static class SpecializedBuilderFactoryImpl<T extends ValidatorFactoryBuilder<T>>
 			implements SpecializedBuilderFactory<T> {
 
 		private Class<T> builderType;
@@ -165,14 +165,14 @@ public class Validation {
 
 		/**
 		 * Determine the provider implementation suitable for builderType and delegate the creation
-		 * of this specific ValidatorBuilder subclass to the provider.
+		 * of this specific ValidatorFactoryBuilder subclass to the provider.
 		 *
-		 * @return a ValidatorBuilder sub interface implementation
+		 * @return a ValidatorFactoryBuilder sub interface implementation
 		 */
-		public T getValidatorBuilder() {
+		public T getBuilder() {
 			if ( builderType == null ) {
 				throw new ValidationException(
-						"builder is mandatory. Use getValidatorBuilder() to use the generic provider discovery mechanism"
+						"builder is mandatory. Use getBuilder() to use the generic provider discovery mechanism"
 				);
 			}
 			if ( resolver == null ) {
@@ -182,7 +182,7 @@ public class Validation {
 				if ( provider.isSuitable( builderType ) ) {
 					GenericBuilderFactoryImpl state = new GenericBuilderFactoryImpl();
 					state.providerResolver( resolver );
-					return provider.createSpecializedValidatorBuilder( state, builderType );
+					return provider.createSpecializedValidatorFactoryBuilder( state, builderType );
 				}
 			}
 			throw new ValidationException( "Unable to find provider: " + builderType );
@@ -203,7 +203,7 @@ public class Validation {
 			return resolver;
 		}
 
-		public ValidatorBuilder<?> getValidatorBuilder() {
+		public ValidatorFactoryBuilder<?> getBuilder() {
 			ValidationProviderResolver resolver = this.resolver == null ?
 					new DefaultValidationProviderResolver() :
 					this.resolver;
@@ -212,7 +212,7 @@ public class Validation {
 				//FIXME looks like an assertion error almost
 				throw new ValidationException( "Unable to find a default provider" );
 			}
-			return resolver.getValidationProviders().get( 0 ).createGenericValidatorBuilder( this );
+			return resolver.getValidationProviders().get( 0 ).createGenericValidatorFactoryBuilder( this );
 		}
 	}
 }
