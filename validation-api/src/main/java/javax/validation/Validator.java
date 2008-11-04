@@ -76,7 +76,7 @@ public interface Validator<T> extends Serializable {
 	/**
 	 * return the class level constraints
 	 */
-	BeanDescriptor getConstraintsForBean();
+	BeanDescriptor getConstraintsForClass();
 
 	/**
 	 * return the property level constraints for a given propertyName
