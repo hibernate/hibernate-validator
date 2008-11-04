@@ -87,6 +87,6 @@ public interface Validator<T> extends Serializable {
 	/**
 	 * return the property names having at least a constraint defined
 	 */
-	Set<String> getValidatedProperties();
+	Set<String> getPropertiesWithConstraints();
 
 }

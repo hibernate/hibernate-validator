@@ -514,7 +514,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 		return metaDataProvider.getPropertyDescriptors().get( propertyName );
 	}
 
-	public Set<String> getValidatedProperties() {
+	public Set<String> getPropertiesWithConstraints() {
 		return Collections.unmodifiableSet( metaDataProvider.getPropertyDescriptors()
 				.keySet() );
 	}
