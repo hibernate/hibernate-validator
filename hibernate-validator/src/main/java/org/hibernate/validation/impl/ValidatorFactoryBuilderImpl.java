@@ -27,7 +27,7 @@ import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.ValidatorFactory;
 import javax.validation.bootstrap.DefaultValidationProviderResolver;
 import javax.validation.spi.ValidationProvider;
-import javax.validation.spi.ValidatorBuilderImplementor;
+import javax.validation.spi.ValidatorFactoryConfiguration;
 import javax.validation.spi.BootstrapState;
 
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
@@ -35,7 +35,7 @@ import org.hibernate.validation.HibernateValidatorFactoryBuilder;
 /**
  * @author Emmanuel Bernard
  */
-public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBuilder, ValidatorBuilderImplementor {
+public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBuilder, ValidatorFactoryConfiguration {
 	private MessageResolver messageResolver = new ResourceBundleMessageResolver();
 	private ConstraintFactory constraintFactory = new ConstraintFactoryImpl();
 	private String configurationFile = "META-INF/validation.xml";

@@ -21,7 +21,7 @@ import javax.validation.ConstraintFactory;
 import javax.validation.MessageResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.spi.ValidatorBuilderImplementor;
+import javax.validation.spi.ValidatorFactoryConfiguration;
 
 import org.hibernate.validation.engine.ValidatorImpl;
 
@@ -35,9 +35,9 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final ConstraintFactory constraintFactory;
 
 
-	public ValidatorFactoryImpl(ValidatorBuilderImplementor validatorBuilder) {
-		this.messageResolver = validatorBuilder.getMessageResolver();
-		this.constraintFactory = validatorBuilder.getConstraintFactory();
+	public ValidatorFactoryImpl(ValidatorFactoryConfiguration configuration) {
+		this.messageResolver = configuration.getMessageResolver();
+		this.constraintFactory = configuration.getConstraintFactory();
 		//do init metadata from XML form
 	}
 

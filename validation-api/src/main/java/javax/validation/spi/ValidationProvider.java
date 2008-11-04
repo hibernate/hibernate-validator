@@ -68,7 +68,7 @@ public interface ValidationProvider {
 
 	/**
 	 * Build a ValidatorFactory using the current provider implementation. The ValidationFactory
-	 * is assembled and follow the configuration passed using ValidatorBuilderImplementor.
+	 * is assembled and follow the configuration passed using ValidatorFactoryConfiguration.
 	 * <p>
 	 * The returned ValidatorFactory is properly initialized and ready for use.
 	 * </p>
@@ -77,5 +77,5 @@ public interface ValidationProvider {
 	 *
 	 * @return the instanciated ValidatorFactory
 	 */
-	ValidatorFactory buildValidatorFactory(ValidatorBuilderImplementor configuration);
+	ValidatorFactory buildValidatorFactory(ValidatorFactoryConfiguration configuration);
 }

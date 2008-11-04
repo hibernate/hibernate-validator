@@ -21,7 +21,7 @@ import javax.validation.ValidationException;
 import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
-import javax.validation.spi.ValidatorBuilderImplementor;
+import javax.validation.spi.ValidatorFactoryConfiguration;
 import javax.validation.spi.BootstrapState;
 
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
@@ -59,7 +59,7 @@ public class HibernateValidationProvider implements ValidationProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ValidatorFactory buildValidatorFactory(ValidatorBuilderImplementor validatorBuilder) {
-		return new ValidatorFactoryImpl( validatorBuilder );
+	public ValidatorFactory buildValidatorFactory(ValidatorFactoryConfiguration configuration) {
+		return new ValidatorFactoryImpl( configuration );
 	}
 }
