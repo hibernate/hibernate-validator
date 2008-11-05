@@ -24,7 +24,6 @@ import java.util.Set;
  * well as the message describing the violation.
  *
  * @author Emmanuel Bernard
- * @todo add pointers to the metadata?
  * @todo the rational behind rootBean and propertyPath is to keep the context available to the user
  */
 public interface ConstraintViolation<T> {
@@ -71,4 +70,10 @@ public interface ConstraintViolation<T> {
 	 * TODO: considering removal, if you think it's important, speak up
 	 */
 	Set<String> getGroups();
+
+	/**
+	 * Constraint metadata reported to fail
+	 * @return constraint metadata
+	 */
+	ConstraintDescriptor getConstraintDescriptor();
 }

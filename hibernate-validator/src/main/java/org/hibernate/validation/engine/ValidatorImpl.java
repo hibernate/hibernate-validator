@@ -186,7 +186,8 @@ public class ValidatorImpl<T> implements Validator<T> {
 							leafBeanInstance,
 							value,
 							context.peekPropertyPath(), //FIXME use error.getProperty()
-							context.getCurrentGroup()
+							context.getCurrentGroup(),
+							constraintDescriptor
 					);
 					context.addConstraintFailure( failingConstraintViolation );
 				}
@@ -319,7 +320,8 @@ public class ValidatorImpl<T> implements Validator<T> {
 								object,
 								wrapper.value,
 								propertyIter.getOriginalProperty(), //FIXME use error.getProperty()
-								group
+								group,
+								wrapper.descriptor
 						);
 						addFailingConstraint( failingConstraintViolations, failingConstraintViolation );
 					}
@@ -381,7 +383,8 @@ public class ValidatorImpl<T> implements Validator<T> {
 								null,
 								object,
 								propertyIter.getOriginalProperty(),  //FIXME use error.getProperty()
-								""
+								"",
+								constraintDescriptor
 						);
 						addFailingConstraint( failingConstraintViolations, failingConstraintViolation );
 					}

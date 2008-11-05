@@ -20,6 +20,7 @@ package org.hibernate.validation.impl;
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintDescriptor;
 
 /**
  * @author Emmanuel Bernard
@@ -33,9 +34,11 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private String propertyPath;
 	private HashSet<String> groups;
 	private Object leafBeanInstance;
+	private final ConstraintDescriptor constraintDescriptor;
 
 
-	public ConstraintViolationImpl(String message, T rootBean, Class<T> beanClass, Object leafBeanInstance, Object value, String propertyPath, String group) {
+	public ConstraintViolationImpl(String message, T rootBean, Class<T> beanClass, Object leafBeanInstance, Object value,
+								   String propertyPath, String group, ConstraintDescriptor constraintDescriptor) {
 		this.message = message;
 		this.rootBean = rootBean;
 		this.beanClass = beanClass;
@@ -44,6 +47,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		groups = new HashSet<String>();
 		groups.add( group );
 		this.leafBeanInstance = leafBeanInstance;
+		this.constraintDescriptor = constraintDescriptor;
 	}
 
 	/**
@@ -90,6 +94,10 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	 */
 	public Set<String> getGroups() {
 		return groups;
+	}
+
+	public ConstraintDescriptor getConstraintDescriptor() {
+		return this.constraintDescriptor;
 	}
 
 	public void addGroups(Set<String> groupSet) {
