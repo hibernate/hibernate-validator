@@ -31,7 +31,8 @@ public interface ConstraintContext {
 	 * Aside from the error message, ConstraintViolation objects generated from such a call
 	 * contains the same contextual information (root bean, path and so on)
 	 * <p/>
-	 * This method can be called multiple time. One ConstraintViolation instance per call is created.
+	 * This method can be called multiple time. One ConstraintViolation instance per
+	 * call is created.
 	 *
 	 * @param message new unexpanded error message
 	 */
@@ -40,8 +41,10 @@ public interface ConstraintContext {
 	/**
 	 * Add a new unexpanded error message to a given sub property.
 	 * <p/>
-	 * If isValid returns false, a ConstraintViolation object will be built per error message including the default one
-	 * if null apply to the current property or the bean the constraint is applied on, otherwise apply to the <code>property</code> named
+	 * If isValid returns false, a ConstraintViolation object will be built
+	 * per error message including the default one
+	 * if null apply to the current property or the bean the constraint is applied on,
+	 * otherwise apply to the <code>property</code> named
 	 * <p/>
 	 * TODO exception or swallowed when bean level instance is not present?
 	 *

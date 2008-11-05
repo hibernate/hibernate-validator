@@ -48,10 +48,10 @@ public interface ConstraintDescriptor {
 	Class<? extends Constraint> getConstraintClass();
 
 	/**
-	 * Returns a map containing the annotation parameter names as keys and the annotation parameter values
-	 * as value.
-	 * If this constraint is used as part of a composed constraint, parameter values are reflecting
-	 * the overridden parameters form the main constraint.
+	 * Returns a map containing the annotation parameter names as keys and the
+	 * annotation parameter values as value.
+	 * If this constraint is used as part of a composed constraint, parameter
+	 * values are reflecting the overridden parameters form the main constraint.
 	 *
 	 * @return Returns a map containing the annotation paramter names as keys and the annotation parameter values
 	 *         as value.

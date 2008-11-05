@@ -9,7 +9,8 @@ import javax.validation.ValidationProviderResolver;
  */
 public interface BootstrapState {
 	/**
-	 * returns the user defined ValidationProviderResolver strategy instance or <code>null</code> if undefined.
+	 * returns the user defined ValidationProviderResolver strategy instance or <code>null</code>
+	 * if undefined.
 	 *
 	 * @return ValidationProviderResolver instance or null
 	 */

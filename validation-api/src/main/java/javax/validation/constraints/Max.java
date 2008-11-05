@@ -35,7 +35,8 @@ import java.lang.annotation.Target;
  * <li><code>BigInteger</code></li>
  * <li><code>Number</code></li>
  * <li><code>String</code></li>
- * <li><code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code></li>
+ * <li><code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>,
+ * <code>double</code></li>
  * </ul>
  * <p/>
  * <code>null</code> elements are considered valid

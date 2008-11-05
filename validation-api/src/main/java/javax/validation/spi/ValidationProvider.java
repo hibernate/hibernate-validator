@@ -23,34 +23,40 @@ import javax.validation.ValidatorFactory;
 /**
  * Contract between the validation bootstrap mechanism and the provider engine.
  * <p/>
- * Implementations must have a public no-arg constructor. The construction of a provider should be
- * as "lightweight" as possible.
+ * Implementations must have a public no-arg constructor. The construction of a provider
+ * should be as "lightweight" as possible.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public interface ValidationProvider {
 	/**
+	 * This sub interface uniquely identify a provider.
+	 * 
 	 * @param builderClass targeted builder class.
 	 *
-	 * @return <code>true</code> if <code>builderClass</code> is the Bean Validation Provider sub interface for ValidatorFactoryBuilder
-	 *         This sub interface uniquely identify a provider.
+	 * @return <code>true</code> if <code>builderClass</code> is the Bean Validation Provider sub
+	 *         interface for ValidatorFactoryBuilder
 	 */
 	boolean isSuitable(Class<? extends ValidatorFactoryBuilder<?>> builderClass);
 
 	/**
-	 * Returns a ValidatorFactoryBuilder instance implementing the <code>builderType</code> interface.
-	 * The ValidatorFactoryBuilder instance uses the current provider (<code>this</code>) to build
-	 * the ValidatorFactory instance.
+	 * Returns a ValidatorFactoryBuilder instance implementing the
+	 * <code>builderType</code> interface.
+	 * The ValidatorFactoryBuilder instance uses the current provider (<code>this</code>)
+	 * to build the ValidatorFactory instance.
 	 * <p/>
-	 * This method can only be called on providers returning true on <code>#issuitable(builderType)</code>
+	 * This method can only be called on providers returning true on <
+	 * code>#issuitable(builderType)</code>
 	 *
 	 * @param builderClass the Builder class type
 	 * @param state bootstrap state
 	 *
 	 * @return specific validator builder implementation
 	 */
-	<T extends ValidatorFactoryBuilder<T>> T createSpecializedValidatorFactoryBuilder(BootstrapState state, Class<T> builderClass);
+	<T extends ValidatorFactoryBuilder<T>> T createSpecializedValidatorFactoryBuilder(
+			BootstrapState state,
+			Class<T> builderClass);
 
 	/**
 	 * Returns a ValidatorFactoryBuilder instance. This instance is not bound to
@@ -67,8 +73,9 @@ public interface ValidationProvider {
 	ValidatorFactoryBuilder<?> createGenericValidatorFactoryBuilder(BootstrapState state);
 
 	/**
-	 * Build a ValidatorFactory using the current provider implementation. The ValidatorFactory
-	 * is assembled and follow the configuration passed using ValidatorFactoryConfiguration.
+	 * Build a ValidatorFactory using the current provider implementation. The
+	 * ValidatorFactory is assembled and follow the configuration passed
+	 * using ValidatorFactoryConfiguration.
 	 * <p>
 	 * The returned ValidatorFactory is properly initialized and ready for use.
 	 * </p>

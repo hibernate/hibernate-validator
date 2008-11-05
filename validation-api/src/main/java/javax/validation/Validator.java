@@ -32,7 +32,8 @@ public interface Validator<T> extends Serializable {
 	 * validate all constraints on object
 	 *
 	 * @param object object to validate
-	 * @param groups group name(s) (including group sequence names) targeted for validation (default to &lt;code&gt;default&lt;/code&gt;)
+	 * @param groups group name(s) (including group sequence names) targeted
+	 * for validation (default to &lt;code&gt;default&lt;/code&gt;)
 	 *
 	 * @return constraint violations or an empty Set if none
 	 *
@@ -45,7 +46,8 @@ public interface Validator<T> extends Serializable {
 	 *
 	 * @param object object to validate
 	 * @param propertyName property to validate (ie field and getter constraints)
-	 * @param groups group name(s) (including group sequence names) targeted for validation (default to &lt;code&gt;default&lt;/code&gt;)
+	 * @param groups group name(s) (including group sequence names) targeted
+	 * for validation (default to &lt;code&gt;default&lt;/code&gt;)
 	 *
 	 * @return constraint violations or an empty Set if none
 	 *
@@ -61,7 +63,8 @@ public interface Validator<T> extends Serializable {
 	 *
 	 * @param propertyName property to validate
 	 * @param value property value to validate
-	 * @param groups group name(s) (including group sequence names) targeted for validation (default to <code>default</code>)
+	 * @param groups group name(s) (including group sequence names) targeted
+	 * for validation (default to <code>default</code>)
 	 *
 	 * @return constraint violations or an empty Set if none
 	 */

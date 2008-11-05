@@ -24,26 +24,30 @@ import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ValidationProvider;
 
 /**
- * This class is the entry point for the Bean Validation framework. There are three ways to bootstrap the framework:
+ * This class is the entry point for the Bean Validation framework. There are three ways
+ * to bootstrap the framework:
  * <ul>
  * <li>
  * The easiest approach is to use the default Bean Validation provider.
  * <pre>
  * ValidatorFactory factory = Validation.getBuilder().build();
  * </pre>
- * In this case {@link  javax.validation.bootstrap.DefaultValidationProviderResolver  DefaultValidationProviderResolver}
+ * In this case {@link  javax.validation.bootstrap.DefaultValidationProviderResolver}
  * will be used to locate available providers.
  *
  * The chosen provider is defined as followed:
  * <ul>
  * <li>if the XML configuration defines a provider, this provider is used</li>
- * <li>if the XML configuratio does not define a provider or if no XML configuration is present the first provider
- * returned by the ValidationProviderResolver isntance is used.</li>
+ * <li>if the XML configuratio does not define a provider or if no XML configuration
+ * is present the first provider returned by the ValidationProviderResolver
+ * isntance is used.</li>
  * </ul>
  * </li>
  * <li>
- * The second bootstrap approach allows to choose a custom <code>ValidationProviderResolver</code>. The chosen
- * <code>ValidationProvider</code> is then determined in the same way as in the default bootstrapping case (see above).
+ * The second bootstrap approach allows to choose a custom
+ * <code>ValidationProviderResolver</code>. The chosen
+ * <code>ValidationProvider</code> is then determined in the same way
+ * as in the default bootstrapping case (see above).
  * <pre>
  * ValidatorFactoryBuilder&lt?&gt; builder = Validation
  *    .defineBootstrapState()
@@ -55,7 +59,8 @@ import javax.validation.spi.ValidationProvider;
  * 
  * <p/>
  * <li>
- * The third approach allows you to specify explicitly and in a type safe fashion the expected provider by
+ * The third approach allows you to specify explicitly and in
+ * a type safe fashion the expected provider by
  * using its specific <code>ValidatorFactoryBuilder</code> sub-interface.
  *
  * Optionally you can choose a custom <code>ValidationProviderResolver</code>.
@@ -71,8 +76,8 @@ import javax.validation.spi.ValidationProvider;
  * Note:<br/>
  * <ul>
  * <li>
- * The ValidatorFactory object built by the bootstrap process should be cached and shared amongst
- * Validator consumers.
+ * The ValidatorFactory object built by the bootstrap process should be cached
+ * and shared amongst Validator consumers.
  * </li>
  * <li>
  * This class is thread-safe.
@@ -86,10 +91,12 @@ import javax.validation.spi.ValidationProvider;
 public class Validation {
 
 	/**
-	 * Build a <code>ValidatorFactoryBuilder</code>. The actual provider choice is given by the XML configuration. If the
+	 * Build a <code>ValidatorFactoryBuilder</code>. The actual provider
+	 * choice is given by the XML configuration. If the
 	 * XML configuration does not exsist the default is taken.
 	 * <p/>
-	 * The provider list is resolved using the {@link  javax.validation.bootstrap.DefaultValidationProviderResolver  DefaultValidationProviderResolver}.
+	 * The provider list is resolved using the
+	 * {@link  javax.validation.bootstrap.DefaultValidationProviderResolver}.
 	 *
 	 * @return <code>ValidatorFactoryBuilder</code> instance.
 	 */
@@ -98,7 +105,8 @@ public class Validation {
 	}
 
 	/**
-	 * Build a <code>ValidatorFactoryBuilder</code>. The provider list is resolved using the strategy provided to the bootstrap state.
+	 * Build a <code>ValidatorFactoryBuilder</code>. The provider list is resolved
+	 * using the strategy provided to the bootstrap state.
 	 * <pre>
 	 * ValidatorFactoryBuilder&lt?&gt; builder = Validation
 	 *    .defineBootstrapState()
@@ -106,10 +114,11 @@ public class Validation {
 	 *    .getBuilder();
 	 * ValidatorFactory factory = builder.build();
 	 * </pre>
-	 * The actual provider choice is given by the XML configuration. If the XML configuration does not exsist the first
-	 * available provider will be returned.
+	 * The actual provider choice is given by the XML configuration. If the XML
+	 * configuration does not exsist the first available provider will be returned.
 	 *
-	 * @return instance building a generic <code>ValidatorFactoryBuilder</code> compliant with the bootstrap state provided.
+	 * @return instance building a generic <code>ValidatorFactoryBuilder</code>
+	 * compliant with the bootstrap state provided.
 	 */
 	public static GenericBuilderFactory defineBootstrapState() {
 		return new GenericBuilderFactoryImpl();
@@ -126,16 +135,19 @@ public class Validation {
 	 *     .providerResolver( new MyResolverStrategy() )
 	 *     .build();
 	 * </pre>,
-	 * where <code>ACMEValidatorFactoryBuilder</code> is the <code>ValidatorFactoryBuilder</code> sub interface uniquely identifying
-	 * the ACME Bean Validation provider.
+	 * where <code>ACMEValidatorFactoryBuilder</code> is the <code>ValidatorFactoryBuilder</code>
+	 * sub interface uniquely identifying the ACME Bean Validation provider.
 	 *
-	 * @param builderType the <code>ValidatorFactoryBuilder</code> sub interface uniquely defining the targeted provider.
+	 * @param builderType the <code>ValidatorFactoryBuilder</code> sub interface
+	 * uniquely defining the targeted provider.
 	 *
-	 * @return instance building a provider specific <code>ValidatorFactoryBuilder</code> sub interface implementation.
+	 * @return instance building a provider specific <code>ValidatorFactoryBuilder</code>
+	 * sub interface implementation.
 	 *
 	 * @see #getBuilder()
 	 */
-	public static <T extends ValidatorFactoryBuilder<T>> SpecializedBuilderFactory<T> builderType(Class<T> builderType) {
+	public static <T extends ValidatorFactoryBuilder<T>>
+	        SpecializedBuilderFactory<T> builderType(Class<T> builderType) {
 		return new SpecializedBuilderFactoryImpl<T>( builderType );
 	}
 

@@ -37,7 +37,9 @@ public interface MessageResolver {
 	 *
 	 * @return Interpolated error message.
 	 */
-	String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value);
+	String interpolate(String message,
+					   ConstraintDescriptor constraintDescriptor,
+					   Object value);
 
 	/**
 	 * Interpolate the message from the constraint parameters and the actual validated object.
@@ -50,5 +52,8 @@ public interface MessageResolver {
 	 *
 	 * @return Interpolated error message.
 	 */
-	String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale);
+	String interpolate(String message,
+					   ConstraintDescriptor constraintDescriptor,
+					   Object value,
+					   Locale locale);
 }

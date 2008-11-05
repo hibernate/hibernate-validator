@@ -40,9 +40,11 @@ public interface ConstraintViolation<T> {
 
 	/**
 	 * If a bean constraint, the bean instance the constraint is applied on
-	 * If a property constraint, the bean instance hosting the property the constraint is applied on
+	 * If a property constraint, the bean instance hosting the property the
+	 * constraint is applied on
 	 * 
-	 * @return the leaf bean the constraint is applied on or null if Validator#validateValue is used
+	 * @return the leaf bean the constraint is applied on or null if Validator#validateValue
+	 * is used
 	 */
 	Object getLeafBean();
 
@@ -54,7 +56,7 @@ public interface ConstraintViolation<T> {
 
 
 	/**
-	 * @return the bean type being validated.
+	 * @return the type of interface or class being validated.
 	 */
 	Class<T> getBeanClass();
 

@@ -32,12 +32,13 @@ import java.io.InputStream;
  *         .build();
  * </pre>
  * <p/>
- * The ValidationProviderResolver is specified at ValidatorFactoryBuilder time (see {@link javax.validation.spi.ValidationProvider}).
+ * The ValidationProviderResolver is specified at ValidatorFactoryBuilder time
+ * (see {@link javax.validation.spi.ValidationProvider}).
  * If none is explicitely requested, the default ValidationProviderResolver is used.
  * <p/>
  * The provider is selected in the following way:
- * - if a specific ValidatorFactoryBuilder subclass is requested programmatically using Validation.builderType(),
- * find the first provider matching it
+ * - if a specific ValidatorFactoryBuilder subclass is requested programmatically using
+ * Validation.builderType(), find the first provider matching it
  * - if a specific ValidatorFactoryBuilder subclass is defined in META-INF/validation.xml,
  * find the first provider matching it
  * - otherwise, use the first provider returned by the ValidationProviderResolver
@@ -48,7 +49,8 @@ import java.io.InputStream;
  */
 public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	/**
-	 * Defines the message resolver used. Has priority over the configuration based message resolver.
+	 * Defines the message resolver used. Has priority over the configuration
+	 * based message resolver.
 	 *
 	 * @param resolver message resolver implementation.
 	 *
@@ -57,7 +59,8 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	T messageResolver(MessageResolver resolver);
 
 	/**
-	 * Defines the constraint factory. Has priority over the configuration based constraint factory.
+	 * Defines the constraint factory. Has priority over the configuration
+	 * based constraint factory.
 	 *
 	 * @param constraintFactory constraint factory inmplementation.
 	 *
@@ -69,7 +72,8 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	 * Configure the ValidatorFactory based on <code>stream</code>
 	 * If not specified, META-INF/validation.xml is used
 	 * <p/>
-	 * The stream should be closed by the client API after the ValidatorFactory has been returned
+	 * The stream should be closed by the client API after the
+	 * ValidatorFactory has been returned
 	 *
 	 * @param stream configuration stream.
 	 *

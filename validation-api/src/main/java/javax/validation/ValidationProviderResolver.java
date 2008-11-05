@@ -23,7 +23,8 @@ import javax.validation.spi.ValidationProvider;
 /**
  * Determine the list of Bean Validation providers available in the runtime environment
  * <p/>
- * Bean Validation providers are identified by the presence of META-INF/services/javax.validation.spi.ValidationProvider
+ * Bean Validation providers are identified by the presence of
+ * META-INF/services/javax.validation.spi.ValidationProvider
  * files following the Service Provider pattern described
  * <a href="http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider">here</a>
  * <p/>
