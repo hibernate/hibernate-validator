@@ -43,7 +43,7 @@ import java.io.InputStream;
  * find the first provider matching it
  * - otherwise, use the first provider returned by the ValidationProviderResolver
  * <p/>
- * Implementations are not meant to be thread safe
+ * Implementations are not meant to be thread-safe
  *
  * @author Emmanuel Bernard
  */

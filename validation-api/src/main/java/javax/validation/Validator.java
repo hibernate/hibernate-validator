@@ -22,6 +22,7 @@ import java.util.Set;
 
 /**
  * Validate a given object type.
+ * Implementations of this interface must be thread-safe
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -77,13 +78,17 @@ public interface Validator<T> extends Serializable {
 	boolean hasConstraints();
 
 	/**
-	 * return the class level constraints
+	 * Return the class level constraints
+	 * The returned object (and associated objects including ConstraintDescriptors)
+     * are immutable.
 	 */
 	BeanDescriptor getConstraintsForClass();
 
 	/**
-	 * return the property level constraints for a given propertyName
+	 * Return the property level constraints for a given propertyName
 	 * or null if either the property does not exist or has no constraint
+	 * The returned object (and associated objects including ConstraintDescriptors)
+     * are immutable.
 	 */
 	PropertyDescriptor getConstraintsForProperty(String propertyName);
 

@@ -74,7 +74,9 @@ public interface ConstraintViolation<T> {
 	Set<String> getGroups();
 
 	/**
-	 * Constraint metadata reported to fail
+	 * Constraint metadata reported to fail.
+	 * The returned instance is immutable.
+	 * 
 	 * @return constraint metadata
 	 */
 	ConstraintDescriptor getConstraintDescriptor();
