@@ -107,6 +107,10 @@ public class ResourceBundleMessageResolver implements MessageResolver {
 		return replace( message, constraintDescriptor.getParameters() );
 	}
 
+	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale) {
+		throw new UnsupportedOperationException( "Interpolation for Locale. Has to be done." );
+	}
+
 
 	private String replace(String message, Map<String, Object> parameters) {
 		Matcher matcher = messagePattern.matcher( message );

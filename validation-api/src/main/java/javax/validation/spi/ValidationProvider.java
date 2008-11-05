@@ -67,7 +67,7 @@ public interface ValidationProvider {
 	ValidatorFactoryBuilder<?> createGenericValidatorFactoryBuilder(BootstrapState state);
 
 	/**
-	 * Build a ValidatorFactory using the current provider implementation. The ValidationFactory
+	 * Build a ValidatorFactory using the current provider implementation. The ValidatorFactory
 	 * is assembled and follow the configuration passed using ValidatorFactoryConfiguration.
 	 * <p>
 	 * The returned ValidatorFactory is properly initialized and ready for use.

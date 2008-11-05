@@ -20,6 +20,7 @@ package org.hibernate.validation.bootstrap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Locale;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintFactory;
@@ -115,6 +116,10 @@ public class ValidationTest {
 				new MessageResolver() {
 					public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {
 						return "my custom message";
+					}
+
+					public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale) {
+						throw new UnsupportedOperationException( "No specific locale is possible" );
 					}
 				}
 		);

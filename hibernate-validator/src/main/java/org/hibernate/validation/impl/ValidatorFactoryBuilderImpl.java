@@ -36,7 +36,8 @@ import org.hibernate.validation.HibernateValidatorFactoryBuilder;
  * @author Emmanuel Bernard
  */
 public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBuilder, ValidatorFactoryConfiguration {
-	private MessageResolver messageResolver = new ResourceBundleMessageResolver();
+	private final MessageResolver defaultMessageResolver = new ResourceBundleMessageResolver();
+	private MessageResolver messageResolver;
 	private ConstraintFactory constraintFactory = new ConstraintFactoryImpl();
 	private String configurationFile = "META-INF/validation.xml";
 	private final ValidationProvider provider;
@@ -50,6 +51,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 			this.providerResolver = state.getValidationProviderResolver();
 		}
 		this.provider = null;
+		this.messageResolver = defaultMessageResolver;
 	}
 
 	public ValidatorFactoryBuilderImpl(ValidationProvider provider) {
@@ -58,6 +60,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		}
 		this.provider = provider;
 		this.providerResolver = null;
+		this.messageResolver = defaultMessageResolver;
 	}
 
 	public ValidatorFactoryBuilderImpl messageResolver(MessageResolver resolver) {
@@ -108,6 +111,10 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 
 	public ValidatorFactoryBuilderImpl configure(InputStream stream) {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public MessageResolver getDefaultMessageResolver() {
+		return defaultMessageResolver;
 	}
 
 	public InputStream getConfigurationStream() {

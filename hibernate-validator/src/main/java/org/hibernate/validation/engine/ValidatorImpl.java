@@ -506,7 +506,7 @@ public class ValidatorImpl<T> implements Validator<T> {
 		return metaDataProvider.getConstraintMetaDataList().size() > 0;
 	}
 
-	public BeanDescriptor getConstraintsForBean() {
+	public BeanDescriptor getConstraintsForClass() {
 		return metaDataProvider.getBeanDescriptor();
 	}
 

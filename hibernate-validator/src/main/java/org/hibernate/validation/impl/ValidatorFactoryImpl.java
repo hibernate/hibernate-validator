@@ -47,4 +47,12 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	public <T> Validator<T> getValidator(Class<T> clazz) {
 		return new ValidatorImpl<T>( clazz, constraintFactory, messageResolver );
 	}
+
+	public <T> Validator<T> getValidator(Class<T> clazz, MessageResolver messageResolver) {
+		return new ValidatorImpl<T>( clazz, constraintFactory, messageResolver );
+	}
+
+	public MessageResolver getMessageResolver() {
+		return messageResolver;
+	}
 }

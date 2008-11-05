@@ -78,6 +78,16 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	T configure(InputStream stream);
 
 	/**
+	 * Return an implementation of the MessageResolver interface following the
+	 * default MessageREsolver defined in the specification:
+	 *  - use the ValidationMessages resource bundle to load keys
+	 *  - use Locale.getDefault()
+	 *
+	 * @return default MessageResolver implementation compliant with the specification
+	 */
+	MessageResolver getDefaultMessageResolver();
+
+	/**
 	 * Build a ValidatorFactory implementation.
 	 *
 	 * @return ValidatorFactory

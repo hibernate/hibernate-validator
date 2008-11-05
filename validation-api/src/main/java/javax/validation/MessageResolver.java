@@ -17,8 +17,10 @@
 */
 package javax.validation;
 
+import java.util.Locale;
+
 /**
- * Interpolate a given validation message.
+ * Interpolate a given constraint violation message.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -26,12 +28,27 @@ package javax.validation;
 public interface MessageResolver {
 	/**
 	 * Interpolate the message from the constraint parameters and the actual validated object.
+	 * The locale is defaulted according to the <code>MessageResolver</code> implementation
+	 * See the implementation documentation for more detail.
 	 *
 	 * @param message The message to interpolate.
 	 * @param constraintDescriptor The constraint descriptor.
-	 * @param value The actual validted object.
+	 * @param value The object being validated
 	 *
 	 * @return Interpolated error message.
 	 */
 	String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value);
+
+	/**
+	 * Interpolate the message from the constraint parameters and the actual validated object.
+	 * The Locale used is provided as a parameter
+	 *
+	 * @param message The message to interpolate.
+	 * @param constraintDescriptor The constraint descriptor.
+	 * @param value The object being validated
+	 * @param locale the locale targeted for the message
+	 *
+	 * @return Interpolated error message.
+	 */
+	String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale);
 }

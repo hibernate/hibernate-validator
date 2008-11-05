@@ -28,7 +28,28 @@ public interface ValidatorFactory {
 	/**
 	 * return an initialized Validator instance for the specific class.
 	 * Validator instances can be pooled and shared by the implementation
-	 * In this scenario, the implementation must return thread-safe Validator implementations
+	 *
+	 * @param clazz the object class the validator validates
 	 */
 	<T> Validator<T> getValidator(Class<T> clazz);
+
+	/**
+	 * return an initialized Validator instance for the specific class.
+	 * Validator instances can be pooled and shared by the implementation
+	 *
+	 * The returned Validator instance must use the MessageResolver instance
+	 * passed as a parameter to resolve error messages. 
+	 *
+	 * @param clazz the object class the validator validates
+	 */
+	<T> Validator<T> getValidator(Class<T> clazz, MessageResolver messageResolver);
+
+	/**
+	 * Returns the MessageResolver instance configured at initialization time
+	 * for the ValidatorFactory
+	 * This is the instance used by #getValidator(Class)
+	 *
+	 * @return MessageResolver instance
+	 */
+	MessageResolver getMessageResolver();
 }

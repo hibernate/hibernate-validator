@@ -24,7 +24,7 @@ import javax.validation.MessageResolver;
 /**
  * Contract between a <code>ValidatorFactoryBuilder</code> and a </code>ValidatorProvider</code> to create
  * a <code>ValidatorFactory</code>.
- * The configuration artifacts provided to the <code>ValidationBuilder</code> are passed along.
+ * The configuration artifacts provided to the <code>ValidatorFactoryBuilder</code> are passed along.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

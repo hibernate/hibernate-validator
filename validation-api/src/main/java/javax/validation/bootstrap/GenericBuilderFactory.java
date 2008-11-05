@@ -13,7 +13,7 @@ public interface GenericBuilderFactory {
 	/**
 	 * Defines the provider resolution strategy.
 	 * This resolver returns the list of providers evaluated
-	 * to build the ValidationBuilder
+	 * to build the ValidatorFactoryBuilder
 	 * <p/>
 	 * If no resolver is defined, the default ValidationProviderResolver
 	 * implementation is used.
@@ -24,7 +24,7 @@ public interface GenericBuilderFactory {
 
 	/**
 	 * Returns a generic ValidatorFactoryBuilder implementation.
-	 * At this stage the provider used to build the ValidationFactory is not defined.
+	 * At this stage the provider used to build the ValidatorFactory is not defined.
 	 * <p/>
 	 * The ValidatorFactoryBuilder implementation is provided by the first provider returned
 	 * by the ValidationProviderResolver strategy.
