@@ -77,7 +77,7 @@ public class ValidationTest {
 		assertDefaultBuilderAndFactory( builder );
 
 		ValidatorFactory factory = builder.build();
-		Validator<Customer> validator = factory.getValidator( Customer.class );
+		Validator validator = factory.getValidator();
 
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
@@ -100,7 +100,7 @@ public class ValidationTest {
 		assertDefaultBuilderAndFactory( builder );
 
 		ValidatorFactory factory = builder.build();
-		Validator<Customer> validator = factory.getValidator( Customer.class );
+		Validator validator = factory.getValidator( );
 
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
@@ -124,7 +124,7 @@ public class ValidationTest {
 				}
 		);
 		factory = builder.build();
-		validator = factory.getValidator( Customer.class );
+		validator = factory.getValidator( );
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		constraintViolation = constraintViolations.iterator().next();
@@ -138,7 +138,7 @@ public class ValidationTest {
 		assertDefaultBuilderAndFactory( builder );
 
 		ValidatorFactory factory = builder.build();
-		Validator<Customer> validator = factory.getValidator( Customer.class );
+		Validator validator = factory.getValidator(  );
 
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
@@ -161,7 +161,7 @@ public class ValidationTest {
 				}
 		);
 		factory = builder.build();
-		validator = factory.getValidator( Customer.class );
+		validator = factory.getValidator( );
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}

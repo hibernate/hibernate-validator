@@ -21,14 +21,14 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Validate a given object type.
+ * Validate objects
  * Implementations of this interface must be thread-safe
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @todo Should Serializable be part of the definition?
  */
-public interface Validator<T> extends Serializable {
+public interface Validator extends Serializable {
 	/**
 	 * validate all constraints on object
 	 *
@@ -40,7 +40,7 @@ public interface Validator<T> extends Serializable {
 	 *
 	 * @throws IllegalArgumentException e if object is null
 	 */
-	Set<ConstraintViolation<T>> validate(T object, String... groups);
+	<T> Set<ConstraintViolation<T>> validate(T object, String... groups);
 
 	/**
 	 * validate all constraints on &lt;code&gt;propertyName&lt;/code&gt; property of object
@@ -54,7 +54,7 @@ public interface Validator<T> extends Serializable {
 	 *
 	 * @throws IllegalArgumentException e if object is null
 	 */
-	Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups);
+	<T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups);
 
 	/**
 	 * validate all constraints on <code>propertyName</code> property
@@ -69,32 +69,41 @@ public interface Validator<T> extends Serializable {
 	 *
 	 * @return constraint violations or an empty Set if none
 	 */
-	Set<ConstraintViolation<T>> validateValue(String propertyName, Object value, String... groups);
+	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, String... groups);
 
 	/**
 	 * return true if at least one constraint declaration is present for the given bean
 	 * or if one property is marked for validation cascade
+	 *
+	 * @param clazz class type evaluated
 	 */
-	boolean hasConstraints();
+	boolean hasConstraints(Class<?> clazz);
 
 	/**
 	 * Return the class level constraints
 	 * The returned object (and associated objects including ConstraintDescriptors)
      * are immutable.
+	 *
+	 * @param clazz class type evaluated
 	 */
-	BeanDescriptor getConstraintsForClass();
+	BeanDescriptor getConstraintsForClass(Class<?> clazz);
 
 	/**
 	 * Return the property level constraints for a given propertyName
 	 * or null if either the property does not exist or has no constraint
 	 * The returned object (and associated objects including ConstraintDescriptors)
      * are immutable.
+	 *
+	 * @param clazz class type evaluated
+	 * @param propertyName property evaludated
 	 */
-	PropertyDescriptor getConstraintsForProperty(String propertyName);
+	PropertyDescriptor getConstraintsForProperty(Class<?> clazz, String propertyName);
 
 	/**
 	 * return the property names having at least a constraint defined
+	 *
+	 * @param clazz class type evaluated
 	 */
-	Set<String> getPropertiesWithConstraints();
+	Set<String> getPropertiesWithConstraints(Class<?> clazz);
 
 }

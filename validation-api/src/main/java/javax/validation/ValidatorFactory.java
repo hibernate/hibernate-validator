@@ -26,23 +26,21 @@ package javax.validation;
  */
 public interface ValidatorFactory {
 	/**
-	 * return an initialized Validator instance for the specific class.
+	 * return an initialized Validator instance.
 	 * Validator instances can be pooled and shared by the implementation
 	 *
-	 * @param clazz the object class the validator validates
 	 */
-	<T> Validator<T> getValidator(Class<T> clazz);
+	Validator getValidator();
 
 	/**
-	 * return an initialized Validator instance for the specific class.
+	 * return an initialized Validator instance.
 	 * Validator instances can be pooled and shared by the implementation
 	 *
 	 * The returned Validator instance must use the MessageResolver instance
 	 * passed as a parameter to resolve error messages. 
 	 *
-	 * @param clazz the object class the validator validates
 	 */
-	<T> Validator<T> getValidator(Class<T> clazz, MessageResolver messageResolver);
+	Validator getValidator(MessageResolver messageResolver);
 
 	/**
 	 * Returns the MessageResolver instance configured at initialization time

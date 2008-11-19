@@ -70,7 +70,7 @@ public class ValidationContext<T> {
 	/**
 	 * Stack for keep track of the currently validated object.
 	 */
-	private Stack<Object> validatedobjectStack = new Stack<Object>();
+	private Stack<ValidatedBean> validatedobjectStack = new Stack<ValidatedBean>();
 
 
 	public ValidationContext(T object) {
@@ -79,18 +79,22 @@ public class ValidationContext<T> {
 
 	public ValidationContext(T rootBean, Object object) {
 		this.rootBean = rootBean;
-		validatedobjectStack.push( object );
+		validatedobjectStack.push( new ValidatedBean(object) );
 		processedObjects = new HashMap<String, IdentitySet>();
 		propertyPath = "";
 		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 	}
 
 	public Object peekValidatedObject() {
-		return validatedobjectStack.peek();
+		return validatedobjectStack.peek().bean;
+	}
+
+	public Class<?> peekValidatedObjectType() {
+		return validatedobjectStack.peek().beanType;
 	}
 
 	public void pushValidatedObject(Object validatedObject) {
-		validatedobjectStack.push( validatedObject );
+		validatedobjectStack.push( new ValidatedBean(validatedObject) );
 	}
 
 	public void popValidatedObject() {
@@ -111,11 +115,11 @@ public class ValidationContext<T> {
 
 	public void markProcessedForCurrentGroup() {
 		if ( processedObjects.containsKey( currentGroup ) ) {
-			processedObjects.get( currentGroup ).add( validatedobjectStack.peek() );
+			processedObjects.get( currentGroup ).add( validatedobjectStack.peek().bean );
 		}
 		else {
 			IdentitySet set = new IdentitySet();
-			set.add( validatedobjectStack.peek() );
+			set.add( validatedobjectStack.peek().bean );
 			processedObjects.put( currentGroup, set );
 		}
 	}
@@ -180,5 +184,22 @@ public class ValidationContext<T> {
 
 	public boolean needsValidation(Set<String> groups) {
 		return groups.contains( currentGroup );
+	}
+
+	//TODO caching the object class is useful?
+	private static class ValidatedBean {
+
+		final Object bean;
+		final Class<?> beanType;
+
+		private ValidatedBean(Object bean) {
+			this.bean = bean;
+			if (bean == null) {
+				this.beanType = null;
+			}
+			else {
+				this.beanType = bean.getClass();
+			}
+		}
 	}
 }

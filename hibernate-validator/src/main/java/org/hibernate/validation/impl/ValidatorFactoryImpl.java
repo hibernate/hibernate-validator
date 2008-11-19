@@ -17,6 +17,8 @@
 */
 package org.hibernate.validation.impl;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintFactory;
 import javax.validation.MessageResolver;
 import javax.validation.Validator;
@@ -24,15 +26,21 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidatorFactoryConfiguration;
 
 import org.hibernate.validation.engine.ValidatorImpl;
+import org.hibernate.validation.engine.ValidatorFactoryImplementor;
+import org.hibernate.validation.engine.MetaDataProviderImpl;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ValidatorFactoryImpl implements ValidatorFactory {
+public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 
 	private final MessageResolver messageResolver;
 	private final ConstraintFactory constraintFactory;
+
+	//TODO is there a way to replace ? by so kind of <T> to express the correlation?
+	private Map<Class<?>, MetaDataProviderImpl<?>> metadataProviders
+			= new ConcurrentHashMap<Class<?>, MetaDataProviderImpl<?>>(10);
 
 
 	public ValidatorFactoryImpl(ValidatorFactoryConfiguration configuration) {
@@ -44,15 +52,27 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T> Validator<T> getValidator(Class<T> clazz) {
-		return new ValidatorImpl<T>( clazz, constraintFactory, messageResolver );
+	public Validator getValidator() {
+		return new ValidatorImpl( this, messageResolver );
 	}
 
-	public <T> Validator<T> getValidator(Class<T> clazz, MessageResolver messageResolver) {
-		return new ValidatorImpl<T>( clazz, constraintFactory, messageResolver );
+	public Validator getValidator(MessageResolver messageResolver) {
+		return new ValidatorImpl( this, messageResolver );
 	}
 
 	public MessageResolver getMessageResolver() {
 		return messageResolver;
+	}
+
+	public <T> MetaDataProviderImpl<T> getMetadataProvider(Class<T> beanClass) {
+		//FIXME make sure a optimized mock is provided when no constraints are present.
+		if (beanClass == null) throw new IllegalArgumentException( "Class cannot be null" );
+		@SuppressWarnings( "unchecked")
+		MetaDataProviderImpl<T> metadata = ( MetaDataProviderImpl<T> ) metadataProviders.get(beanClass);
+		if (metadata == null) {
+			metadata = new MetaDataProviderImpl<T>(beanClass, constraintFactory);
+			metadataProviders.put( beanClass, metadata );
+		}
+		return metadata;
 	}
 }

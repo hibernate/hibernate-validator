@@ -50,6 +50,7 @@ import org.hibernate.validation.util.ReflectionHelper;
  * instantiate an instance of this class and delegate the metadata extraction to it.
  *
  * @author Hardy Ferentschik
+ * FIXME create an interface for MetadataProvider
  */
 
 public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
