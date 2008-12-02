@@ -47,7 +47,7 @@ public interface ValidationProvider {
 	 * to build the ValidatorFactory instance.
 	 * <p/>
 	 * This method can only be called on providers returning true on <
-	 * code>#issuitable(builderType)</code>
+	 * code>#isSuitable(builderType)</code>
 	 *
 	 * @param builderClass the Builder class type
 	 * @param state bootstrap state

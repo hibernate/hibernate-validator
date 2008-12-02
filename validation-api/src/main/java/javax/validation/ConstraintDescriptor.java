@@ -51,19 +51,21 @@ public interface ConstraintDescriptor {
 	 * Returns a map containing the annotation parameter names as keys and the
 	 * annotation parameter values as value.
 	 * If this constraint is used as part of a composed constraint, parameter
-	 * values are reflecting the overridden parameters form the main constraint.
+	 * values are reflecting the overridden parameters from the main constraint.
 	 *
-	 * @return Returns a map containing the annotation paramter names as keys and the annotation parameter values
-	 *         as value.
+	 * @return Returns a map containing the annotation paramter names as keys
+	 *         and the annotation parameter values as value.
 	 */
 	Map<String, Object> getParameters();
 
 	/**
-	 * Return a set of composing <code>ConstraintDescriptor</code>s where each descriptor describes a composing
-	 * constraint. <code>ConstraintDescriptor</code> instances of composing constraints reflect overridden
-	 * parameter values in {@link #getParameters()}  and {@link #getAnnotation()}.
+	 * Return a set of composing <code>ConstraintDescriptor</code>s where each
+	 * descriptor describes a composing constraint. <code>ConstraintDescriptor</code>
+	 * instances of composing constraints reflect overridden parameter values in
+	 * {@link #getParameters()}  and {@link #getAnnotation()}.
 	 *
-	 * @return a set of <code>ConstraintDescriptor<code> objects or an empty set in case there are no composing constraints.
+	 * @return a set of <code>ConstraintDescriptor<code> objects or an empty set
+	 *         in case there are no composing constraints.
 	 */
 	Set<ConstraintDescriptor> getComposingConstraints();
 

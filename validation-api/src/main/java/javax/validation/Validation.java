@@ -38,7 +38,7 @@ import javax.validation.spi.ValidationProvider;
  * The chosen provider is defined as followed:
  * <ul>
  * <li>if the XML configuration defines a provider, this provider is used</li>
- * <li>if the XML configuratio does not define a provider or if no XML configuration
+ * <li>if the XML configuration does not define a provider or if no XML configuration
  * is present the first provider returned by the ValidationProviderResolver
  * isntance is used.</li>
  * </ul>

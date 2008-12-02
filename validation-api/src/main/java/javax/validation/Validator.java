@@ -52,7 +52,7 @@ public interface Validator extends Serializable {
 	 *
 	 * @return constraint violations or an empty Set if none
 	 *
-	 * @throws IllegalArgumentException e if object is null
+	 * @throws IllegalArgumentException e if object is null or if propertyName is not present
 	 */
 	<T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups);
 
@@ -68,6 +68,7 @@ public interface Validator extends Serializable {
 	 * for validation (default to <code>default</code>)
 	 *
 	 * @return constraint violations or an empty Set if none
+	 * @throws IllegalArgumentException e if propertyName is not present
 	 */
 	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, String... groups);
 
