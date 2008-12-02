@@ -6,8 +6,8 @@ import javax.validation.Constraint;
 /**
  * Check that a string length is between min and max
  * Error messages are using either key:
- *  - error.length.min if the min limit is reached
- *  - error.length.max if the max limit is reached
+ *  - constraint.length.min if the min limit is reached
+ *  - constraint.length.max if the max limit is reached
  */
 public class FineGrainedLengthConstraint implements Constraint<Length> {
     private int min;
@@ -41,12 +41,12 @@ public class FineGrainedLengthConstraint implements Constraint<Length> {
 
 		if (length < min) {
 			//add min specific error
-			constraintContext.addError( "{error.length.min}" );
+			constraintContext.addError( "{constraint.length.min}" );
 			return false;
 		}
 		if (length > max) {
 			//add max specific error
-			constraintContext.addError( "{error.length.max}" );
+			constraintContext.addError( "{constraint.length.max}" );
 			return false;
 		}
 		return true;
