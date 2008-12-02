@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 import org.hibernate.validation.impl.ConstraintFactoryImpl;
 import org.hibernate.validation.impl.ElementDescriptorImpl;
+import org.hibernate.validation.impl.BeanDescriptorImpl;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -65,7 +66,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	/**
 	 * The main element descriptor for <code>beanClass</code>.
 	 */
-	private ElementDescriptorImpl beanDescriptor;
+	private BeanDescriptorImpl<T> beanDescriptor;
 
 	/**
 	 * List of constraints.
@@ -109,7 +110,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	 * for this validator and create meta data.
 	 */
 	private void createMetaData() {
-		beanDescriptor = new ElementDescriptorImpl( beanClass, false, "" );
+		beanDescriptor = new BeanDescriptorImpl<T>( beanClass, this );
 		List<Class> classes = new ArrayList<Class>();
 		computeClassHierarchy( beanClass, classes );
 		for ( Class current : classes ) {

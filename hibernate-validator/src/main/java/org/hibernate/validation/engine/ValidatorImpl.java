@@ -334,6 +334,10 @@ public class ValidatorImpl implements Validator {
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
+	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
+		return factory.getMetadataProvider( clazz ).getBeanDescriptor();
+	}
+
 
 	private <T> void validateValue(Class<T> beanType, Object object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, String... groups) {
 		ConstraintDescriptorImpl constraintDescriptor = getConstraintDescriptorForPath( beanType, propertyIter );
@@ -488,27 +492,6 @@ public class ValidatorImpl implements Validator {
 		else {
 			failingConstraintViolations.get( i ).addGroups( failingConstraintViolation.getGroups() );
 		}
-	}
-
-
-	/**
-	 * @todo add child validation
-	 */
-	public boolean hasConstraints(Class<?> clazz) {
-		return factory.getMetadataProvider( clazz ).getConstraintMetaDataList().size() > 0;
-	}
-
-	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
-		return factory.getMetadataProvider( clazz ).getBeanDescriptor();
-	}
-
-	public PropertyDescriptor getConstraintsForProperty(Class<?> clazz, String propertyName) {
-		return factory.getMetadataProvider( clazz ).getPropertyDescriptors().get( propertyName );
-	}
-
-	public Set<String> getPropertiesWithConstraints(Class<?> clazz) {
-		final MetaDataProviderImpl<?> dataProvider = factory.getMetadataProvider( clazz );
-		return Collections.unmodifiableSet( dataProvider.getPropertyDescriptors().keySet() );
 	}
 
 

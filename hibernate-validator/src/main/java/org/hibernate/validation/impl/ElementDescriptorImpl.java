@@ -35,14 +35,14 @@ import javax.validation.PropertyDescriptor;
  * @todo Handle problem in descirbing cyclic dependecies for propertyPath
  */
 //FIXME I implement both interfaces on the same object as a quick hack, we need to fix that.
-public class ElementDescriptorImpl implements PropertyDescriptor, BeanDescriptor {
-	private final Class returnType;
+public class ElementDescriptorImpl implements PropertyDescriptor {
+	private final Class<?> returnType;
 	private final boolean cascaded;
 	private final List<ConstraintDescriptor> constraintDescriptors = new ArrayList<ConstraintDescriptor>();
 	private final String propertyPath;
 
 
-	public ElementDescriptorImpl(Class returnType, boolean cascaded, String propertyPath) {
+	public ElementDescriptorImpl(Class<?> returnType, boolean cascaded, String propertyPath) {
 		this.returnType = returnType;
 		this.cascaded = cascaded;
 		this.propertyPath = propertyPath;

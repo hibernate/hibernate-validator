@@ -73,14 +73,6 @@ public interface Validator extends Serializable {
 	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, String... groups);
 
 	/**
-	 * return true if at least one constraint declaration is present for the given bean
-	 * or if one property is marked for validation cascade
-	 *
-	 * @param clazz class type evaluated
-	 */
-	boolean hasConstraints(Class<?> clazz);
-
-	/**
 	 * Return the class level constraints
 	 * The returned object (and associated objects including ConstraintDescriptors)
      * are immutable.
@@ -88,23 +80,4 @@ public interface Validator extends Serializable {
 	 * @param clazz class type evaluated
 	 */
 	BeanDescriptor getConstraintsForClass(Class<?> clazz);
-
-	/**
-	 * Return the property level constraints for a given propertyName
-	 * or null if either the property does not exist or has no constraint
-	 * The returned object (and associated objects including ConstraintDescriptors)
-     * are immutable.
-	 *
-	 * @param clazz class type evaluated
-	 * @param propertyName property evaludated
-	 */
-	PropertyDescriptor getConstraintsForProperty(Class<?> clazz, String propertyName);
-
-	/**
-	 * return the property names having at least a constraint defined
-	 *
-	 * @param clazz class type evaluated
-	 */
-	Set<String> getPropertiesWithConstraints(Class<?> clazz);
-
 }

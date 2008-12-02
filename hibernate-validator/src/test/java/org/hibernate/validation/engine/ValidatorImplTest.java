@@ -70,7 +70,7 @@ public class ValidatorImplTest {
 	@Test
 	public void testWrongMethodName() {
 		try {
-			getHibernateValidator().hasConstraints( Boy.class );
+			getHibernateValidator().getConstraintsForClass( Boy.class ).hasConstraints();
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -85,19 +85,19 @@ public class ValidatorImplTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullParamterToValidatorImplConstructor() {
-		getHibernateValidator().hasConstraints( null );
+		getHibernateValidator().getConstraintsForClass( null );
 	}
 
 	@Test
 	public void testUnconstraintClass() {
 		Validator validator = getHibernateValidator();
-		assertTrue( "There should be no constraints", !validator.hasConstraints( Unconstraint.class ) );
+		assertTrue( "There should be no constraints", !validator.getConstraintsForClass( Unconstraint.class ).hasConstraints() );
 	}
 
 	@Test
 	public void testHasConstraints() {
 		Validator validator = getHibernateValidator();
-		assertTrue( "There should be constraints", validator.hasConstraints( Customer.class ) );
+		assertTrue( "There should be constraints", validator.getConstraintsForClass( Customer.class ).hasConstraints() );
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -271,7 +271,7 @@ public class ValidatorImplTest {
 	@Test(expected = ValidationException.class)
 	public void testInvalidSequenceName() {
 		Validator validator = getHibernateValidator();
-		validator.hasConstraints( EnglishDictonary.class );
+		validator.getConstraintsForClass( EnglishDictonary.class ).hasConstraints();
 	}
 
 	@Test
