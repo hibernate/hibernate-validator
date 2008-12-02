@@ -21,14 +21,14 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Validate objects
+ * Validate bean instances
  * Implementations of this interface must be thread-safe
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @todo Should Serializable be part of the definition?
  */
-public interface Validator extends Serializable {
+public interface Validator {
 	/**
 	 * validate all constraints on object
 	 *
@@ -73,7 +73,7 @@ public interface Validator extends Serializable {
 	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, String... groups);
 
 	/**
-	 * Return the class level constraints
+	 * Return the descriptor object describing bean constraints
 	 * The returned object (and associated objects including ConstraintDescriptors)
      * are immutable.
 	 *
