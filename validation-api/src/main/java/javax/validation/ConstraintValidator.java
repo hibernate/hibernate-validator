@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Link between an constraint annotation and it's constraint validation implementation.
+ * Link between a constraint annotation and it's constraint validation implementation.
  * <p/>
  * An given constraint annotation should be annotated by a @ConstraintValidator
  * annotation which refers to its constraint validation implementation.

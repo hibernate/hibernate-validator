@@ -46,7 +46,7 @@ public @interface OverridesParameter {
 	/**
 	 * index of the targetted constraint declaration when using
 	 * multiple constraints of the same type.
-	 * The index represent the index of the constraint in the value() array.
+	 * The index represents the index of the constraint in the value() array.
 	 *
 	 * By default, no index is defined and the single constraint declaration
 	 * is targeted

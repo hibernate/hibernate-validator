@@ -37,12 +37,13 @@ public interface Constraint<A extends Annotation> {
 	void initialize(A constraintAnnotation);
 
 	/**
-	 * Implement the validation constraint
+	 * Implement the validation constraint.
+	 * <code>object</code> state must not be changed by a Constraint implementation
 	 *
 	 * @param object object to validate
 	 * @param constraintContext context in which the constraint implementation is evaluated
 	 *
-	 * @return true if object pass the constraint
+	 * @return false if <code>object</code> does not pass the constraint
 	 */
 	boolean isValid(Object object, ConstraintContext constraintContext);
 }
