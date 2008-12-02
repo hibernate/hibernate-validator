@@ -29,9 +29,14 @@ import java.util.Set;
 public interface ConstraintViolation<T> {
 
 	/**
-	 * @return The error message for this constraint violation.
+	 * @return The interpolated error message for this constraint violation.
 	 */
-	String getMessage();
+	String getInterpolatedMessage();
+
+	/**
+	 * @return The non-interpolated error message for this constraint violation.
+	 */
+	String getRawMessage();
 
 	/**
 	 * @return The root bean being validated.

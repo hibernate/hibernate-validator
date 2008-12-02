@@ -164,13 +164,15 @@ public class ValidatorImpl implements Validator {
 
 			if ( !constraintDescriptor.getConstraintImplementation().isValid( value, contextImpl ) ) {
 				for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
-					String message = messageResolver.interpolate(
-							error.getMessage(),
+					final String message = error.getMessage();
+					String interpolatedMessage = messageResolver.interpolate(
+							message,
 							constraintDescriptor,
 							leafBeanInstance
 					);
 					ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 							message,
+							interpolatedMessage,
 							context.getRootBean(),
 							metaDataProvider.getBeanClass(),
 							leafBeanInstance,
@@ -299,13 +301,15 @@ public class ValidatorImpl implements Validator {
 				if ( !wrapper.descriptor.getConstraintImplementation().isValid( wrapper.value, contextImpl ) ) {
 
 					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
-						String message = messageResolver.interpolate(
-								error.getMessage(),
+						final String message = error.getMessage();
+						String interpolatedMessage = messageResolver.interpolate(
+								message,
 								wrapper.descriptor,
 								wrapper.value
 						);
 						ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 								message,
+								interpolatedMessage,
 								object,
 								beanType,
 								object,
@@ -366,13 +370,15 @@ public class ValidatorImpl implements Validator {
 				ConstraintContextImpl contextImpl = new ConstraintContextImpl(constraintDescriptor);
 				if ( !constraintDescriptor.getConstraintImplementation().isValid( object, contextImpl ) ) {
 					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
-						String message = messageResolver.interpolate(
-								error.getMessage(),
+						final String message = error.getMessage();
+						String interpolatedMessage = messageResolver.interpolate(
+								message,
 								constraintDescriptor,
 								object
 						);
 						ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 								message,
+								interpolatedMessage,
 								null,
 								null,
 								null,

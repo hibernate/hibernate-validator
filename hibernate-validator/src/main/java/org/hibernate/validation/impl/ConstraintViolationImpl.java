@@ -27,7 +27,7 @@ import javax.validation.ConstraintDescriptor;
  * @author Hardy Ferentschik
  */
 public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
-	private String message;
+	private String interpolatedMessage;
 	private T rootBean;
 	private Class<T> beanClass;
 	private Object value;
@@ -35,11 +35,14 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private HashSet<String> groups;
 	private Object leafBeanInstance;
 	private final ConstraintDescriptor constraintDescriptor;
+	private String rawMessage;
 
 
-	public ConstraintViolationImpl(String message, T rootBean, Class<T> beanClass, Object leafBeanInstance, Object value,
+	public ConstraintViolationImpl(String rawMessage, String interpolatedMessage, T rootBean, Class<T> beanClass,
+								   Object leafBeanInstance, Object value,
 								   String propertyPath, String group, ConstraintDescriptor constraintDescriptor) {
-		this.message = message;
+		this.rawMessage = rawMessage;
+		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
 		this.beanClass = beanClass;
 		this.value = value;
@@ -53,8 +56,12 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getMessage() {
-		return message;
+	public String getInterpolatedMessage() {
+		return interpolatedMessage;
+	}
+
+	public String getRawMessage() {
+		return rawMessage;
 	}
 
 	/**
@@ -118,7 +125,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		if ( beanClass != null ? !beanClass.equals( that.beanClass ) : that.beanClass != null ) {
 			return false;
 		}
-		if ( message != null ? !message.equals( that.message ) : that.message != null ) {
+		if ( interpolatedMessage != null ? !interpolatedMessage.equals( that.interpolatedMessage ) : that.interpolatedMessage != null ) {
 			return false;
 		}
 		if ( propertyPath != null ? !propertyPath.equals( that.propertyPath ) : that.propertyPath != null ) {
@@ -136,7 +143,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 
 	@Override
 	public int hashCode() {
-		int result = message != null ? message.hashCode() : 0;
+		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
 		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
 		result = 31 * result + ( beanClass != null ? beanClass.hashCode() : 0 );
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );

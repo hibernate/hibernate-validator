@@ -132,7 +132,7 @@ public class ValidatorImplTest {
 		constraintViolations = validator.validate( book, "first", "second", "last" );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "may not be empty", constraintViolation.getMessage() );
+		assertEquals( "Wrong message", "may not be empty", constraintViolation.getInterpolatedMessage() );
 		assertEquals( "Wrong bean class", Book.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getInvalidValue() );
@@ -144,7 +144,7 @@ public class ValidatorImplTest {
 		constraintViolations = validator.validate( book, "first", "second", "last" );
 		constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "length must be between 0 and 30", constraintViolation.getMessage() );
+		assertEquals( "Wrong message", "length must be between 0 and 30", constraintViolation.getInterpolatedMessage() );
 		assertEquals( "Wrong bean class", Book.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", book.getSubtitle(), constraintViolation.getInvalidValue() );
@@ -156,7 +156,7 @@ public class ValidatorImplTest {
 		constraintViolations = validator.validate( book, "first", "second", "last" );
 		constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "length must be between 0 and 20", constraintViolation.getMessage() );
+		assertEquals( "Wrong message", "length must be between 0 and 20", constraintViolation.getInterpolatedMessage() );
 		assertEquals( "Wrong bean class", Author.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", author.getCompany(), constraintViolation.getInvalidValue() );
@@ -187,7 +187,7 @@ public class ValidatorImplTest {
 		constraintViolations = validator.validate( book, "default" );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
 		assertEquals( "Wrong bean class", Book.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getInvalidValue() );
@@ -329,7 +329,7 @@ public class ValidatorImplTest {
 		constraintViolations = validator.validate( customer );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
 		assertEquals( "Wrong bean class", Order.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", customer, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", order1.getOrderNumber(), constraintViolation.getInvalidValue() );
@@ -381,7 +381,7 @@ public class ValidatorImplTest {
 		Set<ConstraintViolation<Actor>> constraintViolations = validator.validate( clint );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "may not be empty", constraintViolation.getMessage() );
+		assertEquals( "Wrong message", "may not be empty", constraintViolation.getInterpolatedMessage() );
 		assertEquals( "Wrong bean class", Actor.class, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", clint, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", morgan.getLastName(), constraintViolation.getInvalidValue() );
@@ -401,7 +401,7 @@ public class ValidatorImplTest {
 
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
 		assertEquals( "Wrong bean class", null, constraintViolation.getBeanClass() );
 		assertEquals( "Wrong root entity", null, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", order.getOrderNumber(), constraintViolation.getInvalidValue() );
