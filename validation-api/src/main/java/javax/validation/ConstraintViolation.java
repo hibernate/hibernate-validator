@@ -59,12 +59,6 @@ public interface ConstraintViolation<T> {
 	 */
 	String getPropertyPath();
 
-
-	/**
-	 * @return the type of interface or class being validated.
-	 */
-	Class<T> getBeanClass();
-
 	/**
 	 * @return the value failing to pass the constraint.
 	 */

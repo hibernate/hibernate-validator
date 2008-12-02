@@ -78,13 +78,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<T> getBeanClass() {
-		return beanClass;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public Object getInvalidValue() {
 		return value;
 	}
