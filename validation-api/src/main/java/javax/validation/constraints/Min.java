@@ -51,7 +51,7 @@ import java.lang.annotation.Target;
 public @interface Min {
 	String message() default "{validator.min}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 
 	/**
 	 * @return Value the element must be higher or equal to

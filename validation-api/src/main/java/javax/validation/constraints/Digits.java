@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
 public @interface Digits {
 	String message() default "{validator.digits}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 
 	/**
 	 * @return maximum number of integral digits accepted for this number

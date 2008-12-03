@@ -19,6 +19,7 @@ package org.hibernate.validation.eg;
 
 import javax.validation.GroupSequence;
 import javax.validation.GroupSequences;
+import javax.validation.groups.Default;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.NotEmpty;
@@ -27,16 +28,16 @@ import org.hibernate.validation.constraints.NotEmpty;
  * @author Hardy Ferentschik
  */
 @GroupSequences({
-		@GroupSequence(name = "default-alias", sequence = { "default" }),
-		@GroupSequence(name = "all", sequence = { "default", "translate" })
+		@GroupSequence(name = DefaultAlias.class, sequence = { Default.class }),
+		@GroupSequence(name = All.class, sequence = { Default.class, Dictonary.Translate.class })
 })
 public class Dictonary extends Book {
-	@NotNull(groups = "translate")
-	@NotEmpty(groups = "translate")
+	@NotNull(groups = Translate.class)
+	@NotEmpty(groups = Translate.class)
 	private String translatesTo;
 
-	@NotNull(groups = "translate")
-	@NotEmpty(groups = "translate")
+	@NotNull(groups = Translate.class)
+	@NotEmpty(groups = Translate.class)
 	private String translatesFrom;
 
 	public String getTranslatesTo() {
@@ -53,5 +54,11 @@ public class Dictonary extends Book {
 
 	public void setTranslatesFrom(String translatesFrom) {
 		this.translatesFrom = translatesFrom;
+	}
+
+	/**
+	 * Translator related constraints
+	 */
+	public interface Translate {
 	}
 }

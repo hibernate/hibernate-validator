@@ -29,10 +29,10 @@ public class Animal {
 		PROKARYOTA, EUKARYOTA
 	}
 
-	@NotEmpty(groups = { "first", "second" })
+	@NotEmpty(groups = { First.class, Second.class })
 	private String name;
 
-	@NotNull(groups = "first")
+	@NotNull(groups = First.class)
 	private Domain domain;
 
 	public String getName() {

@@ -19,6 +19,7 @@ package org.hibernate.validation.eg;
 
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
+import javax.validation.groups.Default;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.Length;
@@ -27,17 +28,17 @@ import org.hibernate.validation.constraints.NotEmpty;
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence(name = "default", sequence = { "first", "second", "last" })
+@GroupSequence(name = Default.class, sequence = { First.class, Second.class, Last.class })
 public class Book {
-	@NotNull(groups = "first")
-	@NotEmpty(groups = "first")
+	@NotNull(groups = First.class)
+	@NotEmpty(groups = First.class)
 	private String title;
 
-	@Length(max = 30, groups = "second")
+	@Length(max = 30, groups = Second.class)
 	private String subtitle;
 
 	@Valid
-	@NotNull(groups = "first")
+	@NotNull(groups = First.class)
 	private Author author;
 
 	public String getTitle() {

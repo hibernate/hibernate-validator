@@ -46,8 +46,8 @@ public class LengthConstraintTest {
 						return "{validator.length}";
 					}
 
-					public String[] groups() {
-						return new String[0];
+					public Class<?>[] groups() {
+						return new Class<?>[0];
 					}
 
 					public Class<? extends Annotation> annotationType() {

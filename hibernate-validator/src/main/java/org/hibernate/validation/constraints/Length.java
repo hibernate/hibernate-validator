@@ -36,11 +36,11 @@ import javax.validation.ConstraintValidator;
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)
 public @interface Length {
-	public abstract int min() default 0;
+	int min() default 0;
 
-	public abstract int max() default Integer.MAX_VALUE;
+	int max() default Integer.MAX_VALUE;
 
-	public abstract String message() default "{validator.length}";
+	String message() default "{validator.length}";
 
-	public abstract String[] groups() default { };
+	Class<?>[] groups() default { };
 }

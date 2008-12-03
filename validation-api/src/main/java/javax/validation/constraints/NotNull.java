@@ -37,5 +37,5 @@ import java.lang.annotation.Target;
 public @interface NotNull {
 	String message() default "{validator.notNull}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 }

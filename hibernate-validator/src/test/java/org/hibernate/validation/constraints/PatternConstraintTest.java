@@ -38,8 +38,8 @@ public class PatternConstraintTest {
 						return "{validator.pattern}";
 					}
 
-					public String[] groups() {
-						return new String[0];
+					public Class<?>[] groups() {
+						return new Class<?>[0];
 					}
 
 					public String regex() {

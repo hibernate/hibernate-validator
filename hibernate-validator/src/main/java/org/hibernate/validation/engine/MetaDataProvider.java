@@ -59,9 +59,9 @@ public interface MetaDataProvider<T> {
 	List<Member> getCascadedMembers();
 
 	/**
-	 * @return A map mapping defined group sequence names to a list of groups.
+	 * @return A map mapping defined group sequences to a list of groups.
 	 */
-	Map<String, List<String>> getGroupSequences();
+	Map<Class<?>, List<Class<?>>> getGroupSequences();
 
 	/**
 	 * @return A list of <code>ValidatorMetaData</code> instances encapsulating the information of all the constraints

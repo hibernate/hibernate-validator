@@ -30,6 +30,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ReportAsViolationFromCompositeConstraint;
 import javax.validation.ValidationException;
+import javax.validation.groups.Default;
 
 /**
  * Describe a single constraint.
@@ -41,16 +42,17 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	private final Annotation annotation;
 	private final Constraint constraintImplementation;
 	private final Class<? extends Constraint> constraintClass;
-	private final Set<String> groups;
+	private final Set<Class<?>> groups;
 	private final Map<String, Object> parameters;
 	private final boolean isReportAsSingleInvalidConstraint;
+	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
 
-	public ConstraintDescriptorImpl(Annotation annotation, String[] groups, Constraint validator, Class<? extends Constraint> constraintClass) {
+	public ConstraintDescriptorImpl(Annotation annotation, Class<?>[] groups, Constraint validator, Class<? extends Constraint> constraintClass) {
 		this.annotation = annotation;
 		if ( groups.length == 0 ) {
-			groups = new String[] { "default" };
+			groups = DEFAULT_GROUP;
 		}
-		this.groups = new HashSet<String>();
+		this.groups = new HashSet<Class<?>>();
 		this.groups.addAll( Arrays.asList( groups ) );
 		this.constraintImplementation = validator;
 		this.parameters = getAnnotationParameters( annotation );
@@ -71,7 +73,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<String> getGroups() {
+	public Set<Class<?>> getGroups() {
 		return groups;
 	}
 
@@ -82,7 +84,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 		return constraintClass;
 	}
 
-	public boolean isInGroups(String group) {
+	public boolean isInGroups(Class<?> group) {
 		return groups.contains( group );
 	}
 

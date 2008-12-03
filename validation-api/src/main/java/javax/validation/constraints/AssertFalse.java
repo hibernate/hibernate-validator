@@ -39,5 +39,5 @@ import java.lang.annotation.Target;
 public @interface AssertFalse {
 	String message() default "{validator.assertFalse}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 }

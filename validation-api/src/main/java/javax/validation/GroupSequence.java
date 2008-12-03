@@ -23,12 +23,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
+ * Define a group sequence
+ * Should be hosted by an
+ *
+ * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 @Target({ TYPE })
 @Retention(RUNTIME)
 public @interface GroupSequence {
-	String name();
+	//TODO depreciate
+	Class<?> name();
 
-	String[] sequence();
+	Class<?>[] sequence();
 }

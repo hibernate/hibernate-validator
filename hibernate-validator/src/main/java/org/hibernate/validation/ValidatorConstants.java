@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -19,6 +19,7 @@ package org.hibernate.validation;
 
 /**
  * @author Hardy Ferentschik
+ * TODO remove
  */
 public class ValidatorConstants {
 
@@ -28,5 +29,5 @@ public class ValidatorConstants {
     /**
      * The default group/sequence name used when no group parameter is passed to validate().
      */
-    public static final String DEFAULT_GROUP_NAME = "default";
+    //public static final String DEFAULT_GROUP_NAME = "default";
 }

@@ -50,5 +50,5 @@ import java.lang.annotation.Target;
 public @interface Past {
 	String message() default "{validator.past}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 }

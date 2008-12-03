@@ -32,7 +32,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private Class<T> beanClass;
 	private Object value;
 	private String propertyPath;
-	private HashSet<String> groups;
+	private Set<Class<?>> groups;
 	private Object leafBeanInstance;
 	private final ConstraintDescriptor constraintDescriptor;
 	private String rawMessage;
@@ -40,14 +40,14 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 
 	public ConstraintViolationImpl(String rawMessage, String interpolatedMessage, T rootBean, Class<T> beanClass,
 								   Object leafBeanInstance, Object value,
-								   String propertyPath, String group, ConstraintDescriptor constraintDescriptor) {
+								   String propertyPath, Class<?> group, ConstraintDescriptor constraintDescriptor) {
 		this.rawMessage = rawMessage;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
 		this.beanClass = beanClass;
 		this.value = value;
 		this.propertyPath = propertyPath;
-		groups = new HashSet<String>();
+		groups = new HashSet<Class<?>>();
 		groups.add( group );
 		this.leafBeanInstance = leafBeanInstance;
 		this.constraintDescriptor = constraintDescriptor;
@@ -92,7 +92,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<String> getGroups() {
+	public Set<Class<?>> getGroups() {
 		return groups;
 	}
 
@@ -100,7 +100,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		return this.constraintDescriptor;
 	}
 
-	public void addGroups(Set<String> groupSet) {
+	public void addGroups(Set<Class<?>> groupSet) {
 		groups.addAll( groupSet );
 	}
 

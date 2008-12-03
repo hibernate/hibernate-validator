@@ -121,7 +121,7 @@ public class ReflectionHelper {
 		}
 
 		try {
-			getAnnotationParameter( annotation, "groups", String[].class );
+			getAnnotationParameter( annotation, "groups", Class[].class );
 		}
 		catch ( Exception e ) {
 			String msg = annotation.annotationType().getName() + " contains ConstraintValidator annotation, but does " +

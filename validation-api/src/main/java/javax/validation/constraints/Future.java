@@ -50,5 +50,5 @@ import java.lang.annotation.Target;
 public @interface Future {
 	String message() default "{validator.future}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 }

@@ -43,7 +43,7 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 @Documented
 public @interface Size {
 	String message() default "{validator.min}";
-	String[] groups() default {};
+	Class<?>[] groups() default {};
 
 	/**
 	 * @return size the element must be higher or equal to

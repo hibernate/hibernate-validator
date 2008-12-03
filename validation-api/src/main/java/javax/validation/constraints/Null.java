@@ -37,6 +37,6 @@ import java.lang.annotation.Target;
 public @interface Null {
 	String message() default "{validator.null}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 }
 

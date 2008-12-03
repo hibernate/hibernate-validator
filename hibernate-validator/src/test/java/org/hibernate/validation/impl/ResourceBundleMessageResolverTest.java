@@ -52,8 +52,8 @@ public class ResourceBundleMessageResolverTest {
 				return "{validator.notNull}";
 			}
 
-			public String[] groups() {
-				return new String[] { };
+			public Class<?>[] groups() {
+				return new Class<?>[] { };
 			}
 
 			public Class<? extends Annotation> annotationType() {
@@ -74,8 +74,8 @@ public class ResourceBundleMessageResolverTest {
 				return "{validator.length}";
 			}
 
-			public String[] groups() {
-				return new String[] { };
+			public Class<?>[] groups() {
+				return new Class<?>[] { };
 			}
 
 			public Class<? extends Annotation> annotationType() {
@@ -87,7 +87,7 @@ public class ResourceBundleMessageResolverTest {
 	@Test
 	public void testSuccessfulInterpolation() {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new String[] { }, new NotNullConstraint(), NotNullConstraint.class
+				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
 		);
 
 		String expected = "replacement worked";
@@ -110,7 +110,7 @@ public class ResourceBundleMessageResolverTest {
 	@Test
 	public void testUnSuccessfulInterpolation() {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new String[] { }, new NotNullConstraint(), NotNullConstraint.class
+				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
 		);
 		String expected = "foo";  // missing {}
 		String actual = resolver.interpolate( "foo", desciptor, null );
@@ -124,7 +124,7 @@ public class ResourceBundleMessageResolverTest {
 	@Test
 	public void testUnkownTokenInterpolation() {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new String[] { }, new NotNullConstraint(), NotNullConstraint.class
+				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
 		);
 		String expected = "{bar}";  // unkown token {}
 		String actual = resolver.interpolate( "{bar}", desciptor, null );
@@ -134,13 +134,13 @@ public class ResourceBundleMessageResolverTest {
 	@Test
 	public void testDefaultInterpolation() {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new String[] { }, new NotNullConstraint(), NotNullConstraint.class
+				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
 		);
 		String expected = "may not be null";
 		String actual = resolver.interpolate( notNull.message(), desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
-		desciptor = new ConstraintDescriptorImpl( length, new String[] { }, new NotNullConstraint(), NotNullConstraint.class );
+		desciptor = new ConstraintDescriptorImpl( length, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class );
 		expected = "length must be between 0 and 2147483647";  // unkown token {}
 		actual = resolver.interpolate( length.message(), desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );

@@ -51,7 +51,7 @@ import java.lang.annotation.Target;
 public @interface Max {
 	String message() default "{validator.max}";
 
-	String[] groups() default { };
+	Class<?>[] groups() default { };
 
 	/**
 	 * @return Value the element must be lower or equal to

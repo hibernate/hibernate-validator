@@ -40,7 +40,7 @@ public interface ConstraintDescriptor {
 	/**
 	 * @return The groups the constraint is applied on.
 	 */
-	Set<String> getGroups();
+	Set<Class<?>> getGroups();
 
 	/**
 	 * @return the constraint implementation class

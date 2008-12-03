@@ -33,7 +33,7 @@ import javax.validation.ConstraintValidator;
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface NotEmpty {
-	public abstract String message() default "{validator.notEmpty}";
+	String message() default "{validator.notEmpty}";
 
-	public abstract String[] groups() default { };
+	Class<?>[] groups() default { };
 }

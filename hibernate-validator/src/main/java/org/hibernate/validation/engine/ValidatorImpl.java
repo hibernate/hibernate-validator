@@ -31,10 +31,9 @@ import javax.validation.BeanDescriptor;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
-import javax.validation.PropertyDescriptor;
 import javax.validation.Validator;
+import javax.validation.groups.Default;
 
-import org.hibernate.validation.ValidatorConstants;
 import org.hibernate.validation.Version;
 import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 import org.hibernate.validation.impl.ConstraintViolationImpl;
@@ -77,6 +76,7 @@ public class ValidatorImpl implements Validator {
 	private final MessageResolver messageResolver;
 	
 	private final ValidatorFactoryImplementor factory;
+	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
 
 	public ValidatorImpl(ValidatorFactoryImplementor factory, MessageResolver messageResolver) {
 		this.factory = factory;
@@ -87,18 +87,18 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T> Set<ConstraintViolation<T>> validate(T object, String... groups) {
+	public <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 		if ( object == null ) {
 			throw new IllegalArgumentException( "Validation of a null object" );
 		}
 
 		ValidationContext<T> context = new ValidationContext<T>( object );
-		List<ConstraintViolationImpl<T>> list = validate( context, Arrays.asList( groups ) );
+		List<ConstraintViolationImpl<T>> list = validateInContext( context, Arrays.asList( groups ) );
 		return new HashSet<ConstraintViolation<T>>( list );
 	}
 
 	/**
-	 * Validates the ovject contained in <code>context</code>.
+	 * Validates the object contained in <code>context</code>.
 	 *
 	 * @param context A context object containing the object to validate together with other state information needed
 	 * for validation.
@@ -109,23 +109,23 @@ public class ValidatorImpl implements Validator {
 	 * @todo Currently we iterate the cascaded fields multiple times. Maybe we should change to an approach where we iterate the object graph only once.
 	 * @todo Context root bean can be a different object than the current Validator<T> hence two different generics variables
 	 */
-	private <T> List<ConstraintViolationImpl<T>> validate(ValidationContext<T> context, List<String> groups) {
+	private <T> List<ConstraintViolationImpl<T>> validateInContext(ValidationContext<T> context, List<Class<?>> groups) {
 		if ( context.peekValidatedObject() == null ) {
 			return Collections.emptyList();
 		}
 
 		// if no group is specified use the default
 		if ( groups.size() == 0 ) {
-			groups = Arrays.asList( ValidatorConstants.DEFAULT_GROUP_NAME );
+			groups = Arrays.asList( DEFAULT_GROUP );
 		}
 
-		List<String> expandedGroups;
+		List<Class<?>> expandedGroups;
 		boolean isGroupSequence;
-		for ( String group : groups ) {
-			expandedGroups = new ArrayList<String>();
-			isGroupSequence = expandGroupName( context.peekValidatedObjectType(), group, expandedGroups );
+		for ( Class<?> group : groups ) {
+			expandedGroups = new ArrayList<Class<?>>();
+			isGroupSequence = expandGroup( context.peekValidatedObjectType(), group, expandedGroups );
 
-			for ( String expandedGroupName : expandedGroups ) {
+			for ( Class<?> expandedGroupName : expandedGroups ) {
 				context.setCurrentGroup( expandedGroupName );
 
 				validateConstraints( context );
@@ -223,6 +223,7 @@ public class ValidatorImpl implements Validator {
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
+			//FIXME change accessibility only once, that's somewhat costly. do it when Member is created
 			ReflectionHelper.setAccessibility( member );
 			Object value = ReflectionHelper.getValue( member, context.peekValidatedObject() );
 			validateCascadedConstraint( context, type, value );
@@ -253,7 +254,7 @@ public class ValidatorImpl implements Validator {
 			context.replacePropertyIndex( propertyIndex );
 
 			context.pushValidatedObject( actualValue );
-			validate( context, Arrays.asList( context.getCurrentGroup() ) );
+			validateInContext( context, Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) );
 			context.popValidatedObject();
 			i++;
 		}
@@ -263,14 +264,15 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups) {
+	public <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
 		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 		validateProperty( object, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
 
-	private <T> void validateProperty(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, String... groups) {
+	private <T> void validateProperty(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
+		if ( object == null ) throw new IllegalArgumentException("Validated object cannot be null");
 		@SuppressWarnings( "unchecked" )
 		final Class<T> beanType = (Class<T>) object.getClass();
 
@@ -282,18 +284,18 @@ public class ValidatorImpl implements Validator {
 
 		// if no group is specified use the default
 		if ( groups.length == 0 ) {
-			groups = new String[] { ValidatorConstants.DEFAULT_GROUP_NAME };
+			groups = DEFAULT_GROUP;
 		}
 
-		List<String> expandedGroups;
+		List<Class<?>> expandedGroups;
 		boolean isGroupSequence;
-		for ( String group : groups ) {
-			expandedGroups = new ArrayList<String>();
-			isGroupSequence = expandGroupName( beanType, group, expandedGroups );
+		for ( Class<?> group : groups ) {
+			expandedGroups = new ArrayList<Class<?>>();
+			isGroupSequence = expandGroup( beanType, group, expandedGroups );
 
-			for ( String expandedGroupName : expandedGroups ) {
+			for ( Class<?> expandedGroup : expandedGroups ) {
 
-				if ( !wrapper.descriptor.isInGroups( expandedGroupName ) ) {
+				if ( !wrapper.descriptor.isInGroups( expandedGroup ) ) {
 					continue;
 				}
 
@@ -332,7 +334,7 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, String... groups) {
+	public <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
 		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 		validateValue( beanType, value, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
@@ -343,7 +345,7 @@ public class ValidatorImpl implements Validator {
 	}
 
 
-	private <T> void validateValue(Class<T> beanType, Object object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, String... groups) {
+	private <T> void validateValue(Class<T> beanType, Object object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
 		ConstraintDescriptorImpl constraintDescriptor = getConstraintDescriptorForPath( beanType, propertyIter );
 
 		if ( constraintDescriptor == null ) {
@@ -352,18 +354,18 @@ public class ValidatorImpl implements Validator {
 
 		// if no group is specified use the default
 		if ( groups.length == 0 ) {
-			groups = new String[] { ValidatorConstants.DEFAULT_GROUP_NAME };
+			groups = DEFAULT_GROUP;
 		}
 
-		List<String> expandedGroups;
+		List<Class<?>> expandedGroups;
 		boolean isGroupSequence;
-		for ( String group : groups ) {
-			expandedGroups = new ArrayList<String>();
-			isGroupSequence = expandGroupName( beanType, group, expandedGroups );
+		for ( Class<?> group : groups ) {
+			expandedGroups = new ArrayList<Class<?>>();
+			isGroupSequence = expandGroup( beanType, group, expandedGroups );
 
-			for ( String expandedGroupName : expandedGroups ) {
+			for ( Class<?> expandedGroup : expandedGroups ) {
 
-				if ( !constraintDescriptor.isInGroups( expandedGroupName ) ) {
+				if ( !constraintDescriptor.isInGroups( expandedGroup ) ) {
 					continue;
 				}
 
@@ -384,7 +386,7 @@ public class ValidatorImpl implements Validator {
 								null,
 								object,
 								propertyIter.getOriginalProperty(),  //FIXME use error.getProperty()
-								"",
+								null, //FIXME why is this a null group!! Used to be "" string should it be Default. Looks weird
 								constraintDescriptor
 						);
 						addFailingConstraint( failingConstraintViolations, failingConstraintViolation );
@@ -505,25 +507,25 @@ public class ValidatorImpl implements Validator {
 	 * Checks whether the provided group name is a group sequence and if so expands the group name and add the expanded
 	 * groups names to <code>expandedGroupName </code>
 	 *
-	 * @param groupName The group name to expand
-	 * @param expandedGroupNames The exanded group names or just a list with the single provided group name id the name
+	 * @param group The group to expand
+	 * @param expandedGroups The exanded group names or just a list with the single provided group name id the name
 	 * was not expandable
 	 *
 	 * @return <code>true</code> if an expansion took place, <code>false</code> otherwise.
 	 */
-	private <T> boolean expandGroupName(Class<T> beanType, String groupName, List<String> expandedGroupNames) {
-		if ( expandedGroupNames == null ) {
+	private <T> boolean expandGroup(Class<T> beanType, Class<?> group, List<Class<?>> expandedGroups) {
+		if ( expandedGroups == null ) {
 			throw new IllegalArgumentException( "List cannot be empty" );
 		}
 
 		boolean isGroupSequence;
 		MetaDataProviderImpl<T> metaDataProvider = factory.getMetadataProvider( beanType );
-		if ( metaDataProvider.getGroupSequences().containsKey( groupName ) ) {
-			expandedGroupNames.addAll( metaDataProvider.getGroupSequences().get( groupName ) );
+		if ( metaDataProvider.getGroupSequences().containsKey( group ) ) {
+			expandedGroups.addAll( metaDataProvider.getGroupSequences().get( group ) );
 			isGroupSequence = true;
 		}
 		else {
-			expandedGroupNames.add( groupName );
+			expandedGroups.add( group );
 			isGroupSequence = false;
 		}
 		return isGroupSequence;

@@ -33,28 +33,28 @@ public interface Validator {
 	 * validate all constraints on object
 	 *
 	 * @param object object to validate
-	 * @param groups group name(s) (including group sequence names) targeted
-	 * for validation (default to &lt;code&gt;default&lt;/code&gt;)
+	 * @param groups groups targeted for validation
+	 *               (default to {@link javax.validation.groups.Default})
 	 *
 	 * @return constraint violations or an empty Set if none
 	 *
 	 * @throws IllegalArgumentException e if object is null
 	 */
-	<T> Set<ConstraintViolation<T>> validate(T object, String... groups);
+	<T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups);
 
 	/**
 	 * validate all constraints on &lt;code&gt;propertyName&lt;/code&gt; property of object
 	 *
 	 * @param object object to validate
 	 * @param propertyName property to validate (ie field and getter constraints)
-	 * @param groups group name(s) (including group sequence names) targeted
-	 * for validation (default to &lt;code&gt;default&lt;/code&gt;)
+	 * @param groups groups targeted for validation
+	 *               (default to {@link javax.validation.groups.Default})
 	 *
 	 * @return constraint violations or an empty Set if none
 	 *
 	 * @throws IllegalArgumentException e if object is null or if propertyName is not present
 	 */
-	<T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, String... groups);
+	<T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups);
 
 	/**
 	 * validate all constraints on <code>propertyName</code> property
@@ -64,13 +64,14 @@ public interface Validator {
 	 *
 	 * @param propertyName property to validate
 	 * @param value property value to validate
-	 * @param groups group name(s) (including group sequence names) targeted
-	 * for validation (default to <code>default</code>)
+	 * @param groups groups targeted for validation
+	 *               (default to {@link javax.validation.groups.Default})
 	 *
 	 * @return constraint violations or an empty Set if none
 	 * @throws IllegalArgumentException e if propertyName is not present
 	 */
-	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, String... groups);
+	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName,
+												  Object value, Class<?>... groups);
 
 	/**
 	 * Return the descriptor object describing bean constraints

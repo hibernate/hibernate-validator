@@ -33,9 +33,9 @@ import javax.validation.ConstraintValidator;
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface Pattern {
-	public abstract String message() default "{validator.pattern}";
+	String message() default "{validator.pattern}";
 
-	public abstract String[] groups() default { };
+	Class<?>[] groups() default { };
 
 	/**
 	 * @return the regular expression the annotated string must match.

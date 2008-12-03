@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.ValidationException;
+import javax.validation.groups.Default;
 import javax.validation.constraints.NotNull;
 
 import static org.junit.Assert.assertEquals;
@@ -94,8 +95,8 @@ public class ReflectionHelperTest {
 				return "test";
 			}
 
-			public String[] groups() {
-				return new String[] { "default" };
+			public Class<?>[] groups() {
+				return new Class<?>[] { Default.class };
 			}
 
 			public Class<? extends Annotation> annotationType() {
@@ -105,8 +106,8 @@ public class ReflectionHelperTest {
 		String message = ReflectionHelper.getAnnotationParameter( testAnnotation, "message", String.class );
 		assertEquals( "Wrong message", "test", message );
 
-		String[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", String[].class );
-		assertEquals( "Wrong message", "default", group[0] );
+		Class<?>[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", Class[].class );
+		assertEquals( "Wrong message", Default.class, group[0] );
 
 		try {
 			ReflectionHelper.getAnnotationParameter( testAnnotation, "message", Integer.class );

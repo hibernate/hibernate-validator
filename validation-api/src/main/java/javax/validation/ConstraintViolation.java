@@ -70,7 +70,7 @@ public interface ConstraintViolation<T> {
 	 *
 	 * TODO: considering removal, if you think it's important, speak up
 	 */
-	Set<String> getGroups();
+	Set<Class<?>> getGroups();
 
 	/**
 	 * Constraint metadata reported to fail.

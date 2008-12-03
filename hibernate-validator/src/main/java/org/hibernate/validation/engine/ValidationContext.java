@@ -47,10 +47,10 @@ public class ValidationContext<T> {
 	private final T rootBean;
 
 	/**
-	 * Maps for each group name to an identity set to keep track of already validated objects. We have to make sure
+	 * Maps for each group to an identity set to keep track of already validated objects. We have to make sure
 	 * that each object gets only validated once (per group).
 	 */
-	private final Map<String, IdentitySet> processedObjects;
+	private final Map<Class<?>, IdentitySet> processedObjects;
 
 	/**
 	 * A list of all failing constraints so far.
@@ -65,7 +65,7 @@ public class ValidationContext<T> {
 	/**
 	 * The current group which is getting processed.
 	 */
-	private String currentGroup;
+	private Class<?> currentGroup;
 
 	/**
 	 * Stack for keep track of the currently validated object.
@@ -80,7 +80,7 @@ public class ValidationContext<T> {
 	public ValidationContext(T rootBean, Object object) {
 		this.rootBean = rootBean;
 		validatedobjectStack.push( new ValidatedBean(object) );
-		processedObjects = new HashMap<String, IdentitySet>();
+		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		propertyPath = "";
 		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 	}
@@ -105,11 +105,11 @@ public class ValidationContext<T> {
 		return rootBean;
 	}
 
-	public String getCurrentGroup() {
+	public Class<?> getCurrentGroup() {
 		return currentGroup;
 	}
 
-	public void setCurrentGroup(String currentGroup) {
+	public void setCurrentGroup(Class<?> currentGroup) {
 		this.currentGroup = currentGroup;
 	}
 
@@ -182,7 +182,7 @@ public class ValidationContext<T> {
 		return propertyPath;
 	}
 
-	public boolean needsValidation(Set<String> groups) {
+	public boolean needsValidation(Set<Class<?>> groups) {
 		return groups.contains( currentGroup );
 	}
 

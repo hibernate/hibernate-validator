@@ -95,9 +95,9 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	private ConstraintFactory constraintFactory = new ConstraintFactoryImpl();
 
 	/**
-	 * Maps group sequence names to the list of group/sequence names.
+	 * Maps group sequences to the list of group/sequences.
 	 */
-	private Map<String, List<String>> groupSequences = new HashMap<String, List<String>>();
+	private Map<Class<?>, List<Class<?>>> groupSequences = new HashMap<Class<?>, List<Class<?>>>();
 
 	public MetaDataProviderImpl(Class<T> beanClass, ConstraintFactory constraintFactory) {
 		this.beanClass = beanClass;
@@ -159,24 +159,24 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 			}
 		}
 
-		for ( Map.Entry<String, List<String>> mapEntry : groupSequences.entrySet() ) {
-			List<String> groupNames = mapEntry.getValue();
-			List<String> expandedGroupNames = new ArrayList<String>();
-			for ( String groupName : groupNames ) {
-				expandedGroupNames.addAll( expandGroupSequenceNames( groupName ) );
+		for ( Map.Entry<Class<?>, List<Class<?>>> mapEntry : groupSequences.entrySet() ) {
+			List<Class<?>> groups = mapEntry.getValue();
+			List<Class<?>> expandedGroups = new ArrayList<Class<?>>();
+			for ( Class<?> group : groups ) {
+				expandedGroups.addAll( expandGroupSequences( group ) );
 			}
-			groupSequences.put( mapEntry.getKey(), expandedGroupNames );
+			groupSequences.put( mapEntry.getKey(), expandedGroups );
 		}
 		if ( log.isDebugEnabled() && !groupSequences.isEmpty() ) {
 			log.debug( "Expanded groups sequences: {}", groupSequences );
 		}
 	}
 
-	private List<String> expandGroupSequenceNames(String group) {
-		List<String> groupList = new ArrayList<String>();
+	private List<Class<?>> expandGroupSequences(Class<?> group) {
+		List<Class<?>> groupList = new ArrayList<Class<?>>();
 		if ( groupSequences.containsKey( group ) ) {
-			for ( String s : groupSequences.get( group ) ) {
-				groupList.addAll( expandGroupSequenceNames( s ) );
+			for ( Class<?> localGroup : groupSequences.get( group ) ) {
+				groupList.addAll( expandGroupSequences( localGroup ) );
 			}
 		}
 		else {
@@ -275,8 +275,8 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(A annotation, Class constraintClass) {
-		String[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", String[].class );
-		for ( String groupName : groups ) {
+		Class<?>[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
+		for ( Class<?> groupName : groups ) {
 			if ( groupSequences.containsKey( groupName ) ) {
 				throw new ValidationException( groupName + " is illegally used as group and sequence name." );
 			}
@@ -414,7 +414,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 		return cascadedMembers;
 	}
 
-	public Map<String, List<String>> getGroupSequences() {
+	public Map<Class<?>, List<Class<?>>> getGroupSequences() {
 		return groupSequences;
 	}
 

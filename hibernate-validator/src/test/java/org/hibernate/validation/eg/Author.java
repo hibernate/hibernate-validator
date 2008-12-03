@@ -27,14 +27,14 @@ import org.hibernate.validation.constraints.NotEmpty;
  */
 public class Author {
 
-	@NotEmpty(groups = "last")
+	@NotEmpty(groups = Last.class)
 	private String firstName;
 
-	@NotNull(groups = "first")
-	@NotEmpty(groups = "first")
+	@NotNull(groups = First.class)
+	@NotEmpty(groups = First.class)
 	private String lastName;
 
-	@Length(max = 20, groups = "last")
+	@Length(max = 20, groups = Last.class)
 	private String company;
 
 	public String getFirstName() {
