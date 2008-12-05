@@ -20,6 +20,7 @@ package javax.validation.spi;
 import java.io.InputStream;
 import javax.validation.ConstraintFactory;
 import javax.validation.MessageResolver;
+import javax.validation.TraversableResolver;
 
 /**
  * Contract between a <code>ValidatorFactoryBuilder</code> and a
@@ -54,4 +55,12 @@ public interface ValidatorFactoryConfiguration {
 	 * @return factory instance or null if not defined
 	 */
 	ConstraintFactory getConstraintFactory();
+
+	/**
+	 * Traversable resolver as defined by the client programmatically
+	 * or null if undefined.
+	 *
+	 * @return traversable provider instance or null if not defined
+	 */
+	TraversableResolver getTraversableResolver();
 }

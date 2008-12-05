@@ -32,6 +32,7 @@ import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
 import javax.validation.Validator;
+import javax.validation.TraversableResolver;
 import javax.validation.groups.Default;
 
 import org.hibernate.validation.Version;
@@ -77,10 +78,13 @@ public class ValidatorImpl implements Validator {
 	
 	private final ValidatorFactoryImplementor factory;
 	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
+	private final TraversableResolver traversableResolver;
 
-	public ValidatorImpl(ValidatorFactoryImplementor factory, MessageResolver messageResolver) {
+	public ValidatorImpl(ValidatorFactoryImplementor factory, MessageResolver messageResolver,
+						 TraversableResolver traversableResolver) {
 		this.factory = factory;
 		this.messageResolver = messageResolver;
+		this.traversableResolver = traversableResolver;
 	}
 
 

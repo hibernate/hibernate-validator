@@ -21,14 +21,15 @@ import java.io.InputStream;
 import java.util.List;
 import javax.validation.ConstraintFactory;
 import javax.validation.MessageResolver;
+import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
-import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.ValidatorFactory;
+import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.bootstrap.DefaultValidationProviderResolver;
+import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.spi.ValidatorFactoryConfiguration;
-import javax.validation.spi.BootstrapState;
 
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
 
@@ -36,12 +37,16 @@ import org.hibernate.validation.HibernateValidatorFactoryBuilder;
  * @author Emmanuel Bernard
  */
 public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBuilder, ValidatorFactoryConfiguration {
+	//FIXME not sure why it is like that. We should cache these instances somehow. Static?
 	private final MessageResolver defaultMessageResolver = new ResourceBundleMessageResolver();
+	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
+
 	private MessageResolver messageResolver;
 	private ConstraintFactory constraintFactory = new ConstraintFactoryImpl();
 	private String configurationFile = "META-INF/validation.xml";
 	private final ValidationProvider provider;
 	private final ValidationProviderResolver providerResolver;
+	private TraversableResolver traversableResolver;
 
 	public ValidatorFactoryBuilderImpl(BootstrapState state) {
 		if (state.getValidationProviderResolver() == null) {
@@ -52,6 +57,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		}
 		this.provider = null;
 		this.messageResolver = defaultMessageResolver;
+		this.traversableResolver = defaultTraversableResolver;
 	}
 
 	public ValidatorFactoryBuilderImpl(ValidationProvider provider) {
@@ -61,10 +67,16 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		this.provider = provider;
 		this.providerResolver = null;
 		this.messageResolver = defaultMessageResolver;
+		this.traversableResolver = defaultTraversableResolver;
 	}
 
 	public ValidatorFactoryBuilderImpl messageResolver(MessageResolver resolver) {
 		this.messageResolver = resolver;
+		return this;
+	}
+
+	public ValidatorFactoryBuilderImpl traversableResolver(TraversableResolver resolver) {
+		this.traversableResolver = resolver;
 		return this;
 	}
 
@@ -107,6 +119,10 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 
 	public ConstraintFactory getConstraintFactory() {
 		return constraintFactory;
+	}
+
+	public TraversableResolver getTraversableResolver() {
+		return traversableResolver;
 	}
 
 	public ValidatorFactoryBuilderImpl configure(InputStream stream) {

@@ -21,13 +21,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintFactory;
 import javax.validation.MessageResolver;
+import javax.validation.TraversableResolver;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import javax.validation.ValidatorBuilder;
 import javax.validation.spi.ValidatorFactoryConfiguration;
 
-import org.hibernate.validation.engine.ValidatorImpl;
-import org.hibernate.validation.engine.ValidatorFactoryImplementor;
 import org.hibernate.validation.engine.MetaDataProviderImpl;
+import org.hibernate.validation.engine.ValidatorFactoryImplementor;
 
 /**
  * @author Emmanuel Bernard
@@ -36,6 +36,7 @@ import org.hibernate.validation.engine.MetaDataProviderImpl;
 public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 
 	private final MessageResolver messageResolver;
+	private final TraversableResolver traversableResolver;
 	private final ConstraintFactory constraintFactory;
 
 	//TODO is there a way to replace ? by so kind of <T> to express the correlation?
@@ -46,6 +47,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 	public ValidatorFactoryImpl(ValidatorFactoryConfiguration configuration) {
 		this.messageResolver = configuration.getMessageResolver();
 		this.constraintFactory = configuration.getConstraintFactory();
+		this.traversableResolver = configuration.getTraversableResolver();
 		//do init metadata from XML form
 	}
 
@@ -53,15 +55,15 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 	 * {@inheritDoc}
 	 */
 	public Validator getValidator() {
-		return new ValidatorImpl( this, messageResolver );
-	}
-
-	public Validator getValidator(MessageResolver messageResolver) {
-		return new ValidatorImpl( this, messageResolver );
+		return defineValidatorState().getValidator();
 	}
 
 	public MessageResolver getMessageResolver() {
 		return messageResolver;
+	}
+
+	public ValidatorBuilder defineValidatorState() {
+		return new ValidatorBuilderImpl(this, messageResolver, traversableResolver);
 	}
 
 	public <T> MetaDataProviderImpl<T> getMetadataProvider(Class<T> beanClass) {

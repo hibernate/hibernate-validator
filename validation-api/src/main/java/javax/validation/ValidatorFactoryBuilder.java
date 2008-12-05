@@ -59,6 +59,16 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	T messageResolver(MessageResolver resolver);
 
 	/**
+	 * Defines the traversable resolver used. Has priority over the configuration
+	 * based traversable resolver.
+	 *
+	 * @param resolver traversable resolver implementation.
+	 *
+	 * @return <code>this</code> following the chaining method pattern.
+	 */
+	T traversableResolver(TraversableResolver resolver);
+
+	/**
 	 * Defines the constraint factory. Has priority over the configuration
 	 * based constraint factory.
 	 *

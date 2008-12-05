@@ -54,7 +54,9 @@ public interface Validator {
 	 *
 	 * @throws IllegalArgumentException e if object is null or if propertyName is not present
 	 */
-	<T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups);
+	<T> Set<ConstraintViolation<T>> validateProperty(T object,
+													 String propertyName,
+													 Class<?>... groups);
 
 	/**
 	 * validate all constraints on <code>propertyName</code> property
@@ -70,8 +72,10 @@ public interface Validator {
 	 * @return constraint violations or an empty Set if none
 	 * @throws IllegalArgumentException e if propertyName is not present
 	 */
-	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName,
-												  Object value, Class<?>... groups);
+	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType,
+												  String propertyName,
+												  Object value,
+												  Class<?>... groups);
 
 	/**
 	 * Return the descriptor object describing bean constraints
