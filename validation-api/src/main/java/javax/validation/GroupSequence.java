@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface GroupSequence {
 	//TODO depreciate
-	Class<?> name();
+	Class<?> name() default void.class;
 
 	Class<?>[] sequence();
 }
