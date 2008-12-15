@@ -30,7 +30,8 @@ public interface Constraint<A extends Annotation> {
 	 * Validator parameters for a given constraint definition
 	 * Annotations parameters are passed as key/value into parameters
 	 * <p/>
-	 * This method is guaranteed to be called before any of the other Constraint implementation methods
+	 * This method is guaranteed to be called before any of the other Constraint
+	 * implementation methods
 	 *
 	 * @param constraintAnnotation parameters for a given constraint definition
 	 */

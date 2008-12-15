@@ -35,8 +35,8 @@ public interface ValidationProvider {
 	 * 
 	 * @param builderClass targeted builder class.
 	 *
-	 * @return <code>true</code> if <code>builderClass</code> is the Bean Validation Provider sub
-	 *         interface for ValidatorFactoryBuilder
+	 * @return <code>true</code> if <code>builderClass</code> is the Bean Validation Provider
+	 *         sub-interface for ValidatorFactoryBuilder
 	 */
 	boolean isSuitable(Class<? extends ValidatorFactoryBuilder<?>> builderClass);
 

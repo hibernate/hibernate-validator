@@ -131,12 +131,14 @@ public class Validation {
 	 * Used by applications targeting a specific provider programmatically.
 	 * <p/>
 	 * <pre>
-	 * ACMEValidatorFactoryBuilder builder = Validation.builderType(ACMEValidatorFactoryBuilder.class)
-	 *     .providerResolver( new MyResolverStrategy() )
-	 *     .build();
+	 * ACMEValidatorFactoryBuilder builder = 
+	 *     Validation.builderType(ACMEValidatorFactoryBuilder.class)
+	 *             .providerResolver( new MyResolverStrategy() )
+	 *             .build();
 	 * </pre>,
-	 * where <code>ACMEValidatorFactoryBuilder</code> is the <code>ValidatorFactoryBuilder</code>
-	 * sub interface uniquely identifying the ACME Bean Validation provider.
+	 * where <code>ACMEValidatorFactoryBuilder</code> is the
+	 * <code>ValidatorFactoryBuilder</code> sub interface uniquely identifying the
+	 * ACME Bean Validation provider.
 	 *
 	 * @param builderType the <code>ValidatorFactoryBuilder</code> sub interface
 	 * uniquely defining the targeted provider.

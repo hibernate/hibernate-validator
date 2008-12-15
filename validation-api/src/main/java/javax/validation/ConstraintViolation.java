@@ -24,7 +24,8 @@ import java.util.Set;
  * well as the message describing the violation.
  *
  * @author Emmanuel Bernard
- * @todo the rational behind rootBean and propertyPath is to keep the context available to the user
+ * @todo the rational behind rootBean and propertyPath is to keep the context
+ *       available to the user
  */
 public interface ConstraintViolation<T> {
 
