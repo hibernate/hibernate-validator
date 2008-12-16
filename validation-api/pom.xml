@@ -18,7 +18,7 @@
 
     <distributionManagement>
         <site>
-            <id>local</id>
+            <id>site</id>
             <url>file:///Users/hardy/Sites/${artifactId}</url>
         </site>
     </distributionManagement>

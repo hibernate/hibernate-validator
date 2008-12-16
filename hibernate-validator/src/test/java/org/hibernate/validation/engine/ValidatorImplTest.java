@@ -71,6 +71,7 @@ public class ValidatorImplTest {
 
 	/**
 	 * JSR 303: Requirements on classes to be validates (3.1)
+	 * @jsr 3.1
 	 */
 	@Test
 	public void testWrongMethodName() {
@@ -339,6 +340,7 @@ public class ValidatorImplTest {
 
 	/**
 	 * JSR 303: Multi-valued constraints (2.2)
+	 * @jsr 2.2
 	 */
 	@Test
 	public void testMultiValueConstraint() {
@@ -361,6 +363,7 @@ public class ValidatorImplTest {
 
 	/**
 	 * JSR 303: Object graph validation (3.5.1)
+	 * @jsr 3.5.1
 	 */
 	@Test
 	public void testGraphValidation() {

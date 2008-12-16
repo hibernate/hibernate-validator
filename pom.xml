@@ -177,7 +177,7 @@
             <url>dav:https://snapshots.jboss.org/maven2</url>
         </snapshotRepository>
         <site>
-            <id>local</id>
+            <id>site</id>
             <url>file:///Users/hardy/Sites</url>
         </site>
     </distributionManagement>
