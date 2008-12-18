@@ -47,6 +47,7 @@ import org.hibernate.validation.eg.Second;
 import org.hibernate.validation.eg.Last;
 import org.hibernate.validation.eg.DefaultAlias;
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
+import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
  * Tests for the implementation of <code>Validator</code>.
@@ -73,6 +74,7 @@ public class ValidatorImplTest {
 	 * JSR 303: Requirements on classes to be validates (3.1)
 	 * @jsr 3.1
 	 */
+	@SpecAssertion( section = {"3.1"} )
 	@Test
 	public void testWrongMethodName() {
 		try {

@@ -49,6 +49,7 @@
         <module>validation-api</module>
         <module>hibernate-validator</module>
         <module>hibernate-validator-legacy</module>
+        <module>tck-utils</module>
     </modules>
 
     <dependencyManagement>
@@ -77,6 +78,11 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>tck-utils</artifactId>
+                <version>${version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
