@@ -17,26 +17,41 @@
 */
 package org.hibernate.validation.constraints;
 
+import java.lang.annotation.Annotation;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.junit.Before;
+
+import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NotEmptyConstraintTest {
 
+	NotEmptyConstraint constraint;
+
+	@Before
+	public void init() {
+		constraint = new NotEmptyConstraint();
+	}
+
 	@Test
 	public void testIsValid() {
-		NotEmptyConstraint constraint = new NotEmptyConstraint();
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( "foo", null ) );
 		assertTrue( constraint.isValid( "  ", null ) );
 
 		assertFalse( constraint.isValid( "", null ) );
+	}
 
+	@Test
+	@SpecAssertion(section = "2.1", note = "Incompatible type cause runtime error")
+	public void testIncompatibleType() {
 		try {
 			constraint.isValid( new Object(), null );
 			fail();

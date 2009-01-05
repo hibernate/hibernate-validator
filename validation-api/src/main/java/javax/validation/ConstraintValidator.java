@@ -39,7 +39,8 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface ConstraintValidator {
 	/**
-	 * Constraint validation implementation
+	 * @return The class implementing the constraint validation logic for the constraint annotation this annotation
+	 * is used on.
 	 */
 	public abstract Class<? extends Constraint> value();
 }

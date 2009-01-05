@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;
@@ -36,6 +37,8 @@ import com.sun.mirror.util.SimpleDeclarationVisitor;
 import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
+ * An APT annotation processor for creating a TCK coverage report.
+ *
  * @author Hardy Ferentschik
  */
 public class TCKAnnotationProcessor implements AnnotationProcessor {
@@ -44,8 +47,6 @@ public class TCKAnnotationProcessor implements AnnotationProcessor {
 	private static final String REPORT_FILE_NAME = "tck.html";
 
 	private final AnnotationProcessorEnvironment env;
-	private final String[] tableHeaders = new String[] { "Section", "Class", "Method" };
-	private final StringBuffer out = new StringBuffer();
 	private final List<JSRReference> references = new ArrayList<JSRReference>();
 	private final File baseDir;
 
@@ -65,25 +66,23 @@ public class TCKAnnotationProcessor implements AnnotationProcessor {
 		for ( Declaration d : env.getDeclarationsAnnotatedWith( annType ) ) {
 			d.accept(
 					getDeclarationScanner(
-							new DoNothingVisitor(),
+							new CreateReferenceVisitor(),
 							NO_OP
 					)
 			);
 		}
 
-
-		writeHeader();
-		writeContents();
-		writeFooter();
-
-		writeReporttoFile();
+		Collections.sort( references );
+		TCKReportGenerator generator = new HtmlTckReportGenerator();
+		String report = generator.generateReport( references );
+		writeReportFile( report );
 	}
 
-	private void writeReporttoFile() {
+	private void writeReportFile(String report) {
 		try {
-			File report = new File( baseDir, REPORT_FILE_NAME );
-			BufferedWriter writer = new BufferedWriter( new FileWriter( report ) );
-			writer.write( out.toString() );
+			File reportFile = new File( baseDir, REPORT_FILE_NAME );
+			BufferedWriter writer = new BufferedWriter( new FileWriter( reportFile ) );
+			writer.write( report );
 			writer.close();
 		}
 		catch ( IOException e ) {
@@ -91,87 +90,16 @@ public class TCKAnnotationProcessor implements AnnotationProcessor {
 		}
 	}
 
-	private void writeFooter() {
-		out.append( "</body></html>" );
-	}
-
-	private void writeHeader() {
-		out.append( "<html><head></head><body>" );
-	}
-
-	private void writeTableHeader() {
-		out.append( "<table border=\"1\"><tr>" );
-		for ( String s : tableHeaders ) {
-			out.append( "<th>" ).append( s ).append( "</th>" );
-		}
-		out.append( "</tr>" );
-	}
-
-	private void writeTableFooter() {
-		out.append( "</table>" );
-	}
-
-	private void writeContents() {
-		writeTableHeader();
-		for ( JSRReference reference : references ) {
-			out.append( "<tr>" );
-			out.append( "<td>" ).append( reference.jsrSectionReference ).append( "</td>" );
-			out.append( "<td><a href=\"" )
-					.append( reference.getSourceLink() )
-					.append( "\">" )
-					.append( reference.className )
-					.append( "</a></td>" );
-			out.append( "<td>" ).append( reference.methodName ).append( "</td>" );
-			out.append( "</tr>" );
-		}
-		writeTableFooter();
-	}
-
-	private class DoNothingVisitor extends SimpleDeclarationVisitor {
+	private class CreateReferenceVisitor extends SimpleDeclarationVisitor {
 		public void visitMethodDeclaration(MethodDeclaration d) {
 			SpecAssertion annotation = d.getAnnotation( SpecAssertion.class );
 			JSRReference ref = new JSRReference(
 					annotation.section()[0], d.getDeclaringType().getQualifiedName(), d.getSimpleName()
 			);
+			if ( annotation.note().length() > 0 ) {
+				ref.note = annotation.note();
+			}
 			references.add( ref );
-		}
-	}
-
-	private static class JSRReference implements Comparable {
-		/**
-		 * The JSR  section this instance references.
-		 */
-		String jsrSectionReference;
-
-		/**
-		 * The name of the class which references the JSR.
-		 */
-		String className;
-
-		/**
-		 * The method which references the JSR.
-		 */
-		String methodName;
-
-		/**
-		 * @todo Add some validation
-		 */
-		JSRReference(String reference, String className, String methodName) {
-			this.jsrSectionReference = reference;
-			this.className = className;
-			this.methodName = methodName;
-		}
-
-		public String getSourceLink() {
-			StringBuilder builder = new StringBuilder();
-			builder.append( "xref-test/" );
-			builder.append( className.replace( '.', '/' ) );
-			builder.append( ".html" );
-			return builder.toString();
-		}
-
-		public int compareTo(Object o) {
-			return jsrSectionReference.compareTo( ( ( JSRReference ) o ).jsrSectionReference );
 		}
 	}
 }

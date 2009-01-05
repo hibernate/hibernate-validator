@@ -41,6 +41,7 @@ import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.constraint.NoGroups;
 import org.hibernate.validation.eg.constraint.NoMessage;
+import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -49,7 +50,7 @@ import org.hibernate.validation.eg.constraint.NoMessage;
  */
 public class ReflectionHelperTest {
 	@Test
-	public void testGetIndexedValueFormMap() {
+	public void testGetIndexedValueForMap() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Object testObject = new Object();
 		String key = "key";
@@ -129,10 +130,8 @@ public class ReflectionHelperTest {
 		}
 	}
 
-	/**
-	 * JSR 303: Constraint definition properties - message (2.1.1.1)
-	 */
 	@Test
+	@SpecAssertion(section = "2.1.1.2", note = "constraint annotation must specify a groups element")
 	public void testConstraintWithNoMessage() {
 		Annotation annotation = new NoGroups() {
 			public String message() {
@@ -148,10 +147,8 @@ public class ReflectionHelperTest {
 		);
 	}
 
-	/**
-	 * JSR 303: Constraint definition properties - groups (2.1.1.2)
-	 */
 	@Test
+	@SpecAssertion(section = "2.1.1.1", note = "constraint annotation must specify a groups element")
 	public void testConstraintWithNoGroups() {
 		Annotation annotation = new NoMessage() {
 			public String[] groups() {
@@ -192,6 +189,6 @@ public class ReflectionHelperTest {
 		annotation = fields[0].getAnnotation( NotNull.class );
 		assertNotNull( annotation );
 		multiValueConstraintAnnotations = ReflectionHelper.getMultiValueConstraints( annotation );
-		assertTrue( "There should be two constraint annotations", multiValueConstraintAnnotations.size() == 0 );			
+		assertTrue( "There should be two constraint annotations", multiValueConstraintAnnotations.size() == 0 );
 	}
 }

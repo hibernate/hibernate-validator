@@ -23,14 +23,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.junit.Before;
+
+import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
+ * Tests the <code>LengthConstraint</code>.
+ *
  * @author Hardy Ferentschik
  */
 public class LengthConstraintTest {
-	@Test
-	public void testIsValid() {
-		LengthConstraint constraint = new LengthConstraint();
+
+	LengthConstraint constraint;
+
+	@Before
+	public void init() {
+		constraint = new LengthConstraint();
 		constraint.initialize(
 				new Length() {
 
@@ -55,6 +63,10 @@ public class LengthConstraintTest {
 					}
 				}
 		);
+	}
+
+	@Test
+	public void testIsValid() {
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertFalse( constraint.isValid( "", null ) );
@@ -63,6 +75,11 @@ public class LengthConstraintTest {
 		assertTrue( constraint.isValid( "foo", null ) );
 		assertFalse( constraint.isValid( "foobar", null ) );
 
+	}
+
+	@Test
+	@SpecAssertion( section = "2.1", note="Incompatible type cause runtime error")
+	public void testIncompatibleType() {
 		try {
 			constraint.isValid( new Object(), null );
 			fail();

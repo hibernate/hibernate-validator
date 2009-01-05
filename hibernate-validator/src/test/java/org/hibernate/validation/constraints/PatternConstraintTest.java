@@ -23,14 +23,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.junit.Before;
+
+import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
  * @author Hardy Ferentschik
  */
 public class PatternConstraintTest {
-	@Test
-	public void testIsValid() {
-		PatternConstraint constraint = new PatternConstraint();
+
+	PatternConstraint constraint;
+
+	@Before
+	public void init() {
+		constraint = new PatternConstraint();
 		constraint.initialize(
 				new Pattern() {
 
@@ -55,12 +61,28 @@ public class PatternConstraintTest {
 					}
 				}
 		);
+	}
+
+	@Test
+	public void testIsValid() {
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertFalse( constraint.isValid( "", null ) );
 		assertFalse( constraint.isValid( "bla bla", null ) );
 		assertFalse( constraint.isValid( "This test is not foobar", null ) );
 
+		try {
+			constraint.isValid( new Object(), null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			// success
+		}
+	}
+
+	@Test
+	@SpecAssertion(section = "2.1", note = "Incompatible type cause runtime error")
+	public void testIncompatibleType() {
 		try {
 			constraint.isValid( new Object(), null );
 			fail();
