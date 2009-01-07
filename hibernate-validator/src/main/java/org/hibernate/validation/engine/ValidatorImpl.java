@@ -64,13 +64,6 @@ public class ValidatorImpl implements Validator {
 		Version.touch();
 	}
 
-	//TODO remove
-	/**
-	 * A map for caching validators for cascaded entities.
-	 */
-	//private final Map<Class<?>, ValidatorImpl> subValidators = new ConcurrentHashMap<Class<?>, ValidatorImpl>();
-
-	
 	/**
 	 * Message resolver used  for interpolating error messages.
 	 */
@@ -151,10 +144,10 @@ public class ValidatorImpl implements Validator {
 	private <T> void validateConstraints(ValidationContext<T> context) {
 		//casting rely on the fact that root object is at the top of the stack
 		@SuppressWarnings( "unchecked" )
-		MetaDataProviderImpl<T> metaDataProvider =
-				( MetaDataProviderImpl<T> ) factory.getMetadataProvider( context.peekValidatedObjectType() );
-		for ( MetaConstraint metaConstraint : metaDataProvider.getConstraintMetaDataList() ) {
-			ConstraintDescriptorImpl constraintDescriptor = metaConstraint.getDescriptor();
+		BeanMetaData<T> beanMetaData =
+				( BeanMetaData<T> ) factory.getBeanMetaData( context.peekValidatedObjectType() );
+		for ( MetaConstraint metaConstraint : beanMetaData.getConstraintMetaDataList() ) {
+			ConstraintDescriptorImpl constraintDescriptor = (ConstraintDescriptorImpl) metaConstraint.getDescriptor();
 			context.pushProperty( metaConstraint.getPropertyName() );
 
 			if ( !context.needsValidation( constraintDescriptor.getGroups() ) ) {
@@ -178,7 +171,7 @@ public class ValidatorImpl implements Validator {
 							message,
 							interpolatedMessage,
 							context.getRootBean(),
-							metaDataProvider.getBeanClass(),
+							beanMetaData.getBeanClass(),
 							leafBeanInstance,
 							value,
 							context.peekPropertyPath(), //FIXME use error.getProperty()
@@ -223,7 +216,7 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <T> void validateCascadedConstraints(ValidationContext<T> context) {
-		List<Member> cascadedMembers = factory.getMetadataProvider( context.peekValidatedObjectType() ).getCascadedMembers();
+		List<Member> cascadedMembers = factory.getBeanMetaData( context.peekValidatedObjectType() ).getCascadedMembers();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
@@ -345,7 +338,7 @@ public class ValidatorImpl implements Validator {
 	}
 
 	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
-		return factory.getMetadataProvider( clazz ).getBeanDescriptor();
+		return factory.getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
 
@@ -425,7 +418,7 @@ public class ValidatorImpl implements Validator {
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint> metaConstraintList = factory.getMetadataProvider(clazz).getConstraintMetaDataList();
+			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData(clazz).getConstraintMetaDataList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
@@ -434,7 +427,7 @@ public class ValidatorImpl implements Validator {
 			}
 		}
 		else {
-			List<Member> cascadedMembers = factory.getMetadataProvider(clazz).getCascadedMembers();
+			List<Member> cascadedMembers = factory.getBeanMetaData(clazz).getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
 					Type type = ReflectionHelper.typeOf( m );
@@ -463,7 +456,7 @@ public class ValidatorImpl implements Validator {
 
 		// bottom out - there is only one token left
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint> metaConstraintList = factory.getMetadataProvider(clazz).getConstraintMetaDataList();
+			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData(clazz).getConstraintMetaDataList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
@@ -474,7 +467,7 @@ public class ValidatorImpl implements Validator {
 			}
 		}
 		else {
-			List<Member> cascadedMembers = factory.getMetadataProvider(clazz).getCascadedMembers();
+			List<Member> cascadedMembers = factory.getBeanMetaData(clazz).getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
 					ReflectionHelper.setAccessibility( m );
@@ -509,8 +502,9 @@ public class ValidatorImpl implements Validator {
 
 	/**
 	 * Checks whether the provided group name is a group sequence and if so expands the group name and add the expanded
-	 * groups names to <code>expandedGroupName </code>
+	 * groups names to <code>expandedGroupName</code>.
 	 *
+	 * @param beanType The class for which to expand the group names.
 	 * @param group The group to expand
 	 * @param expandedGroups The exanded group names or just a list with the single provided group name id the name
 	 * was not expandable
@@ -523,7 +517,7 @@ public class ValidatorImpl implements Validator {
 		}
 
 		boolean isGroupSequence;
-		MetaDataProviderImpl<T> metaDataProvider = factory.getMetadataProvider( beanType );
+		BeanMetaDataImpl<T> metaDataProvider = factory.getBeanMetaData( beanType );
 		if ( metaDataProvider.getGroupSequences().containsKey( group ) ) {
 			expandedGroups.addAll( metaDataProvider.getGroupSequences().get( group ) );
 			isGroupSequence = true;

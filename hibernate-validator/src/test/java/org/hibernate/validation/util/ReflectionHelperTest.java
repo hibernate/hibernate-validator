@@ -41,6 +41,7 @@ import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.constraint.NoGroups;
 import org.hibernate.validation.eg.constraint.NoMessage;
+import org.hibernate.validation.eg.constraint.ValidProperty;
 import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
@@ -151,8 +152,33 @@ public class ReflectionHelperTest {
 	@SpecAssertion(section = "2.1.1.1", note = "constraint annotation must specify a groups element")
 	public void testConstraintWithNoGroups() {
 		Annotation annotation = new NoMessage() {
-			public String[] groups() {
+			public Class<?>[] groups() {
 				return null;
+			}
+
+			public Class<? extends Annotation> annotationType() {
+				return this.getClass();
+			}
+		};
+		assertFalse(
+				"The constraint annotation should not be valid", ReflectionHelper.isConstraintAnnotation( annotation )
+		);
+	}
+
+	@Test
+	@SpecAssertion(section = "2.1.1", note = "properties cannot begin with 'valid'")
+	public void testConstraintWithValidInPropertyName() {
+		Annotation annotation = new ValidProperty() {
+			public String message() {
+				return null;
+			}
+
+			public Class<?>[] groups() {
+				return null;
+			}
+
+			public int validLength() {
+				return 0;
 			}
 
 			public Class<? extends Annotation> annotationType() {
@@ -189,6 +215,6 @@ public class ReflectionHelperTest {
 		annotation = fields[0].getAnnotation( NotNull.class );
 		assertNotNull( annotation );
 		multiValueConstraintAnnotations = ReflectionHelper.getMultiValueConstraints( annotation );
-		assertTrue( "There should be two constraint annotations", multiValueConstraintAnnotations.size() == 0 );
+		assertTrue( "There should be no constraint annotations", multiValueConstraintAnnotations.size() == 0 );
 	}
 }

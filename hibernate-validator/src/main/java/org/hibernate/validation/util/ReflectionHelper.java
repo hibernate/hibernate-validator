@@ -130,6 +130,15 @@ public class ReflectionHelper {
 			return false;
 		}
 
+		Method[] methods = annotation.getClass().getMethods();
+		for ( Method m : methods ) {
+			if ( m.getName().startsWith( "valid" ) ) {
+				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
+				log.warn( msg );
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -140,7 +149,6 @@ public class ReflectionHelper {
 	 *
 	 * @return A list of constraint annotations or the empty list if <code>annotation</code> is not a multi constraint
 	 *         annotation.
-	 *
 	 */
 	public static <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
 		List<Annotation> annotationList = new ArrayList<Annotation>();
@@ -149,8 +157,8 @@ public class ReflectionHelper {
 			Class returnType = m.getReturnType();
 			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
 				Annotation[] annotations = ( Annotation[] ) m.invoke( annotation );
-				for (Annotation a : annotations) {
-					if( isConstraintAnnotation( a ) || isBuiltInConstraintAnnotation( a )) {
+				for ( Annotation a : annotations ) {
+					if ( isConstraintAnnotation( a ) || isBuiltInConstraintAnnotation( a ) ) {
 						annotationList.add( a );
 					}
 				}

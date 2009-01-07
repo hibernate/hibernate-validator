@@ -5,31 +5,31 @@ import java.util.Collections;
 import javax.validation.BeanDescriptor;
 import javax.validation.PropertyDescriptor;
 
-import org.hibernate.validation.engine.MetaDataProvider;
+import org.hibernate.validation.engine.BeanMetaData;
 
 /**
  * @author Emmanuel Bernard
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
-	private final MetaDataProvider<T> metadataProvider;
+	private final BeanMetaData<T> metadataBean;
 
-	public BeanDescriptorImpl(Class<T> returnType, MetaDataProvider<T> metadataProvider) {
+	public BeanDescriptorImpl(Class<T> returnType, BeanMetaData<T> metadataBean) {
 		super(returnType, false, "");
-		this.metadataProvider = metadataProvider;
+		this.metadataBean = metadataBean;
 	}
 
 	/**
 	 * @todo add child validation
 	 */
 	public boolean hasConstraints() {
-		return metadataProvider.getConstraintMetaDataList().size() > 0;
+		return metadataBean.getConstraintMetaDataList().size() > 0;
 	}
 
 	public PropertyDescriptor getConstraintsForProperty(String propertyName) {
-		return metadataProvider.getPropertyDescriptors().get( propertyName );
+		return metadataBean.getPropertyDescriptors().get( propertyName );
 	}
 
 	public Set<String> getPropertiesWithConstraints() {
-		return Collections.unmodifiableSet( metadataProvider.getPropertyDescriptors().keySet() );
+		return Collections.unmodifiableSet( metadataBean.getPropertyDescriptors().keySet() );
 	}
 }

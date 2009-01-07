@@ -15,17 +15,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.eg.constraint;
 
-import javax.validation.ValidatorFactory;
+import javax.validation.Constraint;
+import javax.validation.ConstraintContext;
 
 /**
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public interface ValidatorFactoryImplementor extends ValidatorFactory {
-	/**
-	 * @param clazz The bean class for which to retrieve the meta data.
-	 * @return Gives access to the required parsed meta data. This never returns an <code>null</code> object.
-	 */
-	<T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> clazz);
+public class FrenchZipcodeConstraint implements Constraint<FrenchZipcode> {
+
+	public void initialize(FrenchZipcode parameters) {
+	}
+
+	public boolean isValid(Object object, ConstraintContext constraintContext) {
+		return false;
+	}
 }

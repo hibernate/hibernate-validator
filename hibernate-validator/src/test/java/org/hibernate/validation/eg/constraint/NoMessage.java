@@ -33,5 +33,5 @@ import javax.validation.ConstraintValidator;
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface NoMessage {
-	public abstract String[] groups() default { };
+	Class<?>[] groups() default { };
 }

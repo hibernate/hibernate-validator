@@ -33,18 +33,18 @@ import static java.lang.annotation.ElementType.FIELD;
 @Retention(RUNTIME)
 public @interface OverridesParameter {
 	/**
-	 * constraint type the parameter is overriding
+	 * @return Constraint type the parameter is overriding
 	 */
 	Class<? extends Annotation> constraint();
 
 	/**
-	 * name of constraint parameter overridden
-	 * Defaults to the name of the parameter hosting the annotation  
+	 * @return name of constraint parameter overridden.
+	 * Defaults to the name of the parameter hosting the annotation.
 	 */
 	String parameter();
 
 	/**
-	 * index of the targetted constraint declaration when using
+	 * @return The index of the targeted constraint declaration when using
 	 * multiple constraints of the same type.
 	 * The index represents the index of the constraint in the value() array.
 	 *

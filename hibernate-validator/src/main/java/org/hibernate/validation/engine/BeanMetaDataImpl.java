@@ -54,7 +54,7 @@ import org.hibernate.validation.util.ReflectionHelper;
  * FIXME create an interface for MetadataProvider
  */
 
-public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
+public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static final Logger log = LoggerFactory.make();
 
@@ -99,7 +99,7 @@ public class MetaDataProviderImpl<T> implements MetaDataProvider<T> {
 	 */
 	private Map<Class<?>, List<Class<?>>> groupSequences = new HashMap<Class<?>, List<Class<?>>>();
 
-	public MetaDataProviderImpl(Class<T> beanClass, ConstraintFactory constraintFactory) {
+	public BeanMetaDataImpl(Class<T> beanClass, ConstraintFactory constraintFactory) {
 		this.beanClass = beanClass;
 		this.constraintFactory = constraintFactory;
 		createMetaData();

@@ -18,6 +18,7 @@
 package org.hibernate.validation.constraints;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -78,7 +79,7 @@ public class LengthConstraintTest {
 	}
 
 	@Test
-	@SpecAssertion( section = "2.1", note="Incompatible type cause runtime error")
+	@SpecAssertion(section = "2.1", note = "Incompatible type cause runtime error")
 	public void testIncompatibleType() {
 		try {
 			constraint.isValid( new Object(), null );

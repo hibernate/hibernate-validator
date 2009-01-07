@@ -31,7 +31,7 @@ import javax.validation.PropertyDescriptor;
  *
  * @author Hardy Ferentschik
  */
-public interface MetaDataProvider<T> {
+public interface BeanMetaData<T> {
 
 	/**
 	 * @return the class of the bean.

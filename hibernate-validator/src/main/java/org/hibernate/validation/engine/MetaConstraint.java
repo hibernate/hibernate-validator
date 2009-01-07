@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import javax.validation.ValidationException;
+import javax.validation.ConstraintDescriptor;
 
 import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 import org.hibernate.validation.util.ReflectionHelper;
@@ -138,7 +139,7 @@ public class MetaConstraint {
 		return ReflectionHelper.isArray( t );
 	}
 
-	public ConstraintDescriptorImpl getDescriptor() {
+	public ConstraintDescriptor getDescriptor() {
 		return descriptor;
 	}
 

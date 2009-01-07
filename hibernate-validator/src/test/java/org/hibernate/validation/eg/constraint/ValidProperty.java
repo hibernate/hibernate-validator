@@ -32,6 +32,10 @@ import javax.validation.ConstraintValidator;
 @ConstraintValidator(NoGroupsConstraint.class)
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
-public @interface NoGroups {
+public @interface ValidProperty {
 	String message() default "default message";
+
+	Class<?>[] groups() default { };
+
+	int validLength() default 0;
 }
