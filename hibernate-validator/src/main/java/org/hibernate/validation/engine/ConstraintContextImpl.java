@@ -17,13 +17,11 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import javax.validation.ConstraintContext;
 import javax.validation.ConstraintDescriptor;
-
-import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 
 /**
  * @author Emmanuel Bernard
@@ -33,7 +31,7 @@ public class ConstraintContextImpl implements ConstraintContext {
 	private final List<ErrorMessage> errorMessages;
 	private boolean defaultDisabled;
 
-	public ConstraintContextImpl(ConstraintDescriptorImpl constraintDescriptor) {
+	public ConstraintContextImpl(ConstraintDescriptor constraintDescriptor) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.errorMessages = new ArrayList<ErrorMessage>(3);
 	}

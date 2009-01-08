@@ -17,39 +17,18 @@
 */
 package javax.validation;
 
-import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
 import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * Mark a parameter as overriding the parameter of a composing constraint.
- * Both parameter must share the same type.
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-@Retention(RUNTIME)
+@Documented
 @Target({ METHOD })
-public @interface OverridesParameter {
-	/**
-	 * @return Constraint type the parameter is overriding
-	 */
-	Class<? extends Annotation> constraint();
-
-	/**
-	 * @return name of constraint parameter overridden.
-	 * Defaults to the name of the parameter hosting the annotation.
-	 */
-	String parameter();
-
-	/**
-	 * @return The index of the targeted constraint declaration when using
-	 * multiple constraints of the same type.
-	 * The index represents the index of the constraint in the value() array.
-	 *
-	 * By default, no index is defined and the single constraint declaration
-	 * is targeted
-	 */
-	int index() default -1;
+@Retention(RUNTIME)
+public @interface OverridesParameters {
+	OverridesParameter[] value();
 }

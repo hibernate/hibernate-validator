@@ -28,15 +28,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.BeanDescriptor;
+import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
-import javax.validation.Validator;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import javax.validation.ConstraintFactory;
 import javax.validation.groups.Default;
 
 import org.hibernate.validation.Version;
-import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
@@ -50,7 +52,7 @@ import org.hibernate.validation.util.ReflectionHelper;
  */
 public class ValidatorImpl implements Validator {
 
-    private static final Set<Class<?>> INDEXABLE_CLASS = new HashSet<Class<?>>();
+	private static final Set<Class<?>> INDEXABLE_CLASS = new HashSet<Class<?>>();
 
 	static {
 		INDEXABLE_CLASS.add( Integer.class );
@@ -68,16 +70,18 @@ public class ValidatorImpl implements Validator {
 	 * Message resolver used  for interpolating error messages.
 	 */
 	private final MessageResolver messageResolver;
-	
+
 	private final ValidatorFactoryImplementor factory;
 	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
+	private final ConstraintFactory constraintFactory;
 	private final TraversableResolver traversableResolver;
 
 	public ValidatorImpl(ValidatorFactoryImplementor factory, MessageResolver messageResolver,
-						 TraversableResolver traversableResolver) {
+						 TraversableResolver traversableResolver, ConstraintFactory constraintFactory) {
 		this.factory = factory;
 		this.messageResolver = messageResolver;
 		this.traversableResolver = traversableResolver;
+		this.constraintFactory = constraintFactory;
 	}
 
 
@@ -143,11 +147,11 @@ public class ValidatorImpl implements Validator {
 	 */
 	private <T> void validateConstraints(ValidationContext<T> context) {
 		//casting rely on the fact that root object is at the top of the stack
-		@SuppressWarnings( "unchecked" )
+		@SuppressWarnings("unchecked")
 		BeanMetaData<T> beanMetaData =
 				( BeanMetaData<T> ) factory.getBeanMetaData( context.peekValidatedObjectType() );
 		for ( MetaConstraint metaConstraint : beanMetaData.getConstraintMetaDataList() ) {
-			ConstraintDescriptorImpl constraintDescriptor = (ConstraintDescriptorImpl) metaConstraint.getDescriptor();
+			ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 			context.pushProperty( metaConstraint.getPropertyName() );
 
 			if ( !context.needsValidation( constraintDescriptor.getGroups() ) ) {
@@ -157,28 +161,33 @@ public class ValidatorImpl implements Validator {
 
 			final Object leafBeanInstance = context.peekValidatedObject();
 			Object value = metaConstraint.getValue( leafBeanInstance );
-			ConstraintContextImpl contextImpl = new ConstraintContextImpl(constraintDescriptor);
 
-			if ( !constraintDescriptor.getConstraintImplementation().isValid( value, contextImpl ) ) {
-				for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
-					final String message = error.getMessage();
-					String interpolatedMessage = messageResolver.interpolate(
-							message,
-							constraintDescriptor,
-							leafBeanInstance
-					);
-					ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
-							message,
-							interpolatedMessage,
-							context.getRootBean(),
-							beanMetaData.getBeanClass(),
-							leafBeanInstance,
-							value,
-							context.peekPropertyPath(), //FIXME use error.getProperty()
-							context.getCurrentGroup(),
-							constraintDescriptor
-					);
-					context.addConstraintFailure( failingConstraintViolation );
+			Set<ConstraintDescriptor> descriptors = new HashSet<ConstraintDescriptor>();
+			descriptors.addAll( constraintDescriptor.getComposingConstraints() );
+			descriptors.add(constraintDescriptor);
+			for (ConstraintDescriptor descriptor : descriptors) {
+				ConstraintContextImpl contextImpl = new ConstraintContextImpl( descriptor );
+				if ( !getConstraint( descriptor ).isValid( value, contextImpl ) ) {
+					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
+						final String message = error.getMessage();
+						String interpolatedMessage = messageResolver.interpolate(
+								message,
+								descriptor,
+								leafBeanInstance
+						);
+						ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
+								message,
+								interpolatedMessage,
+								context.getRootBean(),
+								beanMetaData.getBeanClass(),
+								leafBeanInstance,
+								value,
+								context.peekPropertyPath(), //FIXME use error.getProperty()
+								context.getCurrentGroup(),
+								descriptor
+						);
+						context.addConstraintFailure( failingConstraintViolation );
+					}
 				}
 			}
 			context.popProperty();
@@ -216,7 +225,8 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <T> void validateCascadedConstraints(ValidationContext<T> context) {
-		List<Member> cascadedMembers = factory.getBeanMetaData( context.peekValidatedObjectType() ).getCascadedMembers();
+		List<Member> cascadedMembers = factory.getBeanMetaData( context.peekValidatedObjectType() )
+				.getCascadedMembers();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
@@ -269,9 +279,11 @@ public class ValidatorImpl implements Validator {
 
 
 	private <T> void validateProperty(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
-		if ( object == null ) throw new IllegalArgumentException("Validated object cannot be null");
-		@SuppressWarnings( "unchecked" )
-		final Class<T> beanType = (Class<T>) object.getClass();
+		if ( object == null ) {
+			throw new IllegalArgumentException( "Validated object cannot be null" );
+		}
+		@SuppressWarnings("unchecked")
+		final Class<T> beanType = ( Class<T> ) object.getClass();
 
 		DesrciptorValueWrapper wrapper = getConstraintDescriptorAndValueForPath( beanType, propertyIter, object );
 
@@ -292,12 +304,12 @@ public class ValidatorImpl implements Validator {
 
 			for ( Class<?> expandedGroup : expandedGroups ) {
 
-				if ( !wrapper.descriptor.isInGroups( expandedGroup ) ) {
+				if ( !wrapper.descriptor.getGroups().contains( expandedGroup ) ) {
 					continue;
 				}
 
-				ConstraintContextImpl contextImpl = new ConstraintContextImpl(wrapper.descriptor);
-				if ( !wrapper.descriptor.getConstraintImplementation().isValid( wrapper.value, contextImpl ) ) {
+				ConstraintContextImpl contextImpl = new ConstraintContextImpl( wrapper.descriptor );
+				if ( !getConstraint( wrapper.descriptor ).isValid( wrapper.value, contextImpl ) ) {
 
 					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
 						final String message = error.getMessage();
@@ -341,9 +353,8 @@ public class ValidatorImpl implements Validator {
 		return factory.getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
-
 	private <T> void validateValue(Class<T> beanType, Object object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
-		ConstraintDescriptorImpl constraintDescriptor = getConstraintDescriptorForPath( beanType, propertyIter );
+		ConstraintDescriptor constraintDescriptor = getConstraintDescriptorForPath( beanType, propertyIter );
 
 		if ( constraintDescriptor == null ) {
 			return;
@@ -362,12 +373,12 @@ public class ValidatorImpl implements Validator {
 
 			for ( Class<?> expandedGroup : expandedGroups ) {
 
-				if ( !constraintDescriptor.isInGroups( expandedGroup ) ) {
+				if ( !constraintDescriptor.getGroups().contains( expandedGroup ) ) {
 					continue;
 				}
 
-				ConstraintContextImpl contextImpl = new ConstraintContextImpl(constraintDescriptor);
-				if ( !constraintDescriptor.getConstraintImplementation().isValid( object, contextImpl ) ) {
+				ConstraintContextImpl contextImpl = new ConstraintContextImpl( constraintDescriptor );
+				if ( !getConstraint( constraintDescriptor ).isValid( object, contextImpl ) ) {
 					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
 						final String message = error.getMessage();
 						String interpolatedMessage = messageResolver.interpolate(
@@ -383,7 +394,8 @@ public class ValidatorImpl implements Validator {
 								null,
 								object,
 								propertyIter.getOriginalProperty(),  //FIXME use error.getProperty()
-								null, //FIXME why is this a null group!! Used to be "" string should it be Default. Looks weird
+								null,
+								//FIXME why is this a null group!! Used to be "" string should it be Default. Looks weird
 								constraintDescriptor
 						);
 						addFailingConstraint( failingConstraintViolations, failingConstraintViolation );
@@ -412,22 +424,22 @@ public class ValidatorImpl implements Validator {
 	 *
 	 * @return The constraint descriptor matching the given path.
 	 */
-	private ConstraintDescriptorImpl getConstraintDescriptorForPath(Class<?> clazz, PropertyIterator propertyIter) {
+	private ConstraintDescriptor getConstraintDescriptorForPath(Class<?> clazz, PropertyIterator propertyIter) {
 
-		ConstraintDescriptorImpl matchingConstraintDescriptor = null;
+		ConstraintDescriptor matchingConstraintDescriptor = null;
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData(clazz).getConstraintMetaDataList();
+			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData( clazz ).getConstraintMetaDataList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
-					matchingConstraintDescriptor = ( ConstraintDescriptorImpl ) constraintDescriptor;
+					matchingConstraintDescriptor = ( ConstraintDescriptor ) constraintDescriptor;
 				}
 			}
 		}
 		else {
-			List<Member> cascadedMembers = factory.getBeanMetaData(clazz).getCascadedMembers();
+			List<Member> cascadedMembers = factory.getBeanMetaData( clazz ).getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
 					Type type = ReflectionHelper.typeOf( m );
@@ -439,7 +451,7 @@ public class ValidatorImpl implements Validator {
 						}
 					}
 
-					matchingConstraintDescriptor = getConstraintDescriptorForPath( (Class<?>) type, propertyIter );
+					matchingConstraintDescriptor = getConstraintDescriptorForPath( ( Class<?> ) type, propertyIter );
 				}
 			}
 		}
@@ -456,18 +468,18 @@ public class ValidatorImpl implements Validator {
 
 		// bottom out - there is only one token left
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData(clazz).getConstraintMetaDataList();
+			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData( clazz ).getConstraintMetaDataList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
 					return new DesrciptorValueWrapper(
-							( ConstraintDescriptorImpl ) constraintDescriptor, metaConstraint.getValue( value )
+							constraintDescriptor, metaConstraint.getValue( value )
 					);
 				}
 			}
 		}
 		else {
-			List<Member> cascadedMembers = factory.getBeanMetaData(clazz).getCascadedMembers();
+			List<Member> cascadedMembers = factory.getBeanMetaData( clazz ).getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
 					ReflectionHelper.setAccessibility( m );
@@ -529,11 +541,30 @@ public class ValidatorImpl implements Validator {
 		return isGroupSequence;
 	}
 
+	private Constraint getConstraint(ConstraintDescriptor descriptor) {
+		Constraint constraint;
+		try {
+			//unchecked
+			constraint = constraintFactory.getInstance( descriptor.getConstraintClass() );
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException( "Unable to instantiate " + descriptor.getConstraintClass(), e );
+		}
+
+		try {
+			constraint.initialize( descriptor.getAnnotation() );
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException( "Unable to intialize " + constraint.getClass().getName(), e );
+		}
+		return constraint;
+	}
+
 	private class DesrciptorValueWrapper {
-		final ConstraintDescriptorImpl descriptor;
+		final ConstraintDescriptor descriptor;
 		final Object value;
 
-		DesrciptorValueWrapper(ConstraintDescriptorImpl descriptor, Object value) {
+		DesrciptorValueWrapper(ConstraintDescriptor descriptor, Object value) {
 			this.descriptor = descriptor;
 			this.value = value;
 		}

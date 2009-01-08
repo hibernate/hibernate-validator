@@ -23,12 +23,12 @@ import javax.validation.ConstraintContext;
 /**
  * @author Hardy Ferentschik
  */
-public class FrenchZipcodeConstraint implements Constraint<FrenchZipcode> {
+public class UKZipcodeConstraint implements Constraint<UKZipcode> {
 
-	public void initialize(FrenchZipcode parameters) {
+	public void initialize(UKZipcode parameters) {
 	}
 
 	public boolean isValid(Object object, ConstraintContext constraintContext) {
-		return true;
+		return false;
 	}
 }

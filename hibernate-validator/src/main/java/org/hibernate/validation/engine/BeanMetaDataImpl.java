@@ -27,9 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.BeanDescriptor;
-import javax.validation.Constraint;
-import javax.validation.ConstraintFactory;
-import javax.validation.ConstraintValidator;
 import javax.validation.GroupSequence;
 import javax.validation.GroupSequences;
 import javax.validation.PropertyDescriptor;
@@ -38,10 +35,9 @@ import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.impl.ConstraintDescriptorImpl;
-import org.hibernate.validation.impl.ConstraintFactoryImpl;
-import org.hibernate.validation.impl.ElementDescriptorImpl;
 import org.hibernate.validation.impl.BeanDescriptorImpl;
+import org.hibernate.validation.impl.ConstraintDescriptorImpl;
+import org.hibernate.validation.impl.ElementDescriptorImpl;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -51,7 +47,7 @@ import org.hibernate.validation.util.ReflectionHelper;
  * instantiate an instance of this class and delegate the metadata extraction to it.
  *
  * @author Hardy Ferentschik
- * FIXME create an interface for MetadataProvider
+ *         FIXME create an interface for MetadataProvider
  */
 
 public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
@@ -90,18 +86,12 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<String, PropertyDescriptor>();
 
 	/**
-	 * Factory to create acutal constraint instances from the annotated fields/method/class.
-	 */
-	private ConstraintFactory constraintFactory = new ConstraintFactoryImpl();
-
-	/**
 	 * Maps group sequences to the list of group/sequences.
 	 */
 	private Map<Class<?>, List<Class<?>>> groupSequences = new HashMap<Class<?>, List<Class<?>>>();
 
-	public BeanMetaDataImpl(Class<T> beanClass, ConstraintFactory constraintFactory) {
+	public BeanMetaDataImpl(Class<T> beanClass) {
 		this.beanClass = beanClass;
-		this.constraintFactory = constraintFactory;
 		createMetaData();
 	}
 
@@ -244,7 +234,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
 		if ( ReflectionHelper.isConstraintAnnotation( annotation ) ||
-				ReflectionHelper.isBuiltInConstraintAnnotation( annotation) ) {
+				ReflectionHelper.isBuiltInConstraintAnnotation( annotation ) ) {
 			constraints.add( annotation );
 		}
 
@@ -252,29 +242,14 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		constraints.addAll( ReflectionHelper.getMultiValueConstraints( annotation ) );
 
 		for ( Annotation constraint : constraints ) {
-			if ( ReflectionHelper.isBuiltInConstraintAnnotation( constraint ) ) {
-				Class constraintClass = ReflectionHelper.getBuiltInConstraint( constraint );
-				final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor(
-						constraint, constraintClass
-				);
-				constraintDescriptors.add( constraintDescriptor );
-				continue;
-			}
-
-			if ( ReflectionHelper.isConstraintAnnotation( constraint ) ) {
-				ConstraintValidator constraintValidator = constraint.annotationType()
-						.getAnnotation( ConstraintValidator.class );
-				final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor(
-						constraint, constraintValidator.value()
-				);
-				constraintDescriptors.add( constraintDescriptor );
-			}
+			final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( constraint );
+			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(A annotation, Class constraintClass) {
+	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(A annotation) {
 		Class<?>[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
 		for ( Class<?> groupName : groups ) {
 			if ( groupSequences.containsKey( groupName ) ) {
@@ -282,23 +257,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		Constraint<A> constraint;
-		try {
-			//unchecked
-			constraint = constraintFactory.getInstance( constraintClass );
-		}
-		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to instantiate " + constraintClass, e );
-		}
-
-		try {
-			constraint.initialize( annotation );
-		}
-		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to intialize " + constraint.getClass().getName(), e );
-		}
-
-		return new ConstraintDescriptorImpl( annotation, groups, constraint, constraintClass );
+		return new ConstraintDescriptorImpl(annotation, groups);
 	}
 
 	/**

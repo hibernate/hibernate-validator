@@ -1,4 +1,4 @@
-// $Id$
+// $Id: SizeContraint.java 15494 2008-11-04 03:12:55Z epbernard $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -19,6 +19,7 @@ package org.hibernate.validation.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintContext;
+import javax.validation.constraints.Size;
 
 /**
  * Check that a string's length is between min and max.

@@ -37,11 +37,14 @@ import java.util.Map;
 import java.util.ArrayList;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
+import javax.validation.Constraint;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.slf4j.Logger;
 
 import org.hibernate.validation.constraints.NotNullConstraint;
+import org.hibernate.validation.constraints.SizeContraint;
 
 /**
  * Some reflection utility methods.
@@ -63,9 +66,12 @@ public class ReflectionHelper {
 	 * @todo Maybe move into another class
 	 * @todo Read mappings for example from a resource file
 	 */
-	public static Class getBuiltInConstraint(Annotation annotation) {
+	public static Class<? extends Constraint> getBuiltInConstraint(Annotation annotation) {
 		if ( annotation instanceof NotNull ) {
 			return NotNullConstraint.class;
+		}
+		if ( annotation instanceof Size ) {
+			return SizeContraint.class;
 		}
 		else {
 			return null;
@@ -141,6 +147,38 @@ public class ReflectionHelper {
 
 		return true;
 	}
+
+	/**
+	 * Checks whether a given annotation is a multi value constraint or not.
+	 *
+	 * @param annotation the annotation to check.
+	 *
+	 * @return <code>true</code> if the specified annotation is a multi value constraints, <code>false</code>
+	 * otherwise.
+	 */
+	public static boolean  isMultiValueConstraint(Annotation annotation) {
+		boolean isMultiValueConstraint = false;
+		try {
+			Method m = annotation.getClass().getMethod( "value" );
+			Class returnType = m.getReturnType();
+			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+				Annotation[] annotations = ( Annotation[] ) m.invoke( annotation );
+				for ( Annotation a : annotations ) {
+					if ( isConstraintAnnotation( a ) || isBuiltInConstraintAnnotation( a ) ) {
+						isMultiValueConstraint = true;
+					} else {
+						isMultiValueConstraint = false;
+						break;
+					}
+				}
+			}
+		}
+		catch ( Exception e ) {
+			// ignore
+		}
+		return isMultiValueConstraint;
+	}
+
 
 	/**
 	 * Checks whether a given annotation is a multi value constraint and returns the contained constraints if so.

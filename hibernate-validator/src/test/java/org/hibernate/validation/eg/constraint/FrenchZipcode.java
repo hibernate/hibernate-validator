@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.ConstraintValidator;
+import javax.validation.OverridesParameter;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -32,7 +33,7 @@ import javax.validation.constraints.Size;
  * @author Hardy Ferentschik
  */
 @NotNull
-@Size(min = 5, max = 5)
+@Size(max = 5)
 @ConstraintValidator(FrenchZipcodeConstraint.class)
 @Documented
 @Target({ METHOD, FIELD, TYPE })
@@ -41,4 +42,7 @@ public @interface FrenchZipcode {
 	String message() default "Wrong zipcode";
 
 	Class<?>[] groups() default { };
+
+	@OverridesParameter(constraint = Size.class, parameter = "min")
+	int size() default 5;
 }

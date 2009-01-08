@@ -63,7 +63,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 	}
 
 	public ValidatorBuilder defineValidatorState() {
-		return new ValidatorBuilderImpl(this, messageResolver, traversableResolver);
+		return new ValidatorBuilderImpl(this, messageResolver, traversableResolver, constraintFactory);
 	}
 
 	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
@@ -72,7 +72,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 		@SuppressWarnings( "unchecked")
 		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get(beanClass);
 		if (metadata == null) {
-			metadata = new BeanMetaDataImpl<T>(beanClass, constraintFactory);
+			metadata = new BeanMetaDataImpl<T>(beanClass);
 			metadataProviders.put( beanClass, metadata );
 		}
 		return metadata;

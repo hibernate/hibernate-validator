@@ -42,7 +42,7 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 @Retention(RUNTIME)
 @Documented
 public @interface Size {
-	String message() default "{validator.min}";
+	String message() default "{validator.size}";
 	Class<?>[] groups() default {};
 
 	/**

@@ -31,6 +31,7 @@ import java.util.HashMap;
  *
  * @author Paolo Perrotta
  * @author Davide Marchignoli
+ * @author Hardy Ferentschik
  */
 public class AnnotationDescriptor {
 
@@ -39,7 +40,14 @@ public class AnnotationDescriptor {
 	private final Map<String, Object> elements = new HashMap<String, Object>();
 
 	public AnnotationDescriptor(Class<? extends Annotation> annotationType) {
-		type = annotationType;
+		this.type = annotationType;
+	}
+
+    public AnnotationDescriptor(Class<? extends Annotation> annotationType, Map<String, Object> elements) {
+		this.type = annotationType;
+		for (Map.Entry<String, Object> entry : elements.entrySet()) {
+			this.elements.put( entry.getKey(), entry.getValue() );
+		}
 	}
 
 	public void setValue(String elementName, Object value) {

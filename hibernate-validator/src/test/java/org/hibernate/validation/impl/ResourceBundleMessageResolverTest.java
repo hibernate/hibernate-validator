@@ -17,7 +17,6 @@
 */
 package org.hibernate.validation.impl;
 
-import java.lang.annotation.Annotation;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,13 +24,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.hibernate.validation.constraints.Length;
-import org.hibernate.validation.constraints.NotNullConstraint;
+import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
 /**
  * Tests for message resolution.
@@ -42,53 +42,22 @@ public class ResourceBundleMessageResolverTest {
 
 	private ResourceBundleMessageResolver resolver;
 	private NotNull notNull;
-	private Length length;
+	private Size size;
 
 	@Before
 	public void setUp() {
 		resolver = new ResourceBundleMessageResolver( new TestResources() );
-		notNull = new NotNull() {
-			public String message() {
-				return "{validator.notNull}";
-			}
 
-			public Class<?>[] groups() {
-				return new Class<?>[] { };
-			}
+		AnnotationDescriptor descriptor = new AnnotationDescriptor( NotNull.class );
+		notNull = AnnotationFactory.create( descriptor );
 
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-
-		length = new Length() {
-			public int min() {
-				return 0;
-			}
-
-			public int max() {
-				return Integer.MAX_VALUE;
-			}
-
-			public String message() {
-				return "{validator.length}";
-			}
-
-			public Class<?>[] groups() {
-				return new Class<?>[] { };
-			}
-
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
+		descriptor = new AnnotationDescriptor( Size.class );
+		size = AnnotationFactory.create( descriptor );
 	}
 
 	@Test
 	public void testSuccessfulInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
-		);
+		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 
 		String expected = "replacement worked";
 		String actual = resolver.interpolate( "{foo}", desciptor, null );
@@ -109,9 +78,7 @@ public class ResourceBundleMessageResolverTest {
 
 	@Test
 	public void testUnSuccessfulInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
-		);
+		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 		String expected = "foo";  // missing {}
 		String actual = resolver.interpolate( "foo", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
@@ -123,9 +90,7 @@ public class ResourceBundleMessageResolverTest {
 
 	@Test
 	public void testUnkownTokenInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
-		);
+		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 		String expected = "{bar}";  // unkown token {}
 		String actual = resolver.interpolate( "{bar}", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
@@ -133,16 +98,14 @@ public class ResourceBundleMessageResolverTest {
 
 	@Test
 	public void testDefaultInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl(
-				notNull, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class
-		);
+		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 		String expected = "may not be null";
 		String actual = resolver.interpolate( notNull.message(), desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
-		desciptor = new ConstraintDescriptorImpl( length, new Class<?>[] { }, new NotNullConstraint(), NotNullConstraint.class );
-		expected = "length must be between 0 and 2147483647";  // unkown token {}
-		actual = resolver.interpolate( length.message(), desciptor, null );
+		desciptor = new ConstraintDescriptorImpl( size, new Class<?>[] { } );
+		expected = "size must be between -2147483648 and 2147483647";  // unkown token {}
+		actual = resolver.interpolate( size.message(), desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 

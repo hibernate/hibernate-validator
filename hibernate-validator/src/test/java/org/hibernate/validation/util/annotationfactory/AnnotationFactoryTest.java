@@ -17,10 +17,11 @@
 */
 package org.hibernate.validation.util.annotationfactory;
 
+import javax.validation.constraints.Size;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-import org.hibernate.validation.constraints.Length;
 import org.hibernate.validation.constraints.Pattern;
 
 /**
@@ -30,14 +31,14 @@ public class AnnotationFactoryTest {
 
 	@Test
 	public void createAnnotationProxy() {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Length.class );
+		AnnotationDescriptor descriptor = new AnnotationDescriptor( Size.class );
 		descriptor.setValue( "min", 5 );
 		descriptor.setValue( "max", 10 );
 
-		Length l = AnnotationFactory.create( descriptor );
+		Size size = AnnotationFactory.create( descriptor );
 
-		assertEquals( "Wrong parameter value", 5, l.min() );
-		assertEquals( "Wrong parameter value", 10, l.max() );
+		assertEquals( "Wrong parameter value", 5, size.min() );
+		assertEquals( "Wrong parameter value", 10, size.max() );
 	}
 
 	@Test(expected = IllegalArgumentException.class)

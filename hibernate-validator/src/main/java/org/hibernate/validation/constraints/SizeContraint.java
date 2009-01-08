@@ -15,20 +15,41 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg.constraint;
+package org.hibernate.validation.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintContext;
+import javax.validation.constraints.Size;
 
 /**
- * @author Hardy Ferentschik
+ * Check that a string's length is between min and max.
+ *
+ * @author Emmanuel Bernard
+ * @author Gavin King
  */
-public class FrenchZipcodeConstraint implements Constraint<FrenchZipcode> {
+public class SizeContraint implements Constraint<Size> {
+	private int min;
+	private int max;
 
-	public void initialize(FrenchZipcode parameters) {
+	public void initialize(Size parameters) {
+		min = parameters.min();
+		max = parameters.max();
 	}
 
-	public boolean isValid(Object object, ConstraintContext constraintContext) {
-		return true;
+	/**
+	 * {@inheritDoc}
+	 * @todo Implement collection support
+	 */
+	public boolean isValid(Object value, ConstraintContext constraintContext) {
+		if ( value == null ) {
+			return true;
+		}
+		if ( !( value instanceof String ) ) {
+			throw new IllegalArgumentException( "Expected String type." );
+		}
+		String string = ( String ) value;
+		int length = string.length();
+		return length >= min && length <= max;
 	}
+
 }

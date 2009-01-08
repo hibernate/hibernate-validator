@@ -23,8 +23,8 @@ public interface ValidatorBuilder {
 	ValidatorBuilder traversableResolver(TraversableResolver traversableResolver);
 
 	/**
-	 * return an initialized Validator instance respecting the defined state
-	 * Validator instances can be pooled and shared by the implementation
+	 * @return an initialized <code>Validator</code> instance respecting the defined state.
+	 * Validator instances can be pooled and shared by the implementation.
 	 */
 	Validator getValidator();
 
