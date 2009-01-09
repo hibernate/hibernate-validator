@@ -30,15 +30,14 @@ import java.util.Set;
 import javax.validation.BeanDescriptor;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.ConstraintFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageResolver;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.ConstraintFactory;
 import javax.validation.groups.Default;
 
-import org.hibernate.validation.Version;
 import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
@@ -58,12 +57,6 @@ public class ValidatorImpl implements Validator {
 		INDEXABLE_CLASS.add( Integer.class );
 		INDEXABLE_CLASS.add( Long.class );
 		INDEXABLE_CLASS.add( String.class );
-	}
-
-
-	//TODO move to Factory at least
-	static {
-		Version.touch();
 	}
 
 	/**
@@ -151,10 +144,10 @@ public class ValidatorImpl implements Validator {
 		BeanMetaData<T> beanMetaData =
 				( BeanMetaData<T> ) factory.getBeanMetaData( context.peekValidatedObjectType() );
 		for ( MetaConstraint metaConstraint : beanMetaData.getConstraintMetaDataList() ) {
-			ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
+			ConstraintDescriptor mainConstraintDescriptor = metaConstraint.getDescriptor();
 			context.pushProperty( metaConstraint.getPropertyName() );
 
-			if ( !context.needsValidation( constraintDescriptor.getGroups() ) ) {
+			if ( !context.needsValidation( mainConstraintDescriptor.getGroups() ) ) {
 				context.popProperty();
 				continue;
 			}
@@ -162,9 +155,10 @@ public class ValidatorImpl implements Validator {
 			final Object leafBeanInstance = context.peekValidatedObject();
 			Object value = metaConstraint.getValue( leafBeanInstance );
 
+			// we have to check the main constraint and all composing constraints
 			Set<ConstraintDescriptor> descriptors = new HashSet<ConstraintDescriptor>();
-			descriptors.addAll( constraintDescriptor.getComposingConstraints() );
-			descriptors.add(constraintDescriptor);
+			descriptors.addAll( mainConstraintDescriptor.getComposingConstraints() );
+			descriptors.add(mainConstraintDescriptor);
 			for (ConstraintDescriptor descriptor : descriptors) {
 				ConstraintContextImpl contextImpl = new ConstraintContextImpl( descriptor );
 				if ( !getConstraint( descriptor ).isValid( value, contextImpl ) ) {
@@ -353,6 +347,9 @@ public class ValidatorImpl implements Validator {
 		return factory.getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
+	/**
+	 * @todo Implement composing constraints.
+	 */
 	private <T> void validateValue(Class<T> beanType, Object object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
 		ConstraintDescriptor constraintDescriptor = getConstraintDescriptorForPath( beanType, propertyIter );
 
@@ -434,7 +431,7 @@ public class ValidatorImpl implements Validator {
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
-					matchingConstraintDescriptor = ( ConstraintDescriptor ) constraintDescriptor;
+					matchingConstraintDescriptor = constraintDescriptor;
 				}
 			}
 		}

@@ -34,7 +34,7 @@ import org.hibernate.validation.engine.ValidatorFactoryImplementor;
  * @author Hardy Ferentschik
  */
 public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
-
+	
 	private final MessageResolver messageResolver;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintFactory constraintFactory;

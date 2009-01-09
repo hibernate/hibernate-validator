@@ -68,7 +68,7 @@ public class ValidationContext<T> {
 	private Class<?> currentGroup;
 
 	/**
-	 * Stack for keep track of the currently validated object.
+	 * Stack for keeping track of the currently validated object.
 	 */
 	private Stack<ValidatedBean> validatedObjectStack = new Stack<ValidatedBean>();
 
@@ -79,7 +79,7 @@ public class ValidationContext<T> {
 
 	public ValidationContext(T rootBean, Object object) {
 		this.rootBean = rootBean;
-		validatedObjectStack.push( new ValidatedBean(object) );
+		validatedObjectStack.push( new ValidatedBean( object ) );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		propertyPath = "";
 		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
@@ -94,7 +94,7 @@ public class ValidationContext<T> {
 	}
 
 	public void pushValidatedObject(Object validatedObject) {
-		validatedObjectStack.push( new ValidatedBean(validatedObject) );
+		validatedObjectStack.push( new ValidatedBean( validatedObject ) );
 	}
 
 	public void popValidatedObject() {
@@ -186,7 +186,9 @@ public class ValidationContext<T> {
 		return groups.contains( currentGroup );
 	}
 
-	//TODO caching the object class is useful?
+	/**
+	 * @todo Is it useful to cache the object class?
+	 */
 	private static class ValidatedBean {
 
 		final Object bean;
@@ -194,7 +196,7 @@ public class ValidationContext<T> {
 
 		private ValidatedBean(Object bean) {
 			this.bean = bean;
-			if (bean == null) {
+			if ( bean == null ) {
 				this.beanType = null;
 			}
 			else {

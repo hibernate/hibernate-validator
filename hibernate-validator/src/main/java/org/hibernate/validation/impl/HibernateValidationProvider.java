@@ -25,6 +25,7 @@ import javax.validation.spi.ValidatorFactoryConfiguration;
 import javax.validation.spi.BootstrapState;
 
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
+import org.hibernate.validation.Version;
 
 /**
  * Default implementation of <code>ValidationProvider</code> within Hibernate validator.
@@ -42,8 +43,10 @@ public class HibernateValidationProvider implements ValidationProvider {
 	}
 
 	public <T extends ValidatorFactoryBuilder<T>> T createSpecializedValidatorFactoryBuilder(BootstrapState state, Class<T> builderClass) {
-		if ( ! isSuitable( builderClass ) ) {
-			throw new ValidationException("Illegal call to createSpecializedValidatorFactoryBuilder() for a non suitable provider");
+		if ( !isSuitable( builderClass ) ) {
+			throw new ValidationException(
+					"Illegal call to createSpecializedValidatorFactoryBuilder() for a non suitable provider"
+			);
 		}
 		//cast protected  by isSuitable call
 		return builderClass.cast( new ValidatorFactoryBuilderImpl( this ) );

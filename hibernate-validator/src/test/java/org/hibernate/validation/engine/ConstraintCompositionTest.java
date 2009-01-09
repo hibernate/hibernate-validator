@@ -17,40 +17,21 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.HashSet;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.Validation;
-import javax.validation.groups.Default;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.eg.Actor;
-import org.hibernate.validation.eg.Address;
-import org.hibernate.validation.eg.Animal;
-import org.hibernate.validation.eg.Author;
-import org.hibernate.validation.eg.Book;
-import org.hibernate.validation.eg.Boy;
-import org.hibernate.validation.eg.Customer;
-import org.hibernate.validation.eg.Dictonary;
-import org.hibernate.validation.eg.Engine;
-import org.hibernate.validation.eg.EnglishDictonary;
-import org.hibernate.validation.eg.Order;
-import org.hibernate.validation.eg.Unconstraint;
-import org.hibernate.validation.eg.First;
-import org.hibernate.validation.eg.Second;
-import org.hibernate.validation.eg.Last;
-import org.hibernate.validation.eg.DefaultAlias;
-import org.hibernate.validation.eg.FrenchAddress;
-import org.hibernate.validation.HibernateValidatorFactoryBuilder;
+import static org.hibernate.validation.util.TestUtil.getHibernateValidator;
+import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
+
 import org.hibernate.validation.constraints.NotNullConstraint;
 import org.hibernate.validation.constraints.SizeContraint;
-import org.hibernate.tck.annotations.SpecAssertion;
+import org.hibernate.validation.constraints.PatternConstraint;
+import org.hibernate.validation.eg.FrenchAddress;
 
 /**
  * Tests for the implementation of <code>Validator</code>.
@@ -58,19 +39,6 @@ import org.hibernate.tck.annotations.SpecAssertion;
  * @author Hardy Ferentschik
  */
 public class ConstraintCompositionTest {
-
-	private Validator hibernateValidator;
-
-	//TODO should not be Hibernate specific in most case
-	private Validator getHibernateValidator() {
-		if ( hibernateValidator == null ) {
-			HibernateValidatorFactoryBuilder builder = Validation
-					.builderType( HibernateValidatorFactoryBuilder.class )
-					.getBuilder();
-			hibernateValidator = builder.build().getValidator();
-		}
-		return hibernateValidator;
-	}
 
 	@Test
 	public void testComposition() {
@@ -81,28 +49,88 @@ public class ConstraintCompositionTest {
 		address.setAddressline2( "BP 12 " );
 		address.setCity( "Bordeaux" );
 		Set<ConstraintViolation<FrenchAddress>> constraintViolations = validator.validate( address );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		ConstraintViolation<FrenchAddress> violation = constraintViolations.iterator().next();
-		assertEquals(
-				"Wrong error type",
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertConstraintViolation(
+				constraintViolations.iterator().next(),
+				"may not be null",
 				NotNullConstraint.class,
-				violation.getConstraintDescriptor().getConstraintClass()
+				FrenchAddress.class,
+				null,
+				"zipCode"
 		);
-		assertEquals( "Wrong message", "may not be null", violation.getInterpolatedMessage() );
+
+
+		address.setZipCode( "abc" );
+		constraintViolations = validator.validate( address );
+		assertNumberOfViolations( constraintViolations, 3 );
+		for ( ConstraintViolation violation : constraintViolations ) {
+			if ( violation.getInterpolatedMessage().equals( "A french zip code has a length of 5" ) ) {
+				assertConstraintViolation(
+						violation,
+						"A french zip code has a length of 5",
+						SizeContraint.class,
+						FrenchAddress.class,
+						"abc",
+						"zipCode"
+				);
+			}
+			else if ( violation.getInterpolatedMessage().equals( "must match \"d*\"" ) ) {
+				assertConstraintViolation(
+						violation,
+						"must match \"d*\"",
+						PatternConstraint.class,
+						FrenchAddress.class,
+						"abc",
+						"zipCode"
+				);
+			}
+			else if ( violation.getInterpolatedMessage().equals( "must match \".....\"" ) ) {
+				assertConstraintViolation(
+						violation,
+						"must match \".....\"" ,
+						PatternConstraint.class,
+						FrenchAddress.class,
+						"abc",
+						"zipCode"
+				);
+			}
+			else {
+				fail( "Wrong violation found." );
+			}
+		}
+
 
 		address.setZipCode( "123" );
 		constraintViolations = validator.validate( address );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		violation = constraintViolations.iterator().next();
-		assertEquals(
-				"Wrong error type",
-				SizeContraint.class,
-				violation.getConstraintDescriptor().getConstraintClass()
-		);
+		assertNumberOfViolations( constraintViolations, 2 );
+		for ( ConstraintViolation violation : constraintViolations ) {
+			if ( violation.getInterpolatedMessage().equals( "A french zip code has a length of 5" ) ) {
+				assertConstraintViolation(
+						violation,
+						"A french zip code has a length of 5",
+						SizeContraint.class,
+						FrenchAddress.class,
+						"123",
+						"zipCode"
+				);
+			}
+			else if ( violation.getInterpolatedMessage().equals( "must match \".....\"" ) ) {
+				assertConstraintViolation(
+						violation,
+						"must match \".....\"" ,
+						PatternConstraint.class,
+						FrenchAddress.class,
+						"123",
+						"zipCode"
+				);
+			}
+			else {
+				fail( "Wrong violation found." );
+			}
+		}
 
 		address.setZipCode( "33023" );
 		constraintViolations = validator.validate( address );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
-		assertEquals( "Wrong message", "size must be between 5 and 5", violation.getInterpolatedMessage() );
+		assertNumberOfViolations( constraintViolations, 0 );
 	}
 }

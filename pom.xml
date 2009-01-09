@@ -124,6 +124,9 @@
                     <configuration>
                         <forkMode>always</forkMode>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
                     </configuration>
                 </plugin>
                 <plugin>

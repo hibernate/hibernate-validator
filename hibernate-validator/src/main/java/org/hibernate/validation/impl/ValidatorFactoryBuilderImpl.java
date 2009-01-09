@@ -32,11 +32,17 @@ import javax.validation.spi.ValidationProvider;
 import javax.validation.spi.ValidatorFactoryConfiguration;
 
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
+import org.hibernate.validation.Version;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBuilder, ValidatorFactoryConfiguration {
+
+	static {
+		Version.touch();
+	}
+
 	//FIXME not sure why it is like that. We should cache these instances somehow. Static?
 	private final MessageResolver defaultMessageResolver = new ResourceBundleMessageResolver();
 	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
@@ -49,7 +55,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 	private TraversableResolver traversableResolver;
 
 	public ValidatorFactoryBuilderImpl(BootstrapState state) {
-		if (state.getValidationProviderResolver() == null) {
+		if ( state.getValidationProviderResolver() == null ) {
 			this.providerResolver = new DefaultValidationProviderResolver();
 		}
 		else {
@@ -62,7 +68,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 
 	public ValidatorFactoryBuilderImpl(ValidationProvider provider) {
 		if ( provider == null ) {
-			throw new ValidationException( "Assertion error: inconsistent ValidatorFactoryBuilderImpl construction");
+			throw new ValidationException( "Assertion error: inconsistent ValidatorFactoryBuilderImpl construction" );
 		}
 		this.provider = provider;
 		this.providerResolver = null;
