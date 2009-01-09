@@ -1,4 +1,4 @@
-// $Id: SizeContraint.java 15494 2008-11-04 03:12:55Z epbernard $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -19,7 +19,6 @@ package org.hibernate.validation.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintContext;
-import javax.validation.constraints.Size;
 
 /**
  * Check that a string's length is between min and max.
@@ -41,7 +40,7 @@ public class LengthConstraint implements Constraint<Length> {
 			return true;
 		}
 		if ( !( value instanceof String ) ) {
-			throw new IllegalArgumentException( "Expected String type." );
+			throw new IllegalArgumentException( "Expected String type." );                                                              
 		}
 		String string = ( String ) value;
 		int length = string.length();

@@ -18,6 +18,7 @@
 package org.hibernate.validation.util;
 
 import java.beans.Introspector;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -29,22 +30,19 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
+import java.util.Properties;
+import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
-import javax.validation.Constraint;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.slf4j.Logger;
-
-import org.hibernate.validation.constraints.NotNullConstraint;
-import org.hibernate.validation.constraints.SizeContraint;
 
 /**
  * Some reflection utility methods.
@@ -54,6 +52,17 @@ import org.hibernate.validation.constraints.SizeContraint;
 public class ReflectionHelper {
 
 	private static final Logger log = LoggerFactory.make();
+	private static final Properties builtInConstraints = new Properties();
+
+	static {
+		URL url = ReflectionHelper.class.getResource( "/org/hibernate/validation/BuiltinConstraintDefinitions.properties" );
+		try {
+			builtInConstraints.load( url.openStream() );
+		}
+		catch ( IOException e ) {
+			throw new ValidationException( "Unable to load defined builtin constraint definitions." );
+		}
+	}
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -62,20 +71,23 @@ public class ReflectionHelper {
 	}
 
 
-	/**
-	 * @todo Maybe move into another class
-	 * @todo Read mappings for example from a resource file
-	 */
 	public static Class<? extends Constraint> getBuiltInConstraint(Annotation annotation) {
-		if ( annotation instanceof NotNull ) {
-			return NotNullConstraint.class;
+		Class constraint = null;
+		String annotationType = annotation.annotationType().getName();
+		if ( builtInConstraints.containsKey( annotationType ) ) {
+			String constraintImplClassName = null;
+			try {
+				constraintImplClassName = builtInConstraints.getProperty( annotationType );
+				constraint = Class.forName( constraintImplClassName );
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException(
+						"Unable to load " + constraintImplClassName + " as default implementation for " + annotationType
+				);
+			}
+
 		}
-		if ( annotation instanceof Size ) {
-			return SizeContraint.class;
-		}
-		else {
-			return null;
-		}
+		return constraint;
 	}
 
 	/**
@@ -154,9 +166,9 @@ public class ReflectionHelper {
 	 * @param annotation the annotation to check.
 	 *
 	 * @return <code>true</code> if the specified annotation is a multi value constraints, <code>false</code>
-	 * otherwise.
+	 *         otherwise.
 	 */
-	public static boolean  isMultiValueConstraint(Annotation annotation) {
+	public static boolean isMultiValueConstraint(Annotation annotation) {
 		boolean isMultiValueConstraint = false;
 		try {
 			Method m = annotation.getClass().getMethod( "value" );
@@ -166,7 +178,8 @@ public class ReflectionHelper {
 				for ( Annotation a : annotations ) {
 					if ( isConstraintAnnotation( a ) || isBuiltInConstraintAnnotation( a ) ) {
 						isMultiValueConstraint = true;
-					} else {
+					}
+					else {
 						isMultiValueConstraint = false;
 						break;
 					}

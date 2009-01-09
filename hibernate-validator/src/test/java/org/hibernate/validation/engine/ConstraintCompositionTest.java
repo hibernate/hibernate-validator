@@ -29,7 +29,7 @@ import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 
 import org.hibernate.validation.constraints.NotNullConstraint;
-import org.hibernate.validation.constraints.SizeContraint;
+import org.hibernate.validation.constraints.SizeConstraint;
 import org.hibernate.validation.constraints.PatternConstraint;
 import org.hibernate.validation.eg.FrenchAddress;
 
@@ -68,7 +68,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
-						SizeContraint.class,
+						SizeConstraint.class,
 						FrenchAddress.class,
 						"abc",
 						"zipCode"
@@ -108,7 +108,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
-						SizeContraint.class,
+						SizeConstraint.class,
 						FrenchAddress.class,
 						"123",
 						"zipCode"

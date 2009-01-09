@@ -17,6 +17,8 @@
 */
 package org.hibernate.validation.constraints;
 
+import java.util.Collection;
+import java.lang.reflect.Array;
 import javax.validation.Constraint;
 import javax.validation.ConstraintContext;
 import javax.validation.constraints.Size;
@@ -27,7 +29,7 @@ import javax.validation.constraints.Size;
  * @author Emmanuel Bernard
  * @author Gavin King
  */
-public class SizeContraint implements Constraint<Size> {
+public class SizeConstraint implements Constraint<Size> {
 	private int min;
 	private int max;
 
@@ -38,18 +40,28 @@ public class SizeContraint implements Constraint<Size> {
 
 	/**
 	 * {@inheritDoc}
-	 * @todo Implement collection support
 	 */
 	public boolean isValid(Object value, ConstraintContext constraintContext) {
 		if ( value == null ) {
 			return true;
 		}
-		if ( !( value instanceof String ) ) {
+
+		int size;
+		if ( value instanceof String ) {
+			String string = ( String ) value;
+			size = string.length();
+
+		}
+		else if ( value instanceof Collection ) {
+			Collection collection = ( Collection ) value;
+			size = collection.size();
+		}
+		else if ( value instanceof Array ) {
+			size = Array.getLength( value );
+		}
+		else {
 			throw new IllegalArgumentException( "Expected String type." );
 		}
-		String string = ( String ) value;
-		int length = string.length();
-		return length >= min && length <= max;
+		return size >= min && size <= max;
 	}
-
 }

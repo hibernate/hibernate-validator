@@ -1,4 +1,4 @@
-// $Id: ReflectionHelperTest.java 15751 2009-01-07 15:32:23Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
