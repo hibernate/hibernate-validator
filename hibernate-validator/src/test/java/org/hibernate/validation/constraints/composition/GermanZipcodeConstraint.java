@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg.constraint;
+package org.hibernate.validation.constraints.composition;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintContext;
@@ -23,9 +23,9 @@ import javax.validation.ConstraintContext;
 /**
  * @author Hardy Ferentschik
  */
-public class FrenchZipcodeConstraint implements Constraint<FrenchZipcode> {
+public class GermanZipcodeConstraint implements Constraint<GermanZipcode> {
 
-	public void initialize(FrenchZipcode parameters) {
+	public void initialize(GermanZipcode parameters) {
 	}
 
 	public boolean isValid(Object object, ConstraintContext constraintContext) {

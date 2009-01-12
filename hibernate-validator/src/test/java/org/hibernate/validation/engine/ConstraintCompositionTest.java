@@ -24,7 +24,7 @@ import javax.validation.Validator;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import static org.hibernate.validation.util.TestUtil.getHibernateValidator;
+import static org.hibernate.validation.util.TestUtil.getValidator;
 import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 
@@ -32,9 +32,10 @@ import org.hibernate.validation.constraints.NotNullConstraint;
 import org.hibernate.validation.constraints.SizeConstraint;
 import org.hibernate.validation.constraints.PatternConstraint;
 import org.hibernate.validation.eg.FrenchAddress;
+import org.hibernate.validation.eg.GermanAddress;
 
 /**
- * Tests for the implementation of <code>Validator</code>.
+ * Tests for composing constraints.
  *
  * @author Hardy Ferentschik
  */
@@ -42,7 +43,7 @@ public class ConstraintCompositionTest {
 
 	@Test
 	public void testComposition() {
-		Validator validator = getHibernateValidator();
+		Validator validator = getValidator();
 
 		FrenchAddress address = new FrenchAddress();
 		address.setAddressline1( "10 rue des Treuils" );
@@ -87,7 +88,7 @@ public class ConstraintCompositionTest {
 			else if ( violation.getInterpolatedMessage().equals( "must match \".....\"" ) ) {
 				assertConstraintViolation(
 						violation,
-						"must match \".....\"" ,
+						"must match \".....\"",
 						PatternConstraint.class,
 						FrenchAddress.class,
 						"abc",
@@ -117,7 +118,7 @@ public class ConstraintCompositionTest {
 			else if ( violation.getInterpolatedMessage().equals( "must match \".....\"" ) ) {
 				assertConstraintViolation(
 						violation,
-						"must match \".....\"" ,
+						"must match \".....\"",
 						PatternConstraint.class,
 						FrenchAddress.class,
 						"123",
@@ -132,5 +133,25 @@ public class ConstraintCompositionTest {
 		address.setZipCode( "33023" );
 		constraintViolations = validator.validate( address );
 		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	@Test
+	public void testNestedComposition() {
+		Validator validator = getValidator();
+
+		GermanAddress address = new GermanAddress();
+		address.setAddressline1( "Rathausstrasse 5" );
+		address.setAddressline2( "3ter Stock" );
+		address.setCity( "Karlsruhe" );
+		Set<ConstraintViolation<GermanAddress>> constraintViolations = validator.validate( address );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertConstraintViolation(
+				constraintViolations.iterator().next(),
+				"may not be null",
+				NotNullConstraint.class,
+				GermanAddress.class,
+				null,
+				"zipCode"
+		);
 	}
 }

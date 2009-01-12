@@ -17,17 +17,16 @@
 */
 package org.hibernate.validation.eg;
 
-import javax.validation.GroupSequence;
-import javax.validation.GroupSequences;
-import javax.validation.groups.Default;
-
-import org.hibernate.validation.eg.groups.First;
+import org.hibernate.validation.constraints.composition.GermanZipcode;
 
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequences({
-		@GroupSequence(name = Default.class, sequence = { First.class })  // illegal - default is already defined in Book
-})
-public class EnglishDictonary extends Dictonary {
+public class GermanAddress extends Address {
+
+	@GermanZipcode
+	public String getZipCode() {
+		return super.getZipCode();
+	}
+
 }

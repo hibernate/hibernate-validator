@@ -64,10 +64,10 @@ public interface BeanMetaData<T> {
 	Map<Class<?>, List<Class<?>>> getGroupSequences();
 
 	/**
-	 * @return A list of <code>ValidatorMetaData</code> instances encapsulating the information of all the constraints
+	 * @return A list of <code>MetaConstraint</code> instances encapsulating the information of all the constraints
 	 *         defined on the bean.
 	 */
-	List<MetaConstraint> getConstraintMetaDataList();
+	List<MetaConstraint> geMetaConstraintList();
 
 	/**
 	 * @return A map keying the property name of a constraint to its <code>ElementDescriptor</code>.

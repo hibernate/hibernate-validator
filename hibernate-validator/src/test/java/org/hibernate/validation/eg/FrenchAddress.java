@@ -17,10 +17,7 @@
 */
 package org.hibernate.validation.eg;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validation.constraints.Length;
-import org.hibernate.validation.eg.constraint.FrenchZipcode;
+import org.hibernate.validation.constraints.composition.FrenchZipcode;
 
 /**
  * @author Hardy Ferentschik

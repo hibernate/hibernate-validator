@@ -23,6 +23,7 @@ import javax.validation.groups.Default;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.NotEmpty;
+import org.hibernate.validation.eg.groups.All;
 
 /**
  * @author Hardy Ferentschik

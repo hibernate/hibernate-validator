@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg.constraint;
+package org.hibernate.validation.constraints.incomplete;
 
 import java.lang.annotation.Documented;
 import static java.lang.annotation.ElementType.FIELD;
@@ -25,6 +25,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.ConstraintValidator;
 
+import org.hibernate.validation.constraints.incomplete.NoGroupsConstraint;
+
 /**
  * @author Hardy Ferentschik
  */
@@ -32,10 +34,6 @@ import javax.validation.ConstraintValidator;
 @ConstraintValidator(NoGroupsConstraint.class)
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
-public @interface ValidProperty {
+public @interface NoGroups {
 	String message() default "default message";
-
-	Class<?>[] groups() default { };
-
-	int validLength() default 0;
 }

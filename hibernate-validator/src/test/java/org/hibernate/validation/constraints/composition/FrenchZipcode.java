@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg.constraint;
+package org.hibernate.validation.constraints.composition;
 
 import java.lang.annotation.Documented;
 import static java.lang.annotation.ElementType.FIELD;
@@ -38,6 +38,7 @@ import org.hibernate.validation.constraints.Patterns;
  */
 @NotNull
 @Size
+// first pattern just duplicates the length of 5 characters, the second pattern is just to proof that parameters can be overridden.
 @Patterns({ @Pattern(regex = "....."), @Pattern(regex = "bar") })
 @ConstraintValidator(FrenchZipcodeConstraint.class)
 @Documented

@@ -15,30 +15,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg.constraint;
+package org.hibernate.validation.constraints.composition;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.ConstraintValidator;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.Constraint;
+import javax.validation.ConstraintContext;
 
 /**
  * @author Hardy Ferentschik
  */
-@NotNull
-@Size(min = 5, max = 5)
-@ConstraintValidator(UKZipcodeConstraint.class)
-@Documented
-@Target({ METHOD, FIELD, TYPE })
-@Retention(RUNTIME)
-public @interface UKZipcode {
-	public abstract String message() default "Wrong zipcode";
+public class FrenchZipcodeConstraint implements Constraint<FrenchZipcode> {
 
-	public abstract Class<?>[] groups() default { };
+	public void initialize(FrenchZipcode parameters) {
+	}
+
+	public boolean isValid(Object object, ConstraintContext constraintContext) {
+		return true;
+	}
 }

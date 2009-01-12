@@ -194,6 +194,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
+				ReflectionHelper.setAccessibility( field );
 				cascadedFields.add( field );
 			}
 		}
@@ -208,6 +209,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
+				ReflectionHelper.setAccessibility( method );
 				cascadedMethods.add( method );
 			}
 		}
@@ -257,7 +259,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		return new ConstraintDescriptorImpl(annotation, groups);
+		return new ConstraintDescriptorImpl( annotation, groups );
 	}
 
 	/**
@@ -377,7 +379,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return groupSequences;
 	}
 
-	public List<MetaConstraint> getConstraintMetaDataList() {
+	public List<MetaConstraint> geMetaConstraintList() {
 		return metaConstraintList;
 	}
 

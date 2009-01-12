@@ -41,10 +41,10 @@ import org.hibernate.validation.eg.DefaultAlias;
 import org.hibernate.validation.eg.Dictonary;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.EnglishDictonary;
-import org.hibernate.validation.eg.First;
-import org.hibernate.validation.eg.Last;
+import org.hibernate.validation.eg.groups.First;
+import org.hibernate.validation.eg.groups.Second;
+import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.Order;
-import org.hibernate.validation.eg.Second;
 import org.hibernate.validation.eg.Unconstraint;
 import org.hibernate.validation.util.TestUtil;
 
@@ -59,7 +59,7 @@ public class ValidatorImplTest {
 	@Test
 	public void testWrongMethodName() {
 		try {
-			TestUtil.getHibernateValidator().getConstraintsForClass( Boy.class ).hasConstraints();
+			TestUtil.getValidator().getConstraintsForClass( Boy.class ).hasConstraints();
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -74,36 +74,36 @@ public class ValidatorImplTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullParamterToValidatorImplConstructor() {
-		TestUtil.getHibernateValidator().getConstraintsForClass( null );
+		TestUtil.getValidator().getConstraintsForClass( null );
 	}
 
 	@Test
 	public void testUnconstraintClass() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 		assertTrue( "There should be no constraints", !validator.getConstraintsForClass( Unconstraint.class ).hasConstraints() );
 	}
 
 	@Test
 	public void testHasConstraints() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 		assertTrue( "There should be constraints", validator.getConstraintsForClass( Customer.class ).hasConstraints() );
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testValidateWithNull() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 		validator.validate( null );
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testValidateWithNullProperty() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 		validator.validateProperty( null, "firstName" );
 	}
 
 	@Test
 	public void testGroups() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Author author = new Author();
 		author.setLastName( "" );
@@ -156,7 +156,7 @@ public class ValidatorImplTest {
 
 	@Test
 	public void testDefaultGroupSequence() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Author author = new Author();
 		author.setLastName( "" );
@@ -198,7 +198,7 @@ public class ValidatorImplTest {
 
 	@Test
 	public void testBasicValidation() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
@@ -214,7 +214,7 @@ public class ValidatorImplTest {
 
 	@Test
 	public void testGroupSequences() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Dictonary dictonary = new Dictonary();
 		dictonary.setTitle( "English - German" );
@@ -230,7 +230,7 @@ public class ValidatorImplTest {
 
 	@Test
 	public void testValidationFailureInMultipleGroups() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 		Animal elepfant = new Animal();
 		elepfant.setName( "" );
 		elepfant.setDomain( Animal.Domain.EUKARYOTA );
@@ -255,13 +255,13 @@ public class ValidatorImplTest {
 
 	@Test(expected = ValidationException.class)
 	public void testInvalidSequenceName() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 		validator.getConstraintsForClass( EnglishDictonary.class ).hasConstraints();
 	}
 
 	@Test
 	public void testValidationMethod() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Address address = new Address();
 		address.setAddressline1( null );
@@ -299,7 +299,7 @@ public class ValidatorImplTest {
 
 	@Test
 	public void testValidateList() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
@@ -324,7 +324,7 @@ public class ValidatorImplTest {
 	@Test
 	@SpecAssertion( section = {"2.2"} )
 	public void testMultiValueConstraint() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Engine engine = new Engine();
 		engine.setSerialNumber( "mail@foobar.com" );
@@ -343,7 +343,7 @@ public class ValidatorImplTest {
 	@Test
 	@SpecAssertion( section = {"3.5.1"} )
 	public void testGraphValidation() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Actor clint = new Actor( "Clint", "Eastwood" );
 		Actor morgan = new Actor( "Morgan", "" );
@@ -368,7 +368,7 @@ public class ValidatorImplTest {
 
 	@Test
 	public void testValidateValue() {
-		Validator validator = TestUtil.getHibernateValidator();
+		Validator validator = TestUtil.getValidator();
 
 		Order order = new Order();
 

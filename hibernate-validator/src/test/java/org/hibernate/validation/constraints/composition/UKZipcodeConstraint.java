@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg.constraint;
+package org.hibernate.validation.constraints.composition;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintContext;

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ListIterator;
 import javax.validation.BeanDescriptor;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
@@ -38,9 +39,12 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
+import org.slf4j.Logger;
+
 import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.util.LoggerFactory;
 
 /**
  * The main Bean Validation class.
@@ -50,8 +54,9 @@ import org.hibernate.validation.util.ReflectionHelper;
  * @todo Make all properties transient for serializability.
  */
 public class ValidatorImpl implements Validator {
-
+	private static final Logger log = LoggerFactory.make();
 	private static final Set<Class<?>> INDEXABLE_CLASS = new HashSet<Class<?>>();
+	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
 
 	static {
 		INDEXABLE_CLASS.add( Integer.class );
@@ -65,7 +70,7 @@ public class ValidatorImpl implements Validator {
 	private final MessageResolver messageResolver;
 
 	private final ValidatorFactoryImplementor factory;
-	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
+
 	private final ConstraintFactory constraintFactory;
 	private final TraversableResolver traversableResolver;
 
@@ -76,7 +81,6 @@ public class ValidatorImpl implements Validator {
 		this.traversableResolver = traversableResolver;
 		this.constraintFactory = constraintFactory;
 	}
-
 
 	/**
 	 * {@inheritDoc}
@@ -136,33 +140,38 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * Validates the non-cascaded constraints.
 	 *
-	 * @param context The current validation context.
+	 * @param validationContext The current validation context.
 	 */
-	private <T> void validateConstraints(ValidationContext<T> context) {
+	private <T> void validateConstraints(ValidationContext<T> validationContext) {
 		//casting rely on the fact that root object is at the top of the stack
 		@SuppressWarnings("unchecked")
 		BeanMetaData<T> beanMetaData =
-				( BeanMetaData<T> ) factory.getBeanMetaData( context.peekValidatedObjectType() );
-		for ( MetaConstraint metaConstraint : beanMetaData.getConstraintMetaDataList() ) {
+				( BeanMetaData<T> ) factory.getBeanMetaData( validationContext.peekValidatedObjectType() );
+		for ( MetaConstraint metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			ConstraintDescriptor mainConstraintDescriptor = metaConstraint.getDescriptor();
-			context.pushProperty( metaConstraint.getPropertyName() );
+			validationContext.pushProperty( metaConstraint.getPropertyName() );
 
-			if ( !context.needsValidation( mainConstraintDescriptor.getGroups() ) ) {
-				context.popProperty();
+			if ( !validationContext.needsValidation( mainConstraintDescriptor.getGroups() ) ) {
+				validationContext.popProperty();
 				continue;
 			}
 
-			final Object leafBeanInstance = context.peekValidatedObject();
+			final Object leafBeanInstance = validationContext.peekValidatedObject();
 			Object value = metaConstraint.getValue( leafBeanInstance );
 
 			// we have to check the main constraint and all composing constraints
-			Set<ConstraintDescriptor> descriptors = new HashSet<ConstraintDescriptor>();
-			descriptors.addAll( mainConstraintDescriptor.getComposingConstraints() );
-			descriptors.add(mainConstraintDescriptor);
-			for (ConstraintDescriptor descriptor : descriptors) {
-				ConstraintContextImpl contextImpl = new ConstraintContextImpl( descriptor );
-				if ( !getConstraint( descriptor ).isValid( value, contextImpl ) ) {
-					for ( ConstraintContextImpl.ErrorMessage error : contextImpl.getErrorMessages() ) {
+			List<ConstraintDescriptor> descriptors = new ArrayList<ConstraintDescriptor>();
+			descriptors.add( mainConstraintDescriptor );
+			// use a list iterator so that we can keep modifying the underlying list
+			ListIterator<ConstraintDescriptor> listIter = descriptors.listIterator();
+			while ( listIter.hasNext() ) {
+				ConstraintDescriptor descriptor = listIter.next();
+				ConstraintContextImpl constraintContext = new ConstraintContextImpl( descriptor );
+				if ( log.isTraceEnabled() ) {
+					log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
+				}
+				if ( !getConstraint( descriptor ).isValid( value, constraintContext ) ) {
+					for ( ConstraintContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
 						final String message = error.getMessage();
 						String interpolatedMessage = messageResolver.interpolate(
 								message,
@@ -172,23 +181,36 @@ public class ValidatorImpl implements Validator {
 						ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 								message,
 								interpolatedMessage,
-								context.getRootBean(),
+								validationContext.getRootBean(),
 								beanMetaData.getBeanClass(),
 								leafBeanInstance,
 								value,
-								context.peekPropertyPath(), //FIXME use error.getProperty()
-								context.getCurrentGroup(),
+								validationContext.peekPropertyPath(), //FIXME use error.getProperty()
+								validationContext.getCurrentGroup(),
 								descriptor
 						);
-						context.addConstraintFailure( failingConstraintViolation );
+						validationContext.addConstraintFailure( failingConstraintViolation );
 					}
 				}
+				// check for composing constraints and add them to the list. The list iterator needs to set back each time!
+				for ( ConstraintDescriptor composingDescriptor : descriptor.getComposingConstraints() ) {
+					listIter.add( composingDescriptor );
+					listIter = descriptors.listIterator( listIter.previousIndex() );
+				}
 			}
-			context.popProperty();
+			validationContext.popProperty();
 		}
-		context.markProcessedForCurrentGroup();
+		validationContext.markProcessedForCurrentGroup();
 	}
 
+	/**
+	 * Called when processing cascaded constraints. This methods inspects the type of the cascaded constraints and in case
+	 * of a list or array creates an iterator in order to validate each element.
+	 *
+	 * @param context the validation context.
+	 * @param type the type of the cascaded field or property.
+	 * @param value the actual value.
+	 */
 	private <T> void validateCascadedConstraint(ValidationContext<T> context, Type type, Object value) {
 		if ( value == null ) {
 			return;
@@ -224,8 +246,6 @@ public class ValidatorImpl implements Validator {
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
-			//FIXME change accessibility only once, that's somewhat costly. do it when Member is created
-			ReflectionHelper.setAccessibility( member );
 			Object value = ReflectionHelper.getValue( member, context.peekValidatedObject() );
 			validateCascadedConstraint( context, type, value );
 			context.popProperty();
@@ -427,7 +447,7 @@ public class ValidatorImpl implements Validator {
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData( clazz ).getConstraintMetaDataList();
+			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData( clazz ).geMetaConstraintList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
@@ -465,7 +485,7 @@ public class ValidatorImpl implements Validator {
 
 		// bottom out - there is only one token left
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData( clazz ).getConstraintMetaDataList();
+			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData( clazz ).geMetaConstraintList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				ConstraintDescriptor constraintDescriptor = metaConstraint.getDescriptor();
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
@@ -479,7 +499,6 @@ public class ValidatorImpl implements Validator {
 			List<Member> cascadedMembers = factory.getBeanMetaData( clazz ).getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
-					ReflectionHelper.setAccessibility( m );
 					Object newValue;
 					if ( propertyIter.isIndexed() ) {
 						newValue = ReflectionHelper.getValue( m, value );
@@ -526,7 +545,7 @@ public class ValidatorImpl implements Validator {
 		}
 
 		boolean isGroupSequence;
-		BeanMetaDataImpl<T> metaDataProvider = factory.getBeanMetaData( beanType );
+		BeanMetaData<T> metaDataProvider = factory.getBeanMetaData( beanType );
 		if ( metaDataProvider.getGroupSequences().containsKey( group ) ) {
 			expandedGroups.addAll( metaDataProvider.getGroupSequences().get( group ) );
 			isGroupSequence = true;

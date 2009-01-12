@@ -21,6 +21,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.Length;
 import org.hibernate.validation.constraints.NotEmpty;
+import org.hibernate.validation.eg.groups.First;
+import org.hibernate.validation.eg.groups.Last;
 
 /**
  * @author Hardy Ferentschik

@@ -27,5 +27,5 @@ public interface ValidatorFactoryImplementor extends ValidatorFactory {
 	 * @param clazz The bean class for which to retrieve the meta data.
 	 * @return Gives access to the required parsed meta data. This never returns an <code>null</code> object.
 	 */
-	<T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> clazz);
+	<T> BeanMetaData<T> getBeanMetaData(Class<T> clazz);
 }

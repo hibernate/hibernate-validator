@@ -37,11 +37,11 @@ import org.junit.Test;
 
 import org.hibernate.validation.constraints.Pattern;
 import org.hibernate.validation.constraints.Patterns;
+import org.hibernate.validation.constraints.incomplete.NoGroups;
+import org.hibernate.validation.constraints.incomplete.NoMessage;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
-import org.hibernate.validation.eg.constraint.NoGroups;
-import org.hibernate.validation.eg.constraint.NoMessage;
-import org.hibernate.validation.eg.constraint.ValidProperty;
+import org.hibernate.validation.constraints.incomplete.ValidProperty;
 import org.hibernate.tck.annotations.SpecAssertion;
 
 /**

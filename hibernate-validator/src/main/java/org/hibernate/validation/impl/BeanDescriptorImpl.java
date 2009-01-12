@@ -22,7 +22,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	 * @todo add child validation
 	 */
 	public boolean hasConstraints() {
-		return metadataBean.getConstraintMetaDataList().size() > 0;
+		return metadataBean.geMetaConstraintList().size() > 0;
 	}
 
 	public PropertyDescriptor getConstraintsForProperty(String propertyName) {

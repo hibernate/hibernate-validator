@@ -38,7 +38,7 @@ public class TestUtil {
 	private TestUtil() {
 	}
 
-	public static Validator getHibernateValidator() {
+	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
 			HibernateValidatorFactoryBuilder builder = Validation
 					.builderType( HibernateValidatorFactoryBuilder.class )

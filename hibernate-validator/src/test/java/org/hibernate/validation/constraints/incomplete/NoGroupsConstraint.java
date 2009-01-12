@@ -10,28 +10,27 @@
 * You may obtain a copy of the License at
 * http://www.apache.org/licenses/LICENSE-2.0
 * Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
+* distributed under the License is distributed on an "AS IS" BASIS,  
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg.constraint;
+package org.hibernate.validation.constraints.incomplete;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
+import javax.validation.ConstraintContext;
+
+import org.hibernate.validation.constraints.incomplete.NoGroups;
 
 /**
  * @author Hardy Ferentschik
  */
-@Documented
-@ConstraintValidator(NoMessageConstraint.class)
-@Target({ METHOD, FIELD })
-@Retention(RUNTIME)
-public @interface NoMessage {
-	Class<?>[] groups() default { };
+public class NoGroupsConstraint implements Constraint<NoGroups> {
+
+	public void initialize(NoGroups parameters) {
+	}
+
+	public boolean isValid(Object object, ConstraintContext constraintContext) {
+		return false;
+	}
 }

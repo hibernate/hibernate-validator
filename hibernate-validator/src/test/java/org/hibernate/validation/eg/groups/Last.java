@@ -1,4 +1,4 @@
-package org.hibernate.validation.eg;
+package org.hibernate.validation.eg.groups;
 
 /**
  * Group executed Last in the validation
