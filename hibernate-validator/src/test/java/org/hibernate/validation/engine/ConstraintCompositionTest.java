@@ -24,15 +24,15 @@ import javax.validation.Validator;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import static org.hibernate.validation.util.TestUtil.getValidator;
-import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
-import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
-
 import org.hibernate.validation.constraints.NotNullConstraint;
-import org.hibernate.validation.constraints.SizeConstraint;
 import org.hibernate.validation.constraints.PatternConstraint;
+import org.hibernate.validation.constraints.SizeConstraint;
+import org.hibernate.validation.constraints.composition.GermanZipcodeConstraint;
 import org.hibernate.validation.eg.FrenchAddress;
 import org.hibernate.validation.eg.GermanAddress;
+import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
+import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validation.util.TestUtil.getValidator;
 
 /**
  * Tests for composing constraints.
@@ -147,10 +147,32 @@ public class ConstraintCompositionTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
-				"may not be null",
-				NotNullConstraint.class,
+				"Falsche Postnummer.",
+				GermanZipcodeConstraint.class,
 				GermanAddress.class,
 				null,
+				"zipCode"
+		);
+	}
+
+	@Test
+	public void testOnlySingleConstraintViolation() {
+		Validator validator = getValidator();
+
+		GermanAddress address = new GermanAddress();
+		address.setAddressline1( "Rathausstrasse 5" );
+		address.setAddressline2( "3ter Stock" );
+		address.setCity( "Karlsruhe" );
+		address.setZipCode( "abc" );
+		// actually three composing constraints fail, but due to @ReportAsViolationFromCompositeConstraint only one will be reported.
+		Set<ConstraintViolation<GermanAddress>> constraintViolations = validator.validate( address );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertConstraintViolation(
+				constraintViolations.iterator().next(),
+				"Falsche Postnummer.",
+				GermanZipcodeConstraint.class,
+				GermanAddress.class,
+				"abc",
 				"zipCode"
 		);
 	}

@@ -21,10 +21,11 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import javax.validation.ValidationException;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.ValidationException;
+import javax.validation.MessageResolver;
+import javax.validation.ConstraintFactory;
 
-import org.hibernate.validation.impl.ConstraintDescriptorImpl;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -36,9 +37,9 @@ import org.hibernate.validation.util.ReflectionHelper;
 public class MetaConstraint {
 
 	/**
-	 * The constraint specific meta data.
+	 * The constraint tree created from the constraint annotation.
 	 */
-	private final ConstraintDescriptorImpl descriptor;
+	private final ConstraintTree constraintTree;
 
 	/**
 	 * The type (class) the constraint was defined on. <code>null</code> if the constraint was specified on method or
@@ -69,31 +70,34 @@ public class MetaConstraint {
 	 */
 	private final ElementType elementType;
 
-	public MetaConstraint(Type t, ConstraintDescriptorImpl constraintDescriptor) {
+	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor, MessageResolver messageResolver, ConstraintFactory factory) {
+		this( t, null, null, ElementType.FIELD, constraintDescriptor, "", messageResolver, factory );
+	}
+
+	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor, MessageResolver messageResolver, ConstraintFactory factory) {
+		this(
+				null,
+				m,
+				null,
+				ElementType.METHOD,
+				constraintDescriptor,
+				ReflectionHelper.getPropertyName( m ),
+				messageResolver,
+				factory
+		);
+	}
+
+	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor, MessageResolver messageResolver, ConstraintFactory factory) {
+		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName(), messageResolver, factory );
+	}
+
+	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property, MessageResolver messageResolver, ConstraintFactory factory) {
 		this.type = t;
-		this.method = null;
-		this.field = null;
-		this.descriptor = constraintDescriptor;
-		this.elementType = ElementType.TYPE;
-		this.propertyName = "";
-	}
-
-	public MetaConstraint(Method m, ConstraintDescriptorImpl constraintDescriptor) {
 		this.method = m;
-		this.type = null;
-		this.field = null;
-		this.descriptor = constraintDescriptor;
-		this.elementType = ElementType.METHOD;
-		this.propertyName = ReflectionHelper.getPropertyName( m );
-	}
-
-	public MetaConstraint(Field f, ConstraintDescriptorImpl constraintDescriptor) {
 		this.field = f;
-		this.method = null;
-		this.type = null;
-		this.descriptor = constraintDescriptor;
-		this.elementType = ElementType.FIELD;
-		this.propertyName = f.getName();
+		this.elementType = elementType;
+		this.propertyName = property;
+		constraintTree = new ConstraintTree( constraintDescriptor, factory, messageResolver );
 	}
 
 	/**
@@ -140,7 +144,7 @@ public class MetaConstraint {
 	}
 
 	public ConstraintDescriptor getDescriptor() {
-		return descriptor;
+		return constraintTree.getDescriptor();
 	}
 
 	public Method getMethod() {
@@ -161,6 +165,20 @@ public class MetaConstraint {
 
 	public ElementType getElementType() {
 		return elementType;
+	}
+
+	public ConstraintTree getConstraintTree() {
+		return constraintTree;
+	}
+
+	public <T> void validateConstraint(Class beanClass, ValidationContext<T> validationContext) {
+		final Object leafBeanInstance = validationContext.peekValidatedObject();
+		Object value = getValue( leafBeanInstance );
+		constraintTree.validateConstraints( value, beanClass, validationContext );
+	}
+
+	public <T> void validateConstraint(Class beanClass, Object value, ValidationContext<T> validationContext) {
+		constraintTree.validateConstraints( value, beanClass, validationContext );
 	}
 
 	private Type typeOfAnnoatedElement() {

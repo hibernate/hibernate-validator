@@ -143,6 +143,10 @@ public class ValidationContext<T> {
 		return failingConstraintViolations;
 	}
 
+	public void clearFailingConstraints() {
+		failingConstraintViolations.clear();
+	}
+
 	/**
 	 * Adds a new level to the current property path of this context.
 	 *

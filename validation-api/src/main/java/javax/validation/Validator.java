@@ -17,7 +17,6 @@
 */
 package javax.validation;
 
-import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -30,7 +29,7 @@ import java.util.Set;
  */
 public interface Validator {
 	/**
-	 * validate all constraints on object
+	 * Validates all constraints on object.
 	 *
 	 * @param object object to validate
 	 * @param groups groups targeted for validation
@@ -43,7 +42,7 @@ public interface Validator {
 	<T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups);
 
 	/**
-	 * validate all constraints on &lt;code&gt;propertyName&lt;/code&gt; property of object
+	 * Validates all constraints on &lt;code&gt;propertyName&lt;/code&gt; property of object
 	 *
 	 * @param object object to validate
 	 * @param propertyName property to validate (ie field and getter constraints)
@@ -59,11 +58,12 @@ public interface Validator {
 													 Class<?>... groups);
 
 	/**
-	 * validate all constraints on <code>propertyName</code> property
+	 * Validates all constraints on <code>propertyName</code> property
 	 * if the property value is <code>value</code>
 	 * <p/>
 	 * TODO express limitations of ConstraintViolation in this case
 	 *
+	 * @param beanType the bean type
 	 * @param propertyName property to validate
 	 * @param value property value to validate
 	 * @param groups groups targeted for validation
@@ -83,6 +83,7 @@ public interface Validator {
      * are immutable.
 	 *
 	 * @param clazz class type evaluated
+	 * @return the bean descriptor for the specified class.
 	 */
 	BeanDescriptor getConstraintsForClass(Class<?> clazz);
 }
