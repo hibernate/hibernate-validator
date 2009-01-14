@@ -23,7 +23,7 @@ public interface ConstraintContext {
 	String getDefaultErrorMessage();
 
 	/**
-	 * Add a new unexpanded error message.
+	 * Add a new error message. This error message will be interpolated.
 	 * <p/>
 	 * If isValid returns false, a ConstraintViolation object will be built per error message
 	 * including the default one unless #disableDefaultErrorMEssage() has been called.
@@ -39,19 +39,21 @@ public interface ConstraintContext {
 	void addError(String message);
 
 	/**
-	 * Add a new unexpanded error message to a given sub property.
+	 * Add a new error message to a given sub property <code>property</code>.
+	 * This error message will be interpolated.
 	 * <p/>
 	 * If isValid returns false, a ConstraintViolation object will be built
-	 * per error message including the default one
-	 * if null apply to the current property or the bean the constraint is applied on,
-	 * otherwise apply to the <code>property</code> named
+	 * per error message including the default one unless #disableDefaultErrorMEssage()
+	 * has been called.
+	 * If the constraint being validated is not a class-level constraint,
+	 * a ValidationException is raised.
+	 *
 	 * <p/>
-	 * TODO exception or swallowed when bean level instance is not present?
 	 *
 	 * @param message new unexpanded error message
 	 * @param property property name the ConstraintViolation is targeting
 	 *
-	 * @throws ValidationException when the property is not present on the bean level object
+	 * @throws ValidationException if the constraint is not set on a class-level
 	 */
 	void addError(String message, String property);
 
