@@ -7,12 +7,12 @@ package javax.validation;
  */
 public interface ValidatorBuilder {
 	/**
-	 * Defines the message resolver implementation used by the Validator.
-	 * If unset, the message resolver of the ValidatorFactory is used.
+	 * Defines the message interpolator implementation used by the Validator.
+	 * If unset, the message interpolator of the ValidatorFactory is used.
 	 *
 	 * @return self following the chaining method pattern
 	 */
-	ValidatorBuilder messageResolver(MessageResolver messageResolver);
+	ValidatorBuilder messageInterpolator(MessageInterpolator messageInterpolator);
 
 	/**
 	 * Defines the traversable resolver implementation used by the Validator.

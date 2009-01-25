@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 import javax.validation.ConstraintFactory;
 
 import org.hibernate.validation.util.ReflectionHelper;
@@ -70,11 +70,11 @@ public class MetaConstraint {
 	 */
 	private final ElementType elementType;
 
-	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor, MessageResolver messageResolver, ConstraintFactory factory) {
-		this( t, null, null, ElementType.FIELD, constraintDescriptor, "", messageResolver, factory );
+	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor, MessageInterpolator messageInterpolator, ConstraintFactory factory) {
+		this( t, null, null, ElementType.FIELD, constraintDescriptor, "", messageInterpolator, factory );
 	}
 
-	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor, MessageResolver messageResolver, ConstraintFactory factory) {
+	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor, MessageInterpolator messageInterpolator, ConstraintFactory factory) {
 		this(
 				null,
 				m,
@@ -82,22 +82,22 @@ public class MetaConstraint {
 				ElementType.METHOD,
 				constraintDescriptor,
 				ReflectionHelper.getPropertyName( m ),
-				messageResolver,
+				messageInterpolator,
 				factory
 		);
 	}
 
-	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor, MessageResolver messageResolver, ConstraintFactory factory) {
-		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName(), messageResolver, factory );
+	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor, MessageInterpolator messageInterpolator, ConstraintFactory factory) {
+		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName(), messageInterpolator, factory );
 	}
 
-	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property, MessageResolver messageResolver, ConstraintFactory factory) {
+	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property, MessageInterpolator messageInterpolator, ConstraintFactory factory) {
 		this.type = t;
 		this.method = m;
 		this.field = f;
 		this.elementType = elementType;
 		this.propertyName = property;
-		constraintTree = new ConstraintTree( constraintDescriptor, factory, messageResolver );
+		constraintTree = new ConstraintTree( constraintDescriptor, factory, messageInterpolator );
 	}
 
 	/**

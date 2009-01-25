@@ -23,7 +23,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
 import javax.validation.ConstraintFactory;
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 
 import org.slf4j.Logger;
 
@@ -45,23 +45,23 @@ public class ConstraintTree {
 	private Constraint constraint;
 	private final ConstraintDescriptor descriptor;
 	private final ConstraintFactory constraintFactory;
-	private final MessageResolver messageResolver;
+	private final MessageInterpolator messageInterpolator;
 
-	public ConstraintTree(ConstraintDescriptor descriptor, ConstraintFactory constraintFactory, MessageResolver messageResolver) {
-		this( descriptor, null, constraintFactory, messageResolver );
+	public ConstraintTree(ConstraintDescriptor descriptor, ConstraintFactory constraintFactory, MessageInterpolator messageInterpolator) {
+		this( descriptor, null, constraintFactory, messageInterpolator );
 	}
 
-	private ConstraintTree(ConstraintDescriptor descriptor, ConstraintTree parent, ConstraintFactory constraintFactory, MessageResolver messageResolver) {
+	private ConstraintTree(ConstraintDescriptor descriptor, ConstraintTree parent, ConstraintFactory constraintFactory, MessageInterpolator messageInterpolator) {
 		this.parent = parent;
 		this.descriptor = descriptor;
 		this.constraintFactory = constraintFactory;
-		this.messageResolver = messageResolver;
+		this.messageInterpolator = messageInterpolator;
 		this.constraint = getConstraint( descriptor );
 		children = new ArrayList<ConstraintTree>( descriptor.getComposingConstraints().size() );
 
 		for ( ConstraintDescriptor composingDescriptor : descriptor.getComposingConstraints() ) {
 			ConstraintTree treeNode = new ConstraintTree(
-					composingDescriptor, this, constraintFactory, messageResolver
+					composingDescriptor, this, constraintFactory, messageInterpolator
 			);
 			children.add( treeNode );
 		}
@@ -123,7 +123,7 @@ public class ConstraintTree {
 	}
 
 	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ValidationContext<T> validationContext, Object leafBeanInstance, String message, ConstraintDescriptor descriptor) {
-		String interpolatedMessage = messageResolver.interpolate(
+		String interpolatedMessage = messageInterpolator.interpolate(
 				message,
 				descriptor,
 				leafBeanInstance

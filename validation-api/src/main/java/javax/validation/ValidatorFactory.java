@@ -27,7 +27,7 @@ package javax.validation;
 public interface ValidatorFactory {
 	/**
 	 * return an initialized Validator instance using the default factory instances
-	 * for message resolver and traversable resolver.
+	 * for message interpolator and traversable resolver.
 	 *
 	 * Validator instances can be pooled and shared by the implementation
 	 */
@@ -42,11 +42,11 @@ public interface ValidatorFactory {
 	ValidatorBuilder defineValidatorState();
 
 	/**
-	 * Returns the MessageResolver instance configured at initialization time
+	 * Returns the MessageInterpolator instance configured at initialization time
 	 * for the ValidatorFactory
 	 * This is the instance used by #getValidator(Class)
 	 *
-	 * @return MessageResolver instance
+	 * @return MessageInterpolator instance
 	 */
-	MessageResolver getMessageResolver();
+	MessageInterpolator getMessageInterpolator();
 }

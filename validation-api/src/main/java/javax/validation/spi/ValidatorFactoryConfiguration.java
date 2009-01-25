@@ -19,7 +19,7 @@ package javax.validation.spi;
 
 import java.io.InputStream;
 import javax.validation.ConstraintFactory;
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 
 /**
@@ -33,12 +33,12 @@ import javax.validation.TraversableResolver;
  */
 public interface ValidatorFactoryConfiguration {
 	/**
-	 * Message resolver as defined by the client programmatically
+	 * Message interpolator as defined by the client programmatically
 	 * or null if undefined.
 	 *
 	 * @return message provider instance or null if not defined
 	 */
-	MessageResolver getMessageResolver();
+	MessageInterpolator getMessageInterpolator();
 
 	/**
 	 * Returns the configuration stream defined by the client programmatically

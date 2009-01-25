@@ -25,10 +25,10 @@ import java.util.Locale;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public interface MessageResolver {
+public interface MessageInterpolator {
 	/**
 	 * Interpolate the message from the constraint parameters and the actual validated object.
-	 * The locale is defaulted according to the <code>MessageResolver</code> implementation
+	 * The locale is defaulted according to the <code>MessageInterpolator</code> implementation
 	 * See the implementation documentation for more detail.
 	 *
 	 * @param message The message to interpolate.

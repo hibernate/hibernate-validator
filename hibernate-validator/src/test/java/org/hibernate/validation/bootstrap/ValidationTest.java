@@ -25,7 +25,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintFactory;
 import javax.validation.ConstraintViolation;
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
@@ -93,7 +93,7 @@ public class ValidationTest {
 
 
 	@Test
-	public void testCustomMessageResolver() {
+	public void testCustomMessageInterpolator() {
 
 		// first try with the default message resolver
 		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
@@ -112,8 +112,8 @@ public class ValidationTest {
 
 		//FIXME nothing guarantee that a builder can be reused
 		// now we modify the builder, get a new factory and valiator and try again
-		builder.messageResolver(
-				new MessageResolver() {
+		builder.messageInterpolator(
+				new MessageInterpolator() {
 					public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {
 						return "my custom message";
 					}

@@ -1,6 +1,6 @@
 package org.hibernate.validation.impl;
 
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorBuilder;
@@ -11,28 +11,28 @@ import org.hibernate.validation.engine.ValidatorImpl;
  * @author Emmanuel Bernard
  */
 public class ValidatorBuilderImpl implements ValidatorBuilder {
-	private MessageResolver messageResolver;
+	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
-	private final MessageResolver factoryMessageResolver;
+	private final MessageInterpolator factoryMessageInterpolator;
 	private final TraversableResolver factoryTraversableResolver;
 	private final ValidatorFactoryImpl validatorFactory;
 
 	public ValidatorBuilderImpl(ValidatorFactoryImpl validatorFactory,
-								MessageResolver factoryMessageResolver,
+								MessageInterpolator factoryMessageInterpolator,
 								TraversableResolver factoryTraversableResolver) {
 		this.validatorFactory = validatorFactory;
-		this.factoryMessageResolver = factoryMessageResolver;
+		this.factoryMessageInterpolator = factoryMessageInterpolator;
 		this.factoryTraversableResolver = factoryTraversableResolver;
-		messageResolver(factoryMessageResolver);
+		messageInterpolator( factoryMessageInterpolator );
 		traversableResolver(factoryTraversableResolver);
 	}
 
-	public ValidatorBuilder messageResolver(MessageResolver messageResolver) {
-		if (messageResolver == null) {
-			this.messageResolver = factoryMessageResolver;
+	public ValidatorBuilder messageInterpolator(MessageInterpolator messageInterpolator) {
+		if ( messageInterpolator == null) {
+			this.messageInterpolator = factoryMessageInterpolator;
 		}
 		else {
-			this.messageResolver = messageResolver;
+			this.messageInterpolator = messageInterpolator;
 		}
 		return this;
 	}

@@ -28,7 +28,7 @@ import java.io.InputStream;
  * <pre>
  * ValidatorFactoryBuilder<?> builder = //provided by one of the Validation bootstrap methods
  * ValidatorFactory = builder
- *         .messageResolver( new CustomMessageResolver() )
+ *         .messageInterpolator( new CustomMessageInterpolator() )
  *         .build();
  * </pre>
  * <p/>
@@ -49,14 +49,14 @@ import java.io.InputStream;
  */
 public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	/**
-	 * Defines the message resolver used. Has priority over the configuration
-	 * based message resolver.
+	 * Defines the message interpolator used. Has priority over the configuration
+	 * based message interpolator.
 	 *
-	 * @param resolver message resolver implementation.
+	 * @param interpolator message interpolator implementation.
 	 *
 	 * @return <code>this</code> following the chaining method pattern.
 	 */
-	T messageResolver(MessageResolver resolver);
+	T messageInterpolator(MessageInterpolator interpolator);
 
 	/**
 	 * Defines the traversable resolver used. Has priority over the configuration
@@ -92,14 +92,14 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	T configure(InputStream stream);
 
 	/**
-	 * Return an implementation of the MessageResolver interface following the
-	 * default MessageREsolver defined in the specification:
+	 * Return an implementation of the MessageInterpolator interface following the
+	 * default MessageInterpolator defined in the specification:
 	 *  - use the ValidationMessages resource bundle to load keys
 	 *  - use Locale.getDefault()
 	 *
-	 * @return default MessageResolver implementation compliant with the specification
+	 * @return default MessageInterpolator implementation compliant with the specification
 	 */
-	MessageResolver getDefaultMessageResolver();
+	MessageInterpolator getDefaultMessageInterpolator();
 
 	/**
 	 * Build a ValidatorFactory implementation.

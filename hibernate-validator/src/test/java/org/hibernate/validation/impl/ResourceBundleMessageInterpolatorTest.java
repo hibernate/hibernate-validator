@@ -38,15 +38,15 @@ import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
  *
  * @author Hardy Ferentschik
  */
-public class ResourceBundleMessageResolverTest {
+public class ResourceBundleMessageInterpolatorTest {
 
-	private ResourceBundleMessageResolver resolver;
+	private ResourceBundleMessageInterpolator interpolator;
 	private NotNull notNull;
 	private Size size;
 
 	@Before
 	public void setUp() {
-		resolver = new ResourceBundleMessageResolver( new TestResources() );
+		interpolator = new ResourceBundleMessageInterpolator( new TestResources() );
 
 		AnnotationDescriptor descriptor = new AnnotationDescriptor( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
@@ -60,19 +60,19 @@ public class ResourceBundleMessageResolverTest {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 
 		String expected = "replacement worked";
-		String actual = resolver.interpolate( "{foo}", desciptor, null );
+		String actual = interpolator.interpolate( "{foo}", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "replacement worked replacement worked";
-		actual = resolver.interpolate( "{foo} {foo}", desciptor, null );
+		actual = interpolator.interpolate( "{foo} {foo}", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "This replacement worked just fine";
-		actual = resolver.interpolate( "This {foo} just fine", desciptor, null );
+		actual = interpolator.interpolate( "This {foo} just fine", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "{} { replacement worked }";
-		actual = resolver.interpolate( "{} { {foo} }", desciptor, null );
+		actual = interpolator.interpolate( "{} { {foo} }", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -80,11 +80,11 @@ public class ResourceBundleMessageResolverTest {
 	public void testUnSuccessfulInterpolation() {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 		String expected = "foo";  // missing {}
-		String actual = resolver.interpolate( "foo", desciptor, null );
+		String actual = interpolator.interpolate( "foo", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "#{foo  {}";
-		actual = resolver.interpolate( "#{foo  {}", desciptor, null );
+		actual = interpolator.interpolate( "#{foo  {}", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -92,7 +92,7 @@ public class ResourceBundleMessageResolverTest {
 	public void testUnkownTokenInterpolation() {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 		String expected = "{bar}";  // unkown token {}
-		String actual = resolver.interpolate( "{bar}", desciptor, null );
+		String actual = interpolator.interpolate( "{bar}", desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -100,12 +100,12 @@ public class ResourceBundleMessageResolverTest {
 	public void testDefaultInterpolation() {
 		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
 		String expected = "may not be null";
-		String actual = resolver.interpolate( notNull.message(), desciptor, null );
+		String actual = interpolator.interpolate( notNull.message(), desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		desciptor = new ConstraintDescriptorImpl( size, new Class<?>[] { } );
 		expected = "size must be between -2147483648 and 2147483647";  // unkown token {}
-		actual = resolver.interpolate( size.message(), desciptor, null );
+		actual = interpolator.interpolate( size.message(), desciptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 

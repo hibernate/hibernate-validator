@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.ConstraintDescriptor;
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 
 import org.slf4j.Logger;
 
@@ -32,11 +32,11 @@ import org.hibernate.validation.util.LoggerFactory;
 
 
 /**
- * Resource bundle backed message resolver.
+ * Resource bundle backed message interpolator.
  *
  * @author Emmanuel Bernard
  */
-public class ResourceBundleMessageResolver implements MessageResolver {
+public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private static final String DEFAULT_VALIDATION_MESSAGES = "org.hibernate.validation.ValidationMessages";
 	private static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
 	private static final Logger log = LoggerFactory.make();
@@ -48,12 +48,12 @@ public class ResourceBundleMessageResolver implements MessageResolver {
 	private ResourceBundle defaultResourceBundle;
 	private ResourceBundle userResourceBundle;
 
-	public ResourceBundleMessageResolver() {
+	public ResourceBundleMessageInterpolator() {
 		userResourceBundle = getFileBasedResourceBundle();
 		defaultResourceBundle = ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES );
 	}
 
-	public ResourceBundleMessageResolver(ResourceBundle resourceBundle) {
+	public ResourceBundleMessageInterpolator(ResourceBundle resourceBundle) {
 		if ( resourceBundle == null ) {
 			userResourceBundle = getFileBasedResourceBundle();
 		}

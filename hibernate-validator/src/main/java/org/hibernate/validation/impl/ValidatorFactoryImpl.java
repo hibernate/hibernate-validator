@@ -20,7 +20,7 @@ package org.hibernate.validation.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintFactory;
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorBuilder;
@@ -35,7 +35,7 @@ import org.hibernate.validation.engine.ValidatorFactoryImplementor;
  */
 public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 	
-	private final MessageResolver messageResolver;
+	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintFactory constraintFactory;
 
@@ -45,7 +45,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 
 
 	public ValidatorFactoryImpl(ValidatorFactoryConfiguration configuration) {
-		this.messageResolver = configuration.getMessageResolver();
+		this.messageInterpolator = configuration.getMessageInterpolator();
 		this.constraintFactory = configuration.getConstraintFactory();
 		this.traversableResolver = configuration.getTraversableResolver();
 		//do init metadata from XML form
@@ -58,12 +58,12 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 		return defineValidatorState().getValidator();
 	}
 
-	public MessageResolver getMessageResolver() {
-		return messageResolver;
+	public MessageInterpolator getMessageInterpolator() {
+		return messageInterpolator;
 	}
 
 	public ValidatorBuilder defineValidatorState() {
-		return new ValidatorBuilderImpl(this, messageResolver, traversableResolver);
+		return new ValidatorBuilderImpl(this, messageInterpolator, traversableResolver);
 	}
 
 	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
@@ -72,7 +72,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 		@SuppressWarnings( "unchecked")
 		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get(beanClass);
 		if (metadata == null) {
-			metadata = new BeanMetaDataImpl<T>(beanClass, messageResolver, constraintFactory);
+			metadata = new BeanMetaDataImpl<T>(beanClass, messageInterpolator, constraintFactory);
 			metadataProviders.put( beanClass, metadata );
 		}
 		return metadata;

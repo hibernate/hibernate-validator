@@ -20,7 +20,7 @@ package org.hibernate.validation.impl;
 import java.io.InputStream;
 import java.util.List;
 import javax.validation.ConstraintFactory;
-import javax.validation.MessageResolver;
+import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
@@ -44,10 +44,10 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 	}
 
 	//FIXME not sure why it is like that. We should cache these instances somehow. Static?
-	private final MessageResolver defaultMessageResolver = new ResourceBundleMessageResolver();
+	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();
 	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
 
-	private MessageResolver messageResolver;
+	private MessageInterpolator messageInterpolator;
 	private ConstraintFactory constraintFactory = new ConstraintFactoryImpl();
 	private String configurationFile = "META-INF/validation.xml";
 	private final ValidationProvider provider;
@@ -62,7 +62,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 			this.providerResolver = state.getValidationProviderResolver();
 		}
 		this.provider = null;
-		this.messageResolver = defaultMessageResolver;
+		this.messageInterpolator = defaultMessageInterpolator;
 		this.traversableResolver = defaultTraversableResolver;
 	}
 
@@ -72,12 +72,12 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		}
 		this.provider = provider;
 		this.providerResolver = null;
-		this.messageResolver = defaultMessageResolver;
+		this.messageInterpolator = defaultMessageInterpolator;
 		this.traversableResolver = defaultTraversableResolver;
 	}
 
-	public ValidatorFactoryBuilderImpl messageResolver(MessageResolver resolver) {
-		this.messageResolver = resolver;
+	public ValidatorFactoryBuilderImpl messageInterpolator(MessageInterpolator interpolator) {
+		this.messageInterpolator = interpolator;
 		return this;
 	}
 
@@ -119,8 +119,8 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		return provider != null;
 	}
 
-	public MessageResolver getMessageResolver() {
-		return messageResolver;
+	public MessageInterpolator getMessageInterpolator() {
+		return messageInterpolator;
 	}
 
 	public ConstraintFactory getConstraintFactory() {
@@ -135,8 +135,8 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
-	public MessageResolver getDefaultMessageResolver() {
-		return defaultMessageResolver;
+	public MessageInterpolator getDefaultMessageInterpolator() {
+		return defaultMessageInterpolator;
 	}
 
 	public InputStream getConfigurationStream() {
