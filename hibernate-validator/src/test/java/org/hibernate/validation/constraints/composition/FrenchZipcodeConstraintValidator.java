@@ -15,23 +15,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.composition;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintContext;
-import javax.validation.constraints.NotNull;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
- * Validate that the object is not <code>null</code>.
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public class NotNullConstraint implements Constraint<NotNull> {
+public class FrenchZipcodeConstraintValidator implements ConstraintValidator<FrenchZipcode> {
 
-	public void initialize(NotNull parameters) {
+	public void initialize(FrenchZipcode parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintContext constraintContext) {
-		return object != null;
+	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+		return true;
 	}
 }

@@ -19,7 +19,7 @@ package org.hibernate.validation.engine;
 
 import java.util.List;
 import java.util.ArrayList;
-import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
 import javax.validation.ConstraintFactory;
@@ -42,7 +42,7 @@ public class ConstraintTree {
 
 	private final ConstraintTree parent;
 	private final List<ConstraintTree> children;
-	private Constraint constraint;
+	private ConstraintValidator constraintValidator;
 	private final ConstraintDescriptor descriptor;
 	private final ConstraintFactory constraintFactory;
 	private final MessageInterpolator messageInterpolator;
@@ -56,7 +56,7 @@ public class ConstraintTree {
 		this.descriptor = descriptor;
 		this.constraintFactory = constraintFactory;
 		this.messageInterpolator = messageInterpolator;
-		this.constraint = getConstraint( descriptor );
+		this.constraintValidator = getConstraint( descriptor );
 		children = new ArrayList<ConstraintTree>( descriptor.getComposingConstraints().size() );
 
 		for ( ConstraintDescriptor composingDescriptor : descriptor.getComposingConstraints() ) {
@@ -83,8 +83,8 @@ public class ConstraintTree {
 		return children.size() > 0;
 	}
 
-	public Constraint getConstraint() {
-		return constraint;
+	public ConstraintValidator getConstraint() {
+		return constraintValidator;
 	}
 
 	public ConstraintDescriptor getDescriptor() {
@@ -97,12 +97,12 @@ public class ConstraintTree {
 		}
 
 		final Object leafBeanInstance = validationContext.peekValidatedObject();
-		ConstraintContextImpl constraintContext = new ConstraintContextImpl( descriptor );
+		ConstraintValidatorContextImpl constraintContext = new ConstraintValidatorContextImpl( descriptor );
 		if ( log.isTraceEnabled() ) {
 			log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
 		}
-		if ( !constraint.isValid( value, constraintContext ) ) {
-			for ( ConstraintContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
+		if ( !constraintValidator.isValid( value, constraintContext ) ) {
+			for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
 				final String message = error.getMessage();
 				createConstraintViolation( value, beanClass, validationContext, leafBeanInstance, message, descriptor );
 			}
@@ -143,22 +143,22 @@ public class ConstraintTree {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Constraint getConstraint(ConstraintDescriptor descriptor) {
-		Constraint constraint;
+	private ConstraintValidator getConstraint(ConstraintDescriptor descriptor) {
+		ConstraintValidator constraintValidator;
 		try {
 			//unchecked
-			constraint = constraintFactory.getInstance( descriptor.getConstraintClass() );
+			constraintValidator = constraintFactory.getInstance( descriptor.getConstraintValidatorClass() );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to instantiate " + descriptor.getConstraintClass(), e );
+			throw new ValidationException( "Unable to instantiate " + descriptor.getConstraintValidatorClass(), e );
 		}
 
 		try {
-			constraint.initialize( descriptor.getAnnotation() );
+			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to intialize " + constraint.getClass().getName(), e );
+			throw new ValidationException( "Unable to intialize " + constraintValidator.getClass().getName(), e );
 		}
-		return constraint;
+		return constraintValidator;
 	}
 }

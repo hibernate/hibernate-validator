@@ -23,13 +23,13 @@ import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
-import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
 
 /**
  * @author Emmanuel Bernard
  */
 @Documented
-@ConstraintValidator(NotEmptyConstraint.class)
+@Constraint(validatedBy = NotEmptyConstraintValidator.class)
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface NotEmpty {

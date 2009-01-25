@@ -7,7 +7,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
 
 /**
  * @author Emmanuel Bernard
@@ -15,7 +15,7 @@ import javax.validation.ConstraintValidator;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 @Documented
-@ConstraintValidator(LengthConstraint.class)
+@Constraint(validatedBy = LengthConstraintValidator.class)
 public @interface Length {
 	int min() default Integer.MIN_VALUE;
 	int max() default Integer.MAX_VALUE;

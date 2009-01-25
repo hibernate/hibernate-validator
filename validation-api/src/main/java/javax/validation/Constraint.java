@@ -17,35 +17,29 @@
 */
 package javax.validation;
 
-import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
+
 
 /**
- * Define the logic to validate a given constraint.
+ * Link between a constraint annotation and it's constraint validation implementation.
+ * <p/>
+ * An given constraint annotation should be annotated by a @ConstraintValidator
+ * annotation which refers to its constraint validation implementation.
  *
- * @author Emmanuel Bernard
+ * @author Emmanuel Bernard (emmanuel at hibernate.org)
+ * @author Gavin King
  * @author Hardy Ferentschik
  */
-public interface Constraint<A extends Annotation> {
+@Documented
+@Target({ ANNOTATION_TYPE })
+@Retention(RUNTIME)
+public @interface Constraint {
 	/**
-	 * Validator parameters for a given constraint definition
-	 * Annotations parameters are passed as key/value into parameters
-	 * <p/>
-	 * This method is guaranteed to be called before any of the other Constraint
-	 * implementation methods
-	 *
-	 * @param constraintAnnotation parameters for a given constraint definition
+	 * @return The class implementing the constraint validation logic
 	 */
-	void initialize(A constraintAnnotation);
-
-	/**
-	 * Implement the validation constraint.
-	 * <code>object</code> state must not be changed by a Constraint implementation
-	 *
-	 * @param object object to validate
-	 * @param constraintContext context in which the constraint implementation is evaluated
-	 *
-	 * @return false if <code>object</code> does not pass the constraint
-	 */
-	boolean isValid(Object object, ConstraintContext constraintContext);
+	public abstract Class<? extends ConstraintValidator> validatedBy();
 }
- 

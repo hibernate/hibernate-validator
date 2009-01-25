@@ -18,13 +18,13 @@
 package org.hibernate.validation.constraints;
 
 import java.util.regex.Matcher;
-import javax.validation.Constraint;
-import javax.validation.ConstraintContext;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik
  */
-public class PatternConstraint implements Constraint<Pattern> {
+public class PatternConstraintValidator implements ConstraintValidator<Pattern> {
 
 	private java.util.regex.Pattern pattern;
 
@@ -35,7 +35,7 @@ public class PatternConstraint implements Constraint<Pattern> {
 		);
 	}
 
-	public boolean isValid(Object value, ConstraintContext constraintContext) {
+	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;
 		}

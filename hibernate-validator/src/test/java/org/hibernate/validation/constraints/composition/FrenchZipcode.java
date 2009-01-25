@@ -24,7 +24,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
-import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
 import javax.validation.OverridesParameter;
 import javax.validation.OverridesParameters;
 import javax.validation.constraints.NotNull;
@@ -40,7 +40,7 @@ import org.hibernate.validation.constraints.Patterns;
 @Size
 // first pattern just duplicates the length of 5 characters, the second pattern is just to proof that parameters can be overridden.
 @Patterns({ @Pattern(regex = "....."), @Pattern(regex = "bar") })
-@ConstraintValidator(FrenchZipcodeConstraint.class)
+@Constraint(validatedBy = FrenchZipcodeConstraintValidator.class)
 @Documented
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)

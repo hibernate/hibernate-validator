@@ -28,7 +28,7 @@ public class NotNullConstraintTest {
 
 	@Test
 	public void testIsValid() {
-		NotNullConstraint constraint = new NotNullConstraint();
+		NotNullConstraintValidator constraint = new NotNullConstraintValidator();
 
 		assertFalse( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( new Object(), null ) );

@@ -43,9 +43,9 @@ public interface ConstraintDescriptor {
 	Set<Class<?>> getGroups();
 
 	/**
-	 * @return the constraint implementation class
+	 * @return the constraint validation implementation class
 	 */
-	Class<? extends Constraint> getConstraintClass();
+	Class<? extends ConstraintValidator> getConstraintValidatorClass();
 
 	/**
 	 * Returns a map containing the annotation parameter names as keys and the

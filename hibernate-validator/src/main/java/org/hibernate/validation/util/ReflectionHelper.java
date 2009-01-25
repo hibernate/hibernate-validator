@@ -38,8 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
 import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class ReflectionHelper {
 	}
 
 
-	public static Class<? extends Constraint> getBuiltInConstraint(Annotation annotation) {
+	public static Class<? extends ConstraintValidator> getBuiltInConstraint(Annotation annotation) {
 		Class constraint = null;
 		String annotationType = annotation.annotationType().getName();
 		if ( builtInConstraints.containsKey( annotationType ) ) {
@@ -122,9 +122,9 @@ public class ReflectionHelper {
 	 */
 	public static boolean isConstraintAnnotation(Annotation annotation) {
 
-		ConstraintValidator constraintValidator = annotation.annotationType()
-				.getAnnotation( ConstraintValidator.class );
-		if ( constraintValidator == null ) {
+		Constraint constraint = annotation.annotationType()
+				.getAnnotation( Constraint.class );
+		if ( constraint == null ) {
 			return false;
 		}
 
@@ -132,7 +132,7 @@ public class ReflectionHelper {
 			getAnnotationParameter( annotation, "message", String.class );
 		}
 		catch ( Exception e ) {
-			String msg = annotation.annotationType().getName() + " contains ConstraintValidator annotation, but does " +
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
 					"not contain a message parameter. Annotation is getting ignored.";
 			log.warn( msg );
 			return false;
@@ -142,7 +142,7 @@ public class ReflectionHelper {
 			getAnnotationParameter( annotation, "groups", Class[].class );
 		}
 		catch ( Exception e ) {
-			String msg = annotation.annotationType().getName() + " contains ConstraintValidator annotation, but does " +
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
 					"not contain a groups parameter. Annotation is getting ignored.";
 			log.warn( msg );
 			return false;

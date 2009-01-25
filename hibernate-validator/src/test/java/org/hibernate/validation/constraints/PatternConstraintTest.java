@@ -32,11 +32,11 @@ import org.hibernate.tck.annotations.SpecAssertion;
  */
 public class PatternConstraintTest {
 
-	PatternConstraint constraint;
+	PatternConstraintValidator constraint;
 
 	@Before
 	public void init() {
-		constraint = new PatternConstraint();
+		constraint = new PatternConstraintValidator();
 		constraint.initialize(
 				new Pattern() {
 

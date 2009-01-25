@@ -24,10 +24,10 @@ import javax.validation.Validator;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.constraints.NotNullConstraint;
-import org.hibernate.validation.constraints.PatternConstraint;
-import org.hibernate.validation.constraints.SizeConstraint;
-import org.hibernate.validation.constraints.composition.GermanZipcodeConstraint;
+import org.hibernate.validation.constraints.NotNullConstraintValidator;
+import org.hibernate.validation.constraints.PatternConstraintValidator;
+import org.hibernate.validation.constraints.SizeConstraintValidator;
+import org.hibernate.validation.constraints.composition.GermanZipcodeConstraintValidator;
 import org.hibernate.validation.eg.FrenchAddress;
 import org.hibernate.validation.eg.GermanAddress;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
@@ -54,7 +54,7 @@ public class ConstraintCompositionTest {
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
 				"may not be null",
-				NotNullConstraint.class,
+				NotNullConstraintValidator.class,
 				FrenchAddress.class,
 				null,
 				"zipCode"
@@ -69,7 +69,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
-						SizeConstraint.class,
+						SizeConstraintValidator.class,
 						FrenchAddress.class,
 						"abc",
 						"zipCode"
@@ -79,7 +79,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"must match \"d*\"",
-						PatternConstraint.class,
+						PatternConstraintValidator.class,
 						FrenchAddress.class,
 						"abc",
 						"zipCode"
@@ -89,7 +89,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"must match \".....\"",
-						PatternConstraint.class,
+						PatternConstraintValidator.class,
 						FrenchAddress.class,
 						"abc",
 						"zipCode"
@@ -109,7 +109,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
-						SizeConstraint.class,
+						SizeConstraintValidator.class,
 						FrenchAddress.class,
 						"123",
 						"zipCode"
@@ -119,7 +119,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"must match \".....\"",
-						PatternConstraint.class,
+						PatternConstraintValidator.class,
 						FrenchAddress.class,
 						"123",
 						"zipCode"
@@ -148,7 +148,7 @@ public class ConstraintCompositionTest {
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
 				"Falsche Postnummer.",
-				GermanZipcodeConstraint.class,
+				GermanZipcodeConstraintValidator.class,
 				GermanAddress.class,
 				null,
 				"zipCode"
@@ -170,7 +170,7 @@ public class ConstraintCompositionTest {
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
 				"Falsche Postnummer.",
-				GermanZipcodeConstraint.class,
+				GermanZipcodeConstraintValidator.class,
 				GermanAddress.class,
 				"abc",
 				"zipCode"

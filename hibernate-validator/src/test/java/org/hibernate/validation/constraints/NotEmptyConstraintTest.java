@@ -17,8 +17,6 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.annotation.Annotation;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -32,11 +30,11 @@ import org.hibernate.tck.annotations.SpecAssertion;
  */
 public class NotEmptyConstraintTest {
 
-	NotEmptyConstraint constraint;
+	NotEmptyConstraintValidator constraint;
 
 	@Before
 	public void init() {
-		constraint = new NotEmptyConstraint();
+		constraint = new NotEmptyConstraintValidator();
 	}
 
 	@Test

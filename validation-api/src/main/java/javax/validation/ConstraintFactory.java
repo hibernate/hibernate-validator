@@ -18,8 +18,8 @@
 package javax.validation;
 
 /**
- * Instantiate a <code>Constraint</code> instance from its class.
- * The <code>ConstraintFactory</code> is <b>not</b> responsible for calling {@link Constraint#initialize(java.lang.annotation.Annotation)}.
+ * Instantiate a <code>ConstraintValidator</code> instance from its class.
+ * The <code>ConstraintFactory</code> is <b>not</b> responsible for calling {@link ConstraintValidator#initialize(java.lang.annotation.Annotation)}.
  *
  * @author Dhanji R. Prasanna
  * @author Emmanuel Bernard
@@ -28,9 +28,9 @@ package javax.validation;
 public interface ConstraintFactory {
 
 	/**
-	 * @param key The class of the constraint to instantiate.
+	 * @param key The class of the constraint validator to instantiate.
 	 *
-	 * @return An constraint instance of the specified class.
+	 * @return An constraint validator instance of the specified class.
 	 */
-	<T extends Constraint> T getInstance(Class<T> key);
+	<T extends ConstraintValidator> T getInstance(Class<T> key);
 }

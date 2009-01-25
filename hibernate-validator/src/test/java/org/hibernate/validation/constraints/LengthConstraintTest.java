@@ -18,7 +18,6 @@
 package org.hibernate.validation.constraints;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,11 +34,11 @@ import org.hibernate.tck.annotations.SpecAssertion;
  */
 public class LengthConstraintTest {
 
-	LengthConstraint constraint;
+	LengthConstraintValidator constraint;
 
 	@Before
 	public void init() {
-		constraint = new LengthConstraint();
+		constraint = new LengthConstraintValidator();
 		constraint.initialize(
 				new Length() {
 

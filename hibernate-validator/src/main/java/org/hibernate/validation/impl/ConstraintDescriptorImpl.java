@@ -27,9 +27,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
-import javax.validation.Constraint;
-import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintDescriptor;
+import javax.validation.Constraint;
 import javax.validation.OverridesParameter;
 import javax.validation.OverridesParameters;
 import javax.validation.ReportAsViolationFromCompositeConstraint;
@@ -55,7 +55,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 
 	private final Annotation annotation;
-	private final Class<? extends Constraint> constraintClass;
+	private final Class<? extends ConstraintValidator> constraintClass;
 	private final Set<Class<?>> groups;
 	private final Map<String, Object> parameters;
 	private final Set<ConstraintDescriptor> composingConstraints = new HashSet<ConstraintDescriptor>();
@@ -84,9 +84,9 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 			this.constraintClass = ReflectionHelper.getBuiltInConstraint( annotation );
 		}
 		else {
-			ConstraintValidator constraintValidator = annotation.annotationType()
-					.getAnnotation( ConstraintValidator.class );
-			this.constraintClass = constraintValidator.value();
+			Constraint constraint = annotation.annotationType()
+					.getAnnotation( Constraint.class );
+			this.constraintClass = constraint.validatedBy();
 		}
 
 		parseOverrideParameters();
@@ -110,7 +110,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<? extends Constraint> getConstraintClass() {
+	public Class<? extends ConstraintValidator> getConstraintValidatorClass() {
 		return constraintClass;
 	}
 

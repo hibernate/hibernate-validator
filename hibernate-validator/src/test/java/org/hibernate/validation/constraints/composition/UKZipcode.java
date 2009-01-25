@@ -24,7 +24,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
-import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
  */
 @NotNull
 @Size(min = 5, max = 5)
-@ConstraintValidator(UKZipcodeConstraint.class)
+@Constraint(validatedBy = UKZipcodeConstraintValidator.class)
 @Documented
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)

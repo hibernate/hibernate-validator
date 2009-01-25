@@ -17,8 +17,8 @@
 */
 package org.hibernate.validation.constraints;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintContext;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Check that a string's length is between min and max.
@@ -26,7 +26,7 @@ import javax.validation.ConstraintContext;
  * @author Emmanuel Bernard
  * @author Gavin King
  */
-public class LengthConstraint implements Constraint<Length> {
+public class LengthConstraintValidator implements ConstraintValidator<Length> {
 	private int min;
 	private int max;
 
@@ -35,7 +35,7 @@ public class LengthConstraint implements Constraint<Length> {
 		max = parameters.max();
 	}
 
-	public boolean isValid(Object value, ConstraintContext constraintContext) {
+	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;
 		}

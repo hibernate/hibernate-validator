@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Locale;
-import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintFactory;
 import javax.validation.ConstraintViolation;
@@ -32,7 +32,7 @@ import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactoryBuilder;
 import javax.validation.ValidatorFactory;
-import javax.validation.ConstraintContext;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.bootstrap.SpecializedBuilderFactory;
 import javax.validation.spi.ValidationProvider;
 
@@ -43,7 +43,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
-import org.hibernate.validation.constraints.NotNullConstraint;
+import org.hibernate.validation.constraints.NotNullConstraintValidator;
 import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.impl.ConstraintFactoryImpl;
 import org.hibernate.validation.impl.ValidatorFactoryBuilderImpl;
@@ -152,9 +152,9 @@ public class ValidationTest {
 		// now we modify the builder, get a new factory and valiator and try again
 		builder.constraintFactory(
 				new ConstraintFactory() {
-					public <T extends Constraint> T getInstance(Class<T> key) {
-						if ( key == NotNullConstraint.class ) {
-							return ( T ) new BadlyBehavedNotNullConstraint();
+					public <T extends ConstraintValidator> T getInstance(Class<T> key) {
+						if ( key == NotNullConstraintValidator.class ) {
+							return ( T ) new BadlyBehavedNotNullConstraintValidator();
 						}
 						return new ConstraintFactoryImpl().getInstance( key );
 					}
@@ -240,9 +240,9 @@ public class ValidationTest {
 		assertTrue( factory instanceof ValidatorFactoryImpl );
 	}
 
-	class BadlyBehavedNotNullConstraint extends NotNullConstraint {
+	class BadlyBehavedNotNullConstraintValidator extends NotNullConstraintValidator {
 		@Override
-		public boolean isValid(Object object, ConstraintContext constraintContext) {
+		public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 			return true;
 		}
 	}

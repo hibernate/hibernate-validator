@@ -1,11 +1,11 @@
 package javax.validation;
 
 /**
- * Provide contextual data and operation when applying a given constraint implementation
+ * Provide contextual data and operation when applying a given constraint validator implementation
  *
  * @author Emmanuel Bernard
  */
-public interface ConstraintContext {
+public interface ConstraintValidatorContext {
 	/**
 	 * Disable default error message and default ConstraintViolation object generation.
 	 * Useful to set a different error message or generate an ConstraintViolation based on

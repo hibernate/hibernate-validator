@@ -17,20 +17,18 @@
 */
 package org.hibernate.validation.constraints.incomplete;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintContext;
-
-import org.hibernate.validation.constraints.incomplete.NoGroups;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NoGroupsConstraint implements Constraint<NoGroups> {
+public class NoMessageConstraintValidator implements ConstraintValidator<NoMessage> {
 
-	public void initialize(NoGroups parameters) {
+	public void initialize(NoMessage parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintContext constraintContext) {
+	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 		return false;
 	}
 }

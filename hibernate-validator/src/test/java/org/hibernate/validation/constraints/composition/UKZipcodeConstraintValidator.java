@@ -17,18 +17,18 @@
 */
 package org.hibernate.validation.constraints.composition;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintContext;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GermanZipcodeConstraint implements Constraint<GermanZipcode> {
+public class UKZipcodeConstraintValidator implements ConstraintValidator<UKZipcode> {
 
-	public void initialize(GermanZipcode parameters) {
+	public void initialize(UKZipcode parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintContext constraintContext) {
-		return true;
+	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+		return false;
 	}
 }

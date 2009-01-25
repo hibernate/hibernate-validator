@@ -15,20 +15,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints.composition;
+package org.hibernate.validation.constraints;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintContext;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.NotNull;
 
 /**
- * @author Hardy Ferentschik
+ * Validate that the object is not <code>null</code>.
+ *
+ * @author Emmanuel Bernard
  */
-public class UKZipcodeConstraint implements Constraint<UKZipcode> {
+public class NotNullConstraintValidator implements ConstraintValidator<NotNull> {
 
-	public void initialize(UKZipcode parameters) {
+	public void initialize(NotNull parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintContext constraintContext) {
-		return false;
+	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+		return object != null;
 	}
 }

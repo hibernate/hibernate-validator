@@ -19,8 +19,8 @@ package org.hibernate.validation.constraints;
 
 import java.util.Collection;
 import java.lang.reflect.Array;
-import javax.validation.Constraint;
-import javax.validation.ConstraintContext;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
 
 /**
@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
  * @author Emmanuel Bernard
  * @author Gavin King
  */
-public class SizeConstraint implements Constraint<Size> {
+public class SizeConstraintValidator implements ConstraintValidator<Size> {
 	private int min;
 	private int max;
 
@@ -41,7 +41,7 @@ public class SizeConstraint implements Constraint<Size> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isValid(Object value, ConstraintContext constraintContext) {
+	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;
 		}

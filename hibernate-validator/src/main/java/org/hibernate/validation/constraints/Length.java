@@ -24,7 +24,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
-import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
 
 /**
  * Validate that the string is between min and max included
@@ -32,7 +32,7 @@ import javax.validation.ConstraintValidator;
  * @author Emmanuel Bernard
  */
 @Documented
-@ConstraintValidator(LengthConstraint.class)
+@Constraint(validatedBy = LengthConstraintValidator.class)
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)
 public @interface Length {

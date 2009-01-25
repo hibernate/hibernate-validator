@@ -20,18 +20,18 @@ package org.hibernate.validation.engine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.validation.ConstraintContext;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintDescriptor;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ConstraintContextImpl implements ConstraintContext {
+public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
 	private final ConstraintDescriptor constraintDescriptor;
 	private final List<ErrorMessage> errorMessages;
 	private boolean defaultDisabled;
 
-	public ConstraintContextImpl(ConstraintDescriptor constraintDescriptor) {
+	public ConstraintValidatorContextImpl(ConstraintDescriptor constraintDescriptor) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.errorMessages = new ArrayList<ErrorMessage>(3);
 	}

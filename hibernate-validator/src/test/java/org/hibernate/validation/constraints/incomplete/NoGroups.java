@@ -23,15 +23,15 @@ import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
-import javax.validation.ConstraintValidator;
+import javax.validation.Constraint;
 
-import org.hibernate.validation.constraints.incomplete.NoGroupsConstraint;
+import org.hibernate.validation.constraints.incomplete.NoGroupsConstraintValidator;
 
 /**
  * @author Hardy Ferentschik
  */
 @Documented
-@ConstraintValidator(NoGroupsConstraint.class)
+@Constraint(validatedBy = NoGroupsConstraintValidator.class)
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface NoGroups {
