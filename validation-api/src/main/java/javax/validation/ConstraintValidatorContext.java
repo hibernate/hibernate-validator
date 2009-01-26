@@ -18,7 +18,6 @@ public interface ConstraintValidatorContext {
 
 	/**
 	 * @return the current unexpanded default message
-	 * TODO: is it needed
 	 */
 	String getDefaultErrorMessage();
 
