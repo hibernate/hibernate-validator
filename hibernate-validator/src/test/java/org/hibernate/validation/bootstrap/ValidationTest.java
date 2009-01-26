@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.Locale;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintDescriptor;
-import javax.validation.ConstraintFactory;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.Validation;
@@ -45,7 +45,7 @@ import org.junit.Test;
 import org.hibernate.validation.HibernateValidatorFactoryBuilder;
 import org.hibernate.validation.constraints.NotNullConstraintValidator;
 import org.hibernate.validation.eg.Customer;
-import org.hibernate.validation.impl.ConstraintFactoryImpl;
+import org.hibernate.validation.impl.ConstraintValidatorFactoryImpl;
 import org.hibernate.validation.impl.ValidatorFactoryBuilderImpl;
 import org.hibernate.validation.impl.ValidatorFactoryImpl;
 import org.hibernate.validation.impl.HibernateValidationProvider;
@@ -132,7 +132,7 @@ public class ValidationTest {
 	}
 
 	@Test
-	public void testCustomConstraintFactory() {
+	public void testCustomConstraintValidatorFactory() {
 
 		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
 		assertDefaultBuilderAndFactory( builder );
@@ -150,13 +150,13 @@ public class ValidationTest {
 
 		//FIXME nothing guarantee that a builder can be reused
 		// now we modify the builder, get a new factory and valiator and try again
-		builder.constraintFactory(
-				new ConstraintFactory() {
+		builder.constraintValidatorFactory(
+				new ConstraintValidatorFactory() {
 					public <T extends ConstraintValidator> T getInstance(Class<T> key) {
 						if ( key == NotNullConstraintValidator.class ) {
 							return ( T ) new BadlyBehavedNotNullConstraintValidator();
 						}
-						return new ConstraintFactoryImpl().getInstance( key );
+						return new ConstraintValidatorFactoryImpl().getInstance( key );
 					}
 				}
 		);

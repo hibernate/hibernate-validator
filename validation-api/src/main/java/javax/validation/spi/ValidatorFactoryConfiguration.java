@@ -18,7 +18,7 @@
 package javax.validation.spi;
 
 import java.io.InputStream;
-import javax.validation.ConstraintFactory;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 
@@ -49,12 +49,12 @@ public interface ValidatorFactoryConfiguration {
 	InputStream getConfigurationStream();
 
 	/**
-	 * Defines the constraint implementation factory as defined by
+	 * Defines the constraint validator implementation factory as defined by
 	 * the client programmatically or null if undefined
 	 *
 	 * @return factory instance or null if not defined
 	 */
-	ConstraintFactory getConstraintFactory();
+	ConstraintValidatorFactory getConstraintValidatorFactory();
 
 	/**
 	 * Traversable resolver as defined by the client programmatically

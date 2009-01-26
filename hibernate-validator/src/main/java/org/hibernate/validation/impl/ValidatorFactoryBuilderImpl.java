@@ -19,7 +19,7 @@ package org.hibernate.validation.impl;
 
 import java.io.InputStream;
 import java.util.List;
-import javax.validation.ConstraintFactory;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
@@ -48,7 +48,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
 
 	private MessageInterpolator messageInterpolator;
-	private ConstraintFactory constraintFactory = new ConstraintFactoryImpl();
+	private ConstraintValidatorFactory constraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 	private String configurationFile = "META-INF/validation.xml";
 	private final ValidationProvider provider;
 	private final ValidationProviderResolver providerResolver;
@@ -86,8 +86,8 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		return this;
 	}
 
-	public ValidatorFactoryBuilderImpl constraintFactory(ConstraintFactory constraintFactory) {
-		this.constraintFactory = constraintFactory;
+	public ValidatorFactoryBuilderImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
+		this.constraintValidatorFactory = constraintValidatorFactory;
 		return this;
 	}
 
@@ -123,8 +123,8 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		return messageInterpolator;
 	}
 
-	public ConstraintFactory getConstraintFactory() {
-		return constraintFactory;
+	public ConstraintValidatorFactory getConstraintValidatorFactory() {
+		return constraintValidatorFactory;
 	}
 
 	public TraversableResolver getTraversableResolver() {

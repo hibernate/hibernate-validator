@@ -19,7 +19,7 @@ package org.hibernate.validation.impl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.validation.ConstraintFactory;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
@@ -37,7 +37,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 	
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
-	private final ConstraintFactory constraintFactory;
+	private final ConstraintValidatorFactory constraintValidatorFactory;
 
 	//TODO is there a way to replace ? by so kind of <T> to express the correlation?
 	private Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders
@@ -46,7 +46,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 
 	public ValidatorFactoryImpl(ValidatorFactoryConfiguration configuration) {
 		this.messageInterpolator = configuration.getMessageInterpolator();
-		this.constraintFactory = configuration.getConstraintFactory();
+		this.constraintValidatorFactory = configuration.getConstraintValidatorFactory();
 		this.traversableResolver = configuration.getTraversableResolver();
 		//do init metadata from XML form
 	}
@@ -72,7 +72,7 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 		@SuppressWarnings( "unchecked")
 		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get(beanClass);
 		if (metadata == null) {
-			metadata = new BeanMetaDataImpl<T>(beanClass, messageInterpolator, constraintFactory);
+			metadata = new BeanMetaDataImpl<T>(beanClass, messageInterpolator, constraintValidatorFactory );
 			metadataProviders.put( beanClass, metadata );
 		}
 		return metadata;

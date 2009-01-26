@@ -69,14 +69,14 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	T traversableResolver(TraversableResolver resolver);
 
 	/**
-	 * Defines the constraint factory. Has priority over the configuration
+	 * Defines the constraint validator factory. Has priority over the configuration
 	 * based constraint factory.
 	 *
-	 * @param constraintFactory constraint factory inmplementation.
+	 * @param constraintValidatorFactory constraint factory inmplementation.
 	 *
 	 * @return <code>this</code> following the chaining method pattern.
 	 */
-	T constraintFactory(ConstraintFactory constraintFactory);
+	T constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory);
 
 	/**
 	 * Configure the ValidatorFactory based on <code>stream</code>

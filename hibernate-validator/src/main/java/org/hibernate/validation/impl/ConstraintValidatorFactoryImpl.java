@@ -15,22 +15,31 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package javax.validation;
+package org.hibernate.validation.impl;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ValidationException;
 
 /**
- * Instantiate a <code>ConstraintValidator</code> instance from its class.
- * The <code>ConstraintFactory</code> is <b>not</b> responsible for calling {@link ConstraintValidator#initialize(java.lang.annotation.Annotation)}.
+ * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.
  *
- * @author Dhanji R. Prasanna
  * @author Emmanuel Bernard
- * @author Hardy Ferentschik
  */
-public interface ConstraintFactory {
-
+public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
+	
 	/**
-	 * @param key The class of the constraint validator to instantiate.
-	 *
-	 * @return An constraint validator instance of the specified class.
+	 * {@inheritDoc}
 	 */
-	<T extends ConstraintValidator> T getInstance(Class<T> key);
+	public <T extends ConstraintValidator> T getInstance(Class<T> key) {
+		try {
+			return key.newInstance();
+		}
+		catch ( InstantiationException e ) {
+			throw new ValidationException( "Unable to instanciate " + key, e );
+		}
+		catch ( IllegalAccessException e ) {
+			throw new ValidationException( "Unable to instanciate " + key, e );
+		}
+	}
 }

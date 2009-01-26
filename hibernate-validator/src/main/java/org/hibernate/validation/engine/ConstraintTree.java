@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
-import javax.validation.ConstraintFactory;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 
 import org.slf4j.Logger;
@@ -44,24 +44,24 @@ public class ConstraintTree {
 	private final List<ConstraintTree> children;
 	private ConstraintValidator constraintValidator;
 	private final ConstraintDescriptor descriptor;
-	private final ConstraintFactory constraintFactory;
+	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final MessageInterpolator messageInterpolator;
 
-	public ConstraintTree(ConstraintDescriptor descriptor, ConstraintFactory constraintFactory, MessageInterpolator messageInterpolator) {
-		this( descriptor, null, constraintFactory, messageInterpolator );
+	public ConstraintTree(ConstraintDescriptor descriptor, ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator) {
+		this( descriptor, null, constraintValidatorFactory, messageInterpolator );
 	}
 
-	private ConstraintTree(ConstraintDescriptor descriptor, ConstraintTree parent, ConstraintFactory constraintFactory, MessageInterpolator messageInterpolator) {
+	private ConstraintTree(ConstraintDescriptor descriptor, ConstraintTree parent, ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		this.constraintFactory = constraintFactory;
+		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.constraintValidator = getConstraint( descriptor );
 		children = new ArrayList<ConstraintTree>( descriptor.getComposingConstraints().size() );
 
 		for ( ConstraintDescriptor composingDescriptor : descriptor.getComposingConstraints() ) {
 			ConstraintTree treeNode = new ConstraintTree(
-					composingDescriptor, this, constraintFactory, messageInterpolator
+					composingDescriptor, this, constraintValidatorFactory, messageInterpolator
 			);
 			children.add( treeNode );
 		}
@@ -147,7 +147,7 @@ public class ConstraintTree {
 		ConstraintValidator constraintValidator;
 		try {
 			//unchecked
-			constraintValidator = constraintFactory.getInstance( descriptor.getConstraintValidatorClass() );
+			constraintValidator = constraintValidatorFactory.getInstance( descriptor.getConstraintValidatorClass() );
 		}
 		catch ( RuntimeException e ) {
 			throw new ValidationException( "Unable to instantiate " + descriptor.getConstraintValidatorClass(), e );
