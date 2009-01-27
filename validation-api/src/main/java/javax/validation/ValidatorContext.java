@@ -5,14 +5,14 @@ package javax.validation;
  * 
  * @author Emmanuel Bernard
  */
-public interface ValidatorBuilder {
+public interface ValidatorContext {
 	/**
 	 * Defines the message interpolator implementation used by the Validator.
 	 * If unset, the message interpolator of the ValidatorFactory is used.
 	 *
 	 * @return self following the chaining method pattern
 	 */
-	ValidatorBuilder messageInterpolator(MessageInterpolator messageInterpolator);
+	ValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
 
 	/**
 	 * Defines the traversable resolver implementation used by the Validator.
@@ -20,12 +20,11 @@ public interface ValidatorBuilder {
 	 *
 	 * @return self following the chaining method pattern
 	 */
-	ValidatorBuilder traversableResolver(TraversableResolver traversableResolver);
+	ValidatorContext traversableResolver(TraversableResolver traversableResolver);
 
 	/**
 	 * @return an initialized <code>Validator</code> instance respecting the defined state.
 	 * Validator instances can be pooled and shared by the implementation.
 	 */
 	Validator getValidator();
-
 }

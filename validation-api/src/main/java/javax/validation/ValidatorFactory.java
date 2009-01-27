@@ -34,12 +34,12 @@ public interface ValidatorFactory {
 	Validator getValidator();
 
 	/**
-	 * Define the validator state and return a
+	 * Define the validator context and return a
 	 * Validator compliant with this state
 	 *
-	 * @return a ValidatorBuilder
+	 * @return a ValidatorContext
 	 */
-	ValidatorBuilder defineValidatorState();
+	ValidatorContext usingContext();
 
 	/**
 	 * Returns the MessageInterpolator instance configured at initialization time

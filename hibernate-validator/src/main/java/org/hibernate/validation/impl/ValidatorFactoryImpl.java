@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
-import javax.validation.ValidatorBuilder;
+import javax.validation.ValidatorContext;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validation.engine.BeanMetaDataImpl;
@@ -55,15 +55,15 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 	 * {@inheritDoc}
 	 */
 	public Validator getValidator() {
-		return defineValidatorState().getValidator();
+		return usingContext().getValidator();
 	}
 
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
 
-	public ValidatorBuilder defineValidatorState() {
-		return new ValidatorBuilderImpl(this, messageInterpolator, traversableResolver);
+	public ValidatorContext usingContext() {
+		return new ValidatorContextImpl(this, messageInterpolator, traversableResolver);
 	}
 
 	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
