@@ -46,6 +46,7 @@ import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.Unconstraint;
+import org.hibernate.validation.eg.Account;
 import org.hibernate.validation.util.TestUtil;
 
 /**
@@ -84,9 +85,11 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	public void testHasConstraints() {
+	public void testHasConstraintsAndIsBeanConstrained() {
 		Validator validator = TestUtil.getValidator();
-		assertTrue( "There should be constraints", validator.getConstraintsForClass( Customer.class ).hasConstraints() );
+		assertTrue( "There should not be constraints", !validator.getConstraintsForClass( Customer.class ).hasConstraints() );
+		assertTrue( "It should be constrainted", validator.getConstraintsForClass( Customer.class ).isBeanConstrained() );
+		assertTrue( "It should be constrainted even if it has no constraint annotations - not implemented yet", validator.getConstraintsForClass( Account.class ).isBeanConstrained() );
 	}
 
 	@Test(expected = IllegalArgumentException.class)

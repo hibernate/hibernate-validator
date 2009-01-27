@@ -9,10 +9,15 @@ import java.util.Set;
  */
 public interface BeanDescriptor extends ElementDescriptor {
 	/**
-	 * return true if at least one constraint declaration is present for the given bean
-	 * or if one property is marked for validation cascade
+	 * Returns true if the bean involves validation:
+	 *  - a constraint is hosted on the bean itself
+	 *  - a constraint is hosted on one of the bean properties
+	 *  - or a bean property is marked for cascade (@Valid)
+	 *
+	 * @return true if the bean nvolves validation
+	 *
 	 */
-	boolean hasConstraints();
+	boolean isBeanConstrained();
 
 	/**
 	 * Return the property level constraints for a given propertyName
@@ -25,7 +30,8 @@ public interface BeanDescriptor extends ElementDescriptor {
 	PropertyDescriptor getConstraintsForProperty(String propertyName);
 
 	/**
-	 * return the property names having at least a constraint defined
+	 * return the property names having at least a constraint defined or marked
+	 * as cascaded (@Valid)
 	 */
-	Set<String> getPropertiesWithConstraints();
+	Set<String> getConstrainedProperties();
 }

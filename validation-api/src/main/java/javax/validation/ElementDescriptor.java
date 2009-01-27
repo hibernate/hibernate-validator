@@ -29,6 +29,11 @@ import java.util.List;
 public interface ElementDescriptor {
 
 	/**
+	 * return true if at least one constraint declaration is present on the element.
+	 */
+	boolean hasConstraints();
+
+	/**
 	 * @return Statically defined returned type.
 	 *
 	 * @todo should it be Type or even completly removed
