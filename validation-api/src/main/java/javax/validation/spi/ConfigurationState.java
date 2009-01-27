@@ -23,15 +23,15 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 
 /**
- * Contract between a <code>ValidatorFactoryBuilder</code> and a
+ * Contract between a <code>Configuration</code> and a
  * </code>ValidatorProvider</code> to create a <code>ValidatorFactory</code>.
  * The configuration artifacts provided to the
- * <code>ValidatorFactoryBuilder</code> are passed along.
+ * <code>Configuration</code> are passed along.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public interface ValidatorFactoryConfiguration {
+public interface ConfigurationState {
 	/**
 	 * Message interpolator as defined by the client programmatically
 	 * or null if undefined.

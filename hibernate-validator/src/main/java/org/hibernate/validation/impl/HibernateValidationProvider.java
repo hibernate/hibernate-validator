@@ -18,14 +18,13 @@
 package org.hibernate.validation.impl;
 
 import javax.validation.ValidationException;
-import javax.validation.ValidatorFactoryBuilder;
+import javax.validation.Configuration;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
-import javax.validation.spi.ValidatorFactoryConfiguration;
+import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.BootstrapState;
 
-import org.hibernate.validation.HibernateValidatorFactoryBuilder;
-import org.hibernate.validation.Version;
+import org.hibernate.validation.HibernateValidatorConfiguration;
 
 /**
  * Default implementation of <code>ValidationProvider</code> within Hibernate validator.
@@ -38,31 +37,31 @@ public class HibernateValidationProvider implements ValidationProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isSuitable(Class<? extends ValidatorFactoryBuilder<?>> builderClass) {
-		return builderClass == HibernateValidatorFactoryBuilder.class;
+	public boolean isSuitable(Class<? extends Configuration<?>> builderClass) {
+		return builderClass == HibernateValidatorConfiguration.class;
 	}
 
-	public <T extends ValidatorFactoryBuilder<T>> T createSpecializedValidatorFactoryBuilder(BootstrapState state, Class<T> builderClass) {
-		if ( !isSuitable( builderClass ) ) {
+	public <T extends Configuration<T>> T createSpecializedConfiguration(BootstrapState state, Class<T> configurationClass) {
+		if ( !isSuitable( configurationClass ) ) {
 			throw new ValidationException(
-					"Illegal call to createSpecializedValidatorFactoryBuilder() for a non suitable provider"
+					"Illegal call to createSpecializedConfiguration() for a non suitable provider"
 			);
 		}
 		//cast protected  by isSuitable call
-		return builderClass.cast( new ValidatorFactoryBuilderImpl( this ) );
+		return configurationClass.cast( new ConfigurationImpl( this ) );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public ValidatorFactoryBuilder<?> createGenericValidatorFactoryBuilder(BootstrapState state) {
-		return new ValidatorFactoryBuilderImpl( state );
+	public Configuration<?> createGenericConfiguration(BootstrapState state) {
+		return new ConfigurationImpl( state );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public ValidatorFactory buildValidatorFactory(ValidatorFactoryConfiguration configuration) {
-		return new ValidatorFactoryImpl( configuration );
+	public ValidatorFactory buildValidatorFactory(ConfigurationState configurationState) {
+		return new ValidatorFactoryImpl( configurationState );
 	}
 }

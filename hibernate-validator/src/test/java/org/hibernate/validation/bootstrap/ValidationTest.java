@@ -30,10 +30,10 @@ import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactoryBuilder;
+import javax.validation.Configuration;
 import javax.validation.ValidatorFactory;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.bootstrap.SpecializedBuilderFactory;
+import javax.validation.bootstrap.ProviderSpecificBootstrap;
 import javax.validation.spi.ValidationProvider;
 
 import static org.junit.Assert.assertEquals;
@@ -42,11 +42,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.HibernateValidatorFactoryBuilder;
+import org.hibernate.validation.HibernateValidatorConfiguration;
 import org.hibernate.validation.constraints.NotNullConstraintValidator;
 import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.impl.ConstraintValidatorFactoryImpl;
-import org.hibernate.validation.impl.ValidatorFactoryBuilderImpl;
+import org.hibernate.validation.impl.ConfigurationImpl;
 import org.hibernate.validation.impl.ValidatorFactoryImpl;
 import org.hibernate.validation.impl.HibernateValidationProvider;
 
@@ -59,24 +59,24 @@ public class ValidationTest {
 
 	@Test
 	public void testBootstrapAsServiceWithBuilder() {
-		HibernateValidatorFactoryBuilder builder = Validation
-				.builderType( HibernateValidatorFactoryBuilder.class )
-				.getBuilder();
-		assertDefaultBuilderAndFactory( builder );
+		HibernateValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidatorConfiguration.class )
+				.configure();
+		assertDefaultBuilderAndFactory( configuration );
 	}
 
 	@Test
 	public void testBootstrapAsServiceDefault() {
-		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
-		assertDefaultBuilderAndFactory( builder );
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		assertDefaultFactory( factory );
 	}
 
 	@Test
-	public void testGetCustomerValiator() {
-		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
-		assertDefaultBuilderAndFactory( builder );
+	public void testGetCustomerValidator() {
+		Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		assertDefaultBuilderAndFactory( configuration );
 
-		ValidatorFactory factory = builder.build();
+		ValidatorFactory factory = configuration.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
 		Customer customer = new Customer();
@@ -96,10 +96,10 @@ public class ValidationTest {
 	public void testCustomMessageInterpolator() {
 
 		// first try with the default message resolver
-		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
-		assertDefaultBuilderAndFactory( builder );
+		Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		assertDefaultBuilderAndFactory( configuration );
 
-		ValidatorFactory factory = builder.build();
+		ValidatorFactory factory = configuration.buildValidatorFactory();
 		Validator validator = factory.getValidator( );
 
 		Customer customer = new Customer();
@@ -110,9 +110,9 @@ public class ValidationTest {
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
 
-		//FIXME nothing guarantee that a builder can be reused
-		// now we modify the builder, get a new factory and valiator and try again
-		builder.messageInterpolator(
+		//FIXME nothing guarantee that a configuration can be reused
+		// now we modify the configuration, get a new factory and valiator and try again
+		configuration.messageInterpolator(
 				new MessageInterpolator() {
 					public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {
 						return "my custom message";
@@ -123,7 +123,7 @@ public class ValidationTest {
 					}
 				}
 		);
-		factory = builder.build();
+		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator( );
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
@@ -134,10 +134,10 @@ public class ValidationTest {
 	@Test
 	public void testCustomConstraintValidatorFactory() {
 
-		ValidatorFactoryBuilder<?> builder = Validation.getBuilder();
-		assertDefaultBuilderAndFactory( builder );
+		Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		assertDefaultBuilderAndFactory( configuration );
 
-		ValidatorFactory factory = builder.build();
+		ValidatorFactory factory = configuration.buildValidatorFactory();
 		Validator validator = factory.getValidator(  );
 
 		Customer customer = new Customer();
@@ -148,9 +148,9 @@ public class ValidationTest {
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
 
-		//FIXME nothing guarantee that a builder can be reused
-		// now we modify the builder, get a new factory and valiator and try again
-		builder.constraintValidatorFactory(
+		//FIXME nothing guarantee that a configuration can be reused
+		// now we modify the configuration, get a new factory and valiator and try again
+		configuration.constraintValidatorFactory(
 				new ConstraintValidatorFactory() {
 					public <T extends ConstraintValidator> T getInstance(Class<T> key) {
 						if ( key == NotNullConstraintValidator.class ) {
@@ -160,7 +160,7 @@ public class ValidationTest {
 					}
 				}
 		);
-		factory = builder.build();
+		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator( );
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
@@ -178,11 +178,11 @@ public class ValidationTest {
 		};
 
 
-		HibernateValidatorFactoryBuilder builder = Validation
-					.builderType( HibernateValidatorFactoryBuilder.class )
+		HibernateValidatorConfiguration configuration = Validation
+					.byProvider( HibernateValidatorConfiguration.class )
 					.providerResolver( resolver )
-					.getBuilder();
-		assertDefaultBuilderAndFactory( builder );
+					.configure();
+		assertDefaultBuilderAndFactory( configuration );
 	}
 
 	@Test
@@ -197,11 +197,11 @@ public class ValidationTest {
 		};
 
 
-		ValidatorFactoryBuilder<?> builder = Validation
-			        .defineBootstrapState()
+		Configuration<?> configuration = Validation
+			        .byDefaultProvider()
 					.providerResolver( resolver )
-					.getBuilder();
-		assertDefaultBuilderAndFactory( builder );
+					.configure();
+		assertDefaultBuilderAndFactory( configuration );
 	}
 
 	@Test
@@ -213,29 +213,33 @@ public class ValidationTest {
 			}
 		};
 
-		final SpecializedBuilderFactory<HibernateValidatorFactoryBuilder> specializedBuilderFactory =
+		final ProviderSpecificBootstrap<HibernateValidatorConfiguration> providerSpecificBootstrap =
 				Validation
-						.builderType( HibernateValidatorFactoryBuilder.class)
+						.byProvider( HibernateValidatorConfiguration.class)
 						.providerResolver( resolver );
 
 		try {
-			specializedBuilderFactory.getBuilder();
+			providerSpecificBootstrap.configure();
 			fail();
 		}
 		catch ( ValidationException e ) {
 			assertEquals(
 					"Wrong error message",
-					"Unable to find provider: interface org.hibernate.validation.HibernateValidatorFactoryBuilder",
+					"Unable to find provider: interface org.hibernate.validation.HibernateValidatorConfiguration",
 					e.getMessage()
 			);
 		}
 	}
 
-	private void assertDefaultBuilderAndFactory(ValidatorFactoryBuilder builder) {
-		assertNotNull( builder );
-		assertTrue( builder instanceof ValidatorFactoryBuilderImpl );
+	private void assertDefaultBuilderAndFactory(Configuration configuration) {
+		assertNotNull( configuration );
+		assertTrue( configuration instanceof ConfigurationImpl );
 
-		ValidatorFactory factory = builder.build();
+		ValidatorFactory factory = configuration.buildValidatorFactory();
+		assertDefaultFactory(factory);
+	}
+
+	private void assertDefaultFactory(ValidatorFactory factory) {
 		assertNotNull( factory );
 		assertTrue( factory instanceof ValidatorFactoryImpl );
 	}

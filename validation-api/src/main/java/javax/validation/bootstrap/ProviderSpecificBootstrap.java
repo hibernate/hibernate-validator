@@ -1,10 +1,11 @@
 package javax.validation.bootstrap;
 
 import javax.validation.ValidationProviderResolver;
-import javax.validation.ValidatorFactoryBuilder;
+import javax.validation.Configuration;
 
 /**
- * Build implementations of builderType, the specific ValidatorFactoryBuilder
+ * Defines the state used to bootstrap Bean Validation and
+ * creates a provider specific Configuration. The specific Configuration
  * sub interface uniquely identifying a provider.
  * <p/>
  * The requested provider is the first provider suitable for T (as defined in
@@ -15,7 +16,7 @@ import javax.validation.ValidatorFactoryBuilder;
  *
  * @author Emmanuel Bernard
  */
-public interface SpecializedBuilderFactory<T extends ValidatorFactoryBuilder<T>> {
+public interface ProviderSpecificBootstrap<T extends Configuration<T>> {
 
 	/**
 	 * Optionally define the provider resolver implementation used.
@@ -25,13 +26,13 @@ public interface SpecializedBuilderFactory<T extends ValidatorFactoryBuilder<T>>
 	 *
 	 * @return self
 	 */
-	public SpecializedBuilderFactory<T> providerResolver(ValidationProviderResolver resolver);
+	public ProviderSpecificBootstrap<T> providerResolver(ValidationProviderResolver resolver);
 
 	/**
-	 * Determine the provider implementation suitable for builderType and delegate
-	 * the creation of this specific ValidatorFactoryBuilder subclass to the provider.
+	 * Determine the provider implementation suitable for configurationType and delegate
+	 * the creation of this specific Configuration subclass to the provider.
 	 *
-	 * @return a ValidatorFactoryBuilder sub interface implementation
+	 * @return a Configuration sub interface implementation
 	 */
-	public T getBuilder();
+	public T configure();
 }

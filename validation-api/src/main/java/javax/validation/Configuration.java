@@ -26,20 +26,20 @@ import java.io.InputStream;
  * <p/>
  * Usage:
  * <pre>
- * ValidatorFactoryBuilder<?> builder = //provided by one of the Validation bootstrap methods
- * ValidatorFactory = builder
+ * Configuration<?> configuration = //provided by one of the Validation bootstrap methods
+ *     ValidatorFactory = configuration
  *         .messageInterpolator( new CustomMessageInterpolator() )
- *         .build();
+ *         .buildValidatorFactory();
  * </pre>
  * <p/>
- * The ValidationProviderResolver is specified at ValidatorFactoryBuilder time
+ * The ValidationProviderResolver is specified at Configuration time
  * (see {@link javax.validation.spi.ValidationProvider}).
  * If none is explicitely requested, the default ValidationProviderResolver is used.
  * <p/>
  * The provider is selected in the following way:
- * - if a specific ValidatorFactoryBuilder subclass is requested programmatically using
- * Validation.builderType(), find the first provider matching it
- * - if a specific ValidatorFactoryBuilder subclass is defined in META-INF/validation.xml,
+ * - if a specific Configuration subclass is requested programmatically using
+ * Validation.byProvider(Class), find the first provider matching it
+ * - if a specific Configuration subclass is defined in META-INF/validation.xml,
  * find the first provider matching it
  * - otherwise, use the first provider returned by the ValidationProviderResolver
  * <p/>
@@ -47,7 +47,7 @@ import java.io.InputStream;
  *
  * @author Emmanuel Bernard
  */
-public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
+public interface Configuration<T extends Configuration<T>> {
 	/**
 	 * Defines the message interpolator used. Has priority over the configuration
 	 * based message interpolator.
@@ -89,7 +89,7 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	 *
 	 * @return <code>this</code> following the chaining method pattern.
 	 */
-	T configure(InputStream stream);
+	T customConfiguration(InputStream stream);
 
 	/**
 	 * Return an implementation of the MessageInterpolator interface following the
@@ -106,5 +106,5 @@ public interface ValidatorFactoryBuilder<T extends ValidatorFactoryBuilder> {
 	 *
 	 * @return ValidatorFactory
 	 */
-	ValidatorFactory build();
+	ValidatorFactory buildValidatorFactory();
 }

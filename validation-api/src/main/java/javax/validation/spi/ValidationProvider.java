@@ -17,7 +17,7 @@
 */
 package javax.validation.spi;
 
-import javax.validation.ValidatorFactoryBuilder;
+import javax.validation.Configuration;
 import javax.validation.ValidatorFactory;
 
 /**
@@ -33,56 +33,56 @@ public interface ValidationProvider {
 	/**
 	 * This sub interface uniquely identify a provider.
 	 * 
-	 * @param builderClass targeted builder class.
+	 * @param configurationClass targeted configuration class.
 	 *
-	 * @return <code>true</code> if <code>builderClass</code> is the Bean Validation Provider
-	 *         sub-interface for ValidatorFactoryBuilder
+	 * @return <code>true</code> if <code>configurationClass</code> is the Bean Validation Provider
+	 *         sub-interface for Configuration
 	 */
-	boolean isSuitable(Class<? extends ValidatorFactoryBuilder<?>> builderClass);
+	boolean isSuitable(Class<? extends Configuration<?>> configurationClass);
 
 	/**
-	 * Returns a ValidatorFactoryBuilder instance implementing the
-	 * <code>builderType</code> interface.
-	 * The ValidatorFactoryBuilder instance uses the current provider (<code>this</code>)
+	 * Returns a Configuration instance implementing the
+	 * <code>configurationClass</code> interface.
+	 * The Configuration instance uses the current provider (<code>this</code>)
 	 * to build the ValidatorFactory instance.
 	 * <p/>
-	 * This method can only be called on providers returning true on <
-	 * code>#isSuitable(builderType)</code>
+	 * This method can only be called on providers returning true on
+	 * <code>#isSuitable(configurationClass)</code>
 	 *
-	 * @param builderClass the Builder class type
+	 * @param configurationClass the Configuration class type
 	 * @param state bootstrap state
 	 *
-	 * @return specific validator builder implementation
+	 * @return specific Configuration implementation
 	 */
-	<T extends ValidatorFactoryBuilder<T>> T createSpecializedValidatorFactoryBuilder(
+	<T extends Configuration<T>> T createSpecializedConfiguration(
 			BootstrapState state,
-			Class<T> builderClass);
+			Class<T> configurationClass);
 
 	/**
-	 * Returns a ValidatorFactoryBuilder instance. This instance is not bound to
+	 * Returns a Configuration instance. This instance is not bound to
 	 * use the current provider. The choice of provider follows the algorithm described
-	 * in {@link javax.validation.ValidatorFactoryBuilder}
+	 * in {@link javax.validation.Configuration}
 	 * <p/>
 	 * The ValidationProviderResolver used is provided by <code>state</code>.
 	 * If null, the default ValidationProviderResolver is used.
 	 *
 	 * @param state bootstrap state
 	 *
-	 * @return validator builder implementation
+	 * @return Configuration implementation
 	 */
-	ValidatorFactoryBuilder<?> createGenericValidatorFactoryBuilder(BootstrapState state);
+	Configuration<?> createGenericConfiguration(BootstrapState state);
 
 	/**
 	 * Build a ValidatorFactory using the current provider implementation. The
 	 * ValidatorFactory is assembled and follow the configuration passed
-	 * using ValidatorFactoryConfiguration.
+	 * using ConfigurationState.
 	 * <p>
 	 * The returned ValidatorFactory is properly initialized and ready for use.
 	 * </p>
 	 *
-	 * @param configuration the configuration descriptor
+	 * @param configurationState the configuration descriptor
 	 *
 	 * @return the instanciated ValidatorFactory
 	 */
-	ValidatorFactory buildValidatorFactory(ValidatorFactoryConfiguration configuration);
+	ValidatorFactory buildValidatorFactory(ConfigurationState configurationState);
 }

@@ -1,6 +1,6 @@
 package org.hibernate.validation;
 
-import javax.validation.ValidatorFactoryBuilder;
+import javax.validation.Configuration;
 
 /**
  * Uniquely identify Hibernate Validator in the Bean Validation bootstrap strategy
@@ -8,5 +8,5 @@ import javax.validation.ValidatorFactoryBuilder;
  * 
  * @author Emmanuel Bernard
  */
-public interface HibernateValidatorFactoryBuilder extends ValidatorFactoryBuilder<HibernateValidatorFactoryBuilder> {
+public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
 }

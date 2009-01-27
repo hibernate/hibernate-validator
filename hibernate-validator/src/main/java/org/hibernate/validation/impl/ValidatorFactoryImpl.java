@@ -24,7 +24,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorBuilder;
-import javax.validation.spi.ValidatorFactoryConfiguration;
+import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validation.engine.BeanMetaDataImpl;
 import org.hibernate.validation.engine.ValidatorFactoryImplementor;
@@ -44,10 +44,10 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 			= new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(10);
 
 
-	public ValidatorFactoryImpl(ValidatorFactoryConfiguration configuration) {
-		this.messageInterpolator = configuration.getMessageInterpolator();
-		this.constraintValidatorFactory = configuration.getConstraintValidatorFactory();
-		this.traversableResolver = configuration.getTraversableResolver();
+	public ValidatorFactoryImpl(ConfigurationState configurationState) {
+		this.messageInterpolator = configurationState.getMessageInterpolator();
+		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
+		this.traversableResolver = configurationState.getTraversableResolver();
 		//do init metadata from XML form
 	}
 

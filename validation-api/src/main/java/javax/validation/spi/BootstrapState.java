@@ -3,7 +3,7 @@ package javax.validation.spi;
 import javax.validation.ValidationProviderResolver;
 
 /**
- * Defines the state used to bootstrap the ValidatorFactoryBuilder
+ * Defines the state used to bootstrap the Configuration
  *
  * @author Emmanuel Bernard
  */

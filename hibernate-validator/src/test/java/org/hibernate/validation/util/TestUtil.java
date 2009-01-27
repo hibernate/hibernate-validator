@@ -24,7 +24,7 @@ import javax.validation.Validator;
 
 import static org.junit.Assert.assertEquals;
 
-import org.hibernate.validation.HibernateValidatorFactoryBuilder;
+import org.hibernate.validation.HibernateValidatorConfiguration;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -40,10 +40,10 @@ public class TestUtil {
 
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
-			HibernateValidatorFactoryBuilder builder = Validation
-					.builderType( HibernateValidatorFactoryBuilder.class )
-					.getBuilder();
-			hibernateValidator = builder.build().getValidator();
+			HibernateValidatorConfiguration configuration = Validation
+					.byProvider( HibernateValidatorConfiguration.class )
+					.configure();
+			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
 		return hibernateValidator;
 	}

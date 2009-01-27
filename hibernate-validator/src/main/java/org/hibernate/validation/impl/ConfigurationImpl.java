@@ -25,19 +25,19 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
-import javax.validation.ValidatorFactoryBuilder;
+import javax.validation.Configuration;
 import javax.validation.bootstrap.DefaultValidationProviderResolver;
 import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ValidationProvider;
-import javax.validation.spi.ValidatorFactoryConfiguration;
+import javax.validation.spi.ConfigurationState;
 
-import org.hibernate.validation.HibernateValidatorFactoryBuilder;
+import org.hibernate.validation.HibernateValidatorConfiguration;
 import org.hibernate.validation.Version;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBuilder, ValidatorFactoryConfiguration {
+public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
 	static {
 		Version.touch();
@@ -54,7 +54,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 	private final ValidationProviderResolver providerResolver;
 	private TraversableResolver traversableResolver;
 
-	public ValidatorFactoryBuilderImpl(BootstrapState state) {
+	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
 			this.providerResolver = new DefaultValidationProviderResolver();
 		}
@@ -66,9 +66,9 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		this.traversableResolver = defaultTraversableResolver;
 	}
 
-	public ValidatorFactoryBuilderImpl(ValidationProvider provider) {
+	public ConfigurationImpl(ValidationProvider provider) {
 		if ( provider == null ) {
-			throw new ValidationException( "Assertion error: inconsistent ValidatorFactoryBuilderImpl construction" );
+			throw new ValidationException( "Assertion error: inconsistent ConfigurationImpl construction" );
 		}
 		this.provider = provider;
 		this.providerResolver = null;
@@ -76,28 +76,28 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		this.traversableResolver = defaultTraversableResolver;
 	}
 
-	public ValidatorFactoryBuilderImpl messageInterpolator(MessageInterpolator interpolator) {
+	public ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
 		this.messageInterpolator = interpolator;
 		return this;
 	}
 
-	public ValidatorFactoryBuilderImpl traversableResolver(TraversableResolver resolver) {
+	public ConfigurationImpl traversableResolver(TraversableResolver resolver) {
 		this.traversableResolver = resolver;
 		return this;
 	}
 
-	public ValidatorFactoryBuilderImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
+	public ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		return this;
 	}
 
-	public ValidatorFactory build() {
+	public ValidatorFactory buildValidatorFactory() {
 		if ( isSpecificProvider() ) {
 			return provider.buildValidatorFactory( this );
 		}
 		else {
 			//read provider name from configuration
-			Class<? extends ValidatorFactoryBuilder<?>> providerClass = null;
+			Class<? extends Configuration<?>> providerClass = null;
 
 			if ( providerClass != null ) {
 				for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
@@ -131,7 +131,7 @@ public class ValidatorFactoryBuilderImpl implements HibernateValidatorFactoryBui
 		return traversableResolver;
 	}
 
-	public ValidatorFactoryBuilderImpl configure(InputStream stream) {
+	public ConfigurationImpl customConfiguration(InputStream stream) {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
