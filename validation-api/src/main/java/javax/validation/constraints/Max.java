@@ -35,14 +35,13 @@ import java.lang.annotation.Target;
  * <li><code>BigInteger</code></li>
  * <li><code>Number</code></li>
  * <li><code>String</code></li>
- * <li><code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>,
- * <code>double</code></li>
+ * <li><code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, 
+ * <code>float</code>, <code>double</code></li>
  * </ul>
  * <p/>
  * <code>null</code> elements are considered valid
  *
  * @author Emmanuel Bernard
- * @todo support byte ?!
  * @todo Is string supported or not?
  */
 @Target({ METHOD, FIELD, ANNOTATION_TYPE })
