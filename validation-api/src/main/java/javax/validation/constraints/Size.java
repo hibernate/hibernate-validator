@@ -32,6 +32,7 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
  * <ul>
  * <li><code>String</code> (string length is evaludated)</li>
  * <li><code>Collection</code> (collection size is evaluated)</li>
+ * <li><code>Map</code> (map size is evaluated)</li>
  * <li>Array (array length is evaludated)</li>
  *
  * <code>null</code> elements are considered valid.
