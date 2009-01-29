@@ -17,8 +17,7 @@
 */
 package javax.validation;
 
-import java.lang.annotation.ElementType;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Describes a validated element (class, field or property).
@@ -43,6 +42,5 @@ public interface ElementDescriptor {
 	/**
 	 * @return All the constraint descriptors for this element.
 	 */
-	List<ConstraintDescriptor> getConstraintDescriptors();
-
+	Set<ConstraintDescriptor> getConstraintDescriptors();
 }

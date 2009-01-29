@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
 /**
  * @author Hardy Ferentschik
  */
-public class NoMessageConstraintValidator implements ConstraintValidator<NoMessage> {
+public class NoMessageConstraintValidator implements ConstraintValidator<NoMessage, Object> {
 
 	public void initialize(NoMessage parameters) {
 	}

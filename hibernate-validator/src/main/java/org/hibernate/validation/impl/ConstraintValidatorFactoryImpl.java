@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.impl;
 
+import java.lang.annotation.Annotation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ValidationException;
@@ -31,7 +32,7 @@ public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactor
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T extends ConstraintValidator> T getInstance(Class<T> key) {
+	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 		try {
 			return key.newInstance();
 		}

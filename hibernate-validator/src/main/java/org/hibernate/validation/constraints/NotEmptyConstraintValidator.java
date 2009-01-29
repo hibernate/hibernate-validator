@@ -24,20 +24,16 @@ import javax.validation.ConstraintValidatorContext;
  * @author Hardy Ferentschik
  * @todo Extend to not only support strings, but also collections and maps. Needs to be specified first though.
  */
-public class NotEmptyConstraintValidator implements ConstraintValidator<NotEmpty> {
+public class NotEmptyConstraintValidator implements ConstraintValidator<NotEmpty, String> {
 
 	public void initialize(NotEmpty parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(String object, ConstraintValidatorContext constraintValidatorContext) {
 		if ( object == null ) {
 			return true;
 		}
-		if ( !( object instanceof String ) ) {
-			throw new IllegalArgumentException( "Expected String type." );
-		}
-		String string = ( String ) object;
-		int length = string.length();
+		int length = object.length();
 		return length > 0;
 	}
 }

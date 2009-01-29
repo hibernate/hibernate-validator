@@ -23,12 +23,12 @@ import javax.validation.ConstraintValidatorContext;
 /**
  * @author Hardy Ferentschik
  */
-public class GermanZipcodeConstraintValidator implements ConstraintValidator<GermanZipcode> {
+public class GermanZipcodeConstraintValidator implements ConstraintValidator<GermanZipcode, String> {
 
 	public void initialize(GermanZipcode parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(String object, ConstraintValidatorContext constraintValidatorContext) {
 		return true;
 	}
 }

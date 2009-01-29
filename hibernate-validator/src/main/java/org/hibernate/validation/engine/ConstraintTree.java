@@ -19,6 +19,7 @@ package org.hibernate.validation.engine;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.lang.annotation.Annotation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
@@ -56,7 +57,7 @@ public class ConstraintTree {
 		this.descriptor = descriptor;
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
-		this.constraintValidator = getConstraint( descriptor );
+		this.constraintValidator = getConstraintValidator( descriptor );
 		children = new ArrayList<ConstraintTree>( descriptor.getComposingConstraints().size() );
 
 		for ( ConstraintDescriptor composingDescriptor : descriptor.getComposingConstraints() ) {
@@ -142,15 +143,15 @@ public class ConstraintTree {
 		validationContext.addConstraintFailure( failingConstraintViolation );
 	}
 
-	@SuppressWarnings("unchecked")
-	private ConstraintValidator getConstraint(ConstraintDescriptor descriptor) {
+	private ConstraintValidator getConstraintValidator(ConstraintDescriptor descriptor) {
 		ConstraintValidator constraintValidator;
 		try {
-			//unchecked
-			constraintValidator = constraintValidatorFactory.getInstance( descriptor.getConstraintValidatorClass() );
+			//FIXME do choose the right validator depending on the object validated
+			constraintValidator = constraintValidatorFactory.getInstance( descriptor.getConstraintValidatorClasses()[0] );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to instantiate " + descriptor.getConstraintValidatorClass(), e );
+			//FIXME do choose the right validator depending on the object validated
+			throw new ValidationException( "Unable to instantiate " + descriptor.getConstraintValidatorClasses()[0], e );
 		}
 
 		try {

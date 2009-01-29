@@ -29,7 +29,8 @@ import javax.validation.constraints.Size;
  * @author Emmanuel Bernard
  * @author Gavin King
  */
-public class SizeConstraintValidator implements ConstraintValidator<Size> {
+//FIXME split into several type-safe validators
+public class SizeConstraintValidator implements ConstraintValidator<Size, Object> {
 	private int min;
 	private int max;
 

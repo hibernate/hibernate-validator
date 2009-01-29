@@ -21,6 +21,8 @@ import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ElementDescriptor;
 import javax.validation.BeanDescriptor;
@@ -38,7 +40,7 @@ import javax.validation.PropertyDescriptor;
 public class ElementDescriptorImpl implements PropertyDescriptor {
 	private final Class<?> returnType;
 	private final boolean cascaded;
-	private final List<ConstraintDescriptor> constraintDescriptors = new ArrayList<ConstraintDescriptor>();
+	private final Set<ConstraintDescriptor> constraintDescriptors = new HashSet<ConstraintDescriptor>();
 	private final String propertyPath;
 
 
@@ -75,8 +77,8 @@ public class ElementDescriptorImpl implements PropertyDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<ConstraintDescriptor> getConstraintDescriptors() {
-		return Collections.unmodifiableList( constraintDescriptors );
+	public Set<ConstraintDescriptor> getConstraintDescriptors() {
+		return Collections.unmodifiableSet( constraintDescriptors );
 	}
 
 	/**

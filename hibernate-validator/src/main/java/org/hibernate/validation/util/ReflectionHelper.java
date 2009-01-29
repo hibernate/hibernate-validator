@@ -70,8 +70,10 @@ public class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
-
-	public static Class<? extends ConstraintValidator> getBuiltInConstraint(Annotation annotation) {
+	@SuppressWarnings( "unchecked")
+	//FIXME do make it truely multivalidators
+	//FIXME don't rely on properties files, what's the point
+	public static Class<? extends ConstraintValidator<?,?>>[] getBuiltInConstraints(Annotation annotation) {
 		Class constraint = null;
 		String annotationType = annotation.annotationType().getName();
 		if ( builtInConstraints.containsKey( annotationType ) ) {
@@ -87,7 +89,7 @@ public class ReflectionHelper {
 			}
 
 		}
-		return constraint;
+		return new Class[] {constraint};
 	}
 
 	/**

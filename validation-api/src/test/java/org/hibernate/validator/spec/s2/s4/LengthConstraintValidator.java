@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidator;
  * Check that a string length is between min and max
  *
  */
-public class LengthConstraintValidator implements ConstraintValidator<Length> {
+public class LengthConstraintValidator implements ConstraintValidator<Length, String> {
     private int min;
     private int max;
 
@@ -26,13 +26,10 @@ public class LengthConstraintValidator implements ConstraintValidator<Length> {
      * returns false if the specified value does not conform to the definition
      * @exception IllegalArgumentException if the object is not of type String
      */
-    public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
         if ( value == null ) return true;
-        if ( !( value instanceof String ) ) {
-            throw new IllegalArgumentException("Expected String type");
-        }
-        String string = (String) value;
-        int length = string.length();
+
+        int length = value.length();
         return length >= min && length <= max;
     }
 }

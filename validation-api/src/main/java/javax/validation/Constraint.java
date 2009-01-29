@@ -22,13 +22,14 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
+import java.lang.annotation.Annotation;
 
 
 /**
- * Link between a constraint annotation and it's constraint validation implementation.
+ * Link between a constraint annotation and its constraint validation implementations.
  * <p/>
- * An given constraint annotation should be annotated by a @ConstraintValidator
- * annotation which refers to its constraint validation implementation.
+ * A given constraint annotation should be annotated by a @Constraint
+ * annotation which refers to its list of constraint validation implementation.
  *
  * @author Emmanuel Bernard (emmanuel at hibernate.org)
  * @author Gavin King
@@ -39,7 +40,10 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Constraint {
 	/**
-	 * @return The class implementing the constraint validation logic
+	 * ConstraintValidator classes must reference distinct target types.
+	 * If two validators refer to the same type, an exception will occur
+	 * 
+	 * @return aray of ConstraintValidator classes implementing the constraint
 	 */
-	public Class<? extends ConstraintValidator> validatedBy();
+	public Class<? extends ConstraintValidator<?,?>>[] validatedBy();
 }

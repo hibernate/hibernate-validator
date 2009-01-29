@@ -25,7 +25,7 @@ import org.hibernate.validation.constraints.incomplete.NoGroups;
 /**
  * @author Hardy Ferentschik
  */
-public class NoGroupsConstraintValidator implements ConstraintValidator<NoGroups> {
+public class NoGroupsConstraintValidator implements ConstraintValidator<NoGroups, Object> {
 
 	public void initialize(NoGroups parameters) {
 	}

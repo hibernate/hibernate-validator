@@ -45,7 +45,8 @@ public interface ConstraintDescriptor {
 	/**
 	 * @return the constraint validation implementation class
 	 */
-	Class<? extends ConstraintValidator> getConstraintValidatorClass();
+	Class<? extends ConstraintValidator<?,?>>[]
+	    getConstraintValidatorClasses();
 
 	/**
 	 * Returns a map containing the annotation parameter names as keys and the

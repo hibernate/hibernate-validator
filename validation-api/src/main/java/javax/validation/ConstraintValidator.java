@@ -20,12 +20,15 @@ package javax.validation;
 import java.lang.annotation.Annotation;
 
 /**
- * Define the logic to validate a given constraint.
+ * Defines the logic to validate a given constraint A
+ * for a given object type T.
+ * Implementations must comply to the following restriction:
+ * T must resolve to a non parameterized type
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public interface ConstraintValidator<A extends Annotation> {
+public interface ConstraintValidator<A extends Annotation, T> {
 	/**
 	 * Validator parameters for a given constraint definition
 	 * Annotations parameters are passed as key/value into parameters
@@ -46,6 +49,6 @@ public interface ConstraintValidator<A extends Annotation> {
 	 *
 	 * @return false if <code>object</code> does not pass the constraint
 	 */
-	boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext);
+	boolean isValid(T object, ConstraintValidatorContext constraintValidatorContext);
 }
  

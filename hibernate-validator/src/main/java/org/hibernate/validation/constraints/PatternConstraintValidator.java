@@ -24,7 +24,7 @@ import javax.validation.ConstraintValidatorContext;
 /**
  * @author Hardy Ferentschik
  */
-public class PatternConstraintValidator implements ConstraintValidator<Pattern> {
+public class PatternConstraintValidator implements ConstraintValidator<Pattern, String> {
 
 	private java.util.regex.Pattern pattern;
 
@@ -35,15 +35,11 @@ public class PatternConstraintValidator implements ConstraintValidator<Pattern> 
 		);
 	}
 
-	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;
 		}
-		if ( !( value instanceof String ) ) {
-			throw new IllegalArgumentException( "Expected String type." );
-		}
-		String string = ( String ) value;
-		Matcher m = pattern.matcher( string );
+		Matcher m = pattern.matcher( value );
 		return m.matches();
 	}
 }

@@ -49,20 +49,20 @@ import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConstraintDescriptorImpl implements ConstraintDescriptor {
+public class ConstraintDescriptorImpl<U extends Annotation> implements ConstraintDescriptor {
 	private static final Logger log = LoggerFactory.make();
 	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 
-	private final Annotation annotation;
-	private final Class<? extends ConstraintValidator> constraintClass;
+	private final U annotation;
+	private final Class<? extends ConstraintValidator<U,?>>[] constraintClasses;
 	private final Set<Class<?>> groups;
 	private final Map<String, Object> parameters;
 	private final Set<ConstraintDescriptor> composingConstraints = new HashSet<ConstraintDescriptor>();
 	private final Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
 	private final boolean isReportAsSingleInvalidConstraint;
 
-	public ConstraintDescriptorImpl(Annotation annotation, Class<?>[] groups) {
+	public ConstraintDescriptorImpl(U annotation, Class<?>[] groups) {
 		this( annotation, new HashSet<Class<?>>() );
 		if ( groups.length == 0 ) {
 			groups = DEFAULT_GROUP;
@@ -70,7 +70,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 		this.groups.addAll( Arrays.asList( groups ) );
 	}
 
-	public ConstraintDescriptorImpl(Annotation annotation, Set<Class<?>> groups) {
+	public ConstraintDescriptorImpl(U annotation, Set<Class<?>> groups) {
 		this.annotation = annotation;
 		this.groups = groups;
 		this.parameters = getAnnotationParameters( annotation );
@@ -81,12 +81,14 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 
 
 		if ( ReflectionHelper.isBuiltInConstraintAnnotation( annotation ) ) {
-			this.constraintClass = ReflectionHelper.getBuiltInConstraint( annotation );
+			this.constraintClasses = (Class<? extends ConstraintValidator<U,?>>[])
+					ReflectionHelper.getBuiltInConstraints( annotation );
 		}
 		else {
 			Constraint constraint = annotation.annotationType()
 					.getAnnotation( Constraint.class );
-			this.constraintClass = constraint.validatedBy();
+			this.constraintClasses = (Class<? extends ConstraintValidator<U,?>>[])
+					constraint.validatedBy();
 		}
 
 		parseOverrideParameters();
@@ -96,7 +98,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Annotation getAnnotation() {
+	public U getAnnotation() {
 		return annotation;
 	}
 
@@ -110,8 +112,9 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<? extends ConstraintValidator> getConstraintValidatorClass() {
-		return constraintClass;
+	public Class<? extends ConstraintValidator<U,?>>[]
+			getConstraintValidatorClasses() {
+		return constraintClasses;
 	}
 
 	/**
@@ -139,7 +142,7 @@ public class ConstraintDescriptorImpl implements ConstraintDescriptor {
 	public String toString() {
 		return "ConstraintDescriptorImpl{" +
 				"annotation=" + annotation +
-				", constraintClass=" + constraintClass +
+				", constraintClasses=" + constraintClasses +
 				", groups=" + groups +
 				", parameters=" + parameters +
 				", composingConstraints=" + composingConstraints +

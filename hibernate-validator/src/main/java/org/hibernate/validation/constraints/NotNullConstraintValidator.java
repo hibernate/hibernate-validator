@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Emmanuel Bernard
  */
-public class NotNullConstraintValidator implements ConstraintValidator<NotNull> {
+public class NotNullConstraintValidator implements ConstraintValidator<NotNull, Object> {
 
 	public void initialize(NotNull parameters) {
 	}

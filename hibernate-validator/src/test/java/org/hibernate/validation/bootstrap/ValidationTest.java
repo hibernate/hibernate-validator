@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Locale;
+import java.lang.annotation.Annotation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidatorFactory;
@@ -152,9 +153,11 @@ public class ValidationTest {
 		// now we modify the configuration, get a new factory and valiator and try again
 		configuration.constraintValidatorFactory(
 				new ConstraintValidatorFactory() {
-					public <T extends ConstraintValidator> T getInstance(Class<T> key) {
+
+					public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 						if ( key == NotNullConstraintValidator.class ) {
-							return ( T ) new BadlyBehavedNotNullConstraintValidator();
+							T result = ( T ) new BadlyBehavedNotNullConstraintValidator();
+							return result;
 						}
 						return new ConstraintValidatorFactoryImpl().getInstance( key );
 					}

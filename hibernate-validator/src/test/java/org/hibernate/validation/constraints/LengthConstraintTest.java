@@ -77,15 +77,4 @@ public class LengthConstraintTest {
 
 	}
 
-	@Test
-	@SpecAssertion(section = "2.1", note = "Incompatible type cause runtime error")
-	public void testIncompatibleType() {
-		try {
-			constraint.isValid( new Object(), null );
-			fail();
-		}
-		catch ( IllegalArgumentException e ) {
-			// success
-		}
-	}
 }

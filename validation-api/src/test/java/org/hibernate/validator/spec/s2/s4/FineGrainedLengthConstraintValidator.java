@@ -9,7 +9,7 @@ import javax.validation.ConstraintValidator;
  *  - constraint.length.min if the min limit is reached
  *  - constraint.length.max if the max limit is reached
  */
-public class FineGrainedLengthConstraintValidator implements ConstraintValidator<Length> {
+public class FineGrainedLengthConstraintValidator implements ConstraintValidator<Length, String> {
     private int min;
     private int max;
 
@@ -28,13 +28,9 @@ public class FineGrainedLengthConstraintValidator implements ConstraintValidator
      * returns false if the specified value does not conform to the definition
      * @exception IllegalArgumentException if the object is not of type String
      */
-    public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
         if ( value == null ) return true;
-        if ( !( value instanceof String ) ) {
-            throw new IllegalArgumentException("Expected String type");
-        }
-        String string = (String) value;
-        int length = string.length();
+         int length = value.length();
 
 		//remove default error
 		constraintValidatorContext.disableDefaultError();

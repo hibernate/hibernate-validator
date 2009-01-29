@@ -26,7 +26,7 @@ import javax.validation.ConstraintValidatorContext;
  * @author Emmanuel Bernard
  * @author Gavin King
  */
-public class LengthConstraintValidator implements ConstraintValidator<Length> {
+public class LengthConstraintValidator implements ConstraintValidator<Length, String> {
 	private int min;
 	private int max;
 
@@ -35,15 +35,11 @@ public class LengthConstraintValidator implements ConstraintValidator<Length> {
 		max = parameters.max();
 	}
 
-	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;
 		}
-		if ( !( value instanceof String ) ) {
-			throw new IllegalArgumentException( "Expected String type." );                                                              
-		}
-		String string = ( String ) value;
-		int length = string.length();
+		int length = value.length();
 		return length >= min && length <= max;
 	}
 
