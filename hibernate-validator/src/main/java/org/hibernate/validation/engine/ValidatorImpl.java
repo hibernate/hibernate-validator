@@ -1,4 +1,4 @@
-// $Id$
+// $Id: ValidatorImpl.java 15837 2009-01-30 15:49:57Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -66,7 +66,7 @@ public class ValidatorImpl implements Validator {
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final MessageInterpolator messageInterpolator;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,  MessageInterpolator messageInterpolator) {
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 	}
@@ -79,7 +79,9 @@ public class ValidatorImpl implements Validator {
 			throw new IllegalArgumentException( "Validation of a null object" );
 		}
 
-		ValidationContext<T> context = new ValidationContext<T>( object, messageInterpolator, constraintValidatorFactory );
+		ValidationContext<T> context = new ValidationContext<T>(
+				object, messageInterpolator, constraintValidatorFactory
+		);
 		List<ConstraintViolationImpl<T>> list = validateInContext( context, Arrays.asList( groups ) );
 		return new HashSet<ConstraintViolation<T>>( list );
 	}
@@ -152,6 +154,22 @@ public class ValidatorImpl implements Validator {
 		validationContext.markProcessedForCurrentGroup();
 	}
 
+	private <T> void validateCascadedConstraints(ValidationContext<T> context) {
+		List<Member> cascadedMembers = getBeanMetaData( context.peekValidatedObjectType() )
+				.getCascadedMembers();
+		for ( Member member : cascadedMembers ) {
+			Type type = ReflectionHelper.typeOf( member );
+			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
+			Object value = ReflectionHelper.getValue( member, context.peekValidatedObject() );
+			if ( value == null ) {
+				continue;
+			}
+			Iterator<?> iter = createIteratorForCascadedValue( context, type, value );
+			validateCascadedConstraint( context, iter );
+			context.popProperty();
+		}
+	}
+
 	/**
 	 * Called when processing cascaded constraints. This methods inspects the type of the cascaded constraints and in case
 	 * of a list or array creates an iterator in order to validate each element.
@@ -159,12 +177,9 @@ public class ValidatorImpl implements Validator {
 	 * @param context the validation context.
 	 * @param type the type of the cascaded field or property.
 	 * @param value the actual value.
+	 * @return An iterator over the value of a cascaded property.
 	 */
-	private <T> void validateCascadedConstraint(ValidationContext<T> context, Type type, Object value) {
-		if ( value == null ) {
-			return;
-		}
-
+	private <T> Iterator<?> createIteratorForCascadedValue(ValidationContext<T> context, Type type, Object value) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isCollection( type ) ) {
 			boolean isIterable = value instanceof Iterable;
@@ -185,21 +200,8 @@ public class ValidatorImpl implements Validator {
 			list.add( value );
 			iter = list.iterator();
 		}
-
-		validateCascadedConstraint( context, iter );
-	}
-
-	private <T> void validateCascadedConstraints(ValidationContext<T> context) {
-		List<Member> cascadedMembers = getBeanMetaData( context.peekValidatedObjectType() )
-				.getCascadedMembers();
-		for ( Member member : cascadedMembers ) {
-			Type type = ReflectionHelper.typeOf( member );
-			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
-			Object value = ReflectionHelper.getValue( member, context.peekValidatedObject() );
-			validateCascadedConstraint( context, type, value );
-			context.popProperty();
-		}
-	}
+		return iter;
+	}	
 
 	private <T> void validateCascadedConstraint(ValidationContext<T> context, Iterator<?> iter) {
 		Object actualValue;
@@ -271,7 +273,9 @@ public class ValidatorImpl implements Validator {
 						continue;
 					}
 
-					ValidationContext<T> context = new ValidationContext<T>( object, messageInterpolator, constraintValidatorFactory );
+					ValidationContext<T> context = new ValidationContext<T>(
+							object, messageInterpolator, constraintValidatorFactory
+					);
 					metaConstraint.validateConstraint( object.getClass(), context );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
@@ -322,7 +326,9 @@ public class ValidatorImpl implements Validator {
 						continue;
 					}
 
-					ValidationContext<T> context = new ValidationContext<T>( ( T ) value, messageInterpolator, constraintValidatorFactory );
+					ValidationContext<T> context = new ValidationContext<T>(
+							( T ) value, messageInterpolator, constraintValidatorFactory
+					);
 					context.pushProperty( propertyIter.getOriginalProperty() );
 					metaConstraint.validateConstraint( beanType, value, context );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
