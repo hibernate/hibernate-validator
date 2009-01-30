@@ -18,8 +18,8 @@
 package org.hibernate.validation.util.annotationfactory;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Encapsulates the data you need to create an annotation. In

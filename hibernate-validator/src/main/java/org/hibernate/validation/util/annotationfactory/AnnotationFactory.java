@@ -18,10 +18,10 @@
 package org.hibernate.validation.util.annotationfactory;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Proxy;
 
 
 /**

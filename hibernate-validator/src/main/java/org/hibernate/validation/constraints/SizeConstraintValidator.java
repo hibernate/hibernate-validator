@@ -17,8 +17,8 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.util.Collection;
 import java.lang.reflect.Array;
+import java.util.Collection;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;

@@ -38,8 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.validation.ConstraintValidator;
 import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
