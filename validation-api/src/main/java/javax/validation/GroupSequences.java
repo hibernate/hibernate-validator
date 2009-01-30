@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author Hardy Ferentschik
+ * FIXME remove that annotation
  */
 @Target({ TYPE })
 @Retention(RUNTIME)
