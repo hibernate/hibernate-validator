@@ -15,16 +15,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.impl;
+package org.hibernate.validation.engine;
 
-import javax.validation.ValidationException;
 import javax.validation.Configuration;
+import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
-import javax.validation.spi.ValidationProvider;
-import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.BootstrapState;
-
-import org.hibernate.validation.HibernateValidatorConfiguration;
+import javax.validation.spi.ConfigurationState;
+import javax.validation.spi.ValidationProvider;
 
 /**
  * Default implementation of <code>ValidationProvider</code> within Hibernate validator.

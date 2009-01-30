@@ -15,34 +15,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.impl;
+package org.hibernate.validation.engine;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
+import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
-
-import org.hibernate.validation.engine.BeanMetaDataImpl;
-import org.hibernate.validation.engine.ValidatorFactoryImplementor;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
-	
+public class ValidatorFactoryImpl implements ValidatorFactory {
+
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
-
-	//TODO is there a way to replace ? by so kind of <T> to express the correlation?
-	private Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders
-			= new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(10);
-
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
@@ -58,23 +49,17 @@ public class ValidatorFactoryImpl implements ValidatorFactoryImplementor {
 		return usingContext().getValidator();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public ValidatorContext usingContext() {
-		return new ValidatorContextImpl(this, messageInterpolator, traversableResolver);
-	}
-
-	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
-		//FIXME make sure a optimized mock is provided when no constraints are present.
-		if (beanClass == null) throw new IllegalArgumentException( "Class cannot be null" );
-		@SuppressWarnings( "unchecked")
-		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get(beanClass);
-		if (metadata == null) {
-			metadata = new BeanMetaDataImpl<T>(beanClass, messageInterpolator, constraintValidatorFactory );
-			metadataProviders.put( beanClass, metadata );
-		}
-		return metadata;
+		return new ValidatorContextImpl( constraintValidatorFactory, messageInterpolator, traversableResolver );
 	}
 }

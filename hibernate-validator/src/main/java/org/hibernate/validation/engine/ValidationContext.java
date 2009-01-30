@@ -23,8 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.MessageInterpolator;
 
-import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.util.IdentitySet;
 
 /**
@@ -72,17 +73,37 @@ public class ValidationContext<T> {
 	 */
 	private Stack<ValidatedBean> validatedObjectStack = new Stack<ValidatedBean>();
 
+	/**
+	 * The message resolver which should be used in this context.
+	 */
+	private final MessageInterpolator messageResolver;
 
-	public ValidationContext(T object) {
-		this( object, object );
+	/**
+	 * The constraint factory which should be used in this context.
+	 */
+	ConstraintValidatorFactory constraintValidatorFactory;
+
+
+	public ValidationContext(T object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
+		this( object, object, messageResolver, constraintValidatorFactory );
 	}
 
-	public ValidationContext(T rootBean, Object object) {
+	public ValidationContext(T rootBean, Object object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
 		this.rootBean = rootBean;
+		this.messageResolver = messageResolver;
+		this.constraintValidatorFactory = constraintValidatorFactory;
 		validatedObjectStack.push( new ValidatedBean( object ) );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		propertyPath = "";
 		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+	}
+
+	public MessageInterpolator getMessageResolver() {
+		return messageResolver;
+	}
+
+	public ConstraintValidatorFactory getConstraintValidatorFactory() {
+		return constraintValidatorFactory;
 	}
 
 	public Object peekValidatedObject() {

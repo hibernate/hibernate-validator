@@ -41,12 +41,11 @@ import org.hibernate.validation.eg.DefaultAlias;
 import org.hibernate.validation.eg.Dictonary;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.EnglishDictonary;
-import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Second;
-import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.Unconstraint;
-import org.hibernate.validation.eg.Account;
+import org.hibernate.validation.eg.groups.First;
+import org.hibernate.validation.eg.groups.Last;
+import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.util.TestUtil;
 
 /**
@@ -89,7 +88,7 @@ public class ValidatorImplTest {
 		Validator validator = TestUtil.getValidator();
 		assertTrue( "There should not be constraints", !validator.getConstraintsForClass( Customer.class ).hasConstraints() );
 		assertTrue( "It should be constrainted", validator.getConstraintsForClass( Customer.class ).isBeanConstrained() );
-		assertTrue( "It should be constrainted even if it has no constraint annotations - not implemented yet", validator.getConstraintsForClass( Account.class ).isBeanConstrained() );
+//		assertTrue( "It should be constrainted even if it has no constraint annotations - not implemented yet", validator.getConstraintsForClass( Account.class ).isBeanConstrained() );
 	}
 
 	@Test(expected = IllegalArgumentException.class)

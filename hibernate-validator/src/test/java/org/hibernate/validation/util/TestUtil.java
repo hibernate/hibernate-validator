@@ -24,7 +24,7 @@ import javax.validation.Validator;
 
 import static org.junit.Assert.assertEquals;
 
-import org.hibernate.validation.HibernateValidatorConfiguration;
+import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.

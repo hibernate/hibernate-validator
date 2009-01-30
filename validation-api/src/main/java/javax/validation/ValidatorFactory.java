@@ -18,7 +18,7 @@
 package javax.validation;
 
 /**
- * Factory returning initialized Validator instances.
+ * Factory returning initialized <code>Validator</code> instances.
  * Implementations are thread-safe
  * This object is typically cached and reused.
  *
@@ -26,27 +26,26 @@ package javax.validation;
  */
 public interface ValidatorFactory {
 	/**
-	 * return an initialized Validator instance using the default factory instances
+	 * @return Returns an initialized <code>Validator</code> instance using the default factory instances
 	 * for message interpolator and traversable resolver.
-	 *
-	 * Validator instances can be pooled and shared by the implementation
+	 * <p>
+	 * Validator instances can be pooled and shared by the implementation.
+	 * </p>
 	 */
 	Validator getValidator();
 
 	/**
-	 * Define the validator context and return a
-	 * Validator compliant with this state
+	 * Define the validator context and return a <code>Validator</code> compliant with this state.
 	 *
-	 * @return a ValidatorContext
+	 * @return a <code>ValidatorContext</code>.
 	 */
 	ValidatorContext usingContext();
 
 	/**
-	 * Returns the MessageInterpolator instance configured at initialization time
-	 * for the ValidatorFactory
-	 * This is the instance used by #getValidator(Class)
+	 * Returns the <code>MessageInterpolator</code> instance configured at initialization time for the <code>ValidatorFactory<code>.
+	 * This is the instance used by #getValidator(Class).
 	 *
-	 * @return MessageInterpolator instance
+	 * @return MessageInterpolator instance.
 	 */
 	MessageInterpolator getMessageInterpolator();
 }

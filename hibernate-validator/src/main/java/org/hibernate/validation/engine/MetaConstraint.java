@@ -23,8 +23,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
-import javax.validation.MessageInterpolator;
-import javax.validation.ConstraintValidatorFactory;
 
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -70,36 +68,32 @@ public class MetaConstraint {
 	 */
 	private final ElementType elementType;
 
-	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor, MessageInterpolator messageInterpolator, ConstraintValidatorFactory validatorFactory) {
-		this( t, null, null, ElementType.FIELD, constraintDescriptor, "", messageInterpolator, validatorFactory );
+	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor) {
+		this( t, null, null, ElementType.FIELD, constraintDescriptor, "" );
 	}
 
-	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor, MessageInterpolator messageInterpolator, ConstraintValidatorFactory validatorFactory) {
+	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor) {
 		this(
 				null,
 				m,
 				null,
 				ElementType.METHOD,
 				constraintDescriptor,
-				ReflectionHelper.getPropertyName( m ),
-				messageInterpolator,
-				validatorFactory
+				ReflectionHelper.getPropertyName( m )
 		);
 	}
 
-	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor, MessageInterpolator messageInterpolator, ConstraintValidatorFactory validatorFactory) {
-		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName(), messageInterpolator,
-				validatorFactory
-		);
+	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor) {
+		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName() );
 	}
 
-	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property, MessageInterpolator messageInterpolator, ConstraintValidatorFactory validatorFactory) {
+	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property) {
 		this.type = t;
 		this.method = m;
 		this.field = f;
 		this.elementType = elementType;
 		this.propertyName = property;
-		constraintTree = new ConstraintTree( constraintDescriptor, validatorFactory, messageInterpolator );
+		constraintTree = new ConstraintTree( constraintDescriptor );
 	}
 
 	/**

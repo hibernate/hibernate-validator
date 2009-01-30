@@ -15,17 +15,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.impl;
+package org.hibernate.validation.engine;
 
-import java.lang.annotation.ElementType;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 import javax.validation.ConstraintDescriptor;
-import javax.validation.ElementDescriptor;
-import javax.validation.BeanDescriptor;
 import javax.validation.PropertyDescriptor;
 
 /**

@@ -1,4 +1,4 @@
-package org.hibernate.validation.impl;
+package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;

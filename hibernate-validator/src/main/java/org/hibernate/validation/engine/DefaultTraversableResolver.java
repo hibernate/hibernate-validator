@@ -1,4 +1,4 @@
-package org.hibernate.validation.impl;
+package org.hibernate.validation.engine;
 
 import java.lang.annotation.ElementType;
 import javax.validation.TraversableResolver;

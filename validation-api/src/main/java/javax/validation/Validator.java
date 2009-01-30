@@ -20,8 +20,7 @@ package javax.validation;
 import java.util.Set;
 
 /**
- * Validate bean instances
- * Implementations of this interface must be thread-safe
+ * Validate bean instances. Implementations of this interface must be thread-safe.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

@@ -15,23 +15,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.impl;
+package org.hibernate.validation.engine;
 
 import java.io.InputStream;
 import java.util.List;
+import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
-import javax.validation.Configuration;
 import javax.validation.bootstrap.DefaultValidationProviderResolver;
 import javax.validation.spi.BootstrapState;
-import javax.validation.spi.ValidationProvider;
 import javax.validation.spi.ConfigurationState;
+import javax.validation.spi.ValidationProvider;
 
-import org.hibernate.validation.HibernateValidatorConfiguration;
 import org.hibernate.validation.Version;
 
 /**

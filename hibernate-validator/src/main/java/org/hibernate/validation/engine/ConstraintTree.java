@@ -17,18 +17,14 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.lang.annotation.Annotation;
-import javax.validation.ConstraintValidator;
+import java.util.List;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.util.LoggerFactory;
 
 /**
@@ -43,27 +39,19 @@ public class ConstraintTree {
 
 	private final ConstraintTree parent;
 	private final List<ConstraintTree> children;
-	private ConstraintValidator constraintValidator;
 	private final ConstraintDescriptor descriptor;
-	private final ConstraintValidatorFactory constraintValidatorFactory;
-	private final MessageInterpolator messageInterpolator;
 
-	public ConstraintTree(ConstraintDescriptor descriptor, ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator) {
-		this( descriptor, null, constraintValidatorFactory, messageInterpolator );
+	public ConstraintTree(ConstraintDescriptor descriptor) {
+		this( descriptor, null );
 	}
 
-	private ConstraintTree(ConstraintDescriptor descriptor, ConstraintTree parent, ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator) {
+	private ConstraintTree(ConstraintDescriptor descriptor, ConstraintTree parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		this.constraintValidatorFactory = constraintValidatorFactory;
-		this.messageInterpolator = messageInterpolator;
-		this.constraintValidator = getConstraintValidator( descriptor );
 		children = new ArrayList<ConstraintTree>( descriptor.getComposingConstraints().size() );
 
 		for ( ConstraintDescriptor composingDescriptor : descriptor.getComposingConstraints() ) {
-			ConstraintTree treeNode = new ConstraintTree(
-					composingDescriptor, this, constraintValidatorFactory, messageInterpolator
-			);
+			ConstraintTree treeNode = new ConstraintTree( composingDescriptor, this );
 			children.add( treeNode );
 		}
 	}
@@ -84,10 +72,6 @@ public class ConstraintTree {
 		return children.size() > 0;
 	}
 
-	public ConstraintValidator getConstraint() {
-		return constraintValidator;
-	}
-
 	public ConstraintDescriptor getDescriptor() {
 		return descriptor;
 	}
@@ -102,7 +86,7 @@ public class ConstraintTree {
 		if ( log.isTraceEnabled() ) {
 			log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
 		}
-		if ( !constraintValidator.isValid( value, constraintContext ) ) {
+		if ( !getConstraintValidator( descriptor, validationContext ).isValid( value, constraintContext ) ) {
 			for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
 				final String message = error.getMessage();
 				createConstraintViolation( value, beanClass, validationContext, leafBeanInstance, message, descriptor );
@@ -124,7 +108,7 @@ public class ConstraintTree {
 	}
 
 	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ValidationContext<T> validationContext, Object leafBeanInstance, String message, ConstraintDescriptor descriptor) {
-		String interpolatedMessage = messageInterpolator.interpolate(
+		String interpolatedMessage = validationContext.getMessageResolver().interpolate(
 				message,
 				descriptor,
 				leafBeanInstance
@@ -143,15 +127,17 @@ public class ConstraintTree {
 		validationContext.addConstraintFailure( failingConstraintViolation );
 	}
 
-	private ConstraintValidator getConstraintValidator(ConstraintDescriptor descriptor) {
+	private ConstraintValidator getConstraintValidator(ConstraintDescriptor descriptor, ValidationContext validationContext) {
 		ConstraintValidator constraintValidator;
 		try {
 			//FIXME do choose the right validator depending on the object validated
-			constraintValidator = constraintValidatorFactory.getInstance( descriptor.getConstraintValidatorClasses()[0] );
+			constraintValidator = validationContext.getConstraintValidatorFactory().getInstance( descriptor.getConstraintValidatorClasses()[0] );
 		}
 		catch ( RuntimeException e ) {
 			//FIXME do choose the right validator depending on the object validated
-			throw new ValidationException( "Unable to instantiate " + descriptor.getConstraintValidatorClasses()[0], e );
+			throw new ValidationException(
+					"Unable to instantiate " + descriptor.getConstraintValidatorClasses()[0], e
+			);
 		}
 
 		try {

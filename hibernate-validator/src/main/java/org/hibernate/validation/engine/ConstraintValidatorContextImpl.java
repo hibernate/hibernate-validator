@@ -20,8 +20,8 @@ package org.hibernate.validation.engine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Emmanuel Bernard

@@ -1,11 +1,10 @@
-package org.hibernate.validation.impl;
+package org.hibernate.validation.engine;
 
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
-
-import org.hibernate.validation.engine.ValidatorImpl;
 
 /**
  * @author Emmanuel Bernard
@@ -15,20 +14,20 @@ public class ValidatorContextImpl implements ValidatorContext {
 	private TraversableResolver traversableResolver;
 	private final MessageInterpolator factoryMessageInterpolator;
 	private final TraversableResolver factoryTraversableResolver;
-	private final ValidatorFactoryImpl validatorFactory;
+	private final ConstraintValidatorFactory constraintValidatorFactory;
 
-	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory,
+	public ValidatorContextImpl(ConstraintValidatorFactory constraintValidatorFactory,
 								MessageInterpolator factoryMessageInterpolator,
 								TraversableResolver factoryTraversableResolver) {
-		this.validatorFactory = validatorFactory;
+		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.factoryMessageInterpolator = factoryMessageInterpolator;
 		this.factoryTraversableResolver = factoryTraversableResolver;
 		messageInterpolator( factoryMessageInterpolator );
-		traversableResolver(factoryTraversableResolver);
+		traversableResolver( factoryTraversableResolver );
 	}
 
 	public ValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
-		if ( messageInterpolator == null) {
+		if ( messageInterpolator == null ) {
 			this.messageInterpolator = factoryMessageInterpolator;
 		}
 		else {
@@ -38,7 +37,7 @@ public class ValidatorContextImpl implements ValidatorContext {
 	}
 
 	public ValidatorContext traversableResolver(TraversableResolver traversableResolver) {
-		if (traversableResolver == null) {
+		if ( traversableResolver == null ) {
 			this.traversableResolver = factoryTraversableResolver;
 		}
 		else {
@@ -48,6 +47,6 @@ public class ValidatorContextImpl implements ValidatorContext {
 	}
 
 	public Validator getValidator() {
-		return new ValidatorImpl( validatorFactory );
+		return new ValidatorImpl( constraintValidatorFactory, messageInterpolator );
 	}
 }

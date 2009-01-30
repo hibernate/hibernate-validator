@@ -19,11 +19,12 @@ package org.hibernate.validation.bootstrap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Locale;
-import java.lang.annotation.Annotation;
-import javax.validation.ConstraintValidator;
+import java.util.Set;
+import javax.validation.Configuration;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -31,9 +32,7 @@ import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
-import javax.validation.Configuration;
 import javax.validation.ValidatorFactory;
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.bootstrap.ProviderSpecificBootstrap;
 import javax.validation.spi.ValidationProvider;
 
@@ -43,16 +42,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.HibernateValidatorConfiguration;
+import org.hibernate.validation.engine.HibernateValidatorConfiguration;
+import org.hibernate.validation.engine.HibernateValidationProvider;
 import org.hibernate.validation.constraints.NotNullConstraintValidator;
 import org.hibernate.validation.eg.Customer;
-import org.hibernate.validation.impl.ConstraintValidatorFactoryImpl;
-import org.hibernate.validation.impl.ConfigurationImpl;
-import org.hibernate.validation.impl.ValidatorFactoryImpl;
-import org.hibernate.validation.impl.HibernateValidationProvider;
+import org.hibernate.validation.engine.ConfigurationImpl;
+import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
+import org.hibernate.validation.engine.ValidatorFactoryImpl;
 
 /**
- * Tests the validation bootstrapping.
+ * Tests the Bean Validation bootstrapping.
  *
  * @author Hardy Ferentschik
  */
@@ -149,15 +148,14 @@ public class ValidationTest {
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
 
-		//FIXME nothing guarantee that a configuration can be reused
-		// now we modify the configuration, get a new factory and valiator and try again
+		// get a new factory using a custom configuration
+		configuration = Validation.byDefaultProvider().configure();
 		configuration.constraintValidatorFactory(
 				new ConstraintValidatorFactory() {
 
 					public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 						if ( key == NotNullConstraintValidator.class ) {
-							T result = ( T ) new BadlyBehavedNotNullConstraintValidator();
-							return result;
+							return ( T ) new BadlyBehavedNotNullConstraintValidator();
 						}
 						return new ConstraintValidatorFactoryImpl().getInstance( key );
 					}
@@ -228,7 +226,7 @@ public class ValidationTest {
 		catch ( ValidationException e ) {
 			assertEquals(
 					"Wrong error message",
-					"Unable to find provider: interface org.hibernate.validation.HibernateValidatorConfiguration",
+					"Unable to find provider: interface org.hibernate.validation.engine.HibernateValidatorConfiguration",
 					e.getMessage()
 			);
 		}

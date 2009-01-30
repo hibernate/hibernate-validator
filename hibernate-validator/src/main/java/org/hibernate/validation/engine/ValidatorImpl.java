@@ -27,13 +27,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.BeanDescriptor;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
-import org.hibernate.validation.impl.ConstraintViolationImpl;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -48,16 +50,25 @@ public class ValidatorImpl implements Validator {
 	private static final Set<Class<?>> INDEXABLE_CLASS = new HashSet<Class<?>>();
 	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
 
+	/**
+	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
+	 * entity.
+	 */
+	private static Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders
+			= new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>( 10 );
+
 	static {
 		INDEXABLE_CLASS.add( Integer.class );
 		INDEXABLE_CLASS.add( Long.class );
 		INDEXABLE_CLASS.add( String.class );
 	}
 
-	private final ValidatorFactoryImplementor factory;
+	private final ConstraintValidatorFactory constraintValidatorFactory;
+	private final MessageInterpolator messageInterpolator;
 
-	public ValidatorImpl(ValidatorFactoryImplementor factory) {
-		this.factory = factory;
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,  MessageInterpolator messageInterpolator) {
+		this.constraintValidatorFactory = constraintValidatorFactory;
+		this.messageInterpolator = messageInterpolator;
 	}
 
 	/**
@@ -68,7 +79,7 @@ public class ValidatorImpl implements Validator {
 			throw new IllegalArgumentException( "Validation of a null object" );
 		}
 
-		ValidationContext<T> context = new ValidationContext<T>( object );
+		ValidationContext<T> context = new ValidationContext<T>( object, messageInterpolator, constraintValidatorFactory );
 		List<ConstraintViolationImpl<T>> list = validateInContext( context, Arrays.asList( groups ) );
 		return new HashSet<ConstraintViolation<T>>( list );
 	}
@@ -124,7 +135,7 @@ public class ValidatorImpl implements Validator {
 		//casting rely on the fact that root object is at the top of the stack
 		@SuppressWarnings("unchecked")
 		BeanMetaData<T> beanMetaData =
-				( BeanMetaData<T> ) factory.getBeanMetaData( validationContext.peekValidatedObjectType() );
+				( BeanMetaData<T> ) getBeanMetaData( validationContext.peekValidatedObjectType() );
 		for ( MetaConstraint metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			ConstraintDescriptor mainConstraintDescriptor = metaConstraint.getDescriptor();
 
@@ -179,7 +190,7 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <T> void validateCascadedConstraints(ValidationContext<T> context) {
-		List<Member> cascadedMembers = factory.getBeanMetaData( context.peekValidatedObjectType() )
+		List<Member> cascadedMembers = getBeanMetaData( context.peekValidatedObjectType() )
 				.getCascadedMembers();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
@@ -260,7 +271,7 @@ public class ValidatorImpl implements Validator {
 						continue;
 					}
 
-					ValidationContext<T> context = new ValidationContext<T>( object );
+					ValidationContext<T> context = new ValidationContext<T>( object, messageInterpolator, constraintValidatorFactory );
 					metaConstraint.validateConstraint( object.getClass(), context );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
@@ -282,7 +293,7 @@ public class ValidatorImpl implements Validator {
 	}
 
 	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
-		return factory.getBeanMetaData( clazz ).getBeanDescriptor();
+		return getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
 	private <T> void validateValue(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
@@ -311,7 +322,7 @@ public class ValidatorImpl implements Validator {
 						continue;
 					}
 
-					ValidationContext<T> context = new ValidationContext<T>( ( T ) value );
+					ValidationContext<T> context = new ValidationContext<T>( ( T ) value, messageInterpolator, constraintValidatorFactory );
 					context.pushProperty( propertyIter.getOriginalProperty() );
 					metaConstraint.validateConstraint( beanType, value, context );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
@@ -342,7 +353,7 @@ public class ValidatorImpl implements Validator {
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint> metaConstraintList = factory.getBeanMetaData( clazz ).geMetaConstraintList();
+			List<MetaConstraint> metaConstraintList = getBeanMetaData( clazz ).geMetaConstraintList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
 					metaConstraints.add( metaConstraint );
@@ -350,7 +361,7 @@ public class ValidatorImpl implements Validator {
 			}
 		}
 		else {
-			List<Member> cascadedMembers = factory.getBeanMetaData( clazz ).getCascadedMembers();
+			List<Member> cascadedMembers = getBeanMetaData( clazz ).getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
 					Type type = ReflectionHelper.typeOf( m );
@@ -384,7 +395,7 @@ public class ValidatorImpl implements Validator {
 		}
 
 		boolean isGroupSequence;
-		BeanMetaData<T> metaDataProvider = factory.getBeanMetaData( beanType );
+		BeanMetaData<T> metaDataProvider = getBeanMetaData( beanType );
 		if ( metaDataProvider.getGroupSequences().containsKey( group ) ) {
 			expandedGroups.addAll( metaDataProvider.getGroupSequences().get( group ) );
 			isGroupSequence = true;
@@ -394,5 +405,21 @@ public class ValidatorImpl implements Validator {
 			isGroupSequence = false;
 		}
 		return isGroupSequence;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	private <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
+		if ( beanClass == null ) {
+			throw new IllegalArgumentException( "Class cannot be null" );
+		}
+		@SuppressWarnings("unchecked")
+		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get( beanClass );
+		if ( metadata == null ) {
+			metadata = new BeanMetaDataImpl<T>( beanClass );
+			metadataProviders.put( beanClass, metadata );
+		}
+		return metadata;
 	}
 }

@@ -32,14 +32,9 @@ import javax.validation.GroupSequences;
 import javax.validation.PropertyDescriptor;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
-import javax.validation.MessageInterpolator;
-import javax.validation.ConstraintValidatorFactory;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.impl.BeanDescriptorImpl;
-import org.hibernate.validation.impl.ConstraintDescriptorImpl;
-import org.hibernate.validation.impl.ElementDescriptorImpl;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -54,10 +49,6 @@ import org.hibernate.validation.util.ReflectionHelper;
 public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static final Logger log = LoggerFactory.make();
-
-	private final MessageInterpolator messageInterpolator;
-
-	private final ConstraintValidatorFactory constraintValidatorFactory;
 
 	/**
 	 * The root bean class for this validator.
@@ -95,10 +86,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private Map<Class<?>, List<Class<?>>> groupSequences = new HashMap<Class<?>, List<Class<?>>>();
 
-	public BeanMetaDataImpl(Class<T> beanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory) {
+	public BeanMetaDataImpl(Class<T> beanClass) {
 		this.beanClass = beanClass;
-		this.messageInterpolator = messageInterpolator;
-		this.constraintValidatorFactory = constraintValidatorFactory;
 		createMetaData();
 	}
 
@@ -197,9 +186,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			List<ConstraintDescriptorImpl> fieldMetadata = findFieldLevelConstraints( field );
 			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
 				ReflectionHelper.setAccessibility( field );
-				MetaConstraint metaConstraint = new MetaConstraint( field, constraintDescription,
-						messageInterpolator, constraintValidatorFactory
-				);
+				MetaConstraint metaConstraint = new MetaConstraint( field, constraintDescription );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
@@ -214,9 +201,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			List<ConstraintDescriptorImpl> methodMetadata = findMethodLevelConstraints( method );
 			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
 				ReflectionHelper.setAccessibility( method );
-				MetaConstraint metaConstraint = new MetaConstraint( method, constraintDescription,
-						messageInterpolator, constraintValidatorFactory
-				);
+				MetaConstraint metaConstraint = new MetaConstraint( method, constraintDescription );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
@@ -229,9 +214,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void initClassConstraints(Class clazz) {
 		List<ConstraintDescriptorImpl> classMetadata = findClassLevelConstraints( clazz );
 		for ( ConstraintDescriptorImpl constraintDescription : classMetadata ) {
-			MetaConstraint metaConstraint = new MetaConstraint( clazz, constraintDescription,
-					messageInterpolator, constraintValidatorFactory
-			);
+			MetaConstraint metaConstraint = new MetaConstraint( clazz, constraintDescription );
 			metaConstraintList.add( metaConstraint );
 		}
 	}

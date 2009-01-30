@@ -1,4 +1,4 @@
-package org.hibernate.validation;
+package org.hibernate.validation.engine;
 
 import javax.validation.Configuration;
 

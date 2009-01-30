@@ -18,12 +18,12 @@
 package org.hibernate.validation.engine;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import javax.validation.ElementDescriptor;
 import javax.validation.BeanDescriptor;
+import javax.validation.ElementDescriptor;
 import javax.validation.PropertyDescriptor;
 
 /**
