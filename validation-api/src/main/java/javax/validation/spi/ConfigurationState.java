@@ -18,6 +18,8 @@
 package javax.validation.spi;
 
 import java.io.InputStream;
+import java.util.Set;
+import java.util.Map;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -25,42 +27,80 @@ import javax.validation.TraversableResolver;
 /**
  * Contract between a <code>Configuration</code> and a
  * </code>ValidatorProvider</code> to create a <code>ValidatorFactory</code>.
- * The configuration artifacts provided to the
- * <code>Configuration</code> are passed along.
+ * The configuration artifacts defined in the XML configuration and provided to the
+ * <code>Configuration</code> are merged and passed along via ConfigurationState.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public interface ConfigurationState {
+
 	/**
-	 * Message interpolator as defined by the client programmatically
-	 * or null if undefined.
+	 * returns true if Configuration.ignoreXMLConfiguration() has been called
+	 * In this case, the ValiatorFactory must ignore META-INF/validation.xml
+	 * @return true if META-INF/validation.xml should be ignored
+	 */
+	boolean isIgnoreXmlConfiguration();
+
+	/**
+	 * Message interpolator as defined in the following decresing priority:
+	 *  - set via the Configuration programmatic API
+	 *  - defined in META-INF/validation.xml provided that ignoredXmlConfiguration
+	 * is false. In this case the instance is created via its no-arg constructor.
+	 *  - null if undefined.
 	 *
 	 * @return message provider instance or null if not defined
 	 */
 	MessageInterpolator getMessageInterpolator();
 
 	/**
-	 * Returns the configuration stream defined by the client programmatically
-	 * or null if undefined.
+	 * Returns a set of stream corresponding to:
+	 *  - mapping XML streams passed programmatically in Configuration
+	 *  - mapping XML stream located in the resources defined in
+	 * META-INF/validation.xml (constraint-mapping element)
 	 *
-	 * @return the configuration input stream or null
+	 * Streams represented in the XML configuration and opened by the 
+	 * configuration implementation must be closed by the configuration
+	 * implementation after the ValidatorFactory creation (or if an exception
+	 * occurs).
+	 *
+	 * @return set of input stream
 	 */
-	InputStream getConfigurationStream();
+	Set<InputStream> getMappingStreams();
 
 	/**
-	 * Defines the constraint validator implementation factory as defined by
-	 * the client programmatically or null if undefined
+	 * ConstraintValidatorFactory implementation as defined in the following
+	 * decreasing priority:
+	 *  - set via the Configuration programmatic API
+	 *  - defined in META-INF/validation.xml provided that ignoredXmlConfiguration
+	 * is false. In this case the instance is created via its no-arg constructor.
+	 *  - null if undefined.
 	 *
 	 * @return factory instance or null if not defined
 	 */
 	ConstraintValidatorFactory getConstraintValidatorFactory();
 
 	/**
-	 * Traversable resolver as defined by the client programmatically
-	 * or null if undefined.
+	 * TraversableResolver as defined in the following decresing priority:
+	 *  - set via the Configuration programmatic API
+	 *  - defined in META-INF/validation.xml provided that ignoredXmlConfiguration
+	 * is false. In this case the instance is created via its no-arg constructor.
+	 *  - null if undefined.
 	 *
 	 * @return traversable provider instance or null if not defined
 	 */
 	TraversableResolver getTraversableResolver();
+
+	/**
+	 * return  non type-safe properties defined via:
+	 *  - Configuration.addProperty(String, String)
+	 *  - META-INF/validation.xml provided that ignoredXmlConfiguration
+	 * is false.
+	 *
+	 * If a property is defined both programmatically and in XML,
+	 * the value defined programmatically has priority 
+	 *
+	 * @return Map whose key is the property key and the value the property value
+	 */
+	Map<String, String> getProperties();
 }

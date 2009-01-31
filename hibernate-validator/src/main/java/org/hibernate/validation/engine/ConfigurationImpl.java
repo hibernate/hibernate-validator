@@ -19,6 +19,8 @@ package org.hibernate.validation.engine;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
+import java.util.Map;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -52,6 +54,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ValidationProvider provider;
 	private final ValidationProviderResolver providerResolver;
 	private TraversableResolver traversableResolver;
+	private boolean ignoreXmlConfiguration;
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -75,6 +78,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.traversableResolver = defaultTraversableResolver;
 	}
 
+	public HibernateValidatorConfiguration ignoreXmlConfiguration() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
 		this.messageInterpolator = interpolator;
 		return this;
@@ -88,6 +95,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		return this;
+	}
+
+	public HibernateValidatorConfiguration addMapping(InputStream stream) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public HibernateValidatorConfiguration addProperty(String name, String value) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	public ValidatorFactory buildValidatorFactory() {
@@ -118,8 +133,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return provider != null;
 	}
 
+	public boolean isIgnoreXmlConfiguration() {
+		return ignoreXmlConfiguration;
+	}
+
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
+	}
+
+	public Set<InputStream> getMappingStreams() {
+		throw new UnsupportedOperationException( "TODO" );
 	}
 
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
@@ -130,15 +153,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return traversableResolver;
 	}
 
-	public ConfigurationImpl customConfiguration(InputStream stream) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public Map<String, String> getProperties() {
+		throw new UnsupportedOperationException( "TODO" );
 	}
 
 	public MessageInterpolator getDefaultMessageInterpolator() {
 		return defaultMessageInterpolator;
 	}
 
-	public InputStream getConfigurationStream() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
 }
