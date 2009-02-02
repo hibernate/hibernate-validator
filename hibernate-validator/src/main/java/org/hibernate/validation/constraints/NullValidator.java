@@ -1,4 +1,4 @@
-// $Id
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,27 +17,22 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.util.Calendar;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.Null;
 
 /**
- * Check that the <code>java.util.Calendar</code> passed to be validated is in the
- * past.
+ * Validate that the object is <code>null</code>
  *
  * @author Alaa Nassef
  */
-public class PastConstraintCalendarValidator implements ConstraintValidator<Past, Calendar> {
+public class NullValidator implements ConstraintValidator<Null, Object> {
 
-	public void initialize(Past constraintAnnotation) {
+	public void initialize(Null constraintAnnotation) {
 	}
 
-	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
-		//null values are valid
-		if ( cal == null ) {
-			return true;
-		}
-		return cal.before( Calendar.getInstance() );
+	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+		return object == null;
 	}
+
 }
