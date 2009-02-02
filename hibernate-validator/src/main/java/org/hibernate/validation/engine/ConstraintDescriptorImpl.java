@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
@@ -55,6 +56,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 
 	private final U annotation;
+	//TODO make it a list
 	private final Class<? extends ConstraintValidator<U,?>>[] constraintClasses;
 	private final Set<Class<?>> groups;
 	private final Map<String, Object> parameters;
@@ -112,9 +114,11 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<? extends ConstraintValidator<U,?>>[]
+	public List<Class<? extends ConstraintValidator<?,?>>>
 			getConstraintValidatorClasses() {
-		return constraintClasses;
+		return Collections.unmodifiableList(
+				Arrays.asList((Class<? extends ConstraintValidator<?,?>>[]) constraintClasses)
+				);
 	}
 
 	/**

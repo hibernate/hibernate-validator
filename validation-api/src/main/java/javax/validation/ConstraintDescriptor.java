@@ -20,6 +20,7 @@ package javax.validation;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 /**
  * Describes a single constraint and its composing constraints.
@@ -43,9 +44,12 @@ public interface ConstraintDescriptor {
 	Set<Class<?>> getGroups();
 
 	/**
-	 * @return the constraint validation implementation class
+	 * list of the constraint validation implementation classes
+	 * The lsit is immutable
+	 *
+	 * @return list of the constraint validation implementation classes
 	 */
-	Class<? extends ConstraintValidator<?,?>>[]
+	List<Class<? extends ConstraintValidator<?,?>>>
 	    getConstraintValidatorClasses();
 
 	/**

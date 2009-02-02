@@ -131,12 +131,12 @@ public class ConstraintTree {
 		ConstraintValidator constraintValidator;
 		try {
 			//FIXME do choose the right validator depending on the object validated
-			constraintValidator = validationContext.getConstraintValidatorFactory().getInstance( descriptor.getConstraintValidatorClasses()[0] );
+			constraintValidator = validationContext.getConstraintValidatorFactory().getInstance( descriptor.getConstraintValidatorClasses().get(0) );
 		}
 		catch ( RuntimeException e ) {
 			//FIXME do choose the right validator depending on the object validated
 			throw new ValidationException(
-					"Unable to instantiate " + descriptor.getConstraintValidatorClasses()[0], e
+					"Unable to instantiate " + descriptor.getConstraintValidatorClasses().get(0), e
 			);
 		}
 

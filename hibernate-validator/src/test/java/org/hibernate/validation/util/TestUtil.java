@@ -88,7 +88,7 @@ public class TestUtil {
 		assertEquals(
 				"Wrong constraint error Type",
 				constraintType,
-				violation.getConstraintDescriptor().getConstraintValidatorClasses()[0]
+				violation.getConstraintDescriptor().getConstraintValidatorClasses().get(0)
 		);
 		assertConstraintViolation( violation, errorMessage );
 	}
