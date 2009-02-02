@@ -19,16 +19,16 @@ package org.hibernate.validation.constraints;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.AssertFalse;
 
 /**
  * Validates that the value passed is false
  *
  * @author Alaa Nassef
  */
-public class AssertFalseValidator implements ConstraintValidator<AssertTrue, Boolean> {
+public class AssertFalseValidator implements ConstraintValidator<AssertFalse, Boolean> {
 
-	public void initialize(AssertTrue constraintAnnotation) {
+	public void initialize(AssertFalse constraintAnnotation) {
 	}
 
 	public boolean isValid(Boolean bool, ConstraintValidatorContext constraintValidatorContext) {
