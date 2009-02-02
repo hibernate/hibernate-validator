@@ -1,4 +1,4 @@
-// $Id
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -26,11 +26,11 @@ import org.junit.Test;
 
 public class PastValidatorForCalendarTest {
 
-	private static PastConstraintCalendarValidator constraint;
+	private static PastValidatorForCalendar constraint;
 
 	@BeforeClass
 	public static void init() {
-		constraint = new PastConstraintCalendarValidator();
+		constraint = new PastValidatorForCalendar();
 	}
 
 	@Test

@@ -1,4 +1,4 @@
-// $Id
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -27,11 +27,11 @@ import org.junit.Test;
  */
 public class NullValidatorTest {
 
-	private static NullConstraintValidator constraint;
+	private static NullValidator constraint;
 
 	@BeforeClass
 	public static void init() {
-		constraint = new NullConstraintValidator();
+		constraint = new NullValidator();
 	}
 
 	@Test
