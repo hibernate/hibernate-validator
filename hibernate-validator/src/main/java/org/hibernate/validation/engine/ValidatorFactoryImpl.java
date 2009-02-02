@@ -34,6 +34,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
+	private final BuiltinConstraints builtinConstraints = new BuiltinConstraints();
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
@@ -60,6 +61,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	 * {@inheritDoc}
 	 */
 	public ValidatorContext usingContext() {
-		return new ValidatorContextImpl( constraintValidatorFactory, messageInterpolator, traversableResolver );
+		return new ValidatorContextImpl( constraintValidatorFactory, messageInterpolator, traversableResolver, builtinConstraints );
 	}
 }

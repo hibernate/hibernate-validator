@@ -86,8 +86,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private Map<Class<?>, List<Class<?>>> groupSequences = new HashMap<Class<?>, List<Class<?>>>();
 
-	public BeanMetaDataImpl(Class<T> beanClass) {
+	private final BuiltinConstraints builtinConstraints;
+
+	public BeanMetaDataImpl(Class<T> beanClass, BuiltinConstraints builtinConstraints) {
 		this.beanClass = beanClass;
+		this.builtinConstraints = builtinConstraints;
 		createMetaData();
 	}
 
@@ -255,7 +258,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		return new ConstraintDescriptorImpl( annotation, groups );
+		return new ConstraintDescriptorImpl( annotation, groups, builtinConstraints );
 	}
 
 	/**

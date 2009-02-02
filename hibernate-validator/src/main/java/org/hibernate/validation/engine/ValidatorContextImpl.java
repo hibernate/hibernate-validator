@@ -15,13 +15,16 @@ public class ValidatorContextImpl implements ValidatorContext {
 	private final MessageInterpolator factoryMessageInterpolator;
 	private final TraversableResolver factoryTraversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
+	private final BuiltinConstraints builtinConstraints;
 
 	public ValidatorContextImpl(ConstraintValidatorFactory constraintValidatorFactory,
 								MessageInterpolator factoryMessageInterpolator,
-								TraversableResolver factoryTraversableResolver) {
+								TraversableResolver factoryTraversableResolver,
+								BuiltinConstraints builtinConstraints) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.factoryMessageInterpolator = factoryMessageInterpolator;
 		this.factoryTraversableResolver = factoryTraversableResolver;
+		this.builtinConstraints = builtinConstraints;
 		messageInterpolator( factoryMessageInterpolator );
 		traversableResolver( factoryTraversableResolver );
 	}
@@ -47,6 +50,6 @@ public class ValidatorContextImpl implements ValidatorContext {
 	}
 
 	public Validator getValidator() {
-		return new ValidatorImpl( constraintValidatorFactory, messageInterpolator );
+		return new ValidatorImpl( constraintValidatorFactory, messageInterpolator, builtinConstraints );
 	}
 }

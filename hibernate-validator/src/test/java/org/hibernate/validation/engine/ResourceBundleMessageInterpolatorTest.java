@@ -32,8 +32,6 @@ import org.junit.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validation.engine.ResourceBundleMessageInterpolator;
-import org.hibernate.validation.engine.ConstraintDescriptorImpl;
 
 /**
  * Tests for message resolution.
@@ -59,55 +57,63 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testSuccessfulInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
+		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+				notNull, new Class<?>[] { }, new BuiltinConstraints()
+		);
 
 		String expected = "replacement worked";
-		String actual = interpolator.interpolate( "{foo}", desciptor, null );
+		String actual = interpolator.interpolate( "{foo}", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "replacement worked replacement worked";
-		actual = interpolator.interpolate( "{foo} {foo}", desciptor, null );
+		actual = interpolator.interpolate( "{foo} {foo}", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "This replacement worked just fine";
-		actual = interpolator.interpolate( "This {foo} just fine", desciptor, null );
+		actual = interpolator.interpolate( "This {foo} just fine", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "{} { replacement worked }";
-		actual = interpolator.interpolate( "{} { {foo} }", desciptor, null );
+		actual = interpolator.interpolate( "{} { {foo} }", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
 	@Test
 	public void testUnSuccessfulInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
+		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+				notNull, new Class<?>[] { }, new BuiltinConstraints()
+		);
 		String expected = "foo";  // missing {}
-		String actual = interpolator.interpolate( "foo", desciptor, null );
+		String actual = interpolator.interpolate( "foo", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "#{foo  {}";
-		actual = interpolator.interpolate( "#{foo  {}", desciptor, null );
+		actual = interpolator.interpolate( "#{foo  {}", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
 	@Test
 	public void testUnkownTokenInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
+		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+				notNull, new Class<?>[] { }, new BuiltinConstraints()
+		);
 		String expected = "{bar}";  // unkown token {}
-		String actual = interpolator.interpolate( "{bar}", desciptor, null );
+		String actual = interpolator.interpolate( "{bar}", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
 	@Test
 	public void testDefaultInterpolation() {
-		ConstraintDescriptorImpl desciptor = new ConstraintDescriptorImpl( notNull, new Class<?>[] { } );
+		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+				notNull, new Class<?>[] { }, new BuiltinConstraints()
+		);
 		String expected = "may not be null";
-		String actual = interpolator.interpolate( notNull.message(), desciptor, null );
+		String actual = interpolator.interpolate( notNull.message(), descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
-		desciptor = new ConstraintDescriptorImpl( size, new Class<?>[] { } );
+		descriptor = new ConstraintDescriptorImpl( size, new Class<?>[] { }, new BuiltinConstraints() );
 		expected = "size must be between -2147483648 and 2147483647";  // unkown token {}
-		actual = interpolator.interpolate( size.message(), desciptor, null );
+		actual = interpolator.interpolate( size.message(), descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 

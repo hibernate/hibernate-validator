@@ -65,10 +65,12 @@ public class ValidatorImpl implements Validator {
 
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final MessageInterpolator messageInterpolator;
+	private final BuiltinConstraints builtinConstraints;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator) {
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, BuiltinConstraints builtinConstraints) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
+		this.builtinConstraints = builtinConstraints;
 	}
 
 	/**
@@ -423,7 +425,7 @@ public class ValidatorImpl implements Validator {
 		@SuppressWarnings("unchecked")
 		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get( beanClass );
 		if ( metadata == null ) {
-			metadata = new BeanMetaDataImpl<T>( beanClass );
+			metadata = new BeanMetaDataImpl<T>( beanClass, builtinConstraints );
 			metadataProviders.put( beanClass, metadata );
 		}
 		return metadata;
