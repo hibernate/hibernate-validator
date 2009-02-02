@@ -44,7 +44,7 @@ import org.junit.Test;
 
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.engine.HibernateValidationProvider;
-import org.hibernate.validation.constraints.NotNullConstraintValidator;
+import org.hibernate.validation.constraints.NotNullValidator;
 import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.engine.ConfigurationImpl;
 import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
@@ -154,7 +154,7 @@ public class ValidationTest {
 				new ConstraintValidatorFactory() {
 
 					public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-						if ( key == NotNullConstraintValidator.class ) {
+						if ( key == NotNullValidator.class ) {
 							return ( T ) new BadlyBehavedNotNullConstraintValidator();
 						}
 						return new ConstraintValidatorFactoryImpl().getInstance( key );
@@ -245,7 +245,7 @@ public class ValidationTest {
 		assertTrue( factory instanceof ValidatorFactoryImpl );
 	}
 
-	class BadlyBehavedNotNullConstraintValidator extends NotNullConstraintValidator {
+	class BadlyBehavedNotNullConstraintValidator extends NotNullValidator {
 		@Override
 		public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 			return true;

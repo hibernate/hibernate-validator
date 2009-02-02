@@ -24,9 +24,9 @@ import javax.validation.Validator;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.constraints.NotNullConstraintValidator;
+import org.hibernate.validation.constraints.NotNullValidator;
 import org.hibernate.validation.constraints.PatternValidator;
-import org.hibernate.validation.constraints.SizeConstraintValidator;
+import org.hibernate.validation.constraints.SizeValidator;
 import org.hibernate.validation.constraints.composition.GermanZipcodeConstraintValidator;
 import org.hibernate.validation.eg.FrenchAddress;
 import org.hibernate.validation.eg.GermanAddress;
@@ -54,7 +54,7 @@ public class ConstraintCompositionTest {
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
 				"may not be null",
-				NotNullConstraintValidator.class,
+				NotNullValidator.class,
 				FrenchAddress.class,
 				null,
 				"zipCode"
@@ -69,7 +69,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
-						SizeConstraintValidator.class,
+						SizeValidator.class,
 						FrenchAddress.class,
 						"abc",
 						"zipCode"
@@ -109,7 +109,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
-						SizeConstraintValidator.class,
+						SizeValidator.class,
 						FrenchAddress.class,
 						"123",
 						"zipCode"
