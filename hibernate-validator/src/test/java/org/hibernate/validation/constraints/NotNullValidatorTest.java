@@ -17,23 +17,20 @@
 */
 package org.hibernate.validation.constraints;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
- * @todo Extend to not only support strings, but also collections and maps. Needs to be specified first though.
  */
-public class NotEmptyConstraintValidator implements ConstraintValidator<NotEmpty, String> {
+public class NotNullValidatorTest {
 
-	public void initialize(NotEmpty parameters) {
-	}
+	@Test
+	public void testIsValid() {
+		NotNullConstraintValidator constraint = new NotNullConstraintValidator();
 
-	public boolean isValid(String object, ConstraintValidatorContext constraintValidatorContext) {
-		if ( object == null ) {
-			return true;
-		}
-		int length = object.length();
-		return length > 0;
+		assertFalse( constraint.isValid( null, null ) );
+		assertTrue( constraint.isValid( new Object(), null ) );
 	}
 }

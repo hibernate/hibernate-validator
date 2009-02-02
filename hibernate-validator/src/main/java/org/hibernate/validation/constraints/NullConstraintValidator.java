@@ -1,4 +1,4 @@
-// $Id$
+// $Id
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,30 +17,22 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Null;
 
 /**
- * Validate that the string is between min and max included
+ * Validate that the object is <code>null</code>
  *
- * @author Emmanuel Bernard
+ * @author Alaa Nassef
  */
-@Documented
-@Constraint(validatedBy = LengthValidator.class)
-@Target({ METHOD, FIELD, TYPE })
-@Retention(RUNTIME)
-public @interface Length {
-	int min() default 0;
+public class NullConstraintValidator implements ConstraintValidator<Null, Object> {
 
-	int max() default Integer.MAX_VALUE;
+	public void initialize(Null constraintAnnotation) {
+	}
 
-	String message() default "{validator.length}";
+	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+		return object == null;
+	}
 
-	Class<?>[] groups() default { };
 }

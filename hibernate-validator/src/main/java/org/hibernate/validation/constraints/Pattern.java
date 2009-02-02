@@ -29,7 +29,7 @@ import javax.validation.Constraint;
  * @author Hardy Ferentschik
  */
 @Documented
-@Constraint(validatedBy = PatternConstraintValidator.class)
+@Constraint(validatedBy = PatternValidator.class)
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface Pattern {

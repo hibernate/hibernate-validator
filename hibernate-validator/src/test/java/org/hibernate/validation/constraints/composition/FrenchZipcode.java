@@ -52,13 +52,11 @@ public @interface FrenchZipcode {
 	@OverridesParameters({
 			@OverridesParameter(constraint = Size.class, parameter = "min"),
 			@OverridesParameter(constraint = Size.class, parameter = "max")
-	})
-	int size() default 5;
+	}) int size() default 5;
 
-	@OverridesParameter(constraint = Size.class, parameter = "message")
-    String sizeMessage() default "A french zip code has a length of 5";
+	@OverridesParameter(constraint = Size.class,
+			parameter = "message") String sizeMessage() default "A french zip code has a length of 5";
 
 
-	@OverridesParameter(constraint = Pattern.class, parameter = "regex", index=2)
-	String regex() default "\\d*";
+	@OverridesParameter(constraint = Pattern.class, parameter = "regex", index = 2) String regex() default "\\d*";
 }

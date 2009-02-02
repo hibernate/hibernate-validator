@@ -29,7 +29,7 @@ import javax.validation.Constraint;
  * @author Emmanuel Bernard
  */
 @Documented
-@Constraint(validatedBy = NotEmptyConstraintValidator.class)
+@Constraint(validatedBy = NotEmptyValidator.class)
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface NotEmpty {

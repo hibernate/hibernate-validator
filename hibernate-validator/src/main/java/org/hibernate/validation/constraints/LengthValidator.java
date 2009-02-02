@@ -17,30 +17,30 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
- * Validate that the string is between min and max included
+ * Check that a string's length is between min and max.
  *
  * @author Emmanuel Bernard
+ * @author Gavin King
  */
-@Documented
-@Constraint(validatedBy = LengthValidator.class)
-@Target({ METHOD, FIELD, TYPE })
-@Retention(RUNTIME)
-public @interface Length {
-	int min() default 0;
+public class LengthValidator implements ConstraintValidator<Length, String> {
+	private int min;
+	private int max;
 
-	int max() default Integer.MAX_VALUE;
+	public void initialize(Length parameters) {
+		min = parameters.min();
+		max = parameters.max();
+	}
 
-	String message() default "{validator.length}";
+	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+		if ( value == null ) {
+			return true;
+		}
+		int length = value.length();
+		return length >= min && length <= max;
+	}
 
-	Class<?>[] groups() default { };
 }

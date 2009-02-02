@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.hibernate.validation.constraints.NotNullConstraintValidator;
-import org.hibernate.validation.constraints.PatternConstraintValidator;
+import org.hibernate.validation.constraints.PatternValidator;
 import org.hibernate.validation.constraints.SizeConstraintValidator;
 import org.hibernate.validation.constraints.composition.GermanZipcodeConstraintValidator;
 import org.hibernate.validation.eg.FrenchAddress;
@@ -79,7 +79,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"must match \"d*\"",
-						PatternConstraintValidator.class,
+						PatternValidator.class,
 						FrenchAddress.class,
 						"abc",
 						"zipCode"
@@ -89,7 +89,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"must match \".....\"",
-						PatternConstraintValidator.class,
+						PatternValidator.class,
 						FrenchAddress.class,
 						"abc",
 						"zipCode"
@@ -119,7 +119,7 @@ public class ConstraintCompositionTest {
 				assertConstraintViolation(
 						violation,
 						"must match \".....\"",
-						PatternConstraintValidator.class,
+						PatternValidator.class,
 						FrenchAddress.class,
 						"123",
 						"zipCode"

@@ -15,20 +15,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints.incomplete;
+package org.hibernate.validation.constraints;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik
+ * @todo Extend to not only support strings, but also collections and maps. Needs to be specified first though.
  */
-public class NoGroupsConstraintValidator implements ConstraintValidator<NoGroups, Object> {
+public class NotEmptyValidator implements ConstraintValidator<NotEmpty, String> {
 
-	public void initialize(NoGroups parameters) {
+	public void initialize(NotEmpty parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
-		return false;
+	public boolean isValid(String object, ConstraintValidatorContext constraintValidatorContext) {
+		if ( object == null ) {
+			return true;
+		}
+		int length = object.length();
+		return length > 0;
 	}
 }

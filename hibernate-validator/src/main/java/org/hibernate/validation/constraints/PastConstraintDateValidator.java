@@ -1,4 +1,4 @@
-// $Id$
+// $Id
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,30 +17,27 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
+import java.util.Date;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Past;
 
 /**
- * Validate that the string is between min and max included
+ * Check that the <code>java.util.Date</code> passed to be validated is in the
+ * past.
  *
- * @author Emmanuel Bernard
+ * @author Alaa Nassef
  */
-@Documented
-@Constraint(validatedBy = LengthValidator.class)
-@Target({ METHOD, FIELD, TYPE })
-@Retention(RUNTIME)
-public @interface Length {
-	int min() default 0;
+public class PastConstraintDateValidator implements ConstraintValidator<Past, Date> {
 
-	int max() default Integer.MAX_VALUE;
+	public void initialize(Past constraintAnnotation) {
+	}
 
-	String message() default "{validator.length}";
-
-	Class<?>[] groups() default { };
+	public boolean isValid(Date date, ConstraintValidatorContext constraintValidatorContext) {
+		//null values are valid
+		if ( date == null ) {
+			return true;
+		}
+		return date.before( new Date() );
+	}
 }

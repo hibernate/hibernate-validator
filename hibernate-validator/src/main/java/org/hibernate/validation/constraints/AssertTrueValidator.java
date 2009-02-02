@@ -1,4 +1,4 @@
-// $Id$
+// $Id
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,30 +17,26 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.AssertTrue;
 
 /**
- * Validate that the string is between min and max included
+ * Validates that the value passed is true
  *
- * @author Emmanuel Bernard
+ * @author Alaa Nassef
  */
-@Documented
-@Constraint(validatedBy = LengthValidator.class)
-@Target({ METHOD, FIELD, TYPE })
-@Retention(RUNTIME)
-public @interface Length {
-	int min() default 0;
+public class AssertTrueValidator implements ConstraintValidator<AssertTrue, Boolean> {
 
-	int max() default Integer.MAX_VALUE;
+	public void initialize(AssertTrue constraintAnnotation) {
+	}
 
-	String message() default "{validator.length}";
+	public boolean isValid(Boolean bool, ConstraintValidatorContext constraintValidatorContext) {
+		//null values are valid
+		if ( bool == null ) {
+			return true;
+		}
+		return bool;
+	}
 
-	Class<?>[] groups() default { };
 }

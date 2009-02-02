@@ -17,50 +17,32 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.annotation.Annotation;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Before;
 
-import org.hibernate.tck.annotations.SpecAssertion;
+import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
 /**
+ * Tests the <code>LengthConstraint</code>.
+ *
  * @author Hardy Ferentschik
  */
-public class PatternConstraintTest {
+public class LengthValidatorTest {
 
-	PatternConstraintValidator constraint;
+	private static LengthValidator constraint;
 
-	@Before
-	public void init() {
-		constraint = new PatternConstraintValidator();
-		constraint.initialize(
-				new Pattern() {
-
-					public String message() {
-						return "{validator.pattern}";
-					}
-
-					public Class<?>[] groups() {
-						return new Class<?>[0];
-					}
-
-					public String regex() {
-						return "foobar";
-					}
-
-					public int flags() {
-						return 0;
-					}
-
-					public Class<? extends Annotation> annotationType() {
-						return this.getClass();
-					}
-				}
-		);
+	@BeforeClass
+	public static void init() {
+		AnnotationDescriptor descriptor = new AnnotationDescriptor( Length.class );
+		descriptor.setValue( "min", 1 );
+		descriptor.setValue( "max", 3 );
+		descriptor.setValue( "message", "{validator.length}" );
+		Length l = AnnotationFactory.create( descriptor );
+		constraint = new LengthValidator();
+		constraint.initialize( l );
 	}
 
 	@Test
@@ -68,8 +50,9 @@ public class PatternConstraintTest {
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertFalse( constraint.isValid( "", null ) );
-		assertFalse( constraint.isValid( "bla bla", null ) );
-		assertFalse( constraint.isValid( "This test is not foobar", null ) );
+		assertTrue( constraint.isValid( "f", null ) );
+		assertTrue( constraint.isValid( "fo", null ) );
+		assertTrue( constraint.isValid( "foo", null ) );
+		assertFalse( constraint.isValid( "foobar", null ) );
 	}
-
 }

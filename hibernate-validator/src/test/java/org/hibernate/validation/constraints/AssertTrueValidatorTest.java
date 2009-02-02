@@ -1,4 +1,4 @@
-// $Id$
+// $Id
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,30 +17,29 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
- * Validate that the string is between min and max included
- *
- * @author Emmanuel Bernard
+ * @author Alaa Nassef
  */
-@Documented
-@Constraint(validatedBy = LengthValidator.class)
-@Target({ METHOD, FIELD, TYPE })
-@Retention(RUNTIME)
-public @interface Length {
-	int min() default 0;
+public class AssertTrueValidatorTest {
 
-	int max() default Integer.MAX_VALUE;
+	private static AssertTrueValidator constraint;
 
-	String message() default "{validator.length}";
+	@BeforeClass
+	public static void init() {
+		constraint = new AssertTrueValidator();
+	}
 
-	Class<?>[] groups() default { };
+	@Test
+	public void testIsValid() {
+		assertTrue( constraint.isValid( null, null ) );
+		assertTrue( constraint.isValid( true, null ) );
+		assertTrue( constraint.isValid( Boolean.TRUE, null ) );
+		assertFalse( constraint.isValid( false, null ) );
+		assertFalse( constraint.isValid( Boolean.FALSE, null ) );
+	}
 }

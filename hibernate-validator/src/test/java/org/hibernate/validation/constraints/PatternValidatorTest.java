@@ -19,31 +19,37 @@ package org.hibernate.validation.constraints;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Before;
 
-import org.hibernate.tck.annotations.SpecAssertion;
+import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NotEmptyConstraintTest {
+public class PatternValidatorTest {
 
-	NotEmptyConstraintValidator constraint;
+	private static PatternValidator constraint;
 
-	@Before
-	public void init() {
-		constraint = new NotEmptyConstraintValidator();
+	@BeforeClass
+	public static void init() {
+
+		AnnotationDescriptor descriptor = new AnnotationDescriptor( Pattern.class );
+		descriptor.setValue( "regex", "foobar" );
+		descriptor.setValue( "message", "{validator.pattern}" );
+		Pattern p = AnnotationFactory.create( descriptor );
+
+		constraint = new PatternValidator();
+		constraint.initialize( p );
 	}
 
 	@Test
 	public void testIsValid() {
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( "foo", null ) );
-		assertTrue( constraint.isValid( "  ", null ) );
-
 		assertFalse( constraint.isValid( "", null ) );
+		assertFalse( constraint.isValid( "bla bla", null ) );
+		assertFalse( constraint.isValid( "This test is not foobar", null ) );
 	}
 }

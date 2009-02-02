@@ -17,29 +17,30 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.util.regex.Matcher;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class PatternConstraintValidator implements ConstraintValidator<Pattern, String> {
+public class NotEmptyValidatorTest {
 
-	private java.util.regex.Pattern pattern;
+	private static NotEmptyValidator constraint;
 
-	public void initialize(Pattern parameters) {
-		pattern = java.util.regex.Pattern.compile(
-				parameters.regex(),
-				parameters.flags()
-		);
+	@BeforeClass
+	public static void init() {
+		constraint = new NotEmptyValidator();
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
-		if ( value == null ) {
-			return true;
-		}
-		Matcher m = pattern.matcher( value );
-		return m.matches();
+	@Test
+	public void testIsValid() {
+
+		assertTrue( constraint.isValid( null, null ) );
+		assertTrue( constraint.isValid( "foo", null ) );
+		assertTrue( constraint.isValid( "  ", null ) );
+
+		assertFalse( constraint.isValid( "", null ) );
 	}
 }
