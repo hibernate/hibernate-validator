@@ -31,5 +31,5 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
  */
 @Target({ ANNOTATION_TYPE })
 @Retention(RUNTIME)
-public @interface ReportAsViolationFromCompositeConstraint {
+public @interface ReportAsSingleViolation {
 }

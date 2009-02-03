@@ -104,7 +104,7 @@ public class ConstraintTree {
 
 	private boolean reportAsSingleViolation() {
 		return getParent() != null
-				&& getParent().getDescriptor().isReportAsViolationFromCompositeConstraint();
+				&& getParent().getDescriptor().isReportAsSingleViolation();
 	}
 
 	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ValidationContext<T> validationContext, Object leafBeanInstance, String message, ConstraintDescriptor descriptor) {

@@ -25,7 +25,7 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
-import javax.validation.ReportAsViolationFromCompositeConstraint;
+import javax.validation.ReportAsSingleViolation;
 
 /**
  * Constraint used to test nested composing constraints.
@@ -37,7 +37,7 @@ import javax.validation.ReportAsViolationFromCompositeConstraint;
 @Documented
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)
-@ReportAsViolationFromCompositeConstraint
+@ReportAsSingleViolation
 public @interface GermanZipcode {
 	public abstract String message() default "Falsche Postnummer.";
 

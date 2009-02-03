@@ -33,7 +33,7 @@ import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesParameter;
 import javax.validation.OverridesParameters;
-import javax.validation.ReportAsViolationFromCompositeConstraint;
+import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 
@@ -112,7 +112,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 		this.builtinConstraints = builtinConstraints;
 
 		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
-				ReportAsViolationFromCompositeConstraint.class
+				ReportAsSingleViolation.class
 		);
 
 
@@ -169,7 +169,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean isReportAsViolationFromCompositeConstraint() {
+	public boolean isReportAsSingleViolation() {
 		return isReportAsSingleInvalidConstraint;
 	}
 

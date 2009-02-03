@@ -164,7 +164,7 @@ public class ConstraintCompositionTest {
 		address.setAddressline2( "3ter Stock" );
 		address.setCity( "Karlsruhe" );
 		address.setZipCode( "abc" );
-		// actually three composing constraints fail, but due to @ReportAsViolationFromCompositeConstraint only one will be reported.
+		// actually three composing constraints fail, but due to @ReportAsSingleViolation only one will be reported.
 		Set<ConstraintViolation<GermanAddress>> constraintViolations = validator.validate( address );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertConstraintViolation(
