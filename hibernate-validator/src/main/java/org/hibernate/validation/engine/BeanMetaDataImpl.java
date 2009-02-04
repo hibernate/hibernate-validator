@@ -298,7 +298,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( ConstraintDescriptorImpl constraintDescriptor : metadata ) {
 			if ( methodName == null ) {
 				throw new ValidationException(
-						"Annoated methods must follow the JavaBeans naming convention. " + method.getName() + "() does not."
+						"Annotated methods must follow the JavaBeans naming convention. " + method.getName() + "() does not."
 				);
 			}
 			ElementDescriptorImpl elementDescriptor = ( ElementDescriptorImpl ) propertyDescriptors.get( methodName );
