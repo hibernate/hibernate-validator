@@ -65,7 +65,7 @@ public class ValidatorImplTest {
 		catch ( ValidationException e ) {
 			assertEquals(
 					"Wrong error message",
-					"Annoated methods must follow the JavaBeans naming convention. age() does not.",
+					"Annotated methods must follow the JavaBeans naming convention. age() does not.",
 					e.getMessage()
 			);
 		}
