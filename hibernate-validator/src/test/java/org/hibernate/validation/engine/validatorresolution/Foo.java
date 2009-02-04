@@ -15,12 +15,21 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.validatorresolution;
 
 /**
- * Empty un-constraint test class.
- *
  * @author Hardy Ferentschik
  */
-public class Unconstraint {
+public class Foo {
+
+	@Ambigious
+	private Bar bar;
+
+	public Foo(Bar bar) {
+		this.bar = bar;
+	}
+
+	public Bar getBar() {
+		return bar;
+	}
 }

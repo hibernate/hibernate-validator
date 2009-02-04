@@ -32,12 +32,12 @@ import java.io.InputStream;
  *         .buildValidatorFactory();
  * </pre>
  * <p/>
- *
+ * <p/>
  * By default, the configuration information is retrieved from
  * META-INF/validation.xml
  * It is possible to override the configuration retrieved from the XML file
  * by using one or more of the Configuration methods.
- *
+ * <p/>
  * The ValidationProviderResolver is specified at Configuration time
  * (see {@link javax.validation.spi.ValidationProvider}).
  * If none is explicitely requested, the default ValidationProviderResolver is used.
@@ -61,8 +61,11 @@ public interface Configuration<T extends Configuration<T>> {
 	 * This method is typically useful for containers that parse
 	 * META-INF/validation.xml themselves and pass the information
 	 * via the Configuration methods.
+	 *
+	 * @return <code>this</code> following the chaining method pattern.
 	 */
 	T ignoreXmlConfiguration();
+
 	/**
 	 * Defines the message interpolator used. Has priority over the configuration
 	 * based message interpolator.
@@ -94,11 +97,11 @@ public interface Configuration<T extends Configuration<T>> {
 	T constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory);
 
 	/**
-	 * Add a stream describing constaint mapping in the Bean Validation
+	 * Add a stream describing constraint mapping in the Bean Validation
 	 * XML format.
 	 * <p/>
 	 * The stream should be closed by the client API after the
-	 * ValidatorFactory has been built. The Bean Validation provider
+	 * <code>ValidatorFactory</code> has been built. The Bean Validation provider
 	 * must not close the stream.
 	 *
 	 * @param stream XML mapping stream.
@@ -112,29 +115,33 @@ public interface Configuration<T extends Configuration<T>> {
 	 * XML Configuration properties.
 	 * If the underlying provider does not know how to handle the property,
 	 * it must silently ignore it.
-	 *
+	 * <p/>
 	 * Note: Using this non type-safe method is generally not recommended.
-	 *
+	 * <p/>
 	 * It is more appropriate to use, if available, the type-safe equivalent provided
 	 * by a specific provider in its Configuration subclass.
 	 * <code>ValidatorFactory factory = Validation.byProvider(ACMEConfiguration.class)
-	 *        .configure()
-	 *           .providerSpecificProperty(ACMEState.FAST)
-	 *           .buildValidatorFactory();
+	 * .configure()
+	 * .providerSpecificProperty(ACMEState.FAST)
+	 * .buildValidatorFactory();
 	 * </code>
 	 * This method is typically used by containers parsing META-INF/validation.xml
 	 * themselves and injecting the state to the Configuration object.
-	 *
+	 * <p/>
 	 * If a property with a given name is defined both via this method and in the
 	 * XML configuration, the value set programmatically has priority.
+	 *
+	 * @param name property name.
+	 * @param value property value.
+	 * @return <code>this</code> following the chaining method pattern.
 	 */
 	T addProperty(String name, String value);
 
 	/**
 	 * Return an implementation of the MessageInterpolator interface following the
 	 * default MessageInterpolator defined in the specification:
-	 *  - use the ValidationMessages resource bundle to load keys
-	 *  - use Locale.getDefault()
+	 * - use the ValidationMessages resource bundle to load keys
+	 * - use Locale.getDefault()
 	 *
 	 * @return default MessageInterpolator implementation compliant with the specification
 	 */

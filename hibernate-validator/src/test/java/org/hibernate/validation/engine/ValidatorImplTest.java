@@ -42,7 +42,7 @@ import org.hibernate.validation.eg.Dictonary;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.EnglishDictonary;
 import org.hibernate.validation.eg.Order;
-import org.hibernate.validation.eg.Unconstraint;
+import org.hibernate.validation.eg.UnconstraintEntity;
 import org.hibernate.validation.eg.groups.First;
 import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.groups.Second;
@@ -80,7 +80,7 @@ public class ValidatorImplTest {
 	@Test
 	public void testUnconstraintClass() {
 		Validator validator = TestUtil.getValidator();
-		assertTrue( "There should be no constraints", !validator.getConstraintsForClass( Unconstraint.class ).hasConstraints() );
+		assertTrue( "There should be no constraints", !validator.getConstraintsForClass( UnconstraintEntity.class ).hasConstraints() );
 	}
 
 	@Test

@@ -15,12 +15,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.engine.validatorresolution;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.hibernate.validation.eg.MultipleMinMax;
@@ -41,5 +44,19 @@ public class ValidatorResolutionTest {
 		MultipleMinMax minMax = new MultipleMinMax( "5", 5 );
 		Set<ConstraintViolation<MultipleMinMax>> constraintViolations = validator.validate( minMax );
 		assertNumberOfViolations( constraintViolations, 2 );
+	}
+
+	@Test
+	public void testAmbigiousValidatorResolution() {
+		Validator validator = getValidator();
+
+		Foo foo = new Foo( new SerializableBar() );
+		try {
+			validator.validate( foo );
+			fail();
+		}
+		catch ( ValidationException e ) {
+			assertTrue( e.getMessage().startsWith( "There are multiple validators" ) );
+		}
 	}
 }

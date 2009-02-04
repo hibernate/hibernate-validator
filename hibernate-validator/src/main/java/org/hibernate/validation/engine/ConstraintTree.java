@@ -206,7 +206,7 @@ public class ConstraintTree {
 		do {
 			classesToRemove.clear();
 			Class clazz = assignableClasses.get( 0 );
-			for ( int i = 1; i <= assignableClasses.size(); i++ ) {
+			for ( int i = 1; i < assignableClasses.size(); i++ ) {
 				if ( clazz.isAssignableFrom( assignableClasses.get( i ) ) ) {
 					classesToRemove.add( clazz );
 				}

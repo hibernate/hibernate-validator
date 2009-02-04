@@ -268,8 +268,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param beanClass The class to check for constraints annotations.
 	 *
 	 * @return A list of constraint descriptors for all constraint specified on the given class.
-	 *
-	 * @todo inject XML data here, probably externalizing the process
 	 */
 	private List<ConstraintDescriptorImpl> findClassLevelConstraints(Class beanClass) {
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
@@ -289,8 +287,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param method The method to check for constraints annotations.
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given method.
-	 *
-	 * @todo inject XML data here, probably externalizing the process
 	 */
 	private List<ConstraintDescriptorImpl> findMethodLevelConstraints(Method method) {
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
@@ -326,8 +322,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param field The field to check for constraints annotations.
 	 *
 	 * @return A list of constraint descriptors for all constraint specified on the given field.
-	 *
-	 * @todo inject XML data here, probably externalizing the process
 	 */
 	private List<ConstraintDescriptorImpl> findFieldLevelConstraints(Field field) {
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
