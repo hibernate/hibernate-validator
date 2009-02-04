@@ -81,7 +81,7 @@ public class ValidatorImpl implements Validator {
 			throw new IllegalArgumentException( "Validation of a null object" );
 		}
 
-		ValidationContext<T> context = new ValidationContext<T>(
+		ExecutionContext<T> context = new ExecutionContext<T>(
 				object, messageInterpolator, constraintValidatorFactory
 		);
 		List<ConstraintViolationImpl<T>> list = validateInContext( context, Arrays.asList( groups ) );
@@ -100,7 +100,7 @@ public class ValidatorImpl implements Validator {
 	 * @todo Currently we iterate the cascaded fields multiple times. Maybe we should change to an approach where we iterate the object graph only once.
 	 * @todo Context root bean can be a different object than the current Validator<T> hence two different generics variables
 	 */
-	private <T> List<ConstraintViolationImpl<T>> validateInContext(ValidationContext<T> context, List<Class<?>> groups) {
+	private <T> List<ConstraintViolationImpl<T>> validateInContext(ExecutionContext<T> context, List<Class<?>> groups) {
 		if ( context.peekValidatedObject() == null ) {
 			return Collections.emptyList();
 		}
@@ -133,30 +133,30 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * Validates the non-cascaded constraints.
 	 *
-	 * @param validationContext The current validation context.
+	 * @param executionContext The current validation context.
 	 */
-	private <T> void validateConstraints(ValidationContext<T> validationContext) {
+	private <T> void validateConstraints(ExecutionContext<T> executionContext) {
 		//casting rely on the fact that root object is at the top of the stack
 		@SuppressWarnings("unchecked")
 		BeanMetaData<T> beanMetaData =
-				( BeanMetaData<T> ) getBeanMetaData( validationContext.peekValidatedObjectType() );
+				( BeanMetaData<T> ) getBeanMetaData( executionContext.peekValidatedObjectType() );
 		for ( MetaConstraint metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			ConstraintDescriptor mainConstraintDescriptor = metaConstraint.getDescriptor();
 
-			validationContext.pushProperty( metaConstraint.getPropertyName() );
+			executionContext.pushProperty( metaConstraint.getPropertyName() );
 
-			if ( !validationContext.needsValidation( mainConstraintDescriptor.getGroups() ) ) {
-				validationContext.popProperty();
+			if ( !executionContext.needsValidation( mainConstraintDescriptor.getGroups() ) ) {
+				executionContext.popProperty();
 				continue;
 			}
 
-			metaConstraint.validateConstraint( beanMetaData.getBeanClass(), validationContext );
-			validationContext.popProperty();
+			metaConstraint.validateConstraint( beanMetaData.getBeanClass(), executionContext );
+			executionContext.popProperty();
 		}
-		validationContext.markProcessedForCurrentGroup();
+		executionContext.markProcessedForCurrentGroup();
 	}
 
-	private <T> void validateCascadedConstraints(ValidationContext<T> context) {
+	private <T> void validateCascadedConstraints(ExecutionContext<T> context) {
 		List<Member> cascadedMembers = getBeanMetaData( context.peekValidatedObjectType() )
 				.getCascadedMembers();
 		for ( Member member : cascadedMembers ) {
@@ -181,7 +181,7 @@ public class ValidatorImpl implements Validator {
 	 * @param value the actual value.
 	 * @return An iterator over the value of a cascaded property.
 	 */
-	private <T> Iterator<?> createIteratorForCascadedValue(ValidationContext<T> context, Type type, Object value) {
+	private <T> Iterator<?> createIteratorForCascadedValue(ExecutionContext<T> context, Type type, Object value) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isCollection( type ) ) {
 			boolean isIterable = value instanceof Iterable;
@@ -205,7 +205,7 @@ public class ValidatorImpl implements Validator {
 		return iter;
 	}	
 
-	private <T> void validateCascadedConstraint(ValidationContext<T> context, Iterator<?> iter) {
+	private <T> void validateCascadedConstraint(ExecutionContext<T> context, Iterator<?> iter) {
 		Object actualValue;
 		String propertyIndex;
 		int i = 0;
@@ -275,7 +275,7 @@ public class ValidatorImpl implements Validator {
 						continue;
 					}
 
-					ValidationContext<T> context = new ValidationContext<T>(
+					ExecutionContext<T> context = new ExecutionContext<T>(
 							object, messageInterpolator, constraintValidatorFactory
 					);
 					metaConstraint.validateConstraint( object.getClass(), context );
@@ -328,7 +328,7 @@ public class ValidatorImpl implements Validator {
 						continue;
 					}
 
-					ValidationContext<T> context = new ValidationContext<T>(
+					ExecutionContext<T> context = new ExecutionContext<T>(
 							( T ) value, messageInterpolator, constraintValidatorFactory
 					);
 					context.pushProperty( propertyIter.getOriginalProperty() );

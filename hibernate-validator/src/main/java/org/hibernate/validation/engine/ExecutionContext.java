@@ -40,7 +40,7 @@ import org.hibernate.validation.util.IdentitySet;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public class ValidationContext<T> {
+public class ExecutionContext<T> {
 
 	/**
 	 * The root bean of the validation.
@@ -84,11 +84,11 @@ public class ValidationContext<T> {
 	ConstraintValidatorFactory constraintValidatorFactory;
 
 
-	public ValidationContext(T object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
+	public ExecutionContext(T object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
 		this( object, object, messageResolver, constraintValidatorFactory );
 	}
 
-	public ValidationContext(T rootBean, Object object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
+	public ExecutionContext(T rootBean, Object object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
 		this.rootBean = rootBean;
 		this.messageResolver = messageResolver;
 		this.constraintValidatorFactory = constraintValidatorFactory;

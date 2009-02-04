@@ -167,14 +167,14 @@ public class MetaConstraint {
 		return constraintTree;
 	}
 
-	public <T> void validateConstraint(Class beanClass, ValidationContext<T> validationContext) {
-		final Object leafBeanInstance = validationContext.peekValidatedObject();
+	public <T> void validateConstraint(Class beanClass, ExecutionContext<T> executionContext) {
+		final Object leafBeanInstance = executionContext.peekValidatedObject();
 		Object value = getValue( leafBeanInstance );
-		constraintTree.validateConstraints( value, beanClass, validationContext );
+		constraintTree.validateConstraints( value, beanClass, executionContext );
 	}
 
-	public <T> void validateConstraint(Class beanClass, Object value, ValidationContext<T> validationContext) {
-		constraintTree.validateConstraints( value, beanClass, validationContext );
+	public <T> void validateConstraint(Class beanClass, Object value, ExecutionContext<T> executionContext) {
+		constraintTree.validateConstraints( value, beanClass, executionContext );
 	}
 
 	private Type typeOfAnnoatedElement() {

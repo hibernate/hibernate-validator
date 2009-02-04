@@ -80,31 +80,31 @@ public class ConstraintTree {
 		return descriptor;
 	}
 
-	public void validateConstraints(Object value, Class beanClass, ValidationContext validationContext) {
+	public void validateConstraints(Object value, Class beanClass, ExecutionContext executionContext) {
 		for ( ConstraintTree tree : getChildren() ) {
-			tree.validateConstraints( value, beanClass, validationContext );
+			tree.validateConstraints( value, beanClass, executionContext );
 		}
 
-		final Object leafBeanInstance = validationContext.peekValidatedObject();
+		final Object leafBeanInstance = executionContext.peekValidatedObject();
 		ConstraintValidatorContextImpl constraintContext = new ConstraintValidatorContextImpl( descriptor );
 		if ( log.isTraceEnabled() ) {
 			log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
 		}
 		ConstraintValidator validator = getInitalizedValidator(
-				value, validationContext.getConstraintValidatorFactory()
+				value, executionContext.getConstraintValidatorFactory()
 		);
 		if ( !validator.isValid( value, constraintContext ) ) {
 			for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
 				final String message = error.getMessage();
-				createConstraintViolation( value, beanClass, validationContext, leafBeanInstance, message, descriptor );
+				createConstraintViolation( value, beanClass, executionContext, leafBeanInstance, message, descriptor );
 			}
 		}
 		if ( reportAsSingleViolation()
-				&& validationContext.getFailingConstraints().size() > 0 ) {
-			validationContext.clearFailingConstraints();
+				&& executionContext.getFailingConstraints().size() > 0 ) {
+			executionContext.clearFailingConstraints();
 			final String message = ( String ) getParent().getDescriptor().getParameters().get( "message" );
 			createConstraintViolation(
-					value, beanClass, validationContext, leafBeanInstance, message, getParent().descriptor
+					value, beanClass, executionContext, leafBeanInstance, message, getParent().descriptor
 			);
 		}
 	}
@@ -114,8 +114,8 @@ public class ConstraintTree {
 				&& getParent().getDescriptor().isReportAsSingleViolation();
 	}
 
-	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ValidationContext<T> validationContext, Object leafBeanInstance, String message, ConstraintDescriptor descriptor) {
-		String interpolatedMessage = validationContext.getMessageResolver().interpolate(
+	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ExecutionContext<T> executionContext, Object leafBeanInstance, String message, ConstraintDescriptor descriptor) {
+		String interpolatedMessage = executionContext.getMessageResolver().interpolate(
 				message,
 				descriptor,
 				leafBeanInstance
@@ -123,15 +123,15 @@ public class ConstraintTree {
 		ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
 				message,
 				interpolatedMessage,
-				validationContext.getRootBean(),
+				executionContext.getRootBean(),
 				beanClass,
 				leafBeanInstance,
 				value,
-				validationContext.peekPropertyPath(), //FIXME use error.getProperty()
-				validationContext.getCurrentGroup(),
+				executionContext.peekPropertyPath(), //FIXME use error.getProperty()
+				executionContext.getCurrentGroup(),
 				descriptor
 		);
-		validationContext.addConstraintFailure( failingConstraintViolation );
+		executionContext.addConstraintFailure( failingConstraintViolation );
 	}
 
 	/**
