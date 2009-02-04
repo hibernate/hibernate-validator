@@ -19,6 +19,8 @@ package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintValidator;
@@ -29,7 +31,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.hibernate.validation.constraints.composition.FrenchZipcodeConstraintValidator;
-import org.hibernate.validation.util.ValidatorTypeHelper;
 
 /**
  * Tests for message resolution.
@@ -40,8 +41,10 @@ public class ValidatorTypeTest {
 
 	@Test
 	public void testTypeDiscovery() {
+		List<Class<? extends ConstraintValidator<?, ?>>> validators = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		validators.add( FrenchZipcodeConstraintValidator.class );
 		Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes = ValidatorTypeHelper
-				.getValidatorsTypes( new Class[] { FrenchZipcodeConstraintValidator.class } );
+				.getValidatorsTypes( validators );
 		assertEquals( FrenchZipcodeConstraintValidator.class, validatorsTypes.get( String.class ) );
 
 		Type type = ValidatorTypeHelper
@@ -49,20 +52,19 @@ public class ValidatorTypeTest {
 
 
 		Type type2 = ValidatorTypeHelper
-				.extractTypeLoose( TestValidator2.class  );
+				.extractTypeLoose( TestValidator2.class );
 		assertEquals( type, type2 );
 
 	}
 
 	public static class TestValidator implements ConstraintValidator<NotNull, Set<String>> {
 		public void initialize(NotNull constraintAnnotation) {
-			//To change body of implemented methods use File | Settings | File Templates.
 		}
 
 		public boolean isValid(Set<String> object, ConstraintValidatorContext constraintValidatorContext) {
-			return false;  //To change body of implemented methods use File | Settings | File Templates.
+			return false;
 		}
-}
+	}
 
 	public static class TestValidator2 implements ConstraintValidator<NotNull, Set<String>> {
 		public void initialize(NotNull constraintAnnotation) {
