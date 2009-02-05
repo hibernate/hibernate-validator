@@ -20,7 +20,7 @@ package javax.validation;
 import javax.validation.ValidationException;
 
 /**
- * Exception raised in the case that the constraint validator resolution returns more than one possible validators for
+ * Exception raised in the case that the constraint validator resolution cannot determine a suitable validators for
  * a given type.
  *
  * @author Hardy Ferentschik
