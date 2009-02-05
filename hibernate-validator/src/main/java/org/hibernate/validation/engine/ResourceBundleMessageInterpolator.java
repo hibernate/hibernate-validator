@@ -30,11 +30,11 @@ import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
 
-
 /**
  * Resource bundle backed message interpolator.
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private static final String DEFAULT_VALIDATION_MESSAGES = "org.hibernate.validation.ValidationMessages";
@@ -61,6 +61,16 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			this.userResourceBundle = resourceBundle;
 		}
 		defaultResourceBundle = ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES );
+	}
+
+	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {
+		// probably no need for caching, but it could be done by parameters since the map
+		// is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
+		return replace( message, constraintDescriptor.getParameters() );
+	}
+
+	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale) {
+		throw new UnsupportedOperationException( "Interpolation for Locale. Has to be done." );
 	}
 
 	/**
@@ -101,17 +111,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return rb;
 	}
 
-	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {
-		//probably no need for caching, but it could be done by parameters since the map
-		//is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
-		return replace( message, constraintDescriptor.getParameters() );
-	}
-
-	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale) {
-		throw new UnsupportedOperationException( "Interpolation for Locale. Has to be done." );
-	}
-
-
 	private String replace(String message, Map<String, Object> parameters) {
 		Matcher matcher = messagePattern.matcher( message );
 		StringBuffer sb = new StringBuffer();
@@ -121,7 +120,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		matcher.appendTail( sb );
 		return sb.toString();
 	}
-
 
 	private String resolveParameter(String token, Map<String, Object> parameters) {
 		Object variable = parameters.get( token );
