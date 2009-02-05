@@ -1,4 +1,4 @@
-// $Id: Constraint.java 15817 2009-01-25 22:35:36Z epbernard $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors

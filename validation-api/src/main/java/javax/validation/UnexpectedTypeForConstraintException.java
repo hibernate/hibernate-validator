@@ -1,4 +1,4 @@
-// : Person.java 69 2008-09-08 11:05:07Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,23 +15,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.validatorresolution;
+package javax.validation;
 
-import javax.validation.constraints.Size;
+import javax.validation.ValidationException;
 
 /**
+ * Exception raised in the case that the constraint validator resolution returns more than one possible validators for
+ * a given type.
+ *
  * @author Hardy Ferentschik
  */
-public class Bar {
-	// validating Bar actually raises an UnexpectedTypeForConstraintException - @Size is not defined for Integer
-	@Size
-	private Integer value = 0;
-
-	public Integer getValue() {
-		return value;
+public class UnexpectedTypeForConstraintException extends ValidationException {
+	public UnexpectedTypeForConstraintException(String message) {
+		super( message );
 	}
 
-	public void setValue(Integer value) {
-		this.value = value;
+	public UnexpectedTypeForConstraintException() {
+		super();
+	}
+
+	public UnexpectedTypeForConstraintException(String message, Throwable cause) {
+		super( message, cause );
+	}
+
+	public UnexpectedTypeForConstraintException(Throwable cause) {
+		super( cause );
 	}
 }

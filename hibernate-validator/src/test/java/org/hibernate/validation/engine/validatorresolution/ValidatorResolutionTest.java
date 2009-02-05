@@ -18,11 +18,13 @@
 package org.hibernate.validation.engine.validatorresolution;
 
 import java.util.Set;
+import javax.validation.AmbiguousConstraintUsageException;
 import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.UnexpectedTypeForConstraintException;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
@@ -56,8 +58,22 @@ public class ValidatorResolutionTest {
 			validator.validate( foo );
 			fail();
 		}
-		catch ( ValidationException e ) {
+		catch ( AmbiguousConstraintUsageException e ) {
 			assertTrue( e.getMessage().startsWith( "There are multiple validators" ) );
+		}
+	}
+
+	@Test
+	public void testUnexpectedType() {
+		Validator validator = getValidator();
+
+		Bar bar = new Bar();
+		try {
+			validator.validate( bar );
+			fail();
+		}
+		catch ( UnexpectedTypeForConstraintException e ) {
+			assertEquals( "No validator could be found for type: java.lang.Integer", e.getMessage() );
 		}
 	}
 

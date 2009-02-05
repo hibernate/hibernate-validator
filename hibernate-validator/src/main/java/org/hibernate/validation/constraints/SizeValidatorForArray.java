@@ -1,4 +1,4 @@
-// $Id: SizeValidatorForString.java 15853 2009-02-02 15:42:10Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors

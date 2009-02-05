@@ -22,9 +22,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.validation.AmbiguousConstraintUsageException;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.UnexpectedTypeForConstraintException;
 import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
@@ -168,11 +170,19 @@ public class ConstraintTree {
 
 		Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes = ValidatorTypeHelper
 				.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
-
 		List<Class> assignableClasses = findAssingableClasses( valueClass, validatorsTypes );
 
 		resolveAssignableClasses( assignableClasses );
-		if ( assignableClasses.size() != 1 ) {
+		verifyResolveWasUnique( valueClass, assignableClasses );
+
+		return validatorsTypes.get( assignableClasses.get( 0 ) );
+	}
+
+	private void verifyResolveWasUnique(Class valueClass, List<Class> assignableClasses) {
+		if ( assignableClasses.size() == 0 ) {
+			throw new UnexpectedTypeForConstraintException( "No validator could be found for type: " + valueClass.getName() );
+		}
+		else if ( assignableClasses.size() > 1 ) {
 			StringBuilder builder = new StringBuilder();
 			builder.append( "There are multiple validators which could validate the type " );
 			builder.append( valueClass );
@@ -182,10 +192,8 @@ public class ConstraintTree {
 				builder.append( ", " );
 			}
 			builder.delete( builder.length() - 2, builder.length() );
-			throw new ValidationException( builder.toString() );
+			throw new AmbiguousConstraintUsageException( builder.toString() );
 		}
-
-		return validatorsTypes.get( assignableClasses.get( 0 ) );
 	}
 
 	private List<Class> findAssingableClasses(Class valueClass, Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes) {
@@ -213,7 +221,7 @@ public class ConstraintTree {
 	 * which are handled by at least one of the  validators for the specified constraint.
 	 */
 	private void resolveAssignableClasses(List<Class> assignableClasses) {
-		if ( assignableClasses.size() == 1 ) {
+		if ( assignableClasses.size() == 0 || assignableClasses.size() == 1 ) {
 			return;
 		}
 
