@@ -43,7 +43,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
-import org.hibernate.validation.engine.HibernateValidationProvider;
+import org.hibernate.validation.HibernateValidationProvider;
 import org.hibernate.validation.constraints.NotNullValidator;
 import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.engine.ConfigurationImpl;

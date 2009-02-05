@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation;
+package org.hibernate.validation.util;
 
 import java.net.URL;
 import java.util.jar.Attributes;

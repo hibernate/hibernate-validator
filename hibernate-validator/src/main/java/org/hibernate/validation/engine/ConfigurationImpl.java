@@ -33,7 +33,7 @@ import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 
-import org.hibernate.validation.Version;
+import org.hibernate.validation.util.Version;
 
 /**
  * @author Emmanuel Bernard
