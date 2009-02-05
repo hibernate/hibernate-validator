@@ -152,7 +152,13 @@ public class ReflectionHelper {
 				}
 			}
 		}
-		catch ( Exception e ) {
+		catch ( NoSuchMethodException nsme ) {
+			// ignore
+		}
+		catch ( IllegalAccessException iae ) {
+			// ignore
+		}
+		catch ( InvocationTargetException ite ) {
 			// ignore
 		}
 		return isMultiValueConstraint;
@@ -181,7 +187,13 @@ public class ReflectionHelper {
 				}
 			}
 		}
-		catch ( Exception e ) {
+		catch ( NoSuchMethodException nsme ) {
+			// ignore
+		}
+		catch ( IllegalAccessException iae ) {
+			// ignore
+		}
+		catch ( InvocationTargetException ite ) {
 			// ignore
 		}
 		return annotationList;

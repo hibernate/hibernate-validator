@@ -1,4 +1,4 @@
-// $Id$
+// $Id: SizeValidatorForString.java 15853 2009-02-02 15:42:10Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,7 +17,6 @@
 */
 package org.hibernate.validation.constraints;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -26,11 +25,9 @@ import javax.validation.constraints.Size;
 /**
  * Check that a string's length is between min and max.
  *
- * @author Emmanuel Bernard
- * @author Gavin King
+ * @author Hardy Ferentschik
  */
-//FIXME split into several type-safe validators
-public class SizeValidator implements ConstraintValidator<Size, Object> {
+public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection> {
 	private int min;
 	private int max;
 
@@ -40,29 +37,20 @@ public class SizeValidator implements ConstraintValidator<Size, Object> {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Checks the number of entries in a map.
+	 *
+	 * @param collection The collection to validate.
+	 * @param constraintValidatorContext context in which the constraint is evaluated.
+	 *
+	 * @return Returns <code>true</code> if the collection is <code>null</code> or the number of entries in
+	 *         <code>collection</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
+	 *         <code>false</code> otherwise.
 	 */
-	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
-		if ( value == null ) {
+	public boolean isValid(Collection collection, ConstraintValidatorContext constraintValidatorContext) {
+		if ( collection == null ) {
 			return true;
 		}
-
-		int size;
-		if ( value instanceof String ) {
-			String string = ( String ) value;
-			size = string.length();
-
-		}
-		else if ( value instanceof Collection ) {
-			Collection collection = ( Collection ) value;
-			size = collection.size();
-		}
-		else if ( value instanceof Array ) {
-			size = Array.getLength( value );
-		}
-		else {
-			throw new IllegalArgumentException( "Expected String type." );
-		}
-		return size >= min && size <= max;
+		int length = collection.size();
+		return length >= min && length <= max;
 	}
 }

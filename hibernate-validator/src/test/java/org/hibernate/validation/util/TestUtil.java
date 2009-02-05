@@ -48,47 +48,38 @@ public class TestUtil {
 		return hibernateValidator;
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class constraintType, Class rootBean, Object invalidValue, String propertyPath, Class leafBean) {
+	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage,  Class rootBean, Object invalidValue, String propertyPath, Class leafBean) {
 		assertEquals(
 				"Wrong leaf bean type",
 				leafBean,
 				violation.getLeafBean().getClass()
 		);
-		assertConstraintViolation( violation, errorMessage, constraintType, rootBean, invalidValue, propertyPath );
+		assertConstraintViolation( violation, errorMessage, rootBean, invalidValue, propertyPath );
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class constraintType, Class rootBean, Object invalidValue, String propertyPath) {
+	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath) {
 		assertEquals(
 				"Wrong propertyPath",
 				propertyPath,
 				violation.getPropertyPath()
 		);
-		assertConstraintViolation( violation, errorMessage, constraintType, rootBean, invalidValue );
+		assertConstraintViolation( violation, errorMessage, rootBean, invalidValue );
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class constraintType, Class rootBean, Object invalidValue) {
+	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue) {
 		assertEquals(
 				"Wrong invalid value",
 				invalidValue,
 				violation.getInvalidValue()
 		);
-		assertConstraintViolation( violation, errorMessage, constraintType, rootBean );
+		assertConstraintViolation( violation, errorMessage, rootBean );
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class constraintType, Class rootBean) {
+	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean) {
 		assertEquals(
 				"Wrong root bean type",
 				rootBean,
 				violation.getRootBean().getClass()
-		);
-		assertConstraintViolation( violation, errorMessage, constraintType );
-	}
-
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class constraintType) {
-		assertEquals(
-				"Wrong constraint error Type",
-				constraintType,
-				violation.getConstraintDescriptor().getConstraintValidatorClasses().get(0)
 		);
 		assertConstraintViolation( violation, errorMessage );
 	}

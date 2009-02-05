@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -48,12 +48,9 @@ public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
 		else if ( value instanceof BigInteger ) {
 			return ( ( BigInteger ) value ).compareTo( BigInteger.valueOf( maxValue ) ) != 1;
 		}
-		else if ( value instanceof Number ) {
+		else {
 			double doubleValue = value.doubleValue();
 			return doubleValue <= maxValue;
-		}
-		else {
-			return false;
 		}
 	}
 }

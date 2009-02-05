@@ -18,6 +18,8 @@
 package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -59,36 +61,23 @@ public class ValidatorTypeHelper {
 	}
 
 	private static Class<?> extractType(Class<? extends ConstraintValidator<?, ?>> validator) {
-
 		Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
 		Type constraintValidatorType = resolveTypes( resolvedTypes, validator );
 
 		//we now have all bind from a type to its resolution at one level
-
-		//FIXME throw assertion exception if constraintValidatorType == null
 		Type validatorType = ( ( ParameterizedType ) constraintValidatorType ).getActualTypeArguments()[VALIDATOR_TYPE_INDEX];
+		if ( validatorType == null ) {
+			throw new ValidationException( "Null is an invalid type for a constraint validator." );
+		}
+		else if ( validatorType instanceof GenericArrayType ) {
+			validatorType = Array.class;
+		}
+
 		while ( resolvedTypes.containsKey( validatorType ) ) {
 			validatorType = resolvedTypes.get( validatorType );
 		}
 		//FIXME raise an exception if validatorType is not a class
 		return ( Class<?> ) validatorType;
-	}
-
-	//TEst method, remove
-	public static Type extractTypeLoose(Class<? extends ConstraintValidator<?, ?>> validator) {
-
-		Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
-		Type constraintValidatorType = resolveTypes( resolvedTypes, validator );
-
-		//we now have all bind from a type to its resolution at one level
-
-		//FIXME throw assertion exception if constraintValidatorType == null
-		Type validatorType = ( ( ParameterizedType ) constraintValidatorType ).getActualTypeArguments()[VALIDATOR_TYPE_INDEX];
-		while ( resolvedTypes.containsKey( validatorType ) ) {
-			validatorType = resolvedTypes.get( validatorType );
-		}
-		//FIXME raise an exception if validatorType is not a class
-		return validatorType;
 	}
 
 	private static Type resolveTypes(Map<Type, Type> resolvedTypes, Type type) {

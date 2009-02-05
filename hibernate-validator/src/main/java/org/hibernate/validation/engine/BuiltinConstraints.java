@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -45,7 +45,10 @@ import org.hibernate.validation.constraints.NotNullValidator;
 import org.hibernate.validation.constraints.NullValidator;
 import org.hibernate.validation.constraints.PastValidatorForCalendar;
 import org.hibernate.validation.constraints.PastValidatorForDate;
-import org.hibernate.validation.constraints.SizeValidator;
+import org.hibernate.validation.constraints.SizeValidatorForString;
+import org.hibernate.validation.constraints.SizeValidatorForCollection;
+import org.hibernate.validation.constraints.SizeValidatorForArray;
+import org.hibernate.validation.constraints.SizeValidatorForMap;
 
 /**
  * @author Hardy Ferentschik
@@ -94,7 +97,10 @@ public class BuiltinConstraints {
 		builtinConstraints.put( Future.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
-		constraintList.add( SizeValidator.class );
+		constraintList.add( SizeValidatorForString.class );
+		constraintList.add( SizeValidatorForCollection.class );
+		constraintList.add( SizeValidatorForArray.class );
+		constraintList.add( SizeValidatorForMap.class );
 		builtinConstraints.put( Size.class, constraintList );
 
 

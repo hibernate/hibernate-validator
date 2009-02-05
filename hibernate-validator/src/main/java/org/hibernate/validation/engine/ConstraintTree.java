@@ -18,6 +18,7 @@
 package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -162,17 +163,13 @@ public class ConstraintTree {
 	 * @return The class of a matching validator.
 	 */
 	private Class findMatchingValidatorClass(Object value) {
-		Class valueClass = value.getClass();
+
+		Class valueClass = determineValueClass( value );
 
 		Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes = ValidatorTypeHelper
 				.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
 
-		List<Class> assignableClasses = new ArrayList<Class>();
-		for ( Class clazz : validatorsTypes.keySet() ) {
-			if ( clazz.isAssignableFrom( valueClass ) ) {
-				assignableClasses.add( clazz );
-			}
-		}
+		List<Class> assignableClasses = findAssingableClasses( valueClass, validatorsTypes );
 
 		resolveAssignableClasses( assignableClasses );
 		if ( assignableClasses.size() != 1 ) {
@@ -189,6 +186,24 @@ public class ConstraintTree {
 		}
 
 		return validatorsTypes.get( assignableClasses.get( 0 ) );
+	}
+
+	private List<Class> findAssingableClasses(Class valueClass, Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes) {
+		List<Class> assignableClasses = new ArrayList<Class>();
+		for ( Class clazz : validatorsTypes.keySet() ) {
+			if ( clazz.isAssignableFrom( valueClass ) ) {
+				assignableClasses.add( clazz );
+			}
+		}
+		return assignableClasses;
+	}
+
+	private Class determineValueClass(Object value) {
+		Class valueClass = value.getClass();
+		if ( valueClass.isArray() ) {
+			valueClass = Array.class;
+		}
+		return valueClass;
 	}
 
 	/**
