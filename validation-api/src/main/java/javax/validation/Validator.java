@@ -36,7 +36,7 @@ public interface Validator {
 	 *
 	 * @return constraint violations or an empty Set if none
 	 *
-	 * @throws IllegalArgumentException e if object is null
+	 * @throws IllegalArgumentException if object is null
 	 */
 	<T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups);
 
@@ -50,7 +50,7 @@ public interface Validator {
 	 *
 	 * @return constraint violations or an empty Set if none
 	 *
-	 * @throws IllegalArgumentException e if object is null or if propertyName is not present
+	 * @throws IllegalArgumentException if object is null or if propertyName is not present
 	 */
 	<T> Set<ConstraintViolation<T>> validateProperty(T object,
 													 String propertyName,
@@ -69,7 +69,7 @@ public interface Validator {
 	 *               (default to {@link javax.validation.groups.Default})
 	 *
 	 * @return constraint violations or an empty Set if none
-	 * @throws IllegalArgumentException e if propertyName is not present
+	 * @throws IllegalArgumentException if propertyName is not present
 	 */
 	<T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType,
 												  String propertyName,

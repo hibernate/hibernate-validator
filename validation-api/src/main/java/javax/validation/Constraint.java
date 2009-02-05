@@ -29,7 +29,7 @@ import java.lang.annotation.Annotation;
  * Link between a constraint annotation and its constraint validation implementations.
  * <p/>
  * A given constraint annotation should be annotated by a @Constraint
- * annotation which refers to its list of constraint validation implementation.
+ * annotation which refers to its list of constraint validation implementations.
  *
  * @author Emmanuel Bernard (emmanuel at hibernate.org)
  * @author Gavin King
@@ -39,11 +39,11 @@ import java.lang.annotation.Annotation;
 @Target({ ANNOTATION_TYPE })
 @Retention(RUNTIME)
 public @interface Constraint {
-	/**
-	 * ConstraintValidator classes must reference distinct target types.
-	 * If two validators refer to the same type, an exception will occur
-	 * 
-	 * @return aray of ConstraintValidator classes implementing the constraint
-	 */
-	public Class<? extends ConstraintValidator<?,?>>[] validatedBy();
+    /**
+     * ConstraintValidator classes must reference distinct target types.
+     * If two validators refer to the same type, an exception will occur.
+     *
+     * @return array of ConstraintValidator classes implementing the constraint
+     */
+    public Class<? extends ConstraintValidator<?,?>>[] validatedBy();
 }
