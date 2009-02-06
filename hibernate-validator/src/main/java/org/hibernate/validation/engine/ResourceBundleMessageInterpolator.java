@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.engine;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -45,48 +46,64 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 * Regular expression used to do message interpolation.
 	 */
 	private static final Pattern messagePattern = Pattern.compile( "\\{([\\w\\.]+)\\}" );
-	private ResourceBundle defaultResourceBundle;
-	private ResourceBundle userResourceBundle;
+
+	/**
+	 * The default locale for the current user.
+	 */
+	private final Locale defaultLocale;
+
+	private final Map<Locale, ResourceBundle> userBundlesMap = new HashMap<Locale, ResourceBundle>();
+
+	private final Map<Locale, ResourceBundle> defaultBundlesMap = new HashMap<Locale, ResourceBundle>();
 
 	public ResourceBundleMessageInterpolator() {
-		userResourceBundle = getFileBasedResourceBundle();
-		defaultResourceBundle = ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES );
+		this( null );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundle resourceBundle) {
+
+		defaultLocale = Locale.getDefault();
+
 		if ( resourceBundle == null ) {
-			userResourceBundle = getFileBasedResourceBundle();
+			ResourceBundle bundle = getFileBasedResourceBundle( defaultLocale );
+			userBundlesMap.put( defaultLocale, bundle );
+
 		}
 		else {
-			this.userResourceBundle = resourceBundle;
+			userBundlesMap.put( defaultLocale, resourceBundle );
 		}
-		defaultResourceBundle = ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES );
+
+		defaultBundlesMap.put( defaultLocale, ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES, defaultLocale ) );
 	}
 
 	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
-		return replace( message, constraintDescriptor.getParameters() );
+		return replace( message, constraintDescriptor.getParameters(), defaultLocale );
 	}
 
 	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale) {
-		throw new UnsupportedOperationException( "Interpolation for Locale. Has to be done." );
+		return replace( message, constraintDescriptor.getParameters(), locale );
 	}
 
 	/**
 	 * Search current thread classloader for the resource bundle. If not found, search validator (this) classloader.
 	 *
+	 * @param locale The locale of the bundle to load.
+	 *
 	 * @return the resource bundle or <code>null</code> if none is found.
 	 */
-	private ResourceBundle getFileBasedResourceBundle() {
+	private ResourceBundle getFileBasedResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		if ( classLoader != null ) {
-			rb = loadBundle( classLoader, USER_VALIDATION_MESSAGES + " not found by thread local classloader" );
+			rb = loadBundle( classLoader, locale, USER_VALIDATION_MESSAGES + " not found by thread local classloader" );
 		}
 		if ( rb == null ) {
 			rb = loadBundle(
-					this.getClass().getClassLoader(), USER_VALIDATION_MESSAGES + " not found by validator classloader"
+					this.getClass().getClassLoader(),
+					locale,
+					USER_VALIDATION_MESSAGES + " not found by validator classloader"
 			);
 		}
 		if ( log.isDebugEnabled() ) {
@@ -100,10 +117,10 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return rb;
 	}
 
-	private ResourceBundle loadBundle(ClassLoader classLoader, String message) {
+	private ResourceBundle loadBundle(ClassLoader classLoader, Locale locale, String message) {
 		ResourceBundle rb = null;
 		try {
-			rb = ResourceBundle.getBundle( USER_VALIDATION_MESSAGES, Locale.getDefault(), classLoader );
+			rb = ResourceBundle.getBundle( USER_VALIDATION_MESSAGES, locale, classLoader );
 		}
 		catch ( MissingResourceException e ) {
 			log.trace( message );
@@ -111,21 +128,24 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return rb;
 	}
 
-	private String replace(String message, Map<String, Object> parameters) {
+	private String replace(String message, Map<String, Object> parameters, Locale locale) {
 		Matcher matcher = messagePattern.matcher( message );
 		StringBuffer sb = new StringBuffer();
 		while ( matcher.find() ) {
-			matcher.appendReplacement( sb, resolveParameter( matcher.group( 1 ), parameters ) );
+			matcher.appendReplacement( sb, resolveParameter( matcher.group( 1 ), parameters, locale ) );
 		}
 		matcher.appendTail( sb );
 		return sb.toString();
 	}
 
-	private String resolveParameter(String token, Map<String, Object> parameters) {
+	private String resolveParameter(String token, Map<String, Object> parameters, Locale locale) {
 		Object variable = parameters.get( token );
 		if ( variable != null ) {
 			return variable.toString();
 		}
+
+		ResourceBundle userResourceBundle = findUserResourceBundle( locale );
+		ResourceBundle defaultResourceBundle = findDefaultResourceBundle( locale );
 
 		StringBuffer buffer = new StringBuffer();
 		String string = null;
@@ -146,8 +166,28 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		}
 		if ( string != null ) {
 			// call resolve recusively!
-			buffer.append( replace( string, parameters ) );
+			buffer.append( replace( string, parameters, locale ) );
 		}
 		return buffer.toString();
+	}
+
+	private ResourceBundle findDefaultResourceBundle(Locale locale) {
+		if ( defaultBundlesMap.containsKey( locale ) ) {
+			return defaultBundlesMap.get( locale );
+		}
+
+		ResourceBundle bundle = ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES, locale );
+		defaultBundlesMap.put( locale, bundle );
+		return bundle;
+	}
+
+	private ResourceBundle findUserResourceBundle(Locale locale) {
+		if ( userBundlesMap.containsKey( locale ) ) {
+			return userBundlesMap.get( locale );
+		}
+
+		ResourceBundle bundle = getFileBasedResourceBundle( locale );
+		userBundlesMap.put( locale, bundle );
+		return bundle;
 	}
 }

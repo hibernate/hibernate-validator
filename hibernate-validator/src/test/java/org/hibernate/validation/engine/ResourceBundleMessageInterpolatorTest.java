@@ -20,6 +20,7 @@ package org.hibernate.validation.engine;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
@@ -57,7 +58,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testSuccessfulInterpolation() {
-		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new BuiltinConstraints()
 		);
 
@@ -80,7 +81,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUnSuccessfulInterpolation() {
-		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new BuiltinConstraints()
 		);
 		String expected = "foo";  // missing {}
@@ -94,7 +95,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUnkownTokenInterpolation() {
-		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new BuiltinConstraints()
 		);
 		String expected = "{bar}";  // unkown token {}
@@ -104,19 +105,59 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testDefaultInterpolation() {
-		ConstraintDescriptorImpl descriptor = new ConstraintDescriptorImpl(
+		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new BuiltinConstraints()
 		);
 		String expected = "may not be null";
 		String actual = interpolator.interpolate( notNull.message(), descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
-		descriptor = new ConstraintDescriptorImpl( size, new Class<?>[] { }, new BuiltinConstraints() );
+		ConstraintDescriptorImpl<Size> sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+				size, new Class<?>[] { }, new BuiltinConstraints()
+		);
 		expected = "size must be between -2147483648 and 2147483647";  // unkown token {}
-		actual = interpolator.interpolate( size.message(), descriptor, null );
+		actual = interpolator.interpolate( size.message(), sizeDescriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
+	@Test
+	public void testMessageInterpolationWithLocale() {
+		interpolator = new ResourceBundleMessageInterpolator();
+
+		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
+				notNull, new Class<?>[] { }, new BuiltinConstraints()
+		);
+
+		String expected = "kann nicht null sein";
+		String actual = interpolator.interpolate( notNull.message(), descriptor, null, Locale.GERMAN );
+		assertEquals( "Wrong substitution", expected, actual );
+	}
+
+	@Test
+	public void testFallbackToDefaultLocale() {
+		interpolator = new ResourceBundleMessageInterpolator();
+
+		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
+				notNull, new Class<?>[] { }, new BuiltinConstraints()
+		);
+
+		String expected = "may not be null";
+		String actual = interpolator.interpolate( notNull.message(), descriptor, null, Locale.JAPAN );
+		assertEquals( "Wrong substitution", expected, actual );
+	}
+
+	@Test
+	public void testUserResourceBundle() {
+		interpolator = new ResourceBundleMessageInterpolator();
+
+		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
+				notNull, new Class<?>[] { }, new BuiltinConstraints()
+		);
+
+		String expected = "no puede ser null";
+		String actual = interpolator.interpolate( notNull.message(), descriptor, null, new Locale( "es", "ES" ) );
+		assertEquals( "Wrong substitution", expected, actual );
+	}
 
 	class TestResources extends ResourceBundle implements Enumeration<String> {
 		private Map<String, String> testResources;
