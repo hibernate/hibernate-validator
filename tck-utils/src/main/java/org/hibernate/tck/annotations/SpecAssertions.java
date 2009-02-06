@@ -1,4 +1,4 @@
-// $Id$
+// $Id: SpecAssertion.java 15705 2008-12-18 16:21:24Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -23,13 +23,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Documented
-public @interface SpecAssertion {
+public @interface SpecAssertions {
 
-	public String section();
-
-	public String id() default "";
-
-	public String note() default "";
+	SpecAssertion[] value();
 
 }
-

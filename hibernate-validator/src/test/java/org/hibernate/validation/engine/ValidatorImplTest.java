@@ -55,7 +55,7 @@ import org.hibernate.validation.util.TestUtil;
  */
 public class ValidatorImplTest {
 
-	@SpecAssertion( section = {"3.1"} )
+	@SpecAssertion( section = "3.1" )
 	@Test
 	public void testWrongMethodName() {
 		try {
@@ -324,7 +324,7 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	@SpecAssertion( section = {"2.2"} )
+	@SpecAssertion( section = "2.2" )
 	public void testMultiValueConstraint() {
 		Validator validator = TestUtil.getValidator();
 
@@ -343,7 +343,7 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	@SpecAssertion( section = {"3.5.1"} )
+	@SpecAssertion( section = "3.5.1" )
 	public void testGraphValidation() {
 		Validator validator = TestUtil.getValidator();
 

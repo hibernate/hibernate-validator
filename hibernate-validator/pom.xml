@@ -41,6 +41,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>tck-utils</artifactId>
+            <version>0.9-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -147,24 +148,6 @@
                         </configuration>
                         <reports>
                             <report>javadoc</report>
-                        </reports>
-                    </reportSet>
-                    <reportSet>
-                        <id>specCheck</id>
-                        <configuration>
-                            <doclet>org.hibernate.javadoc.JSRDoclet</doclet>
-                            <docletPath>${basedir}/target/test-classes</docletPath>
-                            <additionalparam>
-                                -d ${project.build.directory}/site
-                            </additionalparam>
-                            <!--Other dir than apidocs-->
-                            <destDir>tck</destDir>
-                            <!--For the project-reports page-->
-                            <name>JSR Tests</name>
-                            <description>Cross references unit tests to JSR 303 specification.</description>
-                        </configuration>
-                        <reports>
-                            <report>test-javadoc</report>
                         </reports>
                     </reportSet>
                 </reportSets>

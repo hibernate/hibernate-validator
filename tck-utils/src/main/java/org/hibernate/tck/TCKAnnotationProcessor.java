@@ -94,7 +94,7 @@ public class TCKAnnotationProcessor implements AnnotationProcessor {
 		public void visitMethodDeclaration(MethodDeclaration d) {
 			SpecAssertion annotation = d.getAnnotation( SpecAssertion.class );
 			JSRReference ref = new JSRReference(
-					annotation.section()[0], d.getDeclaringType().getQualifiedName(), d.getSimpleName()
+					annotation.section(), d.getDeclaringType().getQualifiedName(), d.getSimpleName()
 			);
 			if ( annotation.note().length() > 0 ) {
 				ref.note = annotation.note();

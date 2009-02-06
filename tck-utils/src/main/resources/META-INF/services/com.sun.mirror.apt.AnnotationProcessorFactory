@@ -1,1 +1,1 @@
-org.hibernate.tck.TCKAnnotationProcessorFactory
+org.hibernate.tck.report.CoverageProcessorFactory
