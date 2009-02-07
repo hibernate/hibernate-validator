@@ -30,18 +30,18 @@ import java.lang.annotation.Annotation;
  */
 public interface ConstraintValidator<A extends Annotation, T> {
 	/**
-	 * Validator parameters for a given constraint definition
+	 * Validator parameters for a given constraint declaration
 	 * Annotations parameters are passed as key/value into parameters
 	 * <p/>
 	 * This method is guaranteed to be called before any of the other Constraint
 	 * implementation methods
 	 *
-	 * @param constraintAnnotation parameters for a given constraint definition
+	 * @param constraintAnnotation parameters for a given constraint declaration
 	 */
 	void initialize(A constraintAnnotation);
 
 	/**
-	 * Implement the validation constraint.
+	 * Implement the validation logic.
 	 * <code>object</code> state must not be changed by a Constraint implementation
 	 *
 	 * @param object object to validate
