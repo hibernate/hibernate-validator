@@ -5,7 +5,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>4.0.0.Alpha1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -138,4 +138,41 @@
             </plugin>
         </plugins>
     </reporting>
+    <profiles>
+        <profile>
+            <id>tck-audit</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                            <compilerArgument>-proc:none</compilerArgument>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>run-annotation-processor-only</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal> testCompile</goal>
+                                </goals>
+                                <configuration>
+                                    <compilerArgument>-proc:only</compilerArgument>
+                                    <compilerArguments>
+                                        <s>foo</s>
+                                        <processor>org.hibernate.tck.report.CoverageProcessor</processor>
+                                    </compilerArguments>                                 
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
