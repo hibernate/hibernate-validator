@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
@@ -54,20 +54,6 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>apt-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <testOutputDirectory>${project.build.directory}/site</testOutputDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-jdocbook-plugin</artifactId>
                 <version>2.1.0</version>
@@ -95,14 +81,12 @@
                         </format>
                         <format>
                             <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl </stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                         <format>
                             <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl </stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                     </formats>
@@ -115,7 +99,7 @@
                 <executions>
                     <execution>
                         <id>make-doc</id>
-                        <phase>package</phase>
+                        <phase>site</phase>
                         <goals>
                             <goal>resources</goal>
                             <goal>generate</goal>

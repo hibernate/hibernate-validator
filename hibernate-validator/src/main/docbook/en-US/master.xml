@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
@@ -24,13 +24,13 @@
   -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
         <!ENTITY versionNumber "4.0.0.Alpha1">
-        <!ENTITY copyrightYear "2004">
-        <!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
+        <!ENTITY copyrightYear "2009">
+        <!ENTITY copyrightHolder "Red Hat Middleware, LLC. &amp; Gunnar Morling">
 ]>
 
 <book lang="en">
     <bookinfo>
-        <title>Hibernate Validator</title>
+        <title>Hibernate Validator (Bean Validation API reference implementation)</title>
         <subtitle>Reference Guide</subtitle>
         <releaseinfo>&versionNumber;</releaseinfo>
         <productnumber>&versionNumber;</productnumber>
@@ -87,6 +87,16 @@
     <classname>ResourceBundle</classname> .</para>
   </preface>
 
+  <xi:include href="modules/introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/gettingstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/usingvalidator.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />	
+  <xi:include href="modules/customconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/xmlconfiguration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/integration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/extendedri.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+<!--
   <xi:include href="modules/defineconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/checkconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+-->
 </book>
