@@ -57,7 +57,7 @@ public interface ConstraintDescriptor {
 	 * If this constraint is used as part of a composed constraint, parameter
 	 * values are reflecting the overridden parameters from the main constraint.
 	 *
-	 * @return Returns a map containing the annotation paramter names as keys
+	 * @return a map containing the annotation paramter names as keys
 	 *         and the annotation parameter values as value.
 	 */
 	Map<String, Object> getParameters();

@@ -25,7 +25,7 @@ public interface ConstraintValidatorContext {
 	 * Add a new error message. This error message will be interpolated.
 	 * <p/>
 	 * If isValid returns false, a ConstraintViolation object will be built per error message
-	 * including the default one unless #disableDefaultErrorMEssage() has been called.
+	 * including the default one unless #disableDefaultError() has been called.
 	 * <p/>
 	 * Aside from the error message, ConstraintViolation objects generated from such a call
 	 * contains the same contextual information (root bean, path and so on)
@@ -42,18 +42,12 @@ public interface ConstraintValidatorContext {
 	 * This error message will be interpolated.
 	 * <p/>
 	 * If isValid returns false, a ConstraintViolation object will be built
-	 * per error message including the default one unless #disableDefaultErrorMEssage()
+	 * per error message including the default one unless #disableDefaultError()
 	 * has been called.
-	 * If the constraint being validated is not a class-level constraint,
-	 * a ValidationException is raised.
-	 *
 	 * <p/>
 	 *
 	 * @param message new unexpanded error message
 	 * @param property property name the ConstraintViolation is targeting
-	 *
-	 * @throws ValidationException if the constraint is not set on a class-level
 	 */
 	void addError(String message, String property);
-
 }
