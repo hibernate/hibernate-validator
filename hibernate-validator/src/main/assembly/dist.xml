@@ -45,13 +45,11 @@
         <fileSet>
             <directory>target/site/apidocs</directory>
             <outputDirectory>/dist/docs/api</outputDirectory>
-        </fileSet>
-<!--    
+        </fileSet>  
         <fileSet>
             <directory>target/docbook/publish/en-US</directory>
             <outputDirectory>/dist/docs/manual</outputDirectory>
         </fileSet>
--->
         <fileSet>
             <directory>.</directory>
             <outputDirectory></outputDirectory>

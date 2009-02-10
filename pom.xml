@@ -138,7 +138,7 @@
 
     <issueManagement>
         <system>JIRA</system>
-        <url>http://opensource.atlassian.com/projects/hibernate/browse/BVAL</url>
+        <url>http://opensource.atlassian.com/projects/hibernate/browse/HV</url>
     </issueManagement>
 
     <inceptionYear>2007</inceptionYear>
@@ -211,5 +211,4 @@
             </plugin>
         </plugins>
     </reporting>
-
 </project>

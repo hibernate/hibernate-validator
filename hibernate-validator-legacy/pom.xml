@@ -22,10 +22,7 @@
     <description>Following the DRY (Don't Repeat Yourself) principle, Hibernate Validator let's you express your domain
         constraints once (and only once) and ensure their compliance at various level of your system automatically.
     </description>
-    <scm>
-        <url>http://anonhibernate.labs.jboss.com/trunk/HibernateExt/validator</url>
-    </scm>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
