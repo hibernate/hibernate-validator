@@ -5,7 +5,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.0.0.Alpha1-SNAPSHOT</version>
+        <version>4.0.0.Alpha1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,7 @@
     <distributionManagement>
         <site>
             <id>site</id>
-            <url>file:///Users/hardy/Sites/${artifactId}</url>
+            <url>http://validator.hibernate.org</url>
         </site>
     </distributionManagement>
     <dependencies>
@@ -53,6 +53,14 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/dist.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-jdocbook-plugin</artifactId>
@@ -164,7 +172,6 @@
                                 <configuration>
                                     <compilerArgument>-proc:only</compilerArgument>
                                     <compilerArguments>
-                                        <s>foo</s>
                                         <processor>org.hibernate.tck.report.CoverageProcessor</processor>
                                     </compilerArguments>                                 
                                 </configuration>

@@ -6,7 +6,7 @@
     
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
-    <version>1.0.Beta3-SNAPSHOT</version>
+    <version>1.0.Beta3</version>
     <packaging>jar</packaging>
     <name>Bean Validation API</name>
     
@@ -16,35 +16,21 @@
     
     <developers>
         <developer>
+            <id>epbernard</id>
             <name>Emmanuel Bernard</name>
             <email>emmanuel@hibernate.org</email>
             <organization>JBoss, a division of Red Hat</organization>
             <url>http://in.relation.to/Bloggers/Emmanuel</url>
         </developer>
         <developer>
+            <id>hardy.ferentschik</id>
             <name>Hardy Ferentschik</name>
             <email>hferents@redhat.com</email>
             <organization>JBoss, a division of Red Hat</organization>
             <url>http://in.relation.to/Bloggers/Hardy</url>
         </developer>
     </developers>
-    
-    <repositories>
-        <repository>
-            <id>repository.jboss.org</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
-        </repository>
-    </repositories>
-    
-    <pluginRepositories>
-        <pluginRepository>
-            <id>repository.jboss.org</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>   
-      
+         
     <build>
         <extensions>
             <extension>
