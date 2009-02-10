@@ -37,7 +37,7 @@
         <issuenum>1</issuenum>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/hibernate_logo_a.png" format="png" />
+            <imagedata fileref="hibernate_logo_a.png" format="png" />
           </imageobject>
         </mediaobject> 
         <copyright>
@@ -87,13 +87,16 @@
     <classname>ResourceBundle</classname> .</para>
   </preface>
 
-  <xi:include href="modules/introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <!-- For the alpha release we will just include the getting started section, since the others are work in progress -->
+  <!--xi:include href="modules/introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" /-->
   <xi:include href="modules/gettingstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<!--  
   <xi:include href="modules/usingvalidator.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />	
   <xi:include href="modules/customconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/xmlconfiguration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/integration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/extendedri.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+-->
 
 <!--
   <xi:include href="modules/defineconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
