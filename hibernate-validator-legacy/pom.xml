@@ -184,7 +184,7 @@
                         <executions>
                             <execution>
                                 <id>make-doc</id>
-                                <phase>package</phase>
+                                <phase>site</phase>
                                 <goals>
                                     <goal>resources</goal>
                                     <goal>generate</goal>
