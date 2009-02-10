@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.ValidationException;
-import javax.validation.groups.Default;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -39,10 +39,9 @@ import org.hibernate.validation.constraints.Pattern;
 import org.hibernate.validation.constraints.Patterns;
 import org.hibernate.validation.constraints.incomplete.NoGroups;
 import org.hibernate.validation.constraints.incomplete.NoMessage;
+import org.hibernate.validation.constraints.incomplete.ValidProperty;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
-import org.hibernate.validation.constraints.incomplete.ValidProperty;
-import org.hibernate.tck.annotations.SpecAssertion;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -132,7 +131,7 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
-	@SpecAssertion(section = "2.1.1.2", note = "constraint annotation must specify a groups element")
+	// @SpecAssertion(section = "2.1.1.2", note = "constraint annotation must specify a groups element")
 	public void testConstraintWithNoMessage() {
 		Annotation annotation = new NoGroups() {
 			public String message() {
@@ -149,7 +148,7 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
-	@SpecAssertion(section = "2.1.1.1", note = "constraint annotation must specify a groups element")
+	// @SpecAssertion(section = "2.1.1.1", note = "constraint annotation must specify a groups element")
 	public void testConstraintWithNoGroups() {
 		Annotation annotation = new NoMessage() {
 			public Class<?>[] groups() {
@@ -166,7 +165,7 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
-	@SpecAssertion(section = "2.1.1", note = "properties cannot begin with 'valid'")
+	// @SpecAssertion(section = "2.1.1", note = "properties cannot begin with 'valid'")
 	public void testConstraintWithValidInPropertyName() {
 		Annotation annotation = new ValidProperty() {
 			public String message() {
