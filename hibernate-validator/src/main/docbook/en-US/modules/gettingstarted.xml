@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id:$ -->
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
@@ -25,7 +26,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-gettingstarted">
-  <title>Getting started with Bean Validation RI in 5 minutes</title>
+  <title>Getting started in 5 minutes</title>
 
   <para>This chapter will show you how to quickly get started with the
   reference implementation (RI) of the Bean Validation API as specified by
@@ -35,7 +36,7 @@
   <itemizedlist>
     <listitem>
       <para>As the Bean Validation API expresses constraints by the means of
-      annotations, Java version 5 is or later must be installed</para>
+      annotations, Java version 5 or later must be installed</para>
     </listitem>
 
     <listitem>
@@ -46,27 +47,27 @@
       functioning internet connection is required to allow Maven for the
       download of all dependent libraries</para>
     </listitem>
+
+    <listitem>
+      <para>Once Maven is installed you should configure your remote
+      repository by adding the following to your
+      <filename>settings.xml</filename>: <programlisting>&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;jboss&lt;/id&gt;
+        &lt;url&gt;http://repository.jboss.com/maven2&lt;/url&gt;
+        &lt;releases&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/releases&gt;
+        &lt;snapshots&gt;
+            &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;</programlisting>More information about
+      <filename>settings.xml</filename> can be found in the <ulink
+      url="http://maven.apache.org/ref/2.0.8/maven-settings/settings.html">Maven
+      Local Settings Model</ulink>.</para>
+    </listitem>
   </itemizedlist>
-
-  <section id="validator-gettingstarted-buildri" revision="1">
-    <title>Build RI. TODO GM: Remove, if RI is in repo</title>
-
-    <para>As the Bean Validation RI is not yet published in any Maven
-    repository, you have to check it out from the Subversion repository at
-    JBoss and build it yourself. The project can be checked out as
-    follows:</para>
-
-    <programlisting>svn co http://anonsvn.jboss.org/repos/hibernate/validator/trunk/</programlisting>
-
-    <para>If all files are checked out, change into the trunk dir and build
-    the reference implementation by running</para>
-
-    <programlisting>mvn install</programlisting>
-
-    <para>If the build has completed, the JSR 303 API and the reference
-    implementation have been installed into your local Maven repository and
-    can now be used in your projects.</para>
-  </section>
 
   <section id="validator-gettingstarted-createproject" revision="1">
     <title>Setting up a new Maven project</title>
@@ -123,8 +124,7 @@
       </listitem>
     </itemizedlist>
 
-    <para>Having done this, your pom.xml should look like this (TODO GM: keep
-    an eye on versions):</para>
+    <para>Having done this, your pom.xml should look like this:</para>
 
     <programlisting>&lt;project 
     xmlns="http://maven.apache.org/POM/4.0.0" 
@@ -144,12 +144,12 @@
         &lt;dependency&gt;
             &lt;groupId&gt;javax.validation&lt;/groupId&gt;
             &lt;artifactId&gt;validation-api&lt;/artifactId&gt;
-            &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+            &lt;version&gt;1.0.Beta3&lt;/version&gt;
         &lt;/dependency&gt;
         &lt;dependency&gt;
             &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
             &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;
-            &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+            &lt;version&gt;4.0.0.Alpha1&lt;/version&gt;
         &lt;/dependency&gt;
     &lt;/dependencies&gt;
     &lt;build&gt;
