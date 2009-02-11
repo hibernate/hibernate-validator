@@ -6,78 +6,16 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>tck-utils-api</artifactId>
-    <version>0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>TCK Test Coverage Utils</name>
+    <name>TCK Test Coverage Utils Implementation</name>
 
-    <description>
-        Utility classes for TCK Test Coverage creation.
-    </description>
-
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://opensource.atlassian.com/projects/hibernate/browse/BVAL</url>
-    </issueManagement>
-
-    <inceptionYear>2009</inceptionYear>
-
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>license.txt</url>
-        </license>
-    </licenses>
-
-    <modules>
-        <module>impl</module>
-        <module>api<module>
-    </modules>
-
-    <scm>
-        <connection>scm:https://svn.jboss.org/repos/hibernate/validator/trunk/tck-utils-api</connection>
-    </scm>
-
-    <developers>
-        <developer>
-            <name>Hardy Ferentschik</name>
-            <email>hardy.ferentschik@redhat.com</email>
-            <organization>JBoss, a division of Red Hat</organization>
-            <url>http://in.relation.to/Bloggers/Hardy</url>
-        </developer>
-    </developers>
-
-    <repositories>
-        <repository>
-            <id>repository.jboss.org</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>repository.jboss.org</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>snapshots.jboss.org</id>
-            <name>JBoss Snapshot Repository</name>
-            <url>dav:https://snapshots.jboss.org/maven2</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <parent>
+        <artifactId>tck-utils</artifactId>
+        <groupId>org.hibernate</groupId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
    
- <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav</artifactId>
-                <version>1.0-beta-2</version>
-            </extension>
-        </extensions>
+    <build>
         <plugins>
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
@@ -88,83 +26,6 @@
                </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.2</version>
-                    <configuration>
-                        <archive>
-                            <manifestEntries>
-                                <Implementation-Title>${pom.artifactId}</Implementation-Title>
-                                <Implementation-Version>${pom.version}</Implementation-Version>
-                                <Implementation-Vendor>${pom.groupId}</Implementation-Vendor>
-                                <Implementation-Vendor-Id>${pom.groupId}</Implementation-Vendor-Id>
-                                <Implementation-URL>${pom.url}</Implementation-URL>
-                                <Specification-Title>TCK Utils API</Specification-Title>
-                            </manifestEntries>
-                        </archive>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <forkMode>always</forkMode>
-                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <includes>
-                            <include>**/*Test.java</include>
-                        </includes>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.0.1</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jxr-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clover-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>changes-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>
