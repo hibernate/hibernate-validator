@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate</groupId>
-    <artifactId>tck-utils</artifactId>
+    <artifactId>tck-utils-api</artifactId>
     <version>0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>TCK Test Coverage Utils API</name>
+    <name>TCK Test Coverage Utils</name>
 
     <description>
-        Utility classes for TCK creation.
+        Utility classes for TCK Test Coverage creation.
     </description>
 
     <issueManagement>
@@ -28,8 +28,13 @@
         </license>
     </licenses>
 
+    <modules>
+        <module>impl</module>
+        <module>api<module>
+    </modules>
+
     <scm>
-        <connection>scm:https://svn.jboss.org/repos/hibernate/validator/trunk/tck-utils</connection>
+        <connection>scm:https://svn.jboss.org/repos/hibernate/validator/trunk/tck-utils-api</connection>
     </scm>
 
     <developers>
@@ -64,22 +69,8 @@
             <url>dav:https://snapshots.jboss.org/maven2</url>
         </snapshotRepository>
     </distributionManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>tck-utils-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-
-    <build>
+   
+ <build>
         <extensions>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
@@ -87,6 +78,16 @@
                 <version>1.0-beta-2</version>
             </extension>
         </extensions>
+        <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <configuration>
+                  <source>1.5</source>
+                  <target>1.5</target>
+               </configuration>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -101,19 +102,9 @@
                                 <Implementation-Vendor>${pom.groupId}</Implementation-Vendor>
                                 <Implementation-Vendor-Id>${pom.groupId}</Implementation-Vendor-Id>
                                 <Implementation-URL>${pom.url}</Implementation-URL>
-                                <Specification-Title>TCK Utils</Specification-Title>
+                                <Specification-Title>TCK Utils API</Specification-Title>
                             </manifestEntries>
                         </archive>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.0.2</version>
-                    <configuration>
-                        <source>1.5</source>
-                        <target>1.5</target>
-                        <compilerArgument>-proc:none</compilerArgument>
                     </configuration>
                 </plugin>
                 <plugin>
