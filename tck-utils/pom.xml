@@ -8,7 +8,7 @@
     <artifactId>tck-utils</artifactId>
     <version>0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>TCK Utils</name>
+    <name>TCK Test Coverage Utils API</name>
 
     <description>
         Utility classes for TCK creation.
@@ -70,6 +70,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>tck-utils-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
