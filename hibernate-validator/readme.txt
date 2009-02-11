@@ -20,7 +20,7 @@
   -------------
 
   The documentation available as of the date of this release is included in
-  HTML format in the dist/docs/ directory.
+  HTML and PDf format in the dist/docs directory.
 
   Release Notes
   -------------
