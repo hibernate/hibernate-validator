@@ -28,7 +28,8 @@
   - XML configuration
 
   You can find more information about the current state of the implementation on the
-  Bean Validation RI Roadmap - http://www.hibernate.org/459.html
+  Bean Validation RI Roadmap - http://www.hibernate.org/459.html and there is copy of
+  JSR as of the time of this release available here - http://in.relation.to/service/File/10678
 
   Documentation
   -------------

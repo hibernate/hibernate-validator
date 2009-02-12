@@ -68,8 +68,9 @@
     <para>This release has alpha status, meaning that neither the
     implementation nor this documenation is complete. However, implementation
     should be in a state allowing first experiments with this new API. The
-    following list shows the missing features in relation to the latest
-    version of JSR 303:</para>
+    following list shows the missing features in relation to the <ulink
+    url="http://in.relation.to/service/File/10678">1.0.Beta3 version of JSR
+    303</ulink> :</para>
 
     <itemizedlist>
       <listitem>
