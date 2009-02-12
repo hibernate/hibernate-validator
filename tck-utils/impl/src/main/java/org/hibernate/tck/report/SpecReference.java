@@ -42,4 +42,11 @@ public class SpecReference {
     public String getMethodName() {
         return methodName;
     }
+    
+    @Override
+    public String toString()
+    {
+       return "SpecReference[section=" + section + ";assertion=" + assertion + 
+          ";class=" + className + ";method=" + methodName + "]";
+    }
 }

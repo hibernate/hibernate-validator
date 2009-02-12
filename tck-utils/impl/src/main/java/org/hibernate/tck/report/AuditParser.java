@@ -115,8 +115,11 @@ public class AuditParser
     * @return
     */
    public boolean hasAssertion(String sectionId, String assertionId)
-   {
-      if (!assertions.containsKey(sectionId)) return false;
+   {            
+      if (!assertions.containsKey(sectionId)) 
+      {
+         return false;
+      }
       
       for (AuditAssertion assertion : assertions.get(sectionId))
       {
@@ -151,7 +154,9 @@ public class AuditParser
    private void processSectionNode(Element node)
    {
       String sectionId = node.getAttribute("id");
-      titles.put(sectionId, node.getAttribute("title"));                                
+      titles.put(sectionId, node.getAttribute("title"));
+      
+      assertions.put(sectionId, new ArrayList<AuditAssertion>());
       
       NodeList assertionNodes = node.getChildNodes();
       
@@ -166,13 +171,8 @@ public class AuditParser
    }
    
    private void processAssertionNode(String sectionId, Element node)
-   {
+   {      
       List<AuditAssertion> value = assertions.get(sectionId);
-      if (value == null)
-      {
-         value = new ArrayList<AuditAssertion>();
-         assertions.put(sectionId, value);                                          
-      }
                         
       String text = null;
       String note = null;
@@ -194,7 +194,7 @@ public class AuditParser
          }                   
       }
       
-      value.add(new AuditAssertion(node.getAttribute("section"), 
-            node.getAttribute("id"), text, note));      
+      value.add(new AuditAssertion(sectionId, 
+            node.getAttribute("id"), text, note));     
    }
 }
