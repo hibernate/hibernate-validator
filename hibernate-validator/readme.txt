@@ -34,7 +34,7 @@
   -------------
 
   The documentation available as of the date of this release is included in
-  HTML and PDf format in the dist/docs directory.
+  HTML and PDf format in the docs directory.
 
   Release Notes
   -------------
@@ -50,7 +50,7 @@
   Using Hibernate Validator
   -------------------------
 
-  - Copy dist/hibernate-validator-*.jar together will all jar files from dist/lib into the 
+  - Copy hibernate-validator-*.jar together will all jar files from lib into the 
     classpath of your application 
 
   or 

@@ -29,7 +29,7 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>/dist/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
@@ -37,18 +37,18 @@
     <fileSets>
         <fileSet>
             <directory>target</directory>
-            <outputDirectory>/dist</outputDirectory>
+            <outputDirectory></outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>target/site/apidocs</directory>
-            <outputDirectory>/dist/docs/api</outputDirectory>
+            <outputDirectory>docs/api</outputDirectory>
         </fileSet>  
         <fileSet>
             <directory>target/docbook/publish/en-US</directory>
-            <outputDirectory>/dist/docs/manual</outputDirectory>
+            <outputDirectory>docs/manual</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>.</directory>
