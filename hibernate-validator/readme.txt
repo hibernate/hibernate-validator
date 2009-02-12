@@ -4,7 +4,7 @@
   What is it?
   -----------
 
-  This is a reference implementation of JSR 303 - Bean Validation. 
+  This is the reference implementation of JSR 303 - Bean Validation. 
   Bean Validation defines a metadata model and API for JavaBean validation. 
   The default metadata source is annotations, with the ability to override and extend 
   the meta-data through the use of XML validation descriptors.
@@ -15,6 +15,20 @@
   Prior to version 4.x Hibernate Validators was based on a different source base which 
   is not based JSR 303. This code can be accessed via 
   http://anonsvn.jboss.org/repos/hibernate/validator/trunk/hibernate-validator-legacy
+
+  Status
+  ------
+
+  This is an alpha release and not feature complete in relation to the latest version 
+  of JSR 303. The following features are not yet fully implemented:
+
+  - Group inheritance using interfaces and implicit grouping
+  - Implementation of the TraversableResolver interface to allow integration with JPA
+  - Polymorphism in graph validation
+  - XML configuration
+
+  You can find more information about the current state of the implementation on the
+  Bean Validation RI Roadmap - http://www.hibernate.org/459.html
 
   Documentation
   -------------

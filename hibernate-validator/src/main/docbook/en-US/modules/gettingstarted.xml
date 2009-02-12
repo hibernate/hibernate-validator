@@ -29,9 +29,9 @@
   <title>Getting started in 5 minutes</title>
 
   <para>This chapter will show you how to quickly get started with the
-  reference implementation (RI) of the Bean Validation API as specified by
-  <ulink url="http://jcp.org/en/jsr/detail?id=303">JSR 303</ulink>. Be sure to
-  fulfill the following prerequisites in order to proceed:</para>
+  reference implementation (RI) of the Bean Validation API as specified by JSR
+  303. Be sure to fulfill the following prerequisites in order to
+  proceed:</para>
 
   <itemizedlist>
     <listitem>
@@ -348,9 +348,8 @@ public class CarTest {
     <title>Where to go next?</title>
 
     <para>That concludes our 5 minute tour through the world of the Bean
-    Validation RI. You might next be interested in using some <link
-    linkend="validator-usingvalidator">advanced features of the Validator
-    API</link> or how to define your own <link
-    linkend="validator-customconstraints">custom constraint</link>.</para>
+    Validation RI. We will complete this documentation in our coming releases.
+    For now we recommend to refer to the JSR 303 specification directly for
+    more examples.</para>
   </section>
 </chapter>

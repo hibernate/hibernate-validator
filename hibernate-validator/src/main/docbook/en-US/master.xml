@@ -27,7 +27,7 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY versionNumber "4.0.0.Alpha1">
 <!ENTITY copyrightYear "2009">
-<!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
+<!ENTITY copyrightHolder "Red Hat Middleware, LLC. &amp; Gunnar Morling">
 ]>
 <book lang="en">
   <bookinfo>
@@ -45,10 +45,11 @@
 
     <mediaobject>
       <imageobject role="fo">
-        <imagedata fileref="hibernate_logo_a.png" align="center" />
+        <imagedata align="center" fileref="hibernate_logo_a.png" />
       </imageobject>
+
       <imageobject role="html">
-        <imagedata fileref="hibernate_logo_a.png" depth="3cm" />
+        <imagedata depth="3cm" fileref="hibernate_logo_a.png" />
       </imageobject>
     </mediaobject>
 
@@ -81,7 +82,7 @@
       </listitem>
 
       <listitem>
-        <para>Polymorphism in graph validation </para>
+        <para>Polymorphism in graph validation</para>
       </listitem>
 
       <listitem>
@@ -91,17 +92,17 @@
 
     <para>You can find more information about the current state of the
     implementation on the <ulink url="http://www.hibernate.org/459.html">Bean
-    Validation Roadmap</ulink>. </para>
+    Validation Roadmap</ulink>.</para>
 
     <para>The documentation contains so far only a "Getting started" section.
     Work is in progress in this area and following releases will have more up
-    to date documentation. For now refer to <ulink
-    url="http://hibernate.org/~emmanuel/validation/">JSR 303</ulink> directly
-    for further examples.</para>
+    to date documentation. For now refer to JSR 303 directly for further
+    examples.</para>
 
     <para>Please report any problems or bugs in either <ulink
     url="http://opensource.atlassian.com/projects/hibernate/browse/HV">Jira
-      Hibernate Validator</ulink> or on the <ulink url="http://forum.hibernate.org/viewforum.php?f=9">Validator
+    Hibernate Validator</ulink> or on the <ulink
+    url="http://forum.hibernate.org/viewforum.php?f=9">Validator
     Forum</ulink>.</para>
   </preface>
 
