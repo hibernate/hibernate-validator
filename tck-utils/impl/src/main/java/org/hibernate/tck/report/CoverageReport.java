@@ -77,6 +77,8 @@ public class CoverageReport {
         sb.append("    text-decoration: underline;\n");
         sb.append("    margin-top: 2px;\n");
         sb.append("    margin-bottom: 2px; }\n");
+        sb.append("   .coverageMethod {\n");
+        sb.append("    font-style: italic; }\n");
         sb.append("  .pass {\n");
         sb.append("    background-color: #dfd; }\n");
         sb.append("  .fail {\n");
@@ -95,14 +97,15 @@ public class CoverageReport {
 
     private void writeCoverage(OutputStream out) throws IOException {
         for (String sectionId : auditParser.getSectionIds()) {
-            out.write(("<div class=\"sectionHeader\">Section " + sectionId + " - " +
-                    auditParser.getSectionTitle(sectionId) + "</div>\n").getBytes());
 
             List<AuditAssertion> sectionAssertions = auditParser.getAssertionsForSection(sectionId);
 
             if (sectionAssertions != null && !sectionAssertions.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
 
+                out.write(("<div class=\"sectionHeader\">Section " + sectionId + " - " +
+                      auditParser.getSectionTitle(sectionId) + "</div>\n").getBytes());                
+                
                 for (AuditAssertion assertion : sectionAssertions) {
                     List<SpecReference> coverage = getCoverageForAssertion(sectionId, assertion.getId());
 
@@ -125,12 +128,12 @@ public class CoverageReport {
                         sb.append("        <p class=\"noCoverage\">No tests exist for this assertion</p>\n");
                     } else {
                         for (SpecReference ref : coverage) {
-                            sb.append("        <p>");
+                            sb.append("        <div class=\"coverageMethod\">");
                             sb.append(ref.getClassName());
                             sb.append(".");
                             sb.append(ref.getMethodName());
                             sb.append("()");
-                            sb.append("</p>\n");
+                            sb.append("</div>\n");
                         }
                     }
 
