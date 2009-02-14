@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified"
+           targetNamespace="http://jboss.com/products/webbeans/tck/audit"
+           xmlns:audit="http://jboss.com/products/webbeans/tck/audit">
+           
+  <xs:element name="specification">
+    <xs:annotation>
+      <xs:documentation> The specification tag is the root element for tck-audit.xml. </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="audit:section"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>           
+  
+  <xs:element name="section">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="audit:assertion"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="audit:attlist.section"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attributeGroup name="attlist.section">
+    <xs:attribute name="id" type="xs:string"/>
+    <xs:attribute name="title" type="xs:string"/>
+  </xs:attributeGroup>  
+    
+  <xs:element name="assertion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="audit:text"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="audit:note"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="audit:attlist.assertion"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:attributeGroup name="attlist.assertion">
+    <xs:attribute name="id" type="xs:string"/>    
+  </xs:attributeGroup>
+  
+  <xs:element name="text">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string"/>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="note">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string"/>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  
+</xs:schema>
