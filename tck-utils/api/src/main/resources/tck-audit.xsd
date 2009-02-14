@@ -9,7 +9,7 @@
       <xs:documentation> The specification tag is the root element for tck-audit.xml. </xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:sequence>
+      <xs:sequence maxOccurs="unbounded">
         <xs:element ref="audit:section"/>
       </xs:sequence>
       <xs:attribute name="name" type="xs:string"/>
