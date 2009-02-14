@@ -12,6 +12,8 @@
       <xs:sequence>
         <xs:element ref="audit:section"/>
       </xs:sequence>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="version" type="xs:string"/>
     </xs:complexType>
   </xs:element>           
   
