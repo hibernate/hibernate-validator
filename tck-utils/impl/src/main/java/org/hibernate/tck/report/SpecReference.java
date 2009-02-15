@@ -8,6 +8,7 @@ package org.hibernate.tck.report;
 public class SpecReference {
     private String section;
     private String assertion;
+    private String packageName;
     private String className;
     private String methodName;
 
@@ -17,6 +18,10 @@ public class SpecReference {
 
     public void setAssertion(String assertion) {
         this.assertion = assertion;
+    }
+    
+    public void setPackageName(String packageName) {
+       this.packageName = packageName;
     }
 
     public void setClassName(String className) {
@@ -34,6 +39,10 @@ public class SpecReference {
     public String getAssertion() {
         return assertion;
     }
+    
+    public String getPackageName() {
+       return packageName;
+    }
 
     public String getClassName() {
         return className;
@@ -47,6 +56,6 @@ public class SpecReference {
     public String toString()
     {
        return "SpecReference[section=" + section + ";assertion=" + assertion + 
-          ";class=" + className + ";method=" + methodName + "]";
+          ";class=" + packageName + "." + className + ";method=" + methodName + "]";
     }
 }

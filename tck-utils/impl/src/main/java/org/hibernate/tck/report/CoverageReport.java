@@ -53,6 +53,9 @@ public class CoverageReport {
         sb.append("<head><title>JSR-299 TCK Coverage Report</title>\n");
 
         sb.append("<style type=\"text/css\">\n");
+        sb.append("  body {\n");
+        sb.append("   font-family: verdana, arial, sans-serif;\n");
+        sb.append("   font-size: 11px; }\n");
         sb.append("  .code {\n");
         sb.append("    float: left;\n");
         sb.append("    font-weight: bold;\n");
@@ -65,7 +68,13 @@ public class CoverageReport {
         sb.append("    margin-top: 2px;\n");
         sb.append("    margin-bottom: 2px; }\n");
         sb.append("  .sectionHeader {\n");
+        sb.append("    border-bottom: 1px solid #cccccc;\n");
+        sb.append("    margin-top: 8px;\n");
         sb.append("    font-weight: bold; }\n");
+        sb.append("  .packageName {\n");
+        sb.append("   color: #999999;\n");
+        sb.append("   font-size: 9px;\n");
+        sb.append("   font-weight: bold; }\n");
         sb.append("  .noCoverage {\n");
         sb.append("    margin-top: 2px;\n");
         sb.append("    margin-bottom: 2px;\n");
@@ -96,6 +105,7 @@ public class CoverageReport {
     }
 
     private void writeCoverage(OutputStream out) throws IOException {
+       
         for (String sectionId : auditParser.getSectionIds()) {
 
             List<AuditAssertion> sectionAssertions = auditParser.getAssertionsForSection(sectionId);
@@ -105,6 +115,8 @@ public class CoverageReport {
 
                 out.write(("<div class=\"sectionHeader\">Section " + sectionId + " - " +
                       auditParser.getSectionTitle(sectionId) + "</div>\n").getBytes());                
+
+                String currentPackageName = null;
                 
                 for (AuditAssertion assertion : sectionAssertions) {
                     List<SpecReference> coverage = getCoverageForAssertion(sectionId, assertion.getId());
@@ -128,6 +140,14 @@ public class CoverageReport {
                         sb.append("        <p class=\"noCoverage\">No tests exist for this assertion</p>\n");
                     } else {
                         for (SpecReference ref : coverage) {
+                            if (!ref.getPackageName().equals(currentPackageName))
+                            {
+                               currentPackageName = ref.getPackageName();
+                               sb.append("        <div class=\"packageName\">");
+                               sb.append(currentPackageName);
+                               sb.append("        </div>\n");                               
+                            }                           
+                          
                             sb.append("        <div class=\"coverageMethod\">");
                             sb.append(ref.getClassName());
                             sb.append(".");
@@ -179,6 +199,9 @@ public class CoverageReport {
             sb.append("</td>");
 
             sb.append("<td>");
+            sb.append("<div class=\"packageName\">");
+            sb.append(ref.getPackageName());
+            sb.append("</div>");
             sb.append(ref.getClassName());
             sb.append("</td>");
 
