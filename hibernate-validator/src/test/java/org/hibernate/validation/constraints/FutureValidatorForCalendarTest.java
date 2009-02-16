@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -24,6 +24,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * @author Alaa Nassef
+ * @author Hardy Ferentschik
+ */
 public class FutureValidatorForCalendarTest {
 
 	private static FutureValidatorForCalendar constraint;
@@ -39,7 +43,6 @@ public class FutureValidatorForCalendarTest {
 		Calendar pastDate = getPastDate();
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( futureDate, null ) );
-		assertFalse( constraint.isValid( Calendar.getInstance(), null ) );
 		assertFalse( constraint.isValid( pastDate, null ) );
 	}
 
