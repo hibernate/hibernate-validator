@@ -115,8 +115,6 @@ public class CoverageReport {
 
                 out.write(("<div class=\"sectionHeader\">Section " + sectionId + " - " +
                       auditParser.getSectionTitle(sectionId) + "</div>\n").getBytes());                
-
-                String currentPackageName = null;
                 
                 for (AuditAssertion assertion : sectionAssertions) {
                     List<SpecReference> coverage = getCoverageForAssertion(sectionId, assertion.getId());
@@ -135,6 +133,8 @@ public class CoverageReport {
 
                     sb.append("    <div class=\"coverage\">\n");
                     sb.append("      <p class=\"coverageHeader\">Coverage</p>\n");
+                    
+                    String currentPackageName = null;                    
 
                     if (coverage.isEmpty()) {
                         sb.append("        <p class=\"noCoverage\">No tests exist for this assertion</p>\n");
