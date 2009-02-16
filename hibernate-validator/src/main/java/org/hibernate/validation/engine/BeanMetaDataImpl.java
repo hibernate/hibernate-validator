@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.BeanDescriptor;
 import javax.validation.GroupSequence;
-import javax.validation.GroupSequences;
 import javax.validation.PropertyDescriptor;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -139,13 +138,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		GroupSequence groupSequenceAnnotation = clazz.getAnnotation( GroupSequence.class );
 		if ( groupSequenceAnnotation != null ) {
 			addGroupSequence( groupSequenceAnnotation );
-		}
-
-		GroupSequences groupSequencesAnnotation = clazz.getAnnotation( GroupSequences.class );
-		if ( groupSequencesAnnotation != null ) {
-			for ( GroupSequence group : groupSequencesAnnotation.value() ) {
-				addGroupSequence( group );
-			}
 		}
 
 		for ( Map.Entry<Class<?>, List<Class<?>>> mapEntry : groupSequences.entrySet() ) {

@@ -98,7 +98,6 @@ public class ValidatorImpl implements Validator {
 	 * @return List of invalid constraints.
 	 *
 	 * @todo Currently we iterate the cascaded fields multiple times. Maybe we should change to an approach where we iterate the object graph only once.
-	 * @todo Context root bean can be a different object than the current Validator<T> hence two different generics variables
 	 */
 	private <T> List<ConstraintViolationImpl<T>> validateInContext(ExecutionContext<T> context, List<Class<?>> groups) {
 		if ( context.peekValidatedObject() == null ) {

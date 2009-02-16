@@ -18,20 +18,15 @@
 package org.hibernate.validation.eg;
 
 import javax.validation.GroupSequence;
-import javax.validation.GroupSequences;
-import javax.validation.groups.Default;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.hibernate.validation.constraints.NotEmpty;
-import org.hibernate.validation.eg.groups.All;
 
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequences({
-		@GroupSequence(name = DefaultAlias.class, sequence = { Default.class }),
-		@GroupSequence(name = All.class, sequence = { Default.class, Dictonary.Translate.class })
-})
+@GroupSequence(name = DefaultAlias.class, sequence = { Default.class })
 public class Dictonary extends Book {
 	@NotNull(groups = Translate.class)
 	@NotEmpty(groups = Translate.class)

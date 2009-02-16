@@ -18,7 +18,6 @@
 package org.hibernate.validation.eg;
 
 import javax.validation.GroupSequence;
-import javax.validation.GroupSequences;
 import javax.validation.groups.Default;
 
 import org.hibernate.validation.eg.groups.First;
@@ -26,8 +25,6 @@ import org.hibernate.validation.eg.groups.First;
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequences({
-		@GroupSequence(name = Default.class, sequence = { First.class })  // illegal - default is already defined in Book
-})
+@GroupSequence(name = Default.class, sequence = { First.class }) // illegal - default is already defined in Book
 public class EnglishDictonary extends Dictonary {
 }
