@@ -26,6 +26,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -35,6 +36,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validation.constraints.AssertFalseValidator;
 import org.hibernate.validation.constraints.AssertTrueValidator;
+import org.hibernate.validation.constraints.DigitsValidatorForNumber;
+import org.hibernate.validation.constraints.DigitsValidatorForString;
 import org.hibernate.validation.constraints.FutureValidatorForCalendar;
 import org.hibernate.validation.constraints.FutureValidatorForDate;
 import org.hibernate.validation.constraints.MaxValidatorForNumber;
@@ -52,6 +55,7 @@ import org.hibernate.validation.constraints.SizeValidatorForMap;
 
 /**
  * @author Hardy Ferentschik
+ * @author Alaa Nassef
  */
 public class BuiltinConstraints {
 
@@ -95,6 +99,11 @@ public class BuiltinConstraints {
 		constraintList.add( PastValidatorForCalendar.class );
 		constraintList.add( PastValidatorForDate.class );
 		builtinConstraints.put( Future.class, constraintList );
+
+		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList.add( DigitsValidatorForString.class );
+		constraintList.add( DigitsValidatorForNumber.class );
+		builtinConstraints.put( Digits.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( SizeValidatorForString.class );
