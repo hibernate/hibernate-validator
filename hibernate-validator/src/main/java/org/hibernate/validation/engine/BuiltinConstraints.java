@@ -33,6 +33,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Past;
 
 import org.hibernate.validation.constraints.AssertFalseValidator;
 import org.hibernate.validation.constraints.AssertTrueValidator;
@@ -98,7 +99,7 @@ public class BuiltinConstraints {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( PastValidatorForCalendar.class );
 		constraintList.add( PastValidatorForDate.class );
-		builtinConstraints.put( Future.class, constraintList );
+		builtinConstraints.put( Past.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( DigitsValidatorForString.class );
