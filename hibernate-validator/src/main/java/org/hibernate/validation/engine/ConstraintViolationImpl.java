@@ -38,10 +38,10 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private String rawMessage;
 
 
-	public ConstraintViolationImpl(String rawMessage, String interpolatedMessage, T rootBean, Class<T> beanClass,
+	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, T rootBean, Class<T> beanClass,
 								   Object leafBeanInstance, Object value,
 								   String propertyPath, Class<?> group, ConstraintDescriptor constraintDescriptor) {
-		this.rawMessage = rawMessage;
+		this.rawMessage = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
 		this.beanClass = beanClass;
@@ -56,11 +56,11 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getInterpolatedMessage() {
+	public String getMessage() {
 		return interpolatedMessage;
 	}
 
-	public String getRawMessage() {
+	public String getMessageTemplate() {
 		return rawMessage;
 	}
 

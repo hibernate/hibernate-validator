@@ -85,7 +85,7 @@ public class TestUtil {
 	}
 
 	public static void assertConstraintViolation(ConstraintViolation violation, String message) {
-		assertEquals( "Wrong message", message, violation.getInterpolatedMessage() );
+		assertEquals( "Wrong message", message, violation.getMessage() );
 	}
 
 	public static void assertNumberOfViolations(Set violations, int expectedViolations) {

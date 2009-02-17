@@ -108,7 +108,7 @@ public class ValidationTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 
 		//FIXME nothing guarantee that a configuration can be reused
 		// now we modify the configuration, get a new factory and valiator and try again
@@ -128,7 +128,7 @@ public class ValidationTest {
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong message", "my custom message", constraintViolation.getInterpolatedMessage() );
+		assertEquals( "Wrong message", "my custom message", constraintViolation.getMessage() );
 	}
 
 	@Test
@@ -146,7 +146,7 @@ public class ValidationTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getInterpolatedMessage() );
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 
 		// get a new factory using a custom configuration
 		configuration = Validation.byDefaultProvider().configure();

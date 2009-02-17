@@ -60,7 +60,7 @@ public class ConstraintCompositionTest {
 		constraintViolations = validator.validate( address );
 		assertNumberOfViolations( constraintViolations, 3 );
 		for ( ConstraintViolation violation : constraintViolations ) {
-			if ( violation.getInterpolatedMessage().equals( "A french zip code has a length of 5" ) ) {
+			if ( violation.getMessage().equals( "A french zip code has a length of 5" ) ) {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
@@ -69,7 +69,7 @@ public class ConstraintCompositionTest {
 						"zipCode"
 				);
 			}
-			else if ( violation.getInterpolatedMessage().equals( "must match \"d*\"" ) ) {
+			else if ( violation.getMessage().equals( "must match \"d*\"" ) ) {
 				assertConstraintViolation(
 						violation,
 						"must match \"d*\"",
@@ -78,7 +78,7 @@ public class ConstraintCompositionTest {
 						"zipCode"
 				);
 			}
-			else if ( violation.getInterpolatedMessage().equals( "must match \".....\"" ) ) {
+			else if ( violation.getMessage().equals( "must match \".....\"" ) ) {
 				assertConstraintViolation(
 						violation,
 						"must match \".....\"",
@@ -97,7 +97,7 @@ public class ConstraintCompositionTest {
 		constraintViolations = validator.validate( address );
 		assertNumberOfViolations( constraintViolations, 2 );
 		for ( ConstraintViolation violation : constraintViolations ) {
-			if ( violation.getInterpolatedMessage().equals( "A french zip code has a length of 5" ) ) {
+			if ( violation.getMessage().equals( "A french zip code has a length of 5" ) ) {
 				assertConstraintViolation(
 						violation,
 						"A french zip code has a length of 5",
@@ -106,7 +106,7 @@ public class ConstraintCompositionTest {
 						"zipCode"
 				);
 			}
-			else if ( violation.getInterpolatedMessage().equals( "must match \".....\"" ) ) {
+			else if ( violation.getMessage().equals( "must match \".....\"" ) ) {
 				assertConstraintViolation(
 						violation,
 						"must match \".....\"",

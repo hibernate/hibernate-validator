@@ -117,14 +117,14 @@ public class ConstraintTree {
 				&& getParent().getDescriptor().isReportAsSingleViolation();
 	}
 
-	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ExecutionContext<T> executionContext, Object leafBeanInstance, String message, ConstraintDescriptor descriptor) {
+	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ExecutionContext<T> executionContext, Object leafBeanInstance, String messageTemplate, ConstraintDescriptor descriptor) {
 		String interpolatedMessage = executionContext.getMessageResolver().interpolate(
-				message,
+				messageTemplate,
 				descriptor,
 				leafBeanInstance
 		);
 		ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
-				message,
+				messageTemplate,
 				interpolatedMessage,
 				executionContext.getRootBean(),
 				beanClass,
