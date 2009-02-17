@@ -22,15 +22,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 import javax.validation.BeanDescriptor;
 import javax.validation.GroupSequence;
 import javax.validation.PropertyDescriptor;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
+import javax.validation.groups.Default;
 
 import org.slf4j.Logger;
 
@@ -83,7 +84,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Maps group sequences to the list of group/sequences.
 	 */
-	private Map<Class<?>, List<Class<?>>> groupSequences = new HashMap<Class<?>, List<Class<?>>>();
+	private List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 
 	private final BuiltinConstraints builtinConstraints;
 
@@ -99,6 +100,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private void createMetaData() {
 		beanDescriptor = new BeanDescriptorImpl<T>( beanClass, this );
+		initDefaultGroupSequence( beanClass );
 		List<Class> classes = new ArrayList<Class>();
 		computeClassHierarchy( beanClass, classes );
 		for ( Class current : classes ) {
@@ -128,52 +130,19 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initClass(Class clazz) {
-		initGroupSequences( clazz );
 		initClassConstraints( clazz );
 		initMethodConstraints( clazz );
 		initFieldConstraints( clazz );
 	}
 
-	private void initGroupSequences(Class<?> clazz) {
+	private void initDefaultGroupSequence(Class<?> clazz) {
 		GroupSequence groupSequenceAnnotation = clazz.getAnnotation( GroupSequence.class );
-		if ( groupSequenceAnnotation != null ) {
-			addGroupSequence( groupSequenceAnnotation );
-		}
-
-		for ( Map.Entry<Class<?>, List<Class<?>>> mapEntry : groupSequences.entrySet() ) {
-			List<Class<?>> groups = mapEntry.getValue();
-			List<Class<?>> expandedGroups = new ArrayList<Class<?>>();
-			for ( Class<?> group : groups ) {
-				expandedGroups.addAll( expandGroupSequences( group ) );
-			}
-			groupSequences.put( mapEntry.getKey(), expandedGroups );
-		}
-		if ( log.isDebugEnabled() && !groupSequences.isEmpty() ) {
-			log.debug( "Expanded groups sequences: {}", groupSequences );
-		}
-	}
-
-	private List<Class<?>> expandGroupSequences(Class<?> group) {
-		List<Class<?>> groupList = new ArrayList<Class<?>>();
-		if ( groupSequences.containsKey( group ) ) {
-			for ( Class<?> localGroup : groupSequences.get( group ) ) {
-				groupList.addAll( expandGroupSequences( localGroup ) );
-			}
+		if ( groupSequenceAnnotation == null ) {
+			defaultGroupSequence.add( Default.class );
 		}
 		else {
-			groupList.add( group );
+			defaultGroupSequence.addAll( Arrays.asList( groupSequenceAnnotation.sequence() ) );
 		}
-		if ( log.isTraceEnabled() ) {
-			log.trace( "Expanded {} to {}", group, groupList.toString() );
-		}
-		return groupList;
-	}
-
-	private void addGroupSequence(GroupSequence groupSequence) {
-		if ( groupSequences.containsKey( groupSequence.name() ) ) {
-			throw new ValidationException( "Encountered duplicate sequence name: " + groupSequence.name() );
-		}
-		groupSequences.put( groupSequence.name(), Arrays.asList( groupSequence.sequence() ) );
 	}
 
 	private void initFieldConstraints(Class clazz) {
@@ -244,12 +213,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(A annotation) {
 		Class<?>[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
-		for ( Class<?> groupName : groups ) {
-			if ( groupSequences.containsKey( groupName ) ) {
-				throw new ValidationException( groupName + " is illegally used as group and sequence name." );
-			}
-		}
-
 		return new ConstraintDescriptorImpl( annotation, groups, builtinConstraints );
 	}
 
@@ -360,8 +323,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return cascadedMembers;
 	}
 
-	public Map<Class<?>, List<Class<?>>> getGroupSequences() {
-		return groupSequences;
+	public List<Class<?>> getDefaultGroupSequence() {
+		return defaultGroupSequence;
 	}
 
 	public List<MetaConstraint> geMetaConstraintList() {

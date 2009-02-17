@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,31 +15,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
-
-import javax.validation.Valid;
+package org.hibernate.validation.engine.group;
 
 /**
- * Class with no constraints but with a cascade @Valid annotation
+ * Used to determine the execution order if there is one or more group or group sequences are specified.
+ *
+ * @author Hardy Ferentschik
  */
-public class Account {
-	private String accountLogin;
-	private Customer customer;
-
-	public String getAccountLogin() {
-		return accountLogin;
-	}
-
-	public void setAccountLogin(String accountLogin) {
-		this.accountLogin = accountLogin;
-	}
-
-	@Valid
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
+public class GroupExecutionOrder {
 }

@@ -17,12 +17,10 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.HashSet;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,20 +29,11 @@ import org.junit.Test;
 
 import org.hibernate.validation.eg.Actor;
 import org.hibernate.validation.eg.Address;
-import org.hibernate.validation.eg.Animal;
-import org.hibernate.validation.eg.Author;
-import org.hibernate.validation.eg.Book;
 import org.hibernate.validation.eg.Boy;
 import org.hibernate.validation.eg.Customer;
-import org.hibernate.validation.eg.DefaultAlias;
-import org.hibernate.validation.eg.Dictonary;
 import org.hibernate.validation.eg.Engine;
-import org.hibernate.validation.eg.EnglishDictonary;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.UnconstraintEntity;
-import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Last;
-import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.util.TestUtil;
 
 /**
@@ -103,101 +92,6 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	public void testGroups() {
-		Validator validator = TestUtil.getValidator();
-
-		Author author = new Author();
-		author.setLastName( "" );
-		author.setFirstName( "" );
-		Book book = new Book();
-		book.setTitle( "" );
-		book.setAuthor( author );
-
-		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
-
-		author.setFirstName( "Gavin" );
-		author.setLastName( "King" );
-
-		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "may not be empty", constraintViolation.getMessage() );
-		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getInvalidValue() );
-		assertEquals( "Wrong propertyName", "title", constraintViolation.getPropertyPath() );
-
-		book.setTitle( "Hibernate Persistence with JPA" );
-		book.setSubtitle( "Revised Edition of Hibernate in Action" );
-
-		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "length must be between 0 and 30", constraintViolation.getMessage() );
-		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", book.getSubtitle(), constraintViolation.getInvalidValue() );
-		assertEquals( "Wrong propertyName", "subtitle", constraintViolation.getPropertyPath() );
-
-		book.setSubtitle( "Revised Edition" );
-		author.setCompany( "JBoss a divison of RedHat" );
-
-		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "length must be between 0 and 20", constraintViolation.getMessage() );
-		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", author.getCompany(), constraintViolation.getInvalidValue() );
-		assertEquals( "Wrong propertyName", "author.company", constraintViolation.getPropertyPath() );
-
-		author.setCompany( "JBoss" );
-
-		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
-	}
-
-	@Test
-	public void testDefaultGroupSequence() {
-		Validator validator = TestUtil.getValidator();
-
-		Author author = new Author();
-		author.setLastName( "" );
-		author.setFirstName( "" );
-		Book book = new Book();
-		book.setAuthor( author );
-
-		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book, Default.class );
-		assertEquals( "Wrong number of constraints", 2, constraintViolations.size() );
-
-		author.setFirstName( "Gavin" );
-		author.setLastName( "King" );
-
-		constraintViolations = validator.validate( book, Default.class );
-		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
-		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", book.getTitle(), constraintViolation.getInvalidValue() );
-		assertEquals( "Wrong propertyName", "title", constraintViolation.getPropertyPath() );
-
-		book.setTitle( "Hibernate Persistence with JPA" );
-		book.setSubtitle( "Revised Edition of Hibernate in Action" );
-
-		constraintViolations = validator.validate( book, Default.class );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-
-		book.setSubtitle( "Revised Edition" );
-		author.setCompany( "JBoss a divison of RedHat" );
-
-		constraintViolations = validator.validate( book, Default.class );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
-
-		author.setCompany( "JBoss" );
-
-		constraintViolations = validator.validate( book, Default.class );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
-	}
-
-	@Test
 	public void testBasicValidation() {
 		Validator validator = TestUtil.getValidator();
 
@@ -211,53 +105,6 @@ public class ValidatorImplTest {
 
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
-	}
-
-	@Test
-	public void testGroupSequences() {
-		Validator validator = TestUtil.getValidator();
-
-		Dictonary dictonary = new Dictonary();
-		dictonary.setTitle( "English - German" );
-		Author author = new Author();
-		author.setLastName( "-" );
-		author.setFirstName( "-" );
-		author.setCompany( "Langenscheidt Publ." );
-		dictonary.setAuthor( author );
-
-		Set<ConstraintViolation<Dictonary>> constraintViolations = validator.validate( dictonary, DefaultAlias.class );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
-	}
-
-	@Test
-	public void testValidationFailureInMultipleGroups() {
-		Validator validator = TestUtil.getValidator();
-		Animal elepfant = new Animal();
-		elepfant.setName( "" );
-		elepfant.setDomain( Animal.Domain.EUKARYOTA );
-
-		Set<ConstraintViolation<Animal>> constraintViolations = validator.validate( elepfant, First.class, Second.class );
-		assertEquals(
-				"The should be two invalid constraints since the same propertyName gets validated in both groups",
-				1,
-				constraintViolations.size()
-		);
-
-		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		Set<Class<?>> expected = new HashSet<Class<?>>();
-		expected.add( First.class );
-		expected.add( Second.class );
-		assertEquals(
-				"The constraint should be invalid for both groups",
-				expected,
-				constraintViolation.getGroups()
-		);
-	}
-
-	@Test(expected = ValidationException.class)
-	public void testInvalidSequenceName() {
-		Validator validator = TestUtil.getValidator();
-		validator.getConstraintsForClass( EnglishDictonary.class ).hasConstraints();
 	}
 
 	@Test

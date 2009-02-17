@@ -178,6 +178,7 @@ public class ValidatorImpl implements Validator {
 	 * @param context the validation context.
 	 * @param type the type of the cascaded field or property.
 	 * @param value the actual value.
+	 *
 	 * @return An iterator over the value of a cascaded property.
 	 */
 	private <T> Iterator<?> createIteratorForCascadedValue(ExecutionContext<T> context, Type type, Object value) {
@@ -202,7 +203,7 @@ public class ValidatorImpl implements Validator {
 			iter = list.iterator();
 		}
 		return iter;
-	}	
+	}
 
 	private <T> void validateCascadedConstraint(ExecutionContext<T> context, Iterator<?> iter) {
 		Object actualValue;
@@ -403,8 +404,8 @@ public class ValidatorImpl implements Validator {
 
 		boolean isGroupSequence;
 		BeanMetaData<T> metaDataProvider = getBeanMetaData( beanType );
-		if ( metaDataProvider.getGroupSequences().containsKey( group ) ) {
-			expandedGroups.addAll( metaDataProvider.getGroupSequences().get( group ) );
+		if ( Default.class.getName().equals( group.getName() ) ) {
+			expandedGroups.addAll( metaDataProvider.getDefaultGroupSequence() );
 			isGroupSequence = true;
 		}
 		else {
