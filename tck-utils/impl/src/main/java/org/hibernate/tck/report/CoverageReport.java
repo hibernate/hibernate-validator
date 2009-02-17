@@ -9,18 +9,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.tck.config.RuntimeProperties;
+
 /**
  * Generates the TCK spec coverage report
  *
  * @author Shane Bryzak
  */
 public class CoverageReport {
+   
+   public static final String FISHEYE_BASE_URL_PROPERTY = "fisheye_base_url";
+   
+   public static final String SVN_BASE_URL_PROPERTY = "svn_base_url";
+   
     /*
     * References to the spec assertions made by the tck tests
     */
     private final Map<String, List<SpecReference>> references;
 
     private AuditParser auditParser;
+    
+    private RuntimeProperties properties;
+    
+    private String fisheyeBaseUrl = null;
+    
+    private String svnBaseUrl = null;
 
     public CoverageReport(List<SpecReference> references, AuditParser auditParser) {
         this.references = new HashMap<String, List<SpecReference>>();
@@ -34,6 +47,29 @@ public class CoverageReport {
         }
 
         this.auditParser = auditParser;
+        
+        this.properties = new RuntimeProperties();
+        
+        try
+        {
+           fisheyeBaseUrl = this.properties.getStringValue(FISHEYE_BASE_URL_PROPERTY, null, false);
+           
+           if (!fisheyeBaseUrl.endsWith("/"))
+           {
+              fisheyeBaseUrl = fisheyeBaseUrl + "/";
+           }
+           
+           svnBaseUrl = this.properties.getStringValue(SVN_BASE_URL_PROPERTY, null, false);
+           
+           if (!svnBaseUrl.endsWith("/"))
+           {
+              svnBaseUrl = svnBaseUrl + "/";
+           }
+        }
+        catch (Exception ex)
+        {
+           // swallow
+        }        
     }
 
     public void generate(OutputStream out) throws IOException {
@@ -62,6 +98,14 @@ public class CoverageReport {
         sb.append("    width: 50px;\n");
         sb.append("    margin-top: 0px;\n");
         sb.append("    height: 100%; }\n");
+        sb.append("   a.external, a.external:visited, a.external:hover {\n");
+        sb.append("    color: #0000ff;\n");
+        sb.append("    font-size: 9px;\n");
+        sb.append("    font-style: normal;\n");
+        sb.append("    padding-left: 2px;\n");
+        sb.append("    margin-left: 6px;\n");
+        sb.append("    margin-right: 6px;\n");
+        sb.append("    padding-right: 2px; }\n");       
         sb.append("  .results {\n");
         sb.append("    margin-left: 50px; }\n");
         sb.append("  .description {\n");
@@ -105,6 +149,8 @@ public class CoverageReport {
     }
 
     private void writeCoverage(OutputStream out) throws IOException {
+       
+        out.write("<h3>Coverage Detail</h3>\n".getBytes());
        
         for (String sectionId : auditParser.getSectionIds()) {
 
@@ -153,6 +199,34 @@ public class CoverageReport {
                             sb.append(".");
                             sb.append(ref.getMethodName());
                             sb.append("()");
+                            
+                            if (fisheyeBaseUrl != null)
+                            {                               
+                               sb.append("<a class=\"external\" target=\"_blank\" href=\"");
+                               sb.append(fisheyeBaseUrl);
+                               sb.append(currentPackageName.replace('.', '/'));
+                               sb.append("/");
+                               sb.append(ref.getClassName());
+                               sb.append(".java");
+                               sb.append("\">fisheye</a>");
+                            }
+                            
+                            if (svnBaseUrl != null)
+                            {
+                               if (fisheyeBaseUrl != null)
+                               {
+                                  sb.append("|");                                  
+                               }
+                               
+                               sb.append("<a class=\"external\" target=\"_blank\" href=\"");
+                               sb.append(svnBaseUrl);
+                               sb.append(currentPackageName.replace('.', '/'));
+                               sb.append("/");
+                               sb.append(ref.getClassName());
+                               sb.append(".java");
+                               sb.append("\">svn</a>");                               
+                            }
+                            
                             sb.append("</div>\n");
                         }
                     }
