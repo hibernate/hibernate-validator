@@ -26,7 +26,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-gettingstarted">
-  <title>Getting started in 5 minutes</title>
+  <title id="getting-started">Getting started in 5 minutes</title>
 
   <para>This chapter will show you how to quickly get started with the
   reference implementation (RI) of the Bean Validation API as specified by JSR
@@ -104,14 +104,21 @@
     <para>Finally confirm all entered values and change into the newly created
     project directory. All properties of a Maven project (such as its
     dependencies to other libraries, the steps to be performed during build
-    etc.) are described in a file contained pom.xml (project object model),
+    etc.) are described in a file called pom.xml (project object model),
     located in the project's root directory. Now open the project's pom.xml
     and perform the following changes:</para>
 
     <itemizedlist>
       <listitem>
-        <para>Add the dependencies to the Bean Validation API and the
-        reference implementation</para>
+        <para>Add the dependency to hibernate-validator</para>
+      </listitem>
+
+      <listitem>
+        <para>Add an SLF4J binding. As Hibernate Validator uses the logging
+        facade <ulink url="http://www.slf4j.org/">SLF4J</ulink>, it can make
+        use of your preferred logging API. In the following the binding to
+        <ulink url="http://logging.apache.org/log4j/">log4j</ulink> is
+        used.</para>
       </listitem>
 
       <listitem>

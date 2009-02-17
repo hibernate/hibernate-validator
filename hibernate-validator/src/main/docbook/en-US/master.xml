@@ -133,12 +133,13 @@
 
   <!--xi:include href="modules/introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" /-->
 
-  <xi:include href="modules/gettingstarted.xml"
-              xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/gettingstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
   <!--  
   <xi:include href="modules/usingvalidator.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />	
+-->
   <xi:include href="modules/customconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<!--
   <xi:include href="modules/xmlconfiguration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/integration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/extendedri.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
