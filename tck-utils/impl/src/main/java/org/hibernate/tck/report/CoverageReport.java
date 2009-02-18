@@ -219,7 +219,7 @@ public class CoverageReport {
        sb.append("<tr style=\"background-color:#dddddd\">");
        sb.append("<th align=\"left\">Section</th>");
        sb.append("<th>Assertions</th>");
-       sb.append("<th>Coverage</th>");
+       sb.append("<th>Tested</th>");
        sb.append("<th>Coverage %</th>");
        sb.append("</tr>");
        
