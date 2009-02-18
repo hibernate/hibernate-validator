@@ -79,7 +79,7 @@ public class GroupChainGenerator {
 		}
 		List<Group> resolvedGroupSequence = new ArrayList<Group>();
 		GroupSequence sequenceAnnotation = group.getAnnotation( GroupSequence.class );
-		Class<?>[] sequenceArray = sequenceAnnotation.sequence();
+		Class<?>[] sequenceArray = sequenceAnnotation.value();
 		for ( Class clazz : sequenceArray ) {
 			if ( clazz.getAnnotation( GroupSequence.class ) == null ) {
 				resolvedGroupSequence.add( new Group( clazz, group ) );

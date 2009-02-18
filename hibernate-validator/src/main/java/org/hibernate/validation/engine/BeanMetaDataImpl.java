@@ -141,7 +141,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			defaultGroupSequence.add( Default.class );
 		}
 		else {
-			defaultGroupSequence.addAll( Arrays.asList( groupSequenceAnnotation.sequence() ) );
+			defaultGroupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
 		}
 	}
 

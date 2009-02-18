@@ -30,6 +30,6 @@ public class Address {
 	 * Check both basic constraints and high level ones.
 	 * High level constraints are not checked if basic constraints fail.
 	 */
-	@GroupSequence(sequence = {Default.class, HighLevelCoherence.class})
+	@GroupSequence(value = {Default.class, HighLevelCoherence.class})
 	public interface Complete {}
 }

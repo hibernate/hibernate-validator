@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -22,6 +22,6 @@ import javax.validation.GroupSequence;
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence( sequence = CyclicGroupSequence1.class)
+@GroupSequence( value = CyclicGroupSequence1.class)
 public interface CyclicGroupSequence2 {
 }

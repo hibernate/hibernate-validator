@@ -31,7 +31,7 @@ import org.hibernate.validation.eg.groups.Last;
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence(name = Default.class, sequence = { First.class, Second.class, Last.class })
+@GroupSequence(name = Default.class, value = { First.class, Second.class, Last.class })
 public class Book {
 	@NotNull(groups = First.class)
 	@NotEmpty(groups = First.class)
