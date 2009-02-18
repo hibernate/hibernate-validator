@@ -38,17 +38,30 @@ import javax.validation.groups.Default;
 
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.engine.group.GroupChainGenerator;
 
 /**
- * The main Bean Validation class.
+ * The main Bean Validation class. This is the core processing class of Hibernate Validator.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @todo Make all properties transient for serializability.
  */
 public class ValidatorImpl implements Validator {
-	private static final Set<Class<?>> INDEXABLE_CLASS = new HashSet<Class<?>>();
-	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
+	/**
+	 * Set of classes which can be used as index in a map.
+	 */
+	private static final Set<Class<?>> VALID_MAP_INDEX_CLASSES = new HashSet<Class<?>>();
+	static {
+		VALID_MAP_INDEX_CLASSES.add( Integer.class );
+		VALID_MAP_INDEX_CLASSES.add( Long.class );
+		VALID_MAP_INDEX_CLASSES.add( String.class );
+	}
+
+	/**
+	 * The default group array used in case any of the validate methods is called without a group.
+	 */
+	private static final Class<?>[] DEFAULT_GROUP_ARRAY = new Class<?>[] { Default.class };
 
 	/**
 	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
@@ -57,20 +70,23 @@ public class ValidatorImpl implements Validator {
 	private static Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders
 			= new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>( 10 );
 
-	static {
-		INDEXABLE_CLASS.add( Integer.class );
-		INDEXABLE_CLASS.add( Long.class );
-		INDEXABLE_CLASS.add( String.class );
-	}
+	/**
+	 * Used to resolve the group execution order for a validate call.
+	 */
+	private GroupChainGenerator groupChainGenerator;
 
 	private final ConstraintValidatorFactory constraintValidatorFactory;
+
 	private final MessageInterpolator messageInterpolator;
+
 	private final BuiltinConstraints builtinConstraints;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, BuiltinConstraints builtinConstraints) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.builtinConstraints = builtinConstraints;
+
+		groupChainGenerator = new GroupChainGenerator();
 	}
 
 	/**
@@ -84,6 +100,12 @@ public class ValidatorImpl implements Validator {
 		ExecutionContext<T> context = new ExecutionContext<T>(
 				object, messageInterpolator, constraintValidatorFactory
 		);
+
+		// if no group is specified use the default
+		if ( groups.length == 0 ) {
+			groups = DEFAULT_GROUP_ARRAY;
+		}
+
 		List<ConstraintViolationImpl<T>> list = validateInContext( context, Arrays.asList( groups ) );
 		return new HashSet<ConstraintViolation<T>>( list );
 	}
@@ -96,17 +118,10 @@ public class ValidatorImpl implements Validator {
 	 * @param groups A list of groups to validate.
 	 *
 	 * @return List of invalid constraints.
-	 *
-	 * @todo Currently we iterate the cascaded fields multiple times. Maybe we should change to an approach where we iterate the object graph only once.
 	 */
 	private <T> List<ConstraintViolationImpl<T>> validateInContext(ExecutionContext<T> context, List<Class<?>> groups) {
 		if ( context.peekValidatedObject() == null ) {
 			return Collections.emptyList();
-		}
-
-		// if no group is specified use the default
-		if ( groups.size() == 0 ) {
-			groups = Arrays.asList( DEFAULT_GROUP );
 		}
 
 		List<Class<?>> expandedGroups;
@@ -214,7 +229,7 @@ public class ValidatorImpl implements Validator {
 			propertyIndex = String.valueOf( i );
 			if ( actualValue instanceof Map.Entry ) {
 				Object key = ( ( Map.Entry ) actualValue ).getKey();
-				if ( INDEXABLE_CLASS.contains( key.getClass() ) ) {
+				if ( VALID_MAP_INDEX_CLASSES.contains( key.getClass() ) ) {
 					propertyIndex = key.toString();
 				}
 				actualValue = ( ( Map.Entry ) actualValue ).getValue();
@@ -259,7 +274,7 @@ public class ValidatorImpl implements Validator {
 
 		// if no group is specified use the default
 		if ( groups.length == 0 ) {
-			groups = DEFAULT_GROUP;
+			groups = DEFAULT_GROUP_ARRAY;
 		}
 
 		List<Class<?>> expandedGroups;
@@ -312,7 +327,7 @@ public class ValidatorImpl implements Validator {
 
 		// if no group is specified use the default
 		if ( groups.length == 0 ) {
-			groups = DEFAULT_GROUP;
+			groups = DEFAULT_GROUP_ARRAY;
 		}
 
 		List<Class<?>> expandedGroups;

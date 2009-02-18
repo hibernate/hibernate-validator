@@ -17,10 +17,11 @@
 */
 package org.hibernate.validation.engine.group;
 
+import javax.validation.GroupSequence;
+
 /**
- * Used to determine the execution order if there is one or more group or group sequences are specified.
- *
  * @author Hardy Ferentschik
  */
-public class GroupExecutionOrder {
+@GroupSequence( sequence = CyclicGroupSequence1.class)
+public interface CyclicGroupSequence2 {
 }
