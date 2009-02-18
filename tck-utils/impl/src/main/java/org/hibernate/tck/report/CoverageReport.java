@@ -74,6 +74,8 @@ public class CoverageReport {
 
     public void generate(OutputStream out) throws IOException {
         writeHeader(out);
+        writeMasterSummary(out);
+        writeSectionSummary(out);
         writeCoverage(out);
         writeUnmatched(out);
         writeFooter(out);
@@ -147,7 +149,107 @@ public class CoverageReport {
 
         out.write(sb.toString().getBytes());
     }
+    
+    private void writeMasterSummary(OutputStream out) throws IOException {
+       StringBuilder sb = new StringBuilder();
+       
+       sb.append("<h3>Master Summary</h3>\n");
+       
+       sb.append("<table border=\"0\">");
+       
+       sb.append("<tr>");
+       sb.append("<td>Total number of assertions</td>");
+       sb.append("<td>");
+       
+       int assertionTotal = 0;
+       
+       for (List<AuditAssertion> assertions : auditParser.getAssertions().values())
+       {
+          assertionTotal += assertions.size();
+       }
+       
+       sb.append(assertionTotal);
+       sb.append("</td>");
+       sb.append("</tr>");
+       
+       sb.append("</table>");
+       
+       out.write(sb.toString().getBytes());
+    }
 
+    private void writeSectionSummary(OutputStream out) throws IOException {
+       StringBuilder sb = new StringBuilder();
+       
+       sb.append("<h3>Section Summary</h3>\n");
+
+       sb.append("<table width=\"100%\">");
+       
+       sb.append("<tr style=\"background-color:#dddddd\">");
+       sb.append("<th align=\"left\">Section</th>");
+       sb.append("<th>Assertions</th>");
+       sb.append("<th>Coverage</th>");
+       sb.append("<th>Coverage %</th>");
+       sb.append("</tr>");
+       
+       boolean odd = true;
+              
+       for (String sectionId : auditParser.getSectionIds()) {
+          
+         if (odd)
+         {
+            sb.append("<tr style=\"background-color:#f7f7f7\">");
+         }
+         else
+         {
+            sb.append("<tr>");
+         }
+         
+         odd = !odd;
+         
+         int margin = (sectionId.split("[.]").length - 1) * 16;         
+         
+         sb.append("<td style=\"padding-left:" + margin + "px\">");
+         sb.append("<a href=\"#" + sectionId + "\">");
+         sb.append(sectionId);
+         sb.append(" ");
+         sb.append(auditParser.getSectionTitle(sectionId));
+         sb.append("</a>");
+         sb.append("</td>");
+         
+         int assertions = auditParser.getAssertionsForSection(sectionId).size();
+         int coverage = 0;
+         
+         for (AuditAssertion assertion : auditParser.getAssertionsForSection(sectionId))
+         {
+            if (!getCoverageForAssertion(sectionId, assertion.getId()).isEmpty())
+            {
+               coverage++;
+            }
+         }
+         
+         double coveragePercent = assertions > 0 ? ((coverage * 1.0) / assertions) * 100 : 0;
+         
+         sb.append("<td align=\"center\">");
+         sb.append(assertions);
+         sb.append("</td>");
+         
+         sb.append("<td align=\"center\">");
+         sb.append(coverage);
+         sb.append("</td>");
+         
+         String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa";
+         
+         sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
+         sb.append(String.format("%.2f%%", coveragePercent));
+         sb.append("</td>");
+         
+         sb.append("</tr>");
+       }
+
+       sb.append("</table>");       
+       out.write(sb.toString().getBytes());       
+    }
+    
     private void writeCoverage(OutputStream out) throws IOException {
        
         out.write("<h3>Coverage Detail</h3>\n".getBytes());
@@ -159,8 +261,9 @@ public class CoverageReport {
             if (sectionAssertions != null && !sectionAssertions.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
 
-                out.write(("<div class=\"sectionHeader\">Section " + sectionId + " - " +
-                      auditParser.getSectionTitle(sectionId) + "</div>\n").getBytes());                
+                out.write(("<h4 class=\"sectionHeader\" id=\"" + sectionId + "\">Section " + 
+                      sectionId + " - " +
+                      auditParser.getSectionTitle(sectionId) + "</h4>\n").getBytes());                
                 
                 for (AuditAssertion assertion : sectionAssertions) {
                     List<SpecReference> coverage = getCoverageForAssertion(sectionId, assertion.getId());
