@@ -172,6 +172,38 @@ public class CoverageReport {
        sb.append("</td>");
        sb.append("</tr>");
        
+       sb.append("<tr>");
+       sb.append("<td>Total number of tested assertions</td>");
+       
+       int coverage = 0;
+       
+       for (String sectionId : auditParser.getSectionIds())
+       {
+          for (AuditAssertion assertion : auditParser.getAssertionsForSection(sectionId))
+          {
+             if (!getCoverageForAssertion(sectionId, assertion.getId()).isEmpty())
+             {
+                coverage++;
+             }
+          }
+       }
+       
+       sb.append("<td>");
+       sb.append(coverage);
+       sb.append("</td>");
+              
+       sb.append("</tr>");
+
+       sb.append("<tr>");
+       sb.append("<td>Total percentage of tested assertions</td>");
+       
+       double coveragePercent = assertionTotal > 0 ? ((coverage * 1.0) / assertionTotal) * 100 : 0;
+       sb.append("<td>");
+       sb.append(String.format("%.2f%%", coveragePercent));
+       sb.append("</td>");
+              
+       sb.append("</tr>");       
+       
        sb.append("</table>");
        
        out.write(sb.toString().getBytes());
