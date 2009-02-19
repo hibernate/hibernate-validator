@@ -34,6 +34,8 @@ public class CoverageReport {
     private String fisheyeBaseUrl = null;
     
     private String svnBaseUrl = null;
+    
+    private List<SpecReference> unmatched;
 
     public CoverageReport(List<SpecReference> references, AuditParser auditParser) {
         this.references = new HashMap<String, List<SpecReference>>();
@@ -73,12 +75,27 @@ public class CoverageReport {
     }
 
     public void generate(OutputStream out) throws IOException {
+        calculateUnmatched();
         writeHeader(out);
+        writeContents(out);
         writeMasterSummary(out);
         writeSectionSummary(out);
         writeCoverage(out);
         writeUnmatched(out);
         writeFooter(out);
+    }
+    
+    private void calculateUnmatched()
+    {
+       unmatched = new ArrayList<SpecReference>();
+
+       for (String sectionId : references.keySet()) {
+           for (SpecReference ref : references.get(sectionId)) {
+               if (!auditParser.hasAssertion(ref.getSection(), ref.getAssertion())) {
+                   unmatched.add(ref);
+               }
+           }
+       }       
     }
 
     private void writeHeader(OutputStream out) throws IOException {
@@ -150,10 +167,22 @@ public class CoverageReport {
         out.write(sb.toString().getBytes());
     }
     
+    private void writeContents(OutputStream out) throws IOException {
+       StringBuilder sb = new StringBuilder();
+       
+       sb.append("<h3>Contents</h3>");
+       sb.append("<div><a href=\"#masterSummary\">Master Summary</a></div>");
+       sb.append("<div><a href=\"#sectionSummary\">Section Summary</a></div>");
+       sb.append("<div><a href=\"#coverageDetail\">Coverage Detail</a></div>");
+       sb.append("<div><a href=\"#unmatched\">Unmatched Tests</a></div>");
+       
+       out.write(sb.toString().getBytes());
+    }
+    
     private void writeMasterSummary(OutputStream out) throws IOException {
        StringBuilder sb = new StringBuilder();
        
-       sb.append("<h3>Master Summary</h3>\n");
+       sb.append("<h3 id=\"masterSummary\">Master Summary</h3>\n");
        
        sb.append("<table border=\"0\">");
        
@@ -198,11 +227,24 @@ public class CoverageReport {
        sb.append("<td>Total percentage of tested assertions</td>");
        
        double coveragePercent = assertionTotal > 0 ? ((coverage * 1.0) / assertionTotal) * 100 : 0;
-       sb.append("<td>");
+       
+       String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa";
+       
+       sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");       
+       
        sb.append(String.format("%.2f%%", coveragePercent));
        sb.append("</td>");
               
-       sb.append("</tr>");       
+       sb.append("</tr>");      
+       
+       sb.append("<tr>");
+       sb.append("<td>Total number of unmatched tests</td>");
+       
+       sb.append("<td>");
+       sb.append(unmatched.size());
+       sb.append("</td>");
+              
+       sb.append("</tr>");        
        
        sb.append("</table>");
        
@@ -212,7 +254,7 @@ public class CoverageReport {
     private void writeSectionSummary(OutputStream out) throws IOException {
        StringBuilder sb = new StringBuilder();
        
-       sb.append("<h3>Section Summary</h3>\n");
+       sb.append("<h3 id=\"sectionSummary\">Section Summary</h3>\n");
 
        sb.append("<table width=\"100%\">");
        
@@ -284,7 +326,7 @@ public class CoverageReport {
     
     private void writeCoverage(OutputStream out) throws IOException {
        
-        out.write("<h3>Coverage Detail</h3>\n".getBytes());
+        out.write("<h3 id=\"coverageDetail\">Coverage Detail</h3>\n".getBytes());
        
         for (String sectionId : auditParser.getSectionIds()) {
 
@@ -375,21 +417,11 @@ public class CoverageReport {
     }
 
     private void writeUnmatched(OutputStream out) throws IOException {
-        List<SpecReference> unmatched = new ArrayList<SpecReference>();
-
-        for (String sectionId : references.keySet()) {
-            for (SpecReference ref : references.get(sectionId)) {
-                if (!auditParser.hasAssertion(ref.getSection(), ref.getAssertion())) {
-                    unmatched.add(ref);
-                }
-            }
-        }
-
         if (unmatched.isEmpty()) return;
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<h3>Unmatched tests</h3>\n");
+        sb.append("<h3 id=\"unmatched\">Unmatched tests</h3>\n");
         sb.append(String.format("<p>The following %d tests do not match any known assertions:</p>",
                 unmatched.size()));
 
