@@ -110,8 +110,8 @@ public class ValidationTest {
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 
-		//FIXME nothing guarantee that a configuration can be reused
 		// now we modify the configuration, get a new factory and valiator and try again
+		configuration = Validation.byDefaultProvider().configure();
 		configuration.messageInterpolator(
 				new MessageInterpolator() {
 					public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {

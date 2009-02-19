@@ -44,9 +44,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		Version.touch();
 	}
 
-	//FIXME not sure why it is like that. We should cache these instances somehow. Static?
-	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();
-	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
+	private static final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();
+	private static final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
 
 	private MessageInterpolator messageInterpolator;
 	private ConstraintValidatorFactory constraintValidatorFactory = new ConstraintValidatorFactoryImpl();
