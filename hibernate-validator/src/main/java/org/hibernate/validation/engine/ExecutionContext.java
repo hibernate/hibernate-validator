@@ -18,10 +18,10 @@
 package org.hibernate.validation.engine;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -207,7 +207,7 @@ public class ExecutionContext<T> {
 		return propertyPath;
 	}
 
-	public boolean needsValidation(Set<Class<?>> groups) {
+	public boolean needsValidation(Collection<Class<?>> groups) {
 		return groups.contains( currentGroup );
 	}
 

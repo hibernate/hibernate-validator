@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -36,7 +36,7 @@ public class GroupChain {
 	 * @return Returns <code>true</code> if there is another group in the chain <code>false</code> otherwise.
 	 */
 	public boolean hasNext() {
-		return nextGroupPointer <= groupList.size();
+		return nextGroupPointer < groupList.size();
 	}
 
 	/**

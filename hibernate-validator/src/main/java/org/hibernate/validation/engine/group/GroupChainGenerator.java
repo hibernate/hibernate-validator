@@ -18,10 +18,10 @@
 package org.hibernate.validation.engine.group;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
 
@@ -34,7 +34,7 @@ public class GroupChainGenerator {
 
 	private final Map<Class<?>, List<Group>> resolvedSequences = new HashMap<Class<?>, List<Group>>();
 
-	public GroupChain getGroupChainFor(Set<Class<?>> groups) {
+	public GroupChain getGroupChainFor(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
 			throw new IllegalArgumentException( "At least one group has to be specified." );
 		}

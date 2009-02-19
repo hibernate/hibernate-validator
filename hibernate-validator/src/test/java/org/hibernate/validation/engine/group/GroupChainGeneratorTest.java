@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -30,6 +30,8 @@ import org.junit.Test;
 import org.hibernate.validation.eg.groups.First;
 import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.groups.Second;
+
+import static junit.framework.Assert.assertFalse;
 
 /**
  * @author Hardy Ferentschik
@@ -110,6 +112,6 @@ public class GroupChainGeneratorTest {
 		assertTrue( "Should have more groups", chain.hasNext() );
 		assertEquals( "Wrong group", Address.HighLevelCoherence.class, chain.next().getGroup() );
 
-		assertTrue( "There should be no more groups", chain.hasNext() );
+		assertFalse( "There should be no more groups", chain.hasNext() );
 	}
 }

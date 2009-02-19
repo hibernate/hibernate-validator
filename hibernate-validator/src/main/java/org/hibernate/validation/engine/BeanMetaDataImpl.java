@@ -84,7 +84,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Maps group sequences to the list of group/sequences.
 	 */
-	private List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
+	private List<Class<?>> defaultGroupList = new ArrayList<Class<?>>();
 
 	private final BuiltinConstraints builtinConstraints;
 
@@ -138,10 +138,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void initDefaultGroupSequence(Class<?> clazz) {
 		GroupSequence groupSequenceAnnotation = clazz.getAnnotation( GroupSequence.class );
 		if ( groupSequenceAnnotation == null ) {
-			defaultGroupSequence.add( Default.class );
+			defaultGroupList.add( Default.class );
 		}
 		else {
-			defaultGroupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
+			defaultGroupList.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
 		}
 	}
 
@@ -150,7 +150,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			List<ConstraintDescriptorImpl> fieldMetadata = findFieldLevelConstraints( field );
 			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
 				ReflectionHelper.setAccessibility( field );
-				MetaConstraint metaConstraint = new MetaConstraint( field, constraintDescription );
+				MetaConstraint metaConstraint = new MetaConstraint( field, constraintDescription, new ArrayList<Class<?>>(defaultGroupList) );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
@@ -165,7 +165,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			List<ConstraintDescriptorImpl> methodMetadata = findMethodLevelConstraints( method );
 			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
 				ReflectionHelper.setAccessibility( method );
-				MetaConstraint metaConstraint = new MetaConstraint( method, constraintDescription );
+				MetaConstraint metaConstraint = new MetaConstraint( method, constraintDescription, new ArrayList<Class<?>>(defaultGroupList) );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
@@ -178,7 +178,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void initClassConstraints(Class clazz) {
 		List<ConstraintDescriptorImpl> classMetadata = findClassLevelConstraints( clazz );
 		for ( ConstraintDescriptorImpl constraintDescription : classMetadata ) {
-			MetaConstraint metaConstraint = new MetaConstraint( clazz, constraintDescription );
+			MetaConstraint metaConstraint = new MetaConstraint( clazz, constraintDescription, new ArrayList<Class<?>>(defaultGroupList) );
 			metaConstraintList.add( metaConstraint );
 		}
 	}
@@ -323,8 +323,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return cascadedMembers;
 	}
 
-	public List<Class<?>> getDefaultGroupSequence() {
-		return defaultGroupSequence;
+	public List<Class<?>> getDefaultGroupList() {
+		return defaultGroupList;
 	}
 
 	public List<MetaConstraint> geMetaConstraintList() {

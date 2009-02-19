@@ -19,19 +19,17 @@ package org.hibernate.validation.eg;
 
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
-import javax.validation.groups.Default;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.Length;
 import org.hibernate.validation.constraints.NotEmpty;
 import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.eg.groups.Last;
+import org.hibernate.validation.eg.groups.Second;
 
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence(value = { First.class, Second.class, Last.class })
 public class Book {
 	@NotNull(groups = First.class)
 	@NotEmpty(groups = First.class)
@@ -66,5 +64,9 @@ public class Book {
 
 	public void setAuthor(Author author) {
 		this.author = author;
+	}
+
+	@GroupSequence(value = { First.class, Second.class, Last.class })
+	public interface All {
 	}
 }

@@ -21,8 +21,11 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
+import javax.validation.groups.Default;
 
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -68,32 +71,54 @@ public class MetaConstraint {
 	 */
 	private final ElementType elementType;
 
-	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor) {
-		this( t, null, null, ElementType.FIELD, constraintDescriptor, "" );
+	private final List<Class<?>> groupList;
+
+	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor, List<Class<?>> defaultGroupList) {
+		this( t, null, null, ElementType.FIELD, constraintDescriptor, "", defaultGroupList );
 	}
 
-	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor) {
+	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor, List<Class<?>> defaultGroupList) {
 		this(
 				null,
 				m,
 				null,
 				ElementType.METHOD,
 				constraintDescriptor,
-				ReflectionHelper.getPropertyName( m )
+				ReflectionHelper.getPropertyName( m ),
+				defaultGroupList
 		);
 	}
 
-	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor) {
-		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName() );
+	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor, List<Class<?>> defaultGroupList) {
+		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName(), defaultGroupList );
 	}
 
-	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property) {
+	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property, List<Class<?>> defaultGroupList) {
 		this.type = t;
 		this.method = m;
 		this.field = f;
 		this.elementType = elementType;
 		this.propertyName = property;
 		constraintTree = new ConstraintTree( constraintDescriptor );
+		this.groupList = new ArrayList<Class<?>>( constraintDescriptor.getGroups() );
+		checkIfPartOfDefaultGroup( defaultGroupList );
+	}
+
+	private void checkIfPartOfDefaultGroup(List<Class<?>> defaultGroupList) {
+		for ( Class<?> clazz : defaultGroupList ) {
+			if ( groupList.contains( clazz ) ) {
+				groupList.add( Default.class );
+				break;
+			}
+		}
+	}
+
+	/**
+	 * @return Returns the list of groups this constraint is part of. This might include the default group even when
+	 * it is not explicitly specified, but part of the redefined default group list of the hosting bean.
+	 */
+	public List<Class<?>> getGroupList() {
+		return groupList;
 	}
 
 	/**

@@ -37,7 +37,7 @@ import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.util.TestUtil;
 
 /**
- * Tests for the implementation of <code>Validator</code>.
+ * Tests for the group and group sequence feature.
  *
  * @author Hardy Ferentschik
  */
@@ -54,7 +54,9 @@ public class GroupTest {
 		book.setTitle( "" );
 		book.setAuthor( author );
 
-		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
+		Set<ConstraintViolation<Book>> constraintViolations = validator.validate(
+				book, First.class, Second.class, Last.class
+		);
 		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
 
 		author.setFirstName( "Gavin" );
@@ -97,7 +99,7 @@ public class GroupTest {
 	}
 
 	@Test
-	public void testDefaultGroupSequence() {
+	public void testGroupSequence() {
 		Validator validator = TestUtil.getValidator();
 
 		Author author = new Author();
@@ -106,13 +108,13 @@ public class GroupTest {
 		Book book = new Book();
 		book.setAuthor( author );
 
-		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book, Default.class );
+		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book, Book.All.class );
 		assertEquals( "Wrong number of constraints", 2, constraintViolations.size() );
 
 		author.setFirstName( "Gavin" );
 		author.setLastName( "King" );
 
-		constraintViolations = validator.validate( book, Default.class );
+		constraintViolations = validator.validate( book, Book.All.class );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
@@ -123,18 +125,18 @@ public class GroupTest {
 		book.setTitle( "Hibernate Persistence with JPA" );
 		book.setSubtitle( "Revised Edition of Hibernate in Action" );
 
-		constraintViolations = validator.validate( book, Default.class );
+		constraintViolations = validator.validate( book, Book.All.class );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 
 		book.setSubtitle( "Revised Edition" );
 		author.setCompany( "JBoss a divison of RedHat" );
 
-		constraintViolations = validator.validate( book, Default.class );
+		constraintViolations = validator.validate( book, Book.All.class );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 
 		author.setCompany( "JBoss" );
 
-		constraintViolations = validator.validate( book, Default.class );
+		constraintViolations = validator.validate( book, Book.All.class );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
 
@@ -161,7 +163,9 @@ public class GroupTest {
 		elepfant.setName( "" );
 		elepfant.setDomain( Animal.Domain.EUKARYOTA );
 
-		Set<ConstraintViolation<Animal>> constraintViolations = validator.validate( elepfant, First.class, Second.class );
+		Set<ConstraintViolation<Animal>> constraintViolations = validator.validate(
+				elepfant, First.class, Second.class
+		);
 		assertEquals(
 				"The should be two invalid constraints since the same propertyName gets validated in both groups",
 				1,
@@ -177,5 +181,38 @@ public class GroupTest {
 				expected,
 				constraintViolation.getGroups()
 		);
+	}
+
+	@Test
+	public void testValidateAgainstDifferentGroups() {
+		User user = new User();
+
+		// all fields per default null. Depending on the validation group there should be  a different amount
+		// of constraint failures.
+		Validator validator = TestUtil.getValidator();
+
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
+		assertEquals( "Wrong number of constraints", 2, constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, Default.class );
+		assertEquals( "Wrong number of constraints", 2, constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, Billable.class );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, BuyInOneClick.class );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, BuyInOneClick.class, Billable.class );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, BuyInOneClick.class, Default.class );
+		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, BuyInOneClick.class, Default.class, Billable.class );
+		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, BuyInOneClick.class, BuyInOneClick.class );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 	}
 }

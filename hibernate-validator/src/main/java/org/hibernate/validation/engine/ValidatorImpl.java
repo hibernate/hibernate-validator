@@ -29,16 +29,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.BeanDescriptor;
-import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
+import org.hibernate.validation.engine.group.Group;
+import org.hibernate.validation.engine.group.GroupChain;
+import org.hibernate.validation.engine.group.GroupChainGenerator;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.engine.group.GroupChainGenerator;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -52,6 +53,7 @@ public class ValidatorImpl implements Validator {
 	 * Set of classes which can be used as index in a map.
 	 */
 	private static final Set<Class<?>> VALID_MAP_INDEX_CLASSES = new HashSet<Class<?>>();
+
 	static {
 		VALID_MAP_INDEX_CLASSES.add( Integer.class );
 		VALID_MAP_INDEX_CLASSES.add( Long.class );
@@ -124,20 +126,17 @@ public class ValidatorImpl implements Validator {
 			return Collections.emptyList();
 		}
 
-		List<Class<?>> expandedGroups;
-		boolean isGroupSequence;
-		for ( Class<?> group : groups ) {
-			expandedGroups = new ArrayList<Class<?>>();
-			isGroupSequence = expandGroup( context.peekValidatedObjectType(), group, expandedGroups );
+		GroupChain groupChain = groupChainGenerator.getGroupChainFor( groups );
+		while ( groupChain.hasNext() ) {
+			Group group = groupChain.next();
+			Class<?> currentSequence = group.getSequence();
+			context.setCurrentGroup( group.getGroup() );
 
-			for ( Class<?> expandedGroupName : expandedGroups ) {
-				context.setCurrentGroup( expandedGroupName );
+			validateConstraints( context );
+			validateCascadedConstraints( context );
 
-				validateConstraints( context );
-				validateCascadedConstraints( context );
-
-				if ( isGroupSequence && context.getFailingConstraints().size() > 0 ) {
-					break;
+			if ( group.partOfSequence() && context.getFailingConstraints().size() > 0 ) {
+				while ( groupChain.hasNext() && currentSequence == groupChain.next().getSequence() ) {
 				}
 			}
 		}
@@ -155,11 +154,10 @@ public class ValidatorImpl implements Validator {
 		BeanMetaData<T> beanMetaData =
 				( BeanMetaData<T> ) getBeanMetaData( executionContext.peekValidatedObjectType() );
 		for ( MetaConstraint metaConstraint : beanMetaData.geMetaConstraintList() ) {
-			ConstraintDescriptor mainConstraintDescriptor = metaConstraint.getDescriptor();
 
 			executionContext.pushProperty( metaConstraint.getPropertyName() );
 
-			if ( !executionContext.needsValidation( mainConstraintDescriptor.getGroups() ) ) {
+			if ( !executionContext.needsValidation( metaConstraint.getGroupList() ) ) {
 				executionContext.popProperty();
 				continue;
 			}
@@ -277,28 +275,23 @@ public class ValidatorImpl implements Validator {
 			groups = DEFAULT_GROUP_ARRAY;
 		}
 
-		List<Class<?>> expandedGroups;
-		boolean isGroupSequence;
-		for ( Class<?> group : groups ) {
-			expandedGroups = new ArrayList<Class<?>>();
-			isGroupSequence = expandGroup( beanType, group, expandedGroups );
-
-			for ( Class<?> expandedGroup : expandedGroups ) {
-
-				for ( MetaConstraint metaConstraint : metaConstraints ) {
-					if ( !metaConstraint.getDescriptor().getGroups().contains( expandedGroup ) ) {
-						continue;
-					}
-
-					ExecutionContext<T> context = new ExecutionContext<T>(
-							object, messageInterpolator, constraintValidatorFactory
-					);
-					metaConstraint.validateConstraint( object.getClass(), context );
-					failingConstraintViolations.addAll( context.getFailingConstraints() );
+		GroupChain groupChain = groupChainGenerator.getGroupChainFor( Arrays.asList( groups ) );
+		while ( groupChain.hasNext() ) {
+			Group group = groupChain.next();
+			Class<?> currentSequence = group.getSequence();
+			for ( MetaConstraint metaConstraint : metaConstraints ) {
+				if ( !metaConstraint.getGroupList().contains( group.getGroup() ) ) {
+					continue;
 				}
+				ExecutionContext<T> context = new ExecutionContext<T>(
+						object, messageInterpolator, constraintValidatorFactory
+				);
+				metaConstraint.validateConstraint( object.getClass(), context );
+				failingConstraintViolations.addAll( context.getFailingConstraints() );
+			}
 
-				if ( isGroupSequence && failingConstraintViolations.size() > 0 ) {
-					break;
+			if ( group.partOfSequence() && failingConstraintViolations.size() > 0 ) {
+				while ( groupChain.hasNext() && currentSequence == groupChain.next().getSequence() ) {
 				}
 			}
 		}
@@ -330,30 +323,26 @@ public class ValidatorImpl implements Validator {
 			groups = DEFAULT_GROUP_ARRAY;
 		}
 
-		List<Class<?>> expandedGroups;
-		boolean isGroupSequence;
-		for ( Class<?> group : groups ) {
-			expandedGroups = new ArrayList<Class<?>>();
-			isGroupSequence = expandGroup( beanType, group, expandedGroups );
+		GroupChain groupChain = groupChainGenerator.getGroupChainFor( Arrays.asList( groups ) );
+		while ( groupChain.hasNext() ) {
+			Group group = groupChain.next();
+			Class<?> currentSequence = group.getSequence();
 
-			for ( Class<?> expandedGroup : expandedGroups ) {
-
-				for ( MetaConstraint metaConstraint : metaConstraints ) {
-					if ( !metaConstraint.getDescriptor().getGroups().contains( expandedGroup ) ) {
-						continue;
-					}
-
-					ExecutionContext<T> context = new ExecutionContext<T>(
-							( T ) value, messageInterpolator, constraintValidatorFactory
-					);
-					context.pushProperty( propertyIter.getOriginalProperty() );
-					metaConstraint.validateConstraint( beanType, value, context );
-					failingConstraintViolations.addAll( context.getFailingConstraints() );
+			for ( MetaConstraint metaConstraint : metaConstraints ) {
+				if ( !metaConstraint.getGroupList().contains( group.getGroup() ) ) {
+					continue;
 				}
 
-				if ( isGroupSequence && failingConstraintViolations.size() > 0 ) {
-					break;
-				}
+				ExecutionContext<T> context = new ExecutionContext<T>(
+						( T ) value, messageInterpolator, constraintValidatorFactory
+				);
+				context.pushProperty( propertyIter.getOriginalProperty() );
+				metaConstraint.validateConstraint( beanType, value, context );
+				failingConstraintViolations.addAll( context.getFailingConstraints() );
+			}
+
+			if ( group.partOfSequence() && failingConstraintViolations.size() > 0 ) {
+				break;
 			}
 		}
 	}
@@ -399,35 +388,6 @@ public class ValidatorImpl implements Validator {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Checks whether the provided group name is a group sequence and if so expands the group name and add the expanded
-	 * groups names to <code>expandedGroupName</code>.
-	 *
-	 * @param beanType The class for which to expand the group names.
-	 * @param group The group to expand
-	 * @param expandedGroups The exanded group names or just a list with the single provided group name id the name
-	 * was not expandable
-	 *
-	 * @return <code>true</code> if an expansion took place, <code>false</code> otherwise.
-	 */
-	private <T> boolean expandGroup(Class<T> beanType, Class<?> group, List<Class<?>> expandedGroups) {
-		if ( expandedGroups == null ) {
-			throw new IllegalArgumentException( "List cannot be empty" );
-		}
-
-		boolean isGroupSequence;
-		BeanMetaData<T> metaDataProvider = getBeanMetaData( beanType );
-		if ( Default.class.getName().equals( group.getName() ) ) {
-			expandedGroups.addAll( metaDataProvider.getDefaultGroupSequence() );
-			isGroupSequence = true;
-		}
-		else {
-			expandedGroups.add( group );
-			isGroupSequence = false;
-		}
-		return isGroupSequence;
 	}
 
 	/**
