@@ -223,14 +223,18 @@ public class CoverageReport {
               
        sb.append("</tr>");
 
-       sb.append("<tr>");
-       sb.append("<td>Total percentage of tested assertions</td>");
-       
        double coveragePercent = assertionTotal > 0 ? ((coverage * 1.0) / assertionTotal) * 100 : 0;
-       
        String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa";
        
-       sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");       
+       sb.append("<tr style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">");
+       
+       
+       
+       sb.append("<td style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">Total percentage of tested assertions</td>");
+       
+       
+       
+       sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">");       
        
        sb.append(String.format("%.2f%%", coveragePercent));
        sb.append("</td>");
@@ -301,7 +305,7 @@ public class CoverageReport {
             }
          }
          
-         double coveragePercent = assertions > 0 ? ((coverage * 1.0) / assertions) * 100 : 0;
+         double coveragePercent = assertions > 0 ? ((coverage * 1.0) / assertions) * 100 : -1;
          
          sb.append("<td align=\"center\">");
          sb.append(assertions);
@@ -311,12 +315,18 @@ public class CoverageReport {
          sb.append(coverage);
          sb.append("</td>");
          
-         String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa";
+         if (coveragePercent >= 0)
+         {
+            String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa" ;
          
-         sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
-         sb.append(String.format("%.2f%%", coveragePercent));
-         sb.append("</td>");
-         
+            sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
+            sb.append(String.format("%.2f%%", coveragePercent));
+            sb.append("</td>");
+         }
+         else
+         {
+            sb.append("<td />");
+         }
          sb.append("</tr>");
        }
 
