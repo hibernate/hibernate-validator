@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.0.0.Alpha1</version>
+        <version>4.0.0.Alpha2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -22,6 +22,7 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+            <version>1.0.Beta4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -36,6 +37,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -83,12 +85,12 @@
                         </format>
                         <format>
                             <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl</stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                         <format>
                             <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl</stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                     </formats>

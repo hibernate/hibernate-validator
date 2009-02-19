@@ -5,7 +5,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.0.0.Alpha1</version>
+        <version>4.0.0.Alpha2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>hibernate-validator-legacy</artifactId>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>3.3.0.SP1</version>
+            <version>3.3.1.GA</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -37,7 +37,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.4.2</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -78,7 +77,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.4.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
