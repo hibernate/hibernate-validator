@@ -19,8 +19,10 @@ package org.hibernate.validation.engine.groups;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Iterator;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
@@ -31,10 +33,12 @@ import org.hibernate.validation.eg.Author;
 import org.hibernate.validation.eg.Book;
 import org.hibernate.validation.eg.DefaultAlias;
 import org.hibernate.validation.eg.Dictonary;
+import org.hibernate.validation.eg.FrenchAddress;
 import org.hibernate.validation.eg.groups.First;
 import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.util.TestUtil;
+import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 
 /**
  * Tests for the group and group sequence feature.
@@ -209,13 +213,15 @@ public class GroupTest {
 		assertEquals(
 				"There should be one violation against Billable",
 				1,
-				constraintViolations.size() );
+				constraintViolations.size()
+		);
 
 		constraintViolations = validator.validate( user, Default.class, Billable.class );
 		assertEquals(
 				"There should be 3 violation against Default and  Billable",
 				3,
-				constraintViolations.size() );
+				constraintViolations.size()
+		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class );
 		assertEquals(
@@ -251,5 +257,42 @@ public class GroupTest {
 				1,
 				constraintViolations.size()
 		);
+	}
+
+	@Test
+	public void testGroupSequenceFollowedByGroup() {
+		User user = new User();
+		user.setFirstname( "Foo" );
+		user.setLastname( "Bar" );
+		user.setPhoneNumber( "+46 123-456" );
+
+		Validator validator = TestUtil.getValidator();
+
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate(
+				user, BuyInOneClick.class, Optional.class
+		);
+		assertEquals(
+				"There should be two violations against the implicit default group",
+				2,
+				constraintViolations.size()
+		);
+
+		Iterator<ConstraintViolation<User>> iter = constraintViolations.iterator();
+
+		assertConstraintViolation(
+				iter.next(),
+				"may not be null",
+				User.class,
+				null,
+				"defaultCreditCard"
+		);
+
+		assertConstraintViolation(
+				iter.next(),
+				"must match \"[0-9 -]?\"",
+				User.class,
+				"+46 123-456",
+				"phoneNumber"
+		);		
 	}
 }

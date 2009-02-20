@@ -3,6 +3,8 @@ package org.hibernate.validation.engine.groups;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
+import org.hibernate.validation.constraints.Pattern;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -13,6 +15,9 @@ public class User {
 
 	@NotNull(groups = Default.class)
 	private String lastname;
+
+	@Pattern(regex = "[0-9 -]?", groups = Optional.class)
+	private String phoneNumber;
 
 	@NotNull(groups = { Billable.class, BuyInOneClick.class })
 	private CreditCard defaultCreditCard;
@@ -39,5 +44,13 @@ public class User {
 
 	public void setDefaultCreditCard(CreditCard defaultCreditCard) {
 		this.defaultCreditCard = defaultCreditCard;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 }
