@@ -257,6 +257,9 @@ public class GroupTest {
 		);
 	}
 
+	/**
+	 * HV-85
+	 */
 	@Test
 	public void testGroupSequenceFollowedByGroup() {
 		User user = new User();

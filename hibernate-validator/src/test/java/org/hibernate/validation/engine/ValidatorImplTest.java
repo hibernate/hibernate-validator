@@ -34,9 +34,12 @@ import org.hibernate.validation.eg.Boy;
 import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
+import org.hibernate.validation.eg.Person;
 import org.hibernate.validation.eg.UnconstraintEntity;
+import org.hibernate.validation.engine.groups.User;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
+import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 
 /**
  * Tests for the implementation of <code>Validator</code>.
@@ -61,7 +64,6 @@ public class ValidatorImplTest {
 			);
 		}
 	}
-
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullParamterToValidatorImplConstructor() {
@@ -232,7 +234,6 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	// @SpecAssertion( section = "2.2" )
 	public void testMultiValueConstraint() {
 		Validator validator = TestUtil.getValidator();
 
@@ -251,7 +252,6 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	// @SpecAssertion( section = "3.5.1" )
 	public void testGraphValidation() {
 		Validator validator = TestUtil.getValidator();
 
@@ -297,6 +297,39 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong propertyName", "orderList[0].orderNumber", constraintViolation.getPropertyPath() );
 
 		constraintViolations = validator.validateValue( Customer.class, "orderList[0].orderNumber", "1234" );
+		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
+	}
+
+	/**
+	 * HV-108
+	 */
+	@Test
+	public void testValidationIsPolymorphic() {
+		Validator validator = TestUtil.getValidator();
+
+		Customer customer = new Customer();
+		customer.setFirstName( "Foo" );
+		customer.setLastName( "Bar" );
+
+		Order order = new Order();
+		customer.addOrder( order );
+
+		Person person = customer;
+
+		Set<ConstraintViolation<Person>> constraintViolations = validator.validate( person );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+
+		assertConstraintViolation(
+				constraintViolations.iterator().next(),
+				"may not be null",
+				Customer.class,
+				null,
+				"orderList[0].orderNumber"
+		);
+
+		order.setOrderNumber( 123 );
+
+		constraintViolations = validator.validate( person );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
 }
