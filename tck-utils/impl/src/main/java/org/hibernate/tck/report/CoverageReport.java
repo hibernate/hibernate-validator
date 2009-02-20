@@ -145,18 +145,22 @@ public class CoverageReport {
         sb.append("   font-size: 9px;\n");
         sb.append("   font-weight: bold; }\n");
         sb.append("  .noCoverage {\n");
-        sb.append("    margin-top: 2px;\n");
-        sb.append("    margin-bottom: 2px;\n");
+        sb.append("   margin-top: 2px;\n");
+        sb.append("   margin-bottom: 2px;\n");
+        sb.append("   font-weight: bold;\n");
+        sb.append("   font-style: italic;\n");
+        sb.append("   color: #ff0000; }\n");
+        sb.append("  .coverageHeader {\n");
+        sb.append("   font-weight: bold;\n");
+        sb.append("   text-decoration: underline;\n");
+        sb.append("   margin-top: 2px;\n");
+        sb.append("   margin-bottom: 2px; }\n");
+        sb.append("  .coverageMethod {\n");
+        sb.append("   font-style: italic; }\n");
+        sb.append("  .implied {\n");        
+        sb.append("    color: #fff;\n");
         sb.append("    font-weight: bold;\n");
-        sb.append("    font-style: italic;\n");
-        sb.append("    color: #ff0000; }\n");
-        sb.append("   .coverageHeader {\n");
-        sb.append("    font-weight: bold;\n");
-        sb.append("    text-decoration: underline;\n");
-        sb.append("    margin-top: 2px;\n");
-        sb.append("    margin-bottom: 2px; }\n");
-        sb.append("   .coverageMethod {\n");
-        sb.append("    font-style: italic; }\n");
+        sb.append("    background-color: #000; }\n");
         sb.append("  .pass {\n");
         sb.append("    border-top: 1px solid #488c41;\n");
         sb.append("    border-bottom: 1px solid #488c41;\n");
@@ -408,6 +412,11 @@ public class CoverageReport {
                     
                     sb.append("  <div class=\"" + divClass + "\">\n");
 
+                    if (assertion.isImplied())
+                    {
+                       sb.append("<span class=\"implied\">The following assertion is not made explicitly by the spec, however it is implied</span>");
+                    }
+                    
                     sb.append("    <span class=\"code\">");
                     sb.append(assertion.getId());
                     sb.append(")");
