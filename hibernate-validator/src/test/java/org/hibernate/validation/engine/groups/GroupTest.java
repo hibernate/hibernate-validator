@@ -192,27 +192,64 @@ public class GroupTest {
 		Validator validator = TestUtil.getValidator();
 
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
-		assertEquals( "Wrong number of constraints", 2, constraintViolations.size() );
+		assertEquals(
+				"There should be two violations against the implicit default group",
+				2,
+				constraintViolations.size()
+		);
 
 		constraintViolations = validator.validate( user, Default.class );
-		assertEquals( "Wrong number of constraints", 2, constraintViolations.size() );
+		assertEquals(
+				"There should be two violations against the explicit defualt group",
+				2,
+				constraintViolations.size()
+		);
 
 		constraintViolations = validator.validate( user, Billable.class );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals(
+				"There should be one violation against Billable",
+				1,
+				constraintViolations.size() );
+
+		constraintViolations = validator.validate( user, Default.class, Billable.class );
+		assertEquals(
+				"There should be 3 violation against Default and  Billable",
+				3,
+				constraintViolations.size() );
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals(
+				"Three violations expected since BuyInOneClick extends Default and Billable",
+				3,
+				constraintViolations.size()
+		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class, Billable.class );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals(
+				"BuyInOneClick already contains all other groups. Adding Billable does not change the number of violations",
+				3,
+				constraintViolations.size()
+		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class, Default.class );
-		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
+		assertEquals(
+				"BuyInOneClick already contains all other groups. Adding Default does not change the number of violations",
+				3,
+				constraintViolations.size()
+		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class, Default.class, Billable.class );
-		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
+		assertEquals(
+				"BuyInOneClick already contains all other groups. Adding Billable and Default does not change the number of violations",
+				3,
+				constraintViolations.size()
+		);
 
-		constraintViolations = validator.validate( user, BuyInOneClick.class, BuyInOneClick.class );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		constraintViolations = validator.validate( user, Billable.class, Billable.class );
+		assertEquals(
+				"Adding the same group twice is still only leads to a single violation",
+				1,
+				constraintViolations.size()
+		);
 	}
 }

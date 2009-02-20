@@ -47,9 +47,10 @@ public class GroupChainGenerator {
 
 		GroupChain chain = new GroupChain();
 		for ( Class<?> clazz : groups ) {
-			if ( clazz.getAnnotation( GroupSequence.class ) == null ) { // normal clazz
+			if ( clazz.getAnnotation( GroupSequence.class ) == null ) {
 				Group group = new Group( clazz );
 				chain.insertGroup( group );
+				insertInheritedGroups( clazz, chain );
 			}
 			else {
 				insertSequence( clazz, chain );
@@ -57,6 +58,14 @@ public class GroupChainGenerator {
 		}
 
 		return chain;
+	}
+
+	private void insertInheritedGroups(Class<?> clazz, GroupChain chain) {
+		for ( Class<?> extendedInterface : clazz.getInterfaces() ) {
+			Group group = new Group( extendedInterface );
+			chain.insertGroup( group );
+			insertInheritedGroups(extendedInterface, chain);
+		}
 	}
 
 	private void insertSequence(Class<?> clazz, GroupChain chain) {

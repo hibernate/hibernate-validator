@@ -27,10 +27,20 @@ import java.util.List;
  */
 public class GroupChain {
 
+	/**
+	 * The actual list of groups maintained by this instance.
+	 */
 	private List<Group> groupList = new ArrayList<Group>();
 
+	/**
+	 * A pointer to the next group element.
+	 */
 	private int nextGroupPointer = 0;
 
+	/**
+	 * The current group.
+	 */
+	private Class<?> currentSequence = null;
 
 	/**
 	 * @return Returns <code>true</code> if there is another group in the chain <code>false</code> otherwise.
@@ -43,12 +53,14 @@ public class GroupChain {
 	 * @return Returns the next group in the chain or <code>null</code> if there is none.
 	 */
 	public Group next() {
-		if ( hasNext() ) {
-			return groupList.get( nextGroupPointer++ );
-		}
-		else {
+		if ( !hasNext() ) {
 			return null;
 		}
+
+		Group group = groupList.get( nextGroupPointer );
+		nextGroupPointer++;
+		currentSequence = group.getSequence();
+		return group;
 	}
 
 	/**
@@ -61,12 +73,31 @@ public class GroupChain {
 	public boolean containsSequence(Class<?> groupSequence) {
 		boolean result = false;
 		for ( Group group : groupList ) {
-			if ( groupSequence.getName().equals( group.getSequence() ) ) {
+			if ( groupSequence.getName().equals( group.getSequence().getName() ) ) {
 				result = true;
 				break;
 			}
 		}
 		return result;
+	}
+
+	public void moveToLastInCurrentSequence() {
+		if ( currentSequence == null ) {
+			return;
+		}
+
+		while ( hasNext() ) {
+			if ( currentSequence.getName().equals( groupList.get( nextGroupPointer ).getSequence().getName() ) ) {
+				next();
+			}
+			else {
+				break;
+			}
+		}
+	}
+
+	public boolean inSequence() {
+		return currentSequence != null;
 	}
 
 	void insertGroup(Group group) {

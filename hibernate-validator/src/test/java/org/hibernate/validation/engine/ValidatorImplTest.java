@@ -26,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 import org.hibernate.validation.eg.Actor;
 import org.hibernate.validation.eg.Address;
@@ -34,6 +35,7 @@ import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.UnconstraintEntity;
+import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
 
 /**
@@ -43,7 +45,8 @@ import org.hibernate.validation.util.TestUtil;
  */
 public class ValidatorImplTest {
 
-	// @SpecAssertion( section = "3.1" )
+	private static final Logger log = LoggerFactory.make();
+
 	@Test
 	public void testWrongMethodName() {
 		try {
@@ -68,14 +71,22 @@ public class ValidatorImplTest {
 	@Test
 	public void testUnconstraintClass() {
 		Validator validator = TestUtil.getValidator();
-		assertTrue( "There should be no constraints", !validator.getConstraintsForClass( UnconstraintEntity.class ).hasConstraints() );
+		assertTrue(
+				"There should be no constraints",
+				!validator.getConstraintsForClass( UnconstraintEntity.class ).hasConstraints()
+		);
 	}
 
 	@Test
 	public void testHasConstraintsAndIsBeanConstrained() {
 		Validator validator = TestUtil.getValidator();
-		assertTrue( "There should not be constraints", !validator.getConstraintsForClass( Customer.class ).hasConstraints() );
-		assertTrue( "It should be constrainted", validator.getConstraintsForClass( Customer.class ).isBeanConstrained() );
+		assertTrue(
+				"There should not be constraints", !validator.getConstraintsForClass( Customer.class ).hasConstraints()
+		);
+		assertTrue(
+				"It should be constrainted", validator.getConstraintsForClass( Customer.class ).isBeanConstrained()
+		);
+		// TODO fix test
 //		assertTrue( "It should be constrainted even if it has no constraint annotations - not implemented yet", validator.getConstraintsForClass( Account.class ).isBeanConstrained() );
 	}
 
@@ -85,10 +96,61 @@ public class ValidatorImplTest {
 		validator.validate( null );
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
+	public void testPassingNullAsGroup() {
+		Validator validator = TestUtil.getValidator();
+		Customer customer = new Customer();
+		try {
+			validator.validate( customer, null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			log.trace( "success" );
+		}
+
+		try {
+			validator.validateProperty( customer, "firstName", null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			log.trace( "success" );
+		}
+
+		try {
+			validator.validateValue( Customer.class, "firstName", "foobar", null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			log.trace( "success" );
+		}
+	}
+
+	@Test
 	public void testValidateWithNullProperty() {
 		Validator validator = TestUtil.getValidator();
-		validator.validateProperty( null, "firstName" );
+		try {
+			validator.validate( null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			log.trace( "success" );
+		}
+
+		try {
+			validator.validateProperty( null, "firstName" );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			log.trace( "success" );
+		}
+
+		try {
+			validator.validateValue( null, "firstName", "foobar" );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			log.trace( "success" );
+		}
 	}
 
 	@Test
@@ -211,7 +273,9 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong message", "may not be empty", constraintViolation.getMessage() );
 		assertEquals( "Wrong root entity", clint, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", morgan.getLastName(), constraintViolation.getInvalidValue() );
-		assertEquals( "Wrong propertyName", "playedWith[0].playedWith[1].lastName", constraintViolation.getPropertyPath() );
+		assertEquals(
+				"Wrong propertyName", "playedWith[0].playedWith[1].lastName", constraintViolation.getPropertyPath()
+		);
 	}
 
 	@Test

@@ -103,13 +103,48 @@ public class ValidatorImpl implements Validator {
 				object, messageInterpolator, constraintValidatorFactory
 		);
 
+
+		groups = validateGroupVararg( groups );
+
+		List<ConstraintViolationImpl<T>> list = validateInContext( context, Arrays.asList( groups ) );
+		return new HashSet<ConstraintViolation<T>>( list );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
+		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		validateProperty( object, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
+		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
+		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		validateValue( beanType, value, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
+		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
+		return getBeanMetaData( clazz ).getBeanDescriptor();
+	}
+
+	private Class<?>[] validateGroupVararg(Class<?>[] groups) {
+		if ( groups == null ) {
+			throw new IllegalArgumentException( "null passed as group name" );
+		}
+
 		// if no groups is specified use the default
 		if ( groups.length == 0 ) {
 			groups = DEFAULT_GROUP_ARRAY;
 		}
-
-		List<ConstraintViolationImpl<T>> list = validateInContext( context, Arrays.asList( groups ) );
-		return new HashSet<ConstraintViolation<T>>( list );
+		return groups;
 	}
 
 	/**
@@ -129,15 +164,13 @@ public class ValidatorImpl implements Validator {
 		GroupChain groupChain = groupChainGenerator.getGroupChainFor( groups );
 		while ( groupChain.hasNext() ) {
 			Group group = groupChain.next();
-			Class<?> currentSequence = group.getSequence();
 			context.setCurrentGroup( group.getGroup() );
 
 			validateConstraints( context );
 			validateCascadedConstraints( context );
 
-			if ( group.partOfSequence() && context.getFailingConstraints().size() > 0 ) {
-				while ( groupChain.hasNext() && currentSequence == groupChain.next().getSequence() ) {
-				}
+			if ( groupChain.inSequence() && context.getFailingConstraints().size() > 0 ) {
+				groupChain.moveToLastInCurrentSequence();
 			}
 		}
 		return context.getFailingConstraints();
@@ -247,15 +280,6 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
-		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		validateProperty( object, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
-		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
-	}
-
 	private <T> void validateProperty(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
 		if ( object == null ) {
 			throw new IllegalArgumentException( "Validated object cannot be null" );
@@ -270,15 +294,11 @@ public class ValidatorImpl implements Validator {
 			return;
 		}
 
-		// if no groups is specified use the default
-		if ( groups.length == 0 ) {
-			groups = DEFAULT_GROUP_ARRAY;
-		}
+		groups = validateGroupVararg( groups );
 
 		GroupChain groupChain = groupChainGenerator.getGroupChainFor( Arrays.asList( groups ) );
 		while ( groupChain.hasNext() ) {
 			Group group = groupChain.next();
-			Class<?> currentSequence = group.getSequence();
 			for ( MetaConstraint metaConstraint : metaConstraints ) {
 				if ( !metaConstraint.getGroupList().contains( group.getGroup() ) ) {
 					continue;
@@ -290,24 +310,10 @@ public class ValidatorImpl implements Validator {
 				failingConstraintViolations.addAll( context.getFailingConstraints() );
 			}
 
-			if ( group.partOfSequence() && failingConstraintViolations.size() > 0 ) {
-				while ( groupChain.hasNext() && currentSequence == groupChain.next().getSequence() ) {
-				}
+			if ( groupChain.inSequence() && failingConstraintViolations.size() > 0 ) {
+				groupChain.moveToLastInCurrentSequence();
 			}
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
-		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		validateValue( beanType, value, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
-		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
-	}
-
-	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
-		return getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
 	private <T> void validateValue(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
@@ -318,15 +324,11 @@ public class ValidatorImpl implements Validator {
 			return;
 		}
 
-		// if no groups is specified use the default
-		if ( groups.length == 0 ) {
-			groups = DEFAULT_GROUP_ARRAY;
-		}
+		groups = validateGroupVararg( groups );
 
 		GroupChain groupChain = groupChainGenerator.getGroupChainFor( Arrays.asList( groups ) );
 		while ( groupChain.hasNext() ) {
 			Group group = groupChain.next();
-			Class<?> currentSequence = group.getSequence();
 
 			for ( MetaConstraint metaConstraint : metaConstraints ) {
 				if ( !metaConstraint.getGroupList().contains( group.getGroup() ) ) {
@@ -341,8 +343,8 @@ public class ValidatorImpl implements Validator {
 				failingConstraintViolations.addAll( context.getFailingConstraints() );
 			}
 
-			if ( group.partOfSequence() && failingConstraintViolations.size() > 0 ) {
-				break;
+			if ( groupChain.inSequence() && failingConstraintViolations.size() > 0 ) {
+				groupChain.moveToLastInCurrentSequence();
 			}
 		}
 	}
