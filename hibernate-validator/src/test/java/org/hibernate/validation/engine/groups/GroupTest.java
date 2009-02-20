@@ -18,11 +18,10 @@
 package org.hibernate.validation.engine.groups;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Iterator;
+import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +32,6 @@ import org.hibernate.validation.eg.Author;
 import org.hibernate.validation.eg.Book;
 import org.hibernate.validation.eg.DefaultAlias;
 import org.hibernate.validation.eg.Dictonary;
-import org.hibernate.validation.eg.FrenchAddress;
 import org.hibernate.validation.eg.groups.First;
 import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.groups.Second;
