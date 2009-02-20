@@ -194,7 +194,13 @@ public class AuditParser
          }                   
       }
       
+      boolean testable = node.hasAttribute("testable") ? 
+            Boolean.parseBoolean(node.getAttribute("testable")) : true;
+            
+      boolean implied = node.hasAttribute("implied") ?
+            Boolean.parseBoolean(node.getAttribute("implied")) : false;
+      
       value.add(new AuditAssertion(sectionId, 
-            node.getAttribute("id"), text, note));     
+            node.getAttribute("id"), text, note, testable, implied));     
    }
 }

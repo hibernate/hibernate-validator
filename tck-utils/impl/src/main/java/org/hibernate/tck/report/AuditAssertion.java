@@ -12,13 +12,18 @@ public class AuditAssertion implements Comparable<AuditAssertion>
    private String id;
    private String text;
    private String note;
+   private boolean testable;
+   private boolean implied;
    
-   public AuditAssertion(String section, String id, String text, String note)
+   public AuditAssertion(String section, String id, String text, String note, 
+         boolean testable, boolean implied)
    {
       this.section = section;
       this.id = id;
       this.text = text;
       this.note = note;
+      this.testable = testable;
+      this.implied = implied;
    }
    
    public String getSection()
@@ -40,12 +45,21 @@ public class AuditAssertion implements Comparable<AuditAssertion>
    {
       return note;
    }
+   
+   public boolean isTestable()
+   {
+      return testable;
+   }
+   
+   public boolean isImplied()
+   {
+      return implied;
+   }
 
    public int compareTo(AuditAssertion other)
    {            
       int i = section.compareTo(other.section);      
       return i != 0 ? i : id.compareTo(other.id);
    }
-   
    
 }
