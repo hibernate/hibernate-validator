@@ -341,7 +341,7 @@ public class CoverageReport {
             }
          }
          
-         double coveragePercent = testable > 0 ? ((coverage * 1.0) / testable) * 100 : 100;
+         double coveragePercent = assertions > 0 ? ((coverage * 1.0) / assertions) * 100 : -1;
          
          sb.append("<td align=\"center\">");
          sb.append(assertions);
@@ -355,12 +355,18 @@ public class CoverageReport {
          sb.append(coverage);
          sb.append("</td>");
          
-         String bgColor = coveragePercent < failThreshold ? "#ffaaaa" : 
-            coveragePercent < passThreshold ? "#ffffaa" : "#aaffaa";
-
-         sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
-         sb.append(String.format("%.2f%%", coveragePercent));
-         sb.append("</td>");
+         if (coveragePercent >= 0)
+         {
+            String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa" ;
+         
+            sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
+            sb.append(String.format("%.2f%%", coveragePercent));
+            sb.append("</td>");
+         }
+         else
+         {
+            sb.append("<td />");
+         }
 
          sb.append("</tr>");
        }
