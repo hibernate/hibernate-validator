@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -187,7 +187,7 @@ public class GroupTest {
 	public void testValidateAgainstDifferentGroups() {
 		User user = new User();
 
-		// all fields per default null. Depending on the validation group there should be  a different amount
+		// all fields per default null. Depending on the validation groups there should be  a different amount
 		// of constraint failures.
 		Validator validator = TestUtil.getValidator();
 

@@ -1,4 +1,4 @@
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 /**
  * Customer can buy without being harrassed by the checking-out process.

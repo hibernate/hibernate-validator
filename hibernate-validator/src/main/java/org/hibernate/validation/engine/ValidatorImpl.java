@@ -35,9 +35,9 @@ import javax.validation.MessageInterpolator;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
-import org.hibernate.validation.engine.group.Group;
-import org.hibernate.validation.engine.group.GroupChain;
-import org.hibernate.validation.engine.group.GroupChainGenerator;
+import org.hibernate.validation.engine.groups.Group;
+import org.hibernate.validation.engine.groups.GroupChain;
+import org.hibernate.validation.engine.groups.GroupChainGenerator;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -103,7 +103,7 @@ public class ValidatorImpl implements Validator {
 				object, messageInterpolator, constraintValidatorFactory
 		);
 
-		// if no group is specified use the default
+		// if no groups is specified use the default
 		if ( groups.length == 0 ) {
 			groups = DEFAULT_GROUP_ARRAY;
 		}
@@ -264,13 +264,13 @@ public class ValidatorImpl implements Validator {
 		final Class<T> beanType = ( Class<T> ) object.getClass();
 
 		Set<MetaConstraint> metaConstraints = new HashSet<MetaConstraint>();
-		getMetaConstraintsForPath( beanType, propertyIter, metaConstraints );
+		collectMetaConstraintsForPath( beanType, propertyIter, metaConstraints );
 
 		if ( metaConstraints.size() == 0 ) {
 			return;
 		}
 
-		// if no group is specified use the default
+		// if no groups is specified use the default
 		if ( groups.length == 0 ) {
 			groups = DEFAULT_GROUP_ARRAY;
 		}
@@ -312,13 +312,13 @@ public class ValidatorImpl implements Validator {
 
 	private <T> void validateValue(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
 		Set<MetaConstraint> metaConstraints = new HashSet<MetaConstraint>();
-		getMetaConstraintsForPath( beanType, propertyIter, metaConstraints );
+		collectMetaConstraintsForPath( beanType, propertyIter, metaConstraints );
 
 		if ( metaConstraints.size() == 0 ) {
 			return;
 		}
 
-		// if no group is specified use the default
+		// if no groups is specified use the default
 		if ( groups.length == 0 ) {
 			groups = DEFAULT_GROUP_ARRAY;
 		}
@@ -361,7 +361,7 @@ public class ValidatorImpl implements Validator {
 	 * @param propertyIter an instance of <code>PropertyIterator</code>
 	 * @param metaConstraints Set of <code>MetaConstraint</code>s to collect all matching constraints.
 	 */
-	private void getMetaConstraintsForPath(Class<?> clazz, PropertyIterator propertyIter, Set<MetaConstraint> metaConstraints) {
+	private void collectMetaConstraintsForPath(Class<?> clazz, PropertyIterator propertyIter, Set<MetaConstraint> metaConstraints) {
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
@@ -384,7 +384,7 @@ public class ValidatorImpl implements Validator {
 							continue;
 						}
 					}
-					getMetaConstraintsForPath( ( Class<?> ) type, propertyIter, metaConstraints );
+					collectMetaConstraintsForPath( ( Class<?> ) type, propertyIter, metaConstraints );
 				}
 			}
 		}

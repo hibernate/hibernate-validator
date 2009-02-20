@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 import javax.validation.GroupSequence;
 

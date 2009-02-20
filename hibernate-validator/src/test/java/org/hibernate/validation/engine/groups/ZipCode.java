@@ -1,4 +1,4 @@
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 /**
  * @author Emmanuel Bernard

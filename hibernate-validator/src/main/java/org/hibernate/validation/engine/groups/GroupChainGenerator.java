@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,12 +36,12 @@ public class GroupChainGenerator {
 
 	public GroupChain getGroupChainFor(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
-			throw new IllegalArgumentException( "At least one group has to be specified." );
+			throw new IllegalArgumentException( "At least one groups has to be specified." );
 		}
 
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
-				throw new ValidationException( "A group has to be an interface. " + clazz.getName() + " is not." );
+				throw new ValidationException( "A groups has to be an interface. " + clazz.getName() + " is not." );
 			}
 		}
 
@@ -72,7 +72,7 @@ public class GroupChainGenerator {
 
 	private List<Group> resolveSequence(Class<?> group, List<Class<?>> processedSequences) {
 		if ( processedSequences.contains( group ) ) {
-			throw new ValidationException( "Cyclic dependecy in group definition" );
+			throw new ValidationException( "Cyclic dependecy in groups definition" );
 		}
 		else {
 			processedSequences.add( group );

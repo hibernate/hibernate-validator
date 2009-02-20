@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -107,10 +107,10 @@ public class GroupChainGeneratorTest {
 		assertEquals( "Wrong number of groups", 2, chain.size() );
 
 		assertTrue( "Should have more groups", chain.hasNext() );
-		assertEquals( "Wrong group", Default.class, chain.next().getGroup() );
+		assertEquals( "Wrong groups", Default.class, chain.next().getGroup() );
 
 		assertTrue( "Should have more groups", chain.hasNext() );
-		assertEquals( "Wrong group", Address.HighLevelCoherence.class, chain.next().getGroup() );
+		assertEquals( "Wrong groups", Address.HighLevelCoherence.class, chain.next().getGroup() );
 
 		assertFalse( "There should be no more groups", chain.hasNext() );
 	}

@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 /**
  * Encapsulates a single group.
@@ -78,7 +78,7 @@ public class Group {
 	@Override
 	public String toString() {
 		return "Group{" +
-				"group=" + group +
+				"groups=" + group +
 				", sequence=" + sequence +
 				'}';
 	}

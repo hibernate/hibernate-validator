@@ -1,4 +1,4 @@
-package org.hibernate.validation.engine.group;
+package org.hibernate.validation.engine.groups;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;

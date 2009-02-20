@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,13 +15,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.group;
-
-import javax.validation.GroupSequence;
+package org.hibernate.validation.engine.groups;
 
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence(value = CyclicGroupSequence.class)
-public interface CyclicGroupSequence {
+public class CreditCard {
+
+	private String number;
+
+	public String getNumber() {
+		return number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
+	}
 }
