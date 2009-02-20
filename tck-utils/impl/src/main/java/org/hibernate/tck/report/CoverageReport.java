@@ -227,19 +227,18 @@ public class CoverageReport {
           }
        }
        
+       double untestablePercent = assertionTotal > 0 ? (((assertionTotal - testableAssertionTotal) * 1.0) / assertionTotal) * 100 : 100;
+       
        sb.append(assertionTotal);
        sb.append("</td>");
        sb.append("</tr>");
 
        sb.append("<tr>");
-       sb.append("<td>Total number of testable assertions</td>");
+       sb.append("<td>Total number of untestable assertions</td>");
        sb.append("<td>");
-       sb.append(testableAssertionTotal);
+       sb.append(assertionTotal - testableAssertionTotal).append(" (").append(String.format("%.2f%%", untestablePercent)).append(")");
        sb.append("</td>");
        sb.append("</tr>");       
-       
-       sb.append("<tr>");
-       sb.append("<td>Total number of tested assertions</td>");
        
        int coverage = 0;
        
@@ -253,12 +252,6 @@ public class CoverageReport {
              }
           }
        }
-       
-       sb.append("<td>");
-       sb.append(coverage);
-       sb.append("</td>");
-              
-       sb.append("</tr>");
 
        double coveragePercent = testableAssertionTotal > 0 ? ((coverage * 1.0) / testableAssertionTotal) * 100 : 100;
        String bgColor = coveragePercent < failThreshold ? "#ffaaaa" : 
@@ -266,11 +259,13 @@ public class CoverageReport {
        
        sb.append("<tr style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">");
        
-       sb.append("<td style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">Total percentage of tested assertions</td>");
+       sb.append("<td style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">Total number of tested assertions</td>");
        sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">");       
        
+       sb.append(coverage).append(" (");
+       
        sb.append(String.format("%.2f%%", coveragePercent));
-       sb.append("</td>");
+       sb.append(")</td>");
               
        sb.append("</tr>");      
        
