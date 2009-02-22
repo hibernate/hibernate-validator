@@ -18,9 +18,13 @@
 package org.hibernate.validation.engine;
 
 import java.util.Set;
+import javax.validation.BeanDescriptor;
+import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
+import javax.validation.PropertyDescriptor;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +40,6 @@ import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.Person;
 import org.hibernate.validation.eg.UnconstraintEntity;
-import org.hibernate.validation.engine.groups.User;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
@@ -331,5 +334,27 @@ public class ValidatorImplTest {
 
 		constraintViolations = validator.validate( person );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
+	}
+
+	/**
+	 * HV-120
+	 */
+	@Test
+	public void testConstraintDescriptorWithoutExplicitGroup() {
+		Validator validator = TestUtil.getValidator();
+
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
+		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
+		Set<ConstraintDescriptor> descriptors = propertyDescriptor.getConstraintDescriptors();
+
+		assertEquals( "There should be only one constraint descriptor", 1, descriptors.size() );
+		ConstraintDescriptor descriptor = descriptors.iterator().next();
+		Set<Class<?>> groups = descriptor.getGroups();
+		assertTrue( "There should be only one group", groups.size() == 1 );
+		assertEquals(
+				"The declared constraint does not explicitly define a group, hence Default is expected",
+				Default.class,
+				groups.iterator().next()
+		);
 	}
 }
