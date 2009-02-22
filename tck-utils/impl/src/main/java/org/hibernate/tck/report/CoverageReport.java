@@ -85,6 +85,7 @@ public class CoverageReport {
         writeHeader(out);
         writeContents(out);
         writeMasterSummary(out);
+        writeChapterSummary(out);
         writeSectionSummary(out);
         writeCoverage(out);
         writeUnmatched(out);
@@ -196,6 +197,7 @@ public class CoverageReport {
        
        sb.append("<h3>Contents</h3>");
        sb.append("<div><a href=\"#masterSummary\">Master Summary</a></div>");
+       sb.append("<div><a href=\"#chapterSummary\">Chapter Summary</a></div>");
        sb.append("<div><a href=\"#sectionSummary\">Section Summary</a></div>");
        sb.append("<div><a href=\"#coverageDetail\">Coverage Detail</a></div>");
        sb.append("<div><a href=\"#unmatched\">Unmatched Tests</a></div>");
@@ -282,6 +284,121 @@ public class CoverageReport {
        
        out.write(sb.toString().getBytes());
     }
+    
+    private void writeChapterSummary(OutputStream out) throws IOException {
+       StringBuilder sb = new StringBuilder();
+       
+       sb.append("<h3 id=\"chapterSummary\">Chapter Summary</h3>\n");
+
+       sb.append("<table width=\"100%\">");
+       
+       sb.append("<tr style=\"background-color:#dddddd\">");
+       sb.append("<th align=\"left\">Chapter</th>");
+       sb.append("<th>Assertions</th>");
+       sb.append("<th>Testable</th>");
+       sb.append("<th>Tested</th>");
+       sb.append("<th>Coverage %</th>");
+       sb.append("</tr>");
+       
+       boolean odd = true;
+              
+       for (String sectionId : auditParser.getSectionIds()) {
+          
+          // Chapters have no .'s in their id
+         if (sectionId.split("[.]").length == 1)
+         {
+            String prefix = sectionId + ".";
+            
+            int assertions = auditParser.getAssertionsForSection(sectionId).size();
+            int testable = 0;
+            int coverage = 0;                     
+            
+            for (AuditAssertion assertion : auditParser.getAssertionsForSection(sectionId))
+            {
+               if (assertion.isTestable()) testable++;
+               
+               if (!getCoverageForAssertion(sectionId, assertion.getId()).isEmpty())
+               {
+                  coverage++;
+               }
+            }             
+            
+            // Gather stats here
+            for (String subSectionId : auditParser.getSectionIds())
+            {
+               if (subSectionId.startsWith(prefix))
+               {
+                  assertions += auditParser.getAssertionsForSection(subSectionId).size();
+                                    
+                  for (AuditAssertion assertion : auditParser.getAssertionsForSection(subSectionId))
+                  {
+                     if (assertion.isTestable()) testable++;                     
+                     
+                     if (!getCoverageForAssertion(subSectionId, assertion.getId()).isEmpty())
+                     {
+                        coverage++;
+                     }
+                  }                  
+               }
+            }
+            
+            if (odd)
+            {
+               sb.append("<tr style=\"background-color:#f7f7f7\">");
+            }
+            else
+            {
+               sb.append("<tr>");
+            }
+            
+            odd = !odd;
+            
+            int margin = (sectionId.split("[.]").length - 1) * 16;         
+            
+            sb.append("<td style=\"padding-left:" + margin + "px\">");
+            sb.append("<a href=\"#" + sectionId + "\">");
+            sb.append(sectionId);
+            sb.append(" ");
+            sb.append(auditParser.getSectionTitle(sectionId));
+            sb.append("</a>");
+            sb.append("</td>");
+                        
+            double coveragePercent = assertions > 0 ? ((coverage * 1.0) / assertions) * 100 : -1;
+            
+            sb.append("<td align=\"center\">");
+            sb.append(assertions);
+            sb.append("</td>");
+            
+            sb.append("<td align=\"center\">");
+            sb.append(testable);
+            sb.append("</td>");
+            
+            sb.append("<td align=\"center\">");
+            sb.append(coverage);
+            sb.append("</td>");
+            
+            if (coveragePercent >= 0)
+            {
+               String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa" ;
+            
+               sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
+               sb.append(String.format("%.2f%%", coveragePercent));
+               sb.append("</td>");
+            }
+            else
+            {
+               sb.append("<td />");
+            }
+
+            sb.append("</tr>");                        
+            
+         }
+          
+       }
+
+       sb.append("</table>");       
+       out.write(sb.toString().getBytes());        
+    }
 
     private void writeSectionSummary(OutputStream out) throws IOException {
        StringBuilder sb = new StringBuilder();
@@ -324,17 +441,13 @@ public class CoverageReport {
          sb.append("</td>");
          
          int assertions = auditParser.getAssertionsForSection(sectionId).size();
-         int testable = 0;
-         
-         for (AuditAssertion a : auditParser.getAssertionsForSection(sectionId))
-         {
-            if (a.isTestable()) testable++;
-         }
-         
+         int testable = 0;         
          int coverage = 0;
          
          for (AuditAssertion assertion : auditParser.getAssertionsForSection(sectionId))
          {
+            if (assertion.isTestable()) testable++;
+            
             if (!getCoverageForAssertion(sectionId, assertion.getId()).isEmpty())
             {
                coverage++;
