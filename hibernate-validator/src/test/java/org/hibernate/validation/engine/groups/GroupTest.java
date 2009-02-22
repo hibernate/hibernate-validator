@@ -38,6 +38,8 @@ import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 
+import static junit.framework.Assert.fail;
+
 /**
  * Tests for the group and group sequence feature.
  *
@@ -279,21 +281,29 @@ public class GroupTest {
 		);
 
 		Iterator<ConstraintViolation<User>> iter = constraintViolations.iterator();
-
-		assertConstraintViolation(
-				iter.next(),
-				"may not be null",
-				User.class,
-				null,
-				"defaultCreditCard"
-		);
-
-		assertConstraintViolation(
-				iter.next(),
-				"must match \"[0-9 -]?\"",
-				User.class,
-				"+46 123-456",
-				"phoneNumber"
-		);		
+		while ( iter.hasNext() ) {
+			ConstraintViolation<User> violation = iter.next();
+			if ( violation.getPropertyPath().equals( "defaultCreditCard" ) ) {
+				assertConstraintViolation(
+						violation,
+						"may not be null",
+						User.class,
+						null,
+						"defaultCreditCard"
+				);
+			}
+			else if ( violation.getPropertyPath().equals( "phoneNumber" ) ) {
+				assertConstraintViolation(
+						violation,
+						"must match \"[0-9 -]?\"",
+						User.class,
+						"+46 123-456",
+						"phoneNumber"
+				);
+			}
+			else {
+				fail( "Unexpected violation" );
+			}
+		}
 	}
 }
