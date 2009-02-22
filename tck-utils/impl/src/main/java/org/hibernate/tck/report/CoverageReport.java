@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.tck.config.RuntimeProperties;
+import org.hibernate.tck.config.Strings;
 
 /**
  * Generates the TCK spec coverage report
@@ -454,7 +455,9 @@ public class CoverageReport {
             }
          }
          
-         double coveragePercent = assertions > 0 ? ((coverage * 1.0) / assertions) * 100 : -1;
+         int coveredAndUnTestable = coverage + (assertions - testable);
+         
+         double coveragePercent = assertions > 0 ? ((coveredAndUnTestable * 1.0) / (assertions)) * 100 : -1;
          
          sb.append("<td align=\"center\">");
          sb.append(assertions);
@@ -538,7 +541,14 @@ public class CoverageReport {
 
                     sb.append("    <div class=\"results\">");
                     sb.append("<p class=\"description\">");
-                    sb.append(assertion.getText());
+                    if (!Strings.isEmpty(assertion.getNote()))
+                    {
+                       sb.append("<a title=\"" + assertion.getNote() + "\">").append(assertion.getText()).append("</a>");
+                    }
+                    else
+                    {
+                       sb.append(assertion.getText());
+                    }
                     sb.append("</p>\n");
 
                     if (assertion.isTestable())
