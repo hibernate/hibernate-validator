@@ -18,12 +18,13 @@
 package org.hibernate.validation.engine.groups;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -37,8 +38,6 @@ import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
-
-import static junit.framework.Assert.fail;
 
 /**
  * Tests for the group and group sequence feature.
@@ -78,8 +77,8 @@ public class GroupTest {
 		book.setSubtitle( "Revised Edition of Hibernate in Action" );
 
 		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong message", "length must be between 0 and 30", constraintViolation.getMessage() );
 		assertEquals( "Wrong root entity", book, constraintViolation.getRootBean() );
 		assertEquals( "Wrong value", book.getSubtitle(), constraintViolation.getInvalidValue() );
@@ -280,21 +279,19 @@ public class GroupTest {
 				constraintViolations.size()
 		);
 
-		Iterator<ConstraintViolation<User>> iter = constraintViolations.iterator();
-		while ( iter.hasNext() ) {
-			ConstraintViolation<User> violation = iter.next();
-			if ( violation.getPropertyPath().equals( "defaultCreditCard" ) ) {
+		for ( ConstraintViolation<User> constraintViolation : constraintViolations ) {
+			if ( constraintViolation.getPropertyPath().equals( "defaultCreditCard" ) ) {
 				assertConstraintViolation(
-						violation,
+						constraintViolation,
 						"may not be null",
 						User.class,
 						null,
 						"defaultCreditCard"
 				);
 			}
-			else if ( violation.getPropertyPath().equals( "phoneNumber" ) ) {
+			else if ( constraintViolation.getPropertyPath().equals( "phoneNumber" ) ) {
 				assertConstraintViolation(
-						violation,
+						constraintViolation,
 						"must match \"[0-9 -]?\"",
 						User.class,
 						"+46 123-456",
@@ -304,6 +301,59 @@ public class GroupTest {
 			else {
 				fail( "Unexpected violation" );
 			}
+		}
+	}
+
+	/**
+	 * HV-113
+	 */
+	@Test
+	public void testRedefiningDefaultGroup() {
+		Address address = new Address();
+		address.setStreet( "Guldmyntgatan" );
+		address.setCity( "Gothenborg" );
+
+		Validator validator = TestUtil.getValidator();
+
+		Set<ConstraintViolation<Address>> constraintViolations = validator.validate( address );
+		assertEquals(
+				"There should only be one violation for zipcode",
+				1,
+				constraintViolations.size()
+		);
+
+		ConstraintViolation<Address> violation = constraintViolations.iterator().next();
+		assertConstraintViolation( violation, "may not be null", address.getClass(), null, "zipcode" );
+
+		address.setZipcode( "41841" );
+
+		// now the second group in the re-defined default group causes an error
+		constraintViolations = validator.validate( address );
+		assertEquals(
+				"There should only be one violation for zipcode",
+				1,
+				constraintViolations.size()
+		);
+
+		violation = constraintViolations.iterator().next();
+		assertConstraintViolation( violation, "{validator.zipCodeCoherenceChecker}", address.getClass(), address, "" );
+	}
+
+	/**
+	 * HV-113
+	 */
+	@Test
+	public void testInvalidRedefinitionOfDefaultGroup() {
+		Address address = new AddressWithInvalidGroupSequence();
+		Validator validator = TestUtil.getValidator();
+		try {
+			validator.validate( address );
+			fail( "It shoud not be allowed to have Default.class in the group sequence of a class." );
+		}
+		catch ( ValidationException e ) {
+			assertEquals(
+					"Wrong message", "'Default.class' cannot appear in default group sequence list.", e.getMessage()
+			);
 		}
 	}
 }

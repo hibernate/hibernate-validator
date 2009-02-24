@@ -71,8 +71,8 @@ public class ExecutionContext<T> {
 	/**
 	 * Stack for keeping track of the currently validated object.
 	 */
-	private Stack<ValidatedBean> validatedObjectStack = new Stack<ValidatedBean>();
-
+	private Stack<Object> validatedObjectStack = new Stack<Object>();
+	
 	/**
 	 * The message resolver which should be used in this context.
 	 */
@@ -92,7 +92,7 @@ public class ExecutionContext<T> {
 		this.rootBean = rootBean;
 		this.messageResolver = messageResolver;
 		this.constraintValidatorFactory = constraintValidatorFactory;
-		validatedObjectStack.push( new ValidatedBean( object ) );
+		validatedObjectStack.push( object );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		propertyPath = "";
 		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
@@ -107,15 +107,15 @@ public class ExecutionContext<T> {
 	}
 
 	public Object peekValidatedObject() {
-		return validatedObjectStack.peek().bean;
+		return validatedObjectStack.peek();
 	}
 
 	public Class<?> peekValidatedObjectType() {
-		return validatedObjectStack.peek().beanType;
+		return validatedObjectStack.peek().getClass();
 	}
 
 	public void pushValidatedObject(Object validatedObject) {
-		validatedObjectStack.push( new ValidatedBean( validatedObject ) );
+		validatedObjectStack.push( validatedObject );
 	}
 
 	public void popValidatedObject() {
@@ -136,11 +136,11 @@ public class ExecutionContext<T> {
 
 	public void markProcessedForCurrentGroup() {
 		if ( processedObjects.containsKey( currentGroup ) ) {
-			processedObjects.get( currentGroup ).add( validatedObjectStack.peek().bean );
+			processedObjects.get( currentGroup ).add( validatedObjectStack.peek() );
 		}
 		else {
 			IdentitySet set = new IdentitySet();
-			set.add( validatedObjectStack.peek().bean );
+			set.add( validatedObjectStack.peek() );
 			processedObjects.put( currentGroup, set );
 		}
 	}
@@ -157,6 +157,12 @@ public class ExecutionContext<T> {
 		}
 		else {
 			failingConstraintViolations.get( i ).addGroups( failingConstraintViolation.getGroups() );
+		}
+	}
+
+	public void addConstraintFailures(List<ConstraintViolationImpl<T>> failingConstraintViolations) {
+		for(ConstraintViolationImpl<T> violation : failingConstraintViolations) {
+			addConstraintFailure( violation );
 		}
 	}
 
@@ -207,26 +213,7 @@ public class ExecutionContext<T> {
 		return propertyPath;
 	}
 
-	public boolean needsValidation(Collection<Class<?>> groups) {
+	public boolean checkValidationRequired(Collection<Class<?>> groups) {
 		return groups.contains( currentGroup );
-	}
-
-	/**
-	 * @todo Is it useful to cache the object class?
-	 */
-	private static class ValidatedBean {
-
-		final Object bean;
-		final Class<?> beanType;
-
-		private ValidatedBean(Object bean) {
-			this.bean = bean;
-			if ( bean == null ) {
-				this.beanType = null;
-			}
-			else {
-				this.beanType = bean.getClass();
-			}
-		}
 	}
 }

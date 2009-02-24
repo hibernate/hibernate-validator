@@ -115,7 +115,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		ConstraintDescriptorImpl<Size> sizeDescriptor = new ConstraintDescriptorImpl<Size>(
 				size, new Class<?>[] { }, new BuiltinConstraints()
 		);
-		expected = "size must be between -2147483648 and 2147483647";  // unkown token {}
+		expected = "size must be between 0 and 2147483647";  // unkown token {}
 		actual = interpolator.interpolate( size.message(), sizeDescriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 	}

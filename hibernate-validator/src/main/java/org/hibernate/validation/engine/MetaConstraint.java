@@ -23,9 +23,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ValidationException;
-import javax.validation.groups.Default;
 
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -71,54 +71,41 @@ public class MetaConstraint {
 	 */
 	private final ElementType elementType;
 
-	private final List<Class<?>> groupList;
-
-	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor, List<Class<?>> defaultGroupList) {
-		this( t, null, null, ElementType.FIELD, constraintDescriptor, "", defaultGroupList );
+	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor) {
+		this( t, null, null, ElementType.TYPE, constraintDescriptor, "" );
 	}
 
-	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor, List<Class<?>> defaultGroupList) {
+	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor) {
 		this(
 				null,
 				m,
 				null,
 				ElementType.METHOD,
 				constraintDescriptor,
-				ReflectionHelper.getPropertyName( m ),
-				defaultGroupList
+				ReflectionHelper.getPropertyName( m )
 		);
 	}
 
-	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor, List<Class<?>> defaultGroupList) {
-		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName(), defaultGroupList );
+	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor) {
+		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName());
 	}
 
-	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property, List<Class<?>> defaultGroupList) {
+	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property) {
 		this.type = t;
 		this.method = m;
 		this.field = f;
 		this.elementType = elementType;
 		this.propertyName = property;
 		constraintTree = new ConstraintTree( constraintDescriptor );
-		this.groupList = new ArrayList<Class<?>>( constraintDescriptor.getGroups() );
-		checkIfPartOfDefaultGroup( defaultGroupList );
 	}
 
-	private void checkIfPartOfDefaultGroup(List<Class<?>> defaultGroupList) {
-		for ( Class<?> clazz : defaultGroupList ) {
-			if ( groupList.contains( clazz ) ) {
-				groupList.add( Default.class );
-				break;
-			}
-		}
-	}
 
 	/**
 	 * @return Returns the list of groups this constraint is part of. This might include the default group even when
-	 * it is not explicitly specified, but part of the redefined default group list of the hosting bean.
+	 *         it is not explicitly specified, but part of the redefined default group list of the hosting bean.
 	 */
-	public List<Class<?>> getGroupList() {
-		return groupList;
+	public Set<Class<?>> getGroupList() {
+		return constraintTree.getDescriptor().getGroups();
 	}
 
 	/**
@@ -192,14 +179,26 @@ public class MetaConstraint {
 		return constraintTree;
 	}
 
-	public <T> void validateConstraint(Class beanClass, ExecutionContext<T> executionContext) {
+	public <T> boolean validateConstraint(Class beanClass, ExecutionContext<T> executionContext) {
 		final Object leafBeanInstance = executionContext.peekValidatedObject();
 		Object value = getValue( leafBeanInstance );
-		constraintTree.validateConstraints( value, beanClass, executionContext );
+		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		constraintTree.validateConstraints( value, beanClass, executionContext, constraintViolations );
+		if ( constraintViolations.size() > 0 ) {
+			executionContext.addConstraintFailures( constraintViolations );
+			return false;
+		}
+		return true;
 	}
 
-	public <T> void validateConstraint(Class beanClass, Object value, ExecutionContext<T> executionContext) {
-		constraintTree.validateConstraints( value, beanClass, executionContext );
+	public <T> boolean validateConstraint(Class beanClass, Object value, ExecutionContext<T> executionContext) {
+		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		constraintTree.validateConstraints( value, beanClass, executionContext, constraintViolations );
+		if ( constraintViolations.size() > 0 ) {
+			executionContext.addConstraintFailures( constraintViolations );
+			return false;
+		}
+		return true;
 	}
 
 	private Type typeOfAnnoatedElement() {

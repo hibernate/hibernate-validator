@@ -102,6 +102,7 @@ public class ValidatorImplTest {
 	}
 
 	@Test
+	@SuppressWarnings( "NullArgumentToVariableArgMethod")
 	public void testPassingNullAsGroup() {
 		Validator validator = TestUtil.getValidator();
 		Customer customer = new Customer();

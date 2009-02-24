@@ -35,9 +35,12 @@ import javax.validation.MessageInterpolator;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
+import org.slf4j.Logger;
+
 import org.hibernate.validation.engine.groups.Group;
 import org.hibernate.validation.engine.groups.GroupChain;
 import org.hibernate.validation.engine.groups.GroupChainGenerator;
+import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -49,6 +52,8 @@ import org.hibernate.validation.util.ReflectionHelper;
  * @todo Make all properties transient for serializability.
  */
 public class ValidatorImpl implements Validator {
+	private static final Logger log = LoggerFactory.make();
+
 	/**
 	 * Set of classes which can be used as index in a map.
 	 */
@@ -163,13 +168,14 @@ public class ValidatorImpl implements Validator {
 
 		GroupChain groupChain = groupChainGenerator.getGroupChainFor( groups );
 		while ( groupChain.hasNext() ) {
+			int numberOfViolations = context.getFailingConstraints().size();
 			Group group = groupChain.next();
 			context.setCurrentGroup( group.getGroup() );
 
 			validateConstraints( context );
 			validateCascadedConstraints( context );
 
-			if ( groupChain.inSequence() && context.getFailingConstraints().size() > 0 ) {
+			if ( groupChain.inSequence() && context.getFailingConstraints().size() > numberOfViolations ) {
 				groupChain.moveToLastInCurrentSequence();
 			}
 		}
@@ -186,19 +192,46 @@ public class ValidatorImpl implements Validator {
 		@SuppressWarnings("unchecked")
 		BeanMetaData<T> beanMetaData =
 				( BeanMetaData<T> ) getBeanMetaData( executionContext.peekValidatedObjectType() );
-		for ( MetaConstraint metaConstraint : beanMetaData.geMetaConstraintList() ) {
-
-			executionContext.pushProperty( metaConstraint.getPropertyName() );
-
-			if ( !executionContext.needsValidation( metaConstraint.getGroupList() ) ) {
-				executionContext.popProperty();
-				continue;
+		if ( executionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
+			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
+			if ( log.isDebugEnabled() && defaultGroupSequence.size() > 0 ) {
+				log.debug(
+						"Executing redefined Default group for bean {} as sequence {}",
+						beanMetaData.getBeanClass().getName(),
+						defaultGroupSequence
+				);
 			}
+			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
+				executionContext.setCurrentGroup( defaultSequenceMember );
+				boolean validationSuccessful = validateConstraintsForBean( executionContext, beanMetaData );
+				if ( !validationSuccessful ) {
+					if ( log.isDebugEnabled() ) {
+						log.debug(
+								"Aborting validation of Default group sequence for {} due to constraint violation.",
+								beanMetaData.getBeanClass().getName()
+						);
+					}
+					break;
+				}
+			}
+		}
+		else {
+			validateConstraintsForBean( executionContext, beanMetaData );
+		}
+	}
 
-			metaConstraint.validateConstraint( beanMetaData.getBeanClass(), executionContext );
+	private <T> boolean validateConstraintsForBean(ExecutionContext<T> executionContext, BeanMetaData<T> beanMetaData) {
+		boolean validationSuccessful = true;
+		for ( MetaConstraint metaConstraint : beanMetaData.geMetaConstraintList() ) {
+			executionContext.pushProperty( metaConstraint.getPropertyName() );
+			if ( executionContext.checkValidationRequired( metaConstraint.getGroupList() ) ) {
+				boolean tmp = metaConstraint.validateConstraint( beanMetaData.getBeanClass(), executionContext );
+				validationSuccessful = validationSuccessful && tmp;
+			}
 			executionContext.popProperty();
 		}
 		executionContext.markProcessedForCurrentGroup();
+		return validationSuccessful;
 	}
 
 	private <T> void validateCascadedConstraints(ExecutionContext<T> context) {
@@ -306,6 +339,7 @@ public class ValidatorImpl implements Validator {
 				ExecutionContext<T> context = new ExecutionContext<T>(
 						object, messageInterpolator, constraintValidatorFactory
 				);
+				context.pushProperty( propertyIter.getOriginalProperty() );
 				metaConstraint.validateConstraint( object.getClass(), context );
 				failingConstraintViolations.addAll( context.getFailingConstraints() );
 			}

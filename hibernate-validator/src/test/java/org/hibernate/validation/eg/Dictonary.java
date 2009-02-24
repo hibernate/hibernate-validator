@@ -26,7 +26,6 @@ import org.hibernate.validation.constraints.NotEmpty;
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence(value = { Default.class })
 public class Dictonary extends Book {
 	@NotNull(groups = Translate.class)
 	@NotEmpty(groups = Translate.class)

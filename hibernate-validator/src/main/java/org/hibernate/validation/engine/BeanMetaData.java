@@ -61,7 +61,7 @@ public interface BeanMetaData<T> {
 	/**
 	 * @return A map mapping defined group sequences to a list of groups.
 	 */
-	List<Class<?>> getDefaultGroupList();
+	List<Class<?>> getDefaultGroupSequence();
 
 	/**
 	 * @return A list of <code>MetaConstraint</code> instances encapsulating the information of all the constraints

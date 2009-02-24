@@ -83,9 +83,9 @@ public class ConstraintTree {
 		return descriptor;
 	}
 
-	public void validateConstraints(Object value, Class beanClass, ExecutionContext executionContext) {
+	public <T> void validateConstraints(Object value, Class beanClass, ExecutionContext executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
 		for ( ConstraintTree tree : getChildren() ) {
-			tree.validateConstraints( value, beanClass, executionContext );
+			tree.validateConstraints( value, beanClass, executionContext, constraintViolations );
 		}
 
 		final Object leafBeanInstance = executionContext.peekValidatedObject();
@@ -99,15 +99,22 @@ public class ConstraintTree {
 		if ( !validator.isValid( value, constraintContext ) ) {
 			for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
 				final String message = error.getMessage();
-				createConstraintViolation( value, beanClass, executionContext, leafBeanInstance, message, descriptor );
+				createConstraintViolation(
+						value, beanClass, executionContext, leafBeanInstance, message, descriptor, constraintViolations
+				);
 			}
 		}
-		if ( reportAsSingleViolation()
-				&& executionContext.getFailingConstraints().size() > 0 ) {
-			executionContext.clearFailingConstraints();
+		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
+			constraintViolations.clear();
 			final String message = ( String ) getParent().getDescriptor().getParameters().get( "message" );
 			createConstraintViolation(
-					value, beanClass, executionContext, leafBeanInstance, message, getParent().descriptor
+					value,
+					beanClass,
+					executionContext,
+					leafBeanInstance,
+					message,
+					getParent().descriptor,
+					constraintViolations
 			);
 		}
 	}
@@ -117,7 +124,7 @@ public class ConstraintTree {
 				&& getParent().getDescriptor().isReportAsSingleViolation();
 	}
 
-	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ExecutionContext<T> executionContext, Object leafBeanInstance, String messageTemplate, ConstraintDescriptor descriptor) {
+	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ExecutionContext<T> executionContext, Object leafBeanInstance, String messageTemplate, ConstraintDescriptor descriptor, List<ConstraintViolationImpl<T>> constraintViolations) {
 		String interpolatedMessage = executionContext.getMessageResolver().interpolate(
 				messageTemplate,
 				descriptor,
@@ -134,7 +141,7 @@ public class ConstraintTree {
 				executionContext.getCurrentGroup(),
 				descriptor
 		);
-		executionContext.addConstraintFailure( failingConstraintViolation );
+		constraintViolations.add( failingConstraintViolation );
 	}
 
 	/**
