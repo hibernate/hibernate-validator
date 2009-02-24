@@ -155,9 +155,6 @@ public class ExecutionContext<T> {
 		if ( i == -1 ) {
 			failingConstraintViolations.add( failingConstraintViolation );
 		}
-		else {
-			failingConstraintViolations.get( i ).addGroups( failingConstraintViolation.getGroups() );
-		}
 	}
 
 	public void addConstraintFailures(List<ConstraintViolationImpl<T>> failingConstraintViolations) {

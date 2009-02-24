@@ -22,11 +22,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.validation.AmbiguousConstraintUsageException;
+import org.hibernate.validation.AmbiguousConstraintUsageException;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
-import javax.validation.UnexpectedTypeForConstraintException;
+import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
@@ -138,7 +138,6 @@ public class ConstraintTree {
 				leafBeanInstance,
 				value,
 				executionContext.peekPropertyPath(), //FIXME use error.getProperty()
-				executionContext.getCurrentGroup(),
 				descriptor
 		);
 		constraintViolations.add( failingConstraintViolation );
@@ -187,7 +186,7 @@ public class ConstraintTree {
 
 	private void verifyResolveWasUnique(Class valueClass, List<Class> assignableClasses) {
 		if ( assignableClasses.size() == 0 ) {
-			throw new UnexpectedTypeForConstraintException( "No validator could be found for type: " + valueClass.getName() );
+			throw new UnexpectedTypeException( "No validator could be found for type: " + valueClass.getName() );
 		}
 		else if ( assignableClasses.size() > 1 ) {
 			StringBuilder builder = new StringBuilder();
