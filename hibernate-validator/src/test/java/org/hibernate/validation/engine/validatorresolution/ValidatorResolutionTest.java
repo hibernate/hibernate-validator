@@ -18,10 +18,10 @@
 package org.hibernate.validation.engine.validatorresolution;
 
 import java.util.Set;
-import javax.validation.AmbiguousConstraintUsageException;
+import org.hibernate.validation.AmbiguousConstraintUsageException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.UnexpectedTypeForConstraintException;
+import javax.validation.UnexpectedTypeException;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -72,7 +72,7 @@ public class ValidatorResolutionTest {
 			validator.validate( bar );
 			fail();
 		}
-		catch ( UnexpectedTypeForConstraintException e ) {
+		catch ( UnexpectedTypeException e ) {
 			assertEquals( "No validator could be found for type: java.lang.Integer", e.getMessage() );
 		}
 	}

@@ -1,4 +1,4 @@
-// : Person.java 69 2008-09-08 11:05:07Z hardy.ferentschik $
+// $Id: AmbiguousConstraintUsageException.java 15902 2009-02-05 11:53:49Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,23 +15,31 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.validatorresolution;
+package org.hibernate.validation;
 
-import javax.validation.constraints.Size;
+import javax.validation.ValidationException;
+import javax.validation.UnexpectedTypeException;
 
 /**
+ * Exception raised in the case that the constraint validator resolution returns more than one possible validators for
+ * a given type.
+ *
  * @author Hardy Ferentschik
  */
-public class Bar {
-	// validating Bar actually raises an UnexpectedTypeException - @Size is not defined for Integer
-	@Size
-	private Integer value = 0;
-
-	public Integer getValue() {
-		return value;
+public class AmbiguousConstraintUsageException extends UnexpectedTypeException {
+	public AmbiguousConstraintUsageException(String message) {
+		super( message );
 	}
 
-	public void setValue(Integer value) {
-		this.value = value;
+	public AmbiguousConstraintUsageException() {
+		super();
+	}
+
+	public AmbiguousConstraintUsageException(String message, Throwable cause) {
+		super( message, cause );
+	}
+
+	public AmbiguousConstraintUsageException(Throwable cause) {
+		super( cause );
 	}
 }

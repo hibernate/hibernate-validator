@@ -174,16 +174,6 @@ public class GroupTest {
 				1,
 				constraintViolations.size()
 		);
-
-		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		Set<Class<?>> expected = new HashSet<Class<?>>();
-		expected.add( First.class );
-		expected.add( Second.class );
-		assertEquals(
-				"The constraint should be invalid for both groups",
-				expected,
-				constraintViolation.getGroups()
-		);
 	}
 
 	@Test
