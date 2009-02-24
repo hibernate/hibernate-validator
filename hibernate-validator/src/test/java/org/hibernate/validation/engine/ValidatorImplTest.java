@@ -354,13 +354,6 @@ public class ValidatorImplTest {
 		order.setOrderNumber( 1234 );
 		constraintViolations = validator.validateProperty( customer, "orderList[0].orderNumber" );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
-
-		try {
-			constraintViolations = validator.validateProperty( customer, "orderList[1].orderNumber" );
-		}
-		catch ( IllegalArgumentException e ) {
-			assertEquals( "Invalid property path.", e.getMessage() );
-		}
 	}
 
 	@Test
