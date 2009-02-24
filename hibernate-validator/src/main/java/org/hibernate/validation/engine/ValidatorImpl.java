@@ -119,6 +119,13 @@ public class ValidatorImpl implements Validator {
 	 * {@inheritDoc}
 	 */
 	public <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
+
+		sanityCheckPropertyPath( propertyName );
+
+		if ( object == null ) {
+			throw new IllegalArgumentException( "Validated object cannot be null." );
+		}
+
 		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 		validateProperty( object, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
@@ -128,6 +135,13 @@ public class ValidatorImpl implements Validator {
 	 * {@inheritDoc}
 	 */
 	public <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
+
+		sanityCheckPropertyPath( propertyName );
+
+		if ( beanType == null ) {
+			throw new IllegalArgumentException( "The bean type cannot be null." );
+		}
+
 		List<ConstraintViolationImpl<T>> failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 		validateValue( beanType, value, new PropertyIterator( propertyName ), failingConstraintViolations, groups );
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
@@ -138,6 +152,12 @@ public class ValidatorImpl implements Validator {
 	 */
 	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return getBeanMetaData( clazz ).getBeanDescriptor();
+	}
+
+	private void sanityCheckPropertyPath(String propertyName) {
+		if ( propertyName == null || propertyName.length() == 0 ) {
+			throw new IllegalArgumentException( "Invalid property path." );
+		}
 	}
 
 	private Class<?>[] validateGroupVararg(Class<?>[] groups) {
@@ -196,14 +216,14 @@ public class ValidatorImpl implements Validator {
 			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
 			if ( log.isDebugEnabled() && defaultGroupSequence.size() > 0 ) {
 				log.debug(
-						"Executing redefined Default group for bean {} as sequence {}",
+						"Executing re-defined Default group for bean {} as sequence {}",
 						beanMetaData.getBeanClass().getName(),
 						defaultGroupSequence
 				);
 			}
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 				executionContext.setCurrentGroup( defaultSequenceMember );
-				boolean validationSuccessful = validateConstraintsForBean( executionContext, beanMetaData );
+				boolean validationSuccessful = validateConstraintsForCurrentGroup( executionContext, beanMetaData );
 				if ( !validationSuccessful ) {
 					if ( log.isDebugEnabled() ) {
 						log.debug(
@@ -216,11 +236,20 @@ public class ValidatorImpl implements Validator {
 			}
 		}
 		else {
-			validateConstraintsForBean( executionContext, beanMetaData );
+			validateConstraintsForCurrentGroup( executionContext, beanMetaData );
 		}
 	}
 
-	private <T> boolean validateConstraintsForBean(ExecutionContext<T> executionContext, BeanMetaData<T> beanMetaData) {
+	/**
+	 * Validates all constraints for the given bean using the current group set in the execution context.
+	 *
+	 * @param executionContext The execution context.
+	 * @param beanMetaData The bean metadata object for the bean to validate.
+	 *
+	 * @return <code>true</code> if the validation was successful (meaning no constraint violations), <code>false</code>
+	 *         otherwise.
+	 */
+	private <T> boolean validateConstraintsForCurrentGroup(ExecutionContext<T> executionContext, BeanMetaData<T> beanMetaData) {
 		boolean validationSuccessful = true;
 		for ( MetaConstraint metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			executionContext.pushProperty( metaConstraint.getPropertyName() );
@@ -314,14 +343,16 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <T> void validateProperty(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
-		if ( object == null ) {
-			throw new IllegalArgumentException( "Validated object cannot be null" );
-		}
+
 		@SuppressWarnings("unchecked")
 		final Class<T> beanType = ( Class<T> ) object.getClass();
 
 		Set<MetaConstraint> metaConstraints = new HashSet<MetaConstraint>();
-		collectMetaConstraintsForPath( beanType, propertyIter, metaConstraints );
+		Object hostingBean = collectMetaConstraintsForPath( beanType, object, propertyIter, metaConstraints );
+
+		if ( hostingBean == null ) {
+			throw new IllegalArgumentException( "Invalid property path." );
+		}
 
 		if ( metaConstraints.size() == 0 ) {
 			return;
@@ -337,7 +368,7 @@ public class ValidatorImpl implements Validator {
 					continue;
 				}
 				ExecutionContext<T> context = new ExecutionContext<T>(
-						object, messageInterpolator, constraintValidatorFactory
+						object, hostingBean, messageInterpolator, constraintValidatorFactory
 				);
 				context.pushProperty( propertyIter.getOriginalProperty() );
 				metaConstraint.validateConstraint( object.getClass(), context );
@@ -352,7 +383,7 @@ public class ValidatorImpl implements Validator {
 
 	private <T> void validateValue(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Class<?>... groups) {
 		Set<MetaConstraint> metaConstraints = new HashSet<MetaConstraint>();
-		collectMetaConstraintsForPath( beanType, propertyIter, metaConstraints );
+		collectMetaConstraintsForPath( beanType, null, propertyIter, metaConstraints );
 
 		if ( metaConstraints.size() == 0 ) {
 			return;
@@ -386,21 +417,24 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * Collects all <code>MetaConstraint</code>s which match the given path relative to the specified root class.
 	 * <p>
-	 * This method does not traverse an actual object, but rather tries to resolve the porperty generically.
-	 * </p>
-	 * <p>
-	 * This method is called recursively. Only if there is a valid 'validation path' through the object graph
-	 * a constraint descriptor will be returned.
+	 * This method is called recursively.
 	 * </p>
 	 *
 	 * @param clazz the class type to check for constraints.
-	 * @param propertyIter an instance of <code>PropertyIterator</code>
+	 * @param value While resolving the property path this instance points to the current object. Might be <code>null</code>.
+	 * @param propertyIter an instance of <code>PropertyIterator</code> in order to iterate the items of the original property path.
 	 * @param metaConstraints Set of <code>MetaConstraint</code>s to collect all matching constraints.
+	 *
+	 * @return Returns the bean hosting the constraints which match the specified property path.
 	 */
-	private void collectMetaConstraintsForPath(Class<?> clazz, PropertyIterator propertyIter, Set<MetaConstraint> metaConstraints) {
+	private Object collectMetaConstraintsForPath(Class<?> clazz, Object value, PropertyIterator propertyIter, Set<MetaConstraint> metaConstraints) {
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
+			if ( !ReflectionHelper.containsMember( clazz, propertyIter.getHead() ) ) {
+				throw new IllegalArgumentException( "Invalid property path." );
+			}
+
 			List<MetaConstraint> metaConstraintList = getBeanMetaData( clazz ).geMetaConstraintList();
 			for ( MetaConstraint metaConstraint : metaConstraintList ) {
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
@@ -413,17 +447,23 @@ public class ValidatorImpl implements Validator {
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
 					Type type = ReflectionHelper.typeOf( m );
-
+					value = value == null ? null : ReflectionHelper.getValue( m, value );
 					if ( propertyIter.isIndexed() ) {
 						type = ReflectionHelper.getIndexedType( type );
+						value = value == null ? null : ReflectionHelper.getIndexedValue(
+								value, propertyIter.getIndex()
+						);
 						if ( type == null ) {
 							continue;
 						}
 					}
-					collectMetaConstraintsForPath( ( Class<?> ) type, propertyIter, metaConstraints );
+					collectMetaConstraintsForPath(
+							( Class<?> ) type, value, propertyIter, metaConstraints
+					);
 				}
 			}
 		}
+		return value;
 	}
 
 	/**

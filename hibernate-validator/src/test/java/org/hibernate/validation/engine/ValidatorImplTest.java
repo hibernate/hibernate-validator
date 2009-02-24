@@ -102,7 +102,7 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	@SuppressWarnings( "NullArgumentToVariableArgMethod")
+	@SuppressWarnings("NullArgumentToVariableArgMethod")
 	public void testPassingNullAsGroup() {
 		Validator validator = TestUtil.getValidator();
 		Customer customer = new Customer();
@@ -176,7 +176,7 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	public void testValidationMethod() {
+	public void testMultipleValidationMethods() {
 		Validator validator = TestUtil.getValidator();
 
 		Address address = new Address();
@@ -224,15 +224,15 @@ public class ValidatorImplTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 
-		Order order1 = new Order();
-		customer.addOrder( order1 );
+		Order order = new Order();
+		customer.addOrder( order );
 
 		constraintViolations = validator.validate( customer );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 		assertEquals( "Wrong root entity", customer, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", order1.getOrderNumber(), constraintViolation.getInvalidValue() );
+		assertEquals( "Wrong value", order.getOrderNumber(), constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "orderList[0].orderNumber", constraintViolation.getPropertyPath() );
 
 	}
@@ -286,8 +286,6 @@ public class ValidatorImplTest {
 	public void testValidateValue() {
 		Validator validator = TestUtil.getValidator();
 
-		Order order = new Order();
-
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validateValue(
 				Customer.class, "orderList[0].orderNumber", null
 		);
@@ -297,11 +295,113 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
 		assertEquals( "Wrong root entity", null, constraintViolation.getRootBean() );
-		assertEquals( "Wrong value", order.getOrderNumber(), constraintViolation.getInvalidValue() );
+		assertEquals( "Wrong value", null, constraintViolation.getInvalidValue() );
 		assertEquals( "Wrong propertyName", "orderList[0].orderNumber", constraintViolation.getPropertyPath() );
 
 		constraintViolations = validator.validateValue( Customer.class, "orderList[0].orderNumber", "1234" );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
+	}
+
+	@Test
+	public void testValidateValueWithInvalidPropertyPath() {
+		Validator validator = TestUtil.getValidator();
+
+		try {
+			validator.validateValue( Customer.class, "", null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}
+
+		try {
+			validator.validateValue( Customer.class, "foobar", null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}
+
+		try {
+			validator.validateValue( Customer.class, "orderList[0].foobar", null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}		
+	}
+
+	@Test
+	public void testValidateProperty() {
+		Validator validator = TestUtil.getValidator();
+
+		Customer customer = new Customer();
+		Order order = new Order();
+		customer.addOrder( order );
+
+		Set<ConstraintViolation<Customer>> constraintViolations = validator.validateProperty(
+				customer, "orderList[0].orderNumber"
+		);
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+
+		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+		assertEquals( "Wrong root entity", customer, constraintViolation.getRootBean() );
+		assertEquals( "Wrong value", order.getOrderNumber(), constraintViolation.getInvalidValue() );
+		assertEquals( "Wrong propertyName", "orderList[0].orderNumber", constraintViolation.getPropertyPath() );
+
+		order.setOrderNumber( 1234 );
+		constraintViolations = validator.validateProperty( customer, "orderList[0].orderNumber" );
+		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
+
+		try {
+			constraintViolations = validator.validateProperty( customer, "orderList[1].orderNumber" );
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}
+	}
+
+	@Test
+	public void testValidatePropertyWithInvalidPropertyPath() {
+		Validator validator = TestUtil.getValidator();
+
+		Customer customer = new Customer();
+		Order order = new Order();
+		customer.addOrder( order );
+
+		try {
+			validator.validateProperty( customer, "orderList[1].orderNumber" );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}
+
+		try {
+			validator.validateProperty( customer, "" );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}
+
+		try {
+			validator.validateProperty( customer, "foobar" );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}
+
+		try {
+			validator.validateProperty( customer, "orderList[0].foobar" );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			assertEquals( "Invalid property path.", e.getMessage() );
+		}
 	}
 
 	/**

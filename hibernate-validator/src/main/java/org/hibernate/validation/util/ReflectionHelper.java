@@ -234,8 +234,6 @@ public class ReflectionHelper {
 	 *
 	 * @return The bean method name with the "is" or "get" prefix stripped off, <code>null</code>
 	 *         the method name id not according to the JavaBeans standard.
-	 *
-	 * @todo reference the JavaBean naming conventions spec here
 	 */
 	public static String getPropertyName(Member member) {
 		String name = null;
@@ -253,7 +251,6 @@ public class ReflectionHelper {
 				name = Introspector.decapitalize( methodName.substring( 3 ) );
 			}
 		}
-
 		return name;
 	}
 
@@ -488,5 +485,33 @@ public class ReflectionHelper {
 			i++;
 		}
 		return null;
+	}
+
+	/**
+	 * Checks whether the specified class contains a field or member which matches a given property.
+	 *
+	 * @param clazz The class to check.
+	 * @param property The property name.
+	 *
+	 * @return Returns <code>true</code> if the cass contains a field or member for the specified property, <code>
+	 *         false</code> otherwise.
+	 */
+	public static boolean containsMember(Class clazz, String property) {
+		try {
+			clazz.getField( property );
+			return true;
+		}
+		catch ( NoSuchFieldException e ) {
+			; // ignore
+		}
+
+		try {
+			clazz.getMethod( "get" + property.substring( 0, 1 ).toUpperCase() + property.substring( 1 ) );
+			return true;
+		}
+		catch ( NoSuchMethodException e ) {
+			; // ignore
+		}
+		return false;
 	}
 }

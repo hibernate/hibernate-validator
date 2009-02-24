@@ -17,7 +17,6 @@
 */
 package org.hibernate.validation.engine.groups;
 
-import java.util.HashSet;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
