@@ -19,9 +19,13 @@ import org.hibernate.tck.config.Strings;
  */
 public class CoverageReport {
    
-   public static final String FISHEYE_BASE_URL_PROPERTY = "fisheye_base_url";
+    public enum TestStatus {
+        COVERED, UNCOVERED, UNIMPLEMENTED;
+    }
    
-   public static final String SVN_BASE_URL_PROPERTY = "svn_base_url";
+    public static final String FISHEYE_BASE_URL_PROPERTY = "fisheye_base_url";
+   
+    public static final String SVN_BASE_URL_PROPERTY = "svn_base_url";
    
     /*
     * References to the spec assertions made by the tck tests
@@ -85,7 +89,7 @@ public class CoverageReport {
         calculateUnmatched();
         writeHeader(out);
         writeContents(out);
-        writeMasterSummary(out);
+        //writeMasterSummary(out);
         writeChapterSummary(out);
         writeSectionSummary(out);
         writeCoverage(out);
@@ -175,6 +179,12 @@ public class CoverageReport {
         sb.append("    padding-bottom: 1px;\n");
         sb.append("    margin-bottom: 2px;\n");
         sb.append("    background-color: #fdd; }\n");
+        sb.append("  .skip {\n");
+        sb.append("    border-top: 1px solid #ff9900;\n");
+        sb.append("    border-bottom: 1px solid #ff9900;\n");
+        sb.append("    padding-bottom: 1px;\n");
+        sb.append("    margin-bottom: 2px;\n");
+        sb.append("    background-color: #ffcc33; }\n");
         sb.append("  .untestable {\n");
         sb.append("    padding-bottom: 16px;\n");
         sb.append("    margin-bottom: 2px;\n");
@@ -297,11 +307,19 @@ public class CoverageReport {
        sb.append("<th align=\"left\">Chapter</th>");
        sb.append("<th>Assertions</th>");
        sb.append("<th>Testable</th>");
-       sb.append("<th>Tested</th>");
+       sb.append("<th>Tested<br /> (implemented and unimplemented)</th>");
+       sb.append("<th>Tested<br /> (unimplemented)</th>");
+       sb.append("<th>Tested<br /> (implemented)</th>");
        sb.append("<th>Coverage %</th>");
        sb.append("</tr>");
        
        boolean odd = true;
+       
+       int totalAssertions = 0;
+       int totalTestable = 0;
+       int totalTested = 0;
+       int totalUnimplemented = 0;
+       int totalImplemented = 0;
               
        for (String sectionId : auditParser.getSectionIds()) {
           
@@ -312,15 +330,21 @@ public class CoverageReport {
             
             int assertions = auditParser.getAssertionsForSection(sectionId).size();
             int testable = 0;
-            int coverage = 0;                     
+            int implemented = 0;
+            int unimplemented = 0;
             
             for (AuditAssertion assertion : auditParser.getAssertionsForSection(sectionId))
             {
                if (assertion.isTestable()) testable++;
                
-               if (!getCoverageForAssertion(sectionId, assertion.getId()).isEmpty())
+               TestStatus status = getStatus(getCoverageForAssertion(sectionId, assertion.getId()));
+               if (status.equals(TestStatus.COVERED))
                {
-                  coverage++;
+                  implemented++;
+               }
+               else if (status.equals(TestStatus.UNIMPLEMENTED))
+               {
+                  unimplemented++;
                }
             }             
             
@@ -335,13 +359,28 @@ public class CoverageReport {
                   {
                      if (assertion.isTestable()) testable++;                     
                      
-                     if (!getCoverageForAssertion(subSectionId, assertion.getId()).isEmpty())
+                     TestStatus status = getStatus(getCoverageForAssertion(subSectionId, assertion.getId()));
+                     if (status.equals(TestStatus.COVERED))
                      {
-                        coverage++;
+                        implemented++;
+                     }
+                     else if (status.equals(TestStatus.UNIMPLEMENTED))
+                     {
+                        unimplemented++;
                      }
                   }                  
                }
             }
+            
+            int tested = implemented + unimplemented;
+            
+            double coveragePercent = testable > 0 ? ((implemented * 1.0) / testable) * 100 : -1;
+            
+            totalAssertions += assertions;
+            totalTestable += testable;
+            totalImplemented += implemented;
+            totalTested += tested;
+            totalUnimplemented += unimplemented;
             
             if (odd)
             {
@@ -364,8 +403,6 @@ public class CoverageReport {
             sb.append("</a>");
             sb.append("</td>");
                         
-            double coveragePercent = assertions > 0 ? ((coverage * 1.0) / assertions) * 100 : -1;
-            
             sb.append("<td align=\"center\">");
             sb.append(assertions);
             sb.append("</td>");
@@ -375,7 +412,15 @@ public class CoverageReport {
             sb.append("</td>");
             
             sb.append("<td align=\"center\">");
-            sb.append(coverage);
+            sb.append(tested);
+            sb.append("</td>");
+            
+            sb.append("<td align=\"center\">");
+            sb.append(unimplemented);
+            sb.append("</td>");
+            
+            sb.append("<td align=\"center\">");
+            sb.append(implemented);
             sb.append("</td>");
             
             if (coveragePercent >= 0)
@@ -396,6 +441,56 @@ public class CoverageReport {
          }
           
        }
+       
+       if (odd)
+       {
+          sb.append("<tr style=\"background-color:#f7f7f7\">");
+       }
+       else
+       {
+          sb.append("<tr style=\"font-weight: bold\">");
+       } 
+       
+       sb.append("<td>");
+       sb.append("Total");
+       sb.append("</td>");
+                   
+       sb.append("<td align=\"center\">");
+       sb.append(totalAssertions);
+       sb.append("</td>");
+       
+       sb.append("<td align=\"center\">");
+       sb.append(totalTestable);
+       sb.append("</td>");
+       
+       sb.append("<td align=\"center\">");
+       sb.append(totalTested);
+       sb.append("</td>");
+       
+       sb.append("<td align=\"center\">");
+       sb.append(totalUnimplemented);
+       sb.append("</td>");
+       
+       sb.append("<td align=\"center\">");
+       sb.append(totalImplemented);
+       sb.append("</td>");
+       
+       double totalCoveragePercent = totalTestable > 0 ? ((totalImplemented * 1.0) / totalTestable) * 100 : -1;
+       
+       if (totalCoveragePercent >= 0)
+       {
+          String bgColor = totalCoveragePercent < 60 ? "#ffaaaa" : totalCoveragePercent < 80 ? "#ffffaa" : "#aaffaa" ;
+       
+          sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
+          sb.append(String.format("%.2f%%", totalCoveragePercent));
+          sb.append("</td>");
+       }
+       else
+       {
+          sb.append("<td />");
+       }
+
+       sb.append("</tr>");      
 
        sb.append("</table>");       
        out.write(sb.toString().getBytes());        
@@ -412,7 +507,9 @@ public class CoverageReport {
        sb.append("<th align=\"left\">Section</th>");
        sb.append("<th>Assertions</th>");
        sb.append("<th>Testable</th>");
-       sb.append("<th>Tested</th>");
+       sb.append("<th>Tested<br /> (implemented and unimplemented)</th>");
+       sb.append("<th>Tested<br /> (unimplemented)</th>");
+       sb.append("<th>Tested<br /> (implemented)</th>");
        sb.append("<th>Coverage %</th>");
        sb.append("</tr>");
        
@@ -443,21 +540,27 @@ public class CoverageReport {
          
          int assertions = auditParser.getAssertionsForSection(sectionId).size();
          int testable = 0;         
-         int coverage = 0;
+         int implemented = 0;
+         int unimplemented = 0;
          
          for (AuditAssertion assertion : auditParser.getAssertionsForSection(sectionId))
          {
             if (assertion.isTestable()) testable++;
             
-            if (!getCoverageForAssertion(sectionId, assertion.getId()).isEmpty())
+            TestStatus status = getStatus(getCoverageForAssertion(sectionId, assertion.getId()));
+            if (status.equals(TestStatus.COVERED))
             {
-               coverage++;
+               implemented++;
+            }
+            else if (status.equals(TestStatus.UNIMPLEMENTED))
+            {
+               unimplemented++;
             }
          }
          
-         int coveredAndUnTestable = coverage + (assertions - testable);
+         int tested = implemented + unimplemented;
          
-         double coveragePercent = assertions > 0 ? ((coveredAndUnTestable * 1.0) / (assertions)) * 100 : -1;
+         double coveragePercent = testable > 0 ? ((implemented * 1.0) / testable) * 100 : -1;
          
          sb.append("<td align=\"center\">");
          sb.append(assertions);
@@ -468,7 +571,15 @@ public class CoverageReport {
          sb.append("</td>");
          
          sb.append("<td align=\"center\">");
-         sb.append(coverage);
+         sb.append(tested);
+         sb.append("</td>");
+         
+         sb.append("<td align=\"center\">");
+         sb.append(unimplemented);
+         sb.append("</td>");
+         
+         sb.append("<td align=\"center\">");
+         sb.append(implemented);
          sb.append("</td>");
          
          if (coveragePercent >= 0)
@@ -508,14 +619,19 @@ public class CoverageReport {
                 
                 for (AuditAssertion assertion : sectionAssertions) {
                     List<SpecReference> coverage = getCoverageForAssertion(sectionId, assertion.getId());
+                    TestStatus status = getStatus(coverage);
 
                     String divClass = null;
                     
                     if (assertion.isTestable())
                     {
-                       if (coverage.isEmpty())
+                       if (status.equals(TestStatus.UNCOVERED))
                        {
                           divClass = "fail";
+                       }
+                       else if (status.equals(TestStatus.UNIMPLEMENTED))
+                       {
+                          divClass = "skip";
                        }
                        else
                        {
@@ -558,7 +674,7 @@ public class CoverageReport {
                        
                        String currentPackageName = null;                    
    
-                       if (coverage.isEmpty()) {
+                       if (status.equals(TestStatus.UNCOVERED)) {
                            sb.append("        <p class=\"noCoverage\">No tests exist for this assertion</p>\n");
                        } else {
                            for (SpecReference ref : coverage) {
@@ -673,6 +789,27 @@ public class CoverageReport {
         }
 
         return refs;
+    }
+    
+    private TestStatus getStatus(List<SpecReference> references)
+    {
+       if (references.isEmpty())
+       {
+          return TestStatus.UNCOVERED;
+       }
+       for (SpecReference reference : references)
+       {
+          if (isImplemented(reference.getGroups()))
+          {
+             return TestStatus.COVERED;
+          }
+       }
+       return TestStatus.UNIMPLEMENTED;
+    }
+    
+    private boolean isImplemented(List<String> groups)
+    {
+       return !groups.contains("stub") && !groups.contains("broken"); 
     }
 
     private void writeFooter(OutputStream out) throws IOException {
