@@ -18,10 +18,13 @@
 package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
@@ -32,8 +35,11 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
 import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.slf4j.Logger;
 
 import org.hibernate.validation.constraints.AssertFalseValidator;
 import org.hibernate.validation.constraints.AssertTrueValidator;
@@ -49,21 +55,28 @@ import org.hibernate.validation.constraints.NotNullValidator;
 import org.hibernate.validation.constraints.NullValidator;
 import org.hibernate.validation.constraints.PastValidatorForCalendar;
 import org.hibernate.validation.constraints.PastValidatorForDate;
-import org.hibernate.validation.constraints.SizeValidatorForString;
-import org.hibernate.validation.constraints.SizeValidatorForCollection;
+import org.hibernate.validation.constraints.PatternValidator;
 import org.hibernate.validation.constraints.SizeValidatorForArray;
+import org.hibernate.validation.constraints.SizeValidatorForCollection;
 import org.hibernate.validation.constraints.SizeValidatorForMap;
+import org.hibernate.validation.constraints.SizeValidatorForString;
+import org.hibernate.validation.util.LoggerFactory;
+import org.hibernate.validation.util.ReflectionHelper;
 
 /**
+ * Keeps track of builtin constraints and their validator implementations.
+ *
  * @author Hardy Ferentschik
  * @author Alaa Nassef
  */
-public class BuiltinConstraints {
+public class ConstraintHelper {
+
+	private static final Logger log = LoggerFactory.make();
 
 	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new HashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
 
-	public BuiltinConstraints() {
+	public ConstraintHelper() {
 
 		List<Class<? extends ConstraintValidator<?, ?>>> constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( AssertFalseValidator.class );
@@ -113,7 +126,9 @@ public class BuiltinConstraints {
 		constraintList.add( SizeValidatorForMap.class );
 		builtinConstraints.put( Size.class, constraintList );
 
-
+		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList.add( PatternValidator.class );
+		builtinConstraints.put( Pattern.class, constraintList );
 	}
 
 	public List<Class<? extends ConstraintValidator<?, ?>>> getBuiltInConstraints(Annotation annotation) {
@@ -126,4 +141,132 @@ public class BuiltinConstraints {
 		return constraints;
 	}
 
+	public boolean isBuiltinConstraint(Annotation annotation) {
+		return builtinConstraints.containsKey( annotation.annotationType() );
+	}
+
+	/**
+	 * Checks whether a given annotation is a multi value constraint or not.
+	 *
+	 * @param annotation the annotation to check.
+	 *
+	 * @return <code>true</code> if the specified annotation is a multi value constraints, <code>false</code>
+	 *         otherwise.
+	 */
+	public boolean isMultiValueConstraint(Annotation annotation) {
+		boolean isMultiValueConstraint = false;
+		try {
+			Method m = annotation.getClass().getMethod( "value" );
+			Class returnType = m.getReturnType();
+			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+				Annotation[] annotations = ( Annotation[] ) m.invoke( annotation );
+				for ( Annotation a : annotations ) {
+					if ( isConstraintAnnotation( a ) || isBuiltinConstraint( a ) ) {
+						isMultiValueConstraint = true;
+					}
+					else {
+						isMultiValueConstraint = false;
+						break;
+					}
+				}
+			}
+		}
+		catch ( NoSuchMethodException nsme ) {
+			// ignore
+		}
+		catch ( IllegalAccessException iae ) {
+			// ignore
+		}
+		catch ( InvocationTargetException ite ) {
+			// ignore
+		}
+		return isMultiValueConstraint;
+	}
+
+
+	/**
+	 * Checks whether a given annotation is a multi value constraint and returns the contained constraints if so.
+	 *
+	 * @param annotation the annotation to check.
+	 *
+	 * @return A list of constraint annotations or the empty list if <code>annotation</code> is not a multi constraint
+	 *         annotation.
+	 */
+	public <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
+		List<Annotation> annotationList = new ArrayList<Annotation>();
+		try {
+			Method m = annotation.getClass().getMethod( "value" );
+			Class returnType = m.getReturnType();
+			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+				Annotation[] annotations = ( Annotation[] ) m.invoke( annotation );
+				for ( Annotation a : annotations ) {
+					if ( isConstraintAnnotation( a ) || isBuiltinConstraint( a ) ) {
+						annotationList.add( a );
+					}
+				}
+			}
+		}
+		catch ( NoSuchMethodException nsme ) {
+			// ignore
+		}
+		catch ( IllegalAccessException iae ) {
+			// ignore
+		}
+		catch ( InvocationTargetException ite ) {
+			// ignore
+		}
+		return annotationList;
+	}
+
+	/**
+	 * Checks whehter the specified annotation is a valid constraint annotation. A constraint annotations has to
+	 * fulfill the following conditions:
+	 * <ul>
+	 * <li>Has to contain a <code>ConstraintValidator</code> implementation.</li>
+	 * <li>Defines a message parameter.</li>
+	 * <li>Defines a group parameter.</li>
+	 * </ul>
+	 *
+	 * @param annotation The annotation to test.
+	 *
+	 * @return <code>true</code> if the annotation fulfills the above condtions, <code>false</code> otherwise.
+	 */
+	public boolean isConstraintAnnotation(Annotation annotation) {
+
+		Constraint constraint = annotation.annotationType()
+				.getAnnotation( Constraint.class );
+		if ( constraint == null ) {
+			return false;
+		}
+
+		try {
+			ReflectionHelper.getAnnotationParameter( annotation, "message", String.class );
+		}
+		catch ( Exception e ) {
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
+					"not contain a message parameter. Annotation is getting ignored.";
+			log.warn( msg );
+			return false;
+		}
+
+		try {
+			ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
+		}
+		catch ( Exception e ) {
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
+					"not contain a groups parameter. Annotation is getting ignored.";
+			log.warn( msg );
+			return false;
+		}
+
+		Method[] methods = annotation.getClass().getMethods();
+		for ( Method m : methods ) {
+			if ( m.getName().startsWith( "valid" ) ) {
+				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
+				log.warn( msg );
+				return false;
+			}
+		}
+		return true;
+	}
 }

@@ -29,9 +29,8 @@ import javax.validation.OverridesParameter;
 import javax.validation.OverridesParameters;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 
-import org.hibernate.validation.constraints.Pattern;
-import org.hibernate.validation.constraints.Patterns;
 
 /**
  * @author Hardy Ferentschik
@@ -39,7 +38,7 @@ import org.hibernate.validation.constraints.Patterns;
 @NotNull
 @Size
 // first pattern just duplicates the length of 5 characters, the second pattern is just to proof that parameters can be overridden.
-@Patterns({ @Pattern(regex = "....."), @Pattern(regex = "bar") })
+@Pattern.List({ @Pattern(regexp = "....."), @Pattern(regexp = "bar") })
 @Constraint(validatedBy = FrenchZipcodeConstraintValidator.class)
 @Documented
 @Target({ METHOD, FIELD, TYPE })
@@ -58,5 +57,5 @@ public @interface FrenchZipcode {
 			parameter = "message") String sizeMessage() default "A french zip code has a length of 5";
 
 
-	@OverridesParameter(constraint = Pattern.class, parameter = "regex", index = 2) String regex() default "\\d*";
+	@OverridesParameter(constraint = Pattern.class, parameter = "regexp", index = 2) String regex() default "\\d*";
 }

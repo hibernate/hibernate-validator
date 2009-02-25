@@ -1,14 +1,16 @@
 package org.hibernate.validation.engine.groups;
 
+import javax.validation.GroupSequence;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.groups.Default;
 
-import org.hibernate.validation.constraints.Pattern;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+@GroupSequence({ User.class })
 public class User {
 	@NotNull
 	private String firstname;
@@ -16,7 +18,7 @@ public class User {
 	@NotNull(groups = Default.class)
 	private String lastname;
 
-	@Pattern(regex = "[0-9 -]?", groups = Optional.class)
+	@Pattern(regexp = "[0-9 -]?", groups = Optional.class)
 	private String phoneNumber;
 
 	@NotNull(groups = { Billable.class, BuyInOneClick.class })

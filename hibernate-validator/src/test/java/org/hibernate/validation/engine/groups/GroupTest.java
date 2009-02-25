@@ -332,6 +332,41 @@ public class GroupTest {
 	 * HV-113
 	 */
 	@Test
+	public void testRedefiningDefaultGroup2() {
+		Car car = new Car();
+		car.setType( "A" );
+
+		Validator validator = TestUtil.getValidator();
+
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+		assertEquals(
+				"There should be one violations due to the re-defintion of the default group",
+				1,
+				constraintViolations.size()
+		);
+		assertEquals( "Wrong constraint", "length must be between 2 and 20", constraintViolations.iterator().next().getMessage() );
+
+		constraintViolations = validator.validateProperty( car, "type" );
+		assertEquals(
+				"There should be one violations due to the re-defintion of the default group",
+				1,
+				constraintViolations.size()
+		);
+		assertEquals( "Wrong constraint", "length must be between 2 and 20", constraintViolations.iterator().next().getMessage() );
+
+		constraintViolations = validator.validateValue( Car.class, "type", "A" );
+		assertEquals(
+				"There should be one violations due to the re-defintion of the default group",
+				1,
+				constraintViolations.size()
+		);
+		assertEquals( "Wrong constraint", "length must be between 2 and 20", constraintViolations.iterator().next().getMessage() );
+	}
+
+	/**
+	 * HV-113
+	 */
+	@Test
 	public void testInvalidRedefinitionOfDefaultGroup() {
 		Address address = new AddressWithInvalidGroupSequence();
 		Validator validator = TestUtil.getValidator();

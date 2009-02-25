@@ -17,17 +17,17 @@
 */
 package org.hibernate.validation.eg;
 
-import org.hibernate.validation.constraints.Pattern;
-import org.hibernate.validation.constraints.Patterns;
+import javax.validation.constraints.Pattern;
+
 
 /**
  * @author Hardy Ferentschik
  */
 public class Engine {
-	@Patterns({
-			@Pattern(regex = "^[A-Z0-9-]+$",
+	@Pattern.List({
+			@Pattern(regexp = "^[A-Z0-9-]+$",
 					message = "must contain alphabetical characters only"),
-			@Pattern(regex = "^....-....-....$", message = "must match ....-....-....")
+			@Pattern(regexp = "^....-....-....$", message = "must match ....-....-....")
 	})
 	private String serialNumber;
 

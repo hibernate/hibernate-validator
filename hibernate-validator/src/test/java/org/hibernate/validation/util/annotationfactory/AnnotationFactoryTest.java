@@ -18,11 +18,11 @@
 package org.hibernate.validation.util.annotationfactory;
 
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-import org.hibernate.validation.constraints.Pattern;
 
 /**
  * @author Hardy Ferentschik
@@ -44,16 +44,16 @@ public class AnnotationFactoryTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void createAnnotationProxyMissingRequiredParamter() {
 		AnnotationDescriptor descriptor = new AnnotationDescriptor( Pattern.class );
-		Pattern pattern = AnnotationFactory.create( descriptor );
+		AnnotationFactory.create( descriptor );
 	}
 
 	@Test
 	public void createAnnotationProxyWithRequiredParamter() {
 		AnnotationDescriptor descriptor = new AnnotationDescriptor( Pattern.class );
-		descriptor.setValue( "regex", ".*" );
+		descriptor.setValue( "regexp", ".*" );
 
 		Pattern pattern = AnnotationFactory.create( descriptor );
 
-		assertEquals( "Wrong parameter value", ".*", pattern.regex() );
+		assertEquals( "Wrong parameter value", ".*", pattern.regexp() );
 	}
 }

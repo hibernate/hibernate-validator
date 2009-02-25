@@ -17,6 +17,8 @@
 */
 package org.hibernate.validation.engine.groups;
 
+import javax.validation.groups.Default;
+
 /**
  * Encapsulates a single group.
  *
@@ -66,6 +68,10 @@ public class Group {
 		}
 
 		return true;
+	}
+
+	public boolean isDefaultGroup() {
+		return getGroup().getName().equals( Default.class.getName() );
 	}
 
 	@Override

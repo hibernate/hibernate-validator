@@ -17,6 +17,8 @@
 */
 package org.hibernate.validation.constraints;
 
+import javax.validation.constraints.Pattern;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
@@ -36,7 +38,7 @@ public class PatternValidatorTest {
 	public static void init() {
 
 		AnnotationDescriptor descriptor = new AnnotationDescriptor( Pattern.class );
-		descriptor.setValue( "regex", "foobar" );
+		descriptor.setValue( "regexp", "foobar" );
 		descriptor.setValue( "message", "{validator.pattern}" );
 		Pattern p = AnnotationFactory.create( descriptor );
 

@@ -79,7 +79,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler {
 			}
 		}
 		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
-			throw new RuntimeException( "Trying to instanciate " + annotationType + " with unknown elements" );
+			throw new RuntimeException( "Trying to instanciate " + annotationType + " with unknown paramters." );
 		}
 		return result;
 	}

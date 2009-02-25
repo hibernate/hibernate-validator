@@ -59,7 +59,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	public void testSuccessfulInterpolation() {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new BuiltinConstraints()
+				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
 
 		String expected = "replacement worked";
@@ -82,7 +82,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	public void testUnSuccessfulInterpolation() {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new BuiltinConstraints()
+				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
 		String expected = "foo";  // missing {}
 		String actual = interpolator.interpolate( "foo", descriptor, null );
@@ -96,7 +96,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	public void testUnkownTokenInterpolation() {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new BuiltinConstraints()
+				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
 		String expected = "{bar}";  // unkown token {}
 		String actual = interpolator.interpolate( "{bar}", descriptor, null );
@@ -106,14 +106,14 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	public void testDefaultInterpolation() {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new BuiltinConstraints()
+				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
 		String expected = "may not be null";
 		String actual = interpolator.interpolate( notNull.message(), descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		ConstraintDescriptorImpl<Size> sizeDescriptor = new ConstraintDescriptorImpl<Size>(
-				size, new Class<?>[] { }, new BuiltinConstraints()
+				size, new Class<?>[] { }, new ConstraintHelper()
 		);
 		expected = "size must be between 0 and 2147483647";  // unkown token {}
 		actual = interpolator.interpolate( size.message(), sizeDescriptor, null );
@@ -125,7 +125,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator();
 
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new BuiltinConstraints()
+				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
 
 		String expected = "kann nicht null sein";
@@ -138,7 +138,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator();
 
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new BuiltinConstraints()
+				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
 
 		String expected = "may not be null";
@@ -151,7 +151,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator();
 
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new BuiltinConstraints()
+				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
 
 		String expected = "no puede ser null";

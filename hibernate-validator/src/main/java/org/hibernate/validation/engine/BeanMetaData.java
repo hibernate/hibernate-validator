@@ -67,7 +67,7 @@ public interface BeanMetaData<T> {
 	 * @return A list of <code>MetaConstraint</code> instances encapsulating the information of all the constraints
 	 *         defined on the bean.
 	 */
-	List<MetaConstraint> geMetaConstraintList();
+	List<MetaConstraint<T>> geMetaConstraintList();
 
 	/**
 	 * @return A map keying the property name of a constraint to its <code>ElementDescriptor</code>.

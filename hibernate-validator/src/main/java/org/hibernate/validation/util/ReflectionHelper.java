@@ -29,16 +29,12 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.validation.Constraint;
 import javax.validation.ValidationException;
-
-import org.slf4j.Logger;
 
 /**
  * Some reflection utility methods.
@@ -46,8 +42,6 @@ import org.slf4j.Logger;
  * @author Hardy Ferentschik
  */
 public class ReflectionHelper {
-
-	private static final Logger log = LoggerFactory.make();
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -72,133 +66,6 @@ public class ReflectionHelper {
 		}
 		return isBuiltInConstraintAnnotation;
 	}
-
-	/**
-	 * Checks whehter the specified annotation is a valid constraint annotation. A constraint annotations has to
-	 * fulfill the following conditions:
-	 * <ul>
-	 * <li>Has to contain a <code>ConstraintValidator</code> implementation.</li>
-	 * <li>Defines a message parameter.</li>
-	 * <li>Defines a group parameter.</li>
-	 * </ul>
-	 *
-	 * @param annotation The annotation to test.
-	 *
-	 * @return <code>true</code> if the annotation fulfills the above condtions, <code>false</code> otherwise.
-	 */
-	public static boolean isConstraintAnnotation(Annotation annotation) {
-
-		Constraint constraint = annotation.annotationType()
-				.getAnnotation( Constraint.class );
-		if ( constraint == null ) {
-			return false;
-		}
-
-		try {
-			getAnnotationParameter( annotation, "message", String.class );
-		}
-		catch ( Exception e ) {
-			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a message parameter. Annotation is getting ignored.";
-			log.warn( msg );
-			return false;
-		}
-
-		try {
-			getAnnotationParameter( annotation, "groups", Class[].class );
-		}
-		catch ( Exception e ) {
-			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a groups parameter. Annotation is getting ignored.";
-			log.warn( msg );
-			return false;
-		}
-
-		Method[] methods = annotation.getClass().getMethods();
-		for ( Method m : methods ) {
-			if ( m.getName().startsWith( "valid" ) ) {
-				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
-				log.warn( msg );
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Checks whether a given annotation is a multi value constraint or not.
-	 *
-	 * @param annotation the annotation to check.
-	 *
-	 * @return <code>true</code> if the specified annotation is a multi value constraints, <code>false</code>
-	 *         otherwise.
-	 */
-	public static boolean isMultiValueConstraint(Annotation annotation) {
-		boolean isMultiValueConstraint = false;
-		try {
-			Method m = annotation.getClass().getMethod( "value" );
-			Class returnType = m.getReturnType();
-			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-				Annotation[] annotations = ( Annotation[] ) m.invoke( annotation );
-				for ( Annotation a : annotations ) {
-					if ( isConstraintAnnotation( a ) || isBuiltInConstraintAnnotation( a ) ) {
-						isMultiValueConstraint = true;
-					}
-					else {
-						isMultiValueConstraint = false;
-						break;
-					}
-				}
-			}
-		}
-		catch ( NoSuchMethodException nsme ) {
-			// ignore
-		}
-		catch ( IllegalAccessException iae ) {
-			// ignore
-		}
-		catch ( InvocationTargetException ite ) {
-			// ignore
-		}
-		return isMultiValueConstraint;
-	}
-
-
-	/**
-	 * Checks whether a given annotation is a multi value constraint and returns the contained constraints if so.
-	 *
-	 * @param annotation the annotation to check.
-	 *
-	 * @return A list of constraint annotations or the empty list if <code>annotation</code> is not a multi constraint
-	 *         annotation.
-	 */
-	public static <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
-		List<Annotation> annotationList = new ArrayList<Annotation>();
-		try {
-			Method m = annotation.getClass().getMethod( "value" );
-			Class returnType = m.getReturnType();
-			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-				Annotation[] annotations = ( Annotation[] ) m.invoke( annotation );
-				for ( Annotation a : annotations ) {
-					if ( isConstraintAnnotation( a ) || isBuiltInConstraintAnnotation( a ) ) {
-						annotationList.add( a );
-					}
-				}
-			}
-		}
-		catch ( NoSuchMethodException nsme ) {
-			// ignore
-		}
-		catch ( IllegalAccessException iae ) {
-			// ignore
-		}
-		catch ( InvocationTargetException ite ) {
-			// ignore
-		}
-		return annotationList;
-	}
-
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
@@ -502,7 +369,7 @@ public class ReflectionHelper {
 			return true;
 		}
 		catch ( NoSuchFieldException e ) {
-			; // ignore
+			// ignore
 		}
 
 		try {
@@ -510,7 +377,7 @@ public class ReflectionHelper {
 			return true;
 		}
 		catch ( NoSuchMethodException e ) {
-			; // ignore
+			// ignore
 		}
 		return false;
 	}

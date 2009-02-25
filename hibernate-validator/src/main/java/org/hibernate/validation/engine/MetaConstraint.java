@@ -35,7 +35,7 @@ import org.hibernate.validation.util.ReflectionHelper;
  *
  * @author Hardy Ferentschik
  */
-public class MetaConstraint {
+public class MetaConstraint<T> {
 
 	/**
 	 * The constraint tree created from the constraint annotation.
@@ -71,31 +71,38 @@ public class MetaConstraint {
 	 */
 	private final ElementType elementType;
 
+	/**
+	 * The class of the bean hosting this constraint.
+	 */
+	private final Class<T> beanClass;
+
 	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor) {
-		this( t, null, null, ElementType.TYPE, constraintDescriptor, "" );
+		this( t, null, null, ElementType.TYPE, (Class<T>) t.getClass(), constraintDescriptor, "" );
 	}
 
-	public MetaConstraint(Method m, ConstraintDescriptor constraintDescriptor) {
+	public MetaConstraint(Method m, Class<T> beanClass, ConstraintDescriptor constraintDescriptor) {
 		this(
 				null,
 				m,
 				null,
 				ElementType.METHOD,
+				beanClass,
 				constraintDescriptor,
 				ReflectionHelper.getPropertyName( m )
 		);
 	}
 
-	public MetaConstraint(Field f, ConstraintDescriptor constraintDescriptor) {
-		this( null, null, f, ElementType.FIELD, constraintDescriptor, f.getName());
+	public MetaConstraint(Field f, Class<T> beanClass, ConstraintDescriptor constraintDescriptor) {
+		this( null, null, f, ElementType.FIELD, beanClass, constraintDescriptor, f.getName());
 	}
 
-	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, ConstraintDescriptor constraintDescriptor, String property) {
+	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, Class<T> beanClass, ConstraintDescriptor constraintDescriptor, String property) {
 		this.type = t;
 		this.method = m;
 		this.field = f;
 		this.elementType = elementType;
 		this.propertyName = property;
+		this.beanClass = beanClass;
 		constraintTree = new ConstraintTree( constraintDescriptor );
 	}
 
@@ -165,6 +172,10 @@ public class MetaConstraint {
 
 	public Type getType() {
 		return type;
+	}
+
+	public Class<T> getBeanClass() {
+		return beanClass;
 	}
 
 	public String getPropertyName() {

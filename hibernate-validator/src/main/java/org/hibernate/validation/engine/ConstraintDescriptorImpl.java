@@ -40,7 +40,6 @@ import javax.validation.groups.Default;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
-import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
@@ -95,21 +94,21 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	/**
 	 * Handle to the builtin constraint implementations.
 	 */
-	private final BuiltinConstraints builtinConstraints;
+	private final ConstraintHelper constraintHelper;
 
-	public ConstraintDescriptorImpl(U annotation, Class<?>[] groups, BuiltinConstraints builtinConstraints) {
-		this( annotation, new HashSet<Class<?>>(), builtinConstraints );
+	public ConstraintDescriptorImpl(U annotation, Class<?>[] groups, ConstraintHelper constraintHelper) {
+		this( annotation, new HashSet<Class<?>>(), constraintHelper );
 		if ( groups.length == 0 ) {
 			groups = DEFAULT_GROUP;
 		}
 		this.groups.addAll( Arrays.asList( groups ) );
 	}
 
-	public ConstraintDescriptorImpl(U annotation, Set<Class<?>> groups, BuiltinConstraints builtinConstraints) {
+	public ConstraintDescriptorImpl(U annotation, Set<Class<?>> groups, ConstraintHelper constraintHelper) {
 		this.annotation = annotation;
 		this.groups = groups;
 		this.parameters = getAnnotationParameters( annotation );
-		this.builtinConstraints = builtinConstraints;
+		this.constraintHelper = constraintHelper;
 
 		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
 				ReportAsSingleViolation.class
@@ -122,8 +121,8 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	}
 
 	private void findConstraintClasses() {
-		if ( ReflectionHelper.isBuiltInConstraintAnnotation( annotation ) ) {
-			constraintClasses.addAll( builtinConstraints.getBuiltInConstraints( annotation ) );
+		if ( constraintHelper.isBuiltinConstraint( annotation ) ) {
+			constraintClasses.addAll( constraintHelper.getBuiltInConstraints( annotation ) );
 		}
 		else {
 			Constraint constraint = annotation.annotationType().getAnnotation( Constraint.class );
@@ -248,9 +247,8 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 
 	private void parseComposingConstraints() {
 		for ( Annotation declaredAnnotation : annotation.annotationType().getDeclaredAnnotations() ) {
-			if ( ReflectionHelper.isConstraintAnnotation( declaredAnnotation ) || ReflectionHelper.isBuiltInConstraintAnnotation(
-					declaredAnnotation
-			) ) {
+			if ( constraintHelper.isConstraintAnnotation( declaredAnnotation )
+					|| constraintHelper.isBuiltinConstraint( declaredAnnotation ) ) {
 				ConstraintDescriptorImpl descriptor = createComposingConstraintDescriptor(
 						OVERRIDES_PARAMETER_DEFAULT_INDEX,
 						declaredAnnotation
@@ -258,8 +256,8 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 				composingConstraints.add( descriptor );
 				log.debug( "Adding composing constraint: " + descriptor );
 			}
-			else if ( ReflectionHelper.isMultiValueConstraint( declaredAnnotation ) ) {
-				List<Annotation> multiValueConstraints = ReflectionHelper.getMultiValueConstraints( declaredAnnotation );
+			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotation ) ) {
+				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
 				int index = 1;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl descriptor = createComposingConstraintDescriptor(
@@ -288,7 +286,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 			}
 		}
 		Annotation annotationProxy = AnnotationFactory.create( annotationDescriptor );
-		return new ConstraintDescriptorImpl( annotationProxy, groups, builtinConstraints );
+		return new ConstraintDescriptorImpl( annotationProxy, groups, constraintHelper );
 	}
 
 	private class ClassIndexWrapper {

@@ -18,7 +18,6 @@
 package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,20 +27,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
-
-import org.hibernate.validation.constraints.Pattern;
-import org.hibernate.validation.constraints.Patterns;
-import org.hibernate.validation.constraints.incomplete.NoGroups;
-import org.hibernate.validation.constraints.incomplete.NoMessage;
-import org.hibernate.validation.constraints.incomplete.ValidProperty;
-import org.hibernate.validation.eg.Engine;
-import org.hibernate.validation.eg.Order;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -128,92 +117,5 @@ public class ReflectionHelperTest {
 					e.getMessage().startsWith( "The specified annotation defines no parameter" )
 			);
 		}
-	}
-
-	@Test
-	// @SpecAssertion(section = "2.1.1.2", note = "constraint annotation must specify a groups element")
-	public void testConstraintWithNoMessage() {
-		Annotation annotation = new NoGroups() {
-			public String message() {
-				return "";
-			}
-
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-		assertFalse(
-				"The constraint annotation should not be valid", ReflectionHelper.isConstraintAnnotation( annotation )
-		);
-	}
-
-	@Test
-	// @SpecAssertion(section = "2.1.1.1", note = "constraint annotation must specify a groups element")
-	public void testConstraintWithNoGroups() {
-		Annotation annotation = new NoMessage() {
-			public Class<?>[] groups() {
-				return null;
-			}
-
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-		assertFalse(
-				"The constraint annotation should not be valid", ReflectionHelper.isConstraintAnnotation( annotation )
-		);
-	}
-
-	@Test
-	// @SpecAssertion(section = "2.1.1", note = "properties cannot begin with 'valid'")
-	public void testConstraintWithValidInPropertyName() {
-		Annotation annotation = new ValidProperty() {
-			public String message() {
-				return null;
-			}
-
-			public Class<?>[] groups() {
-				return null;
-			}
-
-			public int validLength() {
-				return 0;
-			}
-
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-		assertFalse(
-				"The constraint annotation should not be valid", ReflectionHelper.isConstraintAnnotation( annotation )
-		);
-	}
-
-	@Test
-	public void testGetMultiValueConstraints() throws Exception {
-		Engine engine = new Engine();
-		Field[] fields = engine.getClass().getDeclaredFields();
-		assertNotNull( fields );
-		assertTrue( fields.length == 1 );
-		ReflectionHelper.setAccessibility( fields[0] );
-
-		Annotation annotation = fields[0].getAnnotation( Patterns.class );
-		assertNotNull( annotation );
-		List<Annotation> multiValueConstraintAnnotations = ReflectionHelper.getMultiValueConstraints( annotation );
-		assertTrue( "There should be two constraint annotations", multiValueConstraintAnnotations.size() == 2 );
-		assertTrue( "Wrong constraint annotation", multiValueConstraintAnnotations.get( 0 ) instanceof Pattern );
-		assertTrue( "Wrong constraint annotation", multiValueConstraintAnnotations.get( 1 ) instanceof Pattern );
-
-
-		Order order = new Order();
-		fields = order.getClass().getDeclaredFields();
-		assertNotNull( fields );
-		assertTrue( fields.length == 1 );
-		ReflectionHelper.setAccessibility( fields[0] );
-
-		annotation = fields[0].getAnnotation( NotNull.class );
-		assertNotNull( annotation );
-		multiValueConstraintAnnotations = ReflectionHelper.getMultiValueConstraints( annotation );
-		assertTrue( "There should be no constraint annotations", multiValueConstraintAnnotations.size() == 0 );
 	}
 }
