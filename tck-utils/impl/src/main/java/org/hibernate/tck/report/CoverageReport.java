@@ -425,7 +425,7 @@ public class CoverageReport {
             
             if (coveragePercent >= 0)
             {
-               String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa" ;
+               String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : coveragePercent > 100 ? "#FF00CC" : "#aaffaa" ;
             
                sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
                sb.append(String.format("%.2f%%", coveragePercent));
@@ -584,7 +584,7 @@ public class CoverageReport {
          
          if (coveragePercent >= 0)
          {
-            String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : "#aaffaa" ;
+            String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : coveragePercent > 100 ? "#FF00CC" : "#aaffaa" ;
          
             sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
             sb.append(String.format("%.2f%%", coveragePercent));
@@ -724,6 +724,10 @@ public class CoverageReport {
                        }
    
                        sb.append("    </div>\n");
+                    }
+                    else if (!coverage.isEmpty())
+                    {
+                       sb.append("<b>A test exists for this untestable assertion!</b>");
                     }
                     
                     sb.append("</div></div>");
