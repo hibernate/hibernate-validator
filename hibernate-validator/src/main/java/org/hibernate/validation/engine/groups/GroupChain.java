@@ -18,6 +18,7 @@
 package org.hibernate.validation.engine.groups;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -28,52 +29,27 @@ import java.util.List;
 public class GroupChain {
 
 	/**
-	 * The actual list of groups maintained by this instance.
+	 * The list of single groups.
 	 */
 	private List<Group> groupList = new ArrayList<Group>();
 
 	/**
-	 * A pointer to the next group element.
+	 * The list of sequences.
 	 */
-	private int nextGroupPointer = 0;
+	private List<List<Group>> sequenceList = new ArrayList<List<Group>>();
 
-	/**
-	 * The current group.
-	 */
-	private Class<?> currentSequence = null;
-
-	/**
-	 * @return Returns <code>true</code> if there is another group in the chain <code>false</code> otherwise.
-	 */
-	public boolean hasNext() {
-		return nextGroupPointer < groupList.size();
+	public Iterator<Group> getGroupIterator() {
+		return groupList.iterator();
 	}
 
-	/**
-	 * @return Returns the next group in the chain or <code>null</code> if there is none.
-	 */
-	public Group next() {
-		if ( !hasNext() ) {
-			return null;
-		}
-
-		Group group = groupList.get( nextGroupPointer );
-		nextGroupPointer++;
-		currentSequence = group.getSequence();
-		return group;
-	}
-
-	/**
-	 * @return The number of groups in this chain.
-	 */
-	public int size() {
-		return groupList.size();
+	public Iterator<List<Group>> getSequenceIterator() {
+		return sequenceList.iterator();
 	}
 
 	public boolean containsSequence(Class<?> groupSequence) {
 		boolean result = false;
-		for ( Group group : groupList ) {
-			if ( groupSequence.getName().equals( group.getSequence().getName() ) ) {
+		for ( List<Group> sequence : sequenceList ) {
+			if ( sequence.get( 0 ).getSequence().getName().equals( groupSequence.getName() ) ) {
 				result = true;
 				break;
 			}
@@ -81,30 +57,7 @@ public class GroupChain {
 		return result;
 	}
 
-	public void moveToLastInCurrentSequence() {
-		if ( currentSequence == null ) {
-			return;
-		}
-
-		while ( hasNext() ) {
-			if ( currentSequence.getName().equals( groupList.get( nextGroupPointer ).getSequence().getName() ) ) {
-				next();
-			}
-			else {
-				break;
-			}
-		}
-	}
-
-	public boolean inSequence() {
-		return currentSequence != null;
-	}
-
 	void insertGroup(Group group) {
-		if ( nextGroupPointer != 0 ) {
-			throw new RuntimeException( "Trying to modify the GroupChain while iterating." );
-		}
-
 		if ( !groupList.contains( group ) ) {
 			groupList.add( group );
 		}
@@ -115,16 +68,8 @@ public class GroupChain {
 			return;
 		}
 
-		if ( !containsSequence( groups.get( 0 ).getSequence() ) ) {
-			groupList.addAll( groups );
+		if ( !sequenceList.contains( groups ) ) {
+			sequenceList.add( groups );
 		}
-	}
-
-	@Override
-	public String toString() {
-		return "GroupChain{" +
-				"groupList=" + groupList +
-				", nextGroupPointer=" + nextGroupPointer +
-				'}';
 	}
 }

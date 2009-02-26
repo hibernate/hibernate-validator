@@ -18,20 +18,19 @@
 package org.hibernate.validation.engine.groups;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.List;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.hibernate.validation.eg.groups.First;
 import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.groups.Second;
-
-import static junit.framework.Assert.assertFalse;
 
 /**
  * @author Hardy Ferentschik
@@ -83,20 +82,33 @@ public class GroupChainGeneratorTest {
 		groups.add( Second.class );
 		groups.add( Last.class );
 		GroupChain chain = generator.getGroupChainFor( groups );
-		assertEquals( "Wrong number of groups", 3, chain.size() );
+		int count = countGroups( chain );
+		assertEquals( "Wrong number of groups", 3, count );
 
 		groups.clear();
 		groups.add( First.class );
 		groups.add( First.class );
 		chain = generator.getGroupChainFor( groups );
-		assertEquals( "Wrong number of groups", 1, chain.size() );
+		count = countGroups( chain );
+		assertEquals( "Wrong number of groups", 1, count );
 
 		groups.clear();
 		groups.add( First.class );
 		groups.add( Last.class );
 		groups.add( First.class );
 		chain = generator.getGroupChainFor( groups );
-		assertEquals( "Wrong number of groups", 2, chain.size() );
+		count = countGroups( chain );
+		assertEquals( "Wrong number of groups", 2, count );
+	}
+
+	private int countGroups(GroupChain chain) {
+		Iterator<Group> groupIterator = chain.getGroupIterator();
+		int count = 0;
+		while (groupIterator.hasNext()) {
+			groupIterator.next();
+			count++;
+		}
+		return count;
 	}
 
 	@Test
@@ -104,14 +116,10 @@ public class GroupChainGeneratorTest {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( Address.Complete.class );
 		GroupChain chain = generator.getGroupChainFor( groups );
-		assertEquals( "Wrong number of groups", 2, chain.size() );
+		Iterator<List<Group>> sequences = chain.getSequenceIterator();
+		List<Group> sequence = sequences.next();
 
-		assertTrue( "Should have more groups", chain.hasNext() );
-		assertEquals( "Wrong groups", Default.class, chain.next().getGroup() );
-
-		assertTrue( "Should have more groups", chain.hasNext() );
-		assertEquals( "Wrong groups", Address.HighLevelCoherence.class, chain.next().getGroup() );
-
-		assertFalse( "There should be no more groups", chain.hasNext() );
+		assertEquals( "Wrong group", Default.class, sequence.get(0).getGroup() );
+		assertEquals( "Wrong group", Address.HighLevelCoherence.class, sequence.get(1).getGroup() );
 	}
 }

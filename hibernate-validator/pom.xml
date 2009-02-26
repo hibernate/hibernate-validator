@@ -40,6 +40,12 @@
             <version>4.4</version>
             <scope>test</scope>
         </dependency>
+       <dependency>
+            <groupId>junitperf</groupId>
+            <artifactId>junitperf</artifactId>
+            <version>1.8</version>
+            <scope>test</scope>
+        </dependency>        
     </dependencies>
     <build>
         <resources>

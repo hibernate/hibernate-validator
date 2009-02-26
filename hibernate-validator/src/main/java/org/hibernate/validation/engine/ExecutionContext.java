@@ -203,7 +203,8 @@ public class ExecutionContext<T> {
 	}
 
 	public void replacePropertyIndex(String index) {
-		propertyPath = propertyPath.replaceAll( "\\{0\\}", index );
+		// replace the last occurance of [<oldIndex>] with [<index>] 
+		propertyPath = propertyPath.replaceAll( "\\[[0-9]*\\]$", "[" + index + "]" );
 	}
 
 	public String peekPropertyPath() {

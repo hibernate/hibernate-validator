@@ -183,16 +183,34 @@ public class ValidatorImpl implements Validator {
 			return Collections.emptyList();
 		}
 
-		while ( groupChain.hasNext() ) {
-			int numberOfViolations = context.getFailingConstraints().size();
-			Group group = groupChain.next();
+		// process all groups breadth-first
+		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		while ( groupIterator.hasNext() ) {
+			Group group = groupIterator.next();
 			context.setCurrentGroup( group.getGroup() );
-
 			validateConstraints( context );
+		}
+		groupIterator = groupChain.getGroupIterator();
+		while ( groupIterator.hasNext() ) {
+			Group group = groupIterator.next();
+			context.setCurrentGroup( group.getGroup() );
 			validateCascadedConstraints( context );
+		}
 
-			if ( groupChain.inSequence() && context.getFailingConstraints().size() > numberOfViolations ) {
-				groupChain.moveToLastInCurrentSequence();
+		// process sequences depth-first to guarantee that groups following a violation within a group won't get executed. 
+		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		while ( sequenceIterator.hasNext() ) {
+			List<Group> sequence = sequenceIterator.next();
+			for ( Group group : sequence ) {
+				int numberOfViolations = context.getFailingConstraints().size();
+				context.setCurrentGroup( group.getGroup() );
+
+				validateConstraints( context );
+				validateCascadedConstraints( context );
+
+				if ( context.getFailingConstraints().size() > numberOfViolations ) {
+					break;
+				}
 			}
 		}
 		return context.getFailingConstraints();
@@ -209,8 +227,8 @@ public class ValidatorImpl implements Validator {
 		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) executionContext.peekValidatedObjectType() );
 		if ( executionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
 			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
-			if ( log.isDebugEnabled() && defaultGroupSequence.size() > 0 ) {
-				log.debug(
+			if ( log.isTraceEnabled() && defaultGroupSequence.size() > 0 && defaultGroupSequence.get( 0 ) != Default.class ) {
+				log.trace(
 						"Executing re-defined Default group for bean {} as sequence {}",
 						beanMetaData.getBeanClass().getName(),
 						defaultGroupSequence
@@ -220,12 +238,6 @@ public class ValidatorImpl implements Validator {
 				executionContext.setCurrentGroup( defaultSequenceMember );
 				boolean validationSuccessful = validateConstraintsForCurrentGroup( executionContext, beanMetaData );
 				if ( !validationSuccessful ) {
-					if ( log.isDebugEnabled() ) {
-						log.debug(
-								"Aborting validation of Default group sequence for {} due to constraint violation.",
-								beanMetaData.getBeanClass().getName()
-						);
-					}
 					break;
 				}
 			}
@@ -293,12 +305,12 @@ public class ValidatorImpl implements Validator {
 					( Iterable<?> ) value :
 					map.entrySet();
 			iter = elements.iterator();
-			context.appendIndexToPropertyPath( "[{0}]" );
+			context.appendIndexToPropertyPath( "[]" );
 		}
 		else if ( ReflectionHelper.isArray( type ) ) {
 			List<?> arrayList = Arrays.asList( value );
 			iter = arrayList.iterator();
-			context.appendIndexToPropertyPath( "[{0}]" );
+			context.appendIndexToPropertyPath( "[]" );
 		}
 		else {
 			List<Object> list = new ArrayList<Object>();
@@ -324,19 +336,16 @@ public class ValidatorImpl implements Validator {
 				actualValue = ( ( Map.Entry ) actualValue ).getValue();
 			}
 
-			if ( context.isProcessedForCurrentGroup( actualValue ) ) {
-				i++;
-				continue;
+			if ( !context.isProcessedForCurrentGroup( actualValue ) ) {
+				context.replacePropertyIndex( propertyIndex );
+
+				context.pushValidatedObject( actualValue );
+				validateInContext(
+						context,
+						groupChainGenerator.getGroupChainFor( Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) )
+				);
+				context.popValidatedObject();
 			}
-
-			context.replacePropertyIndex( propertyIndex );
-
-			context.pushValidatedObject( actualValue );
-			validateInContext(
-					context,
-					groupChainGenerator.getGroupChainFor( Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) )
-			);
-			context.popValidatedObject();
 			i++;
 		}
 	}
@@ -357,40 +366,60 @@ public class ValidatorImpl implements Validator {
 			return;
 		}
 
-		while ( groupChain.hasNext() ) {
-			Group group = groupChain.next();
+
+		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		while ( groupIterator.hasNext() ) {
+			Group group = groupIterator.next();
+			validatePropertyForGroup(
+					object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group
+			);
+		}
+
+		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		while ( sequenceIterator.hasNext() ) {
+			List<Group> sequence = sequenceIterator.next();
 			int numberOfConstraintViolations = failingConstraintViolations.size();
-			BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
+			for ( Group group : sequence ) {
+				validatePropertyForGroup(
+						object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group
+				);
 
-			List<Class<?>> groupList;
-			if ( group.isDefaultGroup() ) {
-				groupList = beanMetaData.getDefaultGroupSequence();
-			}
-			else {
-				groupList = new ArrayList<Class<?>>();
-				groupList.add( group.getGroup() );
-			}
-
-			for ( Class<?> groupClass : groupList ) {
-				for ( MetaConstraint<T> metaConstraint : metaConstraints ) {
-					if ( metaConstraint.getGroupList().contains( groupClass ) ) {
-						ExecutionContext<T> context = new ExecutionContext<T>(
-								object, hostingBeanInstance, messageInterpolator, constraintValidatorFactory
-						);
-						context.pushProperty( propertyIter.getOriginalProperty() );
-						metaConstraint.validateConstraint( object.getClass(), context );
-						failingConstraintViolations.addAll( context.getFailingConstraints() );
-					}
-				}
-				if ( failingConstraintViolations.size() > numberOfConstraintViolations) {
+				if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
 					break;
 				}
 			}
+		}
+	}
 
-			if ( groupChain.inSequence() && failingConstraintViolations.size() > numberOfConstraintViolations ) {
-				groupChain.moveToLastInCurrentSequence();
+	private <T> int validatePropertyForGroup(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Set<MetaConstraint<T>> metaConstraints, Object hostingBeanInstance, Group group) {
+		int numberOfConstraintViolations = failingConstraintViolations.size();
+		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
+
+		List<Class<?>> groupList;
+		if ( group.isDefaultGroup() ) {
+			groupList = beanMetaData.getDefaultGroupSequence();
+		}
+		else {
+			groupList = new ArrayList<Class<?>>();
+			groupList.add( group.getGroup() );
+		}
+
+		for ( Class<?> groupClass : groupList ) {
+			for ( MetaConstraint<T> metaConstraint : metaConstraints ) {
+				if ( metaConstraint.getGroupList().contains( groupClass ) ) {
+					ExecutionContext<T> context = new ExecutionContext<T>(
+							object, hostingBeanInstance, messageInterpolator, constraintValidatorFactory
+					);
+					context.pushProperty( propertyIter.getOriginalProperty() );
+					metaConstraint.validateConstraint( object.getClass(), context );
+					failingConstraintViolations.addAll( context.getFailingConstraints() );
+				}
+			}
+			if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
+				break;
 			}
 		}
+		return numberOfConstraintViolations;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -402,38 +431,68 @@ public class ValidatorImpl implements Validator {
 			return;
 		}
 
-		while ( groupChain.hasNext() ) {
-			Group group = groupChain.next();
+		// process groups
+		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		while ( groupIterator.hasNext() ) {
+			Group group = groupIterator.next();
+			validateValueForGroup(
+					beanType,
+					value,
+					propertyIter,
+					failingConstraintViolations,
+					metaConstraints,
+					group
+			);
+		}
+
+		// process squences
+		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		while ( sequenceIterator.hasNext() ) {
+			List<Group> sequence = sequenceIterator.next();
 			int numberOfConstraintViolations = failingConstraintViolations.size();
-			BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
+			for ( Group group : sequence ) {
+				validateValueForGroup(
+						beanType,
+						value,
+						propertyIter,
+						failingConstraintViolations,
+						metaConstraints,
+						group
+				);
 
-			List<Class<?>> groupList;
-			if ( group.isDefaultGroup() ) {
-				groupList = beanMetaData.getDefaultGroupSequence();
-			}
-			else {
-				groupList = new ArrayList<Class<?>>();
-				groupList.add( group.getGroup() );
-			}
-
-			for ( Class<?> groupClass : groupList ) {
-				for ( MetaConstraint<T> metaConstraint : metaConstraints ) {
-					if ( metaConstraint.getGroupList().contains( groupClass ) ) {
-						ExecutionContext<T> context = new ExecutionContext<T>(
-								( T ) value, messageInterpolator, constraintValidatorFactory
-						);
-						context.pushProperty( propertyIter.getOriginalProperty() );
-						metaConstraint.validateConstraint( beanType.getClass(), value, context );
-						failingConstraintViolations.addAll( context.getFailingConstraints() );
-					}
-				}
-				if ( failingConstraintViolations.size() > numberOfConstraintViolations) {
+				if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
 					break;
 				}
 			}
+		}
+	}
 
-			if ( groupChain.inSequence() && failingConstraintViolations.size() > numberOfConstraintViolations ) {
-				groupChain.moveToLastInCurrentSequence();
+	private <T> void validateValueForGroup(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Set<MetaConstraint<T>> metaConstraints, Group group) {
+		int numberOfConstraintViolations = failingConstraintViolations.size();
+		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
+
+		List<Class<?>> groupList;
+		if ( group.isDefaultGroup() ) {
+			groupList = beanMetaData.getDefaultGroupSequence();
+		}
+		else {
+			groupList = new ArrayList<Class<?>>();
+			groupList.add( group.getGroup() );
+		}
+
+		for ( Class<?> groupClass : groupList ) {
+			for ( MetaConstraint<T> metaConstraint : metaConstraints ) {
+				if ( metaConstraint.getGroupList().contains( groupClass ) ) {
+					ExecutionContext<T> context = new ExecutionContext<T>(
+							( T ) value, messageInterpolator, constraintValidatorFactory
+					);
+					context.pushProperty( propertyIter.getOriginalProperty() );
+					metaConstraint.validateConstraint( beanType.getClass(), value, context );
+					failingConstraintViolations.addAll( context.getFailingConstraints() );
+				}
+			}
+			if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
+				break;
 			}
 		}
 	}

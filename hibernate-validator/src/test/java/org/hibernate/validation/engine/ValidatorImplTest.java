@@ -40,6 +40,9 @@ import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.Person;
 import org.hibernate.validation.eg.UnconstraintEntity;
+import org.hibernate.validation.eg.groups.First;
+import org.hibernate.validation.eg.groups.Last;
+import org.hibernate.validation.eg.groups.Second;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
@@ -328,7 +331,7 @@ public class ValidatorImplTest {
 		}
 		catch ( IllegalArgumentException e ) {
 			assertEquals( "Invalid property path.", e.getMessage() );
-		}		
+		}
 	}
 
 	@Test
@@ -450,5 +453,24 @@ public class ValidatorImplTest {
 				Default.class,
 				groups.iterator().next()
 		);
+	}
+
+	@org.junit.Test
+	public void testObjectTraversion() {
+		Validator validator = TestUtil.getValidator();
+
+		Customer customer = new Customer();
+		customer.setFirstName( "John" );
+		customer.setLastName( "Doe" );
+
+		for ( int i = 0; i < 100; i++ ) {
+			Order order = new Order();
+			customer.addOrder( order );
+		}
+
+		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(
+				customer, Default.class, First.class, Second.class, Last.class
+		);
+		assertEquals( "Wrong number of constraints", 100, constraintViolations.size() );
 	}
 }
