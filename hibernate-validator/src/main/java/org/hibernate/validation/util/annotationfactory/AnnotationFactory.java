@@ -34,7 +34,7 @@ import java.lang.reflect.Proxy;
 public class AnnotationFactory {
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Annotation> T create(AnnotationDescriptor descriptor) {
+	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         //TODO round 34ms to generate the proxy, hug! is Javassist Faster?
         Class<T> proxyClass = (Class<T>) Proxy.getProxyClass( classLoader, descriptor.type() );

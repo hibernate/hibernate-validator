@@ -49,7 +49,7 @@ import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConstraintDescriptorImpl<U extends Annotation> implements ConstraintDescriptor {
+public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T> {
 	private static final Logger log = LoggerFactory.make();
 	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
@@ -57,13 +57,13 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	/**
 	 * The actual constraint annotation.
 	 */
-	private final U annotation;
+	private final T annotation;
 
 	/**
 	 * The set of classes implementing the validation for this constraint. See also
 	 * <code>ConstraintValidator</code> resolution algorithm.
 	 */
-	private final List<Class<? extends ConstraintValidator<?, ?>>> constraintClasses = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintClasses = new ArrayList<Class<? extends ConstraintValidator<T, ?>>>();
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -79,7 +79,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	/**
 	 * The composing constraints for this constraints.
 	 */
-	private final Set<ConstraintDescriptor> composingConstraints = new HashSet<ConstraintDescriptor>();
+	private final Set<ConstraintDescriptor<?>> composingConstraints = new HashSet<ConstraintDescriptor<?>>();
 
 	/**
 	 * Override paramter values used for composing constraints.
@@ -96,7 +96,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	 */
 	private final ConstraintHelper constraintHelper;
 
-	public ConstraintDescriptorImpl(U annotation, Class<?>[] groups, ConstraintHelper constraintHelper) {
+	public ConstraintDescriptorImpl(T annotation, Class<?>[] groups, ConstraintHelper constraintHelper) {
 		this( annotation, new HashSet<Class<?>>(), constraintHelper );
 		if ( groups.length == 0 ) {
 			groups = DEFAULT_GROUP;
@@ -104,7 +104,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 		this.groups.addAll( Arrays.asList( groups ) );
 	}
 
-	public ConstraintDescriptorImpl(U annotation, Set<Class<?>> groups, ConstraintHelper constraintHelper) {
+	private ConstraintDescriptorImpl(T annotation, Set<Class<?>> groups, ConstraintHelper constraintHelper) {
 		this.annotation = annotation;
 		this.groups = groups;
 		this.parameters = getAnnotationParameters( annotation );
@@ -125,15 +125,25 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 			constraintClasses.addAll( constraintHelper.getBuiltInConstraints( annotation ) );
 		}
 		else {
-			Constraint constraint = annotation.annotationType().getAnnotation( Constraint.class );
-			constraintClasses.addAll( Arrays.asList( constraint.validatedBy() ) );
+			//TODO are we sure a @Constraint is there?
+			final Class<? extends Annotation> annotationType = annotation.annotationType();
+			Class<? extends ConstraintValidator<?,?>>[] validatedBy = annotationType
+					.getAnnotation( Constraint.class )
+					.validatedBy();
+			for (Class<? extends ConstraintValidator<?,?>> validator : validatedBy) {
+				//FIXME does this create a CCE at runtime?
+				//FIXME if yes wrap into VE, if no we need to test the type here
+				//Once resolved,we can @SuppressWarning("unchecked") on the cast
+				Class<? extends ConstraintValidator<T,?>> safeValidator = (Class<? extends ConstraintValidator<T,?>>) validator;
+				constraintClasses.add( safeValidator );
+			}
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public U getAnnotation() {
+	public T getAnnotation() {
 		return annotation;
 	}
 
@@ -147,7 +157,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<Class<? extends ConstraintValidator<?, ?>>> getConstraintValidatorClasses() {
+	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
 		return Collections.unmodifiableList( constraintClasses );
 	}
 
@@ -161,7 +171,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<ConstraintDescriptor> getComposingConstraints() {
+	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
 		return composingConstraints;
 	}
 
@@ -249,10 +259,7 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 		for ( Annotation declaredAnnotation : annotation.annotationType().getDeclaredAnnotations() ) {
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotation )
 					|| constraintHelper.isBuiltinConstraint( declaredAnnotation ) ) {
-				ConstraintDescriptorImpl descriptor = createComposingConstraintDescriptor(
-						OVERRIDES_PARAMETER_DEFAULT_INDEX,
-						declaredAnnotation
-				);
+				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor( declaredAnnotation, OVERRIDES_PARAMETER_DEFAULT_INDEX );
 				composingConstraints.add( descriptor );
 				log.debug( "Adding composing constraint: " + descriptor );
 			}
@@ -260,8 +267,8 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
 				int index = 1;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
-					ConstraintDescriptorImpl descriptor = createComposingConstraintDescriptor(
-							index, constraintAnnotation
+					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
+						constraintAnnotation, index
 					);
 					composingConstraints.add( descriptor );
 					log.debug( "Adding composing constraint: " + descriptor );
@@ -271,13 +278,25 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 		}
 	}
 
-	private ConstraintDescriptorImpl createComposingConstraintDescriptor(int index, Annotation constraintAnnotation) {
-		AnnotationDescriptor annotationDescriptor = new AnnotationDescriptor(
-				constraintAnnotation.annotationType(), getAnnotationParameters( constraintAnnotation )
+	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(U declaredAnnotation, int index) {
+		//TODO don't quite understand this warning
+		//TODO assuming U.getClass() returns Class<U>
+		@SuppressWarnings("unchecked")
+		final Class<U> annotationType = (Class<U>) declaredAnnotation.annotationType();
+		return createComposingConstraintDescriptor(
+						index,
+						declaredAnnotation,
+						annotationType
+				);
+	}
+
+	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(int index, U constraintAnnotation, Class<U> annotationType) {
+		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<U>(
+				annotationType, getAnnotationParameters( constraintAnnotation )
 		);
 		Map<String, Object> overrides = overrideParameters.get(
 				new ClassIndexWrapper(
-						constraintAnnotation.annotationType(), index
+						annotationType, index
 				)
 		);
 		if ( overrides != null ) {
@@ -285,8 +304,8 @@ public class ConstraintDescriptorImpl<U extends Annotation> implements Constrain
 				annotationDescriptor.setValue( entry.getKey(), entry.getValue() );
 			}
 		}
-		Annotation annotationProxy = AnnotationFactory.create( annotationDescriptor );
-		return new ConstraintDescriptorImpl( annotationProxy, groups, constraintHelper );
+		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
+		return new ConstraintDescriptorImpl<U>( annotationProxy, groups, constraintHelper );
 	}
 
 	private class ClassIndexWrapper {

@@ -49,11 +49,11 @@ public class ResourceBundleMessageInterpolatorTest {
 	public void setUp() {
 		interpolator = new ResourceBundleMessageInterpolator( new TestResources() );
 
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( NotNull.class );
+		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
 
-		descriptor = new AnnotationDescriptor( Size.class );
-		size = AnnotationFactory.create( descriptor );
+		AnnotationDescriptor<Size> sizeDescriptor = new AnnotationDescriptor<Size>( Size.class );
+		size = AnnotationFactory.create( sizeDescriptor );
 	}
 
 	@Test

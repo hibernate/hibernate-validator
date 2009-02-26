@@ -22,6 +22,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.hibernate.validation.AmbiguousConstraintUsageException;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
@@ -40,27 +42,32 @@ import org.hibernate.validation.util.ValidatorTypeHelper;
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintTree {
+public class ConstraintTree<T extends Annotation> {
 
 	private static final Logger log = LoggerFactory.make();
 
-	private final ConstraintTree parent;
-	private final List<ConstraintTree> children;
-	private final ConstraintDescriptor descriptor;
+	private final ConstraintTree<?> parent;
+	private final List<ConstraintTree<?>> children;
+	private final ConstraintDescriptor<T> descriptor;
 
-	public ConstraintTree(ConstraintDescriptor descriptor) {
+	public ConstraintTree(ConstraintDescriptor<T> descriptor) {
 		this( descriptor, null );
 	}
 
-	private ConstraintTree(ConstraintDescriptor descriptor, ConstraintTree parent) {
+	private ConstraintTree(ConstraintDescriptor<T> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		children = new ArrayList<ConstraintTree>( descriptor.getComposingConstraints().size() );
+		final Set<ConstraintDescriptor<?>> composingConstraints = descriptor.getComposingConstraints();
+		children = new ArrayList<ConstraintTree<?>>( composingConstraints.size() );
 
-		for ( ConstraintDescriptor composingDescriptor : descriptor.getComposingConstraints() ) {
-			ConstraintTree treeNode = new ConstraintTree( composingDescriptor, this );
+		for ( ConstraintDescriptor<?> composingDescriptor : composingConstraints ) {
+			ConstraintTree<?> treeNode = createConstraintTree( composingDescriptor );
 			children.add( treeNode );
 		}
+	}
+
+	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptor<U> composingDescriptor) {
+		return new ConstraintTree<U>( composingDescriptor, this );
 	}
 
 	public boolean isRoot() {
@@ -71,7 +78,7 @@ public class ConstraintTree {
 		return parent;
 	}
 
-	public List<ConstraintTree> getChildren() {
+	public List<ConstraintTree<?>> getChildren() {
 		return children;
 	}
 
@@ -79,7 +86,7 @@ public class ConstraintTree {
 		return children.size() > 0;
 	}
 
-	public ConstraintDescriptor getDescriptor() {
+	public ConstraintDescriptor<T> getDescriptor() {
 		return descriptor;
 	}
 
@@ -150,15 +157,18 @@ public class ConstraintTree {
 	 * @return A initalized constraint validator matching the type of the value to be validated.
 	 */
 	private ConstraintValidator getInitalizedValidator(Object value, ConstraintValidatorFactory constraintFactory) {
-		ConstraintValidator constraintValidator;
-		Class validatorClass;
+		Class<? extends ConstraintValidator<T, ?>> validatorClass;
+		//FIXME This sounds really bad, why value can be null. Why are we deciding of the validator based on the value? 
 		if ( value == null ) {
 			validatorClass = descriptor.getConstraintValidatorClasses().get( 0 );
 		}
 		else {
 			validatorClass = findMatchingValidatorClass( value );
 		}
-		constraintValidator = constraintFactory.getInstance( validatorClass );
+		//
+		@SuppressWarnings("unchecked")
+		ConstraintValidator<T,?> constraintValidator =
+				constraintFactory.getInstance( validatorClass );
 		initializeConstraint( descriptor, constraintValidator );
 		return constraintValidator;
 	}
@@ -174,9 +184,9 @@ public class ConstraintTree {
 
 		Class valueClass = determineValueClass( value );
 
-		Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes = ValidatorTypeHelper
-				.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
-		List<Class> assignableClasses = findAssingableClasses( valueClass, validatorsTypes );
+		Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
+				ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
+		List<Class> assignableClasses = findAssignableClasses( valueClass, validatorsTypes );
 
 		resolveAssignableClasses( assignableClasses );
 		verifyResolveWasUnique( valueClass, assignableClasses );
@@ -202,7 +212,7 @@ public class ConstraintTree {
 		}
 	}
 
-	private List<Class> findAssingableClasses(Class valueClass, Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes) {
+	private List<Class> findAssignableClasses(Class valueClass, Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes) {
 		List<Class> assignableClasses = new ArrayList<Class>();
 		for ( Class clazz : validatorsTypes.keySet() ) {
 			if ( clazz.isAssignableFrom( valueClass ) ) {
@@ -247,9 +257,8 @@ public class ConstraintTree {
 		} while ( classesToRemove.size() > 0 );
 	}
 
-	@SuppressWarnings("unchecked")
 	private void initializeConstraint
-			(ConstraintDescriptor
+			(ConstraintDescriptor<T>
 					descriptor, ConstraintValidator
 					constraintValidator) {
 		try {

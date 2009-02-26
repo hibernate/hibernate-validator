@@ -36,7 +36,7 @@ public class LengthValidatorTest {
 
 	@BeforeClass
 	public static void init() {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Length.class );
+		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
 		descriptor.setValue( "min", 1 );
 		descriptor.setValue( "max", 3 );
 		descriptor.setValue( "message", "{validator.length}" );

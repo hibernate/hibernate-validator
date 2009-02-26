@@ -78,7 +78,8 @@ public class ConstraintHelper {
 
 	public ConstraintHelper() {
 
-		List<Class<? extends ConstraintValidator<?, ?>>> constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		List<Class<? extends ConstraintValidator<?, ?>>> constraintList =
+				new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( AssertFalseValidator.class );
 		builtinConstraints.put( AssertFalse.class, constraintList );
 
@@ -131,14 +132,26 @@ public class ConstraintHelper {
 		builtinConstraints.put( Pattern.class, constraintList );
 	}
 
-	public List<Class<? extends ConstraintValidator<?, ?>>> getBuiltInConstraints(Annotation annotation) {
-		List<Class<? extends ConstraintValidator<?, ?>>> constraints = builtinConstraints.get( annotation.annotationType() );
+	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getBuiltInConstraints(T annotation) {
+		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = getBuiltInFromAnnotationType( annotation.annotationType() );
 
-		if ( constraints == null ) {
+		if (builtInList == null || builtInList.size() == 0) {
 			throw new ValidationException( "Unable to find constraints for  " + annotation.annotationType() );
+		}
+		List<Class<? extends ConstraintValidator<T, ?>>> constraints =
+				new ArrayList<Class<? extends ConstraintValidator<T, ?>>>( builtInList.size() );
+		for (Class<? extends ConstraintValidator<?, ?>> validatorClass : builtInList) {
+			//safe cause all CV for a given annotation A are CV<A, ?>
+			@SuppressWarnings( "unchecked" )
+			Class<ConstraintValidator<T, ?>> safeValdiatorClass = (Class<ConstraintValidator<T, ?>>) validatorClass;
+			constraints.add( safeValdiatorClass );
 		}
 
 		return constraints;
+	}
+
+	private List<Class<? extends ConstraintValidator<?, ?>>> getBuiltInFromAnnotationType(Class<?> annotationType) {
+		return builtinConstraints.get( annotationType );
 	}
 
 	public boolean isBuiltinConstraint(Annotation annotation) {

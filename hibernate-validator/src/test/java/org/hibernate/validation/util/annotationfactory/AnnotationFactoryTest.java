@@ -31,7 +31,7 @@ public class AnnotationFactoryTest {
 
 	@Test
 	public void createAnnotationProxy() {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Size.class );
+		AnnotationDescriptor<Size> descriptor = new AnnotationDescriptor<Size>( Size.class );
 		descriptor.setValue( "min", 5 );
 		descriptor.setValue( "max", 10 );
 
@@ -43,13 +43,13 @@ public class AnnotationFactoryTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void createAnnotationProxyMissingRequiredParamter() {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Pattern.class );
+		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		AnnotationFactory.create( descriptor );
 	}
 
 	@Test
 	public void createAnnotationProxyWithRequiredParamter() {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Pattern.class );
+		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		descriptor.setValue( "regexp", ".*" );
 
 		Pattern pattern = AnnotationFactory.create( descriptor );

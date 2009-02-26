@@ -39,7 +39,7 @@ public class MinValidatorForNumberTest {
 
 	@BeforeClass
 	public static void init() {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Min.class );
+		AnnotationDescriptor<Min> descriptor = new AnnotationDescriptor<Min>( Min.class );
 		descriptor.setValue( "value", 15l );
 		descriptor.setValue( "message", "{validator.min}" );
 		Min m = AnnotationFactory.create( descriptor );

@@ -33,17 +33,17 @@ import java.util.Map;
  * @author Davide Marchignoli
  * @author Hardy Ferentschik
  */
-public class AnnotationDescriptor {
+public class AnnotationDescriptor<T extends Annotation> {
 
-	private final Class<? extends Annotation> type;
+	private final Class<T> type;
 
 	private final Map<String, Object> elements = new HashMap<String, Object>();
 
-	public AnnotationDescriptor(Class<? extends Annotation> annotationType) {
+	public AnnotationDescriptor(Class<T> annotationType) {
 		this.type = annotationType;
 	}
 
-    public AnnotationDescriptor(Class<? extends Annotation> annotationType, Map<String, Object> elements) {
+    public AnnotationDescriptor(Class<T> annotationType, Map<String, Object> elements) {
 		this.type = annotationType;
 		for (Map.Entry<String, Object> entry : elements.entrySet()) {
 			this.elements.put( entry.getKey(), entry.getValue() );
@@ -66,7 +66,7 @@ public class AnnotationDescriptor {
 		return elements.size();
 	}
 
-	public Class<? extends Annotation> type() {
+	public Class<T> type() {
 		return type;
 	}
 }

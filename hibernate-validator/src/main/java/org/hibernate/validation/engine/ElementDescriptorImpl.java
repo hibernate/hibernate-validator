@@ -35,7 +35,7 @@ import javax.validation.PropertyDescriptor;
 public class ElementDescriptorImpl implements PropertyDescriptor {
 	private final Class<?> returnType;
 	private final boolean cascaded;
-	private final Set<ConstraintDescriptor> constraintDescriptors = new HashSet<ConstraintDescriptor>();
+	private final Set<ConstraintDescriptor<?>> constraintDescriptors = new HashSet<ConstraintDescriptor<?>>();
 	private final String propertyPath;
 
 
@@ -72,7 +72,7 @@ public class ElementDescriptorImpl implements PropertyDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<ConstraintDescriptor> getConstraintDescriptors() {
+	public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
 		return Collections.unmodifiableSet( constraintDescriptors );
 	}
 

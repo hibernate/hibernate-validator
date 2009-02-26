@@ -37,7 +37,7 @@ public class PatternValidatorTest {
 	@BeforeClass
 	public static void init() {
 
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Pattern.class );
+		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor( Pattern.class );
 		descriptor.setValue( "regexp", "foobar" );
 		descriptor.setValue( "message", "{validator.pattern}" );
 		Pattern p = AnnotationFactory.create( descriptor );

@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.hibernate.validation.constraints.composition.FrenchZipcodeConstraintValidator;
+import org.hibernate.validation.constraints.composition.FrenchZipcode;
 
 /**
  * Tests for message resolution.
@@ -37,9 +38,10 @@ public class ValidatorTypeTest {
 
 	@Test
 	public void testTypeDiscovery() {
-		List<Class<? extends ConstraintValidator<?, ?>>> validators = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		List<Class<? extends ConstraintValidator<FrenchZipcode, ?>>> validators =
+				new ArrayList<Class<? extends ConstraintValidator<FrenchZipcode, ?>>>();
 		validators.add( FrenchZipcodeConstraintValidator.class );
-		Map<Class<?>, Class<? extends ConstraintValidator<? extends Annotation, ?>>> validatorsTypes = ValidatorTypeHelper
+		Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes = ValidatorTypeHelper
 				.getValidatorsTypes( validators );
 		assertEquals( FrenchZipcodeConstraintValidator.class, validatorsTypes.get( String.class ) );
 	}

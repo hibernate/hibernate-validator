@@ -39,7 +39,7 @@ public class MaxValidatorForNumberTest {
 
 	@BeforeClass
 	public static void init() {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Max.class );
+		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor( Max.class );
 		descriptor.setValue( "value", 15l );
 		descriptor.setValue( "message", "{validator.max}" );
 		Max m = AnnotationFactory.create( descriptor );

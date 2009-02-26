@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -36,7 +36,7 @@ public class DigitsValidatorForNumberTest {
 	@Test
 	public void testIsValid() {
 
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Digits.class );
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor( Digits.class );
 		descriptor.setValue( "integer", 5 );
 		descriptor.setValue( "fraction", 2 );
 		descriptor.setValue( "message", "{validator.digits}" );
@@ -64,7 +64,7 @@ public class DigitsValidatorForNumberTest {
 	@Test
 	public void testIsValidZeroLength() {
 
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( Digits.class );
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor( Digits.class );
 		descriptor.setValue( "integer", 0 );
 		descriptor.setValue( "fraction", 0 );
 		descriptor.setValue( "message", "{validator.digits}" );

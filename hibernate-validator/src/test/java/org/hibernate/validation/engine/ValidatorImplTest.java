@@ -439,7 +439,7 @@ public class ValidatorImplTest {
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
-		Set<ConstraintDescriptor> descriptors = propertyDescriptor.getConstraintDescriptors();
+		Set<ConstraintDescriptor<?>> descriptors = propertyDescriptor.getConstraintDescriptors();
 
 		assertEquals( "There should be only one constraint descriptor", 1, descriptors.size() );
 		ConstraintDescriptor descriptor = descriptors.iterator().next();
