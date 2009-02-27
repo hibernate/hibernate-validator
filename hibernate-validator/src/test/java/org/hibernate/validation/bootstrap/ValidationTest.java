@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.bootstrap;
 
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +29,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
@@ -42,12 +44,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.HibernateValidationProvider;
 import org.hibernate.validation.constraints.NotNullValidator;
 import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.engine.ConfigurationImpl;
 import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
+import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.engine.ValidatorFactoryImpl;
 
 /**
@@ -91,7 +93,6 @@ public class ValidationTest {
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
 
-
 	@Test
 	public void testCustomMessageInterpolator() {
 
@@ -100,7 +101,7 @@ public class ValidationTest {
 		assertDefaultBuilderAndFactory( configuration );
 
 		ValidatorFactory factory = configuration.buildValidatorFactory();
-		Validator validator = factory.getValidator( );
+		Validator validator = factory.getValidator();
 
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
@@ -124,7 +125,7 @@ public class ValidationTest {
 				}
 		);
 		factory = configuration.buildValidatorFactory();
-		validator = factory.getValidator( );
+		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		constraintViolation = constraintViolations.iterator().next();
@@ -138,7 +139,7 @@ public class ValidationTest {
 		assertDefaultBuilderAndFactory( configuration );
 
 		ValidatorFactory factory = configuration.buildValidatorFactory();
-		Validator validator = factory.getValidator(  );
+		Validator validator = factory.getValidator();
 
 		Customer customer = new Customer();
 		customer.setFirstName( "John" );
@@ -162,7 +163,7 @@ public class ValidationTest {
 				}
 		);
 		factory = configuration.buildValidatorFactory();
-		validator = factory.getValidator( );
+		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
@@ -180,9 +181,9 @@ public class ValidationTest {
 
 
 		HibernateValidatorConfiguration configuration = Validation
-					.byProvider( HibernateValidatorConfiguration.class )
-					.providerResolver( resolver )
-					.configure();
+				.byProvider( HibernateValidatorConfiguration.class )
+				.providerResolver( resolver )
+				.configure();
 		assertDefaultBuilderAndFactory( configuration );
 	}
 
@@ -199,9 +200,9 @@ public class ValidationTest {
 
 
 		Configuration<?> configuration = Validation
-			        .byDefaultProvider()
-					.providerResolver( resolver )
-					.configure();
+				.byDefaultProvider()
+				.providerResolver( resolver )
+				.configure();
 		assertDefaultBuilderAndFactory( configuration );
 	}
 
@@ -216,7 +217,7 @@ public class ValidationTest {
 
 		final ProviderSpecificBootstrap<HibernateValidatorConfiguration> providerSpecificBootstrap =
 				Validation
-						.byProvider( HibernateValidatorConfiguration.class)
+						.byProvider( HibernateValidatorConfiguration.class )
 						.providerResolver( resolver );
 
 		try {
@@ -237,7 +238,7 @@ public class ValidationTest {
 		assertTrue( configuration instanceof ConfigurationImpl );
 
 		ValidatorFactory factory = configuration.buildValidatorFactory();
-		assertDefaultFactory(factory);
+		assertDefaultFactory( factory );
 	}
 
 	private void assertDefaultFactory(ValidatorFactory factory) {
@@ -250,5 +251,37 @@ public class ValidationTest {
 		public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 			return true;
 		}
+	}
+
+	@Test
+	public void testCustomTraversableResolver() {
+
+		Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		assertDefaultBuilderAndFactory( configuration );
+
+		ValidatorFactory factory = configuration.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Customer customer = new Customer();
+		customer.setFirstName( "John" );
+
+		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
+		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+
+		// get a new factory using a custom configuration
+		configuration = Validation.byDefaultProvider().configure();
+		configuration.traversableResolver(
+				new TraversableResolver() {
+					public boolean isTraversable(Object o, String s, Class<?> aClass, String s1, ElementType elementType) {
+						return false;
+					}
+				}
+		);
+		factory = configuration.buildValidatorFactory();
+		validator = factory.getValidator();
+		constraintViolations = validator.validate( customer );
+		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
 }

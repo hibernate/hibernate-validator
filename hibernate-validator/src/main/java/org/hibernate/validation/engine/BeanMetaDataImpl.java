@@ -63,7 +63,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * List of constraints.
 	 */
-	private List<MetaConstraint<T>> metaConstraintList = new ArrayList<MetaConstraint<T>>();
+	private List<MetaConstraint<T, ?>> metaConstraintList = new ArrayList<MetaConstraint<T, ?>>();
 
 	/**
 	 * List of cascaded fields.
@@ -171,12 +171,12 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private void initFieldConstraints(Class clazz) {
+	private <A extends Annotation >void initFieldConstraints(Class clazz) {
 		for ( Field field : clazz.getDeclaredFields() ) {
 			List<ConstraintDescriptorImpl> fieldMetadata = findFieldLevelConstraints( field );
 			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
 				ReflectionHelper.setAccessibility( field );
-				MetaConstraint<T> metaConstraint = new MetaConstraint<T>( field, beanClass, constraintDescription );
+				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( field, beanClass, constraintDescription );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
@@ -186,12 +186,12 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private void initMethodConstraints(Class clazz) {
+	private <A extends Annotation> void initMethodConstraints(Class clazz) {
 		for ( Method method : clazz.getDeclaredMethods() ) {
 			List<ConstraintDescriptorImpl> methodMetadata = findMethodLevelConstraints( method );
 			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
 				ReflectionHelper.setAccessibility( method );
-				MetaConstraint<T> metaConstraint = new MetaConstraint<T>( method, beanClass, constraintDescription );
+				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( method, beanClass, constraintDescription );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
@@ -201,10 +201,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private void initClassConstraints(Class clazz) {
+	private <A extends Annotation> void initClassConstraints(Class clazz) {
 		List<ConstraintDescriptorImpl> classMetadata = findClassLevelConstraints( clazz );
 		for ( ConstraintDescriptorImpl constraintDescription : classMetadata ) {
-			MetaConstraint<T> metaConstraint = new MetaConstraint<T>( clazz, constraintDescription );
+			MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( clazz, constraintDescription );
 			metaConstraintList.add( metaConstraint );
 		}
 	}
@@ -349,7 +349,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return cascadedMembers;
 	}
 
-	public List<MetaConstraint<T>> geMetaConstraintList() {
+	public List<MetaConstraint<T, ?>> geMetaConstraintList() {
 		return metaConstraintList;
 	}
 

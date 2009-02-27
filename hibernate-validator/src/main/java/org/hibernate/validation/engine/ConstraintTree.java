@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.hibernate.validation.AmbiguousConstraintUsageException;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
@@ -33,6 +31,7 @@ import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
 
+import org.hibernate.validation.AmbiguousConstraintUsageException;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ValidatorTypeHelper;
 
@@ -42,19 +41,19 @@ import org.hibernate.validation.util.ValidatorTypeHelper;
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintTree<T extends Annotation> {
+public class ConstraintTree<A extends Annotation> {
 
 	private static final Logger log = LoggerFactory.make();
 
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
-	private final ConstraintDescriptor<T> descriptor;
+	private final ConstraintDescriptor<A> descriptor;
 
-	public ConstraintTree(ConstraintDescriptor<T> descriptor) {
+	public ConstraintTree(ConstraintDescriptor<A> descriptor) {
 		this( descriptor, null );
 	}
 
-	private ConstraintTree(ConstraintDescriptor<T> descriptor, ConstraintTree<?> parent) {
+	private ConstraintTree(ConstraintDescriptor<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
 		final Set<ConstraintDescriptor<?>> composingConstraints = descriptor.getComposingConstraints();
@@ -86,23 +85,23 @@ public class ConstraintTree<T extends Annotation> {
 		return children.size() > 0;
 	}
 
-	public ConstraintDescriptor<T> getDescriptor() {
+	public ConstraintDescriptor<A> getDescriptor() {
 		return descriptor;
 	}
 
-	public <T> void validateConstraints(Object value, Class beanClass, ExecutionContext executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
-		for ( ConstraintTree tree : getChildren() ) {
+	public <T, V> void validateConstraints(V value, Class<T> beanClass, ExecutionContext<T> executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
+		for ( ConstraintTree<?> tree : getChildren() ) {
 			tree.validateConstraints( value, beanClass, executionContext, constraintViolations );
 		}
 
 		final Object leafBeanInstance = executionContext.peekValidatedObject();
-		ConstraintValidatorContextImpl constraintContext = new ConstraintValidatorContextImpl( descriptor );
 		if ( log.isTraceEnabled() ) {
 			log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
 		}
-		ConstraintValidator validator = getInitalizedValidator(
+		ConstraintValidator<A, V> validator = getInitalizedValidator(
 				value, executionContext.getConstraintValidatorFactory()
 		);
+		ConstraintValidatorContextImpl constraintContext = new ConstraintValidatorContextImpl( descriptor );
 		if ( !validator.isValid( value, constraintContext ) ) {
 			for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
 				final String message = error.getMessage();
@@ -156,8 +155,8 @@ public class ConstraintTree<T extends Annotation> {
 	 *
 	 * @return A initalized constraint validator matching the type of the value to be validated.
 	 */
-	private ConstraintValidator getInitalizedValidator(Object value, ConstraintValidatorFactory constraintFactory) {
-		Class<? extends ConstraintValidator<T, ?>> validatorClass;
+	private <V> ConstraintValidator<A, V> getInitalizedValidator(Object value, ConstraintValidatorFactory constraintFactory) {
+		Class<? extends ConstraintValidator<?, ?>> validatorClass;
 		//FIXME This sounds really bad, why value can be null. Why are we deciding of the validator based on the value? 
 		if ( value == null ) {
 			validatorClass = descriptor.getConstraintValidatorClasses().get( 0 );
@@ -167,10 +166,10 @@ public class ConstraintTree<T extends Annotation> {
 		}
 		//
 		@SuppressWarnings("unchecked")
-		ConstraintValidator<T,?> constraintValidator =
+		ConstraintValidator<?, ?> constraintValidator =
 				constraintFactory.getInstance( validatorClass );
 		initializeConstraint( descriptor, constraintValidator );
-		return constraintValidator;
+		return ( ConstraintValidator<A, V> ) constraintValidator;
 	}
 
 	/**
@@ -180,12 +179,12 @@ public class ConstraintTree<T extends Annotation> {
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private Class findMatchingValidatorClass(Object value) {
+	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Object value) {
 
 		Class valueClass = determineValueClass( value );
 
 		Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
-				ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
+				ValidatorTypeHelper.getValidatorsTypes( ( List<Class<? extends ConstraintValidator<A, ?>>> ) descriptor.getConstraintValidatorClasses() );
 		List<Class> assignableClasses = findAssignableClasses( valueClass, validatorsTypes );
 
 		resolveAssignableClasses( assignableClasses );
@@ -258,7 +257,7 @@ public class ConstraintTree<T extends Annotation> {
 	}
 
 	private void initializeConstraint
-			(ConstraintDescriptor<T>
+			(ConstraintDescriptor<A>
 					descriptor, ConstraintValidator
 					constraintValidator) {
 		try {

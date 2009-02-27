@@ -455,7 +455,7 @@ public class ValidatorImplTest {
 		);
 	}
 
-	@org.junit.Test
+	@Test
 	public void testObjectTraversion() {
 		Validator validator = TestUtil.getValidator();
 

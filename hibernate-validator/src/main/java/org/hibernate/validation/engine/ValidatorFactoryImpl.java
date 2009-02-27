@@ -40,7 +40,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
-		//do init metadata from XML form
 	}
 
 	/**

@@ -18,24 +18,20 @@
 package org.hibernate.validation.engine;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.TraversableResolver;
 
 import org.hibernate.validation.util.IdentitySet;
 
 /**
  * Context object keeping track of all processed objects and all failing constraints.
  * At the same time it keeps track of the currently validated object, the current group and property path.
- * The way the validation works at the moment the validated object and the property path have to be processed
- * in a stack fashion.
- * <p/>
- * all sort of information needed  Introduced to reduce the parameters passed around between the different
- * validate methdods in <code>ValidatorImpl</code>.
+ * Currently the validated object and the property path are processed in a stack fashion.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
@@ -72,7 +68,7 @@ public class ExecutionContext<T> {
 	 * Stack for keeping track of the currently validated object.
 	 */
 	private Stack<Object> validatedObjectStack = new Stack<Object>();
-	
+
 	/**
 	 * The message resolver which should be used in this context.
 	 */
@@ -81,17 +77,20 @@ public class ExecutionContext<T> {
 	/**
 	 * The constraint factory which should be used in this context.
 	 */
-	ConstraintValidatorFactory constraintValidatorFactory;
+	private final ConstraintValidatorFactory constraintValidatorFactory;
 
+	private final TraversableResolver traversableResolver;
 
-	public ExecutionContext(T object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
-		this( object, object, messageResolver, constraintValidatorFactory );
+	public ExecutionContext(T object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		this( object, object, messageResolver, constraintValidatorFactory, traversableResolver );
 	}
 
-	public ExecutionContext(T rootBean, Object object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory) {
+	public ExecutionContext(T rootBean, Object object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		this.rootBean = rootBean;
 		this.messageResolver = messageResolver;
 		this.constraintValidatorFactory = constraintValidatorFactory;
+		this.traversableResolver = traversableResolver;
+
 		validatedObjectStack.push( object );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		propertyPath = "";
@@ -158,7 +157,7 @@ public class ExecutionContext<T> {
 	}
 
 	public void addConstraintFailures(List<ConstraintViolationImpl<T>> failingConstraintViolations) {
-		for(ConstraintViolationImpl<T> violation : failingConstraintViolations) {
+		for ( ConstraintViolationImpl<T> violation : failingConstraintViolations ) {
 			addConstraintFailure( violation );
 		}
 	}
@@ -211,7 +210,28 @@ public class ExecutionContext<T> {
 		return propertyPath;
 	}
 
-	public boolean checkValidationRequired(Collection<Class<?>> groups) {
-		return groups.contains( currentGroup );
+	public String peekProperty() {
+		int lastIndex = propertyPath.lastIndexOf( '.' );
+		if ( lastIndex != -1 ) {
+			return propertyPath.substring( 0, lastIndex );
+		}
+		else {
+			return "";
+		}
+	}
+
+	public boolean isValidationRequired(MetaConstraint metaConstraint) {
+		if ( !metaConstraint.getGroupList().contains( currentGroup ) ) {
+			return false;
+		}
+
+		Class<?> rootBeanClass = rootBean == null ? null : rootBean.getClass();
+		return traversableResolver.isTraversable(
+				peekValidatedObject(),
+				peekProperty(),
+				rootBeanClass,
+				peekPropertyPath(),
+				metaConstraint.getElementType()
+		);
 	}
 }

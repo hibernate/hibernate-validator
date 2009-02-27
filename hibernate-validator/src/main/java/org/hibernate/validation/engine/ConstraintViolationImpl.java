@@ -17,8 +17,6 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
 

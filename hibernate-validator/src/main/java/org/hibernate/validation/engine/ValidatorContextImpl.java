@@ -8,6 +8,7 @@ import javax.validation.ValidatorContext;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class ValidatorContextImpl implements ValidatorContext {
 	private MessageInterpolator messageInterpolator;
@@ -29,6 +30,9 @@ public class ValidatorContextImpl implements ValidatorContext {
 		traversableResolver( factoryTraversableResolver );
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public ValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
 		if ( messageInterpolator == null ) {
 			this.messageInterpolator = factoryMessageInterpolator;
@@ -39,6 +43,9 @@ public class ValidatorContextImpl implements ValidatorContext {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public ValidatorContext traversableResolver(TraversableResolver traversableResolver) {
 		if ( traversableResolver == null ) {
 			this.traversableResolver = factoryTraversableResolver;
@@ -49,7 +56,12 @@ public class ValidatorContextImpl implements ValidatorContext {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Validator getValidator() {
-		return new ValidatorImpl( constraintValidatorFactory, messageInterpolator, constraintHelper );
+		return new ValidatorImpl(
+				constraintValidatorFactory, messageInterpolator, traversableResolver, constraintHelper
+		);
 	}
 }

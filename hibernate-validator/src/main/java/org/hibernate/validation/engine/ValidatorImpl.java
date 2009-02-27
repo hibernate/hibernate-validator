@@ -32,6 +32,7 @@ import javax.validation.BeanDescriptor;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
@@ -86,11 +87,14 @@ public class ValidatorImpl implements Validator {
 
 	private final MessageInterpolator messageInterpolator;
 
+	private final TraversableResolver traversableResolver;
+
 	private final ConstraintHelper constraintHelper;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, ConstraintHelper constraintHelper) {
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
+		this.traversableResolver = traversableResolver;
 		this.constraintHelper = constraintHelper;
 
 		groupChainGenerator = new GroupChainGenerator();
@@ -106,7 +110,7 @@ public class ValidatorImpl implements Validator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		ExecutionContext<T> context = new ExecutionContext<T>(
-				object, messageInterpolator, constraintValidatorFactory
+				object, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
 
 		List<ConstraintViolationImpl<T>> list = validateInContext( context, groupChain );
@@ -258,9 +262,9 @@ public class ValidatorImpl implements Validator {
 	 */
 	private <T> boolean validateConstraintsForCurrentGroup(ExecutionContext<T> executionContext, BeanMetaData<T> beanMetaData) {
 		boolean validationSuccessful = true;
-		for ( MetaConstraint<T> metaConstraint : beanMetaData.geMetaConstraintList() ) {
+		for ( MetaConstraint<T, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			executionContext.pushProperty( metaConstraint.getPropertyName() );
-			if ( executionContext.checkValidationRequired( metaConstraint.getGroupList() ) ) {
+			if ( executionContext.isValidationRequired( metaConstraint ) ) {
 				boolean tmp = metaConstraint.validateConstraint( beanMetaData.getBeanClass(), executionContext );
 				validationSuccessful = validationSuccessful && tmp;
 			}
@@ -355,7 +359,7 @@ public class ValidatorImpl implements Validator {
 		@SuppressWarnings("unchecked")
 		final Class<T> beanType = ( Class<T> ) object.getClass();
 
-		Set<MetaConstraint<T>> metaConstraints = new HashSet<MetaConstraint<T>>();
+		Set<MetaConstraint<T, ?>> metaConstraints = new HashSet<MetaConstraint<T, ?>>();
 		Object hostingBeanInstance = collectMetaConstraintsForPath( beanType, object, propertyIter, metaConstraints );
 
 		if ( hostingBeanInstance == null ) {
@@ -378,21 +382,21 @@ public class ValidatorImpl implements Validator {
 		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			List<Group> sequence = sequenceIterator.next();
-			int numberOfConstraintViolations = failingConstraintViolations.size();
+			int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
 			for ( Group group : sequence ) {
 				validatePropertyForGroup(
 						object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group
 				);
 
-				if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
+				if ( failingConstraintViolations.size() > numberOfConstraintViolationsBefore ) {
 					break;
 				}
 			}
 		}
 	}
 
-	private <T> int validatePropertyForGroup(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Set<MetaConstraint<T>> metaConstraints, Object hostingBeanInstance, Group group) {
-		int numberOfConstraintViolations = failingConstraintViolations.size();
+	private <T> void validatePropertyForGroup(T object, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Set<MetaConstraint<T, ?>> metaConstraints, Object hostingBeanInstance, Group group) {
+		int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
 		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
 
 		List<Class<?>> groupList;
@@ -405,26 +409,30 @@ public class ValidatorImpl implements Validator {
 		}
 
 		for ( Class<?> groupClass : groupList ) {
-			for ( MetaConstraint<T> metaConstraint : metaConstraints ) {
-				if ( metaConstraint.getGroupList().contains( groupClass ) ) {
-					ExecutionContext<T> context = new ExecutionContext<T>(
-							object, hostingBeanInstance, messageInterpolator, constraintValidatorFactory
-					);
-					context.pushProperty( propertyIter.getOriginalProperty() );
-					metaConstraint.validateConstraint( object.getClass(), context );
+			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
+				ExecutionContext<T> context = new ExecutionContext<T>(
+						object,
+						hostingBeanInstance,
+						messageInterpolator,
+						constraintValidatorFactory,
+						traversableResolver
+				);
+				context.pushProperty( propertyIter.getOriginalProperty() );
+				context.setCurrentGroup( groupClass );
+				if ( context.isValidationRequired( metaConstraint ) ) {
+					metaConstraint.validateConstraint( ( Class<T> ) object.getClass(), context );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
 			}
-			if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
+			if ( failingConstraintViolations.size() > numberOfConstraintViolationsBefore ) {
 				break;
 			}
 		}
-		return numberOfConstraintViolations;
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T> void validateValue(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, GroupChain groupChain) {
-		Set<MetaConstraint<T>> metaConstraints = new HashSet<MetaConstraint<T>>();
+		Set<MetaConstraint<T, ?>> metaConstraints = new HashSet<MetaConstraint<T, ?>>();
 		collectMetaConstraintsForPath( beanType, null, propertyIter, metaConstraints );
 
 		if ( metaConstraints.size() == 0 ) {
@@ -467,7 +475,7 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T> void validateValueForGroup(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Set<MetaConstraint<T>> metaConstraints, Group group) {
+	private <T> void validateValueForGroup(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolationImpl<T>> failingConstraintViolations, Set<MetaConstraint<T, ?>> metaConstraints, Group group) {
 		int numberOfConstraintViolations = failingConstraintViolations.size();
 		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
 
@@ -481,13 +489,15 @@ public class ValidatorImpl implements Validator {
 		}
 
 		for ( Class<?> groupClass : groupList ) {
-			for ( MetaConstraint<T> metaConstraint : metaConstraints ) {
-				if ( metaConstraint.getGroupList().contains( groupClass ) ) {
-					ExecutionContext<T> context = new ExecutionContext<T>(
-							( T ) value, messageInterpolator, constraintValidatorFactory
-					);
-					context.pushProperty( propertyIter.getOriginalProperty() );
-					metaConstraint.validateConstraint( beanType.getClass(), value, context );
+			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
+				ExecutionContext<T> context = new ExecutionContext<T>(
+						( T ) value, messageInterpolator, constraintValidatorFactory, traversableResolver
+				);
+				context.pushProperty( propertyIter.getOriginalProperty() );
+				context.setCurrentGroup( groupClass );
+
+				if ( context.isValidationRequired( metaConstraint ) ) {
+					metaConstraint.validateConstraint( beanType, value, context );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
 			}
@@ -511,7 +521,7 @@ public class ValidatorImpl implements Validator {
 	 * @return Returns the bean hosting the constraints which match the specified property path.
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, PropertyIterator propertyIter, Set<MetaConstraint<T>> metaConstraints) {
+	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, PropertyIterator propertyIter, Set<MetaConstraint<T, ?>> metaConstraints) {
 		propertyIter.split();
 
 		if ( !propertyIter.hasNext() ) {
@@ -519,8 +529,8 @@ public class ValidatorImpl implements Validator {
 				throw new IllegalArgumentException( "Invalid property path." );
 			}
 
-			List<MetaConstraint<T>> metaConstraintList = getBeanMetaData( clazz ).geMetaConstraintList();
-			for ( MetaConstraint<T> metaConstraint : metaConstraintList ) {
+			List<MetaConstraint<T, ?>> metaConstraintList = getBeanMetaData( clazz ).geMetaConstraintList();
+			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
 					metaConstraints.add( metaConstraint );
 				}

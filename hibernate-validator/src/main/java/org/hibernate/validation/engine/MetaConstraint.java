@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.engine;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -35,12 +36,12 @@ import org.hibernate.validation.util.ReflectionHelper;
  *
  * @author Hardy Ferentschik
  */
-public class MetaConstraint<T> {
+public class MetaConstraint<T, A extends Annotation> {
 
 	/**
 	 * The constraint tree created from the constraint annotation.
 	 */
-	private final ConstraintTree constraintTree;
+	private final ConstraintTree<A> constraintTree;
 
 	/**
 	 * The type (class) the constraint was defined on. <code>null</code> if the constraint was specified on method or
@@ -76,11 +77,11 @@ public class MetaConstraint<T> {
 	 */
 	private final Class<T> beanClass;
 
-	public MetaConstraint(Type t, ConstraintDescriptor constraintDescriptor) {
-		this( t, null, null, ElementType.TYPE, (Class<T>) t.getClass(), constraintDescriptor, "" );
+	public MetaConstraint(Type t, ConstraintDescriptor<A> constraintDescriptor) {
+		this( t, null, null, ElementType.TYPE, ( Class<T> ) t.getClass(), constraintDescriptor, "" );
 	}
 
-	public MetaConstraint(Method m, Class<T> beanClass, ConstraintDescriptor constraintDescriptor) {
+	public MetaConstraint(Method m, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
 		this(
 				null,
 				m,
@@ -92,18 +93,18 @@ public class MetaConstraint<T> {
 		);
 	}
 
-	public MetaConstraint(Field f, Class<T> beanClass, ConstraintDescriptor constraintDescriptor) {
-		this( null, null, f, ElementType.FIELD, beanClass, constraintDescriptor, f.getName());
+	public MetaConstraint(Field f, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
+		this( null, null, f, ElementType.FIELD, beanClass, constraintDescriptor, f.getName() );
 	}
 
-	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, Class<T> beanClass, ConstraintDescriptor constraintDescriptor, String property) {
+	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor, String property) {
 		this.type = t;
 		this.method = m;
 		this.field = f;
 		this.elementType = elementType;
 		this.propertyName = property;
 		this.beanClass = beanClass;
-		constraintTree = new ConstraintTree( constraintDescriptor );
+		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 	}
 
 
@@ -190,7 +191,7 @@ public class MetaConstraint<T> {
 		return constraintTree;
 	}
 
-	public <T> boolean validateConstraint(Class beanClass, ExecutionContext<T> executionContext) {
+	public <T> boolean validateConstraint(Class<T> beanClass, ExecutionContext<T> executionContext) {
 		final Object leafBeanInstance = executionContext.peekValidatedObject();
 		Object value = getValue( leafBeanInstance );
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
@@ -202,7 +203,7 @@ public class MetaConstraint<T> {
 		return true;
 	}
 
-	public <T> boolean validateConstraint(Class beanClass, Object value, ExecutionContext<T> executionContext) {
+	public <T> boolean validateConstraint(Class<T> beanClass, Object value, ExecutionContext<T> executionContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 		constraintTree.validateConstraints( value, beanClass, executionContext, constraintViolations );
 		if ( constraintViolations.size() > 0 ) {

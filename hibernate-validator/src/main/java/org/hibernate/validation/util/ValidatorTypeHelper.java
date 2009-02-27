@@ -46,7 +46,7 @@ public class ValidatorTypeHelper {
 	 *         key is the type the validator accepts and value the validator class itself.
 	 */
 	public static <T extends Annotation> Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> getValidatorsTypes(
-				List<Class<? extends ConstraintValidator<T, ?>>> validators) {
+			List<Class<? extends ConstraintValidator<T, ?>>> validators) {
 		if ( validators == null || validators.size() == 0 ) {
 			throw new ValidationException( "No ConstraintValidators associated to @Constraint" );
 		}
