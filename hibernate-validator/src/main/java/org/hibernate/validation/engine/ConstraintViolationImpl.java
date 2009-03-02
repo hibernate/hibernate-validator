@@ -27,7 +27,6 @@ import javax.validation.ConstraintViolation;
 public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private String interpolatedMessage;
 	private T rootBean;
-	private Class<T> beanClass;
 	private Object value;
 	private String propertyPath;
 	private Object leafBeanInstance;
@@ -35,13 +34,12 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private String rawMessage;
 
 
-	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, T rootBean, Class<T> beanClass,
+	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, T rootBean,
 								   Object leafBeanInstance, Object value,
 								   String propertyPath, ConstraintDescriptor constraintDescriptor) {
 		this.rawMessage = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
-		this.beanClass = beanClass;
 		this.value = value;
 		this.propertyPath = propertyPath;
 		this.leafBeanInstance = leafBeanInstance;
@@ -99,9 +97,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 
 		ConstraintViolationImpl that = ( ConstraintViolationImpl ) o;
 
-		if ( beanClass != null ? !beanClass.equals( that.beanClass ) : that.beanClass != null ) {
-			return false;
-		}
 		if ( interpolatedMessage != null ? !interpolatedMessage.equals( that.interpolatedMessage ) : that.interpolatedMessage != null ) {
 			return false;
 		}
@@ -122,7 +117,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	public int hashCode() {
 		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
 		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
-		result = 31 * result + ( beanClass != null ? beanClass.hashCode() : 0 );
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );
 		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
 		return result;

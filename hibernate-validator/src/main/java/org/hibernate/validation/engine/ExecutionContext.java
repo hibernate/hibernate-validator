@@ -18,10 +18,13 @@
 package org.hibernate.validation.engine;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import javax.validation.ConstraintDescriptor;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -29,14 +32,17 @@ import javax.validation.TraversableResolver;
 import org.hibernate.validation.util.IdentitySet;
 
 /**
- * Context object keeping track of all processed objects and all failing constraints.
- * At the same time it keeps track of the currently validated object, the current group and property path.
- * Currently the validated object and the property path are processed in a stack fashion.
+ * Context object keeping track of all processed objects and failing constraints.
+ * It also keeps track of the currently validated object, group and property path.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
+ * @todo Look for ways to improve this data structure. It is quite fragile and depends on the right oder of calls
+ * in order to work.
  */
-public class ExecutionContext<T> {
+public class ExecutionContext<T> implements ConstraintValidatorContext {
+
+	private static final String PROPERTY_ROOT = "";
 
 	/**
 	 * The root bean of the validation.
@@ -55,9 +61,9 @@ public class ExecutionContext<T> {
 	private final List<ConstraintViolationImpl<T>> failingConstraintViolations;
 
 	/**
-	 * The current property path.
+	 * Keep track of the property path/
 	 */
-	private String propertyPath;
+	private List<String> propertyPath;
 
 	/**
 	 * The current group which is getting processed.
@@ -65,9 +71,15 @@ public class ExecutionContext<T> {
 	private Class<?> currentGroup;
 
 	/**
+	 * Reference to a <code>ValidatedProperty</code> keeping track of the property we are currently validating,
+	 * together with required meta data.
+	 */
+	private ValidatedProperty currentValidatedProperty;
+
+	/**
 	 * Stack for keeping track of the currently validated object.
 	 */
-	private Stack<Object> validatedObjectStack = new Stack<Object>();
+	private Stack<Object> validatedBeanStack = new Stack<Object>();
 
 	/**
 	 * The message resolver which should be used in this context.
@@ -79,6 +91,9 @@ public class ExecutionContext<T> {
 	 */
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 
+	/**
+	 * Allows a JPA provider to decide whether a property should be validated.
+	 */
 	private final TraversableResolver traversableResolver;
 
 	public ExecutionContext(T object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
@@ -91,9 +106,9 @@ public class ExecutionContext<T> {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.traversableResolver = traversableResolver;
 
-		validatedObjectStack.push( object );
+		validatedBeanStack.push( object );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
-		propertyPath = "";
+		propertyPath = new ArrayList<String>();
 		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 	}
 
@@ -105,20 +120,50 @@ public class ExecutionContext<T> {
 		return constraintValidatorFactory;
 	}
 
-	public Object peekValidatedObject() {
-		return validatedObjectStack.peek();
+	public void disableDefaultError() {
+		assert currentValidatedProperty != null;
+		currentValidatedProperty.disableDefaultError();
 	}
 
-	public Class<?> peekValidatedObjectType() {
-		return validatedObjectStack.peek().getClass();
+	public String getDefaultErrorMessage() {
+		assert currentValidatedProperty != null;
+		return currentValidatedProperty.getDefaultErrorMessage();
 	}
 
-	public void pushValidatedObject(Object validatedObject) {
-		validatedObjectStack.push( validatedObject );
+	public void addError(String message) {
+		assert currentValidatedProperty != null;
+		currentValidatedProperty.addError( message );
 	}
 
-	public void popValidatedObject() {
-		validatedObjectStack.pop();
+	public void addError(String message, String property) {
+		assert currentValidatedProperty != null;
+		currentValidatedProperty.addError( message, property );
+	}
+
+	public List<ErrorMessage> getErrorMessages() {
+		assert currentValidatedProperty != null;
+		return currentValidatedProperty.getErrorMessages();
+	}
+
+	public void setConstraintDescriptor(ConstraintDescriptor constraintDescriptor) {
+		assert currentValidatedProperty != null;
+		currentValidatedProperty.setConstraintDescriptor( constraintDescriptor );
+	}
+
+	public Object peekValidatedBean() {
+		return validatedBeanStack.peek();
+	}
+
+	public Class<?> peekValidatedBeanType() {
+		return validatedBeanStack.peek().getClass();
+	}
+
+	public void pushValidatedBean(Object validatedBean) {
+		validatedBeanStack.push( validatedBean );
+	}
+
+	public void popValidatedBean() {
+		validatedBeanStack.pop();
 	}
 
 	public T getRootBean() {
@@ -135,16 +180,16 @@ public class ExecutionContext<T> {
 
 	public void markProcessedForCurrentGroup() {
 		if ( processedObjects.containsKey( currentGroup ) ) {
-			processedObjects.get( currentGroup ).add( validatedObjectStack.peek() );
+			processedObjects.get( currentGroup ).add( validatedBeanStack.peek() );
 		}
 		else {
 			IdentitySet set = new IdentitySet();
-			set.add( validatedObjectStack.peek() );
+			set.add( validatedBeanStack.peek() );
 			processedObjects.put( currentGroup, set );
 		}
 	}
 
-	public boolean isProcessedForCurrentGroup(Object value) {
+	public boolean isValidatedAgainstCurrentGroup(Object value) {
 		final IdentitySet objectsProcessedInCurrentGroups = processedObjects.get( currentGroup );
 		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
 	}
@@ -176,48 +221,49 @@ public class ExecutionContext<T> {
 	 * @param property the new property to add to the current path.
 	 */
 	public void pushProperty(String property) {
-		if ( propertyPath.length() == 0 ) {
-			propertyPath = property;
-		}
-		else {
-			propertyPath = propertyPath + "." + property;
-		}
+		propertyPath.add( property );
+		currentValidatedProperty = new ValidatedProperty( peekPropertyPath(), getCurrentGroup() );
 	}
 
 	/**
 	 * Drops the last level of the current property path of this context.
 	 */
 	public void popProperty() {
-		int lastIndex = propertyPath.lastIndexOf( '.' );
-		if ( lastIndex != -1 ) {
-			propertyPath = propertyPath.substring( 0, lastIndex );
-		}
-		else {
-			propertyPath = "";
+		if ( propertyPath.size() > 0 ) {
+			propertyPath.remove( propertyPath.size() - 1 );
+			currentValidatedProperty = null;
 		}
 	}
 
-	public void appendIndexToPropertyPath(String index) {
-		propertyPath += index;
+	public void markCurrentPropertyAsIndexed() {
+		String property = peekProperty();
+		property += "[]";
+		popProperty();
+		pushProperty( property );
 	}
 
 	public void replacePropertyIndex(String index) {
-		// replace the last occurance of [<oldIndex>] with [<index>] 
-		propertyPath = propertyPath.replaceAll( "\\[[0-9]*\\]$", "[" + index + "]" );
+		// replace the last occurance of [<oldIndex>] with [<index>]
+		String property = peekProperty();
+		property = property.replaceAll( "\\[[0-9]*\\]$", "[" + index + "]" );
+		popProperty();
+		pushProperty( property );
 	}
 
 	public String peekPropertyPath() {
-		return propertyPath;
+		StringBuilder builder = new StringBuilder();
+		for ( String s : propertyPath ) {
+			builder.append( s ).append( "." );
+		}
+		builder.delete( builder.lastIndexOf( "." ), builder.length() );
+		return builder.toString();
 	}
 
 	public String peekProperty() {
-		int lastIndex = propertyPath.lastIndexOf( '.' );
-		if ( lastIndex != -1 ) {
-			return propertyPath.substring( 0, lastIndex );
+		if ( propertyPath.size() == 0 ) {
+			return PROPERTY_ROOT;
 		}
-		else {
-			return "";
-		}
+		return propertyPath.get( propertyPath.size() - 1 );
 	}
 
 	public boolean isValidationRequired(MetaConstraint metaConstraint) {
@@ -227,11 +273,107 @@ public class ExecutionContext<T> {
 
 		Class<?> rootBeanClass = rootBean == null ? null : rootBean.getClass();
 		return traversableResolver.isTraversable(
-				peekValidatedObject(),
+				peekValidatedBean(),
 				peekProperty(),
 				rootBeanClass,
 				peekPropertyPath(),
 				metaConstraint.getElementType()
 		);
+	}
+
+	public List<ConstraintViolationImpl<T>> createConstraintViolations(Object value) {
+		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		for ( ErrorMessage error : currentValidatedProperty.getErrorMessages() ) {
+			constraintViolations.add( createConstraintViolation( value, error ) );
+		}
+		return constraintViolations;
+	}
+
+	public ConstraintViolationImpl<T> createConstraintViolation(Object value, ErrorMessage error) {
+		ConstraintDescriptor descriptor = currentValidatedProperty.getConstraintDescriptor();
+		String messageTemplate = error.getMessage();
+		String interpolatedMessage = getMessageResolver().interpolate(
+				messageTemplate,
+				descriptor,
+				peekValidatedBean()
+		);
+		return new ConstraintViolationImpl<T>(
+				messageTemplate,
+				interpolatedMessage,
+				getRootBean(),
+				peekValidatedBean(),
+				value,
+				error.getProperty(),
+				descriptor
+		);
+	}
+
+	class ValidatedProperty {
+
+		private final List<ErrorMessage> errorMessages = new ArrayList<ErrorMessage>( 3 );
+		private ConstraintDescriptor constraintDescriptor;
+		private boolean defaultDisabled;
+		private String property;
+		private Class<?> group;
+
+		private ValidatedProperty(String property, Class<?> group) {
+			this.property = property;
+			this.group = group;
+		}
+
+		public void setConstraintDescriptor(ConstraintDescriptor constraintDescriptor) {
+			this.constraintDescriptor = constraintDescriptor;
+		}
+
+		public ConstraintDescriptor getConstraintDescriptor() {
+			return constraintDescriptor;
+		}
+
+		void disableDefaultError() {
+			defaultDisabled = true;
+		}
+
+		public boolean isDefaultErrorDisabled() {
+			return defaultDisabled;
+		}
+
+		public String getDefaultErrorMessage() {
+			return ( String ) constraintDescriptor.getParameters().get( "message" );
+		}
+
+		public void addError(String message) {
+			errorMessages.add( new ErrorMessage( message, property ) );
+		}
+
+		public void addError(String message, String property) {
+			errorMessages.add( new ErrorMessage( message, property ) );
+		}
+
+		public List<ErrorMessage> getErrorMessages() {
+			List<ErrorMessage> returnedErrorMessages = new ArrayList<ErrorMessage>( errorMessages.size() + 1 );
+			Collections.copy( returnedErrorMessages, errorMessages );
+			if ( !defaultDisabled ) {
+				returnedErrorMessages.add( new ErrorMessage( getDefaultErrorMessage(), property ) );
+			}
+			return returnedErrorMessages;
+		}
+	}
+
+	public class ErrorMessage {
+		private final String message;
+		private final String property;
+
+		public ErrorMessage(String message, String property) {
+			this.message = message;
+			this.property = property;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public String getProperty() {
+			return property;
+		}
 	}
 }

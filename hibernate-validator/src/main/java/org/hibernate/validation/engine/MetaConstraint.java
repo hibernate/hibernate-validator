@@ -191,11 +191,11 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree;
 	}
 
-	public <T> boolean validateConstraint(Class<T> beanClass, ExecutionContext<T> executionContext) {
-		final Object leafBeanInstance = executionContext.peekValidatedObject();
+	public <T> boolean validateConstraint(ExecutionContext<T> executionContext) {
+		final Object leafBeanInstance = executionContext.peekValidatedBean();
 		Object value = getValue( leafBeanInstance );
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		constraintTree.validateConstraints( value, beanClass, executionContext, constraintViolations );
+		constraintTree.validateConstraints( value, executionContext, constraintViolations );
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
 			return false;
@@ -203,9 +203,9 @@ public class MetaConstraint<T, A extends Annotation> {
 		return true;
 	}
 
-	public <T> boolean validateConstraint(Class<T> beanClass, Object value, ExecutionContext<T> executionContext) {
+	public <T> boolean validateConstraint(Object value, ExecutionContext<T> executionContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		constraintTree.validateConstraints( value, beanClass, executionContext, constraintViolations );
+		constraintTree.validateConstraints( value, executionContext, constraintViolations );
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
 			return false;

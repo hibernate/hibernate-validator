@@ -89,64 +89,33 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public <T, V> void validateConstraints(V value, Class<T> beanClass, ExecutionContext<T> executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
+	public <T, V> void validateConstraints(V value, ExecutionContext<T> executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
 		for ( ConstraintTree<?> tree : getChildren() ) {
-			tree.validateConstraints( value, beanClass, executionContext, constraintViolations );
+			tree.validateConstraints( value, executionContext, constraintViolations );
 		}
 
-		final Object leafBeanInstance = executionContext.peekValidatedObject();
 		if ( log.isTraceEnabled() ) {
 			log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
 		}
 		ConstraintValidator<A, V> validator = getInitalizedValidator(
 				value, executionContext.getConstraintValidatorFactory()
 		);
-		ConstraintValidatorContextImpl constraintContext = new ConstraintValidatorContextImpl( descriptor );
-		if ( !validator.isValid( value, constraintContext ) ) {
-			for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintContext.getErrorMessages() ) {
-				final String message = error.getMessage();
-				createConstraintViolation(
-						value, beanClass, executionContext, leafBeanInstance, message, descriptor, constraintViolations
-				);
-			}
+		executionContext.setConstraintDescriptor( descriptor );
+		if ( !validator.isValid( value, executionContext ) ) {
+			constraintViolations.addAll( executionContext.createConstraintViolations( value ) );
 		}
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
 			final String message = ( String ) getParent().getDescriptor().getParameters().get( "message" );
-			createConstraintViolation(
-					value,
-					beanClass,
-					executionContext,
-					leafBeanInstance,
-					message,
-					getParent().descriptor,
-					constraintViolations
-			);
+			final String property = executionContext.peekPropertyPath();
+			ExecutionContext<T>.ErrorMessage error = executionContext.new ErrorMessage( message, property );
+			constraintViolations.add(executionContext.createConstraintViolation( value, error ));
 		}
 	}
 
 	private boolean reportAsSingleViolation() {
 		return getParent() != null
 				&& getParent().getDescriptor().isReportAsSingleViolation();
-	}
-
-	private <T> void createConstraintViolation(Object value, Class<T> beanClass, ExecutionContext<T> executionContext, Object leafBeanInstance, String messageTemplate, ConstraintDescriptor descriptor, List<ConstraintViolationImpl<T>> constraintViolations) {
-		String interpolatedMessage = executionContext.getMessageResolver().interpolate(
-				messageTemplate,
-				descriptor,
-				leafBeanInstance
-		);
-		ConstraintViolationImpl<T> failingConstraintViolation = new ConstraintViolationImpl<T>(
-				messageTemplate,
-				interpolatedMessage,
-				executionContext.getRootBean(),
-				beanClass,
-				leafBeanInstance,
-				value,
-				executionContext.peekPropertyPath(), //FIXME use error.getProperty()
-				descriptor
-		);
-		constraintViolations.add( failingConstraintViolation );
 	}
 
 	/**
