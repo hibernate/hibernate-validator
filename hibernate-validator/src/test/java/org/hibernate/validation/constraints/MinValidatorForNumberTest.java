@@ -50,13 +50,17 @@ public class MinValidatorForNumberTest {
 
 	@Test
 	public void testIsValid() {
+		byte b = 1;
+		Byte bWrapper = 127;
 		assertTrue( constraint.isValid( null, null ) );
+		assertTrue( constraint.isValid( bWrapper, null ) );
 		assertTrue( constraint.isValid( 20, null ) );
 		assertTrue( constraint.isValid( 15l, null ) );
 		assertTrue( constraint.isValid( 15, null ) );
 		assertTrue( constraint.isValid( 15.0, null ) );
 		assertTrue( constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ) );
 		assertTrue( constraint.isValid( BigInteger.valueOf( 10000000l ), null ) );
+		assertFalse( constraint.isValid( b, null ) );
 		assertFalse( constraint.isValid( BigDecimal.valueOf( -156000000000.0 ), null ) );
 		assertFalse( constraint.isValid( BigInteger.valueOf( -10000000l ), null ) );
 		assertFalse( constraint.isValid( 10, null ) );

@@ -39,7 +39,7 @@ public class MaxValidatorForNumberTest {
 
 	@BeforeClass
 	public static void init() {
-		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor( Max.class );
+		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
 		descriptor.setValue( "value", 15l );
 		descriptor.setValue( "message", "{validator.max}" );
 		Max m = AnnotationFactory.create( descriptor );
@@ -50,7 +50,10 @@ public class MaxValidatorForNumberTest {
 
 	@Test
 	public void testIsValid() {
+		byte b = 1;
+		Byte bWrapper = 127;
 		assertTrue( constraint.isValid( null, null ) );
+		assertTrue( constraint.isValid( b, null ) );
 		assertTrue( constraint.isValid( 15l, null ) );
 		assertTrue( constraint.isValid( 15, null ) );
 		assertTrue( constraint.isValid( 15.0, null ) );
@@ -60,6 +63,7 @@ public class MaxValidatorForNumberTest {
 		assertTrue( constraint.isValid( 14.99, null ) );
 		assertTrue( constraint.isValid( -14.99, null ) );
 		assertFalse( constraint.isValid( 20, null ) );
+		assertFalse( constraint.isValid( bWrapper, null ) );
 		assertFalse( constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ) );
 		assertFalse( constraint.isValid( BigInteger.valueOf( 10000000l ), null ) );
 	}
