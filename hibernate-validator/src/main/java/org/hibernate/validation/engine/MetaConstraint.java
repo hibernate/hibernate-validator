@@ -192,7 +192,7 @@ public class MetaConstraint<T, A extends Annotation> {
 	}
 
 	public <T> boolean validateConstraint(ExecutionContext<T> executionContext) {
-		final Object leafBeanInstance = executionContext.peekValidatedBean();
+		final Object leafBeanInstance = executionContext.peekCurrentBean();
 		Object value = getValue( leafBeanInstance );
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 		constraintTree.validateConstraints( value, executionContext, constraintViolations );

@@ -100,7 +100,7 @@ public class ConstraintTree<A extends Annotation> {
 		ConstraintValidator<A, V> validator = getInitalizedValidator(
 				value, executionContext.getConstraintValidatorFactory()
 		);
-		executionContext.setConstraintDescriptor( descriptor );
+		executionContext.setCurrentConstraintDescriptor( descriptor );
 		if ( !validator.isValid( value, executionContext ) ) {
 			constraintViolations.addAll( executionContext.createConstraintViolations( value ) );
 		}
@@ -109,7 +109,7 @@ public class ConstraintTree<A extends Annotation> {
 			final String message = ( String ) getParent().getDescriptor().getParameters().get( "message" );
 			final String property = executionContext.peekPropertyPath();
 			ExecutionContext<T>.ErrorMessage error = executionContext.new ErrorMessage( message, property );
-			constraintViolations.add(executionContext.createConstraintViolation( value, error ));
+			constraintViolations.add( executionContext.createConstraintViolation( value, error ) );
 		}
 	}
 
@@ -133,7 +133,6 @@ public class ConstraintTree<A extends Annotation> {
 		else {
 			validatorClass = findMatchingValidatorClass( value );
 		}
-		//
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<?, ?> constraintValidator =
 				constraintFactory.getInstance( validatorClass );

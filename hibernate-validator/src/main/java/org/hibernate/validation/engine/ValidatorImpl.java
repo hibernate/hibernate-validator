@@ -183,7 +183,7 @@ public class ValidatorImpl implements Validator {
 	 * @return List of invalid constraints.
 	 */
 	private <T> List<ConstraintViolationImpl<T>> validateInContext(ExecutionContext<T> context, GroupChain groupChain) {
-		if ( context.peekValidatedBean() == null ) {
+		if ( context.peekCurrentBean() == null ) {
 			return Collections.emptyList();
 		}
 
@@ -228,7 +228,7 @@ public class ValidatorImpl implements Validator {
 	private <T> void validateConstraints(ExecutionContext<T> executionContext) {
 		//casting rely on the fact that root object is at the top of the stack
 		@SuppressWarnings(" unchecked")
-		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) executionContext.peekValidatedBeanType() );
+		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) executionContext.peekCurrentBeanType() );
 		if ( executionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
 			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
 			if ( log.isTraceEnabled() && defaultGroupSequence.size() > 0 && defaultGroupSequence.get( 0 ) != Default.class ) {
@@ -275,12 +275,12 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <T> void validateCascadedConstraints(ExecutionContext<T> context) {
-		List<Member> cascadedMembers = getBeanMetaData( context.peekValidatedBeanType() )
+		List<Member> cascadedMembers = getBeanMetaData( context.peekCurrentBeanType() )
 				.getCascadedMembers();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
-			Object value = ReflectionHelper.getValue( member, context.peekValidatedBean() );
+			Object value = ReflectionHelper.getValue( member, context.peekCurrentBean() );
 			if ( value == null ) {
 				continue;
 			}
@@ -343,12 +343,12 @@ public class ValidatorImpl implements Validator {
 			if ( !context.isValidatedAgainstCurrentGroup( actualValue ) ) {
 				context.replacePropertyIndex( propertyIndex );
 
-				context.pushValidatedBean( actualValue );
+				context.pushCurrentBean( actualValue );
 				validateInContext(
 						context,
 						groupChainGenerator.getGroupChainFor( Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) )
 				);
-				context.popValidatedBean();
+				context.popCurrentBean();
 			}
 			i++;
 		}

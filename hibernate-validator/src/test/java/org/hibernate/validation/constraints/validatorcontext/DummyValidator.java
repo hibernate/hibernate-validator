@@ -15,20 +15,44 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints.incomplete;
+package org.hibernate.validation.constraints.validatorcontext;
 
+import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NoMessageConstraintValidator implements ConstraintValidator<NoMessage, Object> {
+public class DummyValidator implements ConstraintValidator<Dummy, String> {
 
-	public void initialize(NoMessage parameters) {
+	private static boolean disableDefaultError;
+
+	private static Map<String, String> errorMessages;
+
+
+	public void initialize(Dummy parameters) {
 	}
 
-	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+		if ( disableDefaultError ) {
+			constraintValidatorContext.disableDefaultError();
+		}
+
+		if ( errorMessages != null ) {
+			for ( Map.Entry<String, String> entry : errorMessages.entrySet() ) {
+				constraintValidatorContext.addError( entry.getKey(), entry.getValue() );
+			}
+		}
+
 		return false;
+	}
+
+	public static void disableDefaultError(boolean b) {
+		disableDefaultError = b;
+	}
+
+	public static void setErrorMessages(Map<String, String> errorMessages) {
+		DummyValidator.errorMessages = errorMessages;
 	}
 }

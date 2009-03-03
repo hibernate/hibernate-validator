@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints.incomplete;
+package org.hibernate.validation.constraints.invalidvalidators;
 
 import java.lang.annotation.Documented;
 import static java.lang.annotation.ElementType.FIELD;
@@ -29,7 +29,7 @@ import javax.validation.Constraint;
  * @author Hardy Ferentschik
  */
 @Documented
-@Constraint(validatedBy = NoGroupsConstraintValidator.class)
+@Constraint(validatedBy = NoGroupsValidator.class)
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface ValidProperty {
