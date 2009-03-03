@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -23,6 +23,8 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -36,6 +38,9 @@ public class ConstraintValidatorContextTest {
 	@Test
 	public void testNoCustomization() {
 		Validator validator = TestUtil.getValidator();
+
+		DummyValidator.disableDefaultError( false );
+		DummyValidator.setErrorMessages( null );
 
 		DummyBean bean = new DummyBean( "foobar" );
 
@@ -52,8 +57,11 @@ public class ConstraintValidatorContextTest {
 	public void testDisableDefaultErrorWithoutCustomError() {
 		Validator validator = TestUtil.getValidator();
 
-		DummyBean bean = new DummyBean( "foobar" );
 		DummyValidator.disableDefaultError( true );
+		Map<String, String> errors = new HashMap<String, String>();
+		DummyValidator.setErrorMessages( errors );
+
+		DummyBean bean = new DummyBean( "foobar" );
 
 		Set<ConstraintViolation<DummyBean>> constraintViolations = validator.validate( bean );
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
@@ -63,16 +71,46 @@ public class ConstraintValidatorContextTest {
 	public void testDisableDefaultErrorWithCustomErrors() {
 		Validator validator = TestUtil.getValidator();
 
-		DummyBean bean = new DummyBean( "foobar" );
 		DummyValidator.disableDefaultError( true );
 		Map<String, String> errors = new HashMap<String, String>();
 		errors.put( "message1", "property1" );
 		DummyValidator.setErrorMessages( errors );
+
+		DummyBean bean = new DummyBean( "foobar" );
 
 		Set<ConstraintViolation<DummyBean>> constraintViolations = validator.validate( bean );
 		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "Wrong message", "message1", constraintViolation.getMessage() );
 		assertEquals( "Wrong property", "property1", constraintViolation.getPropertyPath() );
+	}
+
+	@Test
+	public void testNestedValidation() {
+		Validator validator = TestUtil.getValidator();
+
+		DummyValidator.disableDefaultError( false );
+		DummyValidator.setErrorMessages( null );
+
+		DummyBean bean = new DummyBean( "foo" );
+		bean.setNestedDummy( new DummyBean( "bar" ) );
+
+		Set<ConstraintViolation<DummyBean>> constraintViolations = validator.validate( bean );
+		assertEquals( "Wrong number of constraints", 2, constraintViolations.size() );
+		boolean validatedNestedBean = false;
+		for ( ConstraintViolation<DummyBean> violation : constraintViolations ) {
+
+			if ( violation.getPropertyPath().equals( "value" ) ) {
+				assertEquals( "Wrong message", "dummy message", violation.getMessage() );
+			}
+			else if ( violation.getPropertyPath().equals( "nestedDummy.value" ) ) {
+				assertEquals( "Wrong message", "dummy message", violation.getMessage() );
+				validatedNestedBean = true;
+			}
+			else {
+				fail( "Wrong property " + violation.getMessage() );
+			}
+		}
+		assertTrue( validatedNestedBean );
 	}
 }

@@ -22,14 +22,13 @@
   This is an alpha release and not feature complete in relation to the latest version 
   of JSR 303. The following features are not yet fully implemented:
 
-  - Group inheritance using interfaces and implicit grouping
+  - Implicit grouping
   - Implementation of the TraversableResolver interface to allow integration with JPA
-  - Polymorphism in graph validation
   - XML configuration
 
   You can find more information about the current state of the implementation on the
   Bean Validation RI Roadmap - http://www.hibernate.org/459.html and there is copy of
-  JSR as of the time of this release available here - http://in.relation.to/service/File/10678
+  JSR as of the time of this release available here - http://in.relation.to/service/File/10774
 
   Documentation
   -------------
@@ -61,7 +60,7 @@
     <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
-        <version>x.y.z</version>
+        <version>${project.version}</version>
     </dependency>
 
     Hibernate Validator can be found in this repository: http://repository.jboss.com/maven2/  

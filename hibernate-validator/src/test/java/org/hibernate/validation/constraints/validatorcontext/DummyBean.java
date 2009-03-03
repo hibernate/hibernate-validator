@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,6 +17,8 @@
 */
 package org.hibernate.validation.constraints.validatorcontext;
 
+import javax.validation.Valid;
+
 /**
  * @author Hardy Ferentschik
  */
@@ -25,7 +27,14 @@ public class DummyBean {
 	@Dummy
 	String value;
 
+	@Valid
+	DummyBean nestedDummy;
+
 	public DummyBean(String value) {
 		this.value = value;
+	}
+
+	public void setNestedDummy(DummyBean nestedDummy) {
+		this.nestedDummy = nestedDummy;
 	}
 }

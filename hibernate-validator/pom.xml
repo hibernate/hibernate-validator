@@ -22,7 +22,7 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>1.0.Beta4-SNAPSHOT</version>
+            <version>1.0.Beta4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

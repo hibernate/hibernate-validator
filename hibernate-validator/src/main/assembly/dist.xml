@@ -34,6 +34,18 @@
         </dependencySet>
     </dependencySets>
 
+    <files>
+      <file>
+        <source>readme.txt</source>
+        <outputDirectory>/</outputDirectory>
+        <filtered>true</filtered>
+      </file>
+      <file>
+        <source>license.txt</source>
+        <outputDirectory>/</outputDirectory>
+      </file>
+    </files>
+
     <fileSets>
         <fileSet>
             <directory>target</directory>
@@ -55,6 +67,7 @@
             <outputDirectory></outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
+                <exclude>*.txt</exclude>
                 <exclude>**/target/**</exclude>
                 <exclude>*.iml</exclude>
             </excludes>

@@ -43,6 +43,8 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 
 	private static final String PROPERTY_ROOT = "";
 
+	private static final String PROPERTY_PATH_SEPERATOR = ".";
+
 	/**
 	 * The root bean of the validation.
 	 */
@@ -76,7 +78,7 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	private ValidatedProperty currentValidatedProperty;
 
 	/**
-	 * Stack for keeping track of the currently validated bean. 
+	 * Stack for keeping track of the currently validated bean.
 	 */
 	private Stack<Object> beanStack = new Stack<Object>();
 
@@ -207,8 +209,8 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	 * @param property the new property to add to the current path.
 	 */
 	public void pushProperty(String property) {
+		currentValidatedProperty = new ValidatedProperty( peekPropertyPath(), property );
 		propertyPath.add( property );
-		currentValidatedProperty = new ValidatedProperty( peekPropertyPath() );
 	}
 
 	/**
@@ -238,10 +240,12 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 
 	public String peekPropertyPath() {
 		StringBuilder builder = new StringBuilder();
-		for ( String s : propertyPath ) {
-			builder.append( s ).append( "." );
+		for ( int i = 0; i <= propertyPath.size() - 1; i++ ) {
+			builder.append( propertyPath.get( i ) );
+			if ( i < propertyPath.size() - 1 ) {
+				builder.append( PROPERTY_PATH_SEPERATOR );
+			}
 		}
-		builder.delete( builder.lastIndexOf( "." ), builder.length() );
 		return builder.toString();
 	}
 
@@ -297,13 +301,15 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	class ValidatedProperty {
 
 		private final List<ErrorMessage> errorMessages = new ArrayList<ErrorMessage>( 3 );
+		private final String property;
+		private final String propertyParent;
 		private ConstraintDescriptor constraintDescriptor;
 		private boolean defaultDisabled;
-		private String property;
 
 
-		private ValidatedProperty(String property) {
+		private ValidatedProperty(String propertyParent, String property) {
 			this.property = property;
+			this.propertyParent = propertyParent;
 		}
 
 		public void setConstraintDescriptor(ConstraintDescriptor constraintDescriptor) {
@@ -327,19 +333,30 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 		}
 
 		public void addError(String message) {
-			errorMessages.add( new ErrorMessage( message, property ) );
+			errorMessages.add( new ErrorMessage( message, buildPropertyPath( propertyParent, property ) ) );
 		}
 
 		public void addError(String message, String property) {
-			errorMessages.add( new ErrorMessage( message, property ) );
+			errorMessages.add( new ErrorMessage( message, buildPropertyPath( propertyParent, property ) ) );
 		}
 
 		public List<ErrorMessage> getErrorMessages() {
 			List<ErrorMessage> returnedErrorMessages = new ArrayList<ErrorMessage>( errorMessages );
 			if ( !defaultDisabled ) {
-				returnedErrorMessages.add( new ErrorMessage( getDefaultErrorMessage(), property ) );
+				returnedErrorMessages.add(
+						new ErrorMessage( getDefaultErrorMessage(), buildPropertyPath( propertyParent, property ) )
+				);
 			}
 			return returnedErrorMessages;
+		}
+
+		private String buildPropertyPath(String parent, String leaf) {
+			if ( PROPERTY_ROOT.equals( parent ) ) {
+				return leaf;
+			}
+			else {
+				return new StringBuilder().append( parent ).append( PROPERTY_PATH_SEPERATOR ).append( leaf ).toString();
+			}
 		}
 	}
 
