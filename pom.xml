@@ -131,7 +131,7 @@
 			              During release:perform, enable the "release" profile
 			            -->
 			            <releaseProfiles>release</releaseProfiles>
-			            <goals>site assembly:assembly</goals>
+			            <goals>package site assembly:assembly</goals>
 			         </configuration>
 			  </plugin>
             </plugins>
@@ -186,6 +186,23 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <id>html</id>
+                        <configuration>
+                            <tags>
+                                <tag>
+                                    <name>todo</name>
+                                    <placement>a</placement>
+                                    <head>ToDo:</head>
+                                </tag>
+                            </tags>
+                        </configuration>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
