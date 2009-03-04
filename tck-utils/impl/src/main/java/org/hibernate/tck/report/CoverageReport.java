@@ -397,7 +397,7 @@ public class CoverageReport {
        }
        else
        {
-          sb.append("<tr style=\"font-weight: bold\">");
+          sb.append("<tr style=\"font-weight: bold;background-color:#dddddd\">");
        } 
        
        sb.append("<td>");
