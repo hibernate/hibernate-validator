@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.tck.config.RuntimeProperties;
 import org.hibernate.tck.config.Strings;
@@ -26,6 +28,9 @@ public class CoverageReport {
     public static final String FISHEYE_BASE_URL_PROPERTY = "fisheye_base_url";
    
     public static final String SVN_BASE_URL_PROPERTY = "svn_base_url";
+    
+    private static final Pattern PATTERN_BOLD = Pattern.compile("([_][^_]*[_])");
+    private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("([~][^~]*[~])");    
    
     /*
     * References to the spec assertions made by the tck tests
@@ -163,6 +168,8 @@ public class CoverageReport {
         sb.append("   margin-bottom: 2px; }\n");
         sb.append("  .coverageMethod {\n");
         sb.append("   font-style: italic; }\n");
+        sb.append("  .highlight {\n");
+        sb.append("    background-color: #ffff00; }\n");
         sb.append("  .implied {\n");        
         sb.append("    color: #fff;\n");
         sb.append("    font-weight: bold;\n");
@@ -207,91 +214,10 @@ public class CoverageReport {
        StringBuilder sb = new StringBuilder();
        
        sb.append("<h3>Contents</h3>");
-       sb.append("<div><a href=\"#masterSummary\">Master Summary</a></div>");
        sb.append("<div><a href=\"#chapterSummary\">Chapter Summary</a></div>");
        sb.append("<div><a href=\"#sectionSummary\">Section Summary</a></div>");
        sb.append("<div><a href=\"#coverageDetail\">Coverage Detail</a></div>");
        sb.append("<div><a href=\"#unmatched\">Unmatched Tests</a></div>");
-       
-       out.write(sb.toString().getBytes());
-    }
-    
-    private void writeMasterSummary(OutputStream out) throws IOException {
-       StringBuilder sb = new StringBuilder();
-       
-       sb.append("<h3 id=\"masterSummary\">Master Summary</h3>\n");
-       
-       sb.append("<table border=\"0\">");
-       
-       sb.append("<tr>");
-       sb.append("<td>Total number of assertions</td>");
-       sb.append("<td>");
-       
-       int assertionTotal = 0;
-       int testableAssertionTotal = 0;
-       
-       for (List<AuditAssertion> assertions : auditParser.getAssertions().values())
-       {
-          assertionTotal += assertions.size();
-          
-          for (AuditAssertion a : assertions)
-          {
-             if (a.isTestable()) testableAssertionTotal++;
-          }
-       }
-       
-       double untestablePercent = assertionTotal > 0 ? (((assertionTotal - testableAssertionTotal) * 1.0) / assertionTotal) * 100 : 100;
-       
-       sb.append(assertionTotal);
-       sb.append("</td>");
-       sb.append("</tr>");
-
-       sb.append("<tr>");
-       sb.append("<td>Total number of untestable assertions</td>");
-       sb.append("<td>");
-       sb.append(assertionTotal - testableAssertionTotal).append(" (").append(String.format("%.2f%%", untestablePercent)).append(")");
-       sb.append("</td>");
-       sb.append("</tr>");       
-       
-       int coverage = 0;
-       
-       for (String sectionId : auditParser.getSectionIds())
-       {
-          for (AuditAssertion assertion : auditParser.getAssertionsForSection(sectionId))
-          {
-             if (!getCoverageForAssertion(sectionId, assertion.getId()).isEmpty())
-             {
-                coverage++;
-             }
-          }
-       }
-
-       double coveragePercent = testableAssertionTotal > 0 ? ((coverage * 1.0) / testableAssertionTotal) * 100 : 100;
-       String bgColor = coveragePercent < failThreshold ? "#ffaaaa" : 
-          coveragePercent < passThreshold ? "#ffffaa" : "#aaffaa";
-       
-       sb.append("<tr style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">");
-       
-       sb.append("<td style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">Total number of tested assertions</td>");
-       sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "; border-color: " + bgColor + "\">");       
-       
-       sb.append(coverage).append(" (");
-       
-       sb.append(String.format("%.2f%%", coveragePercent));
-       sb.append(")</td>");
-              
-       sb.append("</tr>");      
-       
-       sb.append("<tr>");
-       sb.append("<td>Total number of unmatched tests</td>");
-       
-       sb.append("<td>");
-       sb.append(unmatched.size());
-       sb.append("</td>");
-              
-       sb.append("</tr>");        
-       
-       sb.append("</table>");
        
        out.write(sb.toString().getBytes());
     }
@@ -657,13 +583,15 @@ public class CoverageReport {
 
                     sb.append("    <div class=\"results\">");
                     sb.append("<p class=\"description\">");
+                    
+                    String assertionText = parseStrikethrough(parseBold(assertion.getText()));
                     if (!Strings.isEmpty(assertion.getNote()))
                     {
-                       sb.append("<a title=\"" + assertion.getNote() + "\">").append(assertion.getText()).append("</a>");
+                       sb.append("<a title=\"" + assertion.getNote() + "\">").append(assertionText).append("</a>");
                     }
                     else
                     {
-                       sb.append(assertion.getText());
+                       sb.append(assertionText);
                     }
                     sb.append("</p>\n");
 
@@ -736,6 +664,34 @@ public class CoverageReport {
                 out.write(sb.toString().getBytes());
             }
         }
+    }
+    
+    private String parseBold(String text)
+    {
+       Matcher m = PATTERN_BOLD.matcher(text);
+       
+       String result = text;
+       while (m.find())
+       {
+         String replacement = "<span class=\"highlight\">" + m.group().substring(1, m.group().length() - 1) + "</span>";
+         result = m.replaceFirst(replacement);
+         m.reset(result);
+       }       
+       return result;
+    }
+    
+    private String parseStrikethrough(String text)
+    {
+       Matcher m = PATTERN_STRIKETHROUGH.matcher(text);
+       
+       String result = text;
+       while (m.find())
+       {
+         String replacement = "<del>" + m.group().substring(1, m.group().length() - 1) + "</del>";
+         result = m.replaceFirst(replacement);
+         m.reset(result);
+       }       
+       return result;
     }
 
     private void writeUnmatched(OutputStream out) throws IOException {
