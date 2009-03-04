@@ -8,8 +8,10 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,11 @@ public class CoverageReport {
     private static final Pattern PATTERN_BOLD = Pattern.compile("([_][^_]*[_])");
     private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("([~][^~]*[~])");    
     private static final String REPORT_FILE_NAME = "coverage.html";    
+    
+    private static final String COLOUR_SHADE_GREEN = "#ddffdd";
+    private static final String COLOUR_SHADE_RED = "#ffdddd";
+    private static final String COLOUR_SHADE_BLUE = "#80d1ff";
+    private static final String COLOUR_SHADE_ORANGE = "#ffcc33";
    
     /*
     * References to the spec assertions made by the tck tests
@@ -55,6 +62,7 @@ public class CoverageReport {
     
     private int failThreshold;
     private int passThreshold;
+    private Set<String> unimplementedTestGroups;
 
     public CoverageReport(List<SpecReference> references, AuditParser auditParser, File imageSrcDir) {
         this.references = new HashMap<String, List<SpecReference>>();
@@ -89,6 +97,20 @@ public class CoverageReport {
            
            passThreshold = this.properties.getIntValue("pass_threshold", 75, false);
            failThreshold = this.properties.getIntValue("fail_threshold", 50, false);
+           
+           String unimplemented = this.properties.getStringValue("unimplemented_test_groups", null, false);
+           if (unimplemented != null)
+           {
+              String[] parts = unimplemented.split(",");
+              unimplementedTestGroups = new HashSet<String>();
+              for (String part : parts)
+              {
+                 if (!"".equals(part.trim()))
+                 {
+                    unimplementedTestGroups.add(part.trim());
+                 }
+              }
+           }
         }
         catch (Exception ex)
         {
@@ -109,7 +131,6 @@ public class CoverageReport {
         calculateUnmatched();
         writeHeader(out);
         writeContents(out);
-        //writeMasterSummary(out);
         writeChapterSummary(out);
         writeSectionSummary(out);
         writeCoverage(out);
@@ -200,25 +221,25 @@ public class CoverageReport {
         sb.append("    border-bottom: 1px solid #488c41;\n");
         sb.append("    padding-bottom: 1px;\n");
         sb.append("    margin-bottom: 2px;\n");
-        sb.append("    background-color: #dfd; }\n");
+        sb.append("    background-color: " + COLOUR_SHADE_GREEN + "; }\n");
         sb.append("  .fail {\n");
         sb.append("    border-top: 1px solid #ab2020;\n");
         sb.append("    border-bottom: 1px solid #ab2020;\n");
         sb.append("    padding-bottom: 1px;\n");
         sb.append("    margin-bottom: 2px;\n");
-        sb.append("    background-color: #fdd; }\n");
+        sb.append("    background-color: " + COLOUR_SHADE_RED + "; }\n");
         sb.append("  .skip {\n");
         sb.append("    border-top: 1px solid #ff9900;\n");
         sb.append("    border-bottom: 1px solid #ff9900;\n");
         sb.append("    padding-bottom: 1px;\n");
         sb.append("    margin-bottom: 2px;\n");
-        sb.append("    background-color: #ffcc33; }\n");
+        sb.append("    background-color: " + COLOUR_SHADE_ORANGE + "; }\n");
         sb.append("  .untestable {\n");
         sb.append("    padding-bottom: 16px;\n");
         sb.append("    margin-bottom: 2px;\n");
         sb.append("    border-top: 1px solid #317ba6;\n");
         sb.append("    border-bottom: 1px solid #317ba6;\n");
-        sb.append("    background-color: #80d1ff; }\n");        
+        sb.append("    background-color: " + COLOUR_SHADE_BLUE + "; }\n");        
 
         sb.append("</style>\n");
 
@@ -254,7 +275,7 @@ public class CoverageReport {
        sb.append("<th align=\"left\">Chapter</th>");
        sb.append("<th>Assertions</th>");
        sb.append("<th>Testable</th>");
-       sb.append("<th>Tested<br /> (implemented and unimplemented)</th>");
+       sb.append("<th>Total Tested</th>");
        sb.append("<th>Tested<br /> (unimplemented)</th>");
        sb.append("<th>Tested<br /> (implemented)</th>");
        sb.append("<th>Coverage %</th>");
@@ -457,7 +478,7 @@ public class CoverageReport {
        sb.append("<th align=\"left\">Section</th>");
        sb.append("<th>Assertions</th>");
        sb.append("<th>Testable</th>");
-       sb.append("<th>Tested<br /> (implemented and unimplemented)</th>");
+       sb.append("<th>Total Tested</th>");
        sb.append("<th>Tested<br /> (unimplemented)</th>");
        sb.append("<th>Tested<br /> (implemented)</th>");
        sb.append("<th>Coverage %</th>");
@@ -552,11 +573,21 @@ public class CoverageReport {
        sb.append("</table>");       
        out.write(sb.toString().getBytes());       
     }
-    
+
     private void writeCoverage(OutputStream out) throws IOException {
        
         out.write("<h3 id=\"coverageDetail\">Coverage Detail</h3>\n".getBytes());
-       
+
+        StringBuilder key = new StringBuilder();
+        key.append("<table>");
+        key.append("<tr><th style=\"background-color:#dddddd\">Colour Key</th></tr>");
+        key.append("<tr><td style=\"background-color:" + COLOUR_SHADE_GREEN + ";text-align:center\">Assertion is covered</td></tr>");
+        key.append("<tr><td style=\"background-color:" + COLOUR_SHADE_RED + ";text-align:center\">Assertion is not covered</td></tr>");
+        key.append("<tr><td style=\"background-color:" + COLOUR_SHADE_ORANGE + ";text-align:center\">Assertion test is unimplemented</td></tr>");
+        key.append("<tr><td style=\"background-color:" + COLOUR_SHADE_BLUE + ";text-align:center\">Assertion is untestable</td></tr>");
+        key.append("</table>");
+        out.write(key.toString().getBytes());
+        
         for (String sectionId : auditParser.getSectionIds()) {
 
             List<AuditAssertion> sectionAssertions = auditParser.getAssertionsForSection(sectionId);
@@ -807,7 +838,12 @@ public class CoverageReport {
     
     private boolean isImplemented(List<String> groups)
     {
-       return !groups.contains("stub") && !groups.contains("broken"); 
+       for (String group : groups)
+       {
+          if (unimplementedTestGroups.contains(group)) return false;
+       }
+       
+       return true;
     }
 
     private void writeFooter(OutputStream out) throws IOException {
