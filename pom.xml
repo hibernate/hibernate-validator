@@ -6,7 +6,7 @@
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.0.Alpha2</version>
+    <version>4.0.0.Alpha3-SNAPSHOT</version>
     <name>Hibernate Validator Parent</name>
     <url>http://validator.hibernate.org</url>
 
@@ -140,7 +140,7 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn://svn.jboss.org/repos/hibernate/validator/trunk</connection>
+        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk</connection>
         <url>http://fisheye.jboss.org/browse/Hibernate/validator/trunk</url>
     </scm>
 

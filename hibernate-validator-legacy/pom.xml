@@ -5,7 +5,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.0.0.Alpha2</version>
+        <version>4.0.0.Alpha3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>hibernate-validator-legacy</artifactId>
