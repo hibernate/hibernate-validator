@@ -1,9 +1,11 @@
 package org.hibernate.tck.report;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ public class CoverageReport {
     
     private static final Pattern PATTERN_BOLD = Pattern.compile("([_][^_]*[_])");
     private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("([~][^~]*[~])");    
+    private static final String REPORT_FILE_NAME = "coverage.html";    
    
     /*
     * References to the spec assertions made by the tck tests
@@ -38,6 +41,9 @@ public class CoverageReport {
     private final Map<String, List<SpecReference>> references;
 
     private AuditParser auditParser;
+        
+    private File imageSrcDir;
+    private File imageTargetDir;
     
     private RuntimeProperties properties;
     
@@ -50,7 +56,7 @@ public class CoverageReport {
     private int failThreshold;
     private int passThreshold;
 
-    public CoverageReport(List<SpecReference> references, AuditParser auditParser) {
+    public CoverageReport(List<SpecReference> references, AuditParser auditParser, File imageSrcDir) {
         this.references = new HashMap<String, List<SpecReference>>();
 
         for (SpecReference ref : references) {
@@ -62,7 +68,7 @@ public class CoverageReport {
         }
 
         this.auditParser = auditParser;
-        
+        this.imageSrcDir = imageSrcDir;
         this.properties = new RuntimeProperties();
         
         try
@@ -90,7 +96,16 @@ public class CoverageReport {
         }        
     }
 
-    public void generate(OutputStream out) throws IOException {
+    public void generate(File outputDir) throws IOException {
+       File coverageFile = new File(outputDir, REPORT_FILE_NAME);
+       FileOutputStream out = new FileOutputStream(coverageFile);
+       
+       imageTargetDir = new File(outputDir, "/images");
+       if (!imageTargetDir.exists())
+       {
+          imageTargetDir.mkdirs();
+       }
+       
         calculateUnmatched();
         writeHeader(out);
         writeContents(out);
@@ -155,6 +170,12 @@ public class CoverageReport {
         sb.append("   color: #999999;\n");
         sb.append("   font-size: 9px;\n");
         sb.append("   font-weight: bold; }\n");
+        sb.append("  .embeddedImage {\n");
+        sb.append("   margin: 6px;\n");
+        sb.append("   border: 1px solid black;\n");
+        sb.append("   float: right; }\n");
+        sb.append("  .coverage {\n");
+        sb.append("   clear: both; }\n");
         sb.append("  .noCoverage {\n");
         sb.append("   margin-top: 2px;\n");
         sb.append("   margin-bottom: 2px;\n");
@@ -351,7 +372,9 @@ public class CoverageReport {
             
             if (coveragePercent >= 0)
             {
-               String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : coveragePercent > 100 ? "#FF00CC" : "#aaffaa" ;
+               String bgColor = coveragePercent < failThreshold ? "#ffaaaa" : 
+                  coveragePercent < passThreshold ? "#ffffaa" : 
+                     coveragePercent > 100 ? "#FF00CC" : "#aaffaa" ;
             
                sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
                sb.append(String.format("%.2f%%", coveragePercent));
@@ -405,7 +428,8 @@ public class CoverageReport {
        
        if (totalCoveragePercent >= 0)
        {
-          String bgColor = totalCoveragePercent < 60 ? "#ffaaaa" : totalCoveragePercent < 80 ? "#ffffaa" : "#aaffaa" ;
+          String bgColor = totalCoveragePercent < failThreshold ? "#ffaaaa" : 
+             totalCoveragePercent < passThreshold ? "#ffffaa" : "#aaffaa" ;
        
           sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
           sb.append(String.format("%.2f%%", totalCoveragePercent));
@@ -510,7 +534,8 @@ public class CoverageReport {
          
          if (coveragePercent >= 0)
          {
-            String bgColor = coveragePercent < 60 ? "#ffaaaa" : coveragePercent < 80 ? "#ffffaa" : coveragePercent > 100 ? "#FF00CC" : "#aaffaa" ;
+            String bgColor = coveragePercent < failThreshold ? "#ffaaaa" : 
+               coveragePercent < passThreshold ? "#ffffaa" : coveragePercent > 100 ? "#FF00CC" : "#aaffaa" ;
          
             sb.append("<td align=\"center\" style=\"background-color:" + bgColor + "\">");
             sb.append(String.format("%.2f%%", coveragePercent));
@@ -582,12 +607,25 @@ public class CoverageReport {
                     sb.append("</span>\n");
 
                     sb.append("    <div class=\"results\">");
-                    sb.append("<p class=\"description\">");
                     
-                    String assertionText = parseStrikethrough(parseBold(assertion.getText()));
+                    
+                    sb.append("<p class=\"description\">");
+                    String imageFilename = sectionId + "." + assertion.getId() + ".png";
+                    File imageFile = new File(imageSrcDir, imageFilename);
+                    
+                    if (imageFile.exists())
+                    {
+                       sb.append("<img src=\"images/" + imageFile.getName() + "\" class=\"embeddedImage\"/>");
+                       copyFile(imageFile, new File(imageTargetDir, imageFilename));
+                    }
+                    
+                    String assertionText = parseStrikethrough(parseBold(assertion.getText()));                    
+
                     if (!Strings.isEmpty(assertion.getNote()))
                     {
-                       sb.append("<a title=\"" + assertion.getNote() + "\">").append(assertionText).append("</a>");
+                       sb.append("<a title=\"" + assertion.getNote() + "\">");
+                       sb.append(assertionText);
+                       sb.append("</a>");
                     }
                     else
                     {
@@ -776,16 +814,21 @@ public class CoverageReport {
         out.write("</table>".getBytes());
         out.write("</body></html>".getBytes());
     }
-
-    public void writeToFile(File file) {
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            generate(out);
-            out.flush();
-            out.close();
-        }
-        catch (IOException ex) {
-            throw new RuntimeException("Error generating report file", ex);
-        }
+    
+    private void copyFile(File sourceFile, File targetFile) throws IOException 
+    {
+       FileChannel inChannel = new FileInputStream(sourceFile).getChannel();
+    FileChannel outChannel = new FileOutputStream(targetFile).getChannel();
+    try {
+        inChannel.transferTo(0, inChannel.size(),
+                outChannel);
+    } 
+    catch (IOException e) {
+        throw e;
     }
+    finally {
+        if (inChannel != null) inChannel.close();
+        if (outChannel != null) outChannel.close();
+    }
+}    
 }
