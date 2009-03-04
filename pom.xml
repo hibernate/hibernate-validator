@@ -116,6 +116,24 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <configuration>
+                        <descriptorRefs>
+                            <descriptorRef>project</descriptorRef>
+                        </descriptorRefs>
+                    </configuration>
+                </plugin>
+			    <plugin>
+			        <artifactId>maven-release-plugin</artifactId>
+			        <configuration>
+			           <!--
+			              During release:perform, enable the "release" profile
+			            -->
+			            <releaseProfiles>release</releaseProfiles>
+			            <goals>site assembly:assembly</goals>
+			         </configuration>
+			  </plugin>
             </plugins>
         </pluginManagement>
     </build>
