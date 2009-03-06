@@ -17,11 +17,11 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.ConstraintDescriptor;
@@ -45,16 +45,22 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * Regular expression used to do message interpolation.
 	 */
-	private static final Pattern messagePattern = Pattern.compile( "\\{([\\w\\.]+)\\}" );
+	private static final Pattern messageParameterPattern = Pattern.compile( "(\\{[\\w\\.]+\\})" );
 
 	/**
 	 * The default locale for the current user.
 	 */
 	private final Locale defaultLocale;
 
-	private final Map<Locale, ResourceBundle> userBundlesMap = new HashMap<Locale, ResourceBundle>();
+	/**
+	 * User specified resource bundles hashed against their locale.
+	 */
+	private final Map<Locale, ResourceBundle> userBundlesMap = new ConcurrentHashMap<Locale, ResourceBundle>();
 
-	private final Map<Locale, ResourceBundle> defaultBundlesMap = new HashMap<Locale, ResourceBundle>();
+	/**
+	 * Builtin resource bundles hashed against there locale.
+	 */
+	private final Map<Locale, ResourceBundle> defaultBundlesMap = new ConcurrentHashMap<Locale, ResourceBundle>();
 
 	public ResourceBundleMessageInterpolator() {
 		this( null );
@@ -66,7 +72,9 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 		if ( resourceBundle == null ) {
 			ResourceBundle bundle = getFileBasedResourceBundle( defaultLocale );
-			userBundlesMap.put( defaultLocale, bundle );
+			if ( bundle != null ) {
+				userBundlesMap.put( defaultLocale, bundle );
+			}
 
 		}
 		else {
@@ -76,14 +84,68 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		defaultBundlesMap.put( defaultLocale, ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES, defaultLocale ) );
 	}
 
-	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public String interpolate(String message, ConstraintDescriptor<?> constraintDescriptor, Object value) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
-		return replace( message, constraintDescriptor.getParameters(), defaultLocale );
+		return interpolateMessage( message, constraintDescriptor.getParameters(), defaultLocale );
 	}
 
-	public String interpolate(String message, ConstraintDescriptor constraintDescriptor, Object value, Locale locale) {
-		return replace( message, constraintDescriptor.getParameters(), locale );
+	/**
+	 * {@inheritDoc}
+	 */
+	public String interpolate(String message, ConstraintDescriptor<?> constraintDescriptor, Object value, Locale locale) {
+		return interpolateMessage( message, constraintDescriptor.getParameters(), locale );
+	}
+
+	/**
+	 * Runs the message interpolation according to alogrithm specified in JSR 303.
+	 * <br/>
+	 * Note:
+	 * <br/>
+	 * Lookups in user bundles is recursive whereas lookups in default bundle are not!
+	 *
+	 * @param message the message to interpolate
+	 * @param annotationParameters the parameters of the annotation for which to interpolate this message
+	 * @param locale the <code>Locale</code> to use for the resource bundle.
+	 *
+	 * @return the interpolated message.
+	 */
+	private String interpolateMessage(String message, Map<String, Object> annotationParameters, Locale locale) {
+		ResourceBundle userResourceBundle = findUserResourceBundle( locale );
+		ResourceBundle defaultResourceBundle = findDefaultResourceBundle( locale );
+
+		String userBundleResolvedMessage;
+		String resolvedMessage = message;
+		boolean evaluatedDefaultBundleOnce = false;
+		do {
+			// search the user bundle recursive (step1)
+			userBundleResolvedMessage = replaceVariables(
+					resolvedMessage, userResourceBundle, locale, true
+			);
+
+			// exit condition - we have at least tried to vaidate against the default bundle and there was no
+			// further replacements
+			if ( evaluatedDefaultBundleOnce
+					&& !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
+				break;
+			}
+
+			// search the default bundle non recursive (step2)
+			resolvedMessage = replaceVariables( userBundleResolvedMessage, defaultResourceBundle, locale, false );
+
+			evaluatedDefaultBundleOnce = true;
+		} while ( true );
+
+		// resolve annotation attributes (step 4)
+		resolvedMessage = replaceAnnotationAttributes( resolvedMessage, annotationParameters );
+		return resolvedMessage;
+	}
+
+	private boolean hasReplacementTakenPlace(String origMessage, String newMessage) {
+		return !origMessage.equals( newMessage );
 	}
 
 	/**
@@ -128,47 +190,63 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return rb;
 	}
 
-	private String replace(String message, Map<String, Object> parameters, Locale locale) {
-		Matcher matcher = messagePattern.matcher( message );
+	private String replaceVariables(String message, ResourceBundle bundle, Locale locale, boolean recurse) {
+		Matcher matcher = messageParameterPattern.matcher( message );
 		StringBuffer sb = new StringBuffer();
+		String resolvedParameterValue;
 		while ( matcher.find() ) {
-			matcher.appendReplacement( sb, resolveParameter( matcher.group( 1 ), parameters, locale ) );
+			String parameter = matcher.group( 1 );
+			resolvedParameterValue = resolveParameter(
+					parameter, bundle, locale, recurse
+			);
+
+			matcher.appendReplacement( sb, resolvedParameterValue );
 		}
 		matcher.appendTail( sb );
 		return sb.toString();
 	}
 
-	private String resolveParameter(String token, Map<String, Object> parameters, Locale locale) {
-		Object variable = parameters.get( token );
-		if ( variable != null ) {
-			return variable.toString();
+	private String replaceAnnotationAttributes(String message, Map<String, Object> annotationParameters) {
+		Matcher matcher = messageParameterPattern.matcher( message );
+		StringBuffer sb = new StringBuffer();
+		while ( matcher.find() ) {
+			String resolvedParameterValue;
+			String parameter = matcher.group( 1 );
+			Object variable = annotationParameters.get( removeCurlyBrace( parameter ) );
+			if ( variable != null ) {
+				resolvedParameterValue = variable.toString();
+			}
+			else {
+				resolvedParameterValue = message;
+			}
+			matcher.appendReplacement( sb, resolvedParameterValue );
 		}
+		matcher.appendTail( sb );
+		return sb.toString();
+	}
 
-		ResourceBundle userResourceBundle = findUserResourceBundle( locale );
-		ResourceBundle defaultResourceBundle = findDefaultResourceBundle( locale );
-
-		StringBuffer buffer = new StringBuffer();
-		String string = null;
+	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recurse) {
+		String parameterValue;
 		try {
-			string = userResourceBundle != null ? userResourceBundle.getString( token ) : null;
+			if ( bundle != null ) {
+				parameterValue = bundle.getString( removeCurlyBrace( parameterName ) );
+				if ( recurse ) {
+					parameterValue = replaceVariables( parameterValue, bundle, locale, recurse );
+				}
+			}
+			else {
+				parameterValue = parameterName;
+			}
 		}
 		catch ( MissingResourceException e ) {
-			//give a second chance with the default resource bundle
+			// return parameter itself
+			parameterValue = parameterName;
 		}
-		if ( string == null ) {
-			try {
-				string = defaultResourceBundle.getString( token );
-			}
-			catch ( MissingResourceException e ) {
-				//return the unchanged string
-				buffer.append( "{" ).append( token ).append( '}' );
-			}
-		}
-		if ( string != null ) {
-			// call resolve recusively!
-			buffer.append( replace( string, parameters, locale ) );
-		}
-		return buffer.toString();
+		return parameterValue;
+	}
+
+	private String removeCurlyBrace(String parameter) {
+		return parameter.substring( 1, parameter.length() - 1 );
 	}
 
 	private ResourceBundle findDefaultResourceBundle(Locale locale) {
@@ -187,7 +265,9 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		}
 
 		ResourceBundle bundle = getFileBasedResourceBundle( locale );
-		userBundlesMap.put( locale, bundle );
+		if ( bundle != null ) {
+			userBundlesMap.put( locale, bundle );
+		}
 		return bundle;
 	}
 }

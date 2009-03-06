@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -24,6 +24,7 @@ import com.clarkware.junitperf.TimedTest;
 import junit.framework.Test;
 
 import org.hibernate.validation.engine.ValidatorImplTest;
+import org.hibernate.validation.engine.ResourceBundleMessageInterpolatorTest;
 
 /**
  * Work in progress. Timings have no relevance. Using this class one can verify if applied changes affect the
@@ -37,8 +38,8 @@ public class ValidationPerformace {
 
 		long maxTimeInMillis = 1000;
 		List<Class<?>> testClasses = new ArrayList<Class<?>>();
-		testClasses.add( ValidatorImplTest.class );
-		//testClasses.add( GroupTest.class );
+		//testClasses.add( ValidatorImplTest.class );
+		testClasses.add( ResourceBundleMessageInterpolatorTest.class );
 		//testClasses.add( ConstraintCompositionTest.class );
 		Test test = new JUnit4TestFactory( testClasses ).makeTestSuite();
 		return new TimedTest( test, maxTimeInMillis );

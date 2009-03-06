@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Max;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
@@ -47,8 +48,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Before
 	public void setUp() {
-		interpolator = new ResourceBundleMessageInterpolator( new TestResources() );
-
+		// Create some annotations for testing using AnnotationProxies
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
 
@@ -61,6 +61,8 @@ public class ResourceBundleMessageInterpolatorTest {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
+
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
 
 		String expected = "replacement worked";
 		String actual = interpolator.interpolate( "{foo}", descriptor, null );
@@ -84,6 +86,9 @@ public class ResourceBundleMessageInterpolatorTest {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
+
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+
 		String expected = "foo";  // missing {}
 		String actual = interpolator.interpolate( "foo", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
@@ -98,6 +103,9 @@ public class ResourceBundleMessageInterpolatorTest {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
+
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+
 		String expected = "{bar}";  // unkown token {}
 		String actual = interpolator.interpolate( "{bar}", descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
@@ -108,6 +116,9 @@ public class ResourceBundleMessageInterpolatorTest {
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
+
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+
 		String expected = "may not be null";
 		String actual = interpolator.interpolate( notNull.message(), descriptor, null );
 		assertEquals( "Wrong substitution", expected, actual );
@@ -122,11 +133,11 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testMessageInterpolationWithLocale() {
-		interpolator = new ResourceBundleMessageInterpolator();
-
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
+
+		interpolator = new ResourceBundleMessageInterpolator();
 
 		String expected = "kann nicht null sein";
 		String actual = interpolator.interpolate( notNull.message(), descriptor, null, Locale.GERMAN );
@@ -135,11 +146,11 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testFallbackToDefaultLocale() {
-		interpolator = new ResourceBundleMessageInterpolator();
-
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
+
+		interpolator = new ResourceBundleMessageInterpolator();
 
 		String expected = "may not be null";
 		String actual = interpolator.interpolate( notNull.message(), descriptor, null, Locale.JAPAN );
@@ -148,25 +159,53 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUserResourceBundle() {
-		interpolator = new ResourceBundleMessageInterpolator();
-
 		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
 				notNull, new Class<?>[] { }, new ConstraintHelper()
 		);
+
+		interpolator = new ResourceBundleMessageInterpolator();
 
 		String expected = "no puede ser null";
 		String actual = interpolator.interpolate( notNull.message(), descriptor, null, new Locale( "es", "ES" ) );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
-	class TestResources extends ResourceBundle implements Enumeration<String> {
+	/**
+	 * HV-102
+	 */
+	@Test
+	public void testRecursiveMessageInterpoliation() {
+		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
+		descriptor.setValue( "message", "{replace.in.user.bundle1}" );
+		descriptor.setValue( "value", 10l);
+		Max max = AnnotationFactory.create( descriptor );
+
+
+		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
+				max, new Class<?>[] { }, new ConstraintHelper()
+		);
+
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+
+		String expected = "{replace.in.default.bundle2}";
+		String actual = interpolator.interpolate( max.message(), constraintDescriptor, null );
+		assertEquals( "Within default bundle replacement parameter evauation should not be recursive!", expected, actual );
+	}
+
+	/**
+	 * A dummy resource bundle which can be passed to the constructor of ResourceBundleMessageInterpolator to replace
+	 * the user specified resource bundle.
+	 */
+	class TestResourceBundle extends ResourceBundle implements Enumeration<String> {
 		private Map<String, String> testResources;
 		Iterator<String> iter;
 
-		public TestResources() {
+		public TestResourceBundle() {
 			testResources = new HashMap<String, String>();
 			// add some test messages
 			testResources.put( "foo", "replacement worked" );
+			testResources.put( "replace.in.user.bundle1", "{replace.in.user.bundle2}" );
+			testResources.put( "replace.in.user.bundle2", "{replace.in.default.bundle1}" );
 
 			iter = testResources.keySet().iterator();
 		}
