@@ -19,6 +19,7 @@ package org.hibernate.validation.constraints;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
 
 /**
  * Check that a string's length is between min and max.
@@ -33,6 +34,7 @@ public class LengthValidator implements ConstraintValidator<Length, String> {
 	public void initialize(Length parameters) {
 		min = parameters.min();
 		max = parameters.max();
+		validateParameters();
 	}
 
 	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
@@ -43,4 +45,15 @@ public class LengthValidator implements ConstraintValidator<Length, String> {
 		return length >= min && length <= max;
 	}
 
+	private void validateParameters() {
+		if ( min < 0 ) {
+			throw new ValidationException( "The min parameter cannot be negative." );
+		}
+		if ( max < 0 ) {
+			throw new ValidationException( "The max paramter cannot be negative." );
+		}
+		if ( max < min ) {
+			throw new ValidationException( "The length cannot be negative." );
+		}
+	}
 }

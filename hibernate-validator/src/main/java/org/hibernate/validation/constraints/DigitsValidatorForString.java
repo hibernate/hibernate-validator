@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -20,6 +20,7 @@ package org.hibernate.validation.constraints;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Digits;
 
 /**
@@ -28,7 +29,6 @@ import javax.validation.constraints.Digits;
  *
  * @author Alaa Nassef
  * @author Hardy Ferentschik
- *
  */
 public class DigitsValidatorForString implements ConstraintValidator<Digits, String> {
 
@@ -38,6 +38,7 @@ public class DigitsValidatorForString implements ConstraintValidator<Digits, Str
 	public void initialize(Digits constraintAnnotation) {
 		this.maxIntegerLength = constraintAnnotation.integer();
 		this.maxFractionLength = constraintAnnotation.fraction();
+		validateParameters();
 	}
 
 	public boolean isValid(String str, ConstraintValidatorContext constraintValidatorContext) {
@@ -52,7 +53,7 @@ public class DigitsValidatorForString implements ConstraintValidator<Digits, Str
 		}
 
 		int integerPartLength = bigNum.precision() - bigNum.scale();
-		int fractionPartLength = bigNum.scale() < 0 ? 0 : bigNum.scale() ;
+		int fractionPartLength = bigNum.scale() < 0 ? 0 : bigNum.scale();
 
 		return ( maxIntegerLength >= integerPartLength && maxFractionLength >= fractionPartLength );
 	}
@@ -66,5 +67,14 @@ public class DigitsValidatorForString implements ConstraintValidator<Digits, Str
 			return null;
 		}
 		return bd;
+	}
+
+	private void validateParameters() {
+		if ( maxIntegerLength < 0 ) {
+			throw new ValidationException( "The length of the interger part cannot be negative." );
+		}
+		if ( maxFractionLength < 0 ) {
+			throw new ValidationException( "The length of the fraction part cannot be negative." );
+		}
 	}
 }

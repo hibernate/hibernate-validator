@@ -17,11 +17,11 @@
 */
 package org.hibernate.validation.constraints;
 
+import javax.validation.ValidationException;
 import javax.validation.constraints.Pattern;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
@@ -32,26 +32,31 @@ import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
  */
 public class PatternValidatorTest {
 
-	private static PatternValidator constraint;
-
-	@BeforeClass
-	public static void init() {
-
-		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor( Pattern.class );
+	@Test
+	public void testIsValid() {
+		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		descriptor.setValue( "regexp", "foobar" );
 		descriptor.setValue( "message", "{validator.pattern}" );
 		Pattern p = AnnotationFactory.create( descriptor );
 
-		constraint = new PatternValidator();
+		PatternValidator constraint = new PatternValidator();
 		constraint.initialize( p );
-	}
 
-	@Test
-	public void testIsValid() {
 
 		assertTrue( constraint.isValid( null, null ) );
 		assertFalse( constraint.isValid( "", null ) );
 		assertFalse( constraint.isValid( "bla bla", null ) );
 		assertFalse( constraint.isValid( "This test is not foobar", null ) );
+	}
+
+	@Test(expected = ValidationException.class)
+	public void testInvalidRegularExpression() {
+		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
+		descriptor.setValue( "regexp", "(unbalanced parentheses" );
+		descriptor.setValue( "message", "{validator.pattern}" );
+		Pattern p = AnnotationFactory.create( descriptor );
+
+		PatternValidator constraint = new PatternValidator();
+		constraint.initialize( p );
 	}
 }

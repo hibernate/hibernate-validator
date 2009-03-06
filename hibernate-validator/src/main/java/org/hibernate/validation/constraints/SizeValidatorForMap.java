@@ -20,6 +20,7 @@ package org.hibernate.validation.constraints;
 import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Size;
 
 /**
@@ -34,6 +35,7 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
 	public void initialize(Size parameters) {
 		min = parameters.min();
 		max = parameters.max();
+		validateParameters();
 	}
 
 	/**
@@ -52,5 +54,17 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
 		}
 		int size = map.size();
 		return size >= min && size <= max;
+	}
+
+	private void validateParameters() {
+		if ( min < 0 ) {
+			throw new ValidationException( "The min parameter cannot be negative." );
+		}
+		if ( max < 0 ) {
+			throw new ValidationException( "The max paramter cannot be negative." );
+		}
+		if ( max < min ) {
+			throw new ValidationException( "The length cannot be negative." );
+		}
 	}
 }

@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.constraints;
 
+import javax.validation.ValidationException;
 import javax.validation.constraints.Digits;
 
 import static org.junit.Assert.assertFalse;
@@ -37,7 +38,7 @@ public class DigitsValidatorForStringTest {
 	@BeforeClass
 	public static void init() {
 
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor( Digits.class );
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
 		descriptor.setValue( "integer", 5 );
 		descriptor.setValue( "fraction", 2 );
 		descriptor.setValue( "message", "{validator.digits}" );
@@ -59,5 +60,31 @@ public class DigitsValidatorForStringTest {
 		assertFalse( constraint.isValid( "", null ) );
 		assertFalse( constraint.isValid( "256874.0", null ) );
 		assertFalse( constraint.isValid( "12.0001", null ) );
+	}
+
+	@Test(expected = ValidationException.class)
+	public void testNegativeIntegerLength() {
+
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
+		descriptor.setValue( "integer", -1 );
+		descriptor.setValue( "fraction", 1 );
+		descriptor.setValue( "message", "{validator.digits}" );
+		Digits p = AnnotationFactory.create( descriptor );
+
+		DigitsValidatorForString constraint = new DigitsValidatorForString();
+		constraint.initialize( p );
+	}
+
+	@Test(expected = ValidationException.class)
+	public void testNegativeFractionLength() {
+
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
+		descriptor.setValue( "integer", 1 );
+		descriptor.setValue( "fraction", -1 );
+		descriptor.setValue( "message", "{validator.digits}" );
+		Digits p = AnnotationFactory.create( descriptor );
+
+		DigitsValidatorForString constraint = new DigitsValidatorForString();
+		constraint.initialize( p );
 	}
 }

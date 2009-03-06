@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -20,6 +20,7 @@ package org.hibernate.validation.constraints;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Digits;
 
 /**
@@ -28,7 +29,6 @@ import javax.validation.constraints.Digits;
  *
  * @author Alaa Nassef
  * @author Hardy Ferentschik
- * @todo Implement exception handling in initalize once exception behaviour is specified BVAL-117
  */
 public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Number> {
 
@@ -38,6 +38,7 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 	public void initialize(Digits constraintAnnotation) {
 		this.maxIntegerLength = constraintAnnotation.integer();
 		this.maxFractionLength = constraintAnnotation.fraction();
+		validateParameters();
 	}
 
 	public boolean isValid(Number num, ConstraintValidatorContext constraintValidatorContext) {
@@ -50,13 +51,22 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 		if ( num instanceof BigDecimal ) {
 			bigNum = ( BigDecimal ) num;
 		}
-		else  {
+		else {
 			bigNum = new BigDecimal( num.toString() );
 		}
 
 		int integerPartLength = bigNum.precision() - bigNum.scale();
-		int fractionPartLength = bigNum.scale() < 0 ? 0 : bigNum.scale() ;
+		int fractionPartLength = bigNum.scale() < 0 ? 0 : bigNum.scale();
 
 		return ( maxIntegerLength >= integerPartLength && maxFractionLength >= fractionPartLength );
+	}
+
+	private void validateParameters() {
+		if ( maxIntegerLength < 0 ) {
+			throw new ValidationException( "The length of the interger part cannot be negative." );
+		}
+		if ( maxFractionLength < 0 ) {
+			throw new ValidationException( "The length of the fraction part cannot be negative." );
+		}
 	}
 }

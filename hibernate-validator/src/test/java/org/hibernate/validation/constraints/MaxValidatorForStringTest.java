@@ -21,9 +21,8 @@ import javax.validation.constraints.Max;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
@@ -37,7 +36,7 @@ public class MaxValidatorForStringTest {
 
 	@BeforeClass
 	public static void init() {
-		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor( Max.class );
+		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
 		descriptor.setValue( "value", 15l );
 		descriptor.setValue( "message", "{validator.max}" );
 		Max m = AnnotationFactory.create( descriptor );

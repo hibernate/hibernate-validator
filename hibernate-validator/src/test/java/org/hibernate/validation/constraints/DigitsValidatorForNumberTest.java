@@ -18,6 +18,7 @@
 package org.hibernate.validation.constraints;
 
 import java.math.BigDecimal;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Digits;
 
 import static org.junit.Assert.assertFalse;
@@ -36,7 +37,7 @@ public class DigitsValidatorForNumberTest {
 	@Test
 	public void testIsValid() {
 
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor( Digits.class );
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
 		descriptor.setValue( "integer", 5 );
 		descriptor.setValue( "fraction", 2 );
 		descriptor.setValue( "message", "{validator.digits}" );
@@ -64,7 +65,7 @@ public class DigitsValidatorForNumberTest {
 	@Test
 	public void testIsValidZeroLength() {
 
-		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor( Digits.class );
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
 		descriptor.setValue( "integer", 0 );
 		descriptor.setValue( "fraction", 0 );
 		descriptor.setValue( "message", "{validator.digits}" );
@@ -79,4 +80,29 @@ public class DigitsValidatorForNumberTest {
 		assertFalse( constraint.isValid( Double.valueOf( "500.2" ), null ) );
 	}
 
+	@Test(expected = ValidationException.class)
+	public void testNegativeIntegerLength() {
+
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
+		descriptor.setValue( "integer", -1 );
+		descriptor.setValue( "fraction", 1 );
+		descriptor.setValue( "message", "{validator.digits}" );
+		Digits p = AnnotationFactory.create( descriptor );
+
+		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
+		constraint.initialize( p );
+	}
+
+	@Test(expected = ValidationException.class)
+	public void testNegativeFractionLength() {
+
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
+		descriptor.setValue( "integer", 1 );
+		descriptor.setValue( "fraction", -1 );
+		descriptor.setValue( "message", "{validator.digits}" );
+		Digits p = AnnotationFactory.create( descriptor );
+
+		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
+		constraint.initialize( p );
+	}
 }
