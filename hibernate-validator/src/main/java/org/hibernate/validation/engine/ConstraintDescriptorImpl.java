@@ -151,7 +151,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * {@inheritDoc}
 	 */
 	public Set<Class<?>> getGroups() {
-		return groups;
+		return Collections.unmodifiableSet( groups );
 	}
 
 	/**
@@ -165,14 +165,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * {@inheritDoc}
 	 */
 	public Map<String, Object> getParameters() {
-		return parameters;
+		return Collections.unmodifiableMap(parameters);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
-		return composingConstraints;
+		return Collections.unmodifiableSet(composingConstraints);
 	}
 
 	/**
