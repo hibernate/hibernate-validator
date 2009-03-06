@@ -17,11 +17,7 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import javax.validation.ConstraintDescriptor;
-import javax.validation.ElementDescriptor;
+import javax.validation.PropertyDescriptor;
 
 /**
  * Describe a validated element (class, field or property).
@@ -29,33 +25,28 @@ import javax.validation.ElementDescriptor;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ElementDescriptorImpl implements ElementDescriptor {
-	private final Class<?> type;
-	private final Set<ConstraintDescriptor<?>> constraintDescriptors = new HashSet<ConstraintDescriptor<?>>();
+public class PropertyDescriptorImpl extends ElementDescriptorImpl implements PropertyDescriptor {
+	private final boolean cascaded;
+	private final String property;
 
-	public ElementDescriptorImpl(Class<?> type) {
-		this.type = type;
-	}
 
-	public void addConstraintDescriptor(ConstraintDescriptorImpl constraintDescriptor) {
-		constraintDescriptors.add( constraintDescriptor );
-	}
-
-	public boolean hasConstraints() {
-		return constraintDescriptors.size() != 0;
+	public PropertyDescriptorImpl(Class<?> returnType, boolean cascaded, String property) {
+		super( returnType );
+		this.cascaded = cascaded;
+		this.property = property;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<?> getType() {
-		return type;
+	public boolean isCascaded() {
+		return cascaded;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
-		return Collections.unmodifiableSet( constraintDescriptors );
+	public String getPropertyName() {
+		return property;
 	}
 }

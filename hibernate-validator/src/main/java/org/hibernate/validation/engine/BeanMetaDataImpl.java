@@ -18,14 +18,17 @@
 package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.validation.BeanDescriptor;
 import javax.validation.GroupSequence;
 import javax.validation.PropertyDescriptor;
@@ -155,7 +158,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					defaultGroupSequence.add( Default.class );
 				}
 				else if ( group.getName().equals( Default.class.getName() ) ) {
-				   throw new ValidationException( "'Default.class' cannot appear in default group sequence list." );
+					throw new ValidationException( "'Default.class' cannot appear in default group sequence list." );
 				}
 				else {
 					defaultGroupSequence.add( group );
@@ -171,17 +174,21 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private <A extends Annotation >void initFieldConstraints(Class clazz) {
+	private <A extends Annotation> void initFieldConstraints(Class clazz) {
 		for ( Field field : clazz.getDeclaredFields() ) {
 			List<ConstraintDescriptorImpl> fieldMetadata = findFieldLevelConstraints( field );
 			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
 				ReflectionHelper.setAccessibility( field );
-				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( field, beanClass, constraintDescription );
+				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
+						field, beanClass, constraintDescription
+				);
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
 				ReflectionHelper.setAccessibility( field );
+				String name = field.getName();
 				cascadedFields.add( field );
+				addPropertyDescriptorForMember( field );
 			}
 		}
 	}
@@ -191,14 +198,33 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			List<ConstraintDescriptorImpl> methodMetadata = findMethodLevelConstraints( method );
 			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
 				ReflectionHelper.setAccessibility( method );
-				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( method, beanClass, constraintDescription );
+				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
+						method, beanClass, constraintDescription
+				);
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
 				ReflectionHelper.setAccessibility( method );
 				cascadedMethods.add( method );
+				addPropertyDescriptorForMember( method );
 			}
 		}
+	}
+
+	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member) {
+		String name = ReflectionHelper.getPropertyName( member );
+		PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
+				name
+		);
+		if ( propertyDescriptor == null ) {
+			propertyDescriptor = new PropertyDescriptorImpl(
+					ReflectionHelper.getType( member ),
+					( ( AnnotatedElement ) member ).isAnnotationPresent( Valid.class ),
+					name
+			);
+			propertyDescriptors.put( name, propertyDescriptor );
+		}
+		return propertyDescriptor;
 	}
 
 	private <A extends Annotation> void initClassConstraints(Class clazz) {
@@ -282,16 +308,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						"Annotated methods must follow the JavaBeans naming convention. " + method.getName() + "() does not."
 				);
 			}
-			ElementDescriptorImpl elementDescriptor = ( ElementDescriptorImpl ) propertyDescriptors.get( methodName );
-			if ( elementDescriptor == null ) {
-				elementDescriptor = new ElementDescriptorImpl(
-						method.getReturnType(),
-						method.isAnnotationPresent( Valid.class ),
-						methodName
-				);
-				propertyDescriptors.put( methodName, elementDescriptor );
+			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get( methodName );
+			if ( propertyDescriptor == null ) {
+				propertyDescriptor = addPropertyDescriptorForMember( method );
 			}
-			elementDescriptor.addConstraintDescriptor( constraintDescriptor );
+			propertyDescriptor.addConstraintDescriptor( constraintDescriptor );
 		}
 		return metadata;
 	}
@@ -312,16 +333,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		String fieldName = field.getName();
 		for ( ConstraintDescriptorImpl constraintDescriptor : metadata ) {
-			ElementDescriptorImpl elementDescriptor = ( ElementDescriptorImpl ) propertyDescriptors.get( fieldName );
-			if ( elementDescriptor == null ) {
-				elementDescriptor = new ElementDescriptorImpl(
-						field.getType(),
-						field.isAnnotationPresent( Valid.class ),
-						fieldName
-				);
-				propertyDescriptors.put( field.getName(), elementDescriptor );
+			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get( fieldName );
+			if ( propertyDescriptor == null ) {
+				propertyDescriptor = addPropertyDescriptorForMember( field );
 			}
-			elementDescriptor.addConstraintDescriptor( constraintDescriptor );
+			propertyDescriptor.addConstraintDescriptor( constraintDescriptor );
 		}
 		return metadata;
 	}
@@ -353,15 +369,15 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return metaConstraintList;
 	}
 
-	public Map<String, PropertyDescriptor> getPropertyDescriptors() {
-		return propertyDescriptors;
-	}
-
-	public PropertyDescriptor getPropertyDescriptors(String property) {
+	public PropertyDescriptor getPropertyDescriptor(String property) {
 		return propertyDescriptors.get( property );
 	}
 
 	public List<Class<?>> getDefaultGroupSequence() {
 		return defaultGroupSequence;
+	}
+
+	public Set<String> getConstrainedProperties() {
+		return Collections.unmodifiableSet( propertyDescriptors.keySet() );
 	}
 }

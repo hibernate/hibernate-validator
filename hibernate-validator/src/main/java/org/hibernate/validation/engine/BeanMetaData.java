@@ -21,9 +21,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.validation.BeanDescriptor;
-import javax.validation.ElementDescriptor;
 import javax.validation.PropertyDescriptor;
 
 /**
@@ -70,12 +69,18 @@ public interface BeanMetaData<T> {
 	List<MetaConstraint<T, ?>> geMetaConstraintList();
 
 	/**
-	 * @return A map keying the property name of a constraint to its <code>ElementDescriptor</code>.
+	 * Return <code>PropertyDescriptor</code> for the given property.
 	 *
-	 * @todo Maybe needs to be removed since this data structure is ambigious. There could be conflicts between field and
-	 * methods.
+	 * @param property the property for which to retrieve the descriptor.
+	 *
+	 * @return Returns the <code>PropertyDescriptor</code> for the given property or <code>null</code> in case the
+	 *         property does not have a descriptor.
 	 */
-	Map<String, PropertyDescriptor> getPropertyDescriptors();
+	PropertyDescriptor getPropertyDescriptor(String property);
 
-	ElementDescriptor getPropertyDescriptors(String property);
+	/**
+	 * @return the property names having at least one constraint defined or which are marked
+	 *         as cascaded (@Valid).
+	 */
+	Set<String> getConstrainedProperties();
 }
