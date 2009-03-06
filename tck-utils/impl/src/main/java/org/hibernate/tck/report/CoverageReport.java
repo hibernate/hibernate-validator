@@ -412,14 +412,7 @@ public class CoverageReport {
           
        }
        
-       if (odd)
-       {
-          sb.append("<tr style=\"background-color:#f7f7f7\">");
-       }
-       else
-       {
-          sb.append("<tr style=\"font-weight: bold;background-color:#dddddd\">");
-       } 
+       sb.append("<tr style=\"font-weight: bold;background-color:#dddddd\">");
        
        sb.append("<td>");
        sb.append("Total");
