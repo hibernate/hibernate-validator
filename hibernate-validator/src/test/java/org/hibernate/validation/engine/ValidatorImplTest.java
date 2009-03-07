@@ -39,7 +39,6 @@ import org.hibernate.validation.eg.Customer;
 import org.hibernate.validation.eg.Engine;
 import org.hibernate.validation.eg.Order;
 import org.hibernate.validation.eg.Person;
-import org.hibernate.validation.eg.UnconstraintEntity;
 import org.hibernate.validation.eg.groups.First;
 import org.hibernate.validation.eg.groups.Last;
 import org.hibernate.validation.eg.groups.Second;
@@ -59,7 +58,8 @@ public class ValidatorImplTest {
 	@Test
 	public void testWrongMethodName() {
 		try {
-			TestUtil.getValidator().getConstraintsForClass( Boy.class ).hasConstraints();
+			Boy boy = new Boy();
+			TestUtil.getValidator().validate( boy );
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -74,28 +74,6 @@ public class ValidatorImplTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullParamterToValidatorImplConstructor() {
 		TestUtil.getValidator().getConstraintsForClass( null );
-	}
-
-	@Test
-	public void testUnconstraintClass() {
-		Validator validator = TestUtil.getValidator();
-		assertTrue(
-				"There should be no constraints",
-				!validator.getConstraintsForClass( UnconstraintEntity.class ).hasConstraints()
-		);
-	}
-
-	@Test
-	public void testHasConstraintsAndIsBeanConstrained() {
-		Validator validator = TestUtil.getValidator();
-		assertTrue(
-				"There should not be constraints", !validator.getConstraintsForClass( Customer.class ).hasConstraints()
-		);
-		assertTrue(
-				"It should be constrainted", validator.getConstraintsForClass( Customer.class ).isBeanConstrained()
-		);
-		// TODO fix test
-//		assertTrue( "It should be constrainted even if it has no constraint annotations - not implemented yet", validator.getConstraintsForClass( Account.class ).isBeanConstrained() );
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -433,28 +411,6 @@ public class ValidatorImplTest {
 		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
 	}
 
-	/**
-	 * HV-120
-	 */
-	@Test
-	public void testConstraintDescriptorWithoutExplicitGroup() {
-		Validator validator = TestUtil.getValidator();
-
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
-		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
-		Set<ConstraintDescriptor<?>> descriptors = propertyDescriptor.getConstraintDescriptors();
-
-		assertEquals( "There should be only one constraint descriptor", 1, descriptors.size() );
-		ConstraintDescriptor descriptor = descriptors.iterator().next();
-		Set<Class<?>> groups = descriptor.getGroups();
-		assertTrue( "There should be only one group", groups.size() == 1 );
-		assertEquals(
-				"The declared constraint does not explicitly define a group, hence Default is expected",
-				Default.class,
-				groups.iterator().next()
-		);
-	}
-
 	@Test
 	public void testObjectTraversion() {
 		Validator validator = TestUtil.getValidator();
@@ -472,5 +428,27 @@ public class ValidatorImplTest {
 				customer, Default.class, First.class, Second.class, Last.class
 		);
 		assertEquals( "Wrong number of constraints", 100, constraintViolations.size() );
+	}
+
+	/**
+	 * HV-120
+	 */
+	@Test
+	public void testConstraintDescriptorWithoutExplicitGroup() {
+		Validator validator = TestUtil.getValidator();
+
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
+		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
+		Set<ConstraintDescriptor<?>> descriptors = propertyDescriptor.getConstraintDescriptors();
+
+		assertEquals( "There should be only one constraint descriptor", 1, descriptors.size() );
+		ConstraintDescriptor<?> descriptor = descriptors.iterator().next();
+		Set<Class<?>> groups = descriptor.getGroups();
+		assertTrue( "There should be only one group", groups.size() == 1 );
+		assertEquals(
+				"The declared constraint does not explicitly define a group, hence Default is expected",
+				Default.class,
+				groups.iterator().next()
+		);
 	}
 }

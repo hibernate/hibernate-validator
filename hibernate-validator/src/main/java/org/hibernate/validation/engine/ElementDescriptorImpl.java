@@ -41,6 +41,9 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		constraintDescriptors.add( constraintDescriptor );
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean hasConstraints() {
 		return constraintDescriptors.size() != 0;
 	}

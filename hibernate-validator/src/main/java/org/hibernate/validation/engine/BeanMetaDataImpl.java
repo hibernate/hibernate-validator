@@ -104,7 +104,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * for this validator and create meta data.
 	 */
 	private void createMetaData() {
-		beanDescriptor = new BeanDescriptorImpl<T>( beanClass, this );
+		beanDescriptor = new BeanDescriptorImpl<T>( this );
 		initDefaultGroupSequence( beanClass );
 		List<Class> classes = new ArrayList<Class>();
 		computeClassHierarchy( beanClass, classes );

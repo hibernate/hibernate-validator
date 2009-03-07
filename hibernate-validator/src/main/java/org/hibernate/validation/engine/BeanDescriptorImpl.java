@@ -11,8 +11,8 @@ import javax.validation.PropertyDescriptor;
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
 	private final BeanMetaData<T> metadataBean;
 
-	public BeanDescriptorImpl(Class<T> returnType, BeanMetaData<T> metadataBean) {
-		super( returnType );
+	public BeanDescriptorImpl(BeanMetaData<T> metadataBean) {
+		super( metadataBean.getBeanClass() );
 		this.metadataBean = metadataBean;
 	}
 
