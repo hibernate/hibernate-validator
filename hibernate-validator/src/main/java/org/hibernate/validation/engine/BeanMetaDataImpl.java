@@ -176,7 +176,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private <A extends Annotation> void initFieldConstraints(Class clazz) {
 		for ( Field field : clazz.getDeclaredFields() ) {
-			List<ConstraintDescriptorImpl> fieldMetadata = findFieldLevelConstraints( field );
+			List<ConstraintDescriptorImpl> fieldMetadata = findConstraints( field );
 			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
 				ReflectionHelper.setAccessibility( field );
 				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
@@ -186,7 +186,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
 				ReflectionHelper.setAccessibility( field );
-				String name = field.getName();
 				cascadedFields.add( field );
 				addPropertyDescriptorForMember( field );
 			}
@@ -195,7 +194,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private <A extends Annotation> void initMethodConstraints(Class clazz) {
 		for ( Method method : clazz.getDeclaredMethods() ) {
-			List<ConstraintDescriptorImpl> methodMetadata = findMethodLevelConstraints( method );
+			List<ConstraintDescriptorImpl> methodMetadata = findConstraints( method );
 			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
 				ReflectionHelper.setAccessibility( method );
 				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
@@ -238,12 +237,13 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Examines the given annotation to see whether it is a single or multi valued constraint annotation.
 	 *
+	 * @param clazz the class we are currently processing.
 	 * @param annotation The annotation to examine.
 	 *
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
 	 *         single nor multi value annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl> findConstraintAnnotations(A annotation) {
+	private <A extends Annotation> List<ConstraintDescriptorImpl> findConstraintAnnotations(Class<?> clazz, A annotation) {
 		List<ConstraintDescriptorImpl> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl>();
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
@@ -256,16 +256,23 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		constraints.addAll( constraintHelper.getMultiValueConstraints( annotation ) );
 
 		for ( Annotation constraint : constraints ) {
-			final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( constraint );
+			final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( clazz, constraint );
 			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(A annotation) {
+	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(Class<?> clazz, A annotation) {
 		Class<?>[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
-		return new ConstraintDescriptorImpl( annotation, groups, constraintHelper );
+		ConstraintDescriptorImpl constraintDescriptor;
+		if ( clazz.isInterface() ) {
+			constraintDescriptor = new ConstraintDescriptorImpl( annotation, groups, constraintHelper, clazz );
+		}
+		else {
+			constraintDescriptor = new ConstraintDescriptorImpl( annotation, groups, constraintHelper );
+		}
+		return constraintDescriptor;
 	}
 
 	/**
@@ -276,10 +283,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified on the given class.
 	 */
-	private List<ConstraintDescriptorImpl> findClassLevelConstraints(Class beanClass) {
+	private List<ConstraintDescriptorImpl> findClassLevelConstraints(Class<?> beanClass) {
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
 		for ( Annotation annotation : beanClass.getAnnotations() ) {
-			metadata.addAll( findConstraintAnnotations( annotation ) );
+			metadata.addAll( findConstraintAnnotations( beanClass, annotation ) );
 		}
 		for ( ConstraintDescriptorImpl constraintDescriptor : metadata ) {
 			beanDescriptor.addConstraintDescriptor( constraintDescriptor );
@@ -287,55 +294,33 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return metadata;
 	}
 
+
 	/**
-	 * Finds all constraint annotations defined for the given methods and returns them in a list of
+	 * Finds all constraint annotations defined for the given field/method and returns them in a list of
 	 * constraint descriptors.
 	 *
-	 * @param method The method to check for constraints annotations.
+	 * @param member The fiels or method to check for constraints annotations.
 	 *
-	 * @return A list of constraint descriptors for all constraint specified for the given method.
+	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
 	 */
-	private List<ConstraintDescriptorImpl> findMethodLevelConstraints(Method method) {
+	private List<ConstraintDescriptorImpl> findConstraints(Member member) {
+		assert member instanceof Field || member instanceof Method;
+
 		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
-		for ( Annotation annotation : method.getAnnotations() ) {
-			metadata.addAll( findConstraintAnnotations( annotation ) );
+		for ( Annotation annotation : ( ( AnnotatedElement ) member ).getAnnotations() ) {
+			metadata.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation ) );
 		}
 
-		String methodName = ReflectionHelper.getPropertyName( method );
+		String name = ReflectionHelper.getPropertyName( member );
 		for ( ConstraintDescriptorImpl constraintDescriptor : metadata ) {
-			if ( methodName == null ) {
+			if ( member instanceof Method && name == null ) { // can happen if member is a Method which does not follow the bean convention
 				throw new ValidationException(
-						"Annotated methods must follow the JavaBeans naming convention. " + method.getName() + "() does not."
+						"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
 				);
 			}
-			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get( methodName );
+			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get( name );
 			if ( propertyDescriptor == null ) {
-				propertyDescriptor = addPropertyDescriptorForMember( method );
-			}
-			propertyDescriptor.addConstraintDescriptor( constraintDescriptor );
-		}
-		return metadata;
-	}
-
-	/**
-	 * Finds all constraint annotations defined for the given field and returns them in a list of
-	 * constraint descriptors.
-	 *
-	 * @param field The field to check for constraints annotations.
-	 *
-	 * @return A list of constraint descriptors for all constraint specified on the given field.
-	 */
-	private List<ConstraintDescriptorImpl> findFieldLevelConstraints(Field field) {
-		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
-		for ( Annotation annotation : field.getAnnotations() ) {
-			metadata.addAll( findConstraintAnnotations( annotation ) );
-		}
-
-		String fieldName = field.getName();
-		for ( ConstraintDescriptorImpl constraintDescriptor : metadata ) {
-			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get( fieldName );
-			if ( propertyDescriptor == null ) {
-				propertyDescriptor = addPropertyDescriptorForMember( field );
+				propertyDescriptor = addPropertyDescriptorForMember( member );
 			}
 			propertyDescriptor.addConstraintDescriptor( constraintDescriptor );
 		}

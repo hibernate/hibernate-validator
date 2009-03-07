@@ -96,6 +96,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final ConstraintHelper constraintHelper;
 
+	public ConstraintDescriptorImpl(T annotation, Class<?>[] groups, ConstraintHelper constraintHelper, Class<?> implicitGroup) {
+		this( annotation, groups, constraintHelper );
+		this.groups.add( implicitGroup );
+	}
+
 	public ConstraintDescriptorImpl(T annotation, Class<?>[] groups, ConstraintHelper constraintHelper) {
 		this( annotation, new HashSet<Class<?>>(), constraintHelper );
 		if ( groups.length == 0 ) {
@@ -127,14 +132,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		else {
 			//TODO are we sure a @Constraint is there?
 			final Class<? extends Annotation> annotationType = annotation.annotationType();
-			Class<? extends ConstraintValidator<?,?>>[] validatedBy = annotationType
+			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
 					.getAnnotation( Constraint.class )
 					.validatedBy();
-			for (Class<? extends ConstraintValidator<?,?>> validator : validatedBy) {
+			for ( Class<? extends ConstraintValidator<?, ?>> validator : validatedBy ) {
 				//FIXME does this create a CCE at runtime?
 				//FIXME if yes wrap into VE, if no we need to test the type here
 				//Once resolved,we can @SuppressWarning("unchecked") on the cast
-				Class<? extends ConstraintValidator<T,?>> safeValidator = (Class<? extends ConstraintValidator<T,?>>) validator;
+				Class<? extends ConstraintValidator<T, ?>> safeValidator = ( Class<? extends ConstraintValidator<T, ?>> ) validator;
 				constraintClasses.add( safeValidator );
 			}
 		}
@@ -165,14 +170,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * {@inheritDoc}
 	 */
 	public Map<String, Object> getParameters() {
-		return Collections.unmodifiableMap(parameters);
+		return Collections.unmodifiableMap( parameters );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
-		return Collections.unmodifiableSet(composingConstraints);
+		return Collections.unmodifiableSet( composingConstraints );
 	}
 
 	/**
@@ -259,7 +264,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		for ( Annotation declaredAnnotation : annotation.annotationType().getDeclaredAnnotations() ) {
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotation )
 					|| constraintHelper.isBuiltinConstraint( declaredAnnotation ) ) {
-				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor( declaredAnnotation, OVERRIDES_PARAMETER_DEFAULT_INDEX );
+				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
+						declaredAnnotation, OVERRIDES_PARAMETER_DEFAULT_INDEX
+				);
 				composingConstraints.add( descriptor );
 				log.debug( "Adding composing constraint: " + descriptor );
 			}
@@ -268,7 +275,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				int index = 1;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
-						constraintAnnotation, index
+							constraintAnnotation, index
 					);
 					composingConstraints.add( descriptor );
 					log.debug( "Adding composing constraint: " + descriptor );
@@ -282,12 +289,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		//TODO don't quite understand this warning
 		//TODO assuming U.getClass() returns Class<U>
 		@SuppressWarnings("unchecked")
-		final Class<U> annotationType = (Class<U>) declaredAnnotation.annotationType();
+		final Class<U> annotationType = ( Class<U> ) declaredAnnotation.annotationType();
 		return createComposingConstraintDescriptor(
-						index,
-						declaredAnnotation,
-						annotationType
-				);
+				index,
+				declaredAnnotation,
+				annotationType
+		);
 	}
 
 	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(int index, U constraintAnnotation, Class<U> annotationType) {

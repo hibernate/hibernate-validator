@@ -18,11 +18,13 @@
 package org.hibernate.validation.engine.groups;
 
 import java.util.Set;
+import javax.validation.BeanDescriptor;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -344,7 +346,11 @@ public class GroupTest {
 				1,
 				constraintViolations.size()
 		);
-		assertEquals( "Wrong constraint", "length must be between 2 and 20", constraintViolations.iterator().next().getMessage() );
+		assertEquals(
+				"Wrong constraint",
+				"length must be between 2 and 20",
+				constraintViolations.iterator().next().getMessage()
+		);
 
 		constraintViolations = validator.validateProperty( car, "type" );
 		assertEquals(
@@ -352,7 +358,11 @@ public class GroupTest {
 				1,
 				constraintViolations.size()
 		);
-		assertEquals( "Wrong constraint", "length must be between 2 and 20", constraintViolations.iterator().next().getMessage() );
+		assertEquals(
+				"Wrong constraint",
+				"length must be between 2 and 20",
+				constraintViolations.iterator().next().getMessage()
+		);
 
 		constraintViolations = validator.validateValue( Car.class, "type", "A" );
 		assertEquals(
@@ -360,7 +370,11 @@ public class GroupTest {
 				1,
 				constraintViolations.size()
 		);
-		assertEquals( "Wrong constraint", "length must be between 2 and 20", constraintViolations.iterator().next().getMessage() );
+		assertEquals(
+				"Wrong constraint",
+				"length must be between 2 and 20",
+				constraintViolations.iterator().next().getMessage()
+		);
 	}
 
 	/**
@@ -379,5 +393,26 @@ public class GroupTest {
 					"Wrong message", "'Default.class' cannot appear in default group sequence list.", e.getMessage()
 			);
 		}
+	}
+
+	/**
+	 * HV-115
+	 */
+	@Test
+	public void testImplicitGroup() {
+		Validator validator = TestUtil.getValidator();
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
+		assertTrue( beanDescriptor.isBeanConstrained() );
+
+		Set<String> constraintProperties = beanDescriptor.getConstrainedProperties();
+		assertTrue( "Each of the properties should have at least one constraint.", constraintProperties.size() == 5 );
+
+		Order order = new Order();
+		Set<ConstraintViolation<Order>> violations = validator.validate( order );
+		assertTrue( "All 5 NotNull constraints should fail.", violations.size() == 5 );
+
+		// use implicit group Auditable
+		violations = validator.validate( order, Auditable.class );
+		assertTrue( "All 4 NotNull constraints on Auditable should fail.", violations.size() == 4 );
 	}
 }

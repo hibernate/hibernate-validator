@@ -142,6 +142,26 @@ public class ReflectionHelper {
 	}
 
 	/**
+	 * Returns the type of the field of return type of a method.
+	 *
+	 * @param member the member for which to get the type.
+	 *
+	 * @return Returns the type of the field of return type of a method.
+	 */
+	public static Class<?> getAnnotations(Member member) {
+
+		Class<?> type = null;
+		if ( member instanceof Field ) {
+			type = ( ( Field ) member ).getType();
+		}
+
+		if ( member instanceof Method ) {
+			type = ( ( Method ) member ).getReturnType();
+		}
+		return type;
+	}
+
+	/**
 	 * @param member The <code>Member</code> instance for which to retrieve the type.
 	 *
 	 * @return Retrurns the <code>Type</code> of the given <code>Field</code> or <code>Method</code>.
