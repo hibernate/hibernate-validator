@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -76,6 +76,9 @@ public class BeanDescriptorImplTest {
 		);
 
 		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( "foobar" ) );
+
+		// TODO Is this corect or should we get a IllegalArgumentException
+		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( null ) );
 
 		beanDescriptor = validator.getConstraintsForClass( Customer.class );
 		propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderList" );
