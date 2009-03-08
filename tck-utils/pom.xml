@@ -34,7 +34,7 @@
     </licenses>
 
     <scm>
-        <connection>scm:https://svn.jboss.org/repos/hibernate/validator/trunk/tck-utils</connection>
+        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk/tck-utils</connection>
     </scm>
 
     <developers>
