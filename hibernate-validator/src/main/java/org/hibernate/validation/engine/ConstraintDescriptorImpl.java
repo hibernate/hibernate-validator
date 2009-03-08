@@ -44,7 +44,7 @@ import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
 /**
- * Describe a single constraint.
+ * Describe a single constraint (including it's composing constraints).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -63,7 +63,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The set of classes implementing the validation for this constraint. See also
 	 * <code>ConstraintValidator</code> resolution algorithm.
 	 */
-	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintClasses = new ArrayList<Class<? extends ConstraintValidator<T, ?>>>();
+	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitonClasses = new ArrayList<Class<? extends ConstraintValidator<T, ?>>>();
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -80,11 +80,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The composing constraints for this constraints.
 	 */
 	private final Set<ConstraintDescriptor<?>> composingConstraints = new HashSet<ConstraintDescriptor<?>>();
-
-	/**
-	 * Override paramter values used for composing constraints.
-	 */
-	private final Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
 
 	/**
 	 * Flag indicating if in case of a composing constraint a single error or multiple errors should be raised.
@@ -119,18 +114,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				ReportAsSingleViolation.class
 		);
 
-
 		findConstraintClasses();
-		parseOverrideParameters();
-		parseComposingConstraints();
+		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
+		parseComposingConstraints( overrideParameters );
 	}
 
 	private void findConstraintClasses() {
 		if ( constraintHelper.isBuiltinConstraint( annotation ) ) {
-			constraintClasses.addAll( constraintHelper.getBuiltInConstraints( annotation ) );
+			constraintValidatorDefinitonClasses.addAll( constraintHelper.getBuiltInConstraints( annotation ) );
 		}
 		else {
-			//TODO are we sure a @Constraint is there?
 			final Class<? extends Annotation> annotationType = annotation.annotationType();
 			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
 					.getAnnotation( Constraint.class )
@@ -140,7 +133,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				//FIXME if yes wrap into VE, if no we need to test the type here
 				//Once resolved,we can @SuppressWarning("unchecked") on the cast
 				Class<? extends ConstraintValidator<T, ?>> safeValidator = ( Class<? extends ConstraintValidator<T, ?>> ) validator;
-				constraintClasses.add( safeValidator );
+				constraintValidatorDefinitonClasses.add( safeValidator );
 			}
 		}
 	}
@@ -163,7 +156,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * {@inheritDoc}
 	 */
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
-		return Collections.unmodifiableList( constraintClasses );
+		return Collections.unmodifiableList( constraintValidatorDefinitonClasses );
 	}
 
 	/**
@@ -191,7 +184,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	public String toString() {
 		return "ConstraintDescriptorImpl{" +
 				"annotation=" + annotation +
-				", constraintClasses=" + constraintClasses.toString() +
+				", constraintValidatorDefinitonClasses=" + constraintValidatorDefinitonClasses.toString() +
 				", groups=" + groups +
 				", parameters=" + parameters +
 				", composingConstraints=" + composingConstraints +
@@ -216,18 +209,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return Collections.unmodifiableMap( parameters );
 	}
 
-	private void addOverrideParameter(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Object value, OverridesParameter... parameters) {
-		for ( OverridesParameter parameter : parameters ) {
-			ClassIndexWrapper wrapper = new ClassIndexWrapper( parameter.constraint(), parameter.index() );
-			Map<String, Object> map = overrideParameters.get( wrapper );
-			if ( map == null ) {
-				map = new HashMap<String, Object>();
-				overrideParameters.put( wrapper, map );
-			}
-			map.put( parameter.parameter(), value );
-		}
-	}
-
 	private Object getMethodValue(Annotation annotation, Method m) {
 		Object value;
 		try {
@@ -243,7 +224,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return value;
 	}
 
-	private void parseOverrideParameters() {
+	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
+		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
 		for ( Method m : annotation.annotationType().getMethods() ) {
 			if ( m.getAnnotation( OverridesParameter.class ) != null ) {
 				addOverrideParameter(
@@ -258,14 +240,27 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				);
 			}
 		}
+		return overrideParameters;
 	}
 
-	private void parseComposingConstraints() {
+	private void addOverrideParameter(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Object value, OverridesParameter... parameters) {
+		for ( OverridesParameter parameter : parameters ) {
+			ClassIndexWrapper wrapper = new ClassIndexWrapper( parameter.constraint(), parameter.index() );
+			Map<String, Object> map = overrideParameters.get( wrapper );
+			if ( map == null ) {
+				map = new HashMap<String, Object>();
+				overrideParameters.put( wrapper, map );
+			}
+			map.put( parameter.parameter(), value );
+		}
+	}
+
+	private void parseComposingConstraints(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters) {
 		for ( Annotation declaredAnnotation : annotation.annotationType().getDeclaredAnnotations() ) {
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotation )
 					|| constraintHelper.isBuiltinConstraint( declaredAnnotation ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
-						declaredAnnotation, OVERRIDES_PARAMETER_DEFAULT_INDEX
+						declaredAnnotation, overrideParameters, OVERRIDES_PARAMETER_DEFAULT_INDEX
 				);
 				composingConstraints.add( descriptor );
 				log.debug( "Adding composing constraint: " + descriptor );
@@ -275,7 +270,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				int index = 1;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
-							constraintAnnotation, index
+							constraintAnnotation, overrideParameters, index
 					);
 					composingConstraints.add( descriptor );
 					log.debug( "Adding composing constraint: " + descriptor );
@@ -285,19 +280,20 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(U declaredAnnotation, int index) {
+	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(U declaredAnnotation, Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, int index) {
 		//TODO don't quite understand this warning
 		//TODO assuming U.getClass() returns Class<U>
 		@SuppressWarnings("unchecked")
 		final Class<U> annotationType = ( Class<U> ) declaredAnnotation.annotationType();
 		return createComposingConstraintDescriptor(
+				overrideParameters,
 				index,
 				declaredAnnotation,
 				annotationType
 		);
 	}
 
-	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(int index, U constraintAnnotation, Class<U> annotationType) {
+	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, int index, U constraintAnnotation, Class<U> annotationType) {
 		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<U>(
 				annotationType, getAnnotationParameters( constraintAnnotation )
 		);
