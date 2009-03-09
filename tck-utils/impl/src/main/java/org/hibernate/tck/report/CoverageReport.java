@@ -725,6 +725,13 @@ public class CoverageReport {
 
                 out.write(sb.toString().getBytes());
             }
+            else
+            {
+               // We still want to be able to jump to this section by clicking on the links
+               // in the chapter and section summaries
+               out.write(("<div style=\"visibility:hidden\" id=\"" + sectionId + "\"></div>\n").getBytes());                
+
+            }
         }
     }
     
