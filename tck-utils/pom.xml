@@ -3,7 +3,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>tck-utils</artifactId>
-    <version>0.9</version>
+    <version>0.9.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>TCK Test Coverage Utils</name>
 
@@ -31,7 +31,7 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/tags/tck-utils-0.9</connection>
+        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk/tck-utils</connection>
     </scm>
 
     <developers>
