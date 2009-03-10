@@ -273,7 +273,7 @@ public class CarTest {
 
         assertEquals(1, constraintViolations.size());
         assertEquals(
-            "may not be null", constraintViolations.iterator().next().getInterpolatedMessage());
+            "may not be null", constraintViolations.iterator().next().getMessage());
     }
 
     @Test
@@ -286,7 +286,7 @@ public class CarTest {
 
         assertEquals(1, constraintViolations.size());
         assertEquals(
-            "size must be between 2 and 14", constraintViolations.iterator().next().getInterpolatedMessage());
+            "size must be between 2 and 14", constraintViolations.iterator().next().getMessage());
     }
     
     @Test
@@ -299,7 +299,7 @@ public class CarTest {
 
         assertEquals(1, constraintViolations.size());
         assertEquals(
-            "must be greater than 2", constraintViolations.iterator().next().getInterpolatedMessage());
+            "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage());
     }
 
     @Test
