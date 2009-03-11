@@ -164,7 +164,6 @@
         &lt;plugins&gt;
             &lt;plugin&gt;
                 &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-                &lt;version&gt;RELEASE&lt;/version&gt;
                 &lt;configuration&gt;
                     &lt;source&gt;1.5&lt;/source&gt;
                     &lt;target&gt;1.5&lt;/target&gt;

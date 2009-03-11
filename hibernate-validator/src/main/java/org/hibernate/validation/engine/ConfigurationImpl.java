@@ -34,6 +34,7 @@ import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validation.util.Version;
+import org.hibernate.validation.engine.resolver.DefaultTraversableResolver;
 
 /**
  * @author Emmanuel Bernard

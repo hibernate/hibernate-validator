@@ -18,13 +18,12 @@
 package org.hibernate.validation.engine.validatorresolution;
 
 import java.util.Set;
-import org.hibernate.validation.AmbiguousConstraintUsageException;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import javax.validation.UnexpectedTypeException;
+import javax.validation.Validator;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
@@ -58,7 +57,7 @@ public class ValidatorResolutionTest {
 			validator.validate( foo );
 			fail();
 		}
-		catch ( AmbiguousConstraintUsageException e ) {
+		catch ( UnexpectedTypeException e ) {
 			assertTrue( e.getMessage().startsWith( "There are multiple validators" ) );
 		}
 	}

@@ -1,4 +1,4 @@
-// $Id: AmbiguousConstraintUsageException.java 15902 2009-02-05 11:53:49Z hardy.ferentschik $
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,31 +15,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation;
+package org.hibernate.validation.engine.resolver;
 
-import javax.validation.ValidationException;
-import javax.validation.UnexpectedTypeException;
+import java.lang.annotation.ElementType;
+import javax.persistence.Persistence;
+import javax.validation.TraversableResolver;
 
 /**
- * Exception raised in the case that the constraint validator resolution returns more than one possible validators for
- * a given type.
- *
  * @author Hardy Ferentschik
  */
-public class AmbiguousConstraintUsageException extends UnexpectedTypeException {
-	public AmbiguousConstraintUsageException(String message) {
-		super( message );
-	}
+public class JPATraversableResolver implements TraversableResolver {
 
-	public AmbiguousConstraintUsageException() {
-		super();
-	}
-
-	public AmbiguousConstraintUsageException(String message, Throwable cause) {
-		super( message, cause );
-	}
-
-	public AmbiguousConstraintUsageException(Throwable cause) {
-		super( cause );
+	public boolean isTraversable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		return Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty );
 	}
 }

@@ -31,7 +31,6 @@ import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.AmbiguousConstraintUsageException;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ValidatorTypeHelper;
 
@@ -175,7 +174,7 @@ public class ConstraintTree<A extends Annotation> {
 				builder.append( ", " );
 			}
 			builder.delete( builder.length() - 2, builder.length() );
-			throw new AmbiguousConstraintUsageException( builder.toString() );
+			throw new UnexpectedTypeException( builder.toString() );
 		}
 	}
 
