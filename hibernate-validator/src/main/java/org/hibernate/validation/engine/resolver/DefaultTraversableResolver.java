@@ -50,10 +50,10 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	private void detectJPA() {
 		try {
 			ReflectionHelper.classForName( PERSISTENCE_UTIL_CLASS_NAME, this.getClass() );
-			log.info( "Found {} on classpath.", PERSISTENCE_UTIL_CLASS_NAME );
+			log.debug( "Found {} on classpath.", PERSISTENCE_UTIL_CLASS_NAME );
 		}
 		catch ( ClassNotFoundException e ) {
-			log.info(
+			log.debug(
 					"Cannot find {} on classpath. All properties will per default be traversable.",
 					PERSISTENCE_UTIL_CLASS_NAME
 			);
