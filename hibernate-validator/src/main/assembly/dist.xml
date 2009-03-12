@@ -31,6 +31,9 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>lib</outputDirectory>
             <scope>runtime</scope>
+            <excludes>
+                <exclude>com.googlecode.jtype:jtype</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 
@@ -49,13 +52,13 @@
     <fileSets>
         <fileSet>
             <directory>target</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <excludes>
                 <exclude>*-javadoc.jar</exclude>
                 <exclude>*-sources.jar</exclude>
             </excludes>
             <includes>
-                <include>*.jar</include>
+                <include>hibernate-*.jar</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -68,9 +71,10 @@
         </fileSet>
         <fileSet>
             <directory>.</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
+                <exclude>dependency-reduced-pom.xml</exclude>
                 <exclude>*.txt</exclude>
                 <exclude>**/target/**</exclude>
                 <exclude>*.iml</exclude>
