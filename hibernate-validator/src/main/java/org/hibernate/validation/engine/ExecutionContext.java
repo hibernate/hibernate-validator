@@ -85,7 +85,7 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	/**
 	 * The message resolver which should be used in this context.
 	 */
-	private final MessageInterpolator messageResolver;
+	private final MessageInterpolator messageInterpolator;
 
 	/**
 	 * The constraint factory which should be used in this context.
@@ -97,13 +97,13 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	 */
 	private final TraversableResolver traversableResolver;
 
-	public ExecutionContext(T object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
-		this( object, object, messageResolver, constraintValidatorFactory, traversableResolver );
+	public ExecutionContext(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		this( object, object, messageInterpolator, constraintValidatorFactory, traversableResolver );
 	}
 
-	public ExecutionContext(T rootBean, Object object, MessageInterpolator messageResolver, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public ExecutionContext(T rootBean, Object object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		this.rootBean = rootBean;
-		this.messageResolver = messageResolver;
+		this.messageInterpolator = messageInterpolator;
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.traversableResolver = traversableResolver;
 
@@ -282,10 +282,9 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	public ConstraintViolationImpl<T> createConstraintViolation(Object value, ErrorMessage error) {
 		ConstraintDescriptor descriptor = currentValidatedProperty.getConstraintDescriptor();
 		String messageTemplate = error.getMessage();
-		String interpolatedMessage = messageResolver.interpolate(
+		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
-				descriptor,
-				peekCurrentBean()
+				new MessageInterpolatorContext( descriptor, peekCurrentBean() )
 		);
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,

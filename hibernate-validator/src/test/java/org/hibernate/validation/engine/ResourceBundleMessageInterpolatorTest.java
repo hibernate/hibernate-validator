@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Max;
+import javax.validation.MessageInterpolator;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
@@ -63,21 +64,21 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
-
+		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
 		String expected = "replacement worked";
-		String actual = interpolator.interpolate( "{foo}", descriptor, null );
+		String actual = interpolator.interpolate( "{foo}", context );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "replacement worked replacement worked";
-		actual = interpolator.interpolate( "{foo} {foo}", descriptor, null );
+		actual = interpolator.interpolate( "{foo} {foo}", context );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "This replacement worked just fine";
-		actual = interpolator.interpolate( "This {foo} just fine", descriptor, null );
+		actual = interpolator.interpolate( "This {foo} just fine", context );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "{} { replacement worked }";
-		actual = interpolator.interpolate( "{} { {foo} }", descriptor, null );
+		actual = interpolator.interpolate( "{} { {foo} }", context );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -88,13 +89,14 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
 
 		String expected = "foo";  // missing {}
-		String actual = interpolator.interpolate( "foo", descriptor, null );
+		String actual = interpolator.interpolate( "foo", context );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		expected = "#{foo  {}";
-		actual = interpolator.interpolate( "#{foo  {}", descriptor, null );
+		actual = interpolator.interpolate( "#{foo  {}", context );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -105,9 +107,10 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
 
 		String expected = "{bar}";  // unkown token {}
-		String actual = interpolator.interpolate( "{bar}", descriptor, null );
+		String actual = interpolator.interpolate( "{bar}", context );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -118,16 +121,18 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
 
 		String expected = "may not be null";
-		String actual = interpolator.interpolate( notNull.message(), descriptor, null );
+		String actual = interpolator.interpolate( notNull.message(), context );
 		assertEquals( "Wrong substitution", expected, actual );
 
 		ConstraintDescriptorImpl<Size> sizeDescriptor = new ConstraintDescriptorImpl<Size>(
 				size, new Class<?>[] { }, new ConstraintHelper()
 		);
 		expected = "size must be between 0 and 2147483647";  // unkown token {}
-		actual = interpolator.interpolate( size.message(), sizeDescriptor, null );
+		context = new MessageInterpolatorContext( sizeDescriptor, null );
+		actual = interpolator.interpolate( size.message(), context );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -140,7 +145,8 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator();
 
 		String expected = "kann nicht null sein";
-		String actual = interpolator.interpolate( notNull.message(), descriptor, null, Locale.GERMAN );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		String actual = interpolator.interpolate( notNull.message(), context, Locale.GERMAN );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -151,9 +157,10 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator();
+		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
 
 		String expected = "may not be null";
-		String actual = interpolator.interpolate( notNull.message(), descriptor, null, Locale.JAPAN );
+		String actual = interpolator.interpolate( notNull.message(), context, Locale.JAPAN );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -164,9 +171,10 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator();
+		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
 
 		String expected = "no puede ser null";
-		String actual = interpolator.interpolate( notNull.message(), descriptor, null, new Locale( "es", "ES" ) );
+		String actual = interpolator.interpolate( notNull.message(), context, new Locale( "es", "ES" ) );
 		assertEquals( "Wrong substitution", expected, actual );
 	}
 
@@ -186,9 +194,10 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null );
 
 		String expected = "{replace.in.default.bundle2}";
-		String actual = interpolator.interpolate( max.message(), constraintDescriptor, null );
+		String actual = interpolator.interpolate( max.message(), context );
 		assertEquals( "Within default bundle replacement parameter evauation should not be recursive!", expected, actual );
 	}
 

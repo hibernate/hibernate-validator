@@ -115,11 +115,11 @@ public class ValidationTest {
 		configuration = Validation.byDefaultProvider().configure();
 		configuration.messageInterpolator(
 				new MessageInterpolator() {
-					public String interpolate(String message, ConstraintDescriptor<?> constraintDescriptor, Object value) {
+					public String interpolate(String message, Context context) {
 						return "my custom message";
 					}
 
-					public String interpolate(String message, ConstraintDescriptor<?> constraintDescriptor, Object value, Locale locale) {
+					public String interpolate(String message, Context context, Locale locale) {
 						throw new UnsupportedOperationException( "No specific locale is possible" );
 					}
 				}

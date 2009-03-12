@@ -24,7 +24,6 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.validation.ConstraintDescriptor;
 import javax.validation.MessageInterpolator;
 
 import org.slf4j.Logger;
@@ -87,17 +86,17 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String interpolate(String message, ConstraintDescriptor<?> constraintDescriptor, Object value) {
+	public String interpolate(String message, Context context) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
-		return interpolateMessage( message, constraintDescriptor.getParameters(), defaultLocale );
+		return interpolateMessage( message, context.getConstraintDescriptor().getParameters(), defaultLocale );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public String interpolate(String message, ConstraintDescriptor<?> constraintDescriptor, Object value, Locale locale) {
-		return interpolateMessage( message, constraintDescriptor.getParameters(), locale );
+	public String interpolate(String message, Context context, Locale locale) {
+		return interpolateMessage( message, context.getConstraintDescriptor().getParameters(), locale );
 	}
 
 	/**
