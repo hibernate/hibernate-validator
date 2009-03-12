@@ -19,6 +19,7 @@ package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 
+import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
@@ -36,7 +38,7 @@ import org.hibernate.validation.util.ValidatorTypeHelper;
 
 /**
  * Due to constraint conposition a single constraint annotation can lead to a whole constraint tree beeing validated.
- * This class encapsulates such a tree for a single constraint annotation.
+ * This class encapsulates such a tree.
  *
  * @author Hardy Ferentschik
  */
@@ -88,16 +90,27 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public <T, V> void validateConstraints(V value, ExecutionContext<T> executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
+	/**
+	 * Validates the specified value.
+	 *
+	 * @param value The value to validate
+	 * @param type The type of the value determined from the type the annotation was placed on.
+	 * @param executionContext The current execution context.
+	 * @param constraintViolations List of constraint violation into which to accumulate all constraint violation as we traverse
+	 * this <code>ConstraintTree </code>.
+	 * @param <T> Type of the root bean for the current validation.
+	 * @param <V> Type of the value to be validated.
+	 */
+	public <T, V> void validateConstraints(V value, Type type, ExecutionContext<T> executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
 		for ( ConstraintTree<?> tree : getChildren() ) {
-			tree.validateConstraints( value, executionContext, constraintViolations );
+			tree.validateConstraints( value, type, executionContext, constraintViolations );
 		}
 
 		if ( log.isTraceEnabled() ) {
 			log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
 		}
 		ConstraintValidator<A, V> validator = getInitalizedValidator(
-				value, executionContext.getConstraintValidatorFactory()
+				value, type, executionContext.getConstraintValidatorFactory()
 		);
 		executionContext.setCurrentConstraintDescriptor( descriptor );
 		if ( !validator.isValid( value, executionContext ) ) {
@@ -119,73 +132,44 @@ public class ConstraintTree<A extends Annotation> {
 
 	/**
 	 * @param value The value to be validated.
+	 * @param type The type of the value to be validated (the type of the member/class the constraint was placed on).
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator.
 	 *
 	 * @return A initalized constraint validator matching the type of the value to be validated.
 	 */
-	private <V> ConstraintValidator<A, V> getInitalizedValidator(Object value, ConstraintValidatorFactory constraintFactory) {
-		Class<? extends ConstraintValidator<?, ?>> validatorClass;
-		//FIXME This sounds really bad, why value can be null. Why are we deciding of the validator based on the value? 
-		if ( value == null ) {
-			validatorClass = descriptor.getConstraintValidatorClasses().get( 0 );
-		}
-		else {
-			validatorClass = findMatchingValidatorClass( value );
-		}
+	private <V> ConstraintValidator<A, V> getInitalizedValidator(V value, Type type, ConstraintValidatorFactory constraintFactory) {
+		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( value, type );
+
 		@SuppressWarnings("unchecked")
-		ConstraintValidator<?, ?> constraintValidator =
-				constraintFactory.getInstance( validatorClass );
+		ConstraintValidator<A, V> constraintValidator = ( ConstraintValidator<A, V> ) constraintFactory.getInstance(
+				validatorClass
+		);
 		initializeConstraint( descriptor, constraintValidator );
-		return ( ConstraintValidator<A, V> ) constraintValidator;
+		return constraintValidator;
 	}
 
 	/**
 	 * Runs the validator resolution algorithm.
 	 *
-	 * @param value the object to validate
+	 * @param value The value to be validated.
+	 * @param type The type of the value to be validated (the type of the member/class the constraint was placed on).
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Object value) {
+	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Object value, Type type) {
+		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
+				ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
 
-		Class valueClass = determineValueClass( value );
-
-		Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
-				ValidatorTypeHelper.getValidatorsTypes( ( List<Class<? extends ConstraintValidator<A, ?>>> ) descriptor.getConstraintValidatorClasses() );
-		List<Class> assignableClasses = findAssignableClasses( valueClass, validatorsTypes );
-
-		resolveAssignableClasses( assignableClasses );
-		verifyResolveWasUnique( valueClass, assignableClasses );
-
-		return validatorsTypes.get( assignableClasses.get( 0 ) );
-	}
-
-	private void verifyResolveWasUnique(Class valueClass, List<Class> assignableClasses) {
-		if ( assignableClasses.size() == 0 ) {
-			throw new UnexpectedTypeException( "No validator could be found for type: " + valueClass.getName() );
+		List<Type> suitableTypes = new ArrayList<Type>();
+		findSuitableValidatorTypes( type, validatorsTypes, suitableTypes );
+		if ( value != null ) {
+			findSuitableValidatorTypes( determineValueClass( value ), validatorsTypes, suitableTypes );
 		}
-		else if ( assignableClasses.size() > 1 ) {
-			StringBuilder builder = new StringBuilder();
-			builder.append( "There are multiple validators which could validate the type " );
-			builder.append( valueClass );
-			builder.append( ". The validator classes are: " );
-			for ( Class clazz : assignableClasses ) {
-				builder.append( clazz.getName() );
-				builder.append( ", " );
-			}
-			builder.delete( builder.length() - 2, builder.length() );
-			throw new UnexpectedTypeException( builder.toString() );
-		}
-	}
 
-	private List<Class> findAssignableClasses(Class valueClass, Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes) {
-		List<Class> assignableClasses = new ArrayList<Class>();
-		for ( Class clazz : validatorsTypes.keySet() ) {
-			if ( clazz.isAssignableFrom( valueClass ) ) {
-				assignableClasses.add( clazz );
-			}
-		}
-		return assignableClasses;
+		resolveAssignableTypes( suitableTypes );
+		verifyResolveWasUnique( type, suitableTypes );
+
+		return validatorsTypes.get( suitableTypes.get( 0 ) );
 	}
 
 	private Class determineValueClass(Object value) {
@@ -196,36 +180,62 @@ public class ConstraintTree<A extends Annotation> {
 		return valueClass;
 	}
 
+	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
+		if ( assignableClasses.size() == 0 ) {
+			throw new UnexpectedTypeException( "No validator could be found for type: " + valueClass );
+		}
+		else if ( assignableClasses.size() > 1 ) {
+			StringBuilder builder = new StringBuilder();
+			builder.append( "There are multiple validators which could validate the type " );
+			builder.append( valueClass );
+			builder.append( ". The validator classes are: " );
+			for ( Type clazz : assignableClasses ) {
+				builder.append( clazz );
+				builder.append( ", " );
+			}
+			builder.delete( builder.length() - 2, builder.length() );
+			throw new UnexpectedTypeException( builder.toString() );
+		}
+	}
+
+	private void findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes, List<Type> suitableTypes) {
+		for ( Type validatorType : validatorsTypes.keySet() ) {
+			if ( TypeUtils.isAssignable( validatorType, type ) && !suitableTypes.contains( validatorType ) ) {
+				suitableTypes.add( validatorType );
+			}
+		}
+	}
+
 	/**
 	 * Tries to reduce all assignable classes down to a single class.
 	 *
-	 * @param assignableClasses The set of all classes which are assignable to the class of the value to be validated and
+	 * @param assignableTypes The set of all classes which are assignable to the class of the value to be validated and
 	 * which are handled by at least one of the  validators for the specified constraint.
 	 */
-	private void resolveAssignableClasses(List<Class> assignableClasses) {
-		if ( assignableClasses.size() == 0 || assignableClasses.size() == 1 ) {
+	private void resolveAssignableTypes(List<Type> assignableTypes) {
+		if ( assignableTypes.size() == 0 || assignableTypes.size() == 1 ) {
 			return;
 		}
 
-		List<Class> classesToRemove = new ArrayList<Class>();
+		List<Type> typesToRemove = new ArrayList<Type>();
 		do {
-			classesToRemove.clear();
-			Class clazz = assignableClasses.get( 0 );
-			for ( int i = 1; i < assignableClasses.size(); i++ ) {
-				if ( clazz.isAssignableFrom( assignableClasses.get( i ) ) ) {
-					classesToRemove.add( clazz );
+			typesToRemove.clear();
+			Type type = assignableTypes.get( 0 );
+			for ( int i = 1; i < assignableTypes.size(); i++ ) {
+				if ( TypeUtils.isAssignable( type, assignableTypes.get( i ) ) ) {
+					typesToRemove.add( type );
 				}
-				else if ( assignableClasses.get( i ).isAssignableFrom( clazz ) ) {
-					classesToRemove.add( assignableClasses.get( i ) );
+				else if ( TypeUtils.isAssignable( assignableTypes.get( i ), type ) ) {
+					typesToRemove.add( assignableTypes.get( i ) );
 				}
 			}
-			assignableClasses.removeAll( classesToRemove );
-		} while ( classesToRemove.size() > 0 );
+			assignableTypes.removeAll( typesToRemove );
+		} while ( typesToRemove.size() > 0 );
 	}
 
-	private void initializeConstraint
+	private <V> void initializeConstraint
 			(ConstraintDescriptor<A>
-					descriptor, ConstraintValidator
+					descriptor, ConstraintValidator<A, V>
 					constraintValidator) {
 		try {
 			constraintValidator.initialize( descriptor.getAnnotation() );

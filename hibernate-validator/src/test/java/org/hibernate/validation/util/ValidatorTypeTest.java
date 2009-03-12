@@ -18,6 +18,7 @@
 package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class ValidatorTypeTest {
 		List<Class<? extends ConstraintValidator<FrenchZipcode, ?>>> validators =
 				new ArrayList<Class<? extends ConstraintValidator<FrenchZipcode, ?>>>();
 		validators.add( FrenchZipcodeConstraintValidator.class );
-		Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes = ValidatorTypeHelper
+		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes = ValidatorTypeHelper
 				.getValidatorsTypes( validators );
 		assertEquals( FrenchZipcodeConstraintValidator.class, validatorsTypes.get( String.class ) );
 	}

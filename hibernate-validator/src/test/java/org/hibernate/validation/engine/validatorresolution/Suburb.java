@@ -17,10 +17,12 @@
 */
 package org.hibernate.validation.engine.validatorresolution;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 import javax.validation.constraints.Size;
 
 /**
@@ -42,6 +44,17 @@ public class Suburb {
 
 	@Size(min = 4, max = 1000)
 	private Coordinate[] boundingBox;
+
+	@PostCodeList
+	private Collection<? extends Number> includedPostCodes;
+
+	public void setIncludedPostCodes(Collection<? extends Number> includedPostCodes) {
+		this.includedPostCodes = includedPostCodes;
+	}
+
+	public Collection<? extends Number> getIncludedPostcodes() {
+		return includedPostCodes;
+	}
 
 	public void setName(String name) {
 		this.name = name;

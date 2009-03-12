@@ -18,6 +18,8 @@
 package org.hibernate.validation.engine.validatorresolution;
 
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.ConstraintViolation;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.Validator;
@@ -72,7 +74,7 @@ public class ValidatorResolutionTest {
 			fail();
 		}
 		catch ( UnexpectedTypeException e ) {
-			assertEquals( "No validator could be found for type: java.lang.Integer", e.getMessage() );
+			assertEquals( "No validator could be found for type: class java.lang.Integer", e.getMessage() );
 		}
 	}
 
@@ -81,6 +83,10 @@ public class ValidatorResolutionTest {
 		Validator validator = getValidator();
 
 		Suburb suburb = new Suburb();
+
+		List<Integer> postcodes = new ArrayList<Integer>();
+		postcodes.add(12345);
+		suburb.setIncludedPostCodes( postcodes );
 
 		// all values are null and should pass
 		Set<ConstraintViolation<Suburb>> constraintViolations = validator.validate( suburb );

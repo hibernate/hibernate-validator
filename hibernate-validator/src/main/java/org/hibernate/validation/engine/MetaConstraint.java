@@ -19,14 +19,16 @@ package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDescriptor;
-import javax.validation.ValidationException;
 
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -44,22 +46,14 @@ public class MetaConstraint<T, A extends Annotation> {
 	private final ConstraintTree<A> constraintTree;
 
 	/**
-	 * The type (class) the constraint was defined on. <code>null</code> if the constraint was specified on method or
-	 * field level.
+	 * The type the constraint was defined on.
 	 */
 	private final Type type;
 
 	/**
-	 * The method the constraint was defined on. <code>null</code> if the constraint was specified on class or
-	 * field level.
+	 * The member the constraint was defined on.
 	 */
-	private final Method method;
-
-	/**
-	 * The field the constraint was defined on. <code>null</code> if the constraint was specified on class or
-	 * method level.
-	 */
-	private final Field field;
+	private final Member member;
 
 	/**
 	 * The JavaBeans name for this constraint.
@@ -77,32 +71,28 @@ public class MetaConstraint<T, A extends Annotation> {
 	 */
 	private final Class<T> beanClass;
 
-	public MetaConstraint(Type t, ConstraintDescriptor<A> constraintDescriptor) {
-		this( t, null, null, ElementType.TYPE, ( Class<T> ) t.getClass(), constraintDescriptor, "" );
+	public MetaConstraint(Type type, ConstraintDescriptor<A> constraintDescriptor) {
+		this.type = type;
+		this.elementType = ElementType.TYPE;
+		this.member = null;
+		this.propertyName = "";
+		this.beanClass = ( Class<T> ) type.getClass();
+		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 	}
 
-	public MetaConstraint(Method m, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
-		this(
-				null,
-				m,
-				null,
-				ElementType.METHOD,
-				beanClass,
-				constraintDescriptor,
-				ReflectionHelper.getPropertyName( m )
-		);
-	}
-
-	public MetaConstraint(Field f, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
-		this( null, null, f, ElementType.FIELD, beanClass, constraintDescriptor, f.getName() );
-	}
-
-	private MetaConstraint(Type t, Method m, Field f, ElementType elementType, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor, String property) {
-		this.type = t;
-		this.method = m;
-		this.field = f;
-		this.elementType = elementType;
-		this.propertyName = property;
+	public MetaConstraint(Member member, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
+		if ( member instanceof Method ) {
+			this.elementType = ElementType.METHOD;
+		}
+		else if ( member instanceof Field ) {
+			this.elementType = ElementType.FIELD;
+		}
+		else {
+			throw new IllegalArgumentException( "Non allowed member type: " + member );
+		}
+		this.type = null;
+		this.member = member;
+		this.propertyName = ReflectionHelper.getPropertyName( member );
 		this.beanClass = beanClass;
 		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 	}
@@ -114,31 +104,6 @@ public class MetaConstraint<T, A extends Annotation> {
 	 */
 	public Set<Class<?>> getGroupList() {
 		return constraintTree.getDescriptor().getGroups();
-	}
-
-	/**
-	 * @param o the object from which to retrieve the value.
-	 *
-	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
-	 *         is returned of method or field access is used to access the value.
-	 */
-	public Object getValue(Object o) {
-		switch ( elementType ) {
-			case TYPE: {
-				return o;
-			}
-			case METHOD: {
-				return ReflectionHelper.getValue( method, o );
-			}
-			case FIELD: {
-				return ReflectionHelper.getValue( field, o );
-			}
-			default: {
-				throw new ValidationException(
-						"Invalid state of MetaConstraint. Parameter elementType has unexpected value - " + elementType
-				);
-			}
-		}
 	}
 
 	/**
@@ -163,18 +128,6 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree.getDescriptor();
 	}
 
-	public Method getMethod() {
-		return method;
-	}
-
-	public Field getField() {
-		return field;
-	}
-
-	public Type getType() {
-		return type;
-	}
-
 	public Class<T> getBeanClass() {
 		return beanClass;
 	}
@@ -195,7 +148,7 @@ public class MetaConstraint<T, A extends Annotation> {
 		final Object leafBeanInstance = executionContext.peekCurrentBean();
 		Object value = getValue( leafBeanInstance );
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		constraintTree.validateConstraints( value, executionContext, constraintViolations );
+		constraintTree.validateConstraints( value, typeOfAnnoatedElement(), executionContext, constraintViolations );
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
 			return false;
@@ -205,7 +158,7 @@ public class MetaConstraint<T, A extends Annotation> {
 
 	public <T> boolean validateConstraint(Object value, ExecutionContext<T> executionContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		constraintTree.validateConstraints( value, executionContext, constraintViolations );
+		constraintTree.validateConstraints( value, typeOfAnnoatedElement(), executionContext, constraintViolations );
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
 			return false;
@@ -220,20 +173,30 @@ public class MetaConstraint<T, A extends Annotation> {
 				t = type;
 				break;
 			}
-			case METHOD: {
-				t = ReflectionHelper.typeOf( method );
-				break;
-			}
-			case FIELD: {
-				t = ReflectionHelper.typeOf( field );
-				break;
-			}
 			default: {
-				throw new ValidationException(
-						"Invalid state of MetaConstraint. Parameter elementType has unexpected value - " + elementType
-				);
+				t = ReflectionHelper.typeOf( member );
+				if ( t instanceof Class && ((Class) t).isArray()) {
+					t = Array.class;
+				}
 			}
 		}
 		return t;
+	}
+
+	/**
+	 * @param o the object from which to retrieve the value.
+	 *
+	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
+	 *         is returned of method or field access is used to access the value.
+	 */
+	private Object getValue(Object o) {
+		switch ( elementType ) {
+			case TYPE: {
+				return o;
+			}
+			default: {
+				return ReflectionHelper.getValue( member, o );
+			}
+		}
 	}
 }

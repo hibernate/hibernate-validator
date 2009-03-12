@@ -45,14 +45,14 @@ public class ValidatorTypeHelper {
 	 * @return Return a Map&lt;Class, Class&lt;? extends ConstraintValidator&gt;&gt; where the map
 	 *         key is the type the validator accepts and value the validator class itself.
 	 */
-	public static <T extends Annotation> Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> getValidatorsTypes(
+	public static <T extends Annotation> Map<Type, Class<? extends ConstraintValidator<?, ?>>> getValidatorsTypes(
 			List<Class<? extends ConstraintValidator<T, ?>>> validators) {
 		if ( validators == null || validators.size() == 0 ) {
 			throw new ValidationException( "No ConstraintValidators associated to @Constraint" );
 		}
 		else {
-			Map<Class<?>, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
-					new HashMap<Class<?>, Class<? extends ConstraintValidator<?, ?>>>();
+			Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
+					new HashMap<Type, Class<? extends ConstraintValidator<?, ?>>>();
 			for ( Class<? extends ConstraintValidator<?, ?>> validator : validators ) {
 				validatorsTypes.put( extractType( validator ), validator );
 			}
@@ -60,7 +60,7 @@ public class ValidatorTypeHelper {
 		}
 	}
 
-	private static Class<?> extractType(Class<? extends ConstraintValidator<?, ?>> validator) {
+	private static Type extractType(Class<? extends ConstraintValidator<?, ?>> validator) {
 		Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
 		Type constraintValidatorType = resolveTypes( resolvedTypes, validator );
 
@@ -77,7 +77,7 @@ public class ValidatorTypeHelper {
 			validatorType = resolvedTypes.get( validatorType );
 		}
 		//FIXME raise an exception if validatorType is not a class
-		return ( Class<?> ) validatorType;
+		return validatorType;
 	}
 
 	private static Type resolveTypes(Map<Type, Type> resolvedTypes, Type type) {
