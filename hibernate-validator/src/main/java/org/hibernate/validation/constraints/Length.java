@@ -40,7 +40,7 @@ public @interface Length {
 
 	int max() default Integer.MAX_VALUE;
 
-	String message() default "{validator.length}";
+	String message() default "{constraint.length}";
 
 	Class<?>[] groups() default { };
 }
