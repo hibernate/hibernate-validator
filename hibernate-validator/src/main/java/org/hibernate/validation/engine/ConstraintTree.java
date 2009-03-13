@@ -162,6 +162,8 @@ public class ConstraintTree<A extends Annotation> {
 
 		List<Type> suitableTypes = new ArrayList<Type>();
 		findSuitableValidatorTypes( type, validatorsTypes, suitableTypes );
+		// TODO - do we really have to take the actual value into consideration here as well? Or is it enough to
+		// work with the type the constraint was placed on?
 		if ( value != null ) {
 			findSuitableValidatorTypes( determineValueClass( value ), validatorsTypes, suitableTypes );
 		}

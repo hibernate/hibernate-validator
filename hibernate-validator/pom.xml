@@ -86,6 +86,12 @@
                                     <include>com.googlecode.jtype:jtype</include>
                                 </includes>
                             </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.googlecode.jtype</pattern>
+                                    <shadedPattern>org.hibernate.validation.jtype</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
                             </transformers>
