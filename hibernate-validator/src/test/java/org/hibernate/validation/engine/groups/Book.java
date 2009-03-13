@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.groups;
 
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -23,9 +23,10 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.Length;
 import org.hibernate.validation.constraints.NotEmpty;
-import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Last;
-import org.hibernate.validation.eg.groups.Second;
+import org.hibernate.validation.engine.First;
+import org.hibernate.validation.engine.Last;
+import org.hibernate.validation.engine.Second;
+import org.hibernate.validation.engine.groups.Author;
 
 /**
  * @author Hardy Ferentschik

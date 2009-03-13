@@ -15,27 +15,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.constraintcomposition;
 
-import javax.validation.constraints.Pattern;
-
+import org.hibernate.validation.constraints.composition.GermanZipcode;
+import org.hibernate.validation.engine.Address;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Engine {
-	@Pattern.List({
-			@Pattern(regexp = "^[A-Z0-9-]+$",
-					message = "must contain alphabetical characters only"),
-			@Pattern(regexp = "^....-....-....$", message = "must match ....-....-....")
-	})
-	private String serialNumber;
+public class GermanAddress extends Address {
 
-	public String getSerialNumber() {
-		return serialNumber;
+	@GermanZipcode
+	public String getZipCode() {
+		return super.getZipCode();
 	}
 
-	public void setSerialNumber(String serialNumber) {
-		this.serialNumber = serialNumber;
-	}
 }

@@ -28,9 +28,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Last;
-import org.hibernate.validation.eg.groups.Second;
+import org.hibernate.validation.engine.First;
+import org.hibernate.validation.engine.Last;
+import org.hibernate.validation.engine.Second;
 
 /**
  * @author Hardy Ferentschik

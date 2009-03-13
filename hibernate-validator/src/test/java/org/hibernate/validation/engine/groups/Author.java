@@ -15,41 +15,51 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.groups;
 
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validation.constraints.Length;
 import org.hibernate.validation.constraints.NotEmpty;
-import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Second;
+import org.hibernate.validation.engine.First;
+import org.hibernate.validation.engine.Last;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Animal {
-	public enum Domain {
-		PROKARYOTA, EUKARYOTA
-	}
+public class Author {
 
-	@NotEmpty(groups = { First.class, Second.class })
-	private String name;
+	@NotEmpty(groups = Last.class)
+	private String firstName;
 
 	@NotNull(groups = First.class)
-	private Domain domain;
+	@NotEmpty(groups = First.class)
+	private String lastName;
 
-	public String getName() {
-		return name;
+	@Length(max = 20, groups = Last.class)
+	private String company;
+
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public Domain getDomain() {
-		return domain;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setDomain(Domain domain) {
-		this.domain = domain;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
 	}
 }

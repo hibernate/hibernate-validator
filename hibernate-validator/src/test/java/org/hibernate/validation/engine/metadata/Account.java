@@ -1,4 +1,4 @@
-// : Person.java 69 2008-09-08 11:05:07Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,12 +15,33 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.metadata;
+
+import javax.validation.Valid;
+
+import org.hibernate.validation.engine.metadata.Customer;
 
 /**
- * Empty un-constraint test class.
- *
- * @author Hardy Ferentschik
+ * Class with no constraints but with a cascade @Valid annotation
  */
-public class UnconstraintEntity {
+public class Account {
+	private String accountLogin;
+	private Customer customer;
+
+	public String getAccountLogin() {
+		return accountLogin;
+	}
+
+	public void setAccountLogin(String accountLogin) {
+		this.accountLogin = accountLogin;
+	}
+
+	@Valid
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
 }

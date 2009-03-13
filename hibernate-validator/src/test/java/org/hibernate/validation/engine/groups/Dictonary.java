@@ -15,60 +15,44 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.groups;
 
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validation.constraints.Length;
+import org.hibernate.validation.constraints.NotEmpty;
+import org.hibernate.validation.engine.groups.Book;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Address {
-	@NotNull
-	@Length(max = 30)
-	private String addressline1;
+public class Dictonary extends Book {
+	@NotNull(groups = Translate.class)
+	@NotEmpty(groups = Translate.class)
+	private String translatesTo;
 
-	@NotNull
-	@Length(max = 30)
-	private String addressline2;
+	@NotNull(groups = Translate.class)
+	@NotEmpty(groups = Translate.class)
+	private String translatesFrom;
 
-	private String zipCode;
-
-	private String city;
-
-	public String getAddressline1() {
-		return addressline1;
+	public String getTranslatesTo() {
+		return translatesTo;
 	}
 
-	public void setAddressline1(String addressline1) {
-		this.addressline1 = addressline1;
+	public void setTranslatesTo(String translatesTo) {
+		this.translatesTo = translatesTo;
 	}
 
-	public String getAddressline2() {
-		return addressline2;
+	public String getTranslatesFrom() {
+		return translatesFrom;
 	}
 
-	public void setAddressline2(String addressline2) {
-		this.addressline2 = addressline2;
+	public void setTranslatesFrom(String translatesFrom) {
+		this.translatesFrom = translatesFrom;
 	}
 
-	public String getZipCode() {
-		return zipCode;
-	}
-
-	public void setZipCode(String zipCode) {
-		this.zipCode = zipCode;
-	}
-
-	@Length(max = 30)
-	@NotNull
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
+	/**
+	 * Translator related constraints
+	 */
+	public interface Translate {
 	}
 }
-

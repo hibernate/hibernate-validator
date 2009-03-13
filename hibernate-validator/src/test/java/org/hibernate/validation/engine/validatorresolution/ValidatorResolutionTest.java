@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.eg.MultipleMinMax;
+import org.hibernate.validation.engine.validatorresolution.MultipleMinMax;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.getValidator;

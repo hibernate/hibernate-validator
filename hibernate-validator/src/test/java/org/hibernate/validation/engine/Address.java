@@ -15,51 +15,60 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine;
 
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.Length;
-import org.hibernate.validation.constraints.NotEmpty;
-import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Last;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Author {
+public class Address {
+	@NotNull
+	@Length(max = 30)
+	private String addressline1;
 
-	@NotEmpty(groups = Last.class)
-	private String firstName;
+	@NotNull
+	@Length(max = 30)
+	private String addressline2;
 
-	@NotNull(groups = First.class)
-	@NotEmpty(groups = First.class)
-	private String lastName;
+	private String zipCode;
 
-	@Length(max = 20, groups = Last.class)
-	private String company;
+	private String city;
 
-	public String getFirstName() {
-		return firstName;
+	public String getAddressline1() {
+		return addressline1;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setAddressline1(String addressline1) {
+		this.addressline1 = addressline1;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getAddressline2() {
+		return addressline2;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setAddressline2(String addressline2) {
+		this.addressline2 = addressline2;
 	}
 
-	public String getCompany() {
-		return company;
+	public String getZipCode() {
+		return zipCode;
 	}
 
-	public void setCompany(String company) {
-		this.company = company;
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	@Length(max = 30)
+	@NotNull
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
 	}
 }
+

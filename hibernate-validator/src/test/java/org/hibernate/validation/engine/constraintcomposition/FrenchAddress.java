@@ -15,9 +15,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.constraintcomposition;
 
 import org.hibernate.validation.constraints.composition.FrenchZipcode;
+import org.hibernate.validation.engine.Address;
 
 /**
  * @author Hardy Ferentschik

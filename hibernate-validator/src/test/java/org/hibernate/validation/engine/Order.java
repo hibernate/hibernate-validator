@@ -15,18 +15,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine;
 
-import org.hibernate.validation.constraints.composition.GermanZipcode;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GermanAddress extends Address {
+public class Order {
+	@NotNull
+	Integer orderNumber;
 
-	@GermanZipcode
-	public String getZipCode() {
-		return super.getZipCode();
+	public Integer getOrderNumber() {
+		return orderNumber;
 	}
 
+	public void setOrderNumber(Integer orderNumber) {
+		this.orderNumber = orderNumber;
+	}
 }

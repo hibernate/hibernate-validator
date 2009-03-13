@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.engine.metadata;
 
 import java.util.Set;
 import javax.validation.BeanDescriptor;
@@ -31,10 +31,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-import org.hibernate.validation.eg.Account;
-import org.hibernate.validation.eg.Customer;
-import org.hibernate.validation.eg.Order;
-import org.hibernate.validation.eg.UnconstraintEntity;
+import org.hibernate.validation.engine.metadata.Account;
+import org.hibernate.validation.engine.metadata.Customer;
+import org.hibernate.validation.engine.Order;
+import org.hibernate.validation.engine.metadata.UnconstraintEntity;
 import org.hibernate.validation.util.TestUtil;
 
 

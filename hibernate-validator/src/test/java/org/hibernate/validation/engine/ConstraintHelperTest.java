@@ -32,8 +32,8 @@ import org.junit.Test;
 import org.hibernate.validation.constraints.invalidvalidators.NoGroups;
 import org.hibernate.validation.constraints.invalidvalidators.NoMessage;
 import org.hibernate.validation.constraints.invalidvalidators.ValidProperty;
-import org.hibernate.validation.eg.Engine;
-import org.hibernate.validation.eg.Order;
+import org.hibernate.validation.engine.Engine;
+import org.hibernate.validation.engine.Order;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**

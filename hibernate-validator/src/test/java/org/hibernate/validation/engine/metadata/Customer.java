@@ -15,11 +15,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
+
+import org.hibernate.validation.engine.Person;
+import org.hibernate.validation.engine.Order;
 
 /**
  * @author Hardy Ferentschik

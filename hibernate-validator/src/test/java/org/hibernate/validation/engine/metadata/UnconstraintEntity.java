@@ -1,4 +1,4 @@
-// $Id$
+// : Person.java 69 2008-09-08 11:05:07Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,23 +15,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
-
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validation.constraints.NotEmpty;
+package org.hibernate.validation.engine.metadata;
 
 /**
+ * Empty un-constraint test class.
+ *
  * @author Hardy Ferentschik
  */
-public interface Person {
-	@NotNull
-	@NotEmpty
-	String getFirstName();
-
-	String getMiddleName();
-
-	@NotNull
-	@NotEmpty
-	String getLastName();
+public class UnconstraintEntity {
 }

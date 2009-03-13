@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import javax.validation.Configuration;
-import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
@@ -46,7 +45,7 @@ import org.junit.Test;
 
 import org.hibernate.validation.HibernateValidationProvider;
 import org.hibernate.validation.constraints.NotNullValidator;
-import org.hibernate.validation.eg.Customer;
+import org.hibernate.validation.engine.metadata.Customer;
 import org.hibernate.validation.engine.ConfigurationImpl;
 import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;

@@ -15,45 +15,41 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine.groups;
 
-import javax.validation.GroupSequence;
 import javax.validation.constraints.NotNull;
-import javax.validation.groups.Default;
 
 import org.hibernate.validation.constraints.NotEmpty;
+import org.hibernate.validation.engine.First;
+import org.hibernate.validation.engine.Second;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Dictonary extends Book {
-	@NotNull(groups = Translate.class)
-	@NotEmpty(groups = Translate.class)
-	private String translatesTo;
-
-	@NotNull(groups = Translate.class)
-	@NotEmpty(groups = Translate.class)
-	private String translatesFrom;
-
-	public String getTranslatesTo() {
-		return translatesTo;
+public class Animal {
+	public enum Domain {
+		PROKARYOTA, EUKARYOTA
 	}
 
-	public void setTranslatesTo(String translatesTo) {
-		this.translatesTo = translatesTo;
+	@NotEmpty(groups = { First.class, Second.class })
+	private String name;
+
+	@NotNull(groups = First.class)
+	private Domain domain;
+
+	public String getName() {
+		return name;
 	}
 
-	public String getTranslatesFrom() {
-		return translatesFrom;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setTranslatesFrom(String translatesFrom) {
-		this.translatesFrom = translatesFrom;
+	public Domain getDomain() {
+		return domain;
 	}
 
-	/**
-	 * Translator related constraints
-	 */
-	public interface Translate {
+	public void setDomain(Domain domain) {
+		this.domain = domain;
 	}
 }

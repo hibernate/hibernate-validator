@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.engine.constraintcomposition;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -24,8 +24,8 @@ import javax.validation.Validator;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.hibernate.validation.eg.FrenchAddress;
-import org.hibernate.validation.eg.GermanAddress;
+import org.hibernate.validation.engine.constraintcomposition.FrenchAddress;
+import org.hibernate.validation.engine.constraintcomposition.GermanAddress;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.getValidator;

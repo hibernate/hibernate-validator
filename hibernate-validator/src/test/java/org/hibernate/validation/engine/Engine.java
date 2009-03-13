@@ -15,22 +15,27 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 
 /**
  * @author Hardy Ferentschik
  */
-public class Order {
-	@NotNull
-	Integer orderNumber;
+public class Engine {
+	@Pattern.List({
+			@Pattern(regexp = "^[A-Z0-9-]+$",
+					message = "must contain alphabetical characters only"),
+			@Pattern(regexp = "^....-....-....$", message = "must match ....-....-....")
+	})
+	private String serialNumber;
 
-	public Integer getOrderNumber() {
-		return orderNumber;
+	public String getSerialNumber() {
+		return serialNumber;
 	}
 
-	public void setOrderNumber(Integer orderNumber) {
-		this.orderNumber = orderNumber;
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
 	}
 }

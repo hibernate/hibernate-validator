@@ -15,31 +15,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.eg;
+package org.hibernate.validation.engine;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validation.constraints.NotEmpty;
 
 /**
- * Class with no constraints but with a cascade @Valid annotation
+ * @author Hardy Ferentschik
  */
-public class Account {
-	private String accountLogin;
-	private Customer customer;
+public interface Person {
+	@NotNull
+	@NotEmpty
+	String getFirstName();
 
-	public String getAccountLogin() {
-		return accountLogin;
-	}
+	String getMiddleName();
 
-	public void setAccountLogin(String accountLogin) {
-		this.accountLogin = accountLogin;
-	}
-
-	@Valid
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
+	@NotNull
+	@NotEmpty
+	String getLastName();
 }

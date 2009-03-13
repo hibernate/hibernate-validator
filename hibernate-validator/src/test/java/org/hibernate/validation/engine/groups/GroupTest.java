@@ -29,14 +29,14 @@ import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-import org.hibernate.validation.eg.Animal;
-import org.hibernate.validation.eg.Author;
-import org.hibernate.validation.eg.Book;
-import org.hibernate.validation.eg.DefaultAlias;
-import org.hibernate.validation.eg.Dictonary;
-import org.hibernate.validation.eg.groups.First;
-import org.hibernate.validation.eg.groups.Last;
-import org.hibernate.validation.eg.groups.Second;
+import org.hibernate.validation.engine.groups.Animal;
+import org.hibernate.validation.engine.groups.Author;
+import org.hibernate.validation.engine.groups.Book;
+import org.hibernate.validation.engine.DefaultAlias;
+import org.hibernate.validation.engine.First;
+import org.hibernate.validation.engine.groups.Dictonary;
+import org.hibernate.validation.engine.Last;
+import org.hibernate.validation.engine.Second;
 import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 
