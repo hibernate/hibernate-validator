@@ -590,7 +590,7 @@ public class CoverageReport {
 
                 out.write(("<h4 class=\"sectionHeader\" id=\"" + sectionId + "\">Section " + 
                       sectionId + " - " +
-                      auditParser.getSectionTitle(sectionId) + "</h4>\n").getBytes());                
+                      escape(auditParser.getSectionTitle(sectionId)) + "</h4>\n").getBytes());                
                 
                 for (AuditAssertion assertion : sectionAssertions) {
                     List<SpecReference> coverage = getCoverageForAssertion(sectionId, assertion.getId());
@@ -747,6 +747,11 @@ public class CoverageReport {
          m.reset(result);
        }       
        return result;
+    }
+    
+    private String escape(String value)
+    {
+       return value.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     }
     
     private String parseStrikethrough(String text)
