@@ -25,8 +25,7 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
-import javax.validation.OverridesParameter;
-import javax.validation.OverridesParameters;
+import javax.validation.OverridesAttribute;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
@@ -48,14 +47,14 @@ public @interface FrenchZipcode {
 
 	Class<?>[] groups() default { };
 
-	@OverridesParameters({
-			@OverridesParameter(constraint = Size.class, parameter = "min"),
-			@OverridesParameter(constraint = Size.class, parameter = "max")
+	@OverridesAttribute.List({
+			@OverridesAttribute(constraint = Size.class, parameter = "min"),
+			@OverridesAttribute(constraint = Size.class, parameter = "max")
 	}) int size() default 5;
 
-	@OverridesParameter(constraint = Size.class,
+	@OverridesAttribute(constraint = Size.class,
 			parameter = "message") String sizeMessage() default "A french zip code has a length of 5";
 
 
-	@OverridesParameter(constraint = Pattern.class, parameter = "regexp", index = 2) String regex() default "\\d*";
+	@OverridesAttribute(constraint = Pattern.class, parameter = "regexp", index = 2) String regex() default "\\d*";
 }

@@ -31,8 +31,7 @@ import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
-import javax.validation.OverridesParameter;
-import javax.validation.OverridesParameters;
+import javax.validation.OverridesAttribute;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
@@ -227,31 +226,31 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
 		for ( Method m : annotation.annotationType().getMethods() ) {
-			if ( m.getAnnotation( OverridesParameter.class ) != null ) {
-				addOverrideParameter(
-						overrideParameters, getMethodValue( annotation, m ), m.getAnnotation( OverridesParameter.class )
+			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
+				addOverrideAttributes(
+						overrideParameters, getMethodValue( annotation, m ), m.getAnnotation( OverridesAttribute.class )
 				);
 			}
-			else if ( m.getAnnotation( OverridesParameters.class ) != null ) {
-				addOverrideParameter(
+			else if ( m.getAnnotation( OverridesAttribute.List.class ) != null ) {
+				addOverrideAttributes(
 						overrideParameters,
 						getMethodValue( annotation, m ),
-						m.getAnnotation( OverridesParameters.class ).value()
+						m.getAnnotation( OverridesAttribute.List.class ).value()
 				);
 			}
 		}
 		return overrideParameters;
 	}
 
-	private void addOverrideParameter(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Object value, OverridesParameter... parameters) {
-		for ( OverridesParameter parameter : parameters ) {
-			ClassIndexWrapper wrapper = new ClassIndexWrapper( parameter.constraint(), parameter.index() );
+	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Object value, OverridesAttribute... attributes) {
+		for ( OverridesAttribute attribute : attributes ) {
+			ClassIndexWrapper wrapper = new ClassIndexWrapper( attribute.constraint(), attribute.index() );
 			Map<String, Object> map = overrideParameters.get( wrapper );
 			if ( map == null ) {
 				map = new HashMap<String, Object>();
 				overrideParameters.put( wrapper, map );
 			}
-			map.put( parameter.parameter(), value );
+			map.put( attribute.parameter(), value );
 		}
 	}
 
