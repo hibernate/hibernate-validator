@@ -244,13 +244,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Object value, OverridesAttribute... attributes) {
 		for ( OverridesAttribute attribute : attributes ) {
-			ClassIndexWrapper wrapper = new ClassIndexWrapper( attribute.constraint(), attribute.index() );
+			ClassIndexWrapper wrapper = new ClassIndexWrapper( attribute.constraint(), attribute.constraintIndex() );
 			Map<String, Object> map = overrideParameters.get( wrapper );
 			if ( map == null ) {
 				map = new HashMap<String, Object>();
 				overrideParameters.put( wrapper, map );
 			}
-			map.put( attribute.parameter(), value );
+			map.put( attribute.name(), value );
 		}
 	}
 

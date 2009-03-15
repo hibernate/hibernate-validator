@@ -48,13 +48,13 @@ public @interface FrenchZipcode {
 	Class<?>[] groups() default { };
 
 	@OverridesAttribute.List({
-			@OverridesAttribute(constraint = Size.class, parameter = "min"),
-			@OverridesAttribute(constraint = Size.class, parameter = "max")
+			@OverridesAttribute(constraint = Size.class, name = "min"),
+			@OverridesAttribute(constraint = Size.class, name = "max")
 	}) int size() default 5;
 
 	@OverridesAttribute(constraint = Size.class,
-			parameter = "message") String sizeMessage() default "A french zip code has a length of 5";
+			name = "message") String sizeMessage() default "A french zip code has a length of 5";
 
 
-	@OverridesAttribute(constraint = Pattern.class, parameter = "regexp", index = 2) String regex() default "\\d*";
+	@OverridesAttribute(constraint = Pattern.class, name = "regexp", constraintIndex = 2) String regex() default "\\d*";
 }
