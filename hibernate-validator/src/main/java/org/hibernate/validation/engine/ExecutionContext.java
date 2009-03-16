@@ -328,7 +328,7 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 		}
 
 		public String getDefaultErrorMessage() {
-			return ( String ) constraintDescriptor.getParameters().get( "message" );
+			return ( String ) constraintDescriptor.getAttributes().get( "message" );
 		}
 
 		public void addError(String message) {

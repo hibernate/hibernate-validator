@@ -118,7 +118,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
-			final String message = ( String ) getParent().getDescriptor().getParameters().get( "message" );
+			final String message = ( String ) getParent().getDescriptor().getAttributes().get( "message" );
 			final String property = executionContext.peekPropertyPath();
 			ExecutionContext<T>.ErrorMessage error = executionContext.new ErrorMessage( message, property );
 			constraintViolations.add( executionContext.createConstraintViolation( value, error ) );

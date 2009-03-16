@@ -73,7 +73,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The constraint parameters as map. The key is the paramter name and the value the
 	 * parameter value as specified in the constraint.
 	 */
-	private final Map<String, Object> parameters;
+	private final Map<String, Object> attributes;
 
 	/**
 	 * The composing constraints for this constraints.
@@ -106,7 +106,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private ConstraintDescriptorImpl(T annotation, Set<Class<?>> groups, ConstraintHelper constraintHelper) {
 		this.annotation = annotation;
 		this.groups = groups;
-		this.parameters = getAnnotationParameters( annotation );
+		this.attributes = getAnnotationParameters( annotation );
 		this.constraintHelper = constraintHelper;
 
 		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
@@ -161,8 +161,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * {@inheritDoc}
 	 */
-	public Map<String, Object> getParameters() {
-		return Collections.unmodifiableMap( parameters );
+	public Map<String, Object> getAttributes() {
+		return Collections.unmodifiableMap( attributes );
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				"annotation=" + annotation +
 				", constraintValidatorDefinitonClasses=" + constraintValidatorDefinitonClasses.toString() +
 				", groups=" + groups +
-				", parameters=" + parameters +
+				", attributes=" + attributes +
 				", composingConstraints=" + composingConstraints +
 				", isReportAsSingleInvalidConstraint=" + isReportAsSingleInvalidConstraint +
 				'}';
@@ -199,10 +199,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				parameters.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch ( IllegalAccessException e ) {
-				throw new ValidationException( "Unable to read annotation parameters: " + annotation.getClass(), e );
+				throw new ValidationException( "Unable to read annotation attributes: " + annotation.getClass(), e );
 			}
 			catch ( InvocationTargetException e ) {
-				throw new ValidationException( "Unable to read annotation parameters: " + annotation.getClass(), e );
+				throw new ValidationException( "Unable to read annotation attributes: " + annotation.getClass(), e );
 			}
 		}
 		return Collections.unmodifiableMap( parameters );

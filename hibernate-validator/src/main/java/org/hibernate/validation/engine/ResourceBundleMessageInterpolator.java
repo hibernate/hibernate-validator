@@ -89,14 +89,14 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	public String interpolate(String message, Context context) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
-		return interpolateMessage( message, context.getConstraintDescriptor().getParameters(), defaultLocale );
+		return interpolateMessage( message, context.getConstraintDescriptor().getAttributes(), defaultLocale );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public String interpolate(String message, Context context, Locale locale) {
-		return interpolateMessage( message, context.getConstraintDescriptor().getParameters(), locale );
+		return interpolateMessage( message, context.getConstraintDescriptor().getAttributes(), locale );
 	}
 
 	/**
