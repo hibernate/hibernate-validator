@@ -22,6 +22,7 @@ import javax.validation.BeanDescriptor;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import javax.validation.PropertyDescriptor;
 import javax.validation.groups.Default;
 
 import static junit.framework.Assert.assertTrue;
@@ -404,7 +405,7 @@ public class GroupTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
 		assertTrue( beanDescriptor.isBeanConstrained() );
 
-		Set<String> constraintProperties = beanDescriptor.getConstrainedProperties();
+		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
 		assertTrue( "Each of the properties should have at least one constraint.", constraintProperties.size() == 5 );
 
 		Order order = new Order();

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import javax.validation.BeanDescriptor;
 import javax.validation.GroupSequence;
 import javax.validation.PropertyDescriptor;
@@ -362,7 +363,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return defaultGroupSequence;
 	}
 
-	public Set<String> getConstrainedProperties() {
-		return Collections.unmodifiableSet( propertyDescriptors.keySet() );
+	public Set<PropertyDescriptor> getConstrainedProperties() {
+		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>(propertyDescriptors.values() ) );
 	}
 }

@@ -79,8 +79,8 @@ public interface BeanMetaData<T> {
 	PropertyDescriptor getPropertyDescriptor(String property);
 
 	/**
-	 * @return the property names having at least one constraint defined or which are marked
+	 * @return the property descriptors having at least one constraint defined or which are marked
 	 *         as cascaded (@Valid).
 	 */
-	Set<String> getConstrainedProperties();
+	Set<PropertyDescriptor> getConstrainedProperties();
 }

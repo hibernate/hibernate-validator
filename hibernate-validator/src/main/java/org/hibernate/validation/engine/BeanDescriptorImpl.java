@@ -24,7 +24,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		return metadataBean.getPropertyDescriptor( propertyName );
 	}
 
-	public Set<String> getConstrainedProperties() {
+	public Set<PropertyDescriptor> getConstrainedProperties() {
 		return metadataBean.getConstrainedProperties();
 	}
 }

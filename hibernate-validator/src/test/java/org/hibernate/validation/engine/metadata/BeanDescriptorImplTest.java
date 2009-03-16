@@ -95,12 +95,17 @@ public class BeanDescriptorImplTest {
 	public void testGetConstrainedProperties() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
-		Set<String> constraintProperties = beanDescriptor.getConstrainedProperties();
+		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
 		assertEquals( "There should be only one property", 1, constraintProperties.size() );
-		assertTrue( "Wrong property", constraintProperties.contains( "orderNumber" ) );
+		boolean hasOrderNumber = false;
+		for(PropertyDescriptor pd : constraintProperties) {
+			hasOrderNumber |= pd.getPropertyName().equals( "orderNumber" );
+		}
+		assertTrue( "Wrong property", hasOrderNumber );
+
 
 		try {
-			constraintProperties.add( "foobar" );
+			constraintProperties.add( null );
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
