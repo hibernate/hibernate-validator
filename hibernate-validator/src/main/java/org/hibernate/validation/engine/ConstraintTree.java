@@ -29,6 +29,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
+import javax.validation.ConstraintViolation;
 
 import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
@@ -101,7 +102,7 @@ public class ConstraintTree<A extends Annotation> {
 	 * @param <T> Type of the root bean for the current validation.
 	 * @param <V> Type of the value to be validated.
 	 */
-	public <T, V> void validateConstraints(V value, Type type, ExecutionContext<T> executionContext, List<ConstraintViolationImpl<T>> constraintViolations) {
+	public <T, V> void validateConstraints(V value, Type type, ExecutionContext<T> executionContext, List<ConstraintViolation<T>> constraintViolations) {
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			tree.validateConstraints( value, type, executionContext, constraintViolations );
 		}
@@ -112,16 +113,18 @@ public class ConstraintTree<A extends Annotation> {
 		ConstraintValidator<A, V> validator = getInitalizedValidator(
 				value, type, executionContext.getConstraintValidatorFactory()
 		);
-		executionContext.setCurrentConstraintDescriptor( descriptor );
-		if ( !validator.isValid( value, executionContext ) ) {
-			constraintViolations.addAll( executionContext.createConstraintViolations( value ) );
+		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
+				executionContext.peekParentPath(), executionContext.peekProperty(), descriptor
+		);
+		if ( !validator.isValid( value, constraintValidatorContext ) ) {
+			constraintViolations.addAll( executionContext.createConstraintViolations( value, constraintValidatorContext ) );
 		}
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
 			final String message = ( String ) getParent().getDescriptor().getAttributes().get( "message" );
 			final String property = executionContext.peekPropertyPath();
-			ExecutionContext<T>.ErrorMessage error = executionContext.new ErrorMessage( message, property );
-			constraintViolations.add( executionContext.createConstraintViolation( value, error ) );
+			ConstraintValidatorContextImpl.ErrorMessage error = constraintValidatorContext.new ErrorMessage( message, property );
+			constraintViolations.add( executionContext.createConstraintViolation( value, error, descriptor ) );
 		}
 	}
 

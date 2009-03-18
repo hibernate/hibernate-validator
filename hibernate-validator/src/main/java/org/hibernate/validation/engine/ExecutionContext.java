@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import javax.validation.ConstraintDescriptor;
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
+import javax.validation.ConstraintViolation;
 
 import org.hibernate.validation.util.IdentitySet;
 
@@ -42,11 +42,11 @@ import org.hibernate.validation.util.IdentitySet;
  * @todo Look for ways to improve this data structure. It is quite fragile and depends on the right oder of calls
  * in order to work.
  */
-public class ExecutionContext<T> implements ConstraintValidatorContext {
+public class ExecutionContext<T> {
 
-	private static final String PROPERTY_ROOT = "";
+	public static final String PROPERTY_ROOT = "";
 
-	private static final String PROPERTY_PATH_SEPERATOR = ".";
+	public static final String PROPERTY_PATH_SEPERATOR = ".";
 
 	/**
 	 * The root bean of the validation.
@@ -67,7 +67,7 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	/**
 	 * A list of all failing constraints so far.
 	 */
-	private final List<ConstraintViolationImpl<T>> failingConstraintViolations;
+	private final List<ConstraintViolation<T>> failingConstraintViolations;
 
 	/**
 	 * The current property based based from the root bean.
@@ -78,12 +78,6 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	 * The current group we are validating.
 	 */
 	private Class<?> currentGroup;
-
-	/**
-	 * Reference to a <code>ValidatedProperty</code> keeping track of the property we are currently validating,
-	 * together with required meta data.
-	 */
-	private ValidatedProperty currentValidatedProperty;
 
 	/**
 	 * Stack for keeping track of the currently validated bean.
@@ -126,36 +120,11 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		processedPaths = new IdentityHashMap<Object, Set<String>>();
 		propertyPath = new ArrayList<String>();
-		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
 	}
 
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
 		return constraintValidatorFactory;
-	}
-
-	public void disableDefaultError() {
-		assert currentValidatedProperty != null;
-		currentValidatedProperty.disableDefaultError();
-	}
-
-	public String getDefaultErrorMessage() {
-		assert currentValidatedProperty != null;
-		return currentValidatedProperty.getDefaultErrorMessage();
-	}
-
-	public void addError(String message) {
-		assert currentValidatedProperty != null;
-		currentValidatedProperty.addError( message );
-	}
-
-	public void addError(String message, String property) {
-		assert currentValidatedProperty != null;
-		currentValidatedProperty.addError( message, property );
-	}
-
-	public void setCurrentConstraintDescriptor(ConstraintDescriptor constraintDescriptor) {
-		assert currentValidatedProperty != null;
-		currentValidatedProperty.setConstraintDescriptor( constraintDescriptor );
 	}
 
 	public Object peekCurrentBean() {
@@ -220,13 +189,13 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
 	}
 
-	public void addConstraintFailures(List<ConstraintViolationImpl<T>> failingConstraintViolations) {
-		for ( ConstraintViolationImpl<T> violation : failingConstraintViolations ) {
+	public void addConstraintFailures(List<ConstraintViolation<T>> failingConstraintViolations) {
+		for ( ConstraintViolation<T> violation : failingConstraintViolations ) {
 			addConstraintFailure( violation );
 		}
 	}
 
-	public List<ConstraintViolationImpl<T>> getFailingConstraints() {
+	public List<ConstraintViolation<T>> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
 
@@ -236,7 +205,6 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	 * @param property the new property to add to the current path.
 	 */
 	public void pushProperty(String property) {
-		currentValidatedProperty = new ValidatedProperty( peekPropertyPath(), property );
 		propertyPath.add( property );
 	}
 
@@ -246,7 +214,6 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	public void popProperty() {
 		if ( propertyPath.size() > 0 ) {
 			propertyPath.remove( propertyPath.size() - 1 );
-			currentValidatedProperty = null;
 		}
 	}
 
@@ -267,14 +234,7 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	}
 
 	public String peekPropertyPath() {
-		StringBuilder builder = new StringBuilder();
-		for ( int i = 0; i <= propertyPath.size() - 1; i++ ) {
-			builder.append( propertyPath.get( i ) );
-			if ( i < propertyPath.size() - 1 ) {
-				builder.append( PROPERTY_PATH_SEPERATOR );
-			}
-		}
-		return builder.toString();
+		return buildPath( propertyPath.size() - 1 );
 	}
 
 	public String peekProperty() {
@@ -282,6 +242,10 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 			return PROPERTY_ROOT;
 		}
 		return propertyPath.get( propertyPath.size() - 1 );
+	}
+
+	public String peekParentPath() {
+		return buildPath( propertyPath.size() - 2 );
 	}
 
 	public boolean isValidationRequired(MetaConstraint metaConstraint) {
@@ -299,16 +263,18 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 		);
 	}
 
-	public List<ConstraintViolationImpl<T>> createConstraintViolations(Object value) {
+	public List<ConstraintViolationImpl<T>> createConstraintViolations(Object value, ConstraintValidatorContextImpl constraintValidatorContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		for ( ErrorMessage error : currentValidatedProperty.getErrorMessages() ) {
-			constraintViolations.add( createConstraintViolation( value, error ) );
+		for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintValidatorContext.getErrorMessages() ) {
+			ConstraintViolationImpl<T> violation = createConstraintViolation(
+					value, error, constraintValidatorContext.getConstraintDescriptor()
+			);
+			constraintViolations.add( violation );
 		}
 		return constraintViolations;
 	}
 
-	public ConstraintViolationImpl<T> createConstraintViolation(Object value, ErrorMessage error) {
-		ConstraintDescriptor descriptor = currentValidatedProperty.getConstraintDescriptor();
+	public ConstraintViolationImpl<T> createConstraintViolation(Object value, ConstraintValidatorContextImpl.ErrorMessage error, ConstraintDescriptor<?> descriptor) {
 		String messageTemplate = error.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
@@ -323,6 +289,17 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 				error.getProperty(),
 				descriptor
 		);
+	}
+
+	private String buildPath(int index) {
+		StringBuilder builder = new StringBuilder();
+		for ( int i = 0; i <= index; i++ ) {
+			builder.append( propertyPath.get( i ) );
+			if ( i < index ) {
+				builder.append( PROPERTY_PATH_SEPERATOR );
+			}
+		}
+		return builder.toString();
 	}
 
 	private void markProcessed() {
@@ -354,90 +331,10 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 		}
 	}
 
-	private void addConstraintFailure(ConstraintViolationImpl<T> failingConstraintViolation) {
+	private void addConstraintFailure(ConstraintViolation<T> failingConstraintViolation) {
 		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
 		if ( i == -1 ) {
 			failingConstraintViolations.add( failingConstraintViolation );
-		}
-	}
-
-	class ValidatedProperty {
-
-		private final List<ErrorMessage> errorMessages = new ArrayList<ErrorMessage>( 3 );
-		private final String property;
-		private final String propertyParent;
-		private ConstraintDescriptor<?> constraintDescriptor;
-		private boolean defaultDisabled;
-
-
-		private ValidatedProperty(String propertyParent, String property) {
-			this.property = property;
-			this.propertyParent = propertyParent;
-		}
-
-		public void setConstraintDescriptor(ConstraintDescriptor<?> constraintDescriptor) {
-			this.constraintDescriptor = constraintDescriptor;
-		}
-
-		public ConstraintDescriptor<?> getConstraintDescriptor() {
-			return constraintDescriptor;
-		}
-
-		void disableDefaultError() {
-			defaultDisabled = true;
-		}
-
-		public boolean isDefaultErrorDisabled() {
-			return defaultDisabled;
-		}
-
-		public String getDefaultErrorMessage() {
-			return ( String ) constraintDescriptor.getAttributes().get( "message" );
-		}
-
-		public void addError(String message) {
-			errorMessages.add( new ErrorMessage( message, buildPropertyPath( propertyParent, property ) ) );
-		}
-
-		public void addError(String message, String property) {
-			errorMessages.add( new ErrorMessage( message, buildPropertyPath( propertyParent, property ) ) );
-		}
-
-		public List<ErrorMessage> getErrorMessages() {
-			List<ErrorMessage> returnedErrorMessages = new ArrayList<ErrorMessage>( errorMessages );
-			if ( !defaultDisabled ) {
-				returnedErrorMessages.add(
-						new ErrorMessage( getDefaultErrorMessage(), buildPropertyPath( propertyParent, property ) )
-				);
-			}
-			return returnedErrorMessages;
-		}
-
-		private String buildPropertyPath(String parent, String leaf) {
-			if ( PROPERTY_ROOT.equals( parent ) ) {
-				return leaf;
-			}
-			else {
-				return new StringBuilder().append( parent ).append( PROPERTY_PATH_SEPERATOR ).append( leaf ).toString();
-			}
-		}
-	}
-
-	public class ErrorMessage {
-		private final String message;
-		private final String property;
-
-		public ErrorMessage(String message, String property) {
-			this.message = message;
-			this.property = property;
-		}
-
-		public String getMessage() {
-			return message;
-		}
-
-		public String getProperty() {
-			return property;
 		}
 	}
 }

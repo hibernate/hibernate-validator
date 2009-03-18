@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,11 +17,11 @@
 */
 package org.hibernate.validation.engine.graphnavigation;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
-import javax.validation.Valid;
 
 /**
  * @author Hardy Ferentschik
@@ -35,7 +35,10 @@ public class User {
 	private String lastName;
 
 	@Valid
-	private Set<Address> addresses = new HashSet<Address>();
+	private List<Address> addresses = new ArrayList<Address>();
+
+	@Valid
+	private List<User> knowsUser = new ArrayList<User>();
 
 	public User() {
 	}
@@ -45,12 +48,20 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public Set<Address> getAddresses() {
+	public List<Address> getAddresses() {
 		return addresses;
 	}
 
 	public void addAddress(Address address) {
 		addresses.add( address );
+	}
+
+	public void knows(User user) {
+		knowsUser.add( user );
+	}
+
+	public List<User> getKnowsUser() {
+		return knowsUser;
 	}
 
 	public String getFirstName() {

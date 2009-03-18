@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.ConstraintViolation;
 
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -139,7 +140,7 @@ public class MetaConstraint<T, A extends Annotation> {
 	public <T> boolean validateConstraint(ExecutionContext<T> executionContext) {
 		final Object leafBeanInstance = executionContext.peekCurrentBean();
 		Object value = getValue( leafBeanInstance );
-		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 		constraintTree.validateConstraints( value, typeOfAnnoatedElement(), executionContext, constraintViolations );
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
@@ -149,7 +150,7 @@ public class MetaConstraint<T, A extends Annotation> {
 	}
 
 	public <T> boolean validateConstraint(Object value, ExecutionContext<T> executionContext) {
-		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 		constraintTree.validateConstraints( value, typeOfAnnoatedElement(), executionContext, constraintViolations );
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
