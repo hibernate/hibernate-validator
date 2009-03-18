@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Set that compares object by identity rather than equality.
+ * Set that compares object by identity rather than equality. Wraps around a <code>IdentityHashMap</code>
  *
  * @author Emmanuel Bernard
  */
@@ -103,5 +103,12 @@ public class IdentitySet implements Set {
 
 	public Object[] toArray(Object[] a) {
 		return map.keySet().toArray( a );
+	}
+
+	@Override
+	public String toString() {
+		return "IdentitySet{" +
+				"map=" + map +
+				'}';
 	}
 }

@@ -21,7 +21,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -46,11 +45,6 @@ public class MetaConstraint<T, A extends Annotation> {
 	private final ConstraintTree<A> constraintTree;
 
 	/**
-	 * The type the constraint was defined on.
-	 */
-	private final Type type;
-
-	/**
 	 * The member the constraint was defined on.
 	 */
 	private final Member member;
@@ -71,12 +65,11 @@ public class MetaConstraint<T, A extends Annotation> {
 	 */
 	private final Class<T> beanClass;
 
-	public MetaConstraint(Type type, ConstraintDescriptor<A> constraintDescriptor) {
-		this.type = type;
+	public MetaConstraint(Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
 		this.elementType = ElementType.TYPE;
 		this.member = null;
 		this.propertyName = "";
-		this.beanClass = ( Class<T> ) type.getClass();
+		this.beanClass = beanClass;
 		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 	}
 
@@ -90,7 +83,6 @@ public class MetaConstraint<T, A extends Annotation> {
 		else {
 			throw new IllegalArgumentException( "Non allowed member type: " + member );
 		}
-		this.type = null;
 		this.member = member;
 		this.propertyName = ReflectionHelper.getPropertyName( member );
 		this.beanClass = beanClass;
@@ -170,7 +162,7 @@ public class MetaConstraint<T, A extends Annotation> {
 		Type t;
 		switch ( elementType ) {
 			case TYPE: {
-				t = type;
+				t = beanClass;
 				break;
 			}
 			default: {

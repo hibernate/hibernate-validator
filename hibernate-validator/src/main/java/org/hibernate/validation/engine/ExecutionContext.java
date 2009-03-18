@@ -19,8 +19,11 @@ package org.hibernate.validation.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidatorContext;
@@ -51,10 +54,15 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	private final T rootBean;
 
 	/**
-	 * Maps for each group to an identity set to keep track of already validated objects. We have to make sure
-	 * that each object gets only validated once (per group).
+	 * Maps a group to an identity set to keep track of already validated objects. We have to make sure
+	 * that each object gets only validated once per group and property path.
 	 */
 	private final Map<Class<?>, IdentitySet> processedObjects;
+
+	/**
+	 * Maps an object to a list of paths in which it has been invalidated.
+	 */
+	private final Map<Object, Set<String>> processedPaths;
 
 	/**
 	 * A list of all failing constraints so far.
@@ -83,6 +91,13 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	private Stack<Object> beanStack = new Stack<Object>();
 
 	/**
+	 * Flag indicating whether an object can only be validated once per group or once per group AND validation path.
+	 *
+	 * @todo Make this boolean a configurable item.
+	 */
+	private boolean allowOneValidationPerPath = true;
+
+	/**
 	 * The message resolver which should be used in this context.
 	 */
 	private final MessageInterpolator messageInterpolator;
@@ -109,6 +124,7 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 
 		beanStack.push( object );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
+		processedPaths = new IdentityHashMap<Object, Set<String>>();
 		propertyPath = new ArrayList<String>();
 		failingConstraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 	}
@@ -168,29 +184,40 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 
 	public void setCurrentGroup(Class<?> currentGroup) {
 		this.currentGroup = currentGroup;
+		markProcessed();
 	}
 
-	public void markProcessedForCurrentGroup() {
-		if ( processedObjects.containsKey( currentGroup ) ) {
-			processedObjects.get( currentGroup ).add( beanStack.peek() );
+	/**
+	 * Returns <code>true</code> if the specified value has already been validated, <code>false</code> otherwise.
+	 * Each object can only be validated once per group and validation path. The flag {@link #allowOneValidationPerPath}
+	 * determines whether an object can only be validated once per group or once per group and validation path.Ê
+	 *
+	 * @param value The value to be validated.
+	 *
+	 * @return Returns <code>true</code> if the specified value has already been validated, <code>false</code> otherwise.
+	 */
+	public boolean isAlreadyValidated(Object value) {
+		boolean alreadyValidated;
+		alreadyValidated = isAlreadyValidatedForCurrentGroup( value );
+
+		if ( alreadyValidated && allowOneValidationPerPath ) {
+			alreadyValidated = isAlreadyValidatedForPath( value );
 		}
-		else {
-			IdentitySet set = new IdentitySet();
-			set.add( beanStack.peek() );
-			processedObjects.put( currentGroup, set );
-		}
+		return alreadyValidated;
 	}
 
-	public boolean isValidatedAgainstCurrentGroup(Object value) {
+	private boolean isAlreadyValidatedForPath(Object value) {
+		for ( String path : processedPaths.get( value ) ) {
+			if ( path.contains( peekPropertyPath() ) || peekPropertyPath().contains( path ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isAlreadyValidatedForCurrentGroup(Object value) {
 		final IdentitySet objectsProcessedInCurrentGroups = processedObjects.get( currentGroup );
 		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
-	}
-
-	private void addConstraintFailure(ConstraintViolationImpl<T> failingConstraintViolation) {
-		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
-		if ( i == -1 ) {
-			failingConstraintViolations.add( failingConstraintViolation );
-		}
 	}
 
 	public void addConstraintFailures(List<ConstraintViolationImpl<T>> failingConstraintViolations) {
@@ -226,15 +253,16 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 	public void markCurrentPropertyAsIndexed() {
 		String property = peekProperty();
 		property += "[]";
-		popProperty();
+		propertyPath.remove( propertyPath.size() - 1 );
 		pushProperty( property );
 	}
 
-	public void replacePropertyIndex(String index) {
-		// replace the last occurance of [<oldIndex>] with [<index>]
+	public void setPropertyIndex(String index) {
 		String property = peekProperty();
+
+		// replace the last occurance of [<oldIndex>] with [<index>]
 		property = property.replaceAll( "\\[[0-9]*\\]$", "[" + index + "]" );
-		popProperty();
+		propertyPath.remove( propertyPath.size() - 1 );
 		pushProperty( property );
 	}
 
@@ -297,12 +325,48 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 		);
 	}
 
+	private void markProcessed() {
+		markProcessForCurrentGroup();
+		if ( allowOneValidationPerPath ) {
+			markProcessedForCurrentPath();
+		}
+	}
+
+	private void markProcessedForCurrentPath() {
+		if ( processedPaths.containsKey( peekCurrentBean() ) ) {
+			processedPaths.get( peekCurrentBean() ).add( peekPropertyPath() );
+		}
+		else {
+			Set<String> set = new HashSet<String>();
+			set.add( peekPropertyPath() );
+			processedPaths.put( peekCurrentBean(), set );
+		}
+	}
+
+	private void markProcessForCurrentGroup() {
+		if ( processedObjects.containsKey( currentGroup ) ) {
+			processedObjects.get( currentGroup ).add( peekCurrentBean() );
+		}
+		else {
+			IdentitySet set = new IdentitySet();
+			set.add( peekCurrentBean() );
+			processedObjects.put( currentGroup, set );
+		}
+	}
+
+	private void addConstraintFailure(ConstraintViolationImpl<T> failingConstraintViolation) {
+		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
+		if ( i == -1 ) {
+			failingConstraintViolations.add( failingConstraintViolation );
+		}
+	}
+
 	class ValidatedProperty {
 
 		private final List<ErrorMessage> errorMessages = new ArrayList<ErrorMessage>( 3 );
 		private final String property;
 		private final String propertyParent;
-		private ConstraintDescriptor constraintDescriptor;
+		private ConstraintDescriptor<?> constraintDescriptor;
 		private boolean defaultDisabled;
 
 
@@ -311,11 +375,11 @@ public class ExecutionContext<T> implements ConstraintValidatorContext {
 			this.propertyParent = propertyParent;
 		}
 
-		public void setConstraintDescriptor(ConstraintDescriptor constraintDescriptor) {
+		public void setConstraintDescriptor(ConstraintDescriptor<?> constraintDescriptor) {
 			this.constraintDescriptor = constraintDescriptor;
 		}
 
-		public ConstraintDescriptor getConstraintDescriptor() {
+		public ConstraintDescriptor<?> getConstraintDescriptor() {
 			return constraintDescriptor;
 		}
 

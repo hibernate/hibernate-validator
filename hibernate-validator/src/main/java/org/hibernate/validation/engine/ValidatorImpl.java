@@ -201,7 +201,7 @@ public class ValidatorImpl implements Validator {
 			validateCascadedConstraints( context );
 		}
 
-		// process sequences depth-first to guarantee that groups following a violation within a group won't get executed. 
+		// process group sequences depth-first to guarantee that groups following a violation within a group won't get executed.
 		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			List<Group> sequence = sequenceIterator.next();
@@ -270,7 +270,6 @@ public class ValidatorImpl implements Validator {
 			}
 			executionContext.popProperty();
 		}
-		executionContext.markProcessedForCurrentGroup();
 		return validationSuccessful;
 	}
 
@@ -339,14 +338,11 @@ public class ValidatorImpl implements Validator {
 				actualValue = ( ( Map.Entry ) actualValue ).getValue();
 			}
 
-			if ( !context.isValidatedAgainstCurrentGroup( actualValue ) ) {
-				context.replacePropertyIndex( propertyIndex );
-
+			if ( !context.isAlreadyValidated( actualValue ) ) {
+				context.setPropertyIndex( propertyIndex );
 				context.pushCurrentBean( actualValue );
-				validateInContext(
-						context,
-						groupChainGenerator.getGroupChainFor( Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) )
-				);
+				GroupChain groupChain = groupChainGenerator.getGroupChainFor( Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) );
+				validateInContext( context, groupChain );
 				context.popCurrentBean();
 			}
 			i++;

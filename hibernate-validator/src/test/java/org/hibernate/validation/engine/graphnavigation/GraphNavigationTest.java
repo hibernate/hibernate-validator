@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -58,6 +58,6 @@ public class GraphNavigationTest {
 		Validator validator = TestUtil.getValidator();
 
 		Set<ConstraintViolation<Order>> constraintViolations = validator.validate( order );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
 	}
 }
