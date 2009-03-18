@@ -44,7 +44,7 @@
         This is a temporary dependency. Do not use this dependecy in production. 
         -->
         <dependency>
-            <groupId>javax.persistence</groupId>
+            <groupId>org.hibernate.java-persistence</groupId>
             <artifactId>jpa-api</artifactId>
             <version>2.0.Beta1-SNAPSHOT</version>
             <optional>true</optional>
