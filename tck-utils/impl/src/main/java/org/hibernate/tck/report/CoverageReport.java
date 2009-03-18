@@ -34,7 +34,8 @@ public class CoverageReport {
     public static final String SVN_BASE_URL_PROPERTY = "svn_base_url";
     
     private static final Pattern PATTERN_BOLD = Pattern.compile("([_][^_]*[_])");
-    private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("([~][^~]*[~])");    
+    private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("([~][^~]*[~])");
+    private static final Pattern PATTERN_LITERAL = Pattern.compile("([|][^|]*[|])");
     private static final String REPORT_FILE_NAME = "coverage.html";    
     
     private static final String COLOUR_SHADE_GREEN = "#ddffdd";
@@ -212,6 +213,8 @@ public class CoverageReport {
         sb.append("   font-style: italic; }\n");
         sb.append("  .highlight {\n");
         sb.append("    background-color: #ffff00; }\n");
+        sb.append("  .literal {\n");
+        sb.append("   font-family: courier new; }\n");
         sb.append("  .implied {\n");        
         sb.append("    color: #fff;\n");
         sb.append("    font-weight: bold;\n");
@@ -643,7 +646,7 @@ public class CoverageReport {
                        copyFile(imageFile, new File(imageTargetDir, imageFilename));
                     }
                     
-                    String assertionText = parseStrikethrough(parseBold(assertion.getText()));                    
+                    String assertionText = parseStrikethrough(parseBold(parseLiteral(assertion.getText())));                    
 
                     if (!Strings.isEmpty(assertion.getNote()))
                     {
@@ -766,6 +769,20 @@ public class CoverageReport {
          m.reset(result);
        }       
        return result;
+    }
+    
+    private String parseLiteral(String text)
+    {
+       Matcher m = PATTERN_LITERAL.matcher(text);
+       
+       String result = text;
+       while (m.find())
+       {
+         String replacement = "<span class=\"literal\">" + m.group().substring(1, m.group().length() - 1) + "</span>";
+         result = m.replaceFirst(replacement);
+         m.reset(result);
+       }       
+       return result;       
     }
 
     private void writeUnmatched(OutputStream out) throws IOException {
