@@ -18,7 +18,6 @@
 package org.hibernate.validation.engine.metadata;
 
 import javax.validation.PropertyDescriptor;
-import javax.validation.Validator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,26 +34,20 @@ import org.hibernate.validation.util.TestUtil;
 public class PropertyDescriptorTest {
 	@Test
 	public void testIsNotCascaded() {
-		Validator validator = TestUtil.getValidator();
-		PropertyDescriptor descriptor = validator.getConstraintsForClass( Order.class )
-				.getConstraintsForProperty( "orderNumber" );
+		PropertyDescriptor descriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		assertFalse( "Should not be cascaded", descriptor.isCascaded() );
 	}
 
 	@Test
 	public void testIsCascaded() {
-		Validator validator = TestUtil.getValidator();
-		PropertyDescriptor descriptor = validator.getConstraintsForClass( Customer.class )
-				.getConstraintsForProperty( "orderList" );
+		PropertyDescriptor descriptor = TestUtil.getPropertyDescriptor( Customer.class, "orderList" );
 		assertTrue( "Should be cascaded", descriptor.isCascaded() );
 	}
 
 	@Test
 	public void testPropertyName() {
-		Validator validator = TestUtil.getValidator();
 		String propertyName = "orderList";
-		PropertyDescriptor descriptor = validator.getConstraintsForClass( Customer.class )
-				.getConstraintsForProperty( propertyName );
+		PropertyDescriptor descriptor = TestUtil.getPropertyDescriptor( Customer.class, propertyName );
 		assertEquals( "Wrong property name", propertyName, descriptor.getPropertyName() );
 	}
 }

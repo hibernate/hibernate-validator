@@ -46,9 +46,7 @@ public class ElementDescriptorTest {
 
 	@Test
 	public void testGetTypeForConstrainedProperty() {
-		Validator validator = TestUtil.getValidator();
-		ElementDescriptor elementDescriptor = validator.getConstraintsForClass( Order.class )
-				.getConstraintsForProperty( "orderNumber" );
+		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		assertEquals( "Wrong type.", Integer.class, elementDescriptor.getType() );
 	}
 
@@ -57,9 +55,7 @@ public class ElementDescriptorTest {
 	 */
 	@Test
 	public void testElementDescriptorForProperty() {
-		Validator validator = TestUtil.getValidator();
-		ElementDescriptor elementDescriptor = validator.getConstraintsForClass( Order.class )
-				.getConstraintsForProperty( "orderNumber" );
+		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
 		assertTrue( "There should be a descriptor", constraintDescriptors.size() == 1 );
 	}
@@ -69,14 +65,11 @@ public class ElementDescriptorTest {
 	 */
 	@Test
 	public void testElementDescriptorImmutable() {
-		Validator validator = TestUtil.getValidator();
-		ElementDescriptor elementDescriptor = validator.getConstraintsForClass( Order.class )
-				.getConstraintsForProperty( "orderNumber" );
+		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
-		ConstraintDescriptor<?> descriptor = constraintDescriptors.iterator().next();
 
 		try {
-			constraintDescriptors.add( descriptor );
+			constraintDescriptors.add( null );
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
@@ -84,7 +77,7 @@ public class ElementDescriptorTest {
 		}
 
 		try {
-			constraintDescriptors.remove( descriptor );
+			constraintDescriptors.remove( null );
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {

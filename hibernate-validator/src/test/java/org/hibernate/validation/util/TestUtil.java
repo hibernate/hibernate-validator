@@ -18,11 +18,15 @@
 package org.hibernate.validation.util;
 
 import java.util.Set;
+import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
+import javax.validation.ElementDescriptor;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.PropertyDescriptor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 
@@ -48,7 +52,25 @@ public class TestUtil {
 		return hibernateValidator;
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage,  Class rootBean, Object invalidValue, String propertyPath, Class leafBean) {
+	public static ConstraintDescriptor<?> getSingleConstraintDescriptorFor(Class<?> clazz, String property) {
+		Set<ConstraintDescriptor<?>> constraintDescriptors = getConstraintDescriptorsFor( clazz, property );
+		assertTrue(
+				"This method should only be used when there is a single constraint", constraintDescriptors.size() == 1
+		);
+		return constraintDescriptors.iterator().next();
+	}
+
+	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, String property) {
+		Validator validator = getValidator();
+		return validator.getConstraintsForClass( clazz ).getConstraintsForProperty( property );
+	}
+
+	public static Set<ConstraintDescriptor<?>> getConstraintDescriptorsFor(Class<?> clazz, String property) {
+		ElementDescriptor elementDescriptor = getPropertyDescriptor( clazz, property );
+		return elementDescriptor.getConstraintDescriptors();
+	}
+
+	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath, Class leafBean) {
 		assertEquals(
 				"Wrong leaf bean type",
 				leafBean,

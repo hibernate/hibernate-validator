@@ -137,44 +137,26 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public T getAnnotation() {
 		return annotation;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Set<Class<?>> getGroups() {
 		return Collections.unmodifiableSet( groups );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
 		return Collections.unmodifiableList( constraintValidatorDefinitonClasses );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Map<String, Object> getAttributes() {
 		return Collections.unmodifiableMap( attributes );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
 		return Collections.unmodifiableSet( composingConstraints );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean isReportAsSingleViolation() {
 		return isReportAsSingleInvalidConstraint;
 	}
