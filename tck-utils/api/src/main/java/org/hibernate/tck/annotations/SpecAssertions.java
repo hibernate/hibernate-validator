@@ -1,4 +1,4 @@
-// $Id: SpecAssertion.java 15705 2008-12-18 16:21:24Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors

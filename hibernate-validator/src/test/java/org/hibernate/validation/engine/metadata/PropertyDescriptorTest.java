@@ -1,4 +1,4 @@
-// $Id: ElementDescriptorTest.java 16185 2009-03-19 13:55:43Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
