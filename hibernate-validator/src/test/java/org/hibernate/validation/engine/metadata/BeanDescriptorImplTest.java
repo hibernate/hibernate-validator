@@ -19,8 +19,6 @@ package org.hibernate.validation.engine.metadata;
 
 import java.util.Set;
 import javax.validation.BeanDescriptor;
-import javax.validation.ConstraintDescriptor;
-import javax.validation.ElementDescriptor;
 import javax.validation.PropertyDescriptor;
 import javax.validation.Validator;
 
@@ -31,10 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-import org.hibernate.validation.engine.metadata.Account;
-import org.hibernate.validation.engine.metadata.Customer;
 import org.hibernate.validation.engine.Order;
-import org.hibernate.validation.engine.metadata.UnconstraintEntity;
 import org.hibernate.validation.util.TestUtil;
 
 
@@ -44,30 +39,35 @@ import org.hibernate.validation.util.TestUtil;
 public class BeanDescriptorImplTest {
 
 	@Test
-	public void testHasConstraintsAndIsBeanConstrained() {
+	public void testIsBeanConstrained() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
 
+		// constraint via @Valid
 		assertFalse( "There should be no direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
 		assertTrue( "Bean should be constrainted due to @valid ", beanDescriptor.isBeanConstrained() );
 
+		// constraint hosted on bean itself
 		beanDescriptor = validator.getConstraintsForClass( Account.class );
-		assertTrue(
-				"Bean should be constrainted due to @valid", beanDescriptor.isBeanConstrained()
-		);
+		assertTrue( "There should be direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
+		assertTrue( "Bean should be constrainted due to @valid", beanDescriptor.isBeanConstrained() );
+
+		// constraint on bean property
+		beanDescriptor = validator.getConstraintsForClass( Order.class );
+		assertFalse( "There should be no direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
+		assertTrue( "Bean should be constrainted due to @NotNull", beanDescriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testUnconstraintClass() {
 		Validator validator = TestUtil.getValidator();
-		assertFalse(
-				"There should be no constraints",
-				validator.getConstraintsForClass( UnconstraintEntity.class ).hasConstraints()
-		);
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( UnconstraintEntity.class );
+		assertFalse( "There should be no direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
+		assertFalse( "Bean should be unconstrainted.", beanDescriptor.isBeanConstrained() );
 	}
 
 	@Test
-	public void testGetConstraintsForProperty() {
+	public void testGetConstraintForExistingConstrainedProperty() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
@@ -75,17 +75,40 @@ public class BeanDescriptorImplTest {
 				"There should be one constraint descriptor", 1, propertyDescriptor.getConstraintDescriptors().size()
 		);
 
-		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( "foobar" ) );
-
-		// TODO Is this corect or should we get a IllegalArgumentException
-		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( null ) );
-
 		beanDescriptor = validator.getConstraintsForClass( Customer.class );
 		propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderList" );
 		assertEquals(
 				"There should be no constraint descriptors", 0, propertyDescriptor.getConstraintDescriptors().size()
 		);
 		assertTrue( "The property should be cascaded", propertyDescriptor.isCascaded() );
+	}
+
+	@Test
+	public void testGetConstraintForUnConstrainedProperty() {
+		Validator validator = TestUtil.getValidator();
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
+		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderList" );
+		assertEquals(
+				"There should be no constraint descriptors", 0, propertyDescriptor.getConstraintDescriptors().size()
+		);
+		assertTrue( "The property should be cascaded", propertyDescriptor.isCascaded() );
+	}
+
+	@Test
+	public void testGetConstraintsForNonExistingProperty() {
+		Validator validator = TestUtil.getValidator();
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
+		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( "foobar" ) );
+	}
+
+	/**
+	 * @todo Is this corect or should we get a IllegalArgumentException
+	 */
+	@Test
+	public void testGetConstraintsForNullProperty() {
+		Validator validator = TestUtil.getValidator();
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
+		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( null ) );
 	}
 
 	/**
@@ -98,12 +121,20 @@ public class BeanDescriptorImplTest {
 		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
 		assertEquals( "There should be only one property", 1, constraintProperties.size() );
 		boolean hasOrderNumber = false;
-		for(PropertyDescriptor pd : constraintProperties) {
+		for ( PropertyDescriptor pd : constraintProperties ) {
 			hasOrderNumber |= pd.getPropertyName().equals( "orderNumber" );
 		}
 		assertTrue( "Wrong property", hasOrderNumber );
+	}
 
-
+	/**
+	 * HV-95
+	 */
+	@Test
+	public void testGetConstrainedPropertiesImmutable() {
+		Validator validator = TestUtil.getValidator();
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
+		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
 		try {
 			constraintProperties.add( null );
 			fail( "Set should be immutable" );
@@ -113,7 +144,7 @@ public class BeanDescriptorImplTest {
 		}
 
 		try {
-			constraintProperties.remove( "orderNumber" );
+			constraintProperties.remove( constraintProperties.iterator().next() );
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
@@ -125,28 +156,10 @@ public class BeanDescriptorImplTest {
 	 * HV-95
 	 */
 	@Test
-	public void testElementDescriptorImmutable() {
+	public void testGetConstrainedPropertiesForUnconstraintEntity() {
 		Validator validator = TestUtil.getValidator();
-		ElementDescriptor elementDescriptor = validator.getConstraintsForClass( Order.class )
-				.getConstraintsForProperty( "orderNumber" );
-		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
-		assertTrue( "There should be a ConstraintDescriptor", constraintDescriptors.size() == 1 );
-		ConstraintDescriptor<?> descriptor = constraintDescriptors.iterator().next();
-
-		try {
-			constraintDescriptors.add( descriptor );
-			fail( "Set should be immutable" );
-		}
-		catch ( UnsupportedOperationException e ) {
-
-		}
-
-		try {
-			constraintDescriptors.remove( descriptor );
-			fail( "Set should be immutable" );
-		}
-		catch ( UnsupportedOperationException e ) {
-
-		}
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( UnconstraintEntity.class );
+		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
+		assertEquals( "We should get the empty set.", 0, constraintProperties.size() );
 	}
 }

@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,33 +17,18 @@
 */
 package org.hibernate.validation.engine.metadata;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validation.engine.metadata.Customer;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
- * Class with no constraints but with a cascade @Valid annotation
+ * @author Hardy Ferentschik
  */
-@AccountChecker
-public class Account {
-	private String accountLogin;
-	private Customer customer;
+public class AccountValidator implements ConstraintValidator<AccountChecker, Account> {
 
-	public String getAccountLogin() {
-		return accountLogin;
+	public void initialize(AccountChecker parameters) {
 	}
 
-	public void setAccountLogin(String accountLogin) {
-		this.accountLogin = accountLogin;
-	}
-
-	@Valid
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
+	public boolean isValid(Account account, ConstraintValidatorContext constraintValidatorContext) {
+		return false;
 	}
 }

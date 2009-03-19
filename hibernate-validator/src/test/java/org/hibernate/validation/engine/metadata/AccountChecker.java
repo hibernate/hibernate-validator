@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,33 +17,27 @@
 */
 package org.hibernate.validation.engine.metadata;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.lang.annotation.Documented;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
 
-import org.hibernate.validation.engine.metadata.Customer;
+
 
 /**
- * Class with no constraints but with a cascade @Valid annotation
+ * @author Hardy Ferentschik
  */
-@AccountChecker
-public class Account {
-	private String accountLogin;
-	private Customer customer;
+@Constraint(validatedBy = AccountValidator.class)
+@Documented
+@Target({ METHOD, FIELD, TYPE })
+@Retention(RUNTIME)
+public @interface AccountChecker {
 
-	public String getAccountLogin() {
-		return accountLogin;
-	}
+	public abstract String message() default "Account information inconsistent.";
 
-	public void setAccountLogin(String accountLogin) {
-		this.accountLogin = accountLogin;
-	}
-
-	@Valid
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
+	public abstract Class<?>[] groups() default { };
 }
