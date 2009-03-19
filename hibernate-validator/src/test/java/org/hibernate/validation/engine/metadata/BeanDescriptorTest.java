@@ -36,7 +36,7 @@ import org.hibernate.validation.util.TestUtil;
 /**
  * @author Hardy Ferentschik
  */
-public class BeanDescriptorImplTest {
+public class BeanDescriptorTest {
 
 	@Test
 	public void testIsBeanConstrained() {

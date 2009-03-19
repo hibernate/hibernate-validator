@@ -1,4 +1,4 @@
-// $Id$
+// $Id: ElementDescriptorTest.java 16185 2009-03-19 13:55:43Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,12 +17,11 @@
 */
 package org.hibernate.validation.engine.metadata;
 
-import java.util.Set;
-import javax.validation.ConstraintDescriptor;
-import javax.validation.ElementDescriptor;
+import javax.validation.PropertyDescriptor;
 import javax.validation.Validator;
 
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -33,33 +32,29 @@ import org.hibernate.validation.util.TestUtil;
 /**
  * @author Hardy Ferentschik
  */
-public class ElementDescriptorImplTest {
-	/**
-	 * HV-95
-	 */
+public class PropertyDescriptorTest {
 	@Test
-	public void testElementDescriptorImmutable() {
+	public void testIsNotCascaded() {
 		Validator validator = TestUtil.getValidator();
-		ElementDescriptor elementDescriptor = validator.getConstraintsForClass( Order.class )
+		PropertyDescriptor descriptor = validator.getConstraintsForClass( Order.class )
 				.getConstraintsForProperty( "orderNumber" );
-		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
-		assertTrue( "There should be a ConstraintDescriptor", constraintDescriptors.size() == 1 );
-		ConstraintDescriptor<?> descriptor = constraintDescriptors.iterator().next();
+		assertFalse( "Should not be cascaded", descriptor.isCascaded() );
+	}
 
-		try {
-			constraintDescriptors.add( descriptor );
-			fail( "Set should be immutable" );
-		}
-		catch ( UnsupportedOperationException e ) {
+	@Test
+	public void testIsCascaded() {
+		Validator validator = TestUtil.getValidator();
+		PropertyDescriptor descriptor = validator.getConstraintsForClass( Customer.class )
+				.getConstraintsForProperty( "orderList" );
+		assertTrue( "Should be cascaded", descriptor.isCascaded() );
+	}
 
-		}
-
-		try {
-			constraintDescriptors.remove( descriptor );
-			fail( "Set should be immutable" );
-		}
-		catch ( UnsupportedOperationException e ) {
-
-		}
+	@Test
+	public void testPropertyName() {
+		Validator validator = TestUtil.getValidator();
+		String propertyName = "orderList";
+		PropertyDescriptor descriptor = validator.getConstraintsForClass( Customer.class )
+				.getConstraintsForProperty( propertyName );
+		assertEquals( "Wrong property name", propertyName, descriptor.getPropertyName() );
 	}
 }
