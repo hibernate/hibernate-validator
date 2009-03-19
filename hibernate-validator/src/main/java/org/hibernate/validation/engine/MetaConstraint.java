@@ -99,24 +99,6 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree.getDescriptor().getGroups();
 	}
 
-	/**
-	 * @return Returns <code>true</code> in case the constraint is defined on a collection, <code>false</code>
-	 *         otherwise.
-	 */
-	public boolean isCollection() {
-		Type t = typeOfAnnoatedElement();
-		return ReflectionHelper.isCollection( t );
-	}
-
-	/**
-	 * @return Returns <code>true</code> in case the constraint is defined on an array, <code>false</code>
-	 *         otherwise.
-	 */
-	public boolean isArray() {
-		Type t = typeOfAnnoatedElement();
-		return ReflectionHelper.isArray( t );
-	}
-
 	public ConstraintDescriptor getDescriptor() {
 		return constraintTree.getDescriptor();
 	}

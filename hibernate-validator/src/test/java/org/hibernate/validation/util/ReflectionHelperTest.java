@@ -18,15 +18,21 @@
 package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeSet;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -38,6 +44,47 @@ import org.junit.Test;
  * @author Hardy Ferentschik
  */
 public class ReflectionHelperTest {
+
+	@Test
+	public void testIsIterable() throws Exception {
+		Type type = TestTypes.class.getField( "stringList" ).getGenericType();
+		assertTrue( ReflectionHelper.isIterable( type ) );
+
+		assertTrue( ReflectionHelper.isIterable( new TreeSet<Object>().getClass() ) );
+
+		assertTrue( ReflectionHelper.isIterable( List.class ) );
+		assertTrue( ReflectionHelper.isIterable( HashSet.class ) );
+		assertTrue( ReflectionHelper.isIterable( Iterable.class ) );
+		assertTrue( ReflectionHelper.isIterable( Collection.class ) );
+
+		assertFalse( ReflectionHelper.isIterable( null ) );
+		assertFalse( ReflectionHelper.isIterable( Object.class ) );
+	}
+
+	@Test
+	public void testIsMap() throws Exception {
+		assertTrue( ReflectionHelper.isMap( Map.class ) );
+		assertTrue( ReflectionHelper.isMap( SortedMap.class ) );
+
+		Type type = TestTypes.class.getField( "objectMap" ).getGenericType();
+		assertTrue( ReflectionHelper.isMap( type ) );
+
+		assertFalse( ReflectionHelper.isMap( null ) );
+		assertFalse( ReflectionHelper.isMap( Object.class ) );
+	}
+
+	@Test
+	public void testGetIndexedType() throws Exception {
+		Type type = TestTypes.class.getField( "stringList" ).getGenericType();
+		assertEquals( String.class, ReflectionHelper.getIndexedType( type ) );
+
+		type = TestTypes.class.getField( "objectMap" ).getGenericType();
+		assertEquals( Object.class, ReflectionHelper.getIndexedType( type ) );
+
+		type = TestTypes.class.getField( "stringArray" ).getGenericType();
+		assertEquals( String.class, ReflectionHelper.getIndexedType( type ) );
+	}
+
 	@Test
 	public void testGetIndexedValueForMap() {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -117,5 +164,11 @@ public class ReflectionHelperTest {
 					e.getMessage().startsWith( "The specified annotation defines no parameter" )
 			);
 		}
+	}
+
+	public class TestTypes {
+		public List<String> stringList;
+		public Map<String, Object> objectMap;
+		public String[] stringArray;
 	}
 }

@@ -21,7 +21,6 @@ import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -29,12 +28,14 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.validation.ValidationException;
+
+import com.googlecode.jtype.TypeUtils;
 
 /**
  * Some reflection utility methods.
@@ -213,7 +214,7 @@ public class ReflectionHelper {
 		}
 	}
 
-	public static Class<?> loadClass(String name, Class caller) throws ClassNotFoundException {
+	public static Class<?> loadClass(String name, Class<?> caller) throws ClassNotFoundException {
 		try {
 			//try context classloader, if fails try caller classloader
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -231,107 +232,70 @@ public class ReflectionHelper {
 	}
 
 	/**
-	 * Determines the type of elements of a generic collection or array.
+	 * Determines the type of elements of an <code>Iterable</code>, array or the value of a <code>Map</code>.
 	 *
-	 * @param type the collection or array type.
+	 * @param type the type to inspect
 	 *
-	 * @return the element type of the generic collection/array or <code>null</code> in case the specified type is not a collection/array or the
-	 *         element type cannot be determined.
-	 *
-	 * @todo Verify algorithm. Does this hold up in most cases?
+	 * @return Returns the type of elements of an <code>Iterable</code>, array or the value of a <code>Map</code>. <code>
+	 *         null</code> is returned in case the type is not indexable (in the context of JSR 303).
 	 */
 	public static Type getIndexedType(Type type) {
 		Type indexedType = null;
-		if ( isCollection( type ) && type instanceof ParameterizedType ) {
+		if ( isIterable( type ) && type instanceof ParameterizedType ) {
 			ParameterizedType paramType = ( ParameterizedType ) type;
-			Class collectionClass = getCollectionClass( type );
-			if ( collectionClass == Collection.class || collectionClass == java.util.List.class || collectionClass == java.util.Set.class || collectionClass == java.util.SortedSet.class ) {
-				indexedType = paramType.getActualTypeArguments()[0];
-			}
-			else if ( collectionClass == Map.class || collectionClass == java.util.SortedMap.class ) {
-				indexedType = paramType.getActualTypeArguments()[1];
-			}
+			indexedType = paramType.getActualTypeArguments()[0];
 		}
-		else if ( ReflectionHelper.isArray( type ) && type instanceof GenericArrayType ) {
-			GenericArrayType arrayTye = ( GenericArrayType ) type;
-			indexedType = arrayTye.getGenericComponentType();
+		else if ( isMap( type ) && type instanceof ParameterizedType ) {
+			ParameterizedType paramType = ( ParameterizedType ) type;
+			indexedType = paramType.getActualTypeArguments()[1];
+		}
+		else if ( TypeUtils.isArray( type ) ) {
+			indexedType = TypeUtils.getComponentType( type );
 		}
 		return indexedType;
 	}
 
-
 	/**
 	 * @param type the type to check.
 	 *
-	 * @return Returns <code>true</code> if <code>type</code> is an array type or <code>false</code> otherwise.
+	 * @return Returns <code>true</code> if <code>type</code> is a iterable type, <code>false</code> otherwise.
 	 */
-	public static boolean isArray(Type type) {
-		if ( type instanceof Class ) {
-			return ( ( Class ) type ).isArray();
-		}
-		return type instanceof GenericArrayType;
-	}
-
-
-	/**
-	 * @param type the type to check.
-	 *
-	 * @return Returns <code>true</code> if <code>type</code> is a collection type or <code>false</code> otherwise.
-	 */
-	public static boolean isCollection(Type type) {
-		return getCollectionClass( type ) != null;
-	}
-
-
-	/**
-	 * Returns the collection class for the specified type provided it is a collection.
-	 * <p>
-	 * This is a simplified version of commons annotations </code>TypeUtils.getCollectionClass()</code>.
-	 * </p>
-	 *
-	 * @param type the <code>Type</code> to check.
-	 *
-	 * @return the collection class, or <code>null</code> if type is not a collection class.
-	 */
-	@SuppressWarnings("unchecked")
-	public static Class<? extends Collection> getCollectionClass(Type type) {
-		if ( type instanceof Class && isCollectionClass( ( Class ) type ) ) {
-			return ( Class<? extends Collection> ) type;
+	public static boolean isIterable(Type type) {
+		if ( type instanceof Class && isIterableClass( ( Class ) type ) ) {
+			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
-			return getCollectionClass( ( ( ParameterizedType ) type ).getRawType() );
+			return isIterable( ( ( ParameterizedType ) type ).getRawType() );
 		}
 		if ( type instanceof WildcardType ) {
 			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
 			if ( upperBounds.length == 0 ) {
-				return null;
+				return false;
 			}
-			return getCollectionClass( upperBounds[0] );
+			return isIterable( upperBounds[0] );
 		}
-		return null;
+		return false;
 	}
 
 	/**
-	 * Checks whether the specified class parameter is an instance of a collection class.
+	 * @param type the type to check.
 	 *
-	 * @param clazz <code>Class</code> to check.
-	 *
-	 * @return <code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.
+	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>Map</code>, <code>false</code> otherwise.
 	 */
-	private static boolean isCollectionClass(Class<?> clazz) {
-		Class[] interfaces = clazz.getInterfaces();
-
-		for ( Class interfaceClass : interfaces ) {
-			if ( interfaceClass == Collection.class
-					|| interfaceClass == java.util.List.class
-					|| interfaceClass == java.util.Set.class
-					|| interfaceClass == java.util.Map.class
-					|| interfaceClass == java.util.SortedSet.class // extension to the specs
-					|| interfaceClass == java.util.SortedMap.class ) { // extension to the specs)
-				return true;
-			}
+	public static boolean isMap(Type type) {
+		if ( type instanceof Class && isMapClass( ( Class ) type ) ) {
+			return true;
 		}
-
+		if ( type instanceof ParameterizedType ) {
+			return isMap( ( ( ParameterizedType ) type ).getRawType() );
+		}
+		if ( type instanceof WildcardType ) {
+			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
+			if ( upperBounds.length == 0 ) {
+				return false;
+			}
+			return isMap( upperBounds[0] );
+		}
 		return false;
 	}
 
@@ -368,16 +332,14 @@ public class ReflectionHelper {
 
 		Iterator<?> iter = null;
 		Type type = value.getClass();
-		if ( isCollection( type ) ) {
-			boolean isIterable = value instanceof Iterable;
-			Map<?, ?> map = !isIterable ? ( Map<?, ?> ) value : null;
-			Iterable<?> elements = isIterable ?
-					( Iterable<?> ) value :
-					map.values();
-			iter = elements.iterator();
-
+		if ( isIterable( type ) ) {
+			iter = ( ( Iterable<?> ) value ).iterator();
 		}
-		else if ( isArray( type ) ) {
+		else if ( isMap( type ) ) {
+			Map<?, ?> map = ( Map<?, ?> ) value;
+			iter = map.values().iterator();
+		}
+		else if ( TypeUtils.isArray( type ) ) {
 			List<?> arrayList = Arrays.asList( value );
 			iter = arrayList.iterator();
 		}
@@ -403,7 +365,7 @@ public class ReflectionHelper {
 	 * @return Returns <code>true</code> if the cass contains a field or member for the specified property, <code>
 	 *         false</code> otherwise.
 	 */
-	public static boolean containsMember(Class clazz, String property) {
+	public static boolean containsMember(Class<?> clazz, String property) {
 		try {
 			clazz.getField( property );
 			return true;
@@ -435,5 +397,47 @@ public class ReflectionHelper {
 		return Class.forName( name, true, caller.getClassLoader() );
 	}
 
+	/**
+	 * Get all superclasses and interfaces recursively.
+	 *
+	 * @param clazz The class to start the search with.
+	 * @param classes List of classes to which to add all found super classes and interfaces.
+	 */
+	private static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes) {
+		for ( Class current = clazz; current != null; current = current.getSuperclass() ) {
+			if ( classes.contains( current ) ) {
+				return;
+			}
+			classes.add( current );
+			for ( Class currentInterface : current.getInterfaces() ) {
+				computeClassHierarchy( currentInterface, classes );
+			}
+		}
+	}
 
+	/**
+	 * Checks whether the specified class parameter is an instance of a collection class.
+	 *
+	 * @param clazz <code>Class</code> to check.
+	 *
+	 * @return <code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.
+	 */
+	private static boolean isIterableClass(Class<?> clazz) {
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		computeClassHierarchy( clazz, classes );
+		return classes.contains( Iterable.class );
+	}
+
+	/**
+	 * Checks whether the specified class parameter is an instance of a collection class.
+	 *
+	 * @param clazz <code>Class</code> to check.
+	 *
+	 * @return <code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.
+	 */
+	private static boolean isMapClass(Class<?> clazz) {
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		computeClassHierarchy( clazz, classes );
+		return classes.contains( Map.class );
+	}
 }

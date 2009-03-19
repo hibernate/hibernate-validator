@@ -36,6 +36,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
+import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.engine.groups.Group;
@@ -300,16 +301,16 @@ public class ValidatorImpl implements Validator {
 	 */
 	private <T> Iterator<?> createIteratorForCascadedValue(ExecutionContext<T> context, Type type, Object value) {
 		Iterator<?> iter;
-		if ( ReflectionHelper.isCollection( type ) ) {
-			boolean isIterable = value instanceof Iterable;
-			Map<?, ?> map = !isIterable ? ( Map<?, ?> ) value : null;
-			Iterable<?> elements = isIterable ?
-					( Iterable<?> ) value :
-					map.entrySet();
-			iter = elements.iterator();
+		if ( ReflectionHelper.isIterable( type ) ) {
+			iter = ( ( Iterable<?> ) value ).iterator();
 			context.markCurrentPropertyAsIndexed();
 		}
-		else if ( ReflectionHelper.isArray( type ) ) {
+		else if ( ReflectionHelper.isMap( type ) ) {
+			Map<?, ?> map = ( Map<?, ?> ) value;
+			iter = map.values().iterator();
+			context.markCurrentPropertyAsIndexed();
+		}
+		else if ( TypeUtils.isArray( type ) ) {
 			List<?> arrayList = Arrays.asList( value );
 			iter = arrayList.iterator();
 			context.markCurrentPropertyAsIndexed();
