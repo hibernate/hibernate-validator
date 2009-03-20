@@ -69,7 +69,7 @@
     implementation nor this documenation is complete. However, implementation
     should be in a state allowing first experiments with this new API. The
     following list shows the missing features in relation to the <ulink
-    url="http://in.relation.to/service/File/10774">1.0.Beta4 version of JSR
+    url="http://in.relation.to/service/File/10924">1.0.CR1 version of JSR
     303</ulink> :</para>
 
     <itemizedlist>
