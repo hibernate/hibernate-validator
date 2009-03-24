@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="1.0"
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
+    <jxb:bindings schemaLocation="../xsd/validation-mapping-1.0.xsd" node="/xs:schema">
+        <jxb:bindings node="//xs:complexType[8]/xs:sequence[1]/xs:element[1]">
+            <jxb:property name="classType"/>
+        </jxb:bindings>
+    </jxb:bindings>
+</jxb:bindings>
+        

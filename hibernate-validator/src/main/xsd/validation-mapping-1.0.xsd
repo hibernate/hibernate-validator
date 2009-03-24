@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://jboss.org/xml/ns/javax/validation/mapping"
+           xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           version="1.0">
+    <xs:element name="constraint-mappings"
+                type="map:constraint-mappingsType"
+                xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+
+    <xs:complexType name="groupsType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="groupSequenceType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="constraint-mappingsType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="default-package" minOccurs="0"/>
+            <xs:element type="map:beanType"
+                        name="bean"
+                        maxOccurs="unbounded"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+            <xs:element type="map:constraint-definitionType"
+                        name="constraint-definition"
+                        maxOccurs="unbounded"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="validated-byType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="include-existing-validators" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="constraintType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="message" minOccurs="0"/>
+            <xs:element type="map:groupsType"
+                        name="groups"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+            <xs:element type="map:elementType"
+                        name="element"
+                        maxOccurs="unbounded"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="annotation" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="elementType" mixed="true">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="map:annotationType"
+                        name="annotation"
+                        maxOccurs="unbounded"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="classType">
+        <xs:sequence>
+            <xs:element type="groupSequenceType" name="group-sequence" minOccurs="0"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        maxOccurs="unbounded"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="beanType">
+        <xs:sequence>
+            <xs:element type="map:classType"
+                        name="class"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping">
+            </xs:element>
+            <xs:element type="map:fieldType"
+                        name="field"
+                        minOccurs="0"
+                        maxOccurs="unbounded"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+            <xs:element type="map:getterType"
+                        name="getter"
+                        minOccurs="0"
+                        maxOccurs="unbounded"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="class" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="annotationType">
+        <xs:sequence>
+            <xs:element type="map:elementType"
+                        name="element"
+                        maxOccurs="unbounded"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="getterType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        minOccurs="0"
+                        maxOccurs="unbounded"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="constraint-definitionType">
+        <xs:sequence>
+            <xs:element type="map:validated-byType"
+                        name="validated-by"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="annotation" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="fieldType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        minOccurs="0"
+                        maxOccurs="unbounded"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+</xs:schema>
