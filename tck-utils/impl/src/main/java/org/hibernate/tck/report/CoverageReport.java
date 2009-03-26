@@ -646,7 +646,7 @@ public class CoverageReport {
                        copyFile(imageFile, new File(imageTargetDir, imageFilename));
                     }
                     
-                    String assertionText = parseStrikethrough(parseBold(parseLiteral(assertion.getText())));                    
+                    String assertionText = parseStrikethrough(parseBold(parseLiteral(escape(assertion.getText()))));                    
 
                     if (!Strings.isEmpty(assertion.getNote()))
                     {
