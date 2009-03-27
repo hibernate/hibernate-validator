@@ -6,7 +6,7 @@
            xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
            version="1.0">
     <xs:element name="validation-config" type="validation-configType"/>
-    <xs:complexType name="validation-configType">
+    <xs:complexType name="validation-configType" >
         <xs:sequence>
             <xs:element type="xs:string" name="default-provider" minOccurs="0"/>
             <xs:element type="xs:string" name="message-interpolator" minOccurs="0"/>

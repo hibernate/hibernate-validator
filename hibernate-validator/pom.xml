@@ -65,6 +65,9 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
+            <resource>
+              <directory>src/main/xsd</directory>
+            </resource>
         </resources>
         <plugins>
             <plugin>

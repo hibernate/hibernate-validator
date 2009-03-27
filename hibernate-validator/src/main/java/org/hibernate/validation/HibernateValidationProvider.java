@@ -49,7 +49,7 @@ public class HibernateValidationProvider implements ValidationProvider {
 					"Illegal call to createSpecializedConfiguration() for a non suitable provider"
 			);
 		}
-		//cast protected  by isSuitable call
+		//cast protected by isSuitable call
 		return configurationClass.cast( new ConfigurationImpl( this ) );
 	}
 
