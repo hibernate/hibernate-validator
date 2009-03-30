@@ -314,7 +314,7 @@ public class CarTest {
         assertEquals(1, constraintViolations.size());
         assertEquals(
             "Case mode must be UPPER.", 
-            constraintViolations.iterator().next().getInterpolatedMessage());
+            constraintViolations.iterator().next().getMessage());
     }
 
     @Test
@@ -552,7 +552,7 @@ public class CarTest {
         assertEquals(1, constraintViolations.size());
         assertEquals(
             "Passenger count must be less than or equal to seat count.",
-            constraintViolations.iterator().next().getInterpolatedMessage());
+            constraintViolations.iterator().next().getMessage());
     }
 
     @Test
