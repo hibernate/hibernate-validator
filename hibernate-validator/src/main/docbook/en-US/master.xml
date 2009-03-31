@@ -65,36 +65,11 @@
   <preface>
     <title>Preface Alpha Release</title>
 
-    <para>This release has alpha status, meaning that neither the
-    implementation nor this documenation is complete. However, implementation
-    should be in a state allowing first experiments with this new API. The
-    following list shows the missing features in relation to the <ulink
-    url="http://in.relation.to/service/File/10924">1.0.CR1 version of JSR
-    303</ulink> :</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Implicit grouping</para>
-      </listitem>
-
-      <listitem>
-        <para>Implementation of the <classname>TraversableResolver</classname>
-        interface to allow integration with JPA</para>
-      </listitem>
-
-      <listitem>
-        <para>XML configuration</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>You can find more information about the current state of the
-    implementation on the <ulink url="http://www.hibernate.org/459.html">Bean
-    Validation Roadmap</ulink>.</para>
-
-    <para>The documentation contains so far only a "Getting started" section.
-    Work is in progress in this area and following releases will have more up
-    to date documentation. For now refer to JSR 303 directly for further
-    examples.</para>
+    <para>This release has alpha status, which means that neither the
+    implementation nor this documenation is complete. You can find more
+    information about the current state of the implementation on the <ulink
+    url="http://www.hibernate.org/459.html">Bean Validation Roadmap</ulink> or
+    you can refer to JSR 303 directly for further examples.</para>
 
     <para>Please report any problems or bugs in either <ulink
     url="http://opensource.atlassian.com/projects/hibernate/browse/HV">Jira
@@ -129,13 +104,16 @@
 
   <!--xi:include href="modules/introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" /-->
 
-  <xi:include href="modules/gettingstarted.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/gettingstarted.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
 
-  <!--  
-  <xi:include href="modules/usingvalidator.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />	
--->
-  <xi:include href="modules/customconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-<!--
+  <xi:include href="modules/usingvalidator.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/customconstraints.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <!--
   <xi:include href="modules/xmlconfiguration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/integration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/extendedri.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

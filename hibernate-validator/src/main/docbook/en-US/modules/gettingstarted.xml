@@ -26,7 +26,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-gettingstarted">
-  <title id="getting-started">Getting started in 5 minutes</title>
+  <title id="getting-started">Getting started</title>
 
   <para>This chapter will show you how to quickly get started with the
   reference implementation (RI) of the Bean Validation API as specified by JSR
@@ -104,9 +104,11 @@
     <para>Finally confirm all entered values and change into the newly created
     project directory. All properties of a Maven project (such as its
     dependencies to other libraries, the steps to be performed during build
-    etc.) are described in a file called pom.xml (project object model),
-    located in the project's root directory. Now open the project's pom.xml
-    and perform the following changes:</para>
+    etc.) are described in a file called pom.xml (<emphasis
+    role="bold">p</emphasis>roject <emphasis role="bold">o</emphasis>bject
+    <emphasis role="bold">m</emphasis>odel), located in the project's root
+    directory. Now open the project's pom.xml and perform the following
+    changes:</para>
 
     <itemizedlist>
       <listitem>
@@ -178,7 +180,7 @@
     <title>Applying constraints to a model class</title>
 
     <para>Having set up the project, it's time now to actually make use of the
-    Bean Validation API. Therefore, open the project in the IDE of you choice
+    Bean Validation API. Therefore, open the project in the IDE of your choice
     (for Eclipse, you may type mvn eclipse:eclipse to create a standard
     Eclipse project configuration OR you may use the <ulink
     url="http://m2eclipse.codehaus.org/">M2Eclipse</ulink> plugin. NetBeans
@@ -215,28 +217,29 @@ public class Car {
 
 }</programlisting></para>
 
-    <para>@NotNull, @Size and @Min are so-called constraint annotions, that we
-    use to declare certain constraints, which shall be applied to the fields
-    of a Car instance:</para>
+    <para><classname>@NotNull</classname>, <classname>@Size</classname> and
+    <classname>@Min</classname> are so-called constraint annotions, that we
+    use to declare constraints, which shall be applied to the fields of a
+    <classname>Car</classname> instance:</para>
 
     <itemizedlist>
       <listitem>
-        <para>manufacturer shall never be null</para>
+        <para><property>manufacturer</property> shall never be null</para>
       </listitem>
 
       <listitem>
-        <para>licensePlate shall never be null and must be between 2 and 14
-        characters long</para>
+        <para><property>licensePlate</property> shall never be null and must
+        be between 2 and 14 characters long</para>
       </listitem>
 
       <listitem>
-        <para>seatCount shall be at least 2.</para>
+        <para><property>seatCount</property> shall be at least 2.</para>
       </listitem>
     </itemizedlist>
 
-    <para>To perform a validation of these constraints, we use the Validator
-    interface defined by the specification. Let's try it in a test for our Car
-    class:</para>
+    <para>To perform a validation of these constraints, we use the
+    <classname>Validator</classname> interface defined by the specification.
+    Let's try it in a test for our <classname>Car</classname> class:</para>
 
     <para><programlisting>package com.mycompany;
 
@@ -313,41 +316,45 @@ public class CarTest {
     }
 }</programlisting></para>
 
-    <para>In the setUp() method we get a Validator object from the
-    ValidatorFactory. A Validator instance is thread-safe and may be reused
+    <para>In the <methodname>setUp()</methodname> method we get a
+    <classname>Validator</classname> object from the
+    <classname>ValidatorFactory</classname>. A
+    <classname>Validator</classname> instance is thread-safe and may be reused
     multiple times, therefore we store it as field of our test class. We can
     use the validator now to validate the different car objects in the test
     methods.</para>
 
-    <para>The validate() method returns a set of ConstraintViolation objects,
-    which we can iterate through in order to see which validation errors
-    occured. The first three test methods show some expected constraint
-    violations:</para>
+    <para>The <methodname>validate()</methodname> method returns a set of
+    <classname>ConstraintViolation</classname> objects, which we can iterate
+    through in order to see which validation errors occured. The first three
+    test methods show some expected constraint violations:</para>
 
     <itemizedlist>
       <listitem>
-        <para>The @NotNull constraint on manufacturer is violated in
-        manufacturerIsNull()</para>
+        <para>The <classname>@NotNull</classname> constraint on manufacturer
+        is violated in <methodname>manufacturerIsNull()</methodname></para>
       </listitem>
 
       <listitem>
-        <para>The @Size constraint on licensePlate is violated in
-        licensePlateTooShort()</para>
+        <para>The <classname>@Size</classname> constraint on licensePlate is
+        violated in <methodname>licensePlateTooShort()</methodname></para>
       </listitem>
 
       <listitem>
-        <para>The @Min constraint on seatCount is violated in
-        seatCountTooLow()</para>
+        <para>The <classname>@Min</classname> constraint on seatCount is
+        violated in <methodname>seatCountTooLow()</methodname></para>
       </listitem>
     </itemizedlist>
 
-    <para>If the object could be validated successfully (as in carIsValid()),
-    validate() returns an empty set.</para>
+    <para>If the object could be validated successfully (as in
+    <methodname>carIsValid()</methodname>),
+    <methodname>validate()</methodname> returns an empty set.</para>
 
-    <para>Note that we only use classes from the package javax.validation,
-    which stems from the Bean Validation standard API. As we don't reference
-    any classes of the RI directly, it would be no problem to switch to
-    another implementation of the API, should that need arise.</para>
+    <para>Note that we only use classes from the package
+    <package>javax.validation</package>, which stems from the Bean Validation
+    standard API. As we don't reference any classes of the RI directly, it
+    would be no problem to switch to another implementation of the API, should
+    that need arise.</para>
   </section>
 
   <section id="validator-gettingstarted-whatsnext" revision="1">
