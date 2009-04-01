@@ -49,6 +49,7 @@ import org.hibernate.validation.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.Version;
+import org.hibernate.validation.xml.PropertyType;
 import org.hibernate.validation.xml.ValidationConfigType;
 
 /**
@@ -65,20 +66,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private static final Logger log = LoggerFactory.make();
 	private static final String VALIDATION_XML_FILE = "/META-INF/validation.xml";
-	private static final String VALIDATION_CONFIGURATION_XSD = "validation-configuration-1.0.xsd";
+	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.0.xsd";
 	private static final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();
 	private static final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
+	private static final ConstraintValidatorFactory defaultValidatorFactory = new ConstraintValidatorFactoryImpl();
 
-	private final ValidationProvider provider;
 	private final ValidationProviderResolver providerResolver;
-	private final Map<String, String> configProperties = new HashMap<String, String>();
-	private final Set<InputStream> mappings = new HashSet<InputStream>();
 
-	private MessageInterpolator messageInterpolator;
-	private ConstraintValidatorFactory constraintValidatorFactory = new ConstraintValidatorFactoryImpl();
-	private TraversableResolver traversableResolver;
-	private boolean ignoreXmlConfiguration = true; // false;
-	private Class<? extends Configuration<?>> providerClass = null;
+	private ParameterHolder parameterHolder;
+	private boolean ignoreXmlConfiguration = false;
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -87,19 +83,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		else {
 			this.providerResolver = state.getValidationProviderResolver();
 		}
-		this.provider = null;
-		this.messageInterpolator = defaultMessageInterpolator;
-		this.traversableResolver = defaultTraversableResolver;
+		parameterHolder = new ParameterHolder();
 	}
 
 	public ConfigurationImpl(ValidationProvider provider) {
 		if ( provider == null ) {
 			throw new ValidationException( "Assertion error: inconsistent ConfigurationImpl construction" );
 		}
-		this.provider = provider;
 		this.providerResolver = null;
-		this.messageInterpolator = defaultMessageInterpolator;
-		this.traversableResolver = defaultTraversableResolver;
+		parameterHolder = new ParameterHolder();
+		parameterHolder.provider = provider;
 	}
 
 	public HibernateValidatorConfiguration ignoreXmlConfiguration() {
@@ -108,43 +101,45 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
-		this.messageInterpolator = interpolator;
+		this.parameterHolder.messageInterpolator = interpolator;
 		return this;
 	}
 
 	public ConfigurationImpl traversableResolver(TraversableResolver resolver) {
-		this.traversableResolver = resolver;
+		this.parameterHolder.traversableResolver = resolver;
 		return this;
 	}
 
 	public ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
-		this.constraintValidatorFactory = constraintValidatorFactory;
+		this.parameterHolder.constraintValidatorFactory = constraintValidatorFactory;
 		return this;
 	}
 
 	public HibernateValidatorConfiguration addMapping(InputStream stream) {
-		mappings.add( stream );
+		parameterHolder.mappings.add( stream );
 		return this;
 	}
 
 	public HibernateValidatorConfiguration addProperty(String name, String value) {
-		configProperties.put( name, value );
+		if ( value != null ) {
+			parameterHolder.configProperties.put( name, value );
+		}
 		return this;
 	}
 
 	public ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
 		if ( isSpecificProvider() ) {
-			return provider.buildValidatorFactory( this );
+			return parameterHolder.provider.buildValidatorFactory( this );
 		}
 		else {
-			if ( providerClass != null ) {
+			if ( parameterHolder.providerClass != null ) {
 				for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
-					if ( provider.isSuitable( providerClass ) ) {
+					if ( provider.isSuitable( parameterHolder.providerClass ) ) {
 						return provider.buildValidatorFactory( this );
 					}
 				}
-				throw new ValidationException( "Unable to find provider: " + providerClass );
+				throw new ValidationException( "Unable to find provider: " + parameterHolder.providerClass );
 			}
 			else {
 				List<ValidationProvider> providers = providerResolver.getValidationProviders();
@@ -159,23 +154,23 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public MessageInterpolator getMessageInterpolator() {
-		return messageInterpolator;
+		return parameterHolder.messageInterpolator;
 	}
 
 	public Set<InputStream> getMappingStreams() {
-		return mappings;
+		return parameterHolder.mappings;
 	}
 
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
-		return constraintValidatorFactory;
+		return parameterHolder.constraintValidatorFactory;
 	}
 
 	public TraversableResolver getTraversableResolver() {
-		return traversableResolver;
+		return parameterHolder.traversableResolver;
 	}
 
 	public Map<String, String> getProperties() {
-		return configProperties;
+		return parameterHolder.configProperties;
 	}
 
 	public MessageInterpolator getDefaultMessageInterpolator() {
@@ -183,7 +178,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private boolean isSpecificProvider() {
-		return provider != null;
+		return parameterHolder.provider != null;
 	}
 
 	/**
@@ -200,12 +195,103 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			return;
 		}
 
-		setMessageInterpolatorFromXml( config );
-		setTraversableResolverFromXml( config );
-		setProviderClassFromXml( config );
+		// collect the paramters from the xml file
+		ParameterHolder xmlParameters = new ParameterHolder();
+		setProviderClassFromXml( config, xmlParameters );
+		setMessageInterpolatorFromXml( config, xmlParameters );
+		setTraversableResolverFromXml( config, xmlParameters );
+		setConstraintFactoryFromXml( config, xmlParameters );
+		setMappingStreamsFromXml( config, xmlParameters );
+		setPropertiesFromXml( config, xmlParameters );
+
+		applyXmlSettings( xmlParameters );
 	}
 
-	private void setMessageInterpolatorFromXml(ValidationConfigType config) {
+	private void applyXmlSettings(ParameterHolder xmlParameters) {
+		parameterHolder.providerClass = xmlParameters.providerClass;
+
+		if ( parameterHolder.messageInterpolator == null ) {
+			if ( xmlParameters.messageInterpolator != null ) {
+				parameterHolder.messageInterpolator = xmlParameters.messageInterpolator;
+			}
+			else {
+				parameterHolder.messageInterpolator = defaultMessageInterpolator;
+			}
+		}
+
+		if ( parameterHolder.traversableResolver == null ) {
+			if ( xmlParameters.traversableResolver != null ) {
+				parameterHolder.traversableResolver = xmlParameters.traversableResolver;
+			}
+			else {
+				parameterHolder.traversableResolver = defaultTraversableResolver;
+			}
+		}
+
+		if ( parameterHolder.constraintValidatorFactory == null ) {
+			if ( xmlParameters.constraintValidatorFactory != null ) {
+				parameterHolder.constraintValidatorFactory = xmlParameters.constraintValidatorFactory;
+			}
+			else {
+				parameterHolder.constraintValidatorFactory = defaultValidatorFactory;
+			}
+		}
+
+		parameterHolder.mappings.addAll( xmlParameters.mappings );
+
+		for ( Map.Entry<String, String> entry : xmlParameters.configProperties.entrySet() ) {
+			if ( parameterHolder.configProperties.get( entry.getKey() ) == null ) {
+				parameterHolder.configProperties.put( entry.getKey(), entry.getValue() );
+			}
+		}
+	}
+
+	private void setConstraintFactoryFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
+		String constraintFactoryClass = config.getConstraintValidatorFactory();
+		if ( constraintFactoryClass != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<ConstraintValidatorFactory> clazz = ( Class<ConstraintValidatorFactory> ) ReflectionHelper.classForName(
+						constraintFactoryClass, this.getClass()
+				);
+				xmlParameters.constraintValidatorFactory = clazz.newInstance();
+				log.info( "Using {} as constraint factory.", constraintFactoryClass );
+			}
+			catch ( Exception e ) {
+				throw new ValidationException( "Unable to instantiate message interpolator class " + constraintFactoryClass + "." );
+			}
+		}
+	}
+
+	private void setPropertiesFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
+		for ( PropertyType property : config.getProperty() ) {
+			if ( log.isDebugEnabled() ) {
+				log.debug(
+						"Found property '{}' with value '{}' in validation.xml.",
+						property.getName(),
+						property.getValue()
+				);
+			}
+			xmlParameters.configProperties.put( property.getName(), property.getValue() );
+		}
+	}
+
+	private void setMappingStreamsFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
+		for ( String mappingFileName : config.getConstraintMapping() ) {
+			if ( log.isDebugEnabled() ) {
+				log.debug(
+						"Trying to open input stream for {}.", mappingFileName
+				);
+				InputStream in = getInputStreamForPath( mappingFileName );
+				if ( in == null ) {
+					throw new ValidationException( " Unable to open input stream for mapping file." );
+				}
+				xmlParameters.mappings.add( in );
+			}
+		}
+	}
+
+	private void setMessageInterpolatorFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
 		String messageInterpolatorClass = config.getMessageInterpolator();
 		if ( messageInterpolatorClass != null ) {
 			try {
@@ -213,7 +299,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				Class<MessageInterpolator> clazz = ( Class<MessageInterpolator> ) ReflectionHelper.classForName(
 						messageInterpolatorClass, this.getClass()
 				);
-				messageInterpolator = clazz.newInstance();
+				xmlParameters.messageInterpolator = clazz.newInstance();
 				log.info( "Using {} as message interpolator.", messageInterpolatorClass );
 			}
 			catch ( Exception e ) {
@@ -222,7 +308,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 	}
 
-	private void setTraversableResolverFromXml(ValidationConfigType config) {
+	private void setTraversableResolverFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
 		String traversableResolverClass = config.getTraversableResolver();
 		if ( traversableResolverClass != null ) {
 			try {
@@ -230,8 +316,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				Class<TraversableResolver> clazz = ( Class<TraversableResolver> ) ReflectionHelper.classForName(
 						traversableResolverClass, this.getClass()
 				);
-				traversableResolver = clazz.newInstance();
-				log.info( "Using {} as traversable resolver", traversableResolverClass );
+				xmlParameters.traversableResolver = clazz.newInstance();
+				log.info( "Using {} as traversable resolver.", traversableResolverClass );
 			}
 			catch ( Exception e ) {
 				throw new ValidationException( "Unable to instantiate message interpolator class " + traversableResolverClass + "." );
@@ -240,11 +326,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setProviderClassFromXml(ValidationConfigType config) {
+	private void setProviderClassFromXml(ValidationConfigType config, ParameterHolder xmlParamters) {
 		String providerClassName = config.getDefaultProvider();
 		if ( providerClassName != null ) {
 			try {
-				providerClass = ( Class<? extends Configuration<?>> ) ReflectionHelper.classForName(
+				xmlParamters.providerClass = ( Class<? extends Configuration<?>> ) ReflectionHelper.classForName(
 						providerClassName, this.getClass()
 				);
 				log.info( "Using {} as validation provider.", providerClassName );
@@ -256,7 +342,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private ValidationConfigType getValidationConfig() {
-		InputStream inputStream = this.getClass().getResourceAsStream( VALIDATION_XML_FILE );
+		InputStream inputStream = getInputStreamForPath( VALIDATION_XML_FILE );
 		if ( inputStream == null ) {
 			log.info( "No {} found. Using defaults.", VALIDATION_XML_FILE );
 			return null;
@@ -278,6 +364,19 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationConfig;
 	}
 
+	private InputStream getInputStreamForPath(String path) {
+		InputStream inputStream = this.getClass().getResourceAsStream( path );
+		// try absolute path
+		if ( inputStream == null && !path.startsWith( "/" ) ) {
+			inputStream = this.getClass().getResourceAsStream( "/" + path );
+		}
+
+		if ( inputStream == null && log.isDebugEnabled() ) {
+			log.debug( "Unable to open input stream for {}.", path );
+		}
+		return inputStream;
+	}
+
 	private Schema getValidationConfigurationSchema() {
 		URL schemaUrl = this.getClass().getClassLoader().getResource( VALIDATION_CONFIGURATION_XSD );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
@@ -289,5 +388,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			log.warn( "Unable to create schema for {}: {}", VALIDATION_XML_FILE, e.getMessage() );
 		}
 		return schema;
+	}
+
+	private class ParameterHolder {
+		ConstraintValidatorFactory constraintValidatorFactory;
+		MessageInterpolator messageInterpolator;
+		TraversableResolver traversableResolver;
+		ValidationProvider provider;
+		Class<? extends Configuration<?>> providerClass = null;
+		final Map<String, String> configProperties = new HashMap<String, String>();
+		final Set<InputStream> mappings = new HashSet<InputStream>();
 	}
 }

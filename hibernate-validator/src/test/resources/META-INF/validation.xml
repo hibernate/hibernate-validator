@@ -4,5 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <default-provider>org.hibernate.validation.engine.HibernateValidatorConfiguration</default-provider>
     <message-interpolator>org.hibernate.validation.engine.ResourceBundleMessageInterpolator</message-interpolator>
-    <constraint-mapping>META-INF/validation/order-constraints.xml</constraint-mapping>
+    <constraint-mapping>/META-INF/validation/order-constraints.xml</constraint-mapping>
+    <constraint-mapping>META-INF/validation/user-constraints.xml</constraint-mapping>
+    <property name="org.hibernate.validator.test">foobar</property>
 </validation-config>

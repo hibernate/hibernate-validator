@@ -3,7 +3,7 @@
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.0.Alpha4-SNAPSHOT</version>
+    <version>4.0.0.Beta1-SNAPSHOT</version>
     <name>Hibernate Validator Parent</name>
     <url>http://validator.hibernate.org</url>
 
@@ -45,12 +45,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.4.2</version>
+                <version>1.5.6</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.4.2</version>
+                <version>1.5.6</version>
             </dependency>        
         </dependencies>
     </dependencyManagement>
