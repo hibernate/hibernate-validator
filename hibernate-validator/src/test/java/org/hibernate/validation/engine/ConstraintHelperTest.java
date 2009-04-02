@@ -23,17 +23,15 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.constraints.invalidvalidators.NoGroups;
 import org.hibernate.validation.constraints.invalidvalidators.NoMessage;
 import org.hibernate.validation.constraints.invalidvalidators.ValidProperty;
-import org.hibernate.validation.engine.Engine;
-import org.hibernate.validation.engine.Order;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -60,7 +58,7 @@ public class ConstraintHelperTest {
 			}
 		};
 		assertFalse(
-				"The constraint annotation should not be valid", constraintHelper.isConstraintAnnotation( annotation )
+				constraintHelper.isConstraintAnnotation( annotation ), "The constraint annotation should not be valid"
 		);
 	}
 
@@ -76,7 +74,7 @@ public class ConstraintHelperTest {
 			}
 		};
 		assertFalse(
-				"The constraint annotation should not be valid", constraintHelper.isConstraintAnnotation( annotation )
+				constraintHelper.isConstraintAnnotation( annotation ), "The constraint annotation should not be valid"
 		);
 	}
 
@@ -100,7 +98,7 @@ public class ConstraintHelperTest {
 			}
 		};
 		assertFalse(
-				"The constraint annotation should not be valid", constraintHelper.isConstraintAnnotation( annotation )
+				constraintHelper.isConstraintAnnotation( annotation ), "The constraint annotation should not be valid"
 		);
 	}
 
@@ -115,9 +113,9 @@ public class ConstraintHelperTest {
 		Annotation annotation = fields[0].getAnnotation( Pattern.List.class );
 		assertNotNull( annotation );
 		List<Annotation> multiValueConstraintAnnotations = constraintHelper.getMultiValueConstraints( annotation );
-		assertTrue( "There should be two constraint annotations", multiValueConstraintAnnotations.size() == 2 );
-		assertTrue( "Wrong constraint annotation", multiValueConstraintAnnotations.get( 0 ) instanceof Pattern );
-		assertTrue( "Wrong constraint annotation", multiValueConstraintAnnotations.get( 1 ) instanceof Pattern );
+		assertTrue( multiValueConstraintAnnotations.size() == 2, "There should be two constraint annotations" );
+		assertTrue( multiValueConstraintAnnotations.get( 0 ) instanceof Pattern, "Wrong constraint annotation" );
+		assertTrue( multiValueConstraintAnnotations.get( 1 ) instanceof Pattern, "Wrong constraint annotation" );
 
 
 		Order order = new Order();
@@ -129,6 +127,6 @@ public class ConstraintHelperTest {
 		annotation = fields[0].getAnnotation( NotNull.class );
 		assertNotNull( annotation );
 		multiValueConstraintAnnotations = constraintHelper.getMultiValueConstraints( annotation );
-		assertTrue( "There should be no constraint annotations", multiValueConstraintAnnotations.size() == 0 );
+		assertTrue( multiValueConstraintAnnotations.size() == 0, "There should be no constraint annotations" );
 	}
 }

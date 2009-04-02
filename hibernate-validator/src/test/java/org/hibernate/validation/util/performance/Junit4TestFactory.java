@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,36 +17,36 @@
 */
 package org.hibernate.validation.util.performance;
 
-import java.util.List;
+//import java.util.List;
+//
+//import com.clarkware.junitperf.TestFactory;
+//import junit.framework.JUnit4TestAdapter;
+//import junit.framework.TestCase;
+//import junit.framework.TestSuite;
 
-import com.clarkware.junitperf.TestFactory;
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+class JUnit4TestFactory { //extends TestFactory {
 
-class JUnit4TestFactory extends TestFactory {
-
-	static class DummyTestCase extends TestCase {
-		public void test() {
-		}
-	}
-
-	private List<Class<?>> junit4TestClass;
-
-	public JUnit4TestFactory(List<Class<?>> testClasses) {
-		super( DummyTestCase.class );
-		this.junit4TestClass = testClasses;
-	}
-
-	@Override
-	protected TestSuite makeTestSuite() {
-		TestSuite testSuite = new TestSuite( "JUnit4TestFactory" );
-		JUnit4TestAdapter unit4TestAdapter;
-		for ( Class<?> testClass : junit4TestClass ) {
-			unit4TestAdapter = new JUnit4TestAdapter( testClass );
-			testSuite.addTest( unit4TestAdapter );
-		}
-		return testSuite;
-	}
+//	static class DummyTestCase extends TestCase {
+//		public void test() {
+//		}
+//	}
+//
+//	private List<Class<?>> junit4TestClass;
+//
+//	public JUnit4TestFactory(List<Class<?>> testClasses) {
+//		super( DummyTestCase.class );
+//		this.junit4TestClass = testClasses;
+//	}
+//
+//	@Override
+//	protected TestSuite makeTestSuite() {
+//		TestSuite testSuite = new TestSuite( "JUnit4TestFactory" );
+//		JUnit4TestAdapter unit4TestAdapter;
+//		for ( Class<?> testClass : junit4TestClass ) {
+//			unit4TestAdapter = new JUnit4TestAdapter( testClass );
+//			testSuite.addTest( unit4TestAdapter );
+//		}
+//		return testSuite;
+//	}
 }
 

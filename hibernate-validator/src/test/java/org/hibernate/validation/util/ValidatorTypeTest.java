@@ -17,18 +17,17 @@
 */
 package org.hibernate.validation.util;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.validation.ConstraintValidator;
 
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.composition.FrenchZipcodeConstraintValidator;
 import org.hibernate.validation.constraints.composition.FrenchZipcode;
+import org.hibernate.validation.constraints.composition.FrenchZipcodeConstraintValidator;
 
 /**
  * Tests for message resolution.

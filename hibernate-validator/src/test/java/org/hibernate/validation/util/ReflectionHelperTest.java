@@ -31,12 +31,12 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -93,17 +93,17 @@ public class ReflectionHelperTest {
 		map.put( key, testObject );
 
 		Object value = ReflectionHelper.getIndexedValue( map, key );
-		assertEquals( "We should be able to retrieve the indexed object", testObject, value );
+		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
 
 		// try to get to the value by integer index
 		value = ReflectionHelper.getIndexedValue( map, "0" );
-		assertEquals( "We should be able to retrieve the indexed object", testObject, value );
+		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getIndexedValue( map, "foo" );
-		assertNull( "A non existent index should return the null value", value );
+		assertNull( value, "A non existent index should return the null value" );
 
 		value = ReflectionHelper.getIndexedValue( map, "2" );
-		assertNull( "A non existent index should return the null value", value );
+		assertNull( value, "A non existent index should return the null value" );
 	}
 
 	@Test
@@ -113,10 +113,10 @@ public class ReflectionHelperTest {
 		list.add( testObject );
 
 		Object value = ReflectionHelper.getIndexedValue( list, "0" );
-		assertEquals( "We should be able to retrieve the indexed object", testObject, value );
+		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getIndexedValue( list, "2" );
-		assertNull( "A non existent index should return the null value", value );
+		assertNull( value, "A non existent index should return the null value" );
 	}
 
 	@Test
@@ -141,17 +141,17 @@ public class ReflectionHelperTest {
 			}
 		};
 		String message = ReflectionHelper.getAnnotationParameter( testAnnotation, "message", String.class );
-		assertEquals( "Wrong message", "test", message );
+		assertEquals( "test", message, "Wrong message" );
 
 		Class<?>[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", Class[].class );
-		assertEquals( "Wrong message", Default.class, group[0] );
+		assertEquals( Default.class, group[0], "Wrong message" );
 
 		try {
 			ReflectionHelper.getAnnotationParameter( testAnnotation, "message", Integer.class );
 			fail();
 		}
 		catch ( ValidationException e ) {
-			assertTrue( "Wrong exception message", e.getMessage().startsWith( "Wrong parameter type." ) );
+			assertTrue( e.getMessage().startsWith( "Wrong parameter type." ), "Wrong exception message" );
 		}
 
 		try {
@@ -160,8 +160,8 @@ public class ReflectionHelperTest {
 		}
 		catch ( ValidationException e ) {
 			assertTrue(
-					"Wrong exception message",
-					e.getMessage().startsWith( "The specified annotation defines no parameter" )
+					e.getMessage().startsWith( "The specified annotation defines no parameter" ),
+					"Wrong exception message"
 			);
 		}
 	}

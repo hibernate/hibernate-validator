@@ -19,9 +19,9 @@ package org.hibernate.validation.constraints;
 
 import javax.validation.ValidationException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
@@ -50,7 +50,7 @@ public class LengthValidatorTest {
 		assertFalse( constraint.isValid( "foobar", null ) );
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test(expectedExceptions = ValidationException.class)
 	public void testNegativeMinValue() {
 		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
 		descriptor.setValue( "min", -1 );
@@ -62,7 +62,7 @@ public class LengthValidatorTest {
 		constraint.initialize( p );
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test(expectedExceptions = ValidationException.class)
 	public void testNegativeMaxValue() {
 		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
 		descriptor.setValue( "min", 1 );
@@ -74,7 +74,7 @@ public class LengthValidatorTest {
 		constraint.initialize( p );
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test(expectedExceptions = ValidationException.class)
 	public void testNegativeLength() {
 		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
 		descriptor.setValue( "min", 5 );

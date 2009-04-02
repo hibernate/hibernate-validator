@@ -20,8 +20,8 @@ package org.hibernate.validation.util.performance;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.clarkware.junitperf.TimedTest;
-import junit.framework.Test;
+//import com.clarkware.junitperf.TimedTest;
+//import junit.framework.Test;
 
 import org.hibernate.validation.engine.ValidatorImplTest;
 import org.hibernate.validation.engine.ResourceBundleMessageInterpolatorTest;
@@ -34,18 +34,18 @@ import org.hibernate.validation.engine.ResourceBundleMessageInterpolatorTest;
  */
 public class ValidationPerformace {
 
-	public static Test suite() {
-
-		long maxTimeInMillis = 1000;
-		List<Class<?>> testClasses = new ArrayList<Class<?>>();
-		//testClasses.add( ValidatorImplTest.class );
-		testClasses.add( ResourceBundleMessageInterpolatorTest.class );
-		//testClasses.add( ConstraintCompositionTest.class );
-		Test test = new JUnit4TestFactory( testClasses ).makeTestSuite();
-		return new TimedTest( test, maxTimeInMillis );
-	}
-
-	public static void main(String args[]) {
-		junit.textui.TestRunner.run( suite() );
-	}
+//	public static Test suite() {
+//
+//		long maxTimeInMillis = 1000;
+//		List<Class<?>> testClasses = new ArrayList<Class<?>>();
+//		//testClasses.add( ValidatorImplTest.class );
+//		testClasses.add( ResourceBundleMessageInterpolatorTest.class );
+//		//testClasses.add( ConstraintCompositionTest.class );
+//		Test test = new JUnit4TestFactory( testClasses ).makeTestSuite();
+//		return new TimedTest( test, maxTimeInMillis );
+//	}
+//
+//	public static void main(String args[]) {
+//		junit.textui.TestRunner.run( suite() );
+//	}
 }

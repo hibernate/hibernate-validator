@@ -22,14 +22,16 @@ import javax.validation.BeanDescriptor;
 import javax.validation.PropertyDescriptor;
 import javax.validation.Validator;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import org.slf4j.Logger;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.engine.Order;
+import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
 
 
@@ -38,32 +40,34 @@ import org.hibernate.validation.util.TestUtil;
  */
 public class BeanDescriptorTest {
 
+	private static final Logger log = LoggerFactory.make();
+
 	@Test
 	public void testIsBeanConstrained() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
 
 		// constraint via @Valid
-		assertFalse( "There should be no direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
-		assertTrue( "Bean should be constrainted due to @valid ", beanDescriptor.isBeanConstrained() );
+		assertFalse( beanDescriptor.hasConstraints(), "There should be no direct constraints on the specified bean." );
+		assertTrue( beanDescriptor.isBeanConstrained(), "Bean should be constrainted due to @valid " );
 
 		// constraint hosted on bean itself
 		beanDescriptor = validator.getConstraintsForClass( Account.class );
-		assertTrue( "There should be direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
-		assertTrue( "Bean should be constrainted due to @valid", beanDescriptor.isBeanConstrained() );
+		assertTrue( beanDescriptor.hasConstraints(), "There should be direct constraints on the specified bean." );
+		assertTrue( beanDescriptor.isBeanConstrained(), "Bean should be constrainted due to @valid" );
 
 		// constraint on bean property
 		beanDescriptor = validator.getConstraintsForClass( Order.class );
-		assertFalse( "There should be no direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
-		assertTrue( "Bean should be constrainted due to @NotNull", beanDescriptor.isBeanConstrained() );
+		assertFalse( beanDescriptor.hasConstraints(), "There should be no direct constraints on the specified bean." );
+		assertTrue( beanDescriptor.isBeanConstrained(), "Bean should be constrainted due to @NotNull" );
 	}
 
 	@Test
 	public void testUnconstraintClass() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( UnconstraintEntity.class );
-		assertFalse( "There should be no direct constraints on the specified bean.", beanDescriptor.hasConstraints() );
-		assertFalse( "Bean should be unconstrainted.", beanDescriptor.isBeanConstrained() );
+		assertFalse( beanDescriptor.hasConstraints(), "There should be no direct constraints on the specified bean." );
+		assertFalse( beanDescriptor.isBeanConstrained(), "Bean should be unconstrainted." );
 	}
 
 	@Test
@@ -72,15 +76,15 @@ public class BeanDescriptorTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
 		assertEquals(
-				"There should be one constraint descriptor", 1, propertyDescriptor.getConstraintDescriptors().size()
+				1, propertyDescriptor.getConstraintDescriptors().size(), "There should be one constraint descriptor"
 		);
 
 		beanDescriptor = validator.getConstraintsForClass( Customer.class );
 		propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderList" );
 		assertEquals(
-				"There should be no constraint descriptors", 0, propertyDescriptor.getConstraintDescriptors().size()
+				0, propertyDescriptor.getConstraintDescriptors().size(), "There should be no constraint descriptors"
 		);
-		assertTrue( "The property should be cascaded", propertyDescriptor.isCascaded() );
+		assertTrue( propertyDescriptor.isCascaded(), "The property should be cascaded" );
 	}
 
 	@Test
@@ -89,16 +93,16 @@ public class BeanDescriptorTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderList" );
 		assertEquals(
-				"There should be no constraint descriptors", 0, propertyDescriptor.getConstraintDescriptors().size()
+				0, propertyDescriptor.getConstraintDescriptors().size(), "There should be no constraint descriptors"
 		);
-		assertTrue( "The property should be cascaded", propertyDescriptor.isCascaded() );
+		assertTrue( propertyDescriptor.isCascaded(), "The property should be cascaded" );
 	}
 
 	@Test
 	public void testGetConstraintsForNonExistingProperty() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
-		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( "foobar" ) );
+		assertNull( beanDescriptor.getConstraintsForProperty( "foobar" ), "There should be no descriptor" );
 	}
 
 	/**
@@ -108,7 +112,7 @@ public class BeanDescriptorTest {
 	public void testGetConstraintsForNullProperty() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
-		assertNull( "There should be no descriptor", beanDescriptor.getConstraintsForProperty( null ) );
+		assertNull( beanDescriptor.getConstraintsForProperty( null ), "There should be no descriptor" );
 	}
 
 	/**
@@ -119,12 +123,12 @@ public class BeanDescriptorTest {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
 		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
-		assertEquals( "There should be only one property", 1, constraintProperties.size() );
+		assertEquals( 1, constraintProperties.size(), "There should be only one property" );
 		boolean hasOrderNumber = false;
 		for ( PropertyDescriptor pd : constraintProperties ) {
 			hasOrderNumber |= pd.getPropertyName().equals( "orderNumber" );
 		}
-		assertTrue( "Wrong property", hasOrderNumber );
+		assertTrue( hasOrderNumber, "Wrong property" );
 	}
 
 	/**
@@ -140,7 +144,7 @@ public class BeanDescriptorTest {
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 
 		try {
@@ -148,7 +152,7 @@ public class BeanDescriptorTest {
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 	}
 
@@ -160,6 +164,6 @@ public class BeanDescriptorTest {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( UnconstraintEntity.class );
 		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
-		assertEquals( "We should get the empty set.", 0, constraintProperties.size() );
+		assertEquals( 0, constraintProperties.size(), "We should get the empty set." );
 	}
 }

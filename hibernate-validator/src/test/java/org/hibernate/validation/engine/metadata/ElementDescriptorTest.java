@@ -23,12 +23,14 @@ import javax.validation.ConstraintDescriptor;
 import javax.validation.ElementDescriptor;
 import javax.validation.Validator;
 
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import org.slf4j.Logger;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.engine.Order;
+import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
 
 
@@ -37,17 +39,19 @@ import org.hibernate.validation.util.TestUtil;
  */
 public class ElementDescriptorTest {
 
+	private static final Logger log = LoggerFactory.make();
+
 	@Test
 	public void testGetTypeForConstrainedBean() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
-		assertEquals( "Wrong type.", Customer.class, beanDescriptor.getType() );
+		assertEquals( Customer.class, beanDescriptor.getType(), "Wrong type." );
 	}
 
 	@Test
 	public void testGetTypeForConstrainedProperty() {
 		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
-		assertEquals( "Wrong type.", Integer.class, elementDescriptor.getType() );
+		assertEquals( Integer.class, elementDescriptor.getType(), "Wrong type." );
 	}
 
 	/**
@@ -57,7 +61,7 @@ public class ElementDescriptorTest {
 	public void testElementDescriptorForProperty() {
 		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
-		assertTrue( "There should be a descriptor", constraintDescriptors.size() == 1 );
+		assertTrue( constraintDescriptors.size() == 1, "There should be a descriptor" );
 	}
 
 	/**
@@ -73,7 +77,7 @@ public class ElementDescriptorTest {
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 
 		try {
@@ -81,7 +85,7 @@ public class ElementDescriptorTest {
 			fail( "Set should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 	}
 }

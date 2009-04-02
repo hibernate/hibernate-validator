@@ -21,11 +21,9 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
-import org.hibernate.validation.engine.constraintcomposition.FrenchAddress;
-import org.hibernate.validation.engine.constraintcomposition.GermanAddress;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
 import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.getValidator;

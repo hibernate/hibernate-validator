@@ -20,9 +20,9 @@ package org.hibernate.validation.constraints;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Pattern;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
@@ -49,7 +49,7 @@ public class PatternValidatorTest {
 		assertFalse( constraint.isValid( "This test is not foobar", null ) );
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test(expectedExceptions = ValidationException.class)
 	public void testInvalidRegularExpression() {
 		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		descriptor.setValue( "regexp", "(unbalanced parentheses" );

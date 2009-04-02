@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Hibernate Validator Unit Tests" verbose="1">
+    <test name="Unit tests">
+        <packages>
+            <package name="org.hibernate.validation.bootstrap"/>
+            <package name="org.hibernate.validation.constraints"/>
+            <package name="org.hibernate.validation.constraints.validatorcontext"/>
+            <package name="org.hibernate.validation.engine"/>
+            <package name="org.hibernate.validation.engine.constraintcomposition"/>
+            <package name="org.hibernate.validation.engine.graphnavigation"/>
+            <package name="org.hibernate.validation.engine.groups"/>
+            <package name="org.hibernate.validation.engine.metadata"/>
+            <package name="org.hibernate.validation.engine.validatorresolution"/>
+            <package name="org.hibernate.validation.util"/>
+            <package name="org.hibernate.validation.util.annotationfactory"/>
+        </packages>
+    </test>
+</suite>

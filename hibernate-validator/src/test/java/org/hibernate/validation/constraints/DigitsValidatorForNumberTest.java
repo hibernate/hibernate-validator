@@ -21,9 +21,9 @@ import java.math.BigDecimal;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Digits;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
@@ -80,7 +80,7 @@ public class DigitsValidatorForNumberTest {
 		assertFalse( constraint.isValid( Double.valueOf( "500.2" ), null ) );
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test(expectedExceptions = ValidationException.class)
 	public void testNegativeIntegerLength() {
 
 		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
@@ -93,7 +93,7 @@ public class DigitsValidatorForNumberTest {
 		constraint.initialize( p );
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test(expectedExceptions = ValidationException.class)
 	public void testNegativeFractionLength() {
 
 		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );

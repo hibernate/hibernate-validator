@@ -23,9 +23,9 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.TestUtil;
 
@@ -61,7 +61,7 @@ public class GraphNavigationTest {
 		Validator validator = TestUtil.getValidator();
 
 		Set<ConstraintViolation<Order>> constraintViolations = validator.validate( order );
-		assertEquals( "Wrong number of constraints", 3, constraintViolations.size() );
+		assertEquals( 3, constraintViolations.size(), "Wrong number of constraints" );
 
 		List<String> expectedErrorMessages = new ArrayList<String>();
 		expectedErrorMessages.add( "shippingAddress.addressline1" );
@@ -74,7 +74,7 @@ public class GraphNavigationTest {
 			}
 		}
 
-		assertTrue( "All error messages should have occured once", expectedErrorMessages.size() == 0 );
+		assertTrue( expectedErrorMessages.size() == 0, "All error messages should have occured once" );
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class GraphNavigationTest {
 		Validator validator = TestUtil.getValidator();
 
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( john );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 		TestUtil.assertConstraintViolation(
 				constraintViolations.iterator().next(), "may not be null", User.class, null, "lastName"
 		);
@@ -96,21 +96,19 @@ public class GraphNavigationTest {
 		john.knows( jane );
 
 		constraintViolations = validator.validate( john );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 		TestUtil.assertConstraintViolation(
 				constraintViolations.iterator().next(), "may not be null", User.class, null, "lastName"
 		);
 
 		constraintViolations = validator.validate( jane );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 		TestUtil.assertConstraintViolation(
 				constraintViolations.iterator().next(), "may not be null", User.class, null, "knowsUser[0].lastName"
 		);
 
 		john.setLastName( "Doe" );
 		constraintViolations = validator.validate( john );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
-
-
+		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
 	}
 }

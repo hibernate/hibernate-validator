@@ -37,19 +37,19 @@ import javax.validation.ValidatorFactory;
 import javax.validation.bootstrap.ProviderSpecificBootstrap;
 import javax.validation.spi.ValidationProvider;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.junit.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.HibernateValidationProvider;
 import org.hibernate.validation.constraints.NotNullValidator;
-import org.hibernate.validation.engine.metadata.Customer;
 import org.hibernate.validation.engine.ConfigurationImpl;
 import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.engine.ValidatorFactoryImpl;
+import org.hibernate.validation.engine.metadata.Customer;
 
 /**
  * Tests the Bean Validation bootstrapping.
@@ -84,12 +84,12 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 
 		customer.setLastName( "Doe" );
 
 		constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
+		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
 	}
 
 	@Test
@@ -106,9 +106,9 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 
 		// now we modify the configuration, get a new factory and valiator and try again
 		configuration = Validation.byDefaultProvider().configure();
@@ -126,9 +126,9 @@ public class ValidationTest {
 		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 		constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong message", "my custom message", constraintViolation.getMessage() );
+		assertEquals( "my custom message", constraintViolation.getMessage(), "Wrong message" );
 	}
 
 	@Test
@@ -144,9 +144,9 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 
 		// get a new factory using a custom configuration
 		configuration = Validation.byDefaultProvider().configure();
@@ -164,7 +164,7 @@ public class ValidationTest {
 		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
+		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
 	}
 
 	@Test
@@ -225,9 +225,9 @@ public class ValidationTest {
 		}
 		catch ( ValidationException e ) {
 			assertEquals(
-					"Wrong error message",
 					"Unable to find provider: interface org.hibernate.validation.engine.HibernateValidatorConfiguration",
-					e.getMessage()
+					e.getMessage(),
+					"Wrong error message"
 			);
 		}
 	}
@@ -265,9 +265,9 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 1, constraintViolations.size() );
+		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "Wrong message", "may not be null", constraintViolation.getMessage() );
+		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 
 		// get a new factory using a custom configuration
 		configuration = Validation.byDefaultProvider().configure();
@@ -281,6 +281,6 @@ public class ValidationTest {
 		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
-		assertEquals( "Wrong number of constraints", 0, constraintViolations.size() );
+		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
 	}
 }

@@ -24,16 +24,18 @@ import javax.validation.ConstraintDescriptor;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import org.slf4j.Logger;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 import org.hibernate.validation.constraints.NotNullValidator;
 import org.hibernate.validation.engine.Order;
 import org.hibernate.validation.engine.constraintcomposition.GermanAddress;
+import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
 
 
@@ -41,6 +43,8 @@ import org.hibernate.validation.util.TestUtil;
  * @author Hardy Ferentschik
  */
 public class ConstraintDescriptorTest {
+	private static final Logger log = LoggerFactory.make();
+
 	@Test
 	public void testConstraintDescriptorImmutable() {
 		ConstraintDescriptor<?> descriptor = TestUtil.getSingleConstraintDescriptorFor( Order.class, "orderNumber" );
@@ -50,7 +54,7 @@ public class ConstraintDescriptorTest {
 			fail( "Should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 
 		try {
@@ -58,7 +62,7 @@ public class ConstraintDescriptorTest {
 			fail( "Should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 
 		try {
@@ -66,7 +70,7 @@ public class ConstraintDescriptorTest {
 			fail( "Should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 
 		try {
@@ -74,7 +78,7 @@ public class ConstraintDescriptorTest {
 			fail( "Should be immutable" );
 		}
 		catch ( UnsupportedOperationException e ) {
-
+			log.trace( "success" );
 		}
 	}
 
@@ -101,7 +105,7 @@ public class ConstraintDescriptorTest {
 		ConstraintDescriptor<?> descriptor = TestUtil.getSingleConstraintDescriptorFor(
 				GermanAddress.class, "zipCode"
 		);
-		assertEquals( "Wrong number of composing constraints", 1, descriptor.getComposingConstraints().size() );
+		assertEquals( 1, descriptor.getComposingConstraints().size(), "Wrong number of composing constraints" );
 	}
 
 	@Test
@@ -117,13 +121,13 @@ public class ConstraintDescriptorTest {
 		ConstraintDescriptor<?> descriptor = TestUtil.getSingleConstraintDescriptorFor( Order.class, "orderNumber" );
 		Set<Class<?>> groups = descriptor.getGroups();
 		assertTrue( groups.size() == 1 );
-		assertEquals( "Wrong group", Default.class, groups.iterator().next() );
+		assertEquals( Default.class, groups.iterator().next(), "Wrong group" );
 	}
 
 	@Test
 	public void testGetConstraintValidatorClasses() {
 		ConstraintDescriptor<?> descriptor = TestUtil.getSingleConstraintDescriptorFor( Order.class, "orderNumber" );
-		assertEquals( "Wrong classes", NotNullValidator.class, descriptor.getConstraintValidatorClasses().get( 0 ) );
+		assertEquals( NotNullValidator.class, descriptor.getConstraintValidatorClasses().get( 0 ), "Wrong classes" );
 	}
 
 	@Test
