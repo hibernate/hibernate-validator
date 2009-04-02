@@ -385,7 +385,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			schema = sf.newSchema( schemaUrl );
 		}
 		catch ( SAXException e ) {
-			log.warn( "Unable to create schema for {}: {}", VALIDATION_XML_FILE, e.getMessage() );
+			log.warn( "Unable to create schema for {}: {}", VALIDATION_CONFIGURATION_XSD, e.getMessage() );
 		}
 		return schema;
 	}
