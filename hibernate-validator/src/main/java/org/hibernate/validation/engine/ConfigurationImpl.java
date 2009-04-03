@@ -129,24 +129,32 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
+		ValidatorFactory factory = null;
 		if ( isSpecificProvider() ) {
-			return parameterHolder.provider.buildValidatorFactory( this );
+			factory = parameterHolder.provider.buildValidatorFactory( this );
 		}
 		else {
 			if ( parameterHolder.providerClass != null ) {
 				for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
 					if ( provider.isSuitable( parameterHolder.providerClass ) ) {
-						return provider.buildValidatorFactory( this );
+						factory = provider.buildValidatorFactory( this );
+						break;
 					}
 				}
-				throw new ValidationException( "Unable to find provider: " + parameterHolder.providerClass );
+				if ( factory == null ) {
+					throw new ValidationException( "Unable to find provider: " + parameterHolder.providerClass );
+				}
 			}
 			else {
 				List<ValidationProvider> providers = providerResolver.getValidationProviders();
 				assert providers.size() != 0; // I run therefore I am
-				return providers.get( 0 ).buildValidatorFactory( this );
+				factory = providers.get( 0 ).buildValidatorFactory( this );
 			}
 		}
+
+		// reset the param holder
+		parameterHolder = new ParameterHolder();
+		return factory;
 	}
 
 	public boolean isIgnoreXmlConfiguration() {
