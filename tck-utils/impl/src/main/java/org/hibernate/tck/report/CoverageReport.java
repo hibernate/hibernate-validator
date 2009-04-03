@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -129,6 +130,9 @@ public class CoverageReport {
           imageTargetDir.mkdirs();
        }
        
+       copyResourceImage("stickynote.png");
+       copyResourceImage("blank.png");
+       
         calculateUnmatched();
         writeHeader(out);
         writeContents(out);
@@ -137,6 +141,28 @@ public class CoverageReport {
         writeCoverage(out);
         writeUnmatched(out);
         writeFooter(out);
+    }
+    
+    private void copyResourceImage(String filename) throws IOException
+    {
+       InputStream imageData = this.getClass().getClassLoader().getResourceAsStream("META-INF/" + filename);       
+       FileOutputStream out = new FileOutputStream(new File(imageTargetDir, filename));
+       try
+       {       
+          byte[] buffer = new byte[4096];
+          int read = imageData.read(buffer);
+          while (read != -1)
+          {
+             out.write(buffer, 0, read);
+             read = imageData.read(buffer);
+          }
+          
+          out.flush();
+       }
+       finally
+       {
+          out.close();
+       }
     }
     
     private void calculateUnmatched()
@@ -224,26 +250,36 @@ public class CoverageReport {
         sb.append("    border-bottom: 1px solid #488c41;\n");
         sb.append("    padding-bottom: 1px;\n");
         sb.append("    margin-bottom: 2px;\n");
+        sb.append("    min-height: 36px;\n");
         sb.append("    background-color: " + COLOUR_SHADE_GREEN + "; }\n");
         sb.append("  .fail {\n");
         sb.append("    border-top: 1px solid #ab2020;\n");
         sb.append("    border-bottom: 1px solid #ab2020;\n");
         sb.append("    padding-bottom: 1px;\n");
         sb.append("    margin-bottom: 2px;\n");
+        sb.append("    min-height: 36px;\n");
         sb.append("    background-color: " + COLOUR_SHADE_RED + "; }\n");
         sb.append("  .skip {\n");
         sb.append("    border-top: 1px solid #ff9900;\n");
         sb.append("    border-bottom: 1px solid #ff9900;\n");
         sb.append("    padding-bottom: 1px;\n");
         sb.append("    margin-bottom: 2px;\n");
+        sb.append("    min-height: 36px;\n");
         sb.append("    background-color: " + COLOUR_SHADE_ORANGE + "; }\n");
         sb.append("  .untestable {\n");
         sb.append("    padding-bottom: 16px;\n");
         sb.append("    margin-bottom: 2px;\n");
         sb.append("    border-top: 1px solid #317ba6;\n");
         sb.append("    border-bottom: 1px solid #317ba6;\n");
+        sb.append("    min-height: 36px;\n");
         sb.append("    background-color: " + COLOUR_SHADE_BLUE + "; }\n");        
-
+        sb.append("  .stickynote {\n");
+        sb.append("    background: url(images/stickynote.png) left top no-repeat;\n"); 
+        sb.append("    position: absolute;\n");
+        sb.append("    left: 16px;\n");
+        sb.append("    width: 30px;\n");
+        sb.append("    height: 30px;\n");
+        sb.append("    margin-top:16px; }\n");
         sb.append("</style>\n");
 
         sb.append("</head><body>");
@@ -631,6 +667,13 @@ public class CoverageReport {
                     sb.append("    <span class=\"code\">");
                     sb.append(assertion.getId());
                     sb.append(")");
+                    
+                    if (!Strings.isEmpty(assertion.getNote()))
+                    {
+                       sb.append("<img title=\"" + assertion.getNote() + "\" src=\"images/blank.png\" class=\"stickynote\"/>");
+                       //sb.append("<a title=\"" + assertion.getNote() + "\"><img title=\"" + assertion.getNote() + "\" src=\"images/blank.png\" class=\"stickynote\"/></a>");
+                    }
+                    
                     sb.append("</span>\n");
 
                     sb.append("    <div class=\"results\">");
@@ -647,17 +690,7 @@ public class CoverageReport {
                     }
                     
                     String assertionText = parseStrikethrough(parseBold(parseLiteral(escape(assertion.getText()))));                    
-
-                    if (!Strings.isEmpty(assertion.getNote()))
-                    {
-                       sb.append("<a title=\"" + assertion.getNote() + "\">");
-                       sb.append(assertionText);
-                       sb.append("</a>");
-                    }
-                    else
-                    {
-                       sb.append(assertionText);
-                    }
+                    sb.append(assertionText);
                     sb.append("</p>\n");
 
                     if (assertion.isTestable())
