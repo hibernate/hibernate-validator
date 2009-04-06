@@ -22,6 +22,6 @@ import javax.validation.GroupSequence;
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence( value = CyclicGroupSequence1.class)
+@GroupSequence(value = CyclicGroupSequence1.class)
 public interface CyclicGroupSequence2 {
 }

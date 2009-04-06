@@ -23,9 +23,9 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.TestUtil;
@@ -45,7 +45,7 @@ public class ConstraintValidatorContextTest {
 		DummyBean bean = new DummyBean( "foobar" );
 
 		Set<ConstraintViolation<DummyBean>> constraintViolations = validator.validate( bean );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "dummy message", constraintViolation.getMessage(), "Wrong message" );
 	}
@@ -64,7 +64,7 @@ public class ConstraintValidatorContextTest {
 		DummyBean bean = new DummyBean( "foobar" );
 
 		Set<ConstraintViolation<DummyBean>> constraintViolations = validator.validate( bean );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class ConstraintValidatorContextTest {
 		DummyBean bean = new DummyBean( "foobar" );
 
 		Set<ConstraintViolation<DummyBean>> constraintViolations = validator.validate( bean );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "message1", constraintViolation.getMessage(), "Wrong message" );
 		assertEquals( "property1", constraintViolation.getPropertyPath(), "Wrong property" );
@@ -96,7 +96,7 @@ public class ConstraintValidatorContextTest {
 		bean.setNestedDummy( new DummyBean( "bar" ) );
 
 		Set<ConstraintViolation<DummyBean>> constraintViolations = validator.validate( bean );
-		assertEquals( 2, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 2, "Wrong number of constraints" );
 		boolean validatedNestedBean = false;
 		for ( ConstraintViolation<DummyBean> violation : constraintViolations ) {
 

@@ -73,8 +73,8 @@ public class TestUtil {
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath, Class leafBean) {
 		assertEquals(
 
-				leafBean,
 				violation.getLeafBean().getClass(),
+				leafBean,
 				"Wrong leaf bean type"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBean, invalidValue, propertyPath );
@@ -82,8 +82,8 @@ public class TestUtil {
 
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath) {
 		assertEquals(
-				propertyPath,
 				violation.getPropertyPath(),
+				propertyPath,
 				"Wrong propertyPath"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBean, invalidValue );
@@ -91,8 +91,8 @@ public class TestUtil {
 
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue) {
 		assertEquals(
-				invalidValue,
 				violation.getInvalidValue(),
+				invalidValue,
 				"Wrong invalid value"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBean );
@@ -100,18 +100,18 @@ public class TestUtil {
 
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean) {
 		assertEquals(
-				rootBean,
 				violation.getRootBean().getClass(),
+				rootBean,
 				"Wrong root bean type"
 		);
 		assertConstraintViolation( violation, errorMessage );
 	}
 
 	public static void assertConstraintViolation(ConstraintViolation violation, String message) {
-		assertEquals( message, violation.getMessage(), "Wrong message" );
+		assertEquals( violation.getMessage(), message, "Wrong message" );
 	}
 
 	public static void assertNumberOfViolations(Set violations, int expectedViolations) {
-		assertEquals( expectedViolations, violations.size(), "Wrong number of constraint violations" );
+		assertEquals( violations.size(), expectedViolations, "Wrong number of constraint violations" );
 	}
 }

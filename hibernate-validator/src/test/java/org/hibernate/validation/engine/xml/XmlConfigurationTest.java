@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,32 +15,28 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.metadata;
+package org.hibernate.validation.engine.xml;
 
-import javax.validation.Valid;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+import org.testng.annotations.Test;
+
+import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validation.util.TestUtil.getValidator;
 
 /**
- * Class with no constraints but with a cascade @Valid annotation
+ * @author Hardy Ferentschik
  */
-@AccountChecker
-public class Account {
-	private String accountLogin;
-	private Customer customer;
+public class XmlConfigurationTest {
 
-	public String getAccountLogin() {
-		return accountLogin;
-	}
+	@Test
+	public void testValidatorResolutionForMinMax() {
+		Validator validator = getValidator();
 
-	public void setAccountLogin(String accountLogin) {
-		this.accountLogin = accountLogin;
-	}
-
-	@Valid
-	public Customer getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
+		User user = new User();
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 1 );
 	}
 }

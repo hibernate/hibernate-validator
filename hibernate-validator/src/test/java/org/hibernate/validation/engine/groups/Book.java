@@ -26,7 +26,6 @@ import org.hibernate.validation.constraints.NotEmpty;
 import org.hibernate.validation.engine.First;
 import org.hibernate.validation.engine.Last;
 import org.hibernate.validation.engine.Second;
-import org.hibernate.validation.engine.groups.Author;
 
 /**
  * @author Hardy Ferentschik

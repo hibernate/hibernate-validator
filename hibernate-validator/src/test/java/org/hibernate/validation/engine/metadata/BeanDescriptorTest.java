@@ -76,13 +76,13 @@ public class BeanDescriptorTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
 		assertEquals(
-				1, propertyDescriptor.getConstraintDescriptors().size(), "There should be one constraint descriptor"
+				propertyDescriptor.getConstraintDescriptors().size(), 1, "There should be one constraint descriptor"
 		);
 
 		beanDescriptor = validator.getConstraintsForClass( Customer.class );
 		propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderList" );
 		assertEquals(
-				0, propertyDescriptor.getConstraintDescriptors().size(), "There should be no constraint descriptors"
+				propertyDescriptor.getConstraintDescriptors().size(), 0, "There should be no constraint descriptors"
 		);
 		assertTrue( propertyDescriptor.isCascaded(), "The property should be cascaded" );
 	}
@@ -93,7 +93,7 @@ public class BeanDescriptorTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderList" );
 		assertEquals(
-				0, propertyDescriptor.getConstraintDescriptors().size(), "There should be no constraint descriptors"
+				propertyDescriptor.getConstraintDescriptors().size(), 0, "There should be no constraint descriptors"
 		);
 		assertTrue( propertyDescriptor.isCascaded(), "The property should be cascaded" );
 	}
@@ -123,7 +123,7 @@ public class BeanDescriptorTest {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Order.class );
 		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
-		assertEquals( 1, constraintProperties.size(), "There should be only one property" );
+		assertEquals( constraintProperties.size(), 1, "There should be only one property" );
 		boolean hasOrderNumber = false;
 		for ( PropertyDescriptor pd : constraintProperties ) {
 			hasOrderNumber |= pd.getPropertyName().equals( "orderNumber" );
@@ -164,6 +164,6 @@ public class BeanDescriptorTest {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( UnconstraintEntity.class );
 		Set<PropertyDescriptor> constraintProperties = beanDescriptor.getConstrainedProperties();
-		assertEquals( 0, constraintProperties.size(), "We should get the empty set." );
+		assertEquals( constraintProperties.size(), 0, "We should get the empty set." );
 	}
 }

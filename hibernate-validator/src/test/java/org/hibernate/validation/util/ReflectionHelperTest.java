@@ -93,11 +93,11 @@ public class ReflectionHelperTest {
 		map.put( key, testObject );
 
 		Object value = ReflectionHelper.getIndexedValue( map, key );
-		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
+		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
 
 		// try to get to the value by integer index
 		value = ReflectionHelper.getIndexedValue( map, "0" );
-		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
+		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getIndexedValue( map, "foo" );
 		assertNull( value, "A non existent index should return the null value" );
@@ -113,7 +113,7 @@ public class ReflectionHelperTest {
 		list.add( testObject );
 
 		Object value = ReflectionHelper.getIndexedValue( list, "0" );
-		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
+		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getIndexedValue( list, "2" );
 		assertNull( value, "A non existent index should return the null value" );
@@ -144,7 +144,7 @@ public class ReflectionHelperTest {
 		assertEquals( "test", message, "Wrong message" );
 
 		Class<?>[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", Class[].class );
-		assertEquals( Default.class, group[0], "Wrong message" );
+		assertEquals( group[0], Default.class, "Wrong message" );
 
 		try {
 			ReflectionHelper.getAnnotationParameter( testAnnotation, "message", Integer.class );

@@ -84,12 +84,12 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		customer.setLastName( "Doe" );
 
 		constraintViolations = validator.validate( customer );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -106,7 +106,7 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 
@@ -126,7 +126,7 @@ public class ValidationTest {
 		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "my custom message", constraintViolation.getMessage(), "Wrong message" );
 	}
@@ -144,7 +144,7 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 
@@ -164,7 +164,7 @@ public class ValidationTest {
 		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -265,7 +265,7 @@ public class ValidationTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 
@@ -281,6 +281,6 @@ public class ValidationTest {
 		factory = configuration.buildValidatorFactory();
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 }

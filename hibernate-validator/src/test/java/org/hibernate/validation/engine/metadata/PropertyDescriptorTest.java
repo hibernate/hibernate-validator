@@ -48,6 +48,6 @@ public class PropertyDescriptorTest {
 	public void testPropertyName() {
 		String propertyName = "orderList";
 		PropertyDescriptor descriptor = TestUtil.getPropertyDescriptor( Customer.class, propertyName );
-		assertEquals( propertyName, descriptor.getPropertyName(), "Wrong property name" );
+		assertEquals( descriptor.getPropertyName(), propertyName, "Wrong property name" );
 	}
 }

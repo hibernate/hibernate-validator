@@ -20,7 +20,6 @@ package org.hibernate.validation.engine.groups;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validation.constraints.NotEmpty;
-import org.hibernate.validation.engine.groups.Book;
 
 /**
  * @author Hardy Ferentschik

@@ -61,7 +61,7 @@ public class GraphNavigationTest {
 		Validator validator = TestUtil.getValidator();
 
 		Set<ConstraintViolation<Order>> constraintViolations = validator.validate( order );
-		assertEquals( 3, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 3, "Wrong number of constraints" );
 
 		List<String> expectedErrorMessages = new ArrayList<String>();
 		expectedErrorMessages.add( "shippingAddress.addressline1" );
@@ -85,7 +85,7 @@ public class GraphNavigationTest {
 		Validator validator = TestUtil.getValidator();
 
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( john );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		TestUtil.assertConstraintViolation(
 				constraintViolations.iterator().next(), "may not be null", User.class, null, "lastName"
 		);
@@ -96,19 +96,19 @@ public class GraphNavigationTest {
 		john.knows( jane );
 
 		constraintViolations = validator.validate( john );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		TestUtil.assertConstraintViolation(
 				constraintViolations.iterator().next(), "may not be null", User.class, null, "lastName"
 		);
 
 		constraintViolations = validator.validate( jane );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		TestUtil.assertConstraintViolation(
 				constraintViolations.iterator().next(), "may not be null", User.class, null, "knowsUser[0].lastName"
 		);
 
 		john.setLastName( "Doe" );
 		constraintViolations = validator.validate( john );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 }

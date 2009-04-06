@@ -27,8 +27,8 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.OverridesAttribute;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 
 /**

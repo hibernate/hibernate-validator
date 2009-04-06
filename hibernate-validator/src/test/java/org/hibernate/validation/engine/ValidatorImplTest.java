@@ -139,12 +139,12 @@ public class ValidatorImplTest {
 		customer.setFirstName( "John" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		customer.setLastName( "Doe" );
 
 		constraintViolations = validator.validate( customer );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -158,29 +158,29 @@ public class ValidatorImplTest {
 
 		Set<ConstraintViolation<Address>> constraintViolations = validator.validate( address );
 		assertEquals(
-				3,
 				constraintViolations.size(),
+				3,
 				"we should have been 2 not null violation for addresslines and one lenth violation for city"
 		);
 
 		constraintViolations = validator.validateProperty( address, "city" );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"only city should be validated"
 		);
 
 		constraintViolations = validator.validateProperty( address, "city" );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"only city should be validated"
 		);
 
 		constraintViolations = validator.validateValue( Address.class, "city", "Paris" );
 		assertEquals(
-				0,
 				constraintViolations.size(),
+				0,
 				"Paris should be a valid city name."
 		);
 	}
@@ -194,17 +194,17 @@ public class ValidatorImplTest {
 		customer.setLastName( "Doe" );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 
 		Order order = new Order();
 		customer.addOrder( order );
 
 		constraintViolations = validator.validate( customer );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
-		assertEquals( customer, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( order.getOrderNumber(), constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), customer, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), order.getOrderNumber(), "Wrong value" );
 		assertEquals( "orderList[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 	}
 
@@ -215,15 +215,15 @@ public class ValidatorImplTest {
 		Engine engine = new Engine();
 		engine.setSerialNumber( "mail@foobar.com" );
 		Set<ConstraintViolation<Engine>> constraintViolations = validator.validate( engine );
-		assertEquals( 2, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 2, "Wrong number of constraints" );
 
 		engine.setSerialNumber( "ABCDEFGH1234" );
 		constraintViolations = validator.validate( engine );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		engine.setSerialNumber( "ABCD-EFGH-1234" );
 		constraintViolations = validator.validate( engine );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -244,10 +244,10 @@ public class ValidatorImplTest {
 
 		Set<ConstraintViolation<Actor>> constraintViolations = validator.validate( clint );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "may not be empty", constraintViolation.getMessage(), "Wrong message" );
-		assertEquals( clint, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( morgan.getLastName(), constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), clint, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), morgan.getLastName(), "Wrong value" );
 		assertEquals(
 				"playedWith[0].playedWith[1].lastName", constraintViolation.getPropertyPath(), "Wrong propertyName"
 		);
@@ -260,17 +260,17 @@ public class ValidatorImplTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validateValue(
 				Customer.class, "orderList[0].orderNumber", null
 		);
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
-		assertEquals( null, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( null, constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), null, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), null, "Wrong value" );
 		assertEquals( "orderList[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
 		constraintViolations = validator.validateValue( Customer.class, "orderList[0].orderNumber", "1234" );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -313,18 +313,18 @@ public class ValidatorImplTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validateProperty(
 				customer, "orderList[0].orderNumber"
 		);
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
-		assertEquals( customer, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( order.getOrderNumber(), constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), customer, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), order.getOrderNumber(), "Wrong value" );
 		assertEquals( "orderList[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
 		order.setOrderNumber( 1234 );
 		constraintViolations = validator.validateProperty( customer, "orderList[0].orderNumber" );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -385,7 +385,7 @@ public class ValidatorImplTest {
 		Person person = customer;
 
 		Set<ConstraintViolation<Person>> constraintViolations = validator.validate( person );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		assertConstraintViolation(
 				constraintViolations.iterator().next(),
@@ -398,7 +398,7 @@ public class ValidatorImplTest {
 		order.setOrderNumber( 123 );
 
 		constraintViolations = validator.validate( person );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -417,7 +417,7 @@ public class ValidatorImplTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(
 				customer, Default.class, First.class, Second.class, Last.class
 		);
-		assertEquals( 100, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 100, "Wrong number of constraints" );
 	}
 
 	/**
@@ -431,13 +431,13 @@ public class ValidatorImplTest {
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "orderNumber" );
 		Set<ConstraintDescriptor<?>> descriptors = propertyDescriptor.getConstraintDescriptors();
 
-		assertEquals( 1, descriptors.size(), "There should be only one constraint descriptor" );
+		assertEquals( descriptors.size(), 1, "There should be only one constraint descriptor" );
 		ConstraintDescriptor<?> descriptor = descriptors.iterator().next();
 		Set<Class<?>> groups = descriptor.getGroups();
 		assertTrue( groups.size() == 1, "There should be only one group" );
 		assertEquals(
-				Default.class,
 				groups.iterator().next(),
+				Default.class,
 				"The declared constraint does not explicitly define a group, hence Default is expected"
 		);
 	}

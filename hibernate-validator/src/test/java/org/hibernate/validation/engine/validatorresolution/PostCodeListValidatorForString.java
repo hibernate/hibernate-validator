@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -29,7 +29,7 @@ public class PostCodeListValidatorForString implements ConstraintValidator<PostC
 	}
 
 	public boolean isValid(Collection<String> value, ConstraintValidatorContext constraintValidatorContext) {
-		if(value == null) {
+		if ( value == null ) {
 			return true;
 		}
 		return false;

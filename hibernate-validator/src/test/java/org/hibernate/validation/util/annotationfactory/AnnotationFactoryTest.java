@@ -37,8 +37,8 @@ public class AnnotationFactoryTest {
 
 		Size size = AnnotationFactory.create( descriptor );
 
-		assertEquals( 5, size.min(), "Wrong parameter value" );
-		assertEquals( 10, size.max(), "Wrong parameter value" );
+		assertEquals( size.min(), 5, "Wrong parameter value" );
+		assertEquals( size.max(), 10, "Wrong parameter value" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

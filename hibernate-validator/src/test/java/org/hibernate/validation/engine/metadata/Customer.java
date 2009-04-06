@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 
-import org.hibernate.validation.engine.Person;
 import org.hibernate.validation.engine.Order;
+import org.hibernate.validation.engine.Person;
 
 /**
  * @author Hardy Ferentschik

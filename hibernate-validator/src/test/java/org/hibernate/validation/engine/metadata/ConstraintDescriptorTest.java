@@ -105,7 +105,7 @@ public class ConstraintDescriptorTest {
 		ConstraintDescriptor<?> descriptor = TestUtil.getSingleConstraintDescriptorFor(
 				GermanAddress.class, "zipCode"
 		);
-		assertEquals( 1, descriptor.getComposingConstraints().size(), "Wrong number of composing constraints" );
+		assertEquals( descriptor.getComposingConstraints().size(), 1, "Wrong number of composing constraints" );
 	}
 
 	@Test
@@ -121,13 +121,13 @@ public class ConstraintDescriptorTest {
 		ConstraintDescriptor<?> descriptor = TestUtil.getSingleConstraintDescriptorFor( Order.class, "orderNumber" );
 		Set<Class<?>> groups = descriptor.getGroups();
 		assertTrue( groups.size() == 1 );
-		assertEquals( Default.class, groups.iterator().next(), "Wrong group" );
+		assertEquals( groups.iterator().next(), Default.class, "Wrong group" );
 	}
 
 	@Test
 	public void testGetConstraintValidatorClasses() {
 		ConstraintDescriptor<?> descriptor = TestUtil.getSingleConstraintDescriptorFor( Order.class, "orderNumber" );
-		assertEquals( NotNullValidator.class, descriptor.getConstraintValidatorClasses().get( 0 ), "Wrong classes" );
+		assertEquals( descriptor.getConstraintValidatorClasses().get( 0 ), NotNullValidator.class, "Wrong classes" );
 	}
 
 	@Test

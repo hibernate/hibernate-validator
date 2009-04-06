@@ -83,14 +83,14 @@ public class GroupChainGeneratorTest {
 		groups.add( Last.class );
 		GroupChain chain = generator.getGroupChainFor( groups );
 		int count = countGroups( chain );
-		assertEquals( 3, count, "Wrong number of groups" );
+		assertEquals( count, 3, "Wrong number of groups" );
 
 		groups.clear();
 		groups.add( First.class );
 		groups.add( First.class );
 		chain = generator.getGroupChainFor( groups );
 		count = countGroups( chain );
-		assertEquals( 1, count, "Wrong number of groups" );
+		assertEquals( count, 1, "Wrong number of groups" );
 
 		groups.clear();
 		groups.add( First.class );
@@ -98,7 +98,7 @@ public class GroupChainGeneratorTest {
 		groups.add( First.class );
 		chain = generator.getGroupChainFor( groups );
 		count = countGroups( chain );
-		assertEquals( 2, count, "Wrong number of groups" );
+		assertEquals( count, 2, "Wrong number of groups" );
 	}
 
 	private int countGroups(GroupChain chain) {
@@ -119,7 +119,7 @@ public class GroupChainGeneratorTest {
 		Iterator<List<Group>> sequences = chain.getSequenceIterator();
 		List<Group> sequence = sequences.next();
 
-		assertEquals( Default.class, sequence.get( 0 ).getGroup(), "Wrong group" );
-		assertEquals( Address.HighLevelCoherence.class, sequence.get( 1 ).getGroup(), "Wrong group" );
+		assertEquals( sequence.get( 0 ).getGroup(), Default.class, "Wrong group" );
+		assertEquals( sequence.get( 1 ).getGroup(), Address.HighLevelCoherence.class, "Wrong group" );
 	}
 }

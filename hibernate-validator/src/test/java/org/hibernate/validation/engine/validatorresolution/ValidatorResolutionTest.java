@@ -84,7 +84,7 @@ public class ValidatorResolutionTest {
 		Suburb suburb = new Suburb();
 
 		List<Integer> postcodes = new ArrayList<Integer>();
-		postcodes.add(12345);
+		postcodes.add( 12345 );
 		suburb.setIncludedPostCodes( postcodes );
 
 		// all values are null and should pass

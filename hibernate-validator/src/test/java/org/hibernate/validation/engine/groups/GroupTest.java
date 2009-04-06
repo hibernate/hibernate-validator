@@ -58,28 +58,28 @@ public class GroupTest {
 		Set<ConstraintViolation<Book>> constraintViolations = validator.validate(
 				book, First.class, Second.class, Last.class
 		);
-		assertEquals( 3, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 3, "Wrong number of constraints" );
 
 		author.setFirstName( "Gavin" );
 		author.setLastName( "King" );
 
 		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "may not be empty", constraintViolation.getMessage(), "Wrong message" );
-		assertEquals( book, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( book.getTitle(), constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), book, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), book.getTitle(), "Wrong value" );
 		assertEquals( "title", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
 		book.setTitle( "Hibernate Persistence with JPA" );
 		book.setSubtitle( "Revised Edition of Hibernate in Action" );
 
 		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		constraintViolation = constraintViolations.iterator().next();
 		assertEquals( "length must be between 0 and 30", constraintViolation.getMessage(), "Wrong message" );
-		assertEquals( book, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( book.getSubtitle(), constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), book, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), book.getSubtitle(), "Wrong value" );
 		assertEquals( "subtitle", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
 		book.setSubtitle( "Revised Edition" );
@@ -87,16 +87,16 @@ public class GroupTest {
 
 		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
 		constraintViolation = constraintViolations.iterator().next();
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "length must be between 0 and 20", constraintViolation.getMessage() );
-		assertEquals( book, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( author.getCompany(), constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), book, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), author.getCompany(), "Wrong value" );
 		assertEquals( "author.company", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
 		author.setCompany( "JBoss" );
 
 		constraintViolations = validator.validate( book, First.class, Second.class, Last.class );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -110,35 +110,35 @@ public class GroupTest {
 		book.setAuthor( author );
 
 		Set<ConstraintViolation<Book>> constraintViolations = validator.validate( book, Book.All.class );
-		assertEquals( 2, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 2, "Wrong number of constraints" );
 
 		author.setFirstName( "Gavin" );
 		author.setLastName( "King" );
 
 		constraintViolations = validator.validate( book, Book.All.class );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
-		assertEquals( book, constraintViolation.getRootBean(), "Wrong root entity" );
-		assertEquals( book.getTitle(), constraintViolation.getInvalidValue(), "Wrong value" );
+		assertEquals( constraintViolation.getRootBean(), book, "Wrong root entity" );
+		assertEquals( constraintViolation.getInvalidValue(), book.getTitle(), "Wrong value" );
 		assertEquals( "title", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
 		book.setTitle( "Hibernate Persistence with JPA" );
 		book.setSubtitle( "Revised Edition of Hibernate in Action" );
 
 		constraintViolations = validator.validate( book, Book.All.class );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		book.setSubtitle( "Revised Edition" );
 		author.setCompany( "JBoss a divison of RedHat" );
 
 		constraintViolations = validator.validate( book, Book.All.class );
-		assertEquals( 1, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
 		author.setCompany( "JBoss" );
 
 		constraintViolations = validator.validate( book, Book.All.class );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -154,7 +154,7 @@ public class GroupTest {
 		dictonary.setAuthor( author );
 
 		Set<ConstraintViolation<Dictonary>> constraintViolations = validator.validate( dictonary, DefaultAlias.class );
-		assertEquals( 0, constraintViolations.size(), "Wrong number of constraints" );
+		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
 	@Test
@@ -168,8 +168,8 @@ public class GroupTest {
 				elepfant, First.class, Second.class
 		);
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"The should be two invalid constraints since the same propertyName gets validated in both groups"
 		);
 	}
@@ -184,64 +184,64 @@ public class GroupTest {
 
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertEquals(
-				2,
 				constraintViolations.size(),
+				2,
 				"There should be two violations against the implicit default group"
 		);
 
 		constraintViolations = validator.validate( user, Default.class );
 		assertEquals(
-				2,
 				constraintViolations.size(),
+				2,
 				"There should be two violations against the explicit defualt group"
 		);
 
 		constraintViolations = validator.validate( user, Billable.class );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"There should be one violation against Billable"
 		);
 
 		constraintViolations = validator.validate( user, Default.class, Billable.class );
 		assertEquals(
-				3,
 				constraintViolations.size(),
+				3,
 				"There should be 3 violation against Default and  Billable"
 		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class );
 		assertEquals(
-				3,
 				constraintViolations.size(),
+				3,
 				"Three violations expected since BuyInOneClick extends Default and Billable"
 		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class, Billable.class );
 		assertEquals(
-				3,
 				constraintViolations.size(),
+				3,
 				"BuyInOneClick already contains all other groups. Adding Billable does not change the number of violations"
 		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class, Default.class );
 		assertEquals(
-				3,
 				constraintViolations.size(),
+				3,
 				"BuyInOneClick already contains all other groups. Adding Default does not change the number of violations"
 		);
 
 		constraintViolations = validator.validate( user, BuyInOneClick.class, Default.class, Billable.class );
 		assertEquals(
-				3,
 				constraintViolations.size(),
+				3,
 				"BuyInOneClick already contains all other groups. Adding Billable and Default does not change the number of violations"
 		);
 
 		constraintViolations = validator.validate( user, Billable.class, Billable.class );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"Adding the same group twice is still only leads to a single violation"
 		);
 	}
@@ -262,8 +262,8 @@ public class GroupTest {
 				user, BuyInOneClick.class, Optional.class
 		);
 		assertEquals(
-				2,
 				constraintViolations.size(),
+				2,
 				"There should be two violations against the implicit default group"
 		);
 
@@ -305,8 +305,8 @@ public class GroupTest {
 
 		Set<ConstraintViolation<Address>> constraintViolations = validator.validate( address );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"There should only be one violation for zipcode"
 		);
 
@@ -318,8 +318,8 @@ public class GroupTest {
 		// now the second group in the re-defined default group causes an error
 		constraintViolations = validator.validate( address );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"There should only be one violation for zipcode"
 		);
 
@@ -339,8 +339,8 @@ public class GroupTest {
 
 		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"There should be one violations due to the re-defintion of the default group"
 		);
 		assertEquals(
@@ -351,8 +351,8 @@ public class GroupTest {
 
 		constraintViolations = validator.validateProperty( car, "type" );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"There should be one violations due to the re-defintion of the default group"
 		);
 		assertEquals(
@@ -363,8 +363,8 @@ public class GroupTest {
 
 		constraintViolations = validator.validateValue( Car.class, "type", "A" );
 		assertEquals(
-				1,
 				constraintViolations.size(),
+				1,
 				"There should be one violations due to the re-defintion of the default group"
 		);
 		assertEquals(

@@ -1,8 +1,23 @@
 <constraint-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
                      xmlns="http://jboss.org/xml/ns/javax/validation/mapping">
-    <default-package>org.hibernate.validation.engine.groups</default-package>
+    <default-package>org.hibernate.validation.engine.xml</default-package>
     <bean class="User" ignore-annotations="false">
+        <class ignore-annotations="false">
+            <group-sequence>
+                <value>value0</value>
+            </group-sequence>
+            <constraint annotation="org.hibernate.validation.engine.xml.ConsistentUserInformation">
+                <message>message0</message>
+                <groups>
+                    <value>foo</value>
+                </groups>
+                <element name="name1">
+                </element>
+                <element name="name3">
+                </element>
+            </constraint>
+        </class>
         <field name="firstName">
             <constraint annotation="com.acme.app.constraint.LooksLike">
                 <element name="patterns">
