@@ -5,6 +5,8 @@ package org.hibernate.validation.engine.xml;
  */
 public class User {
 
+	private boolean isConsistent;
+
 	private String firstname;
 
 	//@NotNull(groups = Default.class)
@@ -36,5 +38,13 @@ public class User {
 
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+
+	public void setConsistent(boolean consistent) {
+		isConsistent = consistent;
+	}
+
+	public boolean isConsistent() {
+		return isConsistent;
 	}
 }

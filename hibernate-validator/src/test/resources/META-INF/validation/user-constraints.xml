@@ -8,13 +8,17 @@
                 <value>value0</value>
             </group-sequence>
             <constraint annotation="org.hibernate.validation.engine.xml.ConsistentUserInformation">
-                <message>message0</message>
+                <message>Message from xml</message>
                 <groups>
-                    <value>foo</value>
+                    <value>javax.validation.groups.Default</value>
                 </groups>
-                <element name="name1">
+                <element name="stringParam">foobar</element>
+                <element name="stringArrayParam">
+                    <value>foo</value>
+                    <value>bar</value>
                 </element>
-                <element name="name3">
+                <element name="intParam">
+                    <value>42</value>
                 </element>
             </constraint>
         </class>

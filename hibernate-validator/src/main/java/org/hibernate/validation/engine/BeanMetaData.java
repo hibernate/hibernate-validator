@@ -33,6 +33,12 @@ import javax.validation.PropertyDescriptor;
 public interface BeanMetaData<T> {
 
 	/**
+	 * Initalises the given meta data bean taken its current state into account. An instance of <code>BeanMetaData</code>
+	 * won't have any useful state information prior to calling this method.
+	 */
+	void init();
+
+	/**
 	 * @return the class of the bean.
 	 */
 	Class<T> getBeanClass();
@@ -41,16 +47,6 @@ public interface BeanMetaData<T> {
 	 * @return an instance of <code>ElementDescriptor</code> describing the bean this meta data applies for.
 	 */
 	BeanDescriptor getBeanDescriptor();
-
-	/**
-	 * @return A list of all cascaded fields (fields annotated with &#064;Valid).
-	 */
-	List<Field> getCascadedFields();
-
-	/**
-	 * @return A list of all cascaded methods (methods annotated with &#064;Valid).
-	 */
-	List<Method> getCascadedMethods();
 
 	/**
 	 * @return A list of all cascaded methods and fields (methods/fields annotated with &#064;Valid).

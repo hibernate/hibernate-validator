@@ -12,6 +12,7 @@
             <package name="org.hibernate.validation.engine.groups"/>
             <package name="org.hibernate.validation.engine.metadata"/>
             <package name="org.hibernate.validation.engine.validatorresolution"/>
+            <package name="org.hibernate.validation.engine.xml"/>
             <package name="org.hibernate.validation.util"/>
             <package name="org.hibernate.validation.util.annotationfactory"/>
         </packages>

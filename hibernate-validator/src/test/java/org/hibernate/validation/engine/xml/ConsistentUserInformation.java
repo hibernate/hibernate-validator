@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -38,4 +38,10 @@ public @interface ConsistentUserInformation {
 	public abstract String message() default "User information is not consistent.";
 
 	public abstract Class<?>[] groups() default { };
+
+	public abstract String stringParam() default "";
+
+	public abstract String[] stringArrayParam() default { };
+
+	public abstract int intParam() default 0;
 }

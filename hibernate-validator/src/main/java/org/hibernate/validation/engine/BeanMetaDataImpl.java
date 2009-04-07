@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import javax.validation.BeanDescriptor;
 import javax.validation.GroupSequence;
 import javax.validation.PropertyDescriptor;
@@ -48,6 +48,7 @@ import org.hibernate.validation.util.ReflectionHelper;
  * instantiate an instance of this class and delegate the metadata extraction to it.
  *
  * @author Hardy Ferentschik
+ * @todo check the unchecked assignment warnings in this class
  */
 
 public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
@@ -70,14 +71,9 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private List<MetaConstraint<T, ?>> metaConstraintList = new ArrayList<MetaConstraint<T, ?>>();
 
 	/**
-	 * List of cascaded fields.
+	 * List of cascaded members.
 	 */
-	private List<Field> cascadedFields = new ArrayList<Field>();
-
-	/**
-	 * List of cascaded methods.
-	 */
-	private List<Method> cascadedMethods = new ArrayList<Method>();
+	private List<Member> cascadedMembers = new ArrayList<Member>();
 
 	/**
 	 * Maps field and method names to their <code>ElementDescriptorImpl</code>.
@@ -97,7 +93,42 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
+	}
+
+	public void init() {
 		createMetaData();
+	}
+
+	public Class<T> getBeanClass() {
+		return beanClass;
+	}
+
+	public BeanDescriptor getBeanDescriptor() {
+		return beanDescriptor;
+	}
+
+	public List<Member> getCascadedMembers() {
+		return cascadedMembers;
+	}
+
+	public List<MetaConstraint<T, ?>> geMetaConstraintList() {
+		return metaConstraintList;
+	}
+
+	public void addMetaConstraint(MetaConstraint<?, ?> metaConstraint) {
+		metaConstraintList.add( ( MetaConstraint<T, ?> ) metaConstraint );
+	}
+
+	public PropertyDescriptor getPropertyDescriptor(String property) {
+		return propertyDescriptors.get( property );
+	}
+
+	public List<Class<?>> getDefaultGroupSequence() {
+		return defaultGroupSequence;
+	}
+
+	public Set<PropertyDescriptor> getConstrainedProperties() {
+		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
 	}
 
 	/**
@@ -187,7 +218,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
 				ReflectionHelper.setAccessibility( field );
-				cascadedFields.add( field );
+				cascadedMembers.add( field );
 				addPropertyDescriptorForMember( field );
 			}
 		}
@@ -205,7 +236,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
 				ReflectionHelper.setAccessibility( method );
-				cascadedMethods.add( method );
+				cascadedMembers.add( method );
 				addPropertyDescriptorForMember( method );
 			}
 		}
@@ -326,44 +357,5 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			propertyDescriptor.addConstraintDescriptor( constraintDescriptor );
 		}
 		return metadata;
-	}
-
-	public Class<T> getBeanClass() {
-		return beanClass;
-	}
-
-	public BeanDescriptor getBeanDescriptor() {
-		return beanDescriptor;
-	}
-
-	public List<Field> getCascadedFields() {
-		return cascadedFields;
-	}
-
-	public List<Method> getCascadedMethods() {
-		return cascadedMethods;
-	}
-
-	public List<Member> getCascadedMembers() {
-		List<Member> cascadedMembers = new ArrayList<Member>();
-		cascadedMembers.addAll( getCascadedFields() );
-		cascadedMembers.addAll( getCascadedMethods() );
-		return cascadedMembers;
-	}
-
-	public List<MetaConstraint<T, ?>> geMetaConstraintList() {
-		return metaConstraintList;
-	}
-
-	public PropertyDescriptor getPropertyDescriptor(String property) {
-		return propertyDescriptors.get( property );
-	}
-
-	public List<Class<?>> getDefaultGroupSequence() {
-		return defaultGroupSequence;
-	}
-
-	public Set<PropertyDescriptor> getConstrainedProperties() {
-		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>(propertyDescriptors.values() ) );
 	}
 }

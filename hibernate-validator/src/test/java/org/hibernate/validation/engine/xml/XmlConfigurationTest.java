@@ -25,6 +25,7 @@ import org.testng.annotations.Test;
 
 import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.getValidator;
+import org.hibernate.validation.util.TestUtil;
 
 /**
  * @author Hardy Ferentschik
@@ -38,5 +39,10 @@ public class XmlConfigurationTest {
 		User user = new User();
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertNumberOfViolations( constraintViolations, 1 );
+		TestUtil.assertConstraintViolation( constraintViolations.iterator().next(), "Message from xml" );
+
+		user.setConsistent( true );
+		constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 0 );
 	}
 }

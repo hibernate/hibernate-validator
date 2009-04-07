@@ -19,9 +19,17 @@ package org.hibernate.validation.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -44,21 +52,27 @@ import org.xml.sax.SAXException;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validation.xml.BeanType;
 import org.hibernate.validation.xml.ClassType;
 import org.hibernate.validation.xml.ConstraintMappingsType;
+import org.hibernate.validation.xml.ConstraintType;
+import org.hibernate.validation.xml.ElementType;
 import org.hibernate.validation.xml.FieldType;
 import org.hibernate.validation.xml.GetterType;
+import org.hibernate.validation.xml.GroupsType;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @todo Is this the right place to parse the mapping files?
  */
 public class ValidatorFactoryImpl implements ValidatorFactory {
 
 	private static final Logger log = LoggerFactory.make();
 	private static final String VALIDATION_MAPPING_XSD = "META-INF/validation-mapping-1.0.xsd";
+	private static final String MESSAGE_PARAM = "message";
+	private static final String GROUPS_PARAM = "groups";
 
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
@@ -66,13 +80,18 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final ConstraintHelper constraintHelper = new ConstraintHelper();
 	private static final String PACKAGE_SEPERATOR = ".";
 
+	private final Map<Class<?>, Boolean> ignoreAnnotationDefaults = new HashMap<Class<?>, Boolean>();
+	private final Map<Class<?>, List<Member>> ignoreAnnotationOnMember = new HashMap<Class<?>, List<Member>>();
+	private final List<Class<?>> ignoreAnnotationOnClass = new ArrayList<Class<?>>();
+	private final Map<Class<?>, List<MetaConstraint<?, ?>>> constraintMap = new HashMap<Class<?>, List<MetaConstraint<?, ?>>>();
+
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
 
 		parseMappingFiles( configurationState.getMappingStreams() );
-
+		initBeanMetaData();
 	}
 
 	/**
@@ -99,7 +118,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		);
 	}
 
-	public Schema getMappingSchema() {
+	private Schema getMappingSchema() {
 		URL schemaUrl = this.getClass().getClassLoader().getResource( VALIDATION_MAPPING_XSD );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
@@ -119,16 +138,13 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				ConstraintMappingsType mappings = getValidationConfig( in );
 				String defaultPackage = mappings.getDefaultPackage();
 				for ( BeanType bean : mappings.getBean() ) {
-					Class<?> beanClass = getBeanClass( bean.getClazz(), defaultPackage );
-					if ( processedClasses.contains( beanClass ) ) {
-						throw new ValidationException( beanClass.getName() + " has already be configured in xml." );
-					}
-					boolean ignoreAnnotations = bean.isIgnoreAnnotations();
-					@SuppressWarnings("unchecked")
-					BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( beanClass, constraintHelper );
-					parseClassLevelOverrides( metaData, bean.getClassType() );
-					parseFieldLevelOverrides( metaData, bean.getField() );
-					parsePropertyLevelOverrides( metaData, bean.getGetter() );
+					Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
+					checkClassHasNotBeenProcessed( processedClasses, beanClass );
+					Boolean ignoreAnnotations = bean.isIgnoreAnnotations() == null ? false : bean.isIgnoreAnnotations();
+					ignoreAnnotationDefaults.put( beanClass, ignoreAnnotations );
+					parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
+					parseFieldLevelOverrides( bean.getField() );
+					parsePropertyLevelOverrides( bean.getGetter() );
 					processedClasses.add( beanClass );
 				}
 			}
@@ -143,19 +159,226 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
-	private void parseFieldLevelOverrides(BeanMetaDataImpl<?> metaData, List<FieldType> field) {
-		//To change body of created methods use File | Settings | File Templates.
+	private void checkClassHasNotBeenProcessed(Set<Class<?>> processedClasses, Class<?> beanClass) {
+		if ( processedClasses.contains( beanClass ) ) {
+			throw new ValidationException( beanClass.getName() + " has already be configured in xml." );
+		}
 	}
 
-	private void parsePropertyLevelOverrides(BeanMetaDataImpl<?> metaData, List<GetterType> getter) {
-		//To change body of created methods use File | Settings | File Templates.
+	private void parseFieldLevelOverrides(List<FieldType> fields) {
+		for ( FieldType field : fields ) {
+			boolean ignoreFieldAnnotation = field.isIgnoreAnnotations() == null ? false : field.isIgnoreAnnotations();
+		}
 	}
 
-	private void parseClassLevelOverrides(BeanMetaDataImpl<?> metaData, ClassType classType) {
-		//To change body of created methods use File | Settings | File Templates.
+	private void parsePropertyLevelOverrides(List<GetterType> getters) {
+		for ( GetterType getter : getters ) {
+			boolean ignoreGetterAnnotation = getter.isIgnoreAnnotations() == null ? false : getter.isIgnoreAnnotations();
+		}
 	}
 
-	private Class getBeanClass(String clazz, String defaultPackage) {
+	private void parseClassLevelOverrides(ClassType classType, Class<?> beanClass, String defaultPackage) {
+		if ( classType == null ) {
+			return;
+		}
+		boolean ignoreClassAnnotation = classType.isIgnoreAnnotations() == null ? false : classType.isIgnoreAnnotations();
+		if ( ignoreClassAnnotation ) {
+			ignoreAnnotationOnClass.add( beanClass );
+		}
+		for ( ConstraintType constraint : classType.getConstraint() ) {
+			MetaConstraint<?, ?> metaConstraint = createMetaConstraint( constraint, beanClass, defaultPackage );
+			addMetaConstraint( beanClass, metaConstraint );
+		}
+	}
+
+	private void addMetaConstraint(Class<?> beanClass, MetaConstraint<?, ?> metaConstraint) {
+		if ( constraintMap.containsKey( beanClass ) ) {
+			constraintMap.get( beanClass ).add( metaConstraint );
+		}
+		else {
+			List<MetaConstraint<?, ?>> constraintList = new ArrayList<MetaConstraint<?, ?>>();
+			constraintList.add( metaConstraint );
+			constraintMap.put( beanClass, constraintList );
+		}
+	}
+
+	private <A extends Annotation, T> MetaConstraint<?, ?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, String defaultPackage) {
+		@SuppressWarnings("unchecked")
+		Class<A> annotationClass = ( Class<A> ) getClass( constraint.getAnnotation(), defaultPackage );
+		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
+
+		if ( constraint.getMessage() != null ) {
+			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
+		}
+		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
+
+		for ( ElementType elementType : constraint.getElement() ) {
+			String name = elementType.getName();
+			checkNameIsValid( name );
+			Class<?> returnType = getAnnotationParamterType( annotationClass, name );
+			Object elementValue = getElementValue( elementType, returnType );
+			annotationDescriptor.setValue( name, elementValue );
+		}
+
+		A annotation = AnnotationFactory.create( annotationDescriptor );
+		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
+				annotation, new Class[] { }, constraintHelper
+		);
+		return new MetaConstraint<T, A>( beanClass, constraintDescriptor );
+	}
+
+	private void checkNameIsValid(String name) {
+		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
+			throw new ValidationException( MESSAGE_PARAM + " and " + GROUPS_PARAM + " are reserved paramter names." );
+		}
+	}
+
+	private <A extends Annotation> Class<?> getAnnotationParamterType(Class<A> annotationClass, String name) {
+		Method m;
+		try {
+			m = annotationClass.getMethod( name );
+		}
+		catch ( NoSuchMethodException e ) {
+			throw new ValidationException( "Annotation of type " + annotationClass.getName() + " does not contain a paramter " + name + "." );
+		}
+		return m.getReturnType();
+	}
+
+	private Object getElementValue(ElementType elementType, Class<?> returnType) {
+		removeEmptyContentElements( elementType );
+
+		boolean isArray = returnType.isArray();
+		if ( !isArray ) {
+			if ( elementType.getContent().size() != 1 ) {
+				throw new ValidationException( "Attempt to specify an array where single value is expected." );
+			}
+			return getSingleValue( elementType.getContent().get( 0 ), returnType );
+		}
+		else {
+			List<Object> values = new ArrayList<Object>();
+			for ( Serializable s : elementType.getContent() ) {
+				values.add( getSingleValue( s, returnType.getComponentType() ) );
+			}
+			return values.toArray( ( Object[] ) Array.newInstance( returnType.getComponentType(), values.size() ) );
+		}
+	}
+
+	private void removeEmptyContentElements(ElementType elementType) {
+		List<Serializable> contentToDelete = new ArrayList<Serializable>();
+		for ( Serializable content : elementType.getContent() ) {
+			if ( content instanceof String && ( ( String ) content ).matches( "[\\n ].*" ) ) {
+				contentToDelete.add( content );
+			}
+		}
+		elementType.getContent().removeAll( contentToDelete );
+	}
+
+	private Object getSingleValue(Serializable serializable, Class<?> returnType) {
+		String value;
+		if ( serializable instanceof String ) {
+			value = ( String ) serializable;
+		}
+		else if ( serializable instanceof JAXBElement ) {
+			JAXBElement<?> elem = ( JAXBElement<?> ) serializable;
+			// this is safe due to the underlying schema
+			value = ( String ) elem.getValue();
+		}
+		else {
+			throw new ValidationException( "Unexpected paramter value" );
+		}
+
+		return convertStringToReturnType( returnType, value );
+	}
+
+	private Object convertStringToReturnType(Class<?> returnType, String value) {
+		Object returnValue;
+		if ( returnType.isPrimitive() && returnType.getName().equals( byte.class.getName() ) ) {
+			try {
+				returnValue = Byte.parseByte( value );
+			}
+			catch ( NumberFormatException e ) {
+				throw new ValidationException( "Invalid byte format", e );
+			}
+		}
+		else if ( returnType.isPrimitive() && returnType.getName().equals( short.class.getName() ) ) {
+			try {
+				returnValue = Short.parseShort( value );
+			}
+			catch ( NumberFormatException e ) {
+				throw new ValidationException( "Invalid short format", e );
+			}
+		}
+		else if ( returnType.isPrimitive() && returnType.getName().equals( int.class.getName() ) ) {
+			try {
+				returnValue = Integer.parseInt( value );
+			}
+			catch ( NumberFormatException e ) {
+				throw new ValidationException( "Invalid int format", e );
+			}
+		}
+		else if ( returnType.isPrimitive() && returnType.getName().equals( long.class.getName() ) ) {
+			try {
+				returnValue = Long.parseLong( value );
+			}
+			catch ( NumberFormatException e ) {
+				throw new ValidationException( "Invalid long format", e );
+			}
+		}
+		else if ( returnType.isPrimitive() && returnType.getName().equals( float.class.getName() ) ) {
+			try {
+				returnValue = Float.parseFloat( value );
+			}
+			catch ( NumberFormatException e ) {
+				throw new ValidationException( "Invalid float format", e );
+			}
+		}
+		else if ( returnType.isPrimitive() && returnType.getName().equals( double.class.getName() ) ) {
+			try {
+				returnValue = Double.parseDouble( value );
+			}
+			catch ( NumberFormatException e ) {
+				throw new ValidationException( "Invalid double format", e );
+			}
+		}
+		else if ( returnType.isPrimitive() && returnType.getName().equals( boolean.class.getName() ) ) {
+			returnValue = Boolean.parseBoolean( value );
+		}
+		else if ( returnType.isPrimitive() && returnType.getName().equals( char.class.getName() ) ) {
+			if ( value.length() != 1 ) {
+				throw new ValidationException( "Invalid char value: " + value );
+			}
+			returnValue = value.charAt( 0 );
+		}
+		else if ( returnType.getName().equals( String.class.getName() ) ) {
+			returnValue = value;
+		}
+		else if ( returnType.getName().equals( Class.class.getName() ) ) {
+			try {
+				returnValue = ReflectionHelper.classForName( value, this.getClass() );
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException( "Unable to instantiate class: " + value );
+			}
+		}
+		else {
+			throw new ValidationException( "Invalid return type: " + returnType );
+		}
+		return returnValue;
+	}
+
+	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
+		if ( groupsType == null ) {
+			return new Class[] { };
+		}
+
+		List<Class<?>> groupList = new ArrayList<Class<?>>();
+		for ( String groupClass : groupsType.getValue() ) {
+			groupList.add( getClass( groupClass, defaultPackage ) );
+		}
+		return groupList.toArray( new Class[groupList.size()] );
+	}
+
+	private Class<?> getClass(String clazz, String defaultPackage) {
 		String fullyQualifiedClass;
 		if ( isQualifiedClass( clazz ) ) {
 			fullyQualifiedClass = clazz;
@@ -192,5 +415,16 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			throw new ValidationException( msg, e );
 		}
 		return constraintMappings;
+	}
+
+	private void initBeanMetaData() {
+		for ( Map.Entry<Class<?>, List<MetaConstraint<?, ?>>> entry : constraintMap.entrySet() ) {
+			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( entry.getKey(), constraintHelper );
+			for ( MetaConstraint<?, ?> metaConstraint : entry.getValue() ) {
+				metaData.addMetaConstraint( metaConstraint );
+			}
+			metaData.init();
+			BeanMetaDataCache.addBeanMetaData( entry.getKey(), metaData );
+		}
 	}
 }

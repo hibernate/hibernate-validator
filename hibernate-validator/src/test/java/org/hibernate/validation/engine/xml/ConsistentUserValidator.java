@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -29,6 +29,6 @@ public class ConsistentUserValidator implements ConstraintValidator<ConsistentUs
 	}
 
 	public boolean isValid(User user, ConstraintValidatorContext constraintValidatorContext) {
-		return true;
+		return user.isConsistent();
 	}
 }

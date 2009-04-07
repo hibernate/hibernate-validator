@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.BeanDescriptor;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -71,13 +70,6 @@ public class ValidatorImpl implements Validator {
 	 * The default group array used in case any of the validate methods is called without a group.
 	 */
 	private static final Class<?>[] DEFAULT_GROUP_ARRAY = new Class<?>[] { Default.class };
-
-	/**
-	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
-	 * entity.
-	 */
-	private static Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders
-			= new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>( 10 );
 
 	/**
 	 * Used to resolve the group execution order for a validate call.
@@ -559,14 +551,11 @@ public class ValidatorImpl implements Validator {
 	 * {@inheritDoc}
 	 */
 	private <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		if ( beanClass == null ) {
-			throw new IllegalArgumentException( "Class cannot be null" );
-		}
-		@SuppressWarnings("unchecked")
-		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get( beanClass );
+		BeanMetaDataImpl<T> metadata = BeanMetaDataCache.getBeanMetaData( beanClass );
 		if ( metadata == null ) {
 			metadata = new BeanMetaDataImpl<T>( beanClass, constraintHelper );
-			metadataProviders.put( beanClass, metadata );
+			metadata.init();
+			BeanMetaDataCache.addBeanMetaData( beanClass, metadata );
 		}
 		return metadata;
 	}
