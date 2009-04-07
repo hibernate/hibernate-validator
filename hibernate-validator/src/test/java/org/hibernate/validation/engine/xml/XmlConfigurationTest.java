@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -23,9 +23,9 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.getValidator;
-import org.hibernate.validation.util.TestUtil;
 
 /**
  * @author Hardy Ferentschik
@@ -33,7 +33,7 @@ import org.hibernate.validation.util.TestUtil;
 public class XmlConfigurationTest {
 
 	@Test
-	public void testValidatorResolutionForMinMax() {
+	public void testClassConstraintDefinedInXml() {
 		Validator validator = getValidator();
 
 		User user = new User();
@@ -42,6 +42,43 @@ public class XmlConfigurationTest {
 		TestUtil.assertConstraintViolation( constraintViolations.iterator().next(), "Message from xml" );
 
 		user.setConsistent( true );
+		constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	@Test
+	public void testPropertyConstraintDefinedInXml() {
+		Validator validator = getValidator();
+
+		User user = new User();
+		user.setConsistent( true );
+		user.setFirstname( "Wolfeschlegelsteinhausenbergerdorff" );
+
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 1 );
+		TestUtil.assertConstraintViolation( constraintViolations.iterator().next(), "Size is limited!" );
+
+		user.setFirstname( "Wolfgang" );
+		constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	@Test
+	public void testFieldConstraintDefinedInXml() {
+		Validator validator = getValidator();
+
+		User user = new User();
+		user.setConsistent( true );
+		user.setFirstname( "Wolfgang" );
+		user.setLastname( "doe" );
+
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 1 );
+		TestUtil.assertConstraintViolation(
+				constraintViolations.iterator().next(), "Last name has to start with with a capital letter."
+		);
+
+		user.setLastname( "Doe" );
 		constraintViolations = validator.validate( user );
 		assertNumberOfViolations( constraintViolations, 0 );
 	}

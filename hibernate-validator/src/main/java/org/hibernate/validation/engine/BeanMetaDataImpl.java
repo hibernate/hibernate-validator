@@ -93,9 +93,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
-	}
-
-	public void init() {
 		createMetaData();
 	}
 

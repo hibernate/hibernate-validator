@@ -22,9 +22,11 @@
                 </element>
             </constraint>
         </class>
-        <field name="firstName">
-            <constraint annotation="com.acme.app.constraint.LooksLike">
-                <element name="patterns">
+        <field name="lastname">
+            <constraint annotation="javax.validation.constraints.Pattern">
+                <message>Last name has to start with with a capital letter.</message>
+                <element name="regexp">^[A-Z].*</element>
+                <!--element name="patterns">
                     <annotation>
                         <element name="value">myRegExp</element>
                         <element name="flag">
@@ -34,27 +36,18 @@
                     <annotation>
                         <element name="value">my2ndRegExp</element>
                     </annotation>
-                </element>
+                </element-->
             </constraint>
         </field>
-        <field name="orders">
+        <getter name="firstname">
             <valid/>
-            <constraint annotation="com.acme.app.constraint.DiscreteSize">
-                <element name="value">
-                    <value>0</value>
-                    <value>20</value>
-                </element>
-            </constraint>
-        </field>
-        <getter name="orders">
-            <valid/>
-            <constraint annotation="javax.validation.constraint.Size">
-                <message>Size is limited</message>
+            <constraint annotation="javax.validation.constraints.Size">
+                <message>Size is limited!</message>
                 <groups>
-                    <value>com.acme.app.model.LightValidation</value>
-                    <value>javax.persistence.Default</value>
+                    <value>org.hibernate.validation.engine.xml.TestGroup</value>
+                    <value>javax.validation.groups.Default</value>
                 </groups>
-                <element name="max">30</element>
+                <element name="max">10</element>
             </constraint>
         </getter>
     </bean>

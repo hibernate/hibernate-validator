@@ -50,24 +50,6 @@ public class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
-
-	/**
-	 * Checks whether the given annotation is a builtin constraint annotation defined as defined by the specs.
-	 *
-	 * @param annotation the annotation to check
-	 *
-	 * @return <code>true</code> if the annotation is a builtin constraint, <code>false</code> otherwise.
-	 */
-	public static boolean isBuiltInConstraintAnnotation(Annotation annotation) {
-		boolean isBuiltInConstraintAnnotation = false;
-
-		String packageName = annotation.annotationType().getPackage().getName();
-		if ( "javax.validation.constraints".equals( packageName ) ) {
-			isBuiltInConstraintAnnotation = true;
-		}
-		return isBuiltInConstraintAnnotation;
-	}
-
 	@SuppressWarnings("unchecked")
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
 		try {
@@ -269,10 +251,7 @@ public class ReflectionHelper {
 		}
 		if ( type instanceof WildcardType ) {
 			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
-			if ( upperBounds.length == 0 ) {
-				return false;
-			}
-			return isIterable( upperBounds[0] );
+			return upperBounds.length != 0 && isIterable( upperBounds[0] );
 		}
 		return false;
 	}
@@ -291,10 +270,7 @@ public class ReflectionHelper {
 		}
 		if ( type instanceof WildcardType ) {
 			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
-			if ( upperBounds.length == 0 ) {
-				return false;
-			}
-			return isMap( upperBounds[0] );
+			return upperBounds.length != 0 && isMap( upperBounds[0] );
 		}
 		return false;
 	}
@@ -357,7 +333,7 @@ public class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the specified class contains a field or member which matches a given property.
+	 * Checks whether the specified class contains a field or property matching the given name.
 	 *
 	 * @param clazz The class to check.
 	 * @param property The property name.
@@ -366,22 +342,81 @@ public class ReflectionHelper {
 	 *         false</code> otherwise.
 	 */
 	public static boolean containsMember(Class<?> clazz, String property) {
+		return containsField( clazz, property ) || containsMethod( clazz, property );
+	}
+
+	/**
+	 * Checks whether the specified class contains a field matching the specified name.
+	 *
+	 * @param clazz The class to check.
+	 * @param fieldName The field name.
+	 *
+	 * @return Returns <code>true</code> if the cass contains a field for the specified name, <code>
+	 *         false</code> otherwise.
+	 */
+	public static boolean containsField(Class<?> clazz, String fieldName) {
 		try {
-			clazz.getField( property );
+			clazz.getDeclaredField( fieldName );
 			return true;
 		}
 		catch ( NoSuchFieldException e ) {
-			// ignore
+			return false;
 		}
+	}
 
+	/**
+	 * Returns the field with the specified name or <code>null</code> if it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param fieldName The field name.
+	 *
+	 * @return Returns the field with the specified name or <code>null</code> if it does not exist.
+	 */
+	public static Field getField(Class<?> clazz, String fieldName) {
 		try {
-			clazz.getMethod( "get" + property.substring( 0, 1 ).toUpperCase() + property.substring( 1 ) );
+			Field field = clazz.getDeclaredField( fieldName );
+			setAccessibility( field );
+			return field;
+		}
+		catch ( NoSuchFieldException e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * Checks whether the specified class contains a method matching the specified name.
+	 *
+	 * @param clazz The class to check.
+	 * @param methodName The method name.
+	 *
+	 * @return Returns <code>true</code> if the cass contains a property for the specified name, <code>
+	 *         false</code> otherwise.
+	 */
+	public static boolean containsMethod(Class<?> clazz, String methodName) {
+		try {
+			clazz.getMethod( "get" + methodName.substring( 0, 1 ).toUpperCase() + methodName.substring( 1 ) );
 			return true;
 		}
 		catch ( NoSuchMethodException e ) {
-			// ignore
+			return false;
 		}
-		return false;
+	}
+
+	/**
+	 * Returns the method with the specified name or <code>null</code> if it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param methodName The method name.
+	 *
+	 * @return Returns the method with the specified name or <code>null</code> if it does not exist.
+	 */
+	public static Method getMethod(Class<?> clazz, String methodName) {
+		try {
+			return clazz.getMethod( "get" + methodName.substring( 0, 1 ).toUpperCase() + methodName.substring( 1 ) );
+		}
+		catch ( NoSuchMethodException e ) {
+			return null;
+		}
 	}
 
 	public static Class<?> classForName(String name, Class<?> caller) throws ClassNotFoundException {

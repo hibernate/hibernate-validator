@@ -33,12 +33,6 @@ import javax.validation.PropertyDescriptor;
 public interface BeanMetaData<T> {
 
 	/**
-	 * Initalises the given meta data bean taken its current state into account. An instance of <code>BeanMetaData</code>
-	 * won't have any useful state information prior to calling this method.
-	 */
-	void init();
-
-	/**
 	 * @return the class of the bean.
 	 */
 	Class<T> getBeanClass();
