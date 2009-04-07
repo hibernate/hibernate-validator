@@ -22,9 +22,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -174,12 +174,25 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			Field field = ReflectionHelper.getField( beanClass, fieldName );
 			boolean ignoreFieldAnnotation = fieldType.isIgnoreAnnotations() == null ? false : fieldType.isIgnoreAnnotations();
 			if ( ignoreFieldAnnotation ) {
-				ignoreAnnotationOnMember.put( beanClass, null );
+				addMemberToIgnoreList( beanClass, field );
 			}
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
-				MetaConstraint<?, ?> metaConstraint = createMetaConstraint( constraint, beanClass, field, defaultPackage );
+				MetaConstraint<?, ?> metaConstraint = createMetaConstraint(
+						constraint, beanClass, field, defaultPackage
+				);
 				addMetaConstraint( beanClass, metaConstraint );
 			}
+		}
+	}
+
+	private void addMemberToIgnoreList(Class<?> beanClass, Member member) {
+		if ( ignoreAnnotationOnMember.get( beanClass ) == null ) {
+			List<Member> ignoredAnnotationOnMember = new ArrayList<Member>();
+			ignoredAnnotationOnMember.add( member );
+			ignoreAnnotationOnMember.put( beanClass, ignoredAnnotationOnMember );
+		}
+		else {
+			ignoreAnnotationOnMember.get( beanClass ).add( member );
 		}
 	}
 
@@ -192,10 +205,12 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			Method method = ReflectionHelper.getMethod( beanClass, getterName );
 			boolean ignoreGetterAnnotation = getter.isIgnoreAnnotations() == null ? false : getter.isIgnoreAnnotations();
 			if ( ignoreGetterAnnotation ) {
-				ignoreAnnotationOnMember.put( beanClass, null );
+				addMemberToIgnoreList( beanClass, method );
 			}
 			for ( ConstraintType constraint : getter.getConstraint() ) {
-				MetaConstraint<?, ?> metaConstraint = createMetaConstraint( constraint, beanClass, method, defaultPackage );
+				MetaConstraint<?, ?> metaConstraint = createMetaConstraint(
+						constraint, beanClass, method, defaultPackage
+				);
 				addMetaConstraint( beanClass, metaConstraint );
 			}
 		}
@@ -451,7 +466,13 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 	private void initBeanMetaData() {
 		for ( Map.Entry<Class<?>, List<MetaConstraint<?, ?>>> entry : constraintMap.entrySet() ) {
-			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( entry.getKey(), constraintHelper );
+			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl(
+					entry.getKey(),
+					constraintHelper,
+					ignoreAnnotationDefaults,
+					ignoreAnnotationOnClass,
+					ignoreAnnotationOnMember
+			);
 			for ( MetaConstraint<?, ?> metaConstraint : entry.getValue() ) {
 				metaData.addMetaConstraint( metaConstraint );
 			}

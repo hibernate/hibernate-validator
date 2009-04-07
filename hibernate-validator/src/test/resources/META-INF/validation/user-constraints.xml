@@ -3,7 +3,7 @@
                      xmlns="http://jboss.org/xml/ns/javax/validation/mapping">
     <default-package>org.hibernate.validation.engine.xml</default-package>
     <bean class="User" ignore-annotations="false">
-        <class ignore-annotations="false">
+        <class ignore-annotations="true">
             <group-sequence>
                 <value>value0</value>
             </group-sequence>
@@ -39,7 +39,7 @@
                 </element-->
             </constraint>
         </field>
-        <getter name="firstname">
+        <getter name="firstname" ignore-annotations="true">
             <valid/>
             <constraint annotation="javax.validation.constraints.Size">
                 <message>Size is limited!</message>

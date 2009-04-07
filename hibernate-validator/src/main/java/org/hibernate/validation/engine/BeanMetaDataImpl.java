@@ -90,10 +90,32 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private final ConstraintHelper constraintHelper;
 
+	private Map<Class<?>, Boolean> ignoreAnnotationDefaults;
+	private Map<Class<?>, List<Member>> ignoreAnnotationOnMember;
+	private List<Class<?>> ignoreAnnotationOnClass;
+
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
+		this(
+				beanClass,
+				constraintHelper,
+				new HashMap<Class<?>, Boolean>(),
+				new ArrayList<Class<?>>(),
+				new HashMap<Class<?>, List<Member>>()
+		);
+	}
+
+	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, Map<Class<?>, Boolean> ignoreAnnotationDefaults, List<Class<?>> ignoreAnnotationOnClass, Map<Class<?>, List<Member>> ignoreAnnotationOnMember) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
+		this.ignoreAnnotationDefaults = ignoreAnnotationDefaults;
+		this.ignoreAnnotationOnClass = ignoreAnnotationOnClass;
+		this.ignoreAnnotationOnMember = ignoreAnnotationOnMember;
+
 		createMetaData();
+
+		this.ignoreAnnotationDefaults = null;
+		this.ignoreAnnotationOnClass = null;
+		this.ignoreAnnotationOnMember = null;
 	}
 
 	public Class<T> getBeanClass() {
@@ -207,6 +229,9 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( Field field : clazz.getDeclaredFields() ) {
 			List<ConstraintDescriptorImpl> fieldMetadata = findConstraints( field );
 			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
+				if ( checkSkipAnnotationProcessing( clazz, field ) ) {
+					break;
+				}
 				ReflectionHelper.setAccessibility( field );
 				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
 						field, beanClass, constraintDescription
@@ -225,6 +250,9 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( Method method : clazz.getDeclaredMethods() ) {
 			List<ConstraintDescriptorImpl> methodMetadata = findConstraints( method );
 			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
+				if ( checkSkipAnnotationProcessing( clazz, method ) ) {
+					break;
+				}
 				ReflectionHelper.setAccessibility( method );
 				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
 						method, beanClass, constraintDescription
@@ -237,6 +265,29 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				addPropertyDescriptorForMember( method );
 			}
 		}
+	}
+
+	private boolean checkSkipAnnotationProcessing(Class clazz, Member member) {
+		List<Member> ignoreAnnotationForFields = ignoreAnnotationOnMember.get( clazz );
+		boolean ignoreAnnotation;
+		if ( ignoreAnnotationForFields == null || !ignoreAnnotationForFields.contains( member ) ) {
+			ignoreAnnotation = ignoreAnnotationDefaults.containsKey( clazz ) && ignoreAnnotationDefaults.get( clazz );
+		}
+		else {
+			ignoreAnnotation = ignoreAnnotationForFields.contains( member );
+		}
+		if ( ignoreAnnotation ) {
+			String type;
+			if ( member instanceof Field ) {
+				type = "Field";
+			}
+			else {
+				type = "Property";
+			}
+			log.debug( type + " level annotations are getting ignored for " + clazz.getName() + "." + member.getName() );
+			return true;
+		}
+		return false;
 	}
 
 	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member) {
@@ -256,6 +307,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private <A extends Annotation> void initClassConstraints(Class clazz) {
+		if ( ignoreAnnotationOnClass.contains( clazz ) ||
+				( ignoreAnnotationDefaults.containsKey( clazz ) && ignoreAnnotationDefaults.get( clazz ) ) ) {
+			log.debug( "Class level annotation are getting ignored for " + clazz.getName() );
+			return;
+		}
 		List<ConstraintDescriptorImpl> classMetadata = findClassLevelConstraints( clazz );
 		for ( ConstraintDescriptorImpl constraintDescription : classMetadata ) {
 			MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( clazz, constraintDescription );

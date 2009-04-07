@@ -1,5 +1,8 @@
 package org.hibernate.validation.engine.xml;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
+
 /**
  * @author Hardy Ferentschik
  */
@@ -9,13 +12,12 @@ public class User {
 
 	private String firstname;
 
-	//@NotNull(groups = Default.class)
 	private String lastname;
 
 	//@Pattern(regexp = "[0-9 -]?", groups = Optional.class)
 	private String phoneNumber;
 
-
+	@NotNull(groups = Default.class)
 	public String getFirstname() {
 		return firstname;
 	}
