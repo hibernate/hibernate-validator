@@ -1,6 +1,7 @@
 package org.hibernate.validation.engine.xml;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.groups.Default;
 
 /**
@@ -14,7 +15,7 @@ public class User {
 
 	private String lastname;
 
-	//@Pattern(regexp = "[0-9 -]?", groups = Optional.class)
+	@Pattern(regexp = "[0-9 -]+", message = "A phone nmber can only contain numbers, whitespaces and dashes.")
 	private String phoneNumber;
 
 	@NotNull(groups = Default.class)

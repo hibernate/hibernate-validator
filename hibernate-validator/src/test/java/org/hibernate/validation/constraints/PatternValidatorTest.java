@@ -42,7 +42,6 @@ public class PatternValidatorTest {
 		PatternValidator constraint = new PatternValidator();
 		constraint.initialize( p );
 
-
 		assertTrue( constraint.isValid( null, null ) );
 		assertFalse( constraint.isValid( "", null ) );
 		assertFalse( constraint.isValid( "bla bla", null ) );

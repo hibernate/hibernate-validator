@@ -82,4 +82,24 @@ public class XmlConfigurationTest {
 		constraintViolations = validator.validate( user );
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
+
+	@Test
+	public void testAnnotationDefinedConstraintApplies() {
+		Validator validator = getValidator();
+
+		User user = new User();
+		user.setConsistent( true );
+		user.setPhoneNumber( "police" );
+
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 1 );
+		TestUtil.assertConstraintViolation(
+				constraintViolations.iterator().next(),
+				"A phone nmber can only contain numbers, whitespaces and dashes."
+		);
+
+		user.setPhoneNumber( "112" );
+		constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
 }

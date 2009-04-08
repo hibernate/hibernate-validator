@@ -25,7 +25,7 @@
         <field name="lastname">
             <constraint annotation="javax.validation.constraints.Pattern">
                 <message>Last name has to start with with a capital letter.</message>
-                <element name="regexp">^[A-Z].*</element>
+                <element name="regexp">^[A-Z][a-z]+</element>
                 <!--element name="patterns">
                     <annotation>
                         <element name="value">myRegExp</element>
