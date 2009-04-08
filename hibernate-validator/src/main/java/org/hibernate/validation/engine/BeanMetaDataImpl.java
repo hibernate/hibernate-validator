@@ -136,6 +136,28 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return defaultGroupSequence;
 	}
 
+	public void setDefaultGroupSequence(List<Class<?>> groupSequence) {
+		defaultGroupSequence = new ArrayList<Class<?>>();
+		for ( Class<?> group : groupSequence ) {
+			if ( group.getName().equals( beanClass.getName() ) ) {
+				defaultGroupSequence.add( Default.class );
+			}
+			else if ( group.getName().equals( Default.class.getName() ) ) {
+				throw new ValidationException( "'Default.class' cannot appear in default group sequence list." );
+			}
+			else {
+				defaultGroupSequence.add( group );
+			}
+		}
+		if ( log.isDebugEnabled() ) {
+			log.debug(
+					"Bean {} redefines the Default group. Members of the default group sequence are: {}",
+					beanClass.getName(),
+					defaultGroupSequence
+			);
+		}
+	}
+
 	public Set<PropertyDescriptor> getConstrainedProperties() {
 		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
 	}
@@ -148,7 +170,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private void createMetaData(AnnotationIgnores annotationIgnores) {
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
-		initDefaultGroupSequence( beanClass );
+		initDefaultGroupSequence();
 		List<Class> classes = new ArrayList<Class>();
 		computeClassHierarchy( beanClass, classes );
 		for ( Class current : classes ) {
@@ -186,35 +208,17 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Checks whether there is a default group sequence defined for this class.
 	 * See HV-113.
-	 *
-	 * @param clazz The class to check for the <code>GroupSequence</code> annotation.
 	 */
-	private void initDefaultGroupSequence(Class<?> clazz) {
-		GroupSequence groupSequenceAnnotation = clazz.getAnnotation( GroupSequence.class );
+	private void initDefaultGroupSequence() {
+		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
+		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
 		if ( groupSequenceAnnotation == null ) {
-			defaultGroupSequence.add( Default.class );
+			groupSequence.add( beanClass );
 		}
 		else {
-			List<Class<?>> groupSequenceList = Arrays.asList( groupSequenceAnnotation.value() );
-			for ( Class<?> group : groupSequenceList ) {
-				if ( group.getName().equals( clazz.getName() ) ) {
-					defaultGroupSequence.add( Default.class );
-				}
-				else if ( group.getName().equals( Default.class.getName() ) ) {
-					throw new ValidationException( "'Default.class' cannot appear in default group sequence list." );
-				}
-				else {
-					defaultGroupSequence.add( group );
-				}
-			}
-			if ( log.isDebugEnabled() ) {
-				log.debug(
-						"Bean {} redefines the Default group. Members of the default group sequence are: {}",
-						clazz.getName(),
-						defaultGroupSequence
-				);
-			}
+			groupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
 		}
+		setDefaultGroupSequence( groupSequence );
 	}
 
 	private <A extends Annotation> void initFieldConstraints(Class clazz, AnnotationIgnores annotationIgnores) {

@@ -62,6 +62,7 @@ import org.hibernate.validation.xml.ConstraintType;
 import org.hibernate.validation.xml.ElementType;
 import org.hibernate.validation.xml.FieldType;
 import org.hibernate.validation.xml.GetterType;
+import org.hibernate.validation.xml.GroupSequenceType;
 import org.hibernate.validation.xml.GroupsType;
 
 /**
@@ -81,9 +82,12 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final ConstraintHelper constraintHelper = new ConstraintHelper();
 	private static final String PACKAGE_SEPERATOR = ".";
 
+	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
+
 	private AnnotationIgnores annotationIgnores;
 	private Map<Class<?>, List<MetaConstraint<?, ?>>> constraintMap;
-	private List<Member> cascadedMembers = new ArrayList<Member>();
+	private Map<Class<?>, List<Member>> cascadedMembers;
+	private Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
@@ -92,6 +96,8 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 		annotationIgnores = new AnnotationIgnores();
 		constraintMap = new HashMap<Class<?>, List<MetaConstraint<?, ?>>>();
+		cascadedMembers = new HashMap<Class<?>, List<Member>>();
+		defaultSequences = new HashMap<Class<?>, List<Class<?>>>();
 
 		parseMappingFiles( configurationState.getMappingStreams() );
 		initBeanMetaData();
@@ -134,7 +140,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	private void parseMappingFiles(Set<InputStream> mappingStreams) {
-		Set<Class<?>> processedClasses = new HashSet<Class<?>>();
 		for ( InputStream in : mappingStreams ) {
 			try {
 				ConstraintMappingsType mappings = getValidationConfig( in );
@@ -182,7 +187,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 			// valid
 			if ( fieldType.getValid() != null ) {
-				cascadedMembers.add( field );
+				addCascadedMember( beanClass, field );
 			}
 
 			// constraints
@@ -211,7 +216,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 			// valid
 			if ( getterType.getValid() != null ) {
-				cascadedMembers.add( method );
+				addCascadedMember( beanClass, method );
 			}
 
 			// constraints
@@ -228,14 +233,33 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		if ( classType == null ) {
 			return;
 		}
+
+		// ignore annotation
 		boolean ignoreClassAnnotation = classType.isIgnoreAnnotations() == null ? false : classType.isIgnoreAnnotations();
 		if ( ignoreClassAnnotation ) {
 			annotationIgnores.setIgnoreAnnotationsOnClass( beanClass );
 		}
+
+		// group sequence
+		List<Class<?>> groupSequence = createGroupSequence( classType.getGroupSequence(), beanClass, defaultPackage );
+		if ( !groupSequence.isEmpty() ) {
+			defaultSequences.put( beanClass, groupSequence );
+		}
+
+		// constraints
 		for ( ConstraintType constraint : classType.getConstraint() ) {
 			MetaConstraint<?, ?> metaConstraint = createMetaConstraint( constraint, beanClass, null, defaultPackage );
 			addMetaConstraint( beanClass, metaConstraint );
 		}
+	}
+
+	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, Class<?> beanClass, String defaultPackage) {
+		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
+		for ( String groupName : groupSequenceType.getValue() ) {
+			Class<?> group = getClass( groupName, defaultPackage );
+			groupSequence.add( group );
+		}
+		return groupSequence;
 	}
 
 	private void addMetaConstraint(Class<?> beanClass, MetaConstraint<?, ?> metaConstraint) {
@@ -246,6 +270,17 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			List<MetaConstraint<?, ?>> constraintList = new ArrayList<MetaConstraint<?, ?>>();
 			constraintList.add( metaConstraint );
 			constraintMap.put( beanClass, constraintList );
+		}
+	}
+
+	private void addCascadedMember(Class<?> beanClass, Member member) {
+		if ( cascadedMembers.containsKey( beanClass ) ) {
+			cascadedMembers.get( beanClass ).add( member );
+		}
+		else {
+			List<Member> tmpList = new ArrayList<Member>();
+			tmpList.add( member );
+			cascadedMembers.put( beanClass, tmpList );
 		}
 	}
 
@@ -473,15 +508,19 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	private void initBeanMetaData() {
-		for ( Map.Entry<Class<?>, List<MetaConstraint<?, ?>>> entry : constraintMap.entrySet() ) {
-			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( entry.getKey(), constraintHelper, annotationIgnores );
-			for ( MetaConstraint<?, ?> metaConstraint : entry.getValue() ) {
-				metaData.addMetaConstraint( metaConstraint );
+
+		for ( Class<?> beanClass : processedClasses ) {
+			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( beanClass, constraintHelper, annotationIgnores );
+			for ( MetaConstraint<?, ?> constraint : constraintMap.get( beanClass ) ) {
+				metaData.addMetaConstraint( constraint );
 			}
-			for ( Member m : cascadedMembers ) {
+			for ( Member m : cascadedMembers.get( beanClass ) ) {
 				metaData.addCascadedMember( m );
 			}
-			BeanMetaDataCache.addBeanMetaData( entry.getKey(), metaData );
+			if ( defaultSequences.containsKey( beanClass ) ) {
+				metaData.setDefaultGroupSequence( defaultSequences.get( beanClass ) );
+			}
+			BeanMetaDataCache.addBeanMetaData( beanClass, metaData );
 		}
 	}
 }

@@ -5,7 +5,8 @@
     <bean class="User" ignore-annotations="false">
         <class ignore-annotations="true">
             <group-sequence>
-                <value>value0</value>
+                <value>User</value>
+                <value>Optional</value>
             </group-sequence>
             <constraint annotation="org.hibernate.validation.engine.xml.ConsistentUserInformation">
                 <message>Message from xml</message>

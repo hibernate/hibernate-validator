@@ -17,7 +17,7 @@ public class User {
 
 	private CreditCard creditcard;
 
-	@Pattern(regexp = "[0-9 -]+", message = "A phone number can only contain numbers, whitespaces and dashes.")
+	@Pattern(regexp = "[0-9 -]+", message = "A phone number can only contain numbers, whitespaces and dashes.", groups = Optional.class)
 	private String phoneNumber;
 
 	@NotNull(groups = Default.class)
