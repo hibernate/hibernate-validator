@@ -83,6 +83,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 	private AnnotationIgnores annotationIgnores;
 	private Map<Class<?>, List<MetaConstraint<?, ?>>> constraintMap;
+	private List<Member> cascadedMembers = new ArrayList<Member>();
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
@@ -172,10 +173,19 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( beanClass.getName() + " does not contain the fieldType  " + fieldName );
 			}
 			Field field = ReflectionHelper.getField( beanClass, fieldName );
+
+			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.isIgnoreAnnotations() == null ? false : fieldType.isIgnoreAnnotations();
 			if ( ignoreFieldAnnotation ) {
 				annotationIgnores.setIgnoreAnnotationsOnMember( field );
 			}
+
+			// valid
+			if ( fieldType.getValid() != null ) {
+				cascadedMembers.add( field );
+			}
+
+			// constraints
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
 				MetaConstraint<?, ?> metaConstraint = createMetaConstraint(
 						constraint, beanClass, field, defaultPackage
@@ -186,17 +196,26 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	private void parsePropertyLevelOverrides(List<GetterType> getters, Class<?> beanClass, String defaultPackage) {
-		for ( GetterType getter : getters ) {
-			String getterName = getter.getName();
+		for ( GetterType getterType : getters ) {
+			String getterName = getterType.getName();
 			if ( !ReflectionHelper.containsMethod( beanClass, getterName ) ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the property  " + getterName );
 			}
 			Method method = ReflectionHelper.getMethod( beanClass, getterName );
-			boolean ignoreGetterAnnotation = getter.isIgnoreAnnotations() == null ? false : getter.isIgnoreAnnotations();
+
+			// ignore annotations
+			boolean ignoreGetterAnnotation = getterType.isIgnoreAnnotations() == null ? false : getterType.isIgnoreAnnotations();
 			if ( ignoreGetterAnnotation ) {
 				annotationIgnores.setIgnoreAnnotationsOnMember( method );
 			}
-			for ( ConstraintType constraint : getter.getConstraint() ) {
+
+			// valid
+			if ( getterType.getValid() != null ) {
+				cascadedMembers.add( method );
+			}
+
+			// constraints
+			for ( ConstraintType constraint : getterType.getConstraint() ) {
 				MetaConstraint<?, ?> metaConstraint = createMetaConstraint(
 						constraint, beanClass, method, defaultPackage
 				);
@@ -458,6 +477,9 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( entry.getKey(), constraintHelper, annotationIgnores );
 			for ( MetaConstraint<?, ?> metaConstraint : entry.getValue() ) {
 				metaData.addMetaConstraint( metaConstraint );
+			}
+			for ( Member m : cascadedMembers ) {
+				metaData.addCascadedMember( m );
 			}
 			BeanMetaDataCache.addBeanMetaData( entry.getKey(), metaData );
 		}

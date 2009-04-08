@@ -39,8 +39,10 @@
                 </element-->
             </constraint>
         </field>
-        <getter name="firstname" ignore-annotations="true">
+        <field name="creditcard">
             <valid/>
+        </field>
+        <getter name="firstname" ignore-annotations="true">
             <constraint annotation="javax.validation.constraints.Size">
                 <message>Size is limited!</message>
                 <groups>

@@ -124,6 +124,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		metaConstraintList.add( ( MetaConstraint<T, ?> ) metaConstraint );
 	}
 
+	public void addCascadedMember(Member member) {
+		cascadedMembers.add( member );
+	}
+
 	public PropertyDescriptor getPropertyDescriptor(String property) {
 		return propertyDescriptors.get( property );
 	}

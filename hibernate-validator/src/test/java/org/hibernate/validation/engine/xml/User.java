@@ -15,7 +15,9 @@ public class User {
 
 	private String lastname;
 
-	@Pattern(regexp = "[0-9 -]+", message = "A phone nmber can only contain numbers, whitespaces and dashes.")
+	private CreditCard creditcard;
+
+	@Pattern(regexp = "[0-9 -]+", message = "A phone number can only contain numbers, whitespaces and dashes.")
 	private String phoneNumber;
 
 	@NotNull(groups = Default.class)
@@ -49,5 +51,13 @@ public class User {
 
 	public boolean isConsistent() {
 		return isConsistent;
+	}
+
+	public CreditCard getCreditcard() {
+		return creditcard;
+	}
+
+	public void setCreditcard(CreditCard creditcard) {
+		this.creditcard = creditcard;
 	}
 }

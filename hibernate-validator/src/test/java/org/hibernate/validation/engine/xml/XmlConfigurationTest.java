@@ -95,10 +95,32 @@ public class XmlConfigurationTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		TestUtil.assertConstraintViolation(
 				constraintViolations.iterator().next(),
-				"A phone nmber can only contain numbers, whitespaces and dashes."
+				"A phone number can only contain numbers, whitespaces and dashes."
 		);
 
 		user.setPhoneNumber( "112" );
+		constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	@Test
+	public void testCascadingConfiguredInXml() {
+		Validator validator = getValidator();
+
+		User user = new User();
+		user.setConsistent( true );
+		CreditCard card = new CreditCard();
+		card.setNumber( "not a number" );
+		user.setCreditcard( card );
+
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 1 );
+		TestUtil.assertConstraintViolation(
+				constraintViolations.iterator().next(),
+				"Not a credit casrd number."
+		);
+
+		card.setNumber( "1234567890" );
 		constraintViolations = validator.validate( user );
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
