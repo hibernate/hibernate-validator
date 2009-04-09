@@ -32,6 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -58,6 +60,7 @@ import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validation.xml.AnnotationType;
 import org.hibernate.validation.xml.BeanType;
 import org.hibernate.validation.xml.ClassType;
+import org.hibernate.validation.xml.ConstraintDefinitionType;
 import org.hibernate.validation.xml.ConstraintMappingsType;
 import org.hibernate.validation.xml.ConstraintType;
 import org.hibernate.validation.xml.ElementType;
@@ -65,6 +68,7 @@ import org.hibernate.validation.xml.FieldType;
 import org.hibernate.validation.xml.GetterType;
 import org.hibernate.validation.xml.GroupSequenceType;
 import org.hibernate.validation.xml.GroupsType;
+import org.hibernate.validation.xml.ValidatedByType;
 
 /**
  * @author Emmanuel Bernard
@@ -76,12 +80,12 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private static final String VALIDATION_MAPPING_XSD = "META-INF/validation-mapping-1.0.xsd";
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
+	private static final String PACKAGE_SEPERATOR = ".";
 
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final ConstraintHelper constraintHelper = new ConstraintHelper();
-	private static final String PACKAGE_SEPERATOR = ".";
 
 	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
 
@@ -143,9 +147,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private void parseMappingFiles(Set<InputStream> mappingStreams) {
 		for ( InputStream in : mappingStreams ) {
 			try {
-				ConstraintMappingsType mappings = getValidationConfig( in );
-				String defaultPackage = mappings.getDefaultPackage();
-				for ( BeanType bean : mappings.getBean() ) {
+				ConstraintMappingsType mapping = getValidationConfig( in );
+				parseConstraintDefinitions( mapping.getConstraintDefinition() );
+				String defaultPackage = mapping.getDefaultPackage();
+				for ( BeanType bean : mapping.getBean() ) {
 					Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
 					checkClassHasNotBeenProcessed( processedClasses, beanClass );
 					annotationIgnores.setDefaultIgnoreAnnotation( beanClass, bean.isIgnoreAnnotations() );
@@ -163,6 +168,44 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 					log.warn( "Error closing input stream: {}", e.getMessage() );
 				}
 			}
+		}
+	}
+
+	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList) {
+		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
+			String annotationClassName = constraintDefinition.getAnnotation();
+			Class<? extends Annotation> annotationClass;
+			try {
+				annotationClass = ( Class<? extends Annotation> ) ReflectionHelper.classForName(
+						annotationClassName, this.getClass()
+				);
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException( "Unable to load class " + annotationClassName );
+			}
+
+			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
+			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
+			if ( validatedByType.isIncludeExistingValidators() != null && validatedByType.isIncludeExistingValidators() ) {
+				constraintValidatorClasses.addAll( findConstraintValidatorClasses( annotationClass ) );
+			}
+			for ( String validatorClassName : validatedByType.getValue() ) {
+				Class<? extends ConstraintValidator<?, ?>> validatorClass;
+				try {
+					// TODO validate this class!
+					validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) ReflectionHelper.classForName(
+							validatorClassName,
+							this.getClass()
+					);
+				}
+				catch ( ClassNotFoundException e ) {
+					throw new ValidationException( "Unable to load class " + validatorClassName );
+				}
+				constraintValidatorClasses.add( validatorClass );
+			}
+			ConstraintValidatorDefinitionsCache.addConstraintValidatorDefinition(
+					annotationClass, constraintValidatorClasses
+			);
 		}
 	}
 
@@ -556,5 +599,25 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			}
 			BeanMetaDataCache.addBeanMetaData( beanClass, metaData );
 		}
+	}
+
+	private List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> findConstraintValidatorClasses(Class<? extends Annotation> annotationType) {
+		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorDefinitonClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
+		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
+			constraintValidatorDefinitonClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
+		}
+		else {
+			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
+					.getAnnotation( Constraint.class )
+					.validatedBy();
+			for ( Class<? extends ConstraintValidator<?, ?>> validator : validatedBy ) {
+				//FIXME does this create a CCE at runtime?
+				//FIXME if yes wrap into VE, if no we need to test the type here
+				//Once resolved,we can @SuppressWarning("unchecked") on the cast
+				Class<? extends ConstraintValidator<? extends Annotation, ?>> safeValidator = validator;
+				constraintValidatorDefinitonClasses.add( safeValidator );
+			}
+		}
+		return constraintValidatorDefinitonClasses;
 	}
 }

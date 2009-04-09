@@ -279,13 +279,13 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return propertyDescriptor;
 	}
 
-	private <A extends Annotation> void initClassConstraints(Class clazz, AnnotationIgnores annotationIgnores) {
+	private <A extends Annotation> void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
 		if ( annotationIgnores.isIgnoreAnnotations( clazz ) ) {
 			return;
 		}
 		List<ConstraintDescriptorImpl> classMetadata = findClassLevelConstraints( clazz );
 		for ( ConstraintDescriptorImpl constraintDescription : classMetadata ) {
-			MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( clazz, constraintDescription );
+			MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( beanClass, constraintDescription );
 			metaConstraintList.add( metaConstraint );
 		}
 	}
@@ -304,7 +304,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
 		if ( constraintHelper.isConstraintAnnotation( annotation ) ||
-				constraintHelper.isBuiltinConstraint( annotation ) ) {
+				constraintHelper.isBuiltinConstraint( annotation.annotationType() ) ) {
 			constraints.add( annotation );
 		}
 

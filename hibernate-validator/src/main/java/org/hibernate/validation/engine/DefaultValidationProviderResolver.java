@@ -57,8 +57,8 @@ public class DefaultValidationProviderResolver implements ValidationProviderReso
 				while ( providerDefinitions.hasMoreElements() ) {
 					URL url = providerDefinitions.nextElement();
 					InputStream stream = url.openStream();
+					BufferedReader reader = new BufferedReader( new InputStreamReader( stream ), 100 );
 					try {
-						BufferedReader reader = new BufferedReader( new InputStreamReader( stream ), 100 );
 						name = reader.readLine();
 						while ( name != null ) {
 							name = name.trim();
@@ -76,7 +76,7 @@ public class DefaultValidationProviderResolver implements ValidationProviderReso
 						}
 					}
 					finally {
-						stream.close();
+						reader.close();
 					}
 				}
 			}

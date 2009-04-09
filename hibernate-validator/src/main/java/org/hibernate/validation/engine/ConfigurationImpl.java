@@ -265,8 +265,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				xmlParameters.constraintValidatorFactory = clazz.newInstance();
 				log.info( "Using {} as constraint factory.", constraintFactoryClass );
 			}
-			catch ( Exception e ) {
-				throw new ValidationException( "Unable to instantiate message interpolator class " + constraintFactoryClass + "." );
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException(
+						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
+				);
+			}
+			catch ( InstantiationException e ) {
+				throw new ValidationException(
+						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
+				);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new ValidationException(
+						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
+				);
 			}
 		}
 	}
@@ -310,8 +322,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				xmlParameters.messageInterpolator = clazz.newInstance();
 				log.info( "Using {} as message interpolator.", messageInterpolatorClass );
 			}
-			catch ( Exception e ) {
-				throw new ValidationException( "Unable to instantiate message interpolator class " + messageInterpolatorClass + "." );
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException(
+						"Unable to instantiate message interpolator class " + messageInterpolatorClass + ".", e
+				);
+			}
+			catch ( InstantiationException e ) {
+				throw new ValidationException(
+						"Unable to instantiate message interpolator class " + messageInterpolatorClass + ".", e
+				);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new ValidationException(
+						"Unable to instantiate message interpolator class " + messageInterpolatorClass + ".", e
+				);
 			}
 		}
 	}
@@ -327,8 +351,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				xmlParameters.traversableResolver = clazz.newInstance();
 				log.info( "Using {} as traversable resolver.", traversableResolverClass );
 			}
-			catch ( Exception e ) {
-				throw new ValidationException( "Unable to instantiate message interpolator class " + traversableResolverClass + "." );
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException(
+						"Unable to instantiate traversable resolver class " + traversableResolverClass + ".", e
+				);
+			}
+			catch ( InstantiationException e ) {
+				throw new ValidationException(
+						"Unable to instantiate traversable resolver class " + traversableResolverClass + ".", e
+				);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new ValidationException(
+						"Unable to instantiate traversable resolver class " + traversableResolverClass + ".", e
+				);
 			}
 		}
 	}
@@ -398,7 +434,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return schema;
 	}
 
-	private class ParameterHolder {
+	private static class ParameterHolder {
 		ConstraintValidatorFactory constraintValidatorFactory;
 		MessageInterpolator messageInterpolator;
 		TraversableResolver traversableResolver;

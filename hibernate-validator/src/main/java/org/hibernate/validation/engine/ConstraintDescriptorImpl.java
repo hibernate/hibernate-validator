@@ -113,27 +113,42 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				ReportAsSingleViolation.class
 		);
 
-		findConstraintClasses();
+		findConstraintValidatorClasses();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 		parseComposingConstraints( overrideParameters );
 	}
 
-	private void findConstraintClasses() {
-		if ( constraintHelper.isBuiltinConstraint( annotation ) ) {
-			constraintValidatorDefinitonClasses.addAll( constraintHelper.getBuiltInConstraints( annotation ) );
+	private void findConstraintValidatorClasses() {
+		if ( ConstraintValidatorDefinitionsCache.containsConstraintValidatorDefinition( annotation.annotationType())) {
+			for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : ConstraintValidatorDefinitionsCache
+					.getConstraintValidatorDefinition(
+							annotation.annotationType()
+					) ) {
+				constraintValidatorDefinitonClasses.add( ( Class<? extends ConstraintValidator<T, ?>> ) validator );
+			}
+			return;
+		}
+
+		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintDefinitonClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
+		if ( constraintHelper.isBuiltinConstraint( annotation.annotationType() ) ) {
+			constraintDefinitonClasses.addAll( constraintHelper.getBuiltInConstraints( annotation.annotationType() ) );
 		}
 		else {
 			final Class<? extends Annotation> annotationType = annotation.annotationType();
 			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
 					.getAnnotation( Constraint.class )
 					.validatedBy();
-			for ( Class<? extends ConstraintValidator<?, ?>> validator : validatedBy ) {
-				//FIXME does this create a CCE at runtime?
-				//FIXME if yes wrap into VE, if no we need to test the type here
-				//Once resolved,we can @SuppressWarning("unchecked") on the cast
-				Class<? extends ConstraintValidator<T, ?>> safeValidator = ( Class<? extends ConstraintValidator<T, ?>> ) validator;
-				constraintValidatorDefinitonClasses.add( safeValidator );
-			}
+			constraintDefinitonClasses.addAll( Arrays.asList( validatedBy ) );
+		}
+
+		ConstraintValidatorDefinitionsCache.addConstraintValidatorDefinition(
+				annotation.annotationType(), constraintDefinitonClasses
+		);
+
+		for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : constraintDefinitonClasses ) {
+			@SuppressWarnings("unchecked")
+			Class<? extends ConstraintValidator<T, ?>> safeValidator = ( Class<? extends ConstraintValidator<T, ?>> ) validator;
+			constraintValidatorDefinitonClasses.add( safeValidator );
 		}
 	}
 
@@ -239,7 +254,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private void parseComposingConstraints(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters) {
 		for ( Annotation declaredAnnotation : annotation.annotationType().getDeclaredAnnotations() ) {
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotation )
-					|| constraintHelper.isBuiltinConstraint( declaredAnnotation ) ) {
+					|| constraintHelper.isBuiltinConstraint( declaredAnnotation.annotationType() ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
 						declaredAnnotation, overrideParameters, OVERRIDES_PARAMETER_DEFAULT_INDEX
 				);

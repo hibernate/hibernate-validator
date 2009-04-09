@@ -52,4 +52,9 @@
             </constraint>
         </getter>
     </bean>
+    <constraint-definition annotation="org.hibernate.validation.engine.xml.ConsistentUserInformation">
+        <validated-by include-existing-validators="false">
+            <value>org.hibernate.validation.engine.xml.CustomConsistentUserValidator</value>
+        </validated-by>
+    </constraint-definition>
 </constraint-mappings>
