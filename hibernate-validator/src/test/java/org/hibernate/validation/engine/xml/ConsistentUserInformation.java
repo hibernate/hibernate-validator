@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.constraints.Pattern;
 
 
 /**
@@ -44,4 +45,8 @@ public @interface ConsistentUserInformation {
 	public abstract String[] stringArrayParam() default { };
 
 	public abstract int intParam() default 0;
+
+	public abstract Pattern[] patterns();
+
+	public abstract UserType userType() default UserType.BUYER;
 }

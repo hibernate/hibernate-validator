@@ -21,23 +21,21 @@
                 <element name="intParam">
                     <value>42</value>
                 </element>
+                <element name="patterns">
+                    <annotation>
+                        <element name="regexp">myRegExp1</element>
+                    </annotation>
+                    <annotation>
+                        <element name="regexp">myRegExp2</element>
+                    </annotation>
+                </element>
+                <element name="userType">SELLER</element>
             </constraint>
         </class>
         <field name="lastname">
             <constraint annotation="javax.validation.constraints.Pattern">
                 <message>Last name has to start with with a capital letter.</message>
                 <element name="regexp">^[A-Z][a-z]+</element>
-                <!--element name="patterns">
-                    <annotation>
-                        <element name="value">myRegExp</element>
-                        <element name="flag">
-                            <value>INSENSITIVE</value>
-                        </element>
-                    </annotation>
-                    <annotation>
-                        <element name="value">my2ndRegExp</element>
-                    </annotation>
-                </element-->
             </constraint>
         </field>
         <field name="creditcard">

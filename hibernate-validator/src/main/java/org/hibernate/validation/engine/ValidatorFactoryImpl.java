@@ -55,6 +55,7 @@ import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validation.xml.AnnotationType;
 import org.hibernate.validation.xml.BeanType;
 import org.hibernate.validation.xml.ClassType;
 import org.hibernate.validation.xml.ConstraintMappingsType;
@@ -241,7 +242,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 
 		// group sequence
-		List<Class<?>> groupSequence = createGroupSequence( classType.getGroupSequence(), beanClass, defaultPackage );
+		List<Class<?>> groupSequence = createGroupSequence( classType.getGroupSequence(), defaultPackage );
 		if ( !groupSequence.isEmpty() ) {
 			defaultSequences.put( beanClass, groupSequence );
 		}
@@ -253,7 +254,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
-	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, Class<?> beanClass, String defaultPackage) {
+	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
 		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
 		for ( String groupName : groupSequenceType.getValue() ) {
 			Class<?> group = getClass( groupName, defaultPackage );
@@ -364,25 +365,52 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	private Object getSingleValue(Serializable serializable, Class<?> returnType) {
-		String value;
+
+		Object returnValue;
 		if ( serializable instanceof String ) {
-			value = ( String ) serializable;
+			String value = ( String ) serializable;
+			returnValue = convertStringToReturnType( returnType, value );
 		}
-		else if ( serializable instanceof JAXBElement ) {
+		else if ( serializable instanceof JAXBElement && ( ( JAXBElement ) serializable ).getDeclaredType()
+				.equals( String.class ) ) {
 			JAXBElement<?> elem = ( JAXBElement<?> ) serializable;
-			// this is safe due to the underlying schema
-			value = ( String ) elem.getValue();
+			String value = ( String ) elem.getValue();
+			returnValue = convertStringToReturnType( returnType, value );
+		}
+		else if ( serializable instanceof JAXBElement && ( ( JAXBElement ) serializable ).getDeclaredType()
+				.equals( AnnotationType.class ) ) {
+			JAXBElement<?> elem = ( JAXBElement<?> ) serializable;
+			AnnotationType annotationType = ( AnnotationType ) elem.getValue();
+			try {
+				@SuppressWarnings("unchecked")
+				Class<Annotation> annotationClass = ( Class<Annotation> ) returnType;
+				returnValue = createAnnotation( annotationType, annotationClass );
+			}
+			catch ( ClassCastException e ) {
+				throw new ValidationException( "Unexpected paramter value" );
+			}
 		}
 		else {
 			throw new ValidationException( "Unexpected paramter value" );
 		}
+		return returnValue;
 
-		return convertStringToReturnType( returnType, value );
+	}
+
+	private <A extends Annotation> Annotation createAnnotation(AnnotationType annotationType, Class<A> returnType) {
+		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
+		for ( ElementType elementType : annotationType.getElement() ) {
+			String name = elementType.getName();
+			Class<?> paramterType = getAnnotationParamterType( returnType, name );
+			Object elementValue = getElementValue( elementType, paramterType );
+			annotationDescriptor.setValue( name, elementValue );
+		}
+		return AnnotationFactory.create( annotationDescriptor );
 	}
 
 	private Object convertStringToReturnType(Class<?> returnType, String value) {
 		Object returnValue;
-		if ( returnType.isPrimitive() && returnType.getName().equals( byte.class.getName() ) ) {
+		if ( returnType.getName().equals( byte.class.getName() ) ) {
 			try {
 				returnValue = Byte.parseByte( value );
 			}
@@ -390,7 +418,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( "Invalid byte format", e );
 			}
 		}
-		else if ( returnType.isPrimitive() && returnType.getName().equals( short.class.getName() ) ) {
+		else if ( returnType.getName().equals( short.class.getName() ) ) {
 			try {
 				returnValue = Short.parseShort( value );
 			}
@@ -398,7 +426,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( "Invalid short format", e );
 			}
 		}
-		else if ( returnType.isPrimitive() && returnType.getName().equals( int.class.getName() ) ) {
+		else if ( returnType.getName().equals( int.class.getName() ) ) {
 			try {
 				returnValue = Integer.parseInt( value );
 			}
@@ -406,7 +434,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( "Invalid int format", e );
 			}
 		}
-		else if ( returnType.isPrimitive() && returnType.getName().equals( long.class.getName() ) ) {
+		else if ( returnType.getName().equals( long.class.getName() ) ) {
 			try {
 				returnValue = Long.parseLong( value );
 			}
@@ -414,7 +442,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( "Invalid long format", e );
 			}
 		}
-		else if ( returnType.isPrimitive() && returnType.getName().equals( float.class.getName() ) ) {
+		else if ( returnType.getName().equals( float.class.getName() ) ) {
 			try {
 				returnValue = Float.parseFloat( value );
 			}
@@ -422,7 +450,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( "Invalid float format", e );
 			}
 		}
-		else if ( returnType.isPrimitive() && returnType.getName().equals( double.class.getName() ) ) {
+		else if ( returnType.getName().equals( double.class.getName() ) ) {
 			try {
 				returnValue = Double.parseDouble( value );
 			}
@@ -430,10 +458,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( "Invalid double format", e );
 			}
 		}
-		else if ( returnType.isPrimitive() && returnType.getName().equals( boolean.class.getName() ) ) {
+		else if ( returnType.getName().equals( boolean.class.getName() ) ) {
 			returnValue = Boolean.parseBoolean( value );
 		}
-		else if ( returnType.isPrimitive() && returnType.getName().equals( char.class.getName() ) ) {
+		else if ( returnType.getName().equals( char.class.getName() ) ) {
 			if ( value.length() != 1 ) {
 				throw new ValidationException( "Invalid char value: " + value );
 			}
@@ -451,7 +479,14 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			}
 		}
 		else {
-			throw new ValidationException( "Invalid return type: " + returnType );
+			try {
+				@SuppressWarnings("unchecked")
+				Class<Enum> enumClass = ( Class<Enum> ) returnType;
+				returnValue = Enum.valueOf( enumClass, value );
+			}
+			catch ( ClassCastException e ) {
+				throw new ValidationException( "Invalid return type: " + returnType + ". Should be a enumeration type." );
+			}
 		}
 		return returnValue;
 	}
@@ -508,7 +543,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	private void initBeanMetaData() {
-
 		for ( Class<?> beanClass : processedClasses ) {
 			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( beanClass, constraintHelper, annotationIgnores );
 			for ( MetaConstraint<?, ?> constraint : constraintMap.get( beanClass ) ) {
