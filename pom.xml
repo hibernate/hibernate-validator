@@ -37,6 +37,7 @@
     
     <modules>
         <module>hibernate-validator</module>
+        <module>hibernate-validator-archetype</module>
         <module>hibernate-validator-legacy</module>
     </modules>
 
