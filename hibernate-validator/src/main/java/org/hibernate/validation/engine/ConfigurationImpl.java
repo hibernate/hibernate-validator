@@ -199,19 +199,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 
 		ValidationConfigType config = getValidationConfig();
-		if ( config == null ) {
-			return;
-		}
-
-		// collect the paramters from the xml file
 		ParameterHolder xmlParameters = new ParameterHolder();
-		setProviderClassFromXml( config, xmlParameters );
-		setMessageInterpolatorFromXml( config, xmlParameters );
-		setTraversableResolverFromXml( config, xmlParameters );
-		setConstraintFactoryFromXml( config, xmlParameters );
-		setMappingStreamsFromXml( config, xmlParameters );
-		setPropertiesFromXml( config, xmlParameters );
-
+		if ( config != null ) {
+			// collect the paramters from the xml file
+			setProviderClassFromXml( config, xmlParameters );
+			setMessageInterpolatorFromXml( config, xmlParameters );
+			setTraversableResolverFromXml( config, xmlParameters );
+			setConstraintFactoryFromXml( config, xmlParameters );
+			setMappingStreamsFromXml( config, xmlParameters );
+			setPropertiesFromXml( config, xmlParameters );
+		}
 		applyXmlSettings( xmlParameters );
 	}
 
