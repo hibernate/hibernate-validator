@@ -64,7 +64,7 @@ import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
- * Keeps track of builtin constraints and their validator implementations.
+ * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
  *
  * @author Hardy Ferentschik
  * @author Alaa Nassef
@@ -75,6 +75,9 @@ public class ConstraintHelper {
 
 	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new HashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
+
+	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
+			new HashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
 
 	public ConstraintHelper() {
 
@@ -152,7 +155,7 @@ public class ConstraintHelper {
 		return constraints;
 	}
 
-	private List<Class<? extends ConstraintValidator<? , ?>>> getBuiltInFromAnnotationType(Class<? extends Annotation> annotationType) {
+	private List<Class<? extends ConstraintValidator<?, ?>>> getBuiltInFromAnnotationType(Class<? extends Annotation> annotationType) {
 		return builtinConstraints.get( annotationType );
 	}
 
@@ -234,7 +237,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks whehter the specified annotation is a valid constraint annotation. A constraint annotations has to
+	 * Checks whether the specified annotation is a valid constraint annotation. A constraint annotations has to
 	 * fulfill the following conditions:
 	 * <ul>
 	 * <li>Has to contain a <code>ConstraintValidator</code> implementation.</li>
@@ -283,5 +286,20 @@ public class ConstraintHelper {
 			}
 		}
 		return true;
+	}
+
+	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
+		if ( annotationClass == null ) {
+			throw new IllegalArgumentException( "Class cannot be null" );
+		}
+		return constraintValidatorDefinitons.get( annotationClass );
+	}
+
+	public <A extends Annotation> void addConstraintValidatorDefinition(Class<A> annotationClass, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> definitionClasses) {
+		constraintValidatorDefinitons.put( annotationClass, definitionClasses );
+	}
+
+	public boolean containsConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
+		return constraintValidatorDefinitons.containsKey( annotationClass );
 	}
 }

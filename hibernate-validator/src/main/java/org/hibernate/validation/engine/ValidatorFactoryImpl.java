@@ -71,6 +71,8 @@ import org.hibernate.validation.xml.GroupsType;
 import org.hibernate.validation.xml.ValidatedByType;
 
 /**
+ * Factory returning initialized <code>Validator</code> instances.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
@@ -85,24 +87,26 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
-	private final ConstraintHelper constraintHelper = new ConstraintHelper();
+	private final ConstraintHelper constraintHelper;
+	private final BeanMetaDataCache beanMetaDataCache;
 
 	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
-
-	private AnnotationIgnores annotationIgnores;
-	private Map<Class<?>, List<MetaConstraint<?, ?>>> constraintMap;
-	private Map<Class<?>, List<Member>> cascadedMembers;
-	private Map<Class<?>, List<Class<?>>> defaultSequences;
+	private final AnnotationIgnores annotationIgnores;
+	private final Map<Class<?>, List<MetaConstraint<?, ? extends Annotation>>> constraintMap;
+	private final Map<Class<?>, List<Member>> cascadedMembers;
+	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
+		this.constraintHelper = new ConstraintHelper();
+		this.beanMetaDataCache = new BeanMetaDataCache();
 
-		annotationIgnores = new AnnotationIgnores();
-		constraintMap = new HashMap<Class<?>, List<MetaConstraint<?, ?>>>();
-		cascadedMembers = new HashMap<Class<?>, List<Member>>();
-		defaultSequences = new HashMap<Class<?>, List<Class<?>>>();
+		this.annotationIgnores = new AnnotationIgnores();
+		this.constraintMap = new HashMap<Class<?>, List<MetaConstraint<?, ? extends Annotation>>>();
+		this.cascadedMembers = new HashMap<Class<?>, List<Member>>();
+		this.defaultSequences = new HashMap<Class<?>, List<Class<?>>>();
 
 		parseMappingFiles( configurationState.getMappingStreams() );
 		initBeanMetaData();
@@ -127,7 +131,11 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	 */
 	public ValidatorContext usingContext() {
 		return new ValidatorContextImpl(
-				constraintValidatorFactory, messageInterpolator, traversableResolver, constraintHelper
+				constraintValidatorFactory,
+				messageInterpolator,
+				traversableResolver,
+				constraintHelper,
+				beanMetaDataCache
 		);
 	}
 
@@ -171,6 +179,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
+	@SuppressWarnings("unchecked")  
 	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList) {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
@@ -184,6 +193,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				throw new ValidationException( "Unable to load class " + annotationClassName );
 			}
 
+			if ( !annotationClass.isAnnotation() ) {
+				throw new ValidationException( annotationClassName + " is not an annotation" );
+			}
+
 			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
 			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
 			if ( validatedByType.isIncludeExistingValidators() != null && validatedByType.isIncludeExistingValidators() ) {
@@ -192,7 +205,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			for ( String validatorClassName : validatedByType.getValue() ) {
 				Class<? extends ConstraintValidator<?, ?>> validatorClass;
 				try {
-					// TODO validate this class!
 					validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) ReflectionHelper.classForName(
 							validatorClassName,
 							this.getClass()
@@ -201,9 +213,14 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				catch ( ClassNotFoundException e ) {
 					throw new ValidationException( "Unable to load class " + validatorClassName );
 				}
+
+				if ( !ConstraintValidator.class.isAssignableFrom(validatorClass) ) {
+					throw new ValidationException( validatorClass + " is not a constraint validator class" );
+				}
+
 				constraintValidatorClasses.add( validatorClass );
 			}
-			ConstraintValidatorDefinitionsCache.addConstraintValidatorDefinition(
+			constraintHelper.addConstraintValidatorDefinition(
 					annotationClass, constraintValidatorClasses
 			);
 		}
@@ -311,7 +328,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			constraintMap.get( beanClass ).add( metaConstraint );
 		}
 		else {
-			List<MetaConstraint<?, ?>> constraintList = new ArrayList<MetaConstraint<?, ?>>();
+			List<MetaConstraint<?, ? extends Annotation>> constraintList = new ArrayList<MetaConstraint<?, ? extends Annotation>>();
 			constraintList.add( metaConstraint );
 			constraintMap.put( beanClass, constraintList );
 		}
@@ -585,10 +602,12 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		return constraintMappings;
 	}
 
-	private void initBeanMetaData() {
+	private <T> void initBeanMetaData() {
 		for ( Class<?> beanClass : processedClasses ) {
-			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl( beanClass, constraintHelper, annotationIgnores );
-			for ( MetaConstraint<?, ?> constraint : constraintMap.get( beanClass ) ) {
+			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl<T>(
+					( Class<T> ) beanClass, constraintHelper, annotationIgnores
+			);
+			for ( MetaConstraint<?, ? extends Annotation> constraint : constraintMap.get( beanClass ) ) {
 				metaData.addMetaConstraint( constraint );
 			}
 			for ( Member m : cascadedMembers.get( beanClass ) ) {
@@ -597,7 +616,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			if ( defaultSequences.containsKey( beanClass ) ) {
 				metaData.setDefaultGroupSequence( defaultSequences.get( beanClass ) );
 			}
-			BeanMetaDataCache.addBeanMetaData( beanClass, metaData );
+			beanMetaDataCache.addBeanMetaData( ( Class<T> ) beanClass, ( BeanMetaDataImpl<T> ) metaData );
 		}
 	}
 

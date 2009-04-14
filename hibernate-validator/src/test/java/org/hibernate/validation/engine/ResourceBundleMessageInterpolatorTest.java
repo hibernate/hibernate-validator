@@ -45,26 +45,30 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	private ResourceBundleMessageInterpolator interpolator;
 	private NotNull notNull;
+	private ConstraintDescriptorImpl<NotNull> notNullDescriptor;
 	private Size size;
+	private ConstraintDescriptorImpl<Size> sizeDescriptor;
 
 	@BeforeTest
 	public void setUp() {
 		// Create some annotations for testing using AnnotationProxies
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
+		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+				notNull, new Class<?>[] { }, new ConstraintHelper()
+		);
 
-		AnnotationDescriptor<Size> sizeDescriptor = new AnnotationDescriptor<Size>( Size.class );
-		size = AnnotationFactory.create( sizeDescriptor );
+		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
+		size = AnnotationFactory.create( sizeAnnotationDescriptor );
+		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+				size, new Class<?>[] { }, new ConstraintHelper()
+		);
 	}
 
 	@Test
 	public void testSuccessfulInterpolation() {
-		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
-		);
-
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
-		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 		String expected = "replacement worked";
 		String actual = interpolator.interpolate( "{foo}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
@@ -84,12 +88,8 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUnSuccessfulInterpolation() {
-		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
-		);
-
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
-		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "foo";  // missing {}
 		String actual = interpolator.interpolate( "foo", context );
@@ -102,12 +102,8 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUnkownTokenInterpolation() {
-		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
-		);
-
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
-		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "{bar}";  // unkown token {}
 		String actual = interpolator.interpolate( "{bar}", context );
@@ -116,20 +112,13 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testDefaultInterpolation() {
-		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
-		);
-
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
-		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "may not be null";
 		String actual = interpolator.interpolate( notNull.message(), context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		ConstraintDescriptorImpl<Size> sizeDescriptor = new ConstraintDescriptorImpl<Size>(
-				size, new Class<?>[] { }, new ConstraintHelper()
-		);
 		expected = "size must be between 0 and 2147483647";  // unkown token {}
 		context = new MessageInterpolatorContext( sizeDescriptor, null );
 		actual = interpolator.interpolate( size.message(), context );
@@ -138,26 +127,18 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testMessageInterpolationWithLocale() {
-		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
-		);
-
 		interpolator = new ResourceBundleMessageInterpolator();
 
 		String expected = "kann nicht null sein";
-		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 		String actual = interpolator.interpolate( notNull.message(), context, Locale.GERMAN );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
 
 	@Test
 	public void testFallbackToDefaultLocale() {
-		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
-		);
-
 		interpolator = new ResourceBundleMessageInterpolator();
-		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "may not be null";
 		String actual = interpolator.interpolate( notNull.message(), context, Locale.JAPAN );
@@ -166,12 +147,8 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUserResourceBundle() {
-		ConstraintDescriptorImpl<NotNull> descriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
-		);
-
 		interpolator = new ResourceBundleMessageInterpolator();
-		MessageInterpolator.Context context = new MessageInterpolatorContext( descriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "no puede ser null";
 		String actual = interpolator.interpolate( notNull.message(), context, new Locale( "es", "ES" ) );

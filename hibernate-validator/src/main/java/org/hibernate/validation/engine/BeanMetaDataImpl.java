@@ -68,7 +68,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * List of constraints.
 	 */
-	private List<MetaConstraint<T, ?>> metaConstraintList = new ArrayList<MetaConstraint<T, ?>>();
+	private List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = new ArrayList<MetaConstraint<T, ? extends Annotation>>();
 
 	/**
 	 * List of cascaded members.
@@ -86,9 +86,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 
 	/**
-	 * Object keeping track of all builtin constraints.
+	 * Object keeping track of all constraints.
 	 */
 	private final ConstraintHelper constraintHelper;
+
 
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
 		this(
@@ -116,11 +117,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return cascadedMembers;
 	}
 
-	public List<MetaConstraint<T, ?>> geMetaConstraintList() {
+	public List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintList() {
 		return metaConstraintList;
 	}
 
-	public void addMetaConstraint(MetaConstraint<?, ?> metaConstraint) {
+	public void addMetaConstraint(MetaConstraint<?, ? extends Annotation> metaConstraint) {
 		metaConstraintList.add( ( MetaConstraint<T, ?> ) metaConstraint );
 	}
 
@@ -323,10 +324,14 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Class<?>[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
 		ConstraintDescriptorImpl constraintDescriptor;
 		if ( clazz.isInterface() ) {
-			constraintDescriptor = new ConstraintDescriptorImpl( annotation, groups, constraintHelper, clazz );
+			constraintDescriptor = new ConstraintDescriptorImpl(
+					annotation, groups, constraintHelper, clazz
+			);
 		}
 		else {
-			constraintDescriptor = new ConstraintDescriptorImpl( annotation, groups, constraintHelper );
+			constraintDescriptor = new ConstraintDescriptorImpl(
+					annotation, groups, constraintHelper
+			);
 		}
 		return constraintDescriptor;
 	}

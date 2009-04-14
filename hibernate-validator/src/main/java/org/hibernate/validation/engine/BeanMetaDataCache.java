@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Cache for created instances of <code>BeanMetaData</code>.
+ *
  * @author Hardy Ferentschik
  */
 public class BeanMetaDataCache {
@@ -28,19 +30,19 @@ public class BeanMetaDataCache {
 	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
 	 * entity.
 	 */
-	private static Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders
-			= new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>( 10 );
+	private Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
+			10
+	);
 
-	public static <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
+	@SuppressWarnings("unchecked")
+	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
 		if ( beanClass == null ) {
 			throw new IllegalArgumentException( "Class cannot be null" );
 		}
-		@SuppressWarnings("unchecked")
-		BeanMetaDataImpl<T> metadata = ( BeanMetaDataImpl<T> ) metadataProviders.get( beanClass );
-		return metadata;
+		return ( BeanMetaDataImpl<T> ) metadataProviders.get( beanClass );
 	}
 
-	static void addBeanMetaData(Class<?> beanClass, BeanMetaDataImpl<?> metaData) {
+	public <T> void addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
 		metadataProviders.put( beanClass, metaData );
 	}
 }

@@ -119,11 +119,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void findConstraintValidatorClasses() {
-		if ( ConstraintValidatorDefinitionsCache.containsConstraintValidatorDefinition( annotation.annotationType())) {
-			for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : ConstraintValidatorDefinitionsCache
-					.getConstraintValidatorDefinition(
-							annotation.annotationType()
-					) ) {
+		if ( constraintHelper.containsConstraintValidatorDefinition( annotation.annotationType() ) ) {
+			for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : constraintHelper
+					.getConstraintValidatorDefinition( annotation.annotationType() ) ) {
 				constraintValidatorDefinitonClasses.add( ( Class<? extends ConstraintValidator<T, ?>> ) validator );
 			}
 			return;
@@ -141,7 +139,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			constraintDefinitonClasses.addAll( Arrays.asList( validatedBy ) );
 		}
 
-		ConstraintValidatorDefinitionsCache.addConstraintValidatorDefinition(
+		constraintHelper.addConstraintValidatorDefinition(
 				annotation.annotationType(), constraintDefinitonClasses
 		);
 
@@ -304,7 +302,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 		}
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
-		return new ConstraintDescriptorImpl<U>( annotationProxy, groups, constraintHelper );
+		return new ConstraintDescriptorImpl<U>(
+				annotationProxy, groups, constraintHelper
+		);
 	}
 
 	private class ClassIndexWrapper {

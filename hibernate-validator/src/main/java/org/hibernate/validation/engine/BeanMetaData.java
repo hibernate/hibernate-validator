@@ -17,9 +17,8 @@
 */
 package org.hibernate.validation.engine;
 
-import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import javax.validation.BeanDescriptor;
@@ -56,7 +55,7 @@ public interface BeanMetaData<T> {
 	 * @return A list of <code>MetaConstraint</code> instances encapsulating the information of all the constraints
 	 *         defined on the bean.
 	 */
-	List<MetaConstraint<T, ?>> geMetaConstraintList();
+	List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintList();
 
 	/**
 	 * Return <code>PropertyDescriptor</code> for the given property.

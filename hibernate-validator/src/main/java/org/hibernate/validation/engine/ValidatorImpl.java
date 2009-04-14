@@ -19,6 +19,7 @@ package org.hibernate.validation.engine;
 
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -77,18 +78,18 @@ public class ValidatorImpl implements Validator {
 	private GroupChainGenerator groupChainGenerator;
 
 	private final ConstraintValidatorFactory constraintValidatorFactory;
-
 	private final MessageInterpolator messageInterpolator;
-
 	private final TraversableResolver traversableResolver;
-
 	private final ConstraintHelper constraintHelper;
+	private final BeanMetaDataCache beanMetaDataCache;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper) {
+
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.constraintHelper = constraintHelper;
+		this.beanMetaDataCache = beanMetaDataCache;
 
 		groupChainGenerator = new GroupChainGenerator();
 	}
@@ -516,7 +517,7 @@ public class ValidatorImpl implements Validator {
 				throw new IllegalArgumentException( "Invalid property path." );
 			}
 
-			List<MetaConstraint<T, ?>> metaConstraintList = getBeanMetaData( clazz ).geMetaConstraintList();
+			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = getBeanMetaData( clazz ).geMetaConstraintList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
 					metaConstraints.add( metaConstraint );
@@ -551,10 +552,10 @@ public class ValidatorImpl implements Validator {
 	 * {@inheritDoc}
 	 */
 	private <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		BeanMetaDataImpl<T> metadata = BeanMetaDataCache.getBeanMetaData( beanClass );
+		BeanMetaDataImpl<T> metadata = beanMetaDataCache.getBeanMetaData( beanClass );
 		if ( metadata == null ) {
-			metadata = new BeanMetaDataImpl<T>( beanClass, constraintHelper );
-			BeanMetaDataCache.addBeanMetaData( beanClass, metadata );
+			metadata = new BeanMetaDataImpl<T>( beanClass, constraintHelper);
+			beanMetaDataCache.addBeanMetaData( beanClass, metadata );
 		}
 		return metadata;
 	}
