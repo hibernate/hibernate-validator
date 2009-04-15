@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project 
-	xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-   <parent>
-        <artifactId>hibernate-validator-parent</artifactId>
-        <groupId>org.hibernate</groupId>
-        <version>4.0.0.Beta1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>  
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-validator-quickstart</artifactId>
-    <name>Hibernate Validator Quickstart Archetype</name>
+	<parent>
+		<artifactId>hibernate-validator-parent</artifactId>
+		<groupId>org.hibernate</groupId>
+		<version>4.0.0.Beta1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<groupId>org.hibernate</groupId>
+	<artifactId>hibernate-validator-quickstart</artifactId>
+	<name>Hibernate Validator Quickstart</name>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -35,8 +34,20 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-archetype-plugin</artifactId>
+				<version>2.0-alpha-4</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>create-from-project</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>RELEASE</version>
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
@@ -48,8 +59,7 @@
 		<repository>
 			<id>jboss</id>
 			<url>http://repository.jboss.com/maven2</url>
-			<releases>
-			</releases>
+			<releases> </releases>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
