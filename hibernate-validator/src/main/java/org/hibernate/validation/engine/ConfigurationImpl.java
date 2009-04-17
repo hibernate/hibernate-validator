@@ -389,6 +389,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			return null;
 		}
 
+		log.info( "{} found.", VALIDATION_XML_FILE );
+
 		ValidationConfigType validationConfig = null;
 		Schema schema = getValidationConfigurationSchema();
 		try {

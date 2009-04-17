@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
@@ -27,18 +29,19 @@
             <url>http://in.relation.to/Bloggers/Hardy</url>
         </developer>
     </developers>
-    
+
     <mailingLists>
         <mailingList>
             <name>hibernate-dev</name>
             <post>hibernate-dev@lists.jboss.org</post>
         </mailingList>
     </mailingLists>
-    
+
     <modules>
         <module>hibernate-validator</module>
         <module>hibernate-validator-archetype</module>
         <module>hibernate-validator-legacy</module>
+        <module>hibernate-validator-tck-runner</module>
     </modules>
 
     <dependencyManagement>
@@ -52,7 +55,13 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>1.5.6</version>
-            </dependency>        
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>5.8</version>
+                <classifier>jdk15</classifier>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -122,16 +131,16 @@
                         </descriptorRefs>
                     </configuration>
                 </plugin>
-			    <plugin>
-			        <artifactId>maven-release-plugin</artifactId>
-			        <configuration>
-			           <!--
-			              During release:perform, enable the "release" profile
-			            -->
-			            <releaseProfiles>release</releaseProfiles>
-			            <goals>package site assembly:assembly</goals>
-			         </configuration>
-			  </plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <configuration>
+                        <!--
+                                                  During release:perform, enable the "release" profile
+                                                -->
+                        <releaseProfiles>release</releaseProfiles>
+                        <goals>package site assembly:assembly</goals>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -217,7 +226,7 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
                     <targetJdk>1.5</targetJdk>
-                </configuration>               
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

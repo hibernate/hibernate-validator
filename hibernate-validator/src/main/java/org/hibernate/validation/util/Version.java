@@ -53,7 +53,7 @@ public class Version {
 		else {
 			version = manifest.getMainAttributes().getValue( Attributes.Name.IMPLEMENTATION_VERSION );
 		}
-		log.info( "Hibernate Commons Annotations {}", version );
+		log.info( "Hibernate Validator {}", version );
 	}
 
 	public static void touch() {
