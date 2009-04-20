@@ -301,7 +301,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				);
 				InputStream in = getInputStreamForPath( mappingFileName );
 				if ( in == null ) {
-					throw new ValidationException( " Unable to open input stream for mapping file." );
+					throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName + "." );
 				}
 				xmlParameters.mappings.add( in );
 			}
@@ -385,7 +385,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ValidationConfigType getValidationConfig() {
 		InputStream inputStream = getInputStreamForPath( VALIDATION_XML_FILE );
 		if ( inputStream == null ) {
-			log.info( "No {} found. Using defaults.", VALIDATION_XML_FILE );
+			log.info( "No {} found. Using annotation based configuration only!", VALIDATION_XML_FILE );
 			return null;
 		}
 
@@ -412,10 +412,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		// try absolute path
 		if ( inputStream == null && !path.startsWith( "/" ) ) {
 			inputStream = this.getClass().getResourceAsStream( "/" + path );
-		}
-
-		if ( inputStream == null && log.isDebugEnabled() ) {
-			log.debug( "Unable to open input stream for {}.", path );
 		}
 		return inputStream;
 	}

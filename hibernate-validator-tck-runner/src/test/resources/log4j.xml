@@ -21,7 +21,7 @@
 
     <!-- ############### Categories #################  -->
     <category name="org.hibernate">
-        <priority value="DEBUG"/>
+        <priority value="INFO"/>
     </category>
 
     <category name="org.jboss.testharness">

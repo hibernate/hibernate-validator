@@ -74,7 +74,7 @@
                         <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-impl-suite.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <argLine>-Xmx128m</argLine>
-                    <forkMode>once</forkMode>
+                    <forkMode>pertest</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
@@ -206,13 +206,14 @@
                         <executions>
                             <execution>
                                 <id>generate-jsr-303-artifacts</id>
-                                <phase>generate-test-sources</phase>
+                                <phase>test</phase>
                                 <goals>
                                     <goal>java</goal>
                                 </goals>
                             </execution>
                         </executions>
                         <configuration>
+                            <classpathScope>test</classpathScope>
                             <mainClass>org.jboss.testharness.api.TCK</mainClass>
                             <systemProperties>
                                 <systemProperty>
@@ -225,7 +226,7 @@
                                 </systemProperty>
                                 <systemProperty>
                                     <key>org.jboss.testharness.libraryDirectory</key>
-                                    <value>target/dependency/lib</value>
+                                    <value>target/jsr303-artifacts/dependencies</value>
                                 </systemProperty>
                             </systemProperties>
                         </configuration>

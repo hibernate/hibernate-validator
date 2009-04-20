@@ -150,9 +150,9 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				defaultGroupSequence.add( group );
 			}
 		}
-		if ( log.isDebugEnabled() ) {
-			log.debug(
-					"Bean {} redefines the Default group. Members of the default group sequence are: {}",
+		if ( log.isTraceEnabled() ) {
+			log.trace(
+					"Members of the default group sequence for bean {} are: {}",
 					beanClass.getName(),
 					defaultGroupSequence
 			);
