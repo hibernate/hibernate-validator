@@ -47,6 +47,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>1.0.CR2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.5.6</version>
