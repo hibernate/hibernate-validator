@@ -283,6 +283,7 @@ public class ExecutionContext<T> {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
+				null, //FIXME get the rootBeanClass
 				getRootBean(),
 				peekCurrentBean(),
 				value,

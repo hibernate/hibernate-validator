@@ -25,17 +25,18 @@ import javax.validation.ConstraintViolation;
  * @author Hardy Ferentschik
  */
 public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
-	private String interpolatedMessage;
-	private T rootBean;
-	private Object value;
-	private String propertyPath;
-	private Object leafBeanInstance;
+	private final String interpolatedMessage;
+	private final T rootBean;
+	private final Object value;
+	private final String propertyPath;
+	private final Object leafBeanInstance;
 	private final ConstraintDescriptor constraintDescriptor;
-	private String rawMessage;
+	private final String rawMessage;
+	private final Class<T> rootBeanClass;
 
 
-	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, T rootBean,
-								   Object leafBeanInstance, Object value,
+	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, 
+								   T rootBean, Object leafBeanInstance, Object value,
 								   String propertyPath, ConstraintDescriptor constraintDescriptor) {
 		this.rawMessage = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
@@ -44,6 +45,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		this.propertyPath = propertyPath;
 		this.leafBeanInstance = leafBeanInstance;
 		this.constraintDescriptor = constraintDescriptor;
+		this.rootBeanClass = rootBeanClass;
 	}
 
 	/**
@@ -62,6 +64,10 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	 */
 	public T getRootBean() {
 		return rootBean;
+	}
+
+	public Class<T> getRootBeanClass() {
+		return rootBeanClass;
 	}
 
 	public Object getLeafBean() {
