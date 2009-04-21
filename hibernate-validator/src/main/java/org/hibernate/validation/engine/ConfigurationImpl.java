@@ -65,7 +65,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private static final Logger log = LoggerFactory.make();
-	private static final String VALIDATION_XML_FILE = "/META-INF/validation.xml";
+	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
 	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.0.xsd";
 
 	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();

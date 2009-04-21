@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<project name="JBoss5DeployerInstall" default="update" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+
+	<path id="maven-ant-tasks.classpath" path="../lib/maven-ant-tasks.jar" />
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath" />
+
+	<property name="maven.dir" location="${basedir}/lib/maven" />
+
+	<property file="build.properties" />
+	<property file="local.build.properties" />
+
+	<target name="clean" description="Clean up after the JBoss updater">
+		<delete dir="target" failonerror="false" />
+	</target>
+
+	<target name="update" depends="install-webbeans.deployer" description="Update JBoss 5 for the Web Beans RI" />
+
+	<target name="install-webbeans.deployer">
+
+		<fail unless="jboss.home" message="Please pass in -Djboss.home=..." />
+
+		<delete dir="${jboss.home}/server/default/deployers/webbeans.deployer" failonerror="false" />
+		<delete dir="target" failonerror="false" />
+
+		<artifact:dependencies filesetId="webbeans.deployer.fileset" versionsId="webbeans.deployer.versions" >
+			<dependency groupId="org.jboss.webbeans.integration" artifactId="webbeans-jboss-int-deployer" version="${webbeans-ri-int.version}" type="zip" />
+			<dependency groupId="org.jboss.webbeans" artifactId="webbeans-core" version="${webbeans.version}" />
+			<remoteRepository id="repository.jboss.org" url="http://repository.jboss.org/maven2" />
+			<remoteRepository id="snapshots.jboss.org" url="http://snapshots.jboss.org/maven2" />
+		</artifact:dependencies>
+
+		<mkdir dir="target/dependency/lib" />
+		<copy todir="target/dependency/lib">
+			<fileset refid="webbeans.deployer.fileset" />
+			<chainedmapper>
+				<flattenmapper />
+				<mapper classpathref="maven-ant-tasks.classpath" classname="org.apache.maven.artifact.ant.VersionMapper" from="${webbeans.deployer.versions}" to="flatten" />
+			</chainedmapper>
+		</copy>
+
+		<unzip dest="target" src="target/dependency/lib/webbeans-jboss-int-deployer.zip" />
+		
+      <copy todir="target/webbeans.deployer/lib-int/" overwrite="true">
+         <fileset dir="target/dependency/lib">
+            <include name="webbeans-core.jar" />
+         </fileset>
+      </copy>
+		
+		<delete dir="target/dependency" />
+
+		<copy todir="${jboss.home}/server/default/deployers/webbeans.deployer">
+			<fileset dir="target/webbeans.deployer">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+
+	</target>
+
+	<target name="install-jboss-ejb3-update">
+
+		<fail unless="jboss.home" message="Please pass in -Djboss.home=..." />
+
+		<artifact:dependencies filesetId="jboss.ejb3.plugin.fileset" versionsId="jboss.ejb3.plugin.versions">
+			<dependency groupId="org.jboss.ejb3" artifactId="jboss-ejb3-plugin" version="${jboss-ejb3.version}" classifier="installer" />
+			<remoteRepository id="repository.jboss.org" url="http://repository.jboss.org/maven2" />
+		</artifact:dependencies>
+
+		<mkdir dir="target/ejb3.plugin" />
+		<copy todir="target/ejb3.plugin">
+			<fileset refid="jboss.ejb3.plugin.fileset" />
+			<chainedmapper>
+				<flattenmapper />
+				<mapper classpathref="maven-ant-tasks.classpath" classname="org.apache.maven.artifact.ant.VersionMapper" from="${jboss.ejb3.plugin.versions}" to="flatten" />
+			</chainedmapper>
+		</copy>
+		<java jar="target/ejb3.plugin/jboss-ejb3-plugin-installer.jar" fork="true" failonerror="true">
+			<arg line="${jboss.home}" />
+		</java>
+	</target>
+
+	<macrodef name="maven">
+		<attribute name="target" />
+		<attribute name="basedir" />
+		<element name="args" implicit="true" optional="true" />
+		<sequential>
+			<java classname="org.codehaus.classworlds.Launcher" fork="true" dir="@{basedir}" failonerror="true">
+				<classpath>
+					<fileset dir="${maven.dir}/boot">
+						<include name="*.jar" />
+					</fileset>
+					<fileset dir="${maven.dir}/bin">
+						<include name="*.*" />
+					</fileset>
+				</classpath>
+				<sysproperty key="classworlds.conf" value="${maven.dir}/bin/m2.conf" />
+				<sysproperty key="maven.home" value="${maven.dir}" />
+				<args />
+				<arg line="@{target}" />
+			</java>
+		</sequential>
+	</macrodef>
+
+</project>

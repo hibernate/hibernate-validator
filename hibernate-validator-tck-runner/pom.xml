@@ -75,7 +75,7 @@
                     </suiteXmlFiles>
                     <argLine>-Xmx128m</argLine>
                     <forkMode>pertest</forkMode>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <!--redirectTestOutputToFile>true</redirectTestOutputToFile-->
                 </configuration>
             </plugin>
             <plugin>
@@ -167,7 +167,7 @@
                                 </property>
                                 <property>
                                     <name>org.jboss.testharness.container.extraConfigurationDir</name>
-                                    <value>../jboss-as</value>
+                                    <value>src/jboss-as</value>
                                 </property>
                                 <property>
                                     <name>org.jboss.testharness.container.forceRestart</name>
