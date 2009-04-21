@@ -78,7 +78,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
-			this.providerResolver = new DefaultValidationProviderResolver();
+			this.providerResolver = state.getDefaultValidationProviderResolver();
 		}
 		else {
 			this.providerResolver = state.getValidationProviderResolver();
