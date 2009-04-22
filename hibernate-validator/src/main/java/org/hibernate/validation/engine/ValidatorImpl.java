@@ -103,7 +103,7 @@ public class ValidatorImpl implements Validator {
 		}
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
-		ExecutionContext<T> context = new ExecutionContext<T>(
+		ExecutionContext<T> context = ExecutionContext.getContextForValidate(
 				object, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
 
@@ -399,7 +399,7 @@ public class ValidatorImpl implements Validator {
 
 		for ( Class<?> groupClass : groupList ) {
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
-				ExecutionContext<T> context = new ExecutionContext<T>(
+				ExecutionContext<T> context = ExecutionContext.getContextForValidateProperty(
 						object,
 						hostingBeanInstance,
 						messageInterpolator,
@@ -434,6 +434,7 @@ public class ValidatorImpl implements Validator {
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			validateValueForGroup(
+					beanType,
 					value,
 					propertyIter,
 					failingConstraintViolations,
@@ -449,6 +450,7 @@ public class ValidatorImpl implements Validator {
 			int numberOfConstraintViolations = failingConstraintViolations.size();
 			for ( Group group : sequence ) {
 				validateValueForGroup(
+						beanType,
 						value,
 						propertyIter,
 						failingConstraintViolations,
@@ -463,7 +465,7 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T> void validateValueForGroup(Object value, PropertyIterator propertyIter, List<ConstraintViolation<T>> failingConstraintViolations, Set<MetaConstraint<T, ?>> metaConstraints, Group group) {
+	private <T> void validateValueForGroup(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolation<T>> failingConstraintViolations, Set<MetaConstraint<T, ?>> metaConstraints, Group group) {
 		int numberOfConstraintViolations = failingConstraintViolations.size();
 		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
 
@@ -478,8 +480,8 @@ public class ValidatorImpl implements Validator {
 
 		for ( Class<?> groupClass : groupList ) {
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
-				ExecutionContext<T> context = new ExecutionContext<T>(
-						( T ) value, messageInterpolator, constraintValidatorFactory, traversableResolver
+				ExecutionContext<T> context = ExecutionContext.getContextForValidateValue(
+						beanType, value, messageInterpolator, constraintValidatorFactory, traversableResolver
 				);
 				context.pushProperty( propertyIter.getOriginalProperty() );
 				context.setCurrentGroup( groupClass );
@@ -554,7 +556,7 @@ public class ValidatorImpl implements Validator {
 	private <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		BeanMetaDataImpl<T> metadata = beanMetaDataCache.getBeanMetaData( beanClass );
 		if ( metadata == null ) {
-			metadata = new BeanMetaDataImpl<T>( beanClass, constraintHelper);
+			metadata = new BeanMetaDataImpl<T>( beanClass, constraintHelper );
 			beanMetaDataCache.addBeanMetaData( beanClass, metadata );
 		}
 		return metadata;

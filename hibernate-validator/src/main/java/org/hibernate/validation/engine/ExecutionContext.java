@@ -54,6 +54,11 @@ public class ExecutionContext<T> {
 	private final T rootBean;
 
 	/**
+	 * The root bean class of the validation.
+	 */
+	private Class<T> rootBeanClass;
+
+	/**
 	 * Maps a group to an identity set to keep track of already validated objects. We have to make sure
 	 * that each object gets only validated once per group and property path.
 	 */
@@ -106,12 +111,36 @@ public class ExecutionContext<T> {
 	 */
 	private final TraversableResolver traversableResolver;
 
-	public ExecutionContext(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
-		this( object, object, messageInterpolator, constraintValidatorFactory, traversableResolver );
+	public static <T> ExecutionContext<T> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
+		return new ExecutionContext<T>(
+				rootBeanClass, object, object, messageInterpolator, constraintValidatorFactory, traversableResolver
+		);
 	}
 
-	public ExecutionContext(T rootBean, Object object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> ExecutionContext<T> getContextForValidateValue(Class<T> rootBeanClass, Object object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		return new ExecutionContext<T>(
+				rootBeanClass,
+				null,
+				object,
+				messageInterpolator,
+				constraintValidatorFactory,
+				traversableResolver
+		);
+	}
+
+	public static <T> ExecutionContext<T> getContextForValidateProperty(T rootBean, Object object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = ( Class<T> ) rootBean.getClass();
+		return new ExecutionContext<T>(
+				rootBeanClass, rootBean, object, messageInterpolator, constraintValidatorFactory, traversableResolver
+		);
+	}
+
+	private ExecutionContext(Class<T> rootBeanClass, T rootBean, Object object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		this.rootBean = rootBean;
+		this.rootBeanClass = rootBeanClass;
 		this.messageInterpolator = messageInterpolator;
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.traversableResolver = traversableResolver;
@@ -145,6 +174,12 @@ public class ExecutionContext<T> {
 
 	public T getRootBean() {
 		return rootBean;
+	}
+
+	@SuppressWarnings("unchecked")
+	// safe case since rootBean is of type T!
+	public Class<T> getRootBeanClass() {
+		return rootBeanClass;
 	}
 
 	public Class<?> getCurrentGroup() {
@@ -283,7 +318,7 @@ public class ExecutionContext<T> {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
-				null, //FIXME get the rootBeanClass
+				getRootBeanClass(),
 				getRootBean(),
 				peekCurrentBean(),
 				value,

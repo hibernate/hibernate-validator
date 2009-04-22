@@ -266,10 +266,11 @@ public class ValidatorImplTest {
 		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 		assertEquals( constraintViolation.getRootBean(), null, "Wrong root entity" );
+		assertEquals( constraintViolation.getRootBeanClass(), Customer.class, "Wrong root bean class" );
 		assertEquals( constraintViolation.getInvalidValue(), null, "Wrong value" );
 		assertEquals( "orderList[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
-		constraintViolations = validator.validateValue( Customer.class, "orderList[0].orderNumber", "1234" );
+		constraintViolations = validator.validateValue( Customer.class, "orderList[0].orderNumber", 1234 );
 		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
