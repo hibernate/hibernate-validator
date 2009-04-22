@@ -1,7 +1,7 @@
 package org.hibernate.validation.engine;
 
-import javax.validation.MessageInterpolator;
 import javax.validation.ConstraintDescriptor;
+import javax.validation.MessageInterpolator;
 
 /**
  * Takes mandatory elements in the constructor

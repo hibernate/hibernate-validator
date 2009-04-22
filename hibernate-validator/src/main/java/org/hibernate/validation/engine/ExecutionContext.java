@@ -27,9 +27,9 @@ import java.util.Set;
 import java.util.Stack;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
-import javax.validation.ConstraintViolation;
 
 import org.hibernate.validation.util.IdentitySet;
 

@@ -27,9 +27,9 @@ import java.util.Set;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
-import javax.validation.ConstraintViolation;
 
 import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;

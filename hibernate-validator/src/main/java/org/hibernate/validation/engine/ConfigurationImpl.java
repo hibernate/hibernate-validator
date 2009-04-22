@@ -18,13 +18,9 @@
 package org.hibernate.validation.engine;
 
 import java.io.InputStream;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -34,23 +30,14 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
-import org.xml.sax.SAXException;
 
 import org.hibernate.validation.engine.resolver.DefaultTraversableResolver;
+import org.hibernate.validation.engine.xml.ValidationBootstrapParameters;
+import org.hibernate.validation.engine.xml.ValidationXmlParser;
 import org.hibernate.validation.util.LoggerFactory;
-import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.Version;
-import org.hibernate.validation.xml.PropertyType;
-import org.hibernate.validation.xml.ValidationConfigType;
 
 /**
  * Hibernate specific <code>Configuration</code> implementation.
@@ -65,15 +52,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private static final Logger log = LoggerFactory.make();
-	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
-	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.0.xsd";
 
 	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();
 	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
 	private final ConstraintValidatorFactory defaultValidatorFactory = new ConstraintValidatorFactoryImpl();
 	private final ValidationProviderResolver providerResolver;
 
-	private ParameterHolder parameterHolder;
+	private ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
 
 	public ConfigurationImpl(BootstrapState state) {
@@ -83,7 +68,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		else {
 			this.providerResolver = state.getValidationProviderResolver();
 		}
-		parameterHolder = new ParameterHolder();
+		validationBootstrapParameters = new ValidationBootstrapParameters();
 	}
 
 	public ConfigurationImpl(ValidationProvider provider) {
@@ -91,8 +76,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			throw new ValidationException( "Assertion error: inconsistent ConfigurationImpl construction" );
 		}
 		this.providerResolver = null;
-		parameterHolder = new ParameterHolder();
-		parameterHolder.provider = provider;
+		validationBootstrapParameters = new ValidationBootstrapParameters();
+		validationBootstrapParameters.provider = provider;
 	}
 
 	public HibernateValidatorConfiguration ignoreXmlConfiguration() {
@@ -101,28 +86,28 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
-		this.parameterHolder.messageInterpolator = interpolator;
+		this.validationBootstrapParameters.messageInterpolator = interpolator;
 		return this;
 	}
 
 	public ConfigurationImpl traversableResolver(TraversableResolver resolver) {
-		this.parameterHolder.traversableResolver = resolver;
+		this.validationBootstrapParameters.traversableResolver = resolver;
 		return this;
 	}
 
 	public ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
-		this.parameterHolder.constraintValidatorFactory = constraintValidatorFactory;
+		this.validationBootstrapParameters.constraintValidatorFactory = constraintValidatorFactory;
 		return this;
 	}
 
 	public HibernateValidatorConfiguration addMapping(InputStream stream) {
-		parameterHolder.mappings.add( stream );
+		validationBootstrapParameters.mappings.add( stream );
 		return this;
 	}
 
 	public HibernateValidatorConfiguration addProperty(String name, String value) {
 		if ( value != null ) {
-			parameterHolder.configProperties.put( name, value );
+			validationBootstrapParameters.configProperties.put( name, value );
 		}
 		return this;
 	}
@@ -131,18 +116,18 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		parseValidationXml();
 		ValidatorFactory factory = null;
 		if ( isSpecificProvider() ) {
-			factory = parameterHolder.provider.buildValidatorFactory( this );
+			factory = validationBootstrapParameters.provider.buildValidatorFactory( this );
 		}
 		else {
-			if ( parameterHolder.providerClass != null ) {
+			if ( validationBootstrapParameters.providerClass != null ) {
 				for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
-					if ( provider.isSuitable( parameterHolder.providerClass ) ) {
+					if ( provider.isSuitable( validationBootstrapParameters.providerClass ) ) {
 						factory = provider.buildValidatorFactory( this );
 						break;
 					}
 				}
 				if ( factory == null ) {
-					throw new ValidationException( "Unable to find provider: " + parameterHolder.providerClass );
+					throw new ValidationException( "Unable to find provider: " + validationBootstrapParameters.providerClass );
 				}
 			}
 			else {
@@ -153,7 +138,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 
 		// reset the param holder
-		parameterHolder = new ParameterHolder();
+		validationBootstrapParameters = new ValidationBootstrapParameters();
 		return factory;
 	}
 
@@ -162,23 +147,23 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public MessageInterpolator getMessageInterpolator() {
-		return parameterHolder.messageInterpolator;
+		return validationBootstrapParameters.messageInterpolator;
 	}
 
 	public Set<InputStream> getMappingStreams() {
-		return parameterHolder.mappings;
+		return validationBootstrapParameters.mappings;
 	}
 
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
-		return parameterHolder.constraintValidatorFactory;
+		return validationBootstrapParameters.constraintValidatorFactory;
 	}
 
 	public TraversableResolver getTraversableResolver() {
-		return parameterHolder.traversableResolver;
+		return validationBootstrapParameters.traversableResolver;
 	}
 
 	public Map<String, String> getProperties() {
-		return parameterHolder.configProperties;
+		return validationBootstrapParameters.configProperties;
 	}
 
 	public MessageInterpolator getDefaultMessageInterpolator() {
@@ -186,7 +171,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private boolean isSpecificProvider() {
-		return parameterHolder.provider != null;
+		return validationBootstrapParameters.provider != null;
 	}
 
 	/**
@@ -198,244 +183,46 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			return;
 		}
 
-		ValidationConfigType config = getValidationConfig();
-		ParameterHolder xmlParameters = new ParameterHolder();
-		if ( config != null ) {
-			// collect the paramters from the xml file
-			setProviderClassFromXml( config, xmlParameters );
-			setMessageInterpolatorFromXml( config, xmlParameters );
-			setTraversableResolverFromXml( config, xmlParameters );
-			setConstraintFactoryFromXml( config, xmlParameters );
-			setMappingStreamsFromXml( config, xmlParameters );
-			setPropertiesFromXml( config, xmlParameters );
-		}
+		ValidationBootstrapParameters xmlParameters = new ValidationXmlParser().parseValidationXml();
 		applyXmlSettings( xmlParameters );
 	}
 
-	private void applyXmlSettings(ParameterHolder xmlParameters) {
-		parameterHolder.providerClass = xmlParameters.providerClass;
+	private void applyXmlSettings(ValidationBootstrapParameters xmlParameters) {
+		validationBootstrapParameters.providerClass = xmlParameters.providerClass;
 
-		if ( parameterHolder.messageInterpolator == null ) {
+		if ( validationBootstrapParameters.messageInterpolator == null ) {
 			if ( xmlParameters.messageInterpolator != null ) {
-				parameterHolder.messageInterpolator = xmlParameters.messageInterpolator;
+				validationBootstrapParameters.messageInterpolator = xmlParameters.messageInterpolator;
 			}
 			else {
-				parameterHolder.messageInterpolator = defaultMessageInterpolator;
+				validationBootstrapParameters.messageInterpolator = defaultMessageInterpolator;
 			}
 		}
 
-		if ( parameterHolder.traversableResolver == null ) {
+		if ( validationBootstrapParameters.traversableResolver == null ) {
 			if ( xmlParameters.traversableResolver != null ) {
-				parameterHolder.traversableResolver = xmlParameters.traversableResolver;
+				validationBootstrapParameters.traversableResolver = xmlParameters.traversableResolver;
 			}
 			else {
-				parameterHolder.traversableResolver = defaultTraversableResolver;
+				validationBootstrapParameters.traversableResolver = defaultTraversableResolver;
 			}
 		}
 
-		if ( parameterHolder.constraintValidatorFactory == null ) {
+		if ( validationBootstrapParameters.constraintValidatorFactory == null ) {
 			if ( xmlParameters.constraintValidatorFactory != null ) {
-				parameterHolder.constraintValidatorFactory = xmlParameters.constraintValidatorFactory;
+				validationBootstrapParameters.constraintValidatorFactory = xmlParameters.constraintValidatorFactory;
 			}
 			else {
-				parameterHolder.constraintValidatorFactory = defaultValidatorFactory;
+				validationBootstrapParameters.constraintValidatorFactory = defaultValidatorFactory;
 			}
 		}
 
-		parameterHolder.mappings.addAll( xmlParameters.mappings );
+		validationBootstrapParameters.mappings.addAll( xmlParameters.mappings );
 
 		for ( Map.Entry<String, String> entry : xmlParameters.configProperties.entrySet() ) {
-			if ( parameterHolder.configProperties.get( entry.getKey() ) == null ) {
-				parameterHolder.configProperties.put( entry.getKey(), entry.getValue() );
+			if ( validationBootstrapParameters.configProperties.get( entry.getKey() ) == null ) {
+				validationBootstrapParameters.configProperties.put( entry.getKey(), entry.getValue() );
 			}
 		}
-	}
-
-	private void setConstraintFactoryFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
-		String constraintFactoryClass = config.getConstraintValidatorFactory();
-		if ( constraintFactoryClass != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<ConstraintValidatorFactory> clazz = ( Class<ConstraintValidatorFactory> ) ReflectionHelper.classForName(
-						constraintFactoryClass, this.getClass()
-				);
-				xmlParameters.constraintValidatorFactory = clazz.newInstance();
-				log.info( "Using {} as constraint factory.", constraintFactoryClass );
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new ValidationException(
-						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
-				);
-			}
-			catch ( InstantiationException e ) {
-				throw new ValidationException(
-						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
-				);
-			}
-			catch ( IllegalAccessException e ) {
-				throw new ValidationException(
-						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
-				);
-			}
-		}
-	}
-
-	private void setPropertiesFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
-		for ( PropertyType property : config.getProperty() ) {
-			if ( log.isDebugEnabled() ) {
-				log.debug(
-						"Found property '{}' with value '{}' in validation.xml.",
-						property.getName(),
-						property.getValue()
-				);
-			}
-			xmlParameters.configProperties.put( property.getName(), property.getValue() );
-		}
-	}
-
-	private void setMappingStreamsFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
-		for ( String mappingFileName : config.getConstraintMapping() ) {
-			if ( log.isDebugEnabled() ) {
-				log.debug(
-						"Trying to open input stream for {}.", mappingFileName
-				);
-				InputStream in = getInputStreamForPath( mappingFileName );
-				if ( in == null ) {
-					throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName + "." );
-				}
-				xmlParameters.mappings.add( in );
-			}
-		}
-	}
-
-	private void setMessageInterpolatorFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
-		String messageInterpolatorClass = config.getMessageInterpolator();
-		if ( messageInterpolatorClass != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<MessageInterpolator> clazz = ( Class<MessageInterpolator> ) ReflectionHelper.classForName(
-						messageInterpolatorClass, this.getClass()
-				);
-				xmlParameters.messageInterpolator = clazz.newInstance();
-				log.info( "Using {} as message interpolator.", messageInterpolatorClass );
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new ValidationException(
-						"Unable to instantiate message interpolator class " + messageInterpolatorClass + ".", e
-				);
-			}
-			catch ( InstantiationException e ) {
-				throw new ValidationException(
-						"Unable to instantiate message interpolator class " + messageInterpolatorClass + ".", e
-				);
-			}
-			catch ( IllegalAccessException e ) {
-				throw new ValidationException(
-						"Unable to instantiate message interpolator class " + messageInterpolatorClass + ".", e
-				);
-			}
-		}
-	}
-
-	private void setTraversableResolverFromXml(ValidationConfigType config, ParameterHolder xmlParameters) {
-		String traversableResolverClass = config.getTraversableResolver();
-		if ( traversableResolverClass != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<TraversableResolver> clazz = ( Class<TraversableResolver> ) ReflectionHelper.classForName(
-						traversableResolverClass, this.getClass()
-				);
-				xmlParameters.traversableResolver = clazz.newInstance();
-				log.info( "Using {} as traversable resolver.", traversableResolverClass );
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new ValidationException(
-						"Unable to instantiate traversable resolver class " + traversableResolverClass + ".", e
-				);
-			}
-			catch ( InstantiationException e ) {
-				throw new ValidationException(
-						"Unable to instantiate traversable resolver class " + traversableResolverClass + ".", e
-				);
-			}
-			catch ( IllegalAccessException e ) {
-				throw new ValidationException(
-						"Unable to instantiate traversable resolver class " + traversableResolverClass + ".", e
-				);
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void setProviderClassFromXml(ValidationConfigType config, ParameterHolder xmlParamters) {
-		String providerClassName = config.getDefaultProvider();
-		if ( providerClassName != null ) {
-			try {
-				xmlParamters.providerClass = ( Class<? extends Configuration<?>> ) ReflectionHelper.classForName(
-						providerClassName, this.getClass()
-				);
-				log.info( "Using {} as validation provider.", providerClassName );
-			}
-			catch ( Exception e ) {
-				throw new ValidationException( "Unable to instantiate validation provider class " + providerClassName + "." );
-			}
-		}
-	}
-
-	private ValidationConfigType getValidationConfig() {
-		InputStream inputStream = getInputStreamForPath( VALIDATION_XML_FILE );
-		if ( inputStream == null ) {
-			log.info( "No {} found. Using annotation based configuration only!", VALIDATION_XML_FILE );
-			return null;
-		}
-
-		log.info( "{} found.", VALIDATION_XML_FILE );
-
-		ValidationConfigType validationConfig = null;
-		Schema schema = getValidationConfigurationSchema();
-		try {
-			JAXBContext jc = JAXBContext.newInstance( ValidationConfigType.class );
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
-			unmarshaller.setSchema( schema );
-			StreamSource stream = new StreamSource( inputStream );
-			JAXBElement<ValidationConfigType> root = unmarshaller.unmarshal( stream, ValidationConfigType.class );
-			validationConfig = root.getValue();
-		}
-		catch ( JAXBException e ) {
-			log.error( "Error parsing validation.xml: {}", e.getMessage() );
-		}
-		return validationConfig;
-	}
-
-	private InputStream getInputStreamForPath(String path) {
-		InputStream inputStream = this.getClass().getResourceAsStream( path );
-		// try absolute path
-		if ( inputStream == null && !path.startsWith( "/" ) ) {
-			inputStream = this.getClass().getResourceAsStream( "/" + path );
-		}
-		return inputStream;
-	}
-
-	private Schema getValidationConfigurationSchema() {
-		URL schemaUrl = this.getClass().getClassLoader().getResource( VALIDATION_CONFIGURATION_XSD );
-		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
-		Schema schema = null;
-		try {
-			schema = sf.newSchema( schemaUrl );
-		}
-		catch ( SAXException e ) {
-			log.warn( "Unable to create schema for {}: {}", VALIDATION_CONFIGURATION_XSD, e.getMessage() );
-		}
-		return schema;
-	}
-
-	private static class ParameterHolder {
-		ConstraintValidatorFactory constraintValidatorFactory;
-		MessageInterpolator messageInterpolator;
-		TraversableResolver traversableResolver;
-		ValidationProvider provider;
-		Class<? extends Configuration<?>> providerClass = null;
-		final Map<String, String> configProperties = new HashMap<String, String>();
-		final Set<InputStream> mappings = new HashSet<InputStream>();
 	}
 }

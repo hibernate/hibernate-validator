@@ -39,6 +39,7 @@ import javax.validation.groups.Default;
 
 import org.slf4j.Logger;
 
+import org.hibernate.validation.engine.xml.AnnotationIgnores;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 

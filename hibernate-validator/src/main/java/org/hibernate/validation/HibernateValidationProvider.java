@@ -24,8 +24,8 @@ import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 
-import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.engine.ConfigurationImpl;
+import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.engine.ValidatorFactoryImpl;
 
 /**
