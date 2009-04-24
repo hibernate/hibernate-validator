@@ -139,10 +139,6 @@
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
                     <configuration>
-                        <!--
-                                                  During release:perform, enable the "release" profile
-                                                -->
-                        <releaseProfiles>release</releaseProfiles>
                         <goals>package site assembly:assembly</goals>
                     </configuration>
                 </plugin>
