@@ -166,8 +166,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/tags/v4_0_0_Alpha3</connection>
-        <url>http://fisheye.jboss.org/browse/Hibernate/validator/tags/v4_0_0_Alpha3</url>
+        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk</connection>
+        <url>http://fisheye.jboss.org/browse/Hibernate/validator/trunk</url>
     </scm>
 
     <distributionManagement>
