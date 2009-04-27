@@ -36,7 +36,7 @@
   -------------
 
   The full list of changes can be found at 
-  http://opensource.atlassian.com/projects/hibernate/secure/ConfigureReleaseNote.jspa?projectId=10090.
+  http://opensource.atlassian.com/projects/hibernate/secure/ConfigureReleaseNote.jspa?projectId=10060.
 
   System Requirements
   -------------------
