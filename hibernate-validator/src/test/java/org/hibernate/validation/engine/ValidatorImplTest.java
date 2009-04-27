@@ -123,7 +123,7 @@ public class ValidatorImplTest {
 		}
 
 		try {
-			validator.validateValue( null, "firstName", "foobar" );
+			validator.validateValue( null, "firstName", "foobar" );                              
 			fail();
 		}
 		catch ( IllegalArgumentException e ) {

@@ -33,13 +33,13 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.jsr303.tck</groupId>
-            <artifactId>jsr303-tck-impl</artifactId>
+            <artifactId>jsr303-tck</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.test-harness</groupId>
             <artifactId>jboss-test-harness-jboss-as-50</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0.BETA2</version>
         </dependency>
     </dependencies>
 
@@ -60,7 +60,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.hibernate.jsr303.tck</groupId>
-                                    <artifactId>jsr303-tck-impl</artifactId>
+                                    <artifactId>jsr303-tck</artifactId>
                                     <type>xml</type>
                                     <classifier>suite</classifier>
                                     <overWrite>true</overWrite>
@@ -94,7 +94,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-impl-suite.xml</suiteXmlFile>
+                        <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-suite.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <argLine>-Xmx128m</argLine>
                     <forkMode>pertest</forkMode>
