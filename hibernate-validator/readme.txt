@@ -19,16 +19,12 @@
   Status
   ------
 
-  This is an alpha release and not feature complete in relation to the latest version 
-  of JSR 303. The following features are not yet fully implemented:
-
-  - Implicit grouping
-  - Implementation of the TraversableResolver interface to allow integration with JPA
-  - XML configuration
+  This is an beta release and even though it should be nearly feature complete there might be
+  still some variances between the specification and this implementation.
 
   You can find more information about the current state of the implementation on the
   Bean Validation RI Roadmap - http://www.hibernate.org/459.html and there is copy of
-  JSR as of the time of this release available here - http://in.relation.to/service/File/10924
+  JSR as of the time of this release available here - http://in.relation.to/service/File/11150
 
   Documentation
   -------------

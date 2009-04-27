@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id:$ -->
+<!-- $Id$ -->
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
@@ -63,11 +63,10 @@
   <toc></toc>
 
   <preface>
-    <title>Preface Alpha Release</title>
+    <title>Preface Beta Release</title>
 
-    <para>This release has alpha status, which means that neither the
-    implementation nor this documenation is complete. You can find more
-    information about the current state of the implementation on the <ulink
+    <para>This release has beta status, which means that this documenation is not yet complete.
+    You can find more information about the current state of the implementation on the <ulink
     url="http://www.hibernate.org/459.html">Bean Validation Roadmap</ulink> or
     you can refer to JSR 303 directly for further examples.</para>
 

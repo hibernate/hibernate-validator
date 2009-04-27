@@ -122,8 +122,7 @@ public class Car {
     <section>
       <title>Class-level annotations</title>
 
-      <para>TODO: Should this be mentioned here? Yes it should :)
-      (hardy)</para>
+      <para>TODO</para>
     </section>
 
     <section>
@@ -425,7 +424,7 @@ assertEquals(
       <section>
         <title>getConstraintsForClass()</title>
 
-        <para>TODO: Should this be mentioned here? Yes! (HF)</para>
+        <para>TODO</para>
       </section>
     </section>
 
