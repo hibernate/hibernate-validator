@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.0.Beta1-SNAPSHOT</version>
+    <version>4.0.0.Beta1</version>
     <name>Hibernate Validator Parent</name>
     <url>http://validator.hibernate.org</url>
 
@@ -166,8 +164,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk</connection>
-        <url>http://fisheye.jboss.org/browse/Hibernate/validator/trunk</url>
+        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/tags/hibernate-validator-parent-4.0.0.Beta1</connection>
+        <url>http://fisheye.jboss.org/browse/Hibernate/validator/tags/hibernate-validator-parent-4.0.0.Beta1</url>
     </scm>
 
     <distributionManagement>
