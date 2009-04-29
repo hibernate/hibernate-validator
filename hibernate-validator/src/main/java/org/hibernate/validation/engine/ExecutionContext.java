@@ -293,7 +293,7 @@ public class ExecutionContext<T> {
 				peekCurrentBean(),
 				peekProperty(),
 				rootBeanClass,
-				peekPropertyPath(),
+				peekParentPath(),
 				metaConstraint.getElementType()
 		);
 	}
@@ -328,6 +328,7 @@ public class ExecutionContext<T> {
 	}
 
 	private String buildPath(int index) {
+		if (index < 0) return PROPERTY_ROOT;
 		StringBuilder builder = new StringBuilder();
 		for ( int i = 0; i <= index; i++ ) {
 			builder.append( propertyPath.get( i ) );
