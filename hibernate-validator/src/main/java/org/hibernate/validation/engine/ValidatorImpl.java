@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.hibernate.validation.engine.groups.Group;
 import org.hibernate.validation.engine.groups.GroupChain;
 import org.hibernate.validation.engine.groups.GroupChainGenerator;
+import org.hibernate.validation.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.PropertyIterator;
 import org.hibernate.validation.util.ReflectionHelper;
@@ -79,6 +80,7 @@ public class ValidatorImpl implements Validator {
 
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final MessageInterpolator messageInterpolator;
+	//never use it directly, always use getCachingTraversableResolver() to retrieved the single threaded caching wrapper.
 	private final TraversableResolver traversableResolver;
 	private final ConstraintHelper constraintHelper;
 	private final BeanMetaDataCache beanMetaDataCache;
@@ -104,7 +106,7 @@ public class ValidatorImpl implements Validator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		ExecutionContext<T> context = ExecutionContext.getContextForValidate(
-				object, messageInterpolator, constraintValidatorFactory, traversableResolver
+				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
 		List<ConstraintViolation<T>> list = validateInContext( context, groupChain );
@@ -181,6 +183,8 @@ public class ValidatorImpl implements Validator {
 			return Collections.emptyList();
 		}
 
+		//FIXME if context not accessible do not call isTraversable??
+
 		// process all groups breadth-first
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
@@ -256,6 +260,7 @@ public class ValidatorImpl implements Validator {
 	 */
 	private <T> boolean validateConstraintsForCurrentGroup(ExecutionContext<T> executionContext, BeanMetaData<T> beanMetaData) {
 		boolean validationSuccessful = true;
+		//FIXME isValidationRequired for all constraints in a given context May need to divide by elementType
 		for ( MetaConstraint<T, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			executionContext.pushProperty( metaConstraint.getPropertyName() );
 			if ( executionContext.isValidationRequired( metaConstraint ) ) {
@@ -270,6 +275,7 @@ public class ValidatorImpl implements Validator {
 	private <T> void validateCascadedConstraints(ExecutionContext<T> context) {
 		List<Member> cascadedMembers = getBeanMetaData( context.peekCurrentBeanType() )
 				.getCascadedMembers();
+		//FIXME isValidationRequired for all constraints in a given context May need to divide by elementType
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
@@ -359,12 +365,14 @@ public class ValidatorImpl implements Validator {
 			return;
 		}
 
+		//this method is at the root of validateProperty calls, share the same cachedTR
+		TraversableResolver cachedResolver = getCachingTraversableResolver();
 
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			validatePropertyForGroup(
-					object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group
+					object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group, cachedResolver
 			);
 		}
 
@@ -374,7 +382,7 @@ public class ValidatorImpl implements Validator {
 			int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
 			for ( Group group : sequence ) {
 				validatePropertyForGroup(
-						object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group
+						object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group, cachedResolver
 				);
 
 				if ( failingConstraintViolations.size() > numberOfConstraintViolationsBefore ) {
@@ -384,7 +392,14 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T> void validatePropertyForGroup(T object, PropertyIterator propertyIter, List<ConstraintViolation<T>> failingConstraintViolations, Set<MetaConstraint<T, ?>> metaConstraints, Object hostingBeanInstance, Group group) {
+	private <T> void validatePropertyForGroup(
+			T object,
+			PropertyIterator propertyIter,
+			List<ConstraintViolation<T>> failingConstraintViolations,
+			Set<MetaConstraint<T, ?>> metaConstraints,
+			Object hostingBeanInstance,
+			Group group,
+			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
 		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
 
@@ -404,7 +419,7 @@ public class ValidatorImpl implements Validator {
 						hostingBeanInstance,
 						messageInterpolator,
 						constraintValidatorFactory,
-						traversableResolver
+						cachedTraversableResolver
 				);
 				context.pushProperty( propertyIter.getOriginalProperty() );
 				context.setCurrentGroup( groupClass );
@@ -429,6 +444,9 @@ public class ValidatorImpl implements Validator {
 			return;
 		}
 
+		//root of validateValue calls, share the same cached TraversableResolver
+		TraversableResolver cachedTraversableResolver = getCachingTraversableResolver();
+
 		// process groups
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
@@ -439,7 +457,8 @@ public class ValidatorImpl implements Validator {
 					propertyIter,
 					failingConstraintViolations,
 					metaConstraints,
-					group
+					group,
+					cachedTraversableResolver
 			);
 		}
 
@@ -455,7 +474,8 @@ public class ValidatorImpl implements Validator {
 						propertyIter,
 						failingConstraintViolations,
 						metaConstraints,
-						group
+						group,
+						cachedTraversableResolver
 				);
 
 				if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
@@ -465,7 +485,14 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T> void validateValueForGroup(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolation<T>> failingConstraintViolations, Set<MetaConstraint<T, ?>> metaConstraints, Group group) {
+	private <T> void validateValueForGroup(
+			Class<T> beanType,
+			Object value,
+			PropertyIterator propertyIter,
+			List<ConstraintViolation<T>> failingConstraintViolations,
+			Set<MetaConstraint<T, ?>> metaConstraints,
+			Group group,
+			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolations = failingConstraintViolations.size();
 		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
 
@@ -478,10 +505,11 @@ public class ValidatorImpl implements Validator {
 			groupList.add( group.getGroup() );
 		}
 
+
 		for ( Class<?> groupClass : groupList ) {
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
 				ExecutionContext<T> context = ExecutionContext.getContextForValidateValue(
-						beanType, value, messageInterpolator, constraintValidatorFactory, traversableResolver
+						beanType, value, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver
 				);
 				context.pushProperty( propertyIter.getOriginalProperty() );
 				context.setCurrentGroup( groupClass );
@@ -560,5 +588,13 @@ public class ValidatorImpl implements Validator {
 			beanMetaDataCache.addBeanMetaData( beanClass, metadata );
 		}
 		return metadata;
+	}
+
+	/**
+	 * Must be called and stored for the duration of the stack call
+	 * A new instance is returned each time
+	 */
+	private TraversableResolver getCachingTraversableResolver() {
+		return new SingleThreadCachedTraversableResolver( traversableResolver );
 	}
 }
