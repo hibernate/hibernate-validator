@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -27,6 +27,7 @@ import javax.validation.TraversableResolver;
 public class JPATraversableResolver implements TraversableResolver {
 
 	public boolean isTraversable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
-		return Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty );
+		return traversableObject == null ||
+				Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty );
 	}
 }

@@ -176,8 +176,6 @@ public class ExecutionContext<T> {
 		return rootBean;
 	}
 
-	@SuppressWarnings("unchecked")
-	// safe case since rootBean is of type T!
 	public Class<T> getRootBeanClass() {
 		return rootBeanClass;
 	}
@@ -288,15 +286,14 @@ public class ExecutionContext<T> {
 			return false;
 		}
 
-		Class<?> rootBeanClass = rootBean == null ? null : rootBean.getClass();
 		return traversableResolver.isTraversable(
 				peekCurrentBean(),
 				peekProperty(),
-				rootBeanClass,
+				getRootBeanClass(),
 				peekParentPath(),
 				metaConstraint.getElementType()
 		);
-	}
+	}  
 
 	public List<ConstraintViolationImpl<T>> createConstraintViolations(Object value, ConstraintValidatorContextImpl constraintValidatorContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
