@@ -86,16 +86,8 @@ public class ValidatorTypeHelper {
 		}
 		else if ( type instanceof Class ) {
 			Class clazz = ( Class ) type;
-			Type returnedType = resolveTypes( resolvedTypes, clazz.getGenericSuperclass() );
-			if ( returnedType != null ) {
-				return returnedType;
-			}
-			for ( Type genericInterface : clazz.getGenericInterfaces() ) {
-				returnedType = resolveTypes( resolvedTypes, genericInterface );
-				if ( returnedType != null ) {
-					return returnedType;
-				}
-			}
+			final Type returnedType = resolveTypeForClassAndHierarchy( resolvedTypes, clazz );
+			if ( returnedType != null) return  returnedType;
 		}
 		else if ( type instanceof ParameterizedType ) {
 			ParameterizedType paramType = ( ParameterizedType ) type;
@@ -116,13 +108,25 @@ public class ValidatorTypeHelper {
 				return type;
 			}
 			else {
-				resolveTypes( resolvedTypes, rawType.getGenericSuperclass() );
-				for ( Type genericInterface : rawType.getGenericInterfaces() ) {
-					resolveTypes( resolvedTypes, genericInterface );
-				}
+				Type returnedType = resolveTypeForClassAndHierarchy( resolvedTypes, rawType );
+				if ( returnedType != null) return  returnedType;
 			}
 		}
 		//else we don't care I think
+		return null;
+	}
+
+	private static Type resolveTypeForClassAndHierarchy(Map<Type, Type> resolvedTypes, Class<?> clazz) {
+		Type returnedType = resolveTypes( resolvedTypes, clazz.getGenericSuperclass() );
+		if ( returnedType != null ) {
+			return returnedType;
+		}
+		for ( Type genericInterface : clazz.getGenericInterfaces() ) {
+			returnedType = resolveTypes( resolvedTypes, genericInterface );
+			if ( returnedType != null ) {
+				return returnedType;
+			}
+		}
 		return null;
 	}
 }
