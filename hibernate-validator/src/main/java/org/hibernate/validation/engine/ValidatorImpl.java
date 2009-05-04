@@ -544,12 +544,17 @@ public class ValidatorImpl implements Validator {
 	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, PropertyIterator propertyIter, Set<MetaConstraint<T, ?>> metaConstraints) {
 		propertyIter.split();
 
+		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
 		if ( !propertyIter.hasNext() ) {
-			if ( !ReflectionHelper.containsMember( clazz, propertyIter.getHead() ) ) {
+			//use metadata first as ReflectionHelper#containsMember is slow
+			//TODO store some metadata here?
+			if ( metaData.getPropertyDescriptor( propertyIter.getHead() ) == null
+					&& !ReflectionHelper.containsMember( clazz, propertyIter.getHead() ) ) {
+				//TODO better error report
 				throw new IllegalArgumentException( "Invalid property path." );
 			}
 
-			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = getBeanMetaData( clazz ).geMetaConstraintList();
+			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
 				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
 					metaConstraints.add( metaConstraint );
@@ -557,7 +562,7 @@ public class ValidatorImpl implements Validator {
 			}
 		}
 		else {
-			List<Member> cascadedMembers = getBeanMetaData( clazz ).getCascadedMembers();
+			List<Member> cascadedMembers = metaData.getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
 					Type type = ReflectionHelper.typeOf( m );

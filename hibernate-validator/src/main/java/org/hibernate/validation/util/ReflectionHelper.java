@@ -394,7 +394,15 @@ public class ReflectionHelper {
 	 */
 	public static boolean containsMethod(Class<?> clazz, String methodName) {
 		try {
-			clazz.getMethod( "get" + methodName.substring( 0, 1 ).toUpperCase() + methodName.substring( 1 ) );
+			char string[] = methodName.toCharArray();
+			string[0] = Character.toUpperCase( string[0] );
+			methodName = new String( string );
+			try {
+				clazz.getMethod( "get" + methodName );
+			}
+			catch ( NoSuchMethodException e ) {
+				clazz.getMethod( "is" + methodName );
+			}
 			return true;
 		}
 		catch ( NoSuchMethodException e ) {
