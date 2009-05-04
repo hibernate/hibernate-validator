@@ -279,10 +279,12 @@ public class ValidatorImpl implements Validator {
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
-			Object value = ReflectionHelper.getValue( member, context.peekCurrentBean() );
-			if ( value != null ) {
-				Iterator<?> iter = createIteratorForCascadedValue( context, type, value );
-				validateCascadedConstraint( context, iter );
+			if ( context.isCascadeRequired( member ) ) {
+				Object value = ReflectionHelper.getValue( member, context.peekCurrentBean() );
+				if ( value != null ) {
+					Iterator<?> iter = createIteratorForCascadedValue( context, type, value );
+					validateCascadedConstraint( context, iter );
+				}
 			}
 			context.popProperty();
 		}

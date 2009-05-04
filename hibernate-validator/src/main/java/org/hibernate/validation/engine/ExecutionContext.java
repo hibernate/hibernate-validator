@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.lang.reflect.Member;
+import java.lang.reflect.Field;
+import java.lang.annotation.ElementType;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -293,7 +296,17 @@ public class ExecutionContext<T> {
 				peekParentPath(),
 				metaConstraint.getElementType()
 		);
-	}  
+	}
+
+	public boolean isCascadeRequired(Member member) {
+		return traversableResolver.isTraversable(
+				peekCurrentBean(),
+				peekProperty(),
+				getRootBeanClass(),
+				peekParentPath(),
+				member instanceof Field ? ElementType.FIELD : ElementType.METHOD
+		);
+	}
 
 	public List<ConstraintViolationImpl<T>> createConstraintViolations(Object value, ConstraintValidatorContextImpl constraintValidatorContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
