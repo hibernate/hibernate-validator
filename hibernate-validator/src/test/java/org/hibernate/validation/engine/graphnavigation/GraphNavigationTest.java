@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.Validation;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -110,5 +111,15 @@ public class GraphNavigationTest {
 		john.setLastName( "Doe" );
 		constraintViolations = validator.validate( john );
 		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
+	}
+
+	@Test
+	public void testFullGraphValidationBeforeNextGroupInSequence() {
+		Parent p = new Parent();
+		p.setChild( new Child() );
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<Parent>> errors = validator.validate( p, ProperOrder.class );
+		assertEquals( 1, errors.size() );
+		assertEquals( "child.name", errors.iterator().next().getPropertyPath() );
 	}
 }
