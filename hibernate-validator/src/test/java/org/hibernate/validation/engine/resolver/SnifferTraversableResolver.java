@@ -9,23 +9,30 @@ import javax.validation.TraversableResolver;
  * @author Emmanuel Bernard
  */
 public class SnifferTraversableResolver implements TraversableResolver {
-	Set<String> paths = new HashSet<String>();
-	Set<Call> calls = new HashSet<Call>();
+	Set<String> reachPaths = new HashSet<String>();
+	Set<String> cascadePaths = new HashSet<String>();
+	Set<Call> reachCalls = new HashSet<Call>();
+	Set<Call> cascadeCalls = new HashSet<Call>();
 
 	public SnifferTraversableResolver(Suit suit) {
-		calls.add( new Call(suit, "size", Suit.class, "", ElementType.FIELD ) );
-		calls.add( new Call(suit, "trousers", Suit.class, "", ElementType.FIELD ) );
-		calls.add( new Call(suit.getTrousers(), "length", Suit.class, "trousers", ElementType.FIELD ) );
-		calls.add( new Call(suit, "jacket", Suit.class, "", ElementType.METHOD ) );
-		calls.add( new Call(suit.getJacket(), "width", Suit.class, "jacket", ElementType.METHOD ) );
+		reachCalls.add( new Call(suit, "size", Suit.class, "", ElementType.FIELD ) );
+		reachCalls.add( new Call(suit, "trousers", Suit.class, "", ElementType.FIELD ) );
+		cascadeCalls.add( new Call(suit, "trousers", Suit.class, "", ElementType.FIELD ) );
+		reachCalls.add( new Call(suit.getTrousers(), "length", Suit.class, "trousers", ElementType.FIELD ) );
+		reachCalls.add( new Call(suit, "jacket", Suit.class, "", ElementType.METHOD ) );
+		cascadeCalls.add( new Call(suit, "jacket", Suit.class, "", ElementType.METHOD ) );
+		reachCalls.add( new Call(suit.getJacket(), "width", Suit.class, "jacket", ElementType.METHOD ) );
 	}
 
-	public Set<String> getPaths() {
-		return paths;
+	public Set<String> getReachPaths() {
+		return reachPaths;
 	}
 
-	//TODO add test with correct paths and types to make sure the impl does not mess it up
-	public boolean isTraversable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+	public Set<String> getCascadePaths() {
+		return cascadePaths;
+	}
+
+	public boolean isTraversable(Set<Call> calls, Set<String> paths, Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
 		String path = "";
 		if (! (pathToTraversableObject == null || pathToTraversableObject.length() == 0 ) ) {
 			path = pathToTraversableObject + ".";
@@ -37,6 +44,14 @@ public class SnifferTraversableResolver implements TraversableResolver {
 			throw new IllegalStateException( "Unexpected " + call.toString() );
 		}
 		return true;
+	}
+
+	public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		return isTraversable( reachCalls, reachPaths, traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType );
+	}
+
+	public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		return isTraversable( cascadeCalls, cascadePaths, traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType );
 	}
 
 	private static final class Call {

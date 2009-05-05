@@ -57,17 +57,22 @@ public class CachedTraversableResolverTest {
 	}
 
 	private static class AskOnceTR implements TraversableResolver {
-		private Set<Holder> asked = new HashSet<Holder>();
+		private Set<Holder> askedReach = new HashSet<Holder>();
+		private Set<Holder> askedCascade = new HashSet<Holder>();
 
-		public Set<Holder> getAsked() {
-			return asked;
-		}
-
-		public boolean isTraversable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		private boolean isTraversable(Set<Holder> asked, Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
 			Holder h = new Holder(traversableObject, traversableProperty);
-			if (asked.contains( h )) throw new IllegalStateException( "Called twice" );
+			if ( asked.contains( h )) throw new IllegalStateException( "Called twice" );
 			asked.add( h );
 			return true;
+		}
+
+		public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+			return isTraversable( askedReach, traversableObject, traversableProperty, rootBeanType, pathToTraversableObject,elementType );
+		}
+
+		public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+			return isTraversable( askedCascade, traversableObject, traversableProperty, rootBeanType, pathToTraversableObject,elementType );
 		}
 
 		public static class Holder {

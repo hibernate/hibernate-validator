@@ -289,7 +289,7 @@ public class ExecutionContext<T> {
 			return false;
 		}
 
-		return traversableResolver.isTraversable(
+		return traversableResolver.isReachable(
 				peekCurrentBean(),
 				peekProperty(),
 				getRootBeanClass(),
@@ -299,12 +299,24 @@ public class ExecutionContext<T> {
 	}
 
 	public boolean isCascadeRequired(Member member) {
-		return traversableResolver.isTraversable(
-				peekCurrentBean(),
-				peekProperty(),
-				getRootBeanClass(),
-				peekParentPath(),
-				member instanceof Field ? ElementType.FIELD : ElementType.METHOD
+		final ElementType type = member instanceof Field ? ElementType.FIELD : ElementType.METHOD;
+		final String parentPath = peekParentPath();
+		final Class<T> rootBeanType = getRootBeanClass();
+		final String traversableProperty = peekProperty();
+		final Object traversableobject = peekCurrentBean();
+		return traversableResolver.isReachable(
+				traversableobject,
+				traversableProperty,
+				rootBeanType,
+				parentPath,
+				type
+		)
+				&& traversableResolver.isCascadable(
+				traversableobject,
+				traversableProperty,
+				rootBeanType,
+				parentPath,
+				type
 		);
 	}
 

@@ -1,9 +1,5 @@
 package org.hibernate.validation.engine.resolver;
 
-import java.lang.annotation.ElementType;
-import java.util.HashSet;
-import java.util.Set;
-import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.validation.Validator;
@@ -11,8 +7,6 @@ import javax.validation.groups.Default;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
-
-import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 
 /**
  * @author Emmanuel Bernard
@@ -36,6 +30,7 @@ public class TraversableResolverTest {
 		//Raises an IllegalStateException if something goes wrong
 		v.validate( suit, Default.class, Cloth.class );
 
-		assertEquals( 5, resolver.getPaths().size() );
+		assertEquals( 5, resolver.getReachPaths().size() );
+		assertEquals( 2, resolver.getCascadePaths().size() );
 	}
 }

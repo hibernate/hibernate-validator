@@ -260,7 +260,6 @@ public class ValidatorImpl implements Validator {
 	 */
 	private <T> boolean validateConstraintsForCurrentGroup(ExecutionContext<T> executionContext, BeanMetaData<T> beanMetaData) {
 		boolean validationSuccessful = true;
-		//FIXME isValidationRequired for all constraints in a given context May need to divide by elementType
 		for ( MetaConstraint<T, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			executionContext.pushProperty( metaConstraint.getPropertyName() );
 			if ( executionContext.isValidationRequired( metaConstraint ) ) {
@@ -272,10 +271,11 @@ public class ValidatorImpl implements Validator {
 		return validationSuccessful;
 	}
 
+	//this method must always be called after validateConstraints for the same context
+	//TODO define a validate that calls  validateConstraints and then validateCascadedConstraints
 	private <T> void validateCascadedConstraints(ExecutionContext<T> context) {
 		List<Member> cascadedMembers = getBeanMetaData( context.peekCurrentBeanType() )
 				.getCascadedMembers();
-		//FIXME isValidationRequired for all constraints in a given context May need to divide by elementType
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			context.pushProperty( ReflectionHelper.getPropertyName( member ) );

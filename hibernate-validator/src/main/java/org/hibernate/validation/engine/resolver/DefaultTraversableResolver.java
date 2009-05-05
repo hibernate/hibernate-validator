@@ -38,12 +38,6 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		detectJPA();
 	}
 
-	public boolean isTraversable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
-		return jpaTraversableResolver == null || jpaTraversableResolver.isTraversable(
-				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
-		);
-	}
-
 	/**
 	 * Tries to load detect and load JPA.
 	 */
@@ -87,5 +81,17 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
+	}
+
+	public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		return jpaTraversableResolver == null || jpaTraversableResolver.isReachable(
+				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
+		);
+	}
+
+	public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		return jpaTraversableResolver == null || jpaTraversableResolver.isCascadable(
+				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
+		);
 	}
 }

@@ -23,11 +23,16 @@ import javax.validation.TraversableResolver;
 
 /**
  * @author Hardy Ferentschik
+ * @author Emmanuel Bernard
  */
 public class JPATraversableResolver implements TraversableResolver {
 
-	public boolean isTraversable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+	public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
 		return traversableObject == null ||
 				Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty );
+	}
+
+	public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		return true;
 	}
 }

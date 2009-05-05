@@ -273,7 +273,11 @@ public class ValidationTest {
 		configuration = Validation.byDefaultProvider().configure();
 		configuration.traversableResolver(
 				new TraversableResolver() {
-					public boolean isTraversable(Object o, String s, Class<?> aClass, String s1, ElementType elementType) {
+					public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+						return false;
+					}
+
+					public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
 						return false;
 					}
 				}
