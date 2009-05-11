@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -18,26 +18,50 @@
 package org.hibernate.validation.constraints;
 
 import java.util.Calendar;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import java.util.Date;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Future;
 
 /**
- * Check that the <code>java.util.Calendar</code> passed to be validated is in
- * the future.
- *
- * @author Alaa Nassef
+ * @author Hardy Ferentschik
  */
-public class FutureValidatorForCalendar implements ConstraintValidator<Future, Calendar> {
+public class DateHolder {
 
-	public void initialize(Future constraintAnnotation) {
+	@Past
+	private Calendar calendarWithPastDate;
+
+	@Future
+	private Calendar calendarWithFutureDate;
+
+	@Past
+	private Date past;
+
+	@Past
+	private Date future;
+
+	public DateHolder() {
+		calendarWithPastDate = Calendar.getInstance();
+		calendarWithPastDate.add( Calendar.YEAR, -1 );
+		past = calendarWithPastDate.getTime();
+
+		calendarWithFutureDate = Calendar.getInstance();
+		calendarWithFutureDate.add( Calendar.YEAR, 1 );
+		future = calendarWithFutureDate.getTime();
 	}
 
-	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
-		//null values are valid
-		if ( cal == null ) {
-			return true;
-		}
-		return cal.after( Calendar.getInstance() );
+	public Calendar getCalendarWithPastDate() {
+		return calendarWithPastDate;
+	}
+
+	public Calendar getCalendarWithFutureDate() {
+		return calendarWithFutureDate;
+	}
+
+	public Date getPast() {
+		return past;
+	}
+
+	public Date getFuture() {
+		return future;
 	}
 }

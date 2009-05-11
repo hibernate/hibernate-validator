@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,29 +15,31 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.validatorcontext;
 
-import java.util.Calendar;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Future;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
+
+import org.hibernate.validation.constraints.DateHolder;
+import org.hibernate.validation.util.TestUtil;
 
 /**
- * Check that the <code>java.util.Calendar</code> passed to be validated is in
- * the future.
- *
- * @author Alaa Nassef
+ * @author Hardy Ferentschik
  */
-public class FutureValidatorForCalendar implements ConstraintValidator<Future, Calendar> {
+public class FutureValidatorTest {
 
-	public void initialize(Future constraintAnnotation) {
-	}
-
-	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
-		//null values are valid
-		if ( cal == null ) {
-			return true;
-		}
-		return cal.after( Calendar.getInstance() );
+	/**
+	 * HV-158
+	 */
+	@Test
+	public void testFutureAndPast() {
+		Validator validator = TestUtil.getValidator();
+		DateHolder dateHolder = new DateHolder();
+		Set<ConstraintViolation<DateHolder>> constraintViolations = validator.validate( dateHolder );
+		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 	}
 }

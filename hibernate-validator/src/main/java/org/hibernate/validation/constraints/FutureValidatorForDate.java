@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -20,7 +20,7 @@ package org.hibernate.validation.constraints;
 import java.util.Date;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.Future;
 
 /**
  * Check that the <code>java.util.Date</code> passed to be validated is in the
@@ -28,9 +28,9 @@ import javax.validation.constraints.Past;
  *
  * @author Alaa Nassef
  */
-public class FutureValidatorForDate implements ConstraintValidator<Past, Date> {
+public class FutureValidatorForDate implements ConstraintValidator<Future, Date> {
 
-	public void initialize(Past constraintAnnotation) {
+	public void initialize(Future constraintAnnotation) {
 	}
 
 	public boolean isValid(Date date, ConstraintValidatorContext constraintValidatorContext) {
