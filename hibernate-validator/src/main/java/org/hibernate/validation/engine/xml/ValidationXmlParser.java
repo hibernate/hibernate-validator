@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -115,12 +115,12 @@ public class ValidationXmlParser {
 	}
 
 	private void setMappingStreamsFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
-		for ( String mappingFileName : config.getConstraintMapping() ) {
+		for ( JAXBElement<String> mappingFileName : config.getConstraintMapping() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debug(
 						"Trying to open input stream for {}.", mappingFileName
 				);
-				InputStream in = getInputStreamForPath( mappingFileName );
+				InputStream in = getInputStreamForPath( mappingFileName.getValue() );
 				if ( in == null ) {
 					throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName + "." );
 				}

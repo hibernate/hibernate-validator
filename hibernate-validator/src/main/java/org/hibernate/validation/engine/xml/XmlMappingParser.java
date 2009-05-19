@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -162,11 +162,11 @@ public class XmlMappingParser {
 			if ( validatedByType.isIncludeExistingValidators() != null && validatedByType.isIncludeExistingValidators() ) {
 				constraintValidatorClasses.addAll( findConstraintValidatorClasses( annotationClass ) );
 			}
-			for ( String validatorClassName : validatedByType.getValue() ) {
+			for ( JAXBElement<String> validatorClassName : validatedByType.getValue() ) {
 				Class<? extends ConstraintValidator<?, ?>> validatorClass;
 				try {
 					validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) ReflectionHelper.classForName(
-							validatorClassName,
+							validatorClassName.getValue(),
 							this.getClass()
 					);
 				}
@@ -318,8 +318,8 @@ public class XmlMappingParser {
 
 	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
 		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
-		for ( String groupName : groupSequenceType.getValue() ) {
-			Class<?> group = getClass( groupName, defaultPackage );
+		for ( JAXBElement<String> groupName : groupSequenceType.getValue() ) {
+			Class<?> group = getClass( groupName.getValue(), defaultPackage );
 			groupSequence.add( group );
 		}
 		return groupSequence;
@@ -537,8 +537,8 @@ public class XmlMappingParser {
 		}
 
 		List<Class<?>> groupList = new ArrayList<Class<?>>();
-		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( getClass( groupClass, defaultPackage ) );
+		for ( JAXBElement<String> groupClass : groupsType.getValue() ) {
+			groupList.add( getClass( groupClass.getValue(), defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}

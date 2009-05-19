@@ -103,6 +103,7 @@
                 <configuration>
                     <packageName>org.hibernate.validation.xml</packageName>
                     <outputDirectory>${basedir}/target/generated-sources</outputDirectory>
+                    <extension>true</extension>
                 </configuration>
             </plugin>
             <plugin>
