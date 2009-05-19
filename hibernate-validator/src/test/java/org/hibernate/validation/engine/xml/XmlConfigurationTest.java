@@ -19,6 +19,7 @@ package org.hibernate.validation.engine.xml;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 
 import org.testng.annotations.Test;
@@ -26,6 +27,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validation.util.TestUtil.getValidator;
+import static org.hibernate.validation.util.TestUtil.getValidatorWithCustomConfiguration;
 
 /**
  * @author Hardy Ferentschik
@@ -123,5 +125,10 @@ public class XmlConfigurationTest {
 		card.setNumber( "1234567890" );
 		constraintViolations = validator.validate( user );
 		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	@Test(expectedExceptions = ValidationException.class)
+	public void testInvalidValidationXml() {
+		getValidatorWithCustomConfiguration( "META-INF/validation-invalid-xml.xml" );
 	}
 }

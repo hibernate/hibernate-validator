@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.util;
 
+import java.io.InputStream;
 import java.util.Set;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
@@ -25,6 +26,7 @@ import javax.validation.PropertyDescriptor;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import org.slf4j.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -36,6 +38,7 @@ import org.hibernate.validation.engine.HibernateValidatorConfiguration;
  * @author Hardy Ferentschik
  */
 public class TestUtil {
+	private static final Logger log = LoggerFactory.make();
 
 	private static Validator hibernateValidator;
 
@@ -50,6 +53,34 @@ public class TestUtil {
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
 		return hibernateValidator;
+	}
+
+	/**
+	 * @param path The path to the xml file which should server as <code>validation.xml</code> for the returned
+	 * <code>Validator</code>.
+	 *
+	 * @return A <code>Validator</code> instance which respects the configuration specified in the file with the path
+	 *         <code>path</code>.
+	 */
+	public static Validator getValidatorWithCustomConfiguration(String path) {
+		Thread.currentThread().setContextClassLoader( new CustomValidationXmlClassLoader( path ) );
+
+		HibernateValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidatorConfiguration.class )
+				.configure();
+		return configuration.buildValidatorFactory().getValidator();
+	}
+
+	/**
+	 * @return A <code>Validator</code> instance which ignores <i>validation.xml</code>.
+	 */
+	public static Validator getValidatorIgnoringValidationXml() {
+		Thread.currentThread().setContextClassLoader( new IgnoringValidationXmlClassLoader() );
+
+		HibernateValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidatorConfiguration.class )
+				.configure();
+		return configuration.buildValidatorFactory().getValidator();
 	}
 
 	public static ConstraintDescriptor<?> getSingleConstraintDescriptorFor(Class<?> clazz, String property) {
@@ -113,5 +144,37 @@ public class TestUtil {
 
 	public static void assertNumberOfViolations(Set violations, int expectedViolations) {
 		assertEquals( violations.size(), expectedViolations, "Wrong number of constraint violations" );
+	}
+
+	private static class CustomValidationXmlClassLoader extends ClassLoader {
+		private final String customValidationXmlPath;
+
+		CustomValidationXmlClassLoader(String pathToCustomValidationXml) {
+			super( CustomValidationXmlClassLoader.class.getClassLoader() );
+			customValidationXmlPath = pathToCustomValidationXml;
+		}
+
+		public InputStream getResourceAsStream(String path) {
+			String finalPath = path;
+			if ( "META-INF/validation.xml".equals( path ) ) {
+				log.info( "Using {} as validation.xml", customValidationXmlPath );
+				finalPath = customValidationXmlPath;
+			}
+			return super.getResourceAsStream( finalPath );
+		}
+	}
+
+	private static class IgnoringValidationXmlClassLoader extends ClassLoader {
+		IgnoringValidationXmlClassLoader() {
+			super( IgnoringValidationXmlClassLoader.class.getClassLoader() );
+		}
+
+		public InputStream getResourceAsStream(String path) {
+			if ( "META-INF/validation.xml".equals( path ) ) {
+				log.info( "Ignoring call to load validation.xml" );
+				return null;
+			}
+			return super.getResourceAsStream( path );
+		}
 	}
 }

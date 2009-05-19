@@ -224,15 +224,18 @@ public class ValidationXmlParser {
 		}
 		catch ( JAXBException e ) {
 			log.error( "Error parsing validation.xml: {}", e.getMessage() );
+			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE);
 		}
 		return validationConfig;
 	}
 
 	private InputStream getInputStreamForPath(String path) {
-		InputStream inputStream = this.getClass().getResourceAsStream( path );
-		// try absolute path
-		if ( inputStream == null && !path.startsWith( "/" ) ) {
-			inputStream = this.getClass().getResourceAsStream( "/" + path );
+		// try the context class loader first
+		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream( path );
+
+		// try the current class loader
+		if ( inputStream == null ) {
+			inputStream = this.getClass().getResourceAsStream( path );
 		}
 		return inputStream;
 	}
