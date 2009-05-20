@@ -118,7 +118,7 @@ public class ValidationXmlParser {
 		for ( JAXBElement<String> mappingFileName : config.getConstraintMapping() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debug(
-						"Trying to open input stream for {}.", mappingFileName
+						"Trying to open input stream for {}.", mappingFileName.getValue()
 				);
 				InputStream in = getInputStreamForPath( mappingFileName.getValue() );
 				if ( in == null ) {

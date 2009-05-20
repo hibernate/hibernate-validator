@@ -93,15 +93,17 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl<T>(
 					( Class<T> ) beanClass, constraintHelper, annotationIgnores
 			);
-			for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintMap()
-					.get( beanClass ) ) {
+
+			for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( beanClass ) ) {
 				metaData.addMetaConstraint( constraint );
 			}
-			for ( Member m : mappingParser.getCascadedMembers().get( beanClass ) ) {
+
+			for ( Member m : mappingParser.getCascadedMembersForClass( beanClass ) ) {
 				metaData.addCascadedMember( m );
 			}
-			if ( mappingParser.getDefaultSequences().containsKey( beanClass ) ) {
-				metaData.setDefaultGroupSequence( mappingParser.getDefaultSequences().get( beanClass ) );
+
+			if ( !mappingParser.getDefaultSequenceForClass( beanClass ).isEmpty() ) {
+				metaData.setDefaultGroupSequence( mappingParser.getDefaultSequenceForClass( beanClass ) );
 			}
 			beanMetaDataCache.addBeanMetaData( ( Class<T> ) beanClass, ( BeanMetaDataImpl<T> ) metaData );
 		}

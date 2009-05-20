@@ -22,6 +22,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 
+import static org.testng.Assert.assertFalse;
 import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.TestUtil;
@@ -130,5 +131,16 @@ public class XmlConfigurationTest {
 	@Test(expectedExceptions = ValidationException.class)
 	public void testInvalidValidationXml() {
 		getValidatorWithCustomConfiguration( "META-INF/validation-invalid-xml.xml" );
+	}
+
+	/**
+	 * HV-159
+	 */
+	@Test
+	public void testNoDefinedConstraints() {
+		Validator validator = getValidatorWithCustomConfiguration( "org/hibernate/validation/engine/xml/validation.xml" );
+		assertFalse(
+				validator.getConstraintsForClass( Order.class ).isBeanConstrained(), "Bean should be unsonstrained"
+		);
 	}
 }

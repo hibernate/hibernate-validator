@@ -27,6 +27,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -127,16 +128,31 @@ public class XmlMappingParser {
 		return annotationIgnores;
 	}
 
-	public Map<Class<?>, List<MetaConstraint<?, ? extends Annotation>>> getConstraintMap() {
-		return constraintMap;
+	public List<MetaConstraint<?, ? extends Annotation>> getConstraintsForClass(Class<?> beanClass) {
+		if ( constraintMap.containsKey( beanClass ) ) {
+			return constraintMap.get( beanClass );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
-	public Map<Class<?>, List<Member>> getCascadedMembers() {
-		return cascadedMembers;
+	public List<Member> getCascadedMembersForClass(Class<?> beanClass) {
+		if ( cascadedMembers.containsKey( beanClass ) ) {
+			return cascadedMembers.get( beanClass );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
-	public Map<Class<?>, List<Class<?>>> getDefaultSequences() {
-		return defaultSequences;
+	public List<Class<?>> getDefaultSequenceForClass(Class<?> beanClass) {
+		if ( defaultSequences.containsKey( beanClass ) ) {
+			return defaultSequences.get( beanClass );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
