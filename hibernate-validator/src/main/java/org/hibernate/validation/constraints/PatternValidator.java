@@ -35,7 +35,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, String> {
 		Pattern.Flag flags[] = parameters.flags();
 		int intFlag = 0;
 		for ( Pattern.Flag flag : flags ) {
-			intFlag = intFlag | mapFlagToInt( flag );
+			intFlag = intFlag | flag.getValue();
 		}
 
 		try {
@@ -52,40 +52,5 @@ public class PatternValidator implements ConstraintValidator<Pattern, String> {
 		}
 		Matcher m = pattern.matcher( value );
 		return m.matches();
-	}
-
-	private int mapFlagToInt(Pattern.Flag flag) {
-		int intFlag = 0;
-		switch ( flag ) {
-			case UNIX_LINES: {
-				intFlag = java.util.regex.Pattern.UNIX_LINES;
-				break;
-			}
-			case CASE_INSENSITIVE: {
-				intFlag = java.util.regex.Pattern.CASE_INSENSITIVE;
-				break;
-			}
-			case COMMENTS: {
-				intFlag = java.util.regex.Pattern.COMMENTS;
-				break;
-			}
-			case MULTILINE: {
-				intFlag = java.util.regex.Pattern.MULTILINE;
-				break;
-			}
-			case DOTALL: {
-				intFlag = java.util.regex.Pattern.DOTALL;
-				break;
-			}
-			case UNICODE_CASE: {
-				intFlag = java.util.regex.Pattern.UNICODE_CASE;
-				break;
-			}
-			case CANON_EQ: {
-				intFlag = java.util.regex.Pattern.CANON_EQ;
-				break;
-			}
-		}
-		return intFlag;
 	}
 }
