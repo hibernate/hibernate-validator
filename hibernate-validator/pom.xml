@@ -232,6 +232,11 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.twdata.maven</groupId>
+                <artifactId>maven-cli-plugin</artifactId>
+                <version>0.6.3.CR3</version>
+            </plugin>
         </plugins>
     </build>
     <reporting>
