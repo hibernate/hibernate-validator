@@ -61,7 +61,7 @@
                                     <artifactId>jsr303-tck</artifactId>
                                     <type>xml</type>
                                     <classifier>suite</classifier>
-                                    <overWrite>true</overWrite>
+                                    <overWrite>false</overWrite>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>javax.validation</groupId>
