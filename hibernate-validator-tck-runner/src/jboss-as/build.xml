@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="JBoss5DeployerInstall" default="update" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
-	<path id="maven-ant-tasks.classpath" path="../lib/maven-ant-tasks.jar" />
+	<path id="maven-ant-tasks.classpath" path="./maven-ant-tasks.jar" />
 	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath" />
 
 	<property name="maven.dir" location="${basedir}/lib/maven" />
