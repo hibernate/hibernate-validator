@@ -23,15 +23,11 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.invalidvalidators.NoGroups;
-import org.hibernate.validation.constraints.invalidvalidators.NoMessage;
-import org.hibernate.validation.constraints.invalidvalidators.ValidProperty;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -44,62 +40,6 @@ public class ConstraintHelperTest {
 	@BeforeClass
 	public static void init() {
 		constraintHelper = new ConstraintHelper();
-	}
-
-	@Test
-	public void testConstraintWithNoMessage() {
-		Annotation annotation = new NoGroups() {
-			public String message() {
-				return "";
-			}
-
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-		assertFalse(
-				constraintHelper.isConstraintAnnotation( annotation ), "The constraint annotation should not be valid"
-		);
-	}
-
-	@Test
-	public void testConstraintWithNoGroups() {
-		Annotation annotation = new NoMessage() {
-			public Class<?>[] groups() {
-				return null;
-			}
-
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-		assertFalse(
-				constraintHelper.isConstraintAnnotation( annotation ), "The constraint annotation should not be valid"
-		);
-	}
-
-	@Test
-	public void testConstraintWithValidInPropertyName() {
-		Annotation annotation = new ValidProperty() {
-			public String message() {
-				return null;
-			}
-
-			public Class<?>[] groups() {
-				return null;
-			}
-
-			public int validLength() {
-				return 0;
-			}
-
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-		assertFalse(
-				constraintHelper.isConstraintAnnotation( annotation ), "The constraint annotation should not be valid"
-		);
 	}
 
 	@Test

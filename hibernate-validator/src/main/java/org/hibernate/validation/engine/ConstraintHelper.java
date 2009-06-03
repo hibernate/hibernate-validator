@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Constraint;
+import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
@@ -38,8 +39,6 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import org.slf4j.Logger;
 
 import org.hibernate.validation.constraints.AssertFalseValidator;
 import org.hibernate.validation.constraints.AssertTrueValidator;
@@ -60,7 +59,6 @@ import org.hibernate.validation.constraints.SizeValidatorForArray;
 import org.hibernate.validation.constraints.SizeValidatorForCollection;
 import org.hibernate.validation.constraints.SizeValidatorForMap;
 import org.hibernate.validation.constraints.SizeValidatorForString;
-import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -70,8 +68,6 @@ import org.hibernate.validation.util.ReflectionHelper;
  * @author Alaa Nassef
  */
 public class ConstraintHelper {
-
-	private static final Logger log = LoggerFactory.make();
 
 	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new HashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
@@ -263,8 +259,7 @@ public class ConstraintHelper {
 		catch ( Exception e ) {
 			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
 					"not contain a message parameter. Annotation is getting ignored.";
-			log.warn( msg );
-			return false;
+			throw new ConstraintDefinitionException( msg );
 		}
 
 		try {
@@ -273,16 +268,14 @@ public class ConstraintHelper {
 		catch ( Exception e ) {
 			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
 					"not contain a groups parameter. Annotation is getting ignored.";
-			log.warn( msg );
-			return false;
+			throw new ConstraintDefinitionException( msg );
 		}
 
 		Method[] methods = annotation.getClass().getMethods();
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) ) {
 				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
-				log.warn( msg );
-				return false;
+				throw new ConstraintDefinitionException( msg );
 			}
 		}
 		return true;
