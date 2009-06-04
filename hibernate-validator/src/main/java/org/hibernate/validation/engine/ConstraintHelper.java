@@ -258,16 +258,24 @@ public class ConstraintHelper {
 		}
 		catch ( Exception e ) {
 			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a message parameter. Annotation is getting ignored.";
+					"not contain a message parameter.";
 			throw new ConstraintDefinitionException( msg );
 		}
 
 		try {
-			ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
+			Class<?>[] defaultGroups = ( Class<?>[] ) annotation.annotationType()
+					.getMethod( "groups" )
+					.getDefaultValue();
+			if ( defaultGroups.length != 0 ) {
+				String msg = annotation.annotationType()
+						.getName() + " contains Constraint annotation, but the groups " +
+						"paramter default value is not empty.";
+				throw new ConstraintDefinitionException( msg );
+			}
 		}
-		catch ( Exception e ) {
+		catch ( NoSuchMethodException nsme ) {
 			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a groups parameter. Annotation is getting ignored.";
+					"not contain a groups parameter.";
 			throw new ConstraintDefinitionException( msg );
 		}
 
