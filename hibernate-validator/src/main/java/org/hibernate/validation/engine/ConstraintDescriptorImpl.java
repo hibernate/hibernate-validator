@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
+import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
@@ -225,13 +226,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		for ( Method m : annotation.annotationType().getMethods() ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
 				addOverrideAttributes(
-						overrideParameters, getMethodValue( annotation, m ), m.getAnnotation( OverridesAttribute.class )
+						overrideParameters, m, m.getAnnotation( OverridesAttribute.class )
 				);
 			}
 			else if ( m.getAnnotation( OverridesAttribute.List.class ) != null ) {
 				addOverrideAttributes(
 						overrideParameters,
-						getMethodValue( annotation, m ),
+						m,
 						m.getAnnotation( OverridesAttribute.List.class ).value()
 				);
 			}
@@ -239,15 +240,39 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return overrideParameters;
 	}
 
-	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Object value, OverridesAttribute... attributes) {
-		for ( OverridesAttribute attribute : attributes ) {
-			ClassIndexWrapper wrapper = new ClassIndexWrapper( attribute.constraint(), attribute.constraintIndex() );
+	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Method m, OverridesAttribute... attributes) {
+
+		Object value = getMethodValue( annotation, m );
+		for ( OverridesAttribute overridesAttribute : attributes ) {
+			ensureAttributeIsOverridable( m, overridesAttribute );
+
+			ClassIndexWrapper wrapper = new ClassIndexWrapper(
+					overridesAttribute.constraint(), overridesAttribute.constraintIndex()
+			);
 			Map<String, Object> map = overrideParameters.get( wrapper );
 			if ( map == null ) {
 				map = new HashMap<String, Object>();
 				overrideParameters.put( wrapper, map );
 			}
-			map.put( attribute.name(), value );
+			map.put( overridesAttribute.name(), value );
+		}
+	}
+
+	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
+		try {
+			Class<?> returnTypeOfOverridenConstraint = overridesAttribute.constraint()
+					.getMethod( overridesAttribute.name() )
+					.getReturnType();
+			if ( !returnTypeOfOverridenConstraint.equals( m.getReturnType() ) ) {
+				String message = "The overiding type of a composite constraint must be identical to the overwridden one. Expected " + returnTypeOfOverridenConstraint
+						.getName() + " found " + m.getReturnType();
+				throw new ConstraintDefinitionException( message );
+			}
+		}
+		catch ( NoSuchMethodException nsme ) {
+			throw new ConstraintDefinitionException(
+					"Overriden constraint does not define an attribute with name " + overridesAttribute.name()
+			);
 		}
 	}
 
@@ -316,6 +341,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		);
 	}
 
+	/**
+	 * A wrapper class to keep track for which compposing constraints (class and index) a given attribute override applies to.
+	 */
 	private class ClassIndexWrapper {
 		final Class<?> clazz;
 		final int index;
