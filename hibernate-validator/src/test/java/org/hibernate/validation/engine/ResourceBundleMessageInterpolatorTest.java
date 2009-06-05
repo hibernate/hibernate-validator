@@ -55,13 +55,13 @@ public class ResourceBundleMessageInterpolatorTest {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
 		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new Class<?>[] { }, new ConstraintHelper()
+				notNull, new ConstraintHelper()
 		);
 
 		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
 		size = AnnotationFactory.create( sizeAnnotationDescriptor );
 		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
-				size, new Class<?>[] { }, new ConstraintHelper()
+				size, new ConstraintHelper()
 		);
 	}
 
@@ -167,7 +167,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
-				max, new Class<?>[] { }, new ConstraintHelper()
+				max, new ConstraintHelper()
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );

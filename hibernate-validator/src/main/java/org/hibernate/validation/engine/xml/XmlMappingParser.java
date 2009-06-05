@@ -361,7 +361,7 @@ public class XmlMappingParser {
 
 		A annotation = AnnotationFactory.create( annotationDescriptor );
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				annotation, new Class[] { }, constraintHelper
+				annotation, constraintHelper
 		);
 
 		MetaConstraint<T, A> metaConstraint;

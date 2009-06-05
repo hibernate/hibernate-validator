@@ -39,6 +39,7 @@ import javax.validation.groups.Default;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
+import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
@@ -50,7 +51,6 @@ import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
  */
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T> {
 	private static final Logger log = LoggerFactory.make();
-	private static final Class<?>[] DEFAULT_GROUP = new Class<?>[] { Default.class };
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 
 	/**
@@ -67,7 +67,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * The groups for which to apply this constraint.
 	 */
-	private final Set<Class<?>> groups;
+	private final Set<Class<?>> groups = new HashSet<Class<?>>();
 
 	/**
 	 * The constraint parameters as map. The key is the paramter name and the value the
@@ -90,28 +90,30 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final ConstraintHelper constraintHelper;
 
-	public ConstraintDescriptorImpl(T annotation, Class<?>[] groups, ConstraintHelper constraintHelper, Class<?> implicitGroup) {
-		this( annotation, groups, constraintHelper );
+	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup) {
+		this( annotation, constraintHelper );
 		this.groups.add( implicitGroup );
 	}
 
-	public ConstraintDescriptorImpl(T annotation, Class<?>[] groups, ConstraintHelper constraintHelper) {
-		this( annotation, new HashSet<Class<?>>(), constraintHelper );
-		if ( groups.length == 0 ) {
-			groups = DEFAULT_GROUP;
-		}
-		this.groups.addAll( Arrays.asList( groups ) );
-	}
 
-	private ConstraintDescriptorImpl(T annotation, Set<Class<?>> groups, ConstraintHelper constraintHelper) {
+	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper) {
 		this.annotation = annotation;
-		this.groups = groups;
 		this.attributes = getAnnotationParameters( annotation );
 		this.constraintHelper = constraintHelper;
 
 		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
 				ReportAsSingleViolation.class
 		);
+
+		Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
+				annotation, "groups", Class[].class
+		);
+		if ( groupsFromAnnotation.length == 0 ) {
+			groups.add( Default.class );
+		}
+		else {
+			this.groups.addAll( Arrays.asList( groupsFromAnnotation ) );
+		}
 
 		findConstraintValidatorClasses();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
@@ -288,9 +290,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, int index, U constraintAnnotation, Class<U> annotationType) {
+		// use a annotation proxy
 		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<U>(
 				annotationType, getAnnotationParameters( constraintAnnotation )
 		);
+
+		// get the right override parameters
 		Map<String, Object> overrides = overrideParameters.get(
 				new ClassIndexWrapper(
 						annotationType, index
@@ -301,9 +306,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				annotationDescriptor.setValue( entry.getKey(), entry.getValue() );
 			}
 		}
+
+		// groups get inherited from the parent
+		annotationDescriptor.setValue( "groups", groups.toArray( new Class<?>[] { } ) );
+
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
 		return new ConstraintDescriptorImpl<U>(
-				annotationProxy, groups, constraintHelper
+				annotationProxy, constraintHelper
 		);
 	}
 

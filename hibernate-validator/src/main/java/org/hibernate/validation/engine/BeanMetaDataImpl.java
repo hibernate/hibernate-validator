@@ -115,11 +115,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public List<Member> getCascadedMembers() {
-		return cascadedMembers;
+		return Collections.unmodifiableList( cascadedMembers );
 	}
 
 	public List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintList() {
-		return metaConstraintList;
+		return Collections.unmodifiableList( metaConstraintList );
 	}
 
 	public void addMetaConstraint(MetaConstraint<?, ? extends Annotation> metaConstraint) {
@@ -135,7 +135,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public List<Class<?>> getDefaultGroupSequence() {
-		return defaultGroupSequence;
+		return Collections.unmodifiableList( defaultGroupSequence );
 	}
 
 	public void setDefaultGroupSequence(List<Class<?>> groupSequence) {
@@ -325,14 +325,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Class<?>[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
 		ConstraintDescriptorImpl constraintDescriptor;
 		if ( clazz.isInterface() ) {
-			constraintDescriptor = new ConstraintDescriptorImpl(
-					annotation, groups, constraintHelper, clazz
-			);
+			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper, clazz );
 		}
 		else {
-			constraintDescriptor = new ConstraintDescriptorImpl(
-					annotation, groups, constraintHelper
-			);
+			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper );
 		}
 		return constraintDescriptor;
 	}
