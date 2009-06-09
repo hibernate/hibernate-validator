@@ -18,9 +18,9 @@
 package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +51,8 @@ public class ConstraintTree<A extends Annotation> {
 	private final List<ConstraintTree<?>> children;
 	private final ConstraintDescriptor<A> descriptor;
 
+	private final Map<Class<? extends ConstraintValidator<?, ?>>, ConstraintValidator<A, ?>> constraintValidatorCache;
+
 	public ConstraintTree(ConstraintDescriptor<A> descriptor) {
 		this( descriptor, null );
 	}
@@ -58,6 +60,8 @@ public class ConstraintTree<A extends Annotation> {
 	private ConstraintTree(ConstraintDescriptor<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
+		this.constraintValidatorCache = new HashMap<Class<? extends ConstraintValidator<?, ?>>, ConstraintValidator<A, ?>>();
+
 		final Set<ConstraintDescriptor<?>> composingConstraints = descriptor.getComposingConstraints();
 		children = new ArrayList<ConstraintTree<?>>( composingConstraints.size() );
 
@@ -117,13 +121,19 @@ public class ConstraintTree<A extends Annotation> {
 				executionContext.peekParentPath(), executionContext.peekProperty(), descriptor
 		);
 		if ( !validator.isValid( value, constraintValidatorContext ) ) {
-			constraintViolations.addAll( executionContext.createConstraintViolations( value, constraintValidatorContext ) );
+			constraintViolations.addAll(
+					executionContext.createConstraintViolations(
+							value, constraintValidatorContext
+					)
+			);
 		}
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
 			final String message = ( String ) getParent().getDescriptor().getAttributes().get( "message" );
 			final String property = executionContext.peekPropertyPath();
-			ConstraintValidatorContextImpl.ErrorMessage error = constraintValidatorContext.new ErrorMessage( message, property );
+			ConstraintValidatorContextImpl.ErrorMessage error = constraintValidatorContext.new ErrorMessage(
+					message, property
+			);
 			constraintViolations.add( executionContext.createConstraintViolation( value, error, descriptor ) );
 		}
 	}
@@ -143,10 +153,21 @@ public class ConstraintTree<A extends Annotation> {
 	private <V> ConstraintValidator<A, V> getInitalizedValidator(V value, Type type, ConstraintValidatorFactory constraintFactory) {
 		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( value, type );
 
-		@SuppressWarnings("unchecked")
-		ConstraintValidator<A, V> constraintValidator = ( ConstraintValidator<A, V> ) constraintFactory.getInstance(
-				validatorClass
-		);
+		ConstraintValidator<A, V> constraintValidator;
+
+		if ( !constraintValidatorCache.containsKey( validatorClass ) ) {
+			constraintValidator = ( ConstraintValidator<A, V> ) constraintFactory.getInstance(
+					validatorClass
+			);
+			constraintValidatorCache.put( validatorClass, constraintValidator );
+		}
+		else {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "Constraint validator {} found in cache" );
+			}
+			constraintValidator = ( ConstraintValidator<A, V> ) constraintValidatorCache.get( validatorClass );
+		}
+
 		initializeConstraint( descriptor, constraintValidator );
 		return constraintValidator;
 	}
@@ -165,24 +186,15 @@ public class ConstraintTree<A extends Annotation> {
 
 		List<Type> suitableTypes = new ArrayList<Type>();
 		findSuitableValidatorTypes( type, validatorsTypes, suitableTypes );
-		// TODO - do we really have to take the actual value into consideration here as well? Or is it enough to
-		// work with the type the constraint was placed on?
+
 		if ( value != null ) {
-			findSuitableValidatorTypes( determineValueClass( value ), validatorsTypes, suitableTypes );
+			findSuitableValidatorTypes( value.getClass(), validatorsTypes, suitableTypes );
 		}
 
 		resolveAssignableTypes( suitableTypes );
 		verifyResolveWasUnique( type, suitableTypes );
 
 		return validatorsTypes.get( suitableTypes.get( 0 ) );
-	}
-
-	private Class determineValueClass(Object value) {
-		Class valueClass = value.getClass();
-		if ( valueClass.isArray() ) {
-			valueClass = Array.class;
-		}
-		return valueClass;
 	}
 
 	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
