@@ -36,9 +36,6 @@ import org.hibernate.validation.engine.ValidatorFactoryImpl;
  */
 public class HibernateValidationProvider implements ValidationProvider {
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean isSuitable(Class<? extends Configuration<?>> builderClass) {
 		return builderClass == HibernateValidatorConfiguration.class;
 	}
@@ -53,16 +50,12 @@ public class HibernateValidationProvider implements ValidationProvider {
 		return configurationClass.cast( new ConfigurationImpl( this ) );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+
 	public Configuration<?> createGenericConfiguration(BootstrapState state) {
 		return new ConfigurationImpl( state );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+
 	public ValidatorFactory buildValidatorFactory(ConfigurationState configurationState) {
 		return new ValidatorFactoryImpl( configurationState );
 	}
