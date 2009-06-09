@@ -56,6 +56,13 @@ import org.hibernate.validation.constraints.PastValidatorForCalendar;
 import org.hibernate.validation.constraints.PastValidatorForDate;
 import org.hibernate.validation.constraints.PatternValidator;
 import org.hibernate.validation.constraints.SizeValidatorForArray;
+import org.hibernate.validation.constraints.SizeValidatorForArraysOfBoolean;
+import org.hibernate.validation.constraints.SizeValidatorForArraysOfByte;
+import org.hibernate.validation.constraints.SizeValidatorForArraysOfChar;
+import org.hibernate.validation.constraints.SizeValidatorForArraysOfDouble;
+import org.hibernate.validation.constraints.SizeValidatorForArraysOfFloat;
+import org.hibernate.validation.constraints.SizeValidatorForArraysOfInt;
+import org.hibernate.validation.constraints.SizeValidatorForArraysOfLong;
 import org.hibernate.validation.constraints.SizeValidatorForCollection;
 import org.hibernate.validation.constraints.SizeValidatorForMap;
 import org.hibernate.validation.constraints.SizeValidatorForString;
@@ -124,6 +131,13 @@ public class ConstraintHelper {
 		constraintList.add( SizeValidatorForCollection.class );
 		constraintList.add( SizeValidatorForArray.class );
 		constraintList.add( SizeValidatorForMap.class );
+		constraintList.add( SizeValidatorForArraysOfBoolean.class );
+		constraintList.add( SizeValidatorForArraysOfByte.class );
+		constraintList.add( SizeValidatorForArraysOfChar.class );
+		constraintList.add( SizeValidatorForArraysOfDouble.class );
+		constraintList.add( SizeValidatorForArraysOfFloat.class );
+		constraintList.add( SizeValidatorForArraysOfInt.class );
+		constraintList.add( SizeValidatorForArraysOfLong.class );
 		builtinConstraints.put( Size.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
