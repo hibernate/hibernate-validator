@@ -24,7 +24,7 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.Size;
 
 /**
- * Check that a string's length is between min and max.
+ * Check that the length of an array is betweeb <i>min</i> and <i>max</i>
  *
  * @author Hardy Ferentschik
  */
