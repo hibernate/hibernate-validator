@@ -27,7 +27,7 @@ public class DigitsValidator implements Validator<Digits>, PropertyConstraint {
 			return true;
 		}
 
-		String stringValue = null;
+		String stringValue;
 
 		if ( value instanceof String ) {
 			try {
