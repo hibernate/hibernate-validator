@@ -18,7 +18,6 @@
 package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -28,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
+
+import com.googlecode.jtype.TypeUtils;
 
 
 /**
@@ -70,7 +71,7 @@ public class ValidatorTypeHelper {
 			throw new ValidationException( "Null is an invalid type for a constraint validator." );
 		}
 		else if ( validatorType instanceof GenericArrayType ) {
-			validatorType = Array.class;
+			validatorType = TypeUtils.getArrayType( TypeUtils.getComponentType( validatorType ) );
 		}
 
 		while ( resolvedTypes.containsKey( validatorType ) ) {
@@ -87,7 +88,9 @@ public class ValidatorTypeHelper {
 		else if ( type instanceof Class ) {
 			Class clazz = ( Class ) type;
 			final Type returnedType = resolveTypeForClassAndHierarchy( resolvedTypes, clazz );
-			if ( returnedType != null) return  returnedType;
+			if ( returnedType != null ) {
+				return returnedType;
+			}
 		}
 		else if ( type instanceof ParameterizedType ) {
 			ParameterizedType paramType = ( ParameterizedType ) type;
@@ -109,7 +112,9 @@ public class ValidatorTypeHelper {
 			}
 			else {
 				Type returnedType = resolveTypeForClassAndHierarchy( resolvedTypes, rawType );
-				if ( returnedType != null) return  returnedType;
+				if ( returnedType != null ) {
+					return returnedType;
+				}
 			}
 		}
 		//else we don't care I think

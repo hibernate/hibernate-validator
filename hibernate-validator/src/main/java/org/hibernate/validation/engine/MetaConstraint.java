@@ -19,8 +19,8 @@ package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
+
+import com.googlecode.jtype.TypeUtils;
 
 import org.hibernate.validation.util.ReflectionHelper;
 
@@ -150,8 +152,8 @@ public class MetaConstraint<T, A extends Annotation> {
 			}
 			default: {
 				t = ReflectionHelper.typeOf( member );
-				if ( t instanceof Class && ((Class) t).isArray()) {
-					t = Array.class;
+				if ( t instanceof Class && ((Class) t).isPrimitive()) {
+					t = ReflectionHelper.boxedTyp( t );
 				}
 			}
 		}
