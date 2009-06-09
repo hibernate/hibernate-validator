@@ -435,6 +435,47 @@ public class ReflectionHelper {
 	}
 
 	/**
+	 * Returns the autoboxed type of a primitive type.
+	 *
+	 * @param primitiveType the primitive type
+	 * @return  the autoboxed type of a primitive type.
+	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not represent a primitive type.
+	 */
+	public static Class<?> boxedTyp(Type primitiveType) {
+		if ( !( primitiveType instanceof Class ) && !( ( Class ) primitiveType ).isPrimitive() ) {
+			throw new IllegalArgumentException( primitiveType.getClass() + "has to be a primitive type" );
+		}
+
+		if ( primitiveType == boolean.class ) {
+			return Boolean.class;
+		}
+		else if ( primitiveType == char.class ) {
+			return Character.class;
+		}
+		else if ( primitiveType == double.class ) {
+			return Double.class;
+		}
+		else if ( primitiveType == float.class ) {
+			return Float.class;
+		}
+		else if ( primitiveType == long.class ) {
+			return Long.class;
+		}
+		else if ( primitiveType == int.class ) {
+			return Integer.class;
+		}
+		else if ( primitiveType == short.class ) {
+			return Short.class;
+		}
+		else if ( primitiveType == byte.class ) {
+			return Byte.class;
+		}
+		else {
+			throw new RuntimeException( "Unhandled primitive type." );
+		}
+	}
+
+	/**
 	 * Get all superclasses and interfaces recursively.
 	 *
 	 * @param clazz The class to start the search with.
