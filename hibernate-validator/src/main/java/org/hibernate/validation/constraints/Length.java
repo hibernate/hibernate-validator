@@ -40,7 +40,7 @@ public @interface Length {
 
 	int max() default Integer.MAX_VALUE;
 
-	String message() default "{constraint.length}";
+	String message() default "{org.hibernate.validation.constraints.Length.message}";
 
 	Class<?>[] groups() default { };
 }

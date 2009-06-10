@@ -33,7 +33,7 @@ import javax.validation.Constraint;
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface NotEmpty {
-	String message() default "{constraint.notEmpty}";
+	String message() default "{org.hibernate.validation.constraints.NotEmpty.message}";
 
 	Class<?>[] groups() default { };
 }
