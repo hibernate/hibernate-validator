@@ -50,11 +50,9 @@ public class HibernateValidationProvider implements ValidationProvider {
 		return configurationClass.cast( new ConfigurationImpl( this ) );
 	}
 
-
 	public Configuration<?> createGenericConfiguration(BootstrapState state) {
 		return new ConfigurationImpl( state );
 	}
-
 
 	public ValidatorFactory buildValidatorFactory(ConfigurationState configurationState) {
 		return new ValidatorFactoryImpl( configurationState );
