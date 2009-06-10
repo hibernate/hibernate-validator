@@ -21,6 +21,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
+import org.hibernate.validation.constraints.impl.NotNullValidator;
+
 /**
  * @author Hardy Ferentschik
  */

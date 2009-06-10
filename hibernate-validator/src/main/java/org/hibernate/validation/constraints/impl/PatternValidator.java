@@ -15,25 +15,42 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
+import java.util.regex.Matcher;
+import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Hardy Ferentschik
- * @todo Extend to not only support strings, but also collections and maps. Needs to be specified first though.
  */
-public class NotEmptyValidator implements ConstraintValidator<NotEmpty, String> {
+public class PatternValidator implements ConstraintValidator<Pattern, String> {
 
-	public void initialize(NotEmpty parameters) {
+	private java.util.regex.Pattern pattern;
+
+	public void initialize(Pattern parameters) {
+		Pattern.Flag flags[] = parameters.flags();
+		int intFlag = 0;
+		for ( Pattern.Flag flag : flags ) {
+			intFlag = intFlag | flag.getValue();
+		}
+
+		try {
+			pattern = java.util.regex.Pattern.compile( parameters.regexp(), intFlag );
+		}
+		catch ( PatternSyntaxException e ) {
+			throw new ValidationException( "Invalid regular expression.", e );
+		}
 	}
 
-	public boolean isValid(String object, ConstraintValidatorContext constraintValidatorContext) {
-		if ( object == null ) {
+	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+		if ( value == null ) {
 			return true;
 		}
-		int length = object.length();
-		return length > 0;
+		Matcher m = pattern.matcher( value );
+		return m.matches();
 	}
 }

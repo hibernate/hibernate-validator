@@ -15,43 +15,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Max;
 
 /**
- * Check that the number being validated is greater than or equal to the minimum
- * value specified.
+ * Check that the String being validated represents a number, and has a value
+ * less than or equal to the maximum value specified.
  *
  * @author Alaa Nassef
  */
-public class MinValidatorForNumber implements ConstraintValidator<Min, Number> {
+public class MaxValidatorForString implements ConstraintValidator<Max, String> {
 
-	private long minValue;
+	private long maxValue;
 
-	public void initialize(Min minValue) {
-		this.minValue = minValue.value();
+	public void initialize(Max maxValue) {
+		this.maxValue = maxValue.value();
 	}
 
-	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
-		if ( value instanceof BigDecimal ) {
-			return ( ( BigDecimal ) value ).compareTo( BigDecimal.valueOf( minValue ) ) != -1;
+		try {
+			return new BigDecimal( value ).compareTo( BigDecimal.valueOf( maxValue ) ) != 1;
 		}
-		else if ( value instanceof BigInteger ) {
-			return ( ( BigInteger ) value ).compareTo( BigInteger.valueOf( minValue ) ) != -1;
+		catch ( NumberFormatException nfe ) {
+			return false;
 		}
-		else {
-			double doubleValue = value.doubleValue();
-			return doubleValue >= minValue;
-		}
-
 	}
 }

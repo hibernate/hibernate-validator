@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
 import java.lang.reflect.Array;
 import javax.validation.ConstraintValidator;
@@ -24,9 +24,9 @@ import javax.validation.constraints.Size;
 
 /**
  * @author Hardy Ferentschik
- */
-public class SizeValidatorForArraysOfChar extends SizeValidatorForArraysOfPrimitives
-		implements ConstraintValidator<Size, char[]> {
+*/
+public class SizeValidatorForArraysOfInt extends SizeValidatorForArraysOfPrimitives
+		implements ConstraintValidator<Size, int[]> {
 
 	/**
 	 * Checks the number of entries in an array.
@@ -38,7 +38,7 @@ public class SizeValidatorForArraysOfChar extends SizeValidatorForArraysOfPrimit
 	 *         <code>array</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean isValid(char[] array, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(int[] array, ConstraintValidatorContext constraintValidatorContext) {
 		if ( array == null ) {
 			return true;
 		}

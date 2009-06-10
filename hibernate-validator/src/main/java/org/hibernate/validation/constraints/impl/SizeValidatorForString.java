@@ -15,9 +15,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
@@ -26,9 +25,11 @@ import javax.validation.constraints.Size;
 /**
  * Check that a string's length is between min and max.
  *
+ * @author Emmanuel Bernard
+ * @author Gavin King
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
+public class SizeValidatorForString implements ConstraintValidator<Size, String> {
 	private int min;
 	private int max;
 
@@ -39,21 +40,20 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
 	}
 
 	/**
-	 * Checks the number of entries in a map.
+	 * Checks the length of the specified string.
 	 *
-	 * @param map The map to validate.
+	 * @param s The string to validate.
 	 * @param constraintValidatorContext context in which the constraint is evaluated.
 	 *
-	 * @return Returns <code>true</code> if the map is <code>null</code> or the number of entries in <code>map</code>
-	 *         is between the specified <code>min</code> and <code>max</code> values (inclusive),
-	 *         <code>false</code> otherwise.
+	 * @return Returns <code>true</code> if the string is <code>null</code> or the length of <code>s</code> between the specified
+	 *         <code>min</code> and <code>max</code> values (inclusive), <code>false</code> otherwise.
 	 */
-	public boolean isValid(Map map, ConstraintValidatorContext constraintValidatorContext) {
-		if ( map == null ) {
+	public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+		if ( s == null ) {
 			return true;
 		}
-		int size = map.size();
-		return size >= min && size <= max;
+		int length = s.length();
+		return length >= min && length <= max;
 	}
 
 	private void validateParameters() {

@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,37 +15,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
- * Check that the String being validated represents a number, and has a value
- * more than or equal to the minimum value specified.
+ * Validate that the object is not <code>null</code>.
  *
- * @author Alaa Nassef
+ * @author Emmanuel Bernard
  */
-public class MinValidatorForString implements ConstraintValidator<Min, String> {
+public class NotNullValidator implements ConstraintValidator<NotNull, Object> {
 
-	private long minValue;
-
-	public void initialize(Min minValue) {
-		this.minValue = minValue.value();
+	public void initialize(NotNull parameters) {
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
-		//null values are valid
-		if ( value == null ) {
-			return true;
-		}
-		try {
-			return new BigDecimal( ( String ) value ).compareTo( BigDecimal.valueOf( minValue ) ) != -1;
-		}
-		catch ( NumberFormatException nfe ) {
-			return false;
-		}
+	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
+		return object != null;
 	}
 }

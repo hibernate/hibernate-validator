@@ -26,6 +26,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 
+import org.hibernate.validation.constraints.impl.LengthValidator;
+
 /**
  * Validate that the string is between min and max included
  *

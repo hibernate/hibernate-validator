@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,28 +15,38 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
+import java.lang.reflect.Array;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.AssertTrue;
+import javax.validation.ValidationException;
+import javax.validation.constraints.Size;
 
 /**
- * Validates that the value passed is true
+ * Check that the length of an array is betweeb <i>min</i> and <i>max</i>
  *
- * @author Alaa Nassef
+ * @author Hardy Ferentschik
  */
-public class AssertTrueValidator implements ConstraintValidator<AssertTrue, Boolean> {
+public class SizeValidatorForArraysOfPrimitives {
+	protected int min;
+	protected int max;
 
-	public void initialize(AssertTrue constraintAnnotation) {
+	public void initialize(Size parameters) {
+		min = parameters.min();
+		max = parameters.max();
+		validateParameters();
 	}
 
-	public boolean isValid(Boolean bool, ConstraintValidatorContext constraintValidatorContext) {
-		//null values are valid
-		if ( bool == null ) {
-			return true;
+	private void validateParameters() {
+		if ( min < 0 ) {
+			throw new ValidationException( "The min parameter cannot be negative." );
 		}
-		return bool;
+		if ( max < 0 ) {
+			throw new ValidationException( "The max paramter cannot be negative." );
+		}
+		if ( max < min ) {
+			throw new ValidationException( "The length cannot be negative." );
+		}
 	}
-
 }

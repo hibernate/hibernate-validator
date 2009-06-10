@@ -24,6 +24,8 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import org.hibernate.validation.constraints.impl.FutureValidatorForCalendar;
+
 /**
  * @author Alaa Nassef
  * @author Hardy Ferentschik

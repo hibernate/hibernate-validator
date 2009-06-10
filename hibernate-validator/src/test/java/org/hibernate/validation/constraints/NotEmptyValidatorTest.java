@@ -22,6 +22,8 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import org.hibernate.validation.constraints.impl.NotEmptyValidator;
+
 /**
  * @author Hardy Ferentschik
  */

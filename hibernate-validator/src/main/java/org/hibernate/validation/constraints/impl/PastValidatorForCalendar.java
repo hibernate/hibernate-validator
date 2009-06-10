@@ -15,23 +15,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
+import java.util.Calendar;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 /**
- * Validate that the object is not <code>null</code>.
+ * Check that the <code>java.util.Calendar</code> passed to be validated is in the
+ * past.
  *
- * @author Emmanuel Bernard
+ * @author Alaa Nassef
  */
-public class NotNullValidator implements ConstraintValidator<NotNull, Object> {
+public class PastValidatorForCalendar implements ConstraintValidator<Past, Calendar> {
 
-	public void initialize(NotNull parameters) {
+	public void initialize(Past constraintAnnotation) {
 	}
 
-	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
-		return object != null;
+	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
+		//null values are valid
+		if ( cal == null ) {
+			return true;
+		}
+		return cal.before( Calendar.getInstance() );
 	}
 }

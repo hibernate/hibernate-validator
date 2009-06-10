@@ -15,29 +15,43 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.util.Calendar;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Future;
+import javax.validation.constraints.Min;
 
 /**
- * Check that the <code>java.util.Calendar</code> passed to be validated is in
- * the future.
+ * Check that the number being validated is greater than or equal to the minimum
+ * value specified.
  *
  * @author Alaa Nassef
  */
-public class FutureValidatorForCalendar implements ConstraintValidator<Future, Calendar> {
+public class MinValidatorForNumber implements ConstraintValidator<Min, Number> {
 
-	public void initialize(Future constraintAnnotation) {
+	private long minValue;
+
+	public void initialize(Min minValue) {
+		this.minValue = minValue.value();
 	}
 
-	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
-		if ( cal == null ) {
+		if ( value == null ) {
 			return true;
 		}
-		return cal.after( Calendar.getInstance() );
+		if ( value instanceof BigDecimal ) {
+			return ( ( BigDecimal ) value ).compareTo( BigDecimal.valueOf( minValue ) ) != -1;
+		}
+		else if ( value instanceof BigInteger ) {
+			return ( ( BigInteger ) value ).compareTo( BigInteger.valueOf( minValue ) ) != -1;
+		}
+		else {
+			double doubleValue = value.doubleValue();
+			return doubleValue >= minValue;
+		}
+
 	}
 }

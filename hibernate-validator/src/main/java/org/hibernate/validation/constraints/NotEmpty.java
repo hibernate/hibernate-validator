@@ -25,6 +25,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 
+import org.hibernate.validation.constraints.impl.NotEmptyValidator;
+
 /**
  * @author Emmanuel Bernard
  */

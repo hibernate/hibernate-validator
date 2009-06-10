@@ -15,38 +15,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.lang.reflect.Array;
+import java.util.Calendar;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Future;
 
 /**
- * Check that the length of an array is betweeb <i>min</i> and <i>max</i>
+ * Check that the <code>java.util.Calendar</code> passed to be validated is in
+ * the future.
  *
- * @author Hardy Ferentschik
+ * @author Alaa Nassef
  */
-public class SizeValidatorForArraysOfPrimitives {
-	protected int min;
-	protected int max;
+public class FutureValidatorForCalendar implements ConstraintValidator<Future, Calendar> {
 
-	public void initialize(Size parameters) {
-		min = parameters.min();
-		max = parameters.max();
-		validateParameters();
+	public void initialize(Future constraintAnnotation) {
 	}
 
-	private void validateParameters() {
-		if ( min < 0 ) {
-			throw new ValidationException( "The min parameter cannot be negative." );
+	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
+		//null values are valid
+		if ( cal == null ) {
+			return true;
 		}
-		if ( max < 0 ) {
-			throw new ValidationException( "The max paramter cannot be negative." );
-		}
-		if ( max < min ) {
-			throw new ValidationException( "The length cannot be negative." );
-		}
+		return cal.after( Calendar.getInstance() );
 	}
 }

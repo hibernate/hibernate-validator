@@ -15,42 +15,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.util.Date;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Max;
+import javax.validation.constraints.Future;
 
 /**
- * Check that the number being validated is less than or equal to the maximum
- * value specified.
+ * Check that the <code>java.util.Date</code> passed to be validated is in the
+ * future.
  *
  * @author Alaa Nassef
  */
-public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
+public class FutureValidatorForDate implements ConstraintValidator<Future, Date> {
 
-	private long maxValue;
-
-	public void initialize(Max maxValue) {
-		this.maxValue = maxValue.value();
+	public void initialize(Future constraintAnnotation) {
 	}
 
-	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Date date, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
-		if ( value == null ) {
+		if ( date == null ) {
 			return true;
 		}
-		if ( value instanceof BigDecimal ) {
-			return ( ( BigDecimal ) value ).compareTo( BigDecimal.valueOf( maxValue ) ) != 1;
-		}
-		else if ( value instanceof BigInteger ) {
-			return ( ( BigInteger ) value ).compareTo( BigInteger.valueOf( maxValue ) ) != 1;
-		}
-		else {
-			double doubleValue = value.doubleValue();
-			return doubleValue <= maxValue;
-		}
+		return date.after( new Date() );
 	}
 }

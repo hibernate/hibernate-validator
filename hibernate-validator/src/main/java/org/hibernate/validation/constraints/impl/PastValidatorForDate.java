@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,24 +15,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
+import java.util.Date;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.Past;
 
 /**
- * Validate that the object is <code>null</code>
+ * Check that the <code>java.util.Date</code> passed to be validated is in the
+ * past.
  *
  * @author Alaa Nassef
  */
-public class NullValidator implements ConstraintValidator<Null, Object> {
+public class PastValidatorForDate implements ConstraintValidator<Past, Date> {
 
-	public void initialize(Null constraintAnnotation) {
+	public void initialize(Past constraintAnnotation) {
 	}
 
-	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
-		return object == null;
+	public boolean isValid(Date date, ConstraintValidatorContext constraintValidatorContext) {
+		//null values are valid
+		if ( date == null ) {
+			return true;
+		}
+		return date.before( new Date() );
 	}
-
 }

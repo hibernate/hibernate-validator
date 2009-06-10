@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,37 +15,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Max;
+import javax.validation.constraints.AssertTrue;
 
 /**
- * Check that the String being validated represents a number, and has a value
- * less than or equal to the maximum value specified.
+ * Validates that the value passed is true
  *
  * @author Alaa Nassef
  */
-public class MaxValidatorForString implements ConstraintValidator<Max, String> {
+public class AssertTrueValidator implements ConstraintValidator<AssertTrue, Boolean> {
 
-	private long maxValue;
-
-	public void initialize(Max maxValue) {
-		this.maxValue = maxValue.value();
+	public void initialize(AssertTrue constraintAnnotation) {
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Boolean bool, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
-		if ( value == null ) {
-			return true;
-		}
-		try {
-			return new BigDecimal( value ).compareTo( BigDecimal.valueOf( maxValue ) ) != 1;
-		}
-		catch ( NumberFormatException nfe ) {
-			return false;
-		}
+		return bool == null || bool;
 	}
+
 }

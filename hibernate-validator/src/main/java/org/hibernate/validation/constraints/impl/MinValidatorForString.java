@@ -15,45 +15,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
+import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
+import javax.validation.constraints.Min;
 
 /**
- * Check that a string's length is between min and max.
+ * Check that the String being validated represents a number, and has a value
+ * more than or equal to the minimum value specified.
  *
- * @author Emmanuel Bernard
- * @author Gavin King
+ * @author Alaa Nassef
  */
-public class LengthValidator implements ConstraintValidator<Length, String> {
-	private int min;
-	private int max;
+public class MinValidatorForString implements ConstraintValidator<Min, String> {
 
-	public void initialize(Length parameters) {
-		min = parameters.min();
-		max = parameters.max();
-		validateParameters();
+	private long minValue;
+
+	public void initialize(Min minValue) {
+		this.minValue = minValue.value();
 	}
 
 	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
-		int length = value.length();
-		return length >= min && length <= max;
-	}
-
-	private void validateParameters() {
-		if ( min < 0 ) {
-			throw new ValidationException( "The min parameter cannot be negative." );
+		try {
+			return new BigDecimal( ( String ) value ).compareTo( BigDecimal.valueOf( minValue ) ) != -1;
 		}
-		if ( max < 0 ) {
-			throw new ValidationException( "The max paramter cannot be negative." );
-		}
-		if ( max < min ) {
-			throw new ValidationException( "The length cannot be negative." );
+		catch ( NumberFormatException nfe ) {
+			return false;
 		}
 	}
 }

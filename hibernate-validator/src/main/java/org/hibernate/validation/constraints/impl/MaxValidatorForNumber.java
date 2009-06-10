@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,28 +15,42 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.Max;
 
 /**
- * Validates that the value passed is false
+ * Check that the number being validated is less than or equal to the maximum
+ * value specified.
  *
  * @author Alaa Nassef
  */
-public class AssertFalseValidator implements ConstraintValidator<AssertFalse, Boolean> {
+public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
 
-	public void initialize(AssertFalse constraintAnnotation) {
+	private long maxValue;
+
+	public void initialize(Max maxValue) {
+		this.maxValue = maxValue.value();
 	}
 
-	public boolean isValid(Boolean bool, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
-		if ( bool == null ) {
+		if ( value == null ) {
 			return true;
 		}
-		return !bool;
+		if ( value instanceof BigDecimal ) {
+			return ( ( BigDecimal ) value ).compareTo( BigDecimal.valueOf( maxValue ) ) != 1;
+		}
+		else if ( value instanceof BigInteger ) {
+			return ( ( BigInteger ) value ).compareTo( BigInteger.valueOf( maxValue ) ) != 1;
+		}
+		else {
+			double doubleValue = value.doubleValue();
+			return doubleValue <= maxValue;
+		}
 	}
-
 }

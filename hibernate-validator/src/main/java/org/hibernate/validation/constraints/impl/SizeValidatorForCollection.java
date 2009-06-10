@@ -15,8 +15,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
+import java.util.Collection;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
@@ -25,11 +26,9 @@ import javax.validation.constraints.Size;
 /**
  * Check that a string's length is between min and max.
  *
- * @author Emmanuel Bernard
- * @author Gavin King
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForString implements ConstraintValidator<Size, String> {
+public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection> {
 	private int min;
 	private int max;
 
@@ -40,23 +39,24 @@ public class SizeValidatorForString implements ConstraintValidator<Size, String>
 	}
 
 	/**
-	 * Checks the length of the specified string.
+	 * Checks the number of entries in a map.
 	 *
-	 * @param s The string to validate.
+	 * @param collection The collection to validate.
 	 * @param constraintValidatorContext context in which the constraint is evaluated.
 	 *
-	 * @return Returns <code>true</code> if the string is <code>null</code> or the length of <code>s</code> between the specified
-	 *         <code>min</code> and <code>max</code> values (inclusive), <code>false</code> otherwise.
+	 * @return Returns <code>true</code> if the collection is <code>null</code> or the number of entries in
+	 *         <code>collection</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
+	 *         <code>false</code> otherwise.
 	 */
-	public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-		if ( s == null ) {
+	public boolean isValid(Collection collection, ConstraintValidatorContext constraintValidatorContext) {
+		if ( collection == null ) {
 			return true;
 		}
-		int length = s.length();
+		int length = collection.size();
 		return length >= min && length <= max;
 	}
 
-	private void validateParameters() {
+		private void validateParameters() {
 		if ( min < 0 ) {
 			throw new ValidationException( "The min parameter cannot be negative." );
 		}

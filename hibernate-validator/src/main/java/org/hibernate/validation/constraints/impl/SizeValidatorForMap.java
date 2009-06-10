@@ -15,20 +15,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.lang.reflect.Array;
+import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Size;
 
 /**
- * Check that the length of an array is betweeb <i>min</i> and <i>max</i>
+ * Check that a string's length is between min and max.
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForArray implements ConstraintValidator<Size, Object[]> {
+public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
 	private int min;
 	private int max;
 
@@ -39,21 +39,21 @@ public class SizeValidatorForArray implements ConstraintValidator<Size, Object[]
 	}
 
 	/**
-	 * Checks the number of entries in an array.
+	 * Checks the number of entries in a map.
 	 *
-	 * @param array The array to validate.
+	 * @param map The map to validate.
 	 * @param constraintValidatorContext context in which the constraint is evaluated.
 	 *
-	 * @return Returns <code>true</code> if the array is <code>null</code> or the number of entries in
-	 *         <code>array</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
+	 * @return Returns <code>true</code> if the map is <code>null</code> or the number of entries in <code>map</code>
+	 *         is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean isValid(Object[] array, ConstraintValidatorContext constraintValidatorContext) {
-		if ( array == null ) {
+	public boolean isValid(Map map, ConstraintValidatorContext constraintValidatorContext) {
+		if ( map == null ) {
 			return true;
 		}
-		int length = Array.getLength( array );
-		return length >= min && length <= max;
+		int size = map.size();
+		return size >= min && size <= max;
 	}
 
 	private void validateParameters() {

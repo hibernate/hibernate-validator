@@ -32,7 +32,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.NotNullValidator;
+import org.hibernate.validation.constraints.impl.NotNullValidator;
 import org.hibernate.validation.engine.ConfigurationImpl;
 import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;

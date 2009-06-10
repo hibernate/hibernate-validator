@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,18 +15,28 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
 import java.lang.reflect.Array;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Size;
 
 /**
+ * Check that the length of an array is betweeb <i>min</i> and <i>max</i>
+ *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForArraysOfByte extends SizeValidatorForArraysOfPrimitives
-		implements ConstraintValidator<Size, byte[]> {
+public class SizeValidatorForArray implements ConstraintValidator<Size, Object[]> {
+	private int min;
+	private int max;
+
+	public void initialize(Size parameters) {
+		min = parameters.min();
+		max = parameters.max();
+		validateParameters();
+	}
 
 	/**
 	 * Checks the number of entries in an array.
@@ -38,11 +48,23 @@ public class SizeValidatorForArraysOfByte extends SizeValidatorForArraysOfPrimit
 	 *         <code>array</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean isValid(byte[] array, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Object[] array, ConstraintValidatorContext constraintValidatorContext) {
 		if ( array == null ) {
 			return true;
 		}
 		int length = Array.getLength( array );
 		return length >= min && length <= max;
+	}
+
+	private void validateParameters() {
+		if ( min < 0 ) {
+			throw new ValidationException( "The min parameter cannot be negative." );
+		}
+		if ( max < 0 ) {
+			throw new ValidationException( "The max paramter cannot be negative." );
+		}
+		if ( max < min ) {
+			throw new ValidationException( "The length cannot be negative." );
+		}
 	}
 }

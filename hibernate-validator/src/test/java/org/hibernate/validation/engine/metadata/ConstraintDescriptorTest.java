@@ -32,7 +32,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.NotNullValidator;
+import org.hibernate.validation.constraints.impl.NotNullValidator;
 import org.hibernate.validation.engine.Order;
 import org.hibernate.validation.engine.constraintcomposition.GermanAddress;
 import org.hibernate.validation.util.LoggerFactory;
