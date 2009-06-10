@@ -34,6 +34,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
+import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 
 import com.googlecode.jtype.TypeUtils;
@@ -148,6 +149,10 @@ public class ValidatorImpl implements Validator {
 	 */
 	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return getBeanMetaData( clazz ).getBeanDescriptor();
+	}
+
+	public <T> T unwrap(Class<T> type) {
+		throw new ValidationException( "Type " + type + " not supported");
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {

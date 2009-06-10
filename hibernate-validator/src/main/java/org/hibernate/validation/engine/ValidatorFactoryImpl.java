@@ -27,6 +27,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
+import javax.validation.ValidationException;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validation.engine.xml.AnnotationIgnores;
@@ -68,6 +69,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	 */
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
+	}
+
+	public <T> T unwrap(Class<T> type) {
+		throw new ValidationException( "Type " + type + " not supported");
 	}
 
 	/**
