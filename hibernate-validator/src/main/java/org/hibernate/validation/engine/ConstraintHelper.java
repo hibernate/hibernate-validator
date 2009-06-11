@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintValidator;
@@ -83,10 +84,10 @@ import org.hibernate.validation.util.ReflectionHelper;
 public class ConstraintHelper {
 
 	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
-			new HashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
+			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
 
 	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
-			new HashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
+			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
 
 	public ConstraintHelper() {
 
@@ -275,7 +276,7 @@ public class ConstraintHelper {
 	 *
 	 * @return <code>true</code> if the annotation fulfills the above condtions, <code>false</code> otherwise.
 	 */
-	public boolean isConstraintAnnotation(Annotation annotation) {
+	public static boolean isConstraintAnnotation(Annotation annotation) {
 
 		Constraint constraint = annotation.annotationType()
 				.getAnnotation( Constraint.class );
