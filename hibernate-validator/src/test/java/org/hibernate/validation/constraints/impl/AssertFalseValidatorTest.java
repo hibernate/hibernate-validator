@@ -15,34 +15,31 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.impl.AssertTrueValidator;
-
 /**
  * @author Alaa Nassef
  */
-public class AssertTrueValidatorTest {
+public class AssertFalseValidatorTest {
 
-	private static AssertTrueValidator constraint;
+	private static AssertFalseValidator constraint;
 
 	@BeforeClass
 	public static void init() {
-		constraint = new AssertTrueValidator();
+		constraint = new AssertFalseValidator();
 	}
 
 	@Test
 	public void testIsValid() {
 		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( true, null ) );
-		assertTrue( constraint.isValid( Boolean.TRUE, null ) );
-		assertFalse( constraint.isValid( false, null ) );
-		assertFalse( constraint.isValid( Boolean.FALSE, null ) );
+		assertTrue( constraint.isValid( false, null ) );
+		assertTrue( constraint.isValid( Boolean.FALSE, null ) );
+		assertFalse( constraint.isValid( true, null ) );
+		assertFalse( constraint.isValid( Boolean.TRUE, null ) );
 	}
 }
-

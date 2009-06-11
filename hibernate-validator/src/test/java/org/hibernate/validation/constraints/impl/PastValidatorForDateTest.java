@@ -15,33 +15,46 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
+
+import java.util.Date;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.impl.AssertFalseValidator;
+public class PastValidatorForDateTest {
 
-/**
- * @author Alaa Nassef
- */
-public class AssertFalseValidatorTest {
-
-	private static AssertFalseValidator constraint;
+	private static PastValidatorForDate constraint;
 
 	@BeforeClass
 	public static void init() {
-		constraint = new AssertFalseValidator();
+		constraint = new PastValidatorForDate();
 	}
 
 	@Test
 	public void testIsValid() {
+		Date futureDate = getFutureDate();
+		Date pastDate = getPastDate();
 		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( false, null ) );
-		assertTrue( constraint.isValid( Boolean.FALSE, null ) );
-		assertFalse( constraint.isValid( true, null ) );
-		assertFalse( constraint.isValid( Boolean.TRUE, null ) );
+		assertTrue( constraint.isValid( pastDate, null ) );
+		assertFalse( constraint.isValid( new Date(), null ) );
+		assertFalse( constraint.isValid( futureDate, null ) );
 	}
+
+	private Date getFutureDate() {
+		Date date = new Date();
+		long timeStamp = date.getTime();
+		date.setTime( timeStamp + 31557600000l );
+		return date;
+	}
+
+	private Date getPastDate() {
+		Date date = new Date();
+		long timeStamp = date.getTime();
+		date.setTime( timeStamp - 31557600000l );
+		return date;
+	}
+
 }

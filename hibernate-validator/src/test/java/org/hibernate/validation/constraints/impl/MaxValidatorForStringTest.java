@@ -15,50 +15,46 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import java.util.Calendar;
+import javax.validation.constraints.Max;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.impl.PastValidatorForCalendar;
+import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
 /**
  * @author Alaa Nassef
- * @author Hardy Ferentschik
  */
-public class PastValidatorForCalendarTest {
+public class MaxValidatorForStringTest {
 
-	private static PastValidatorForCalendar constraint;
+	private static MaxValidatorForString constraint;
 
 	@BeforeClass
 	public static void init() {
-		constraint = new PastValidatorForCalendar();
+		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
+		descriptor.setValue( "value", 15l );
+		descriptor.setValue( "message", "{validator.max}" );
+		Max m = AnnotationFactory.create( descriptor );
+
+		constraint = new MaxValidatorForString();
+		constraint.initialize( m );
 	}
 
 	@Test
 	public void testIsValid() {
-		Calendar futureDate = getFutureDate();
-		Calendar pastDate = getPastDate();
 		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( pastDate, null ) );
-		assertFalse( constraint.isValid( futureDate, null ) );
-	}
-
-	private Calendar getFutureDate() {
-		Calendar cal = Calendar.getInstance();
-		int year = cal.get( Calendar.YEAR );
-		cal.set( Calendar.YEAR, year + 1 );
-		return cal;
-	}
-
-	private Calendar getPastDate() {
-		Calendar cal = Calendar.getInstance();
-		int year = cal.get( Calendar.YEAR );
-		cal.set( Calendar.YEAR, year - 1 );
-		return cal;
+		assertTrue( constraint.isValid( "15", null ) );
+		assertTrue( constraint.isValid( "15.0", null ) );
+		assertTrue( constraint.isValid( "10", null ) );
+		assertTrue( constraint.isValid( "14.99", null ) );
+		assertTrue( constraint.isValid( "-14.99", null ) );
+		assertFalse( constraint.isValid( "20", null ) );
+		//number format exception
+		assertFalse( constraint.isValid( "15l", null ) );
 	}
 }

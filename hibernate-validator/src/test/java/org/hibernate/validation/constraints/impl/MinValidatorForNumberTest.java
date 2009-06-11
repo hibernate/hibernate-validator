@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -28,7 +28,6 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validation.constraints.impl.MinValidatorForNumber;
 
 /**
  * @author Alaa Nassef

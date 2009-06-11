@@ -1,4 +1,4 @@
-// $Id:$
+// $Id: FutureValidatorTest.java 16528 2009-05-11 12:18:22Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints.validatorcontext;
+package org.hibernate.validation.constraints.impl;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;

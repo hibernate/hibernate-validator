@@ -15,47 +15,49 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
-import javax.validation.constraints.Max;
+import java.util.Calendar;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validation.constraints.impl.MaxValidatorForString;
-
 /**
  * @author Alaa Nassef
+ * @author Hardy Ferentschik
  */
-public class MaxValidatorForStringTest {
+public class FutureValidatorForCalendarTest {
 
-	private static MaxValidatorForString constraint;
+	private static FutureValidatorForCalendar constraint;
 
 	@BeforeClass
 	public static void init() {
-		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
-		descriptor.setValue( "value", 15l );
-		descriptor.setValue( "message", "{validator.max}" );
-		Max m = AnnotationFactory.create( descriptor );
-
-		constraint = new MaxValidatorForString();
-		constraint.initialize( m );
+		constraint = new FutureValidatorForCalendar();
 	}
 
 	@Test
 	public void testIsValid() {
+		Calendar futureDate = getFutureDate();
+		Calendar pastDate = getPastDate();
 		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( "15", null ) );
-		assertTrue( constraint.isValid( "15.0", null ) );
-		assertTrue( constraint.isValid( "10", null ) );
-		assertTrue( constraint.isValid( "14.99", null ) );
-		assertTrue( constraint.isValid( "-14.99", null ) );
-		assertFalse( constraint.isValid( "20", null ) );
-		//number format exception
-		assertFalse( constraint.isValid( "15l", null ) );
+		assertTrue( constraint.isValid( futureDate, null ) );
+		assertFalse( constraint.isValid( pastDate, null ) );
 	}
+
+	private Calendar getFutureDate() {
+		Calendar cal = Calendar.getInstance();
+		int year = cal.get( Calendar.YEAR );
+		cal.set( Calendar.YEAR, year + 1 );
+		return cal;
+	}
+
+	private Calendar getPastDate() {
+		Calendar cal = Calendar.getInstance();
+		int year = cal.get( Calendar.YEAR );
+		cal.set( Calendar.YEAR, year - 1 );
+		return cal;
+	}
+
 }
