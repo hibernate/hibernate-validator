@@ -68,7 +68,7 @@ public class ValidatorTypeHelper {
 		//we now have all bind from a type to its resolution at one level
 		Type validatorType = ( ( ParameterizedType ) constraintValidatorType ).getActualTypeArguments()[VALIDATOR_TYPE_INDEX];
 		if ( validatorType == null ) {
-			throw new ValidationException( "Null is an invalid type for a constraint validator." );
+			throw new ValidationException( "null is an invalid type for a constraint validator." );
 		}
 		else if ( validatorType instanceof GenericArrayType ) {
 			validatorType = TypeUtils.getArrayType( TypeUtils.getComponentType( validatorType ) );
