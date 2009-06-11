@@ -4,14 +4,15 @@
     <test name="Unit tests">
         <packages>
             <package name="org.hibernate.validation.bootstrap"/>
-            <package name="org.hibernate.validation.constraints"/>
-            <package name="org.hibernate.validation.constraints.validatorcontext"/>
+            <package name="org.hibernate.validation.constraints.impl"/>
+            <package name="org.hibernate.validation.constraints.custom"/>
             <package name="org.hibernate.validation.engine"/>
             <package name="org.hibernate.validation.engine.constraintcomposition"/>
             <package name="org.hibernate.validation.engine.graphnavigation"/>
             <package name="org.hibernate.validation.engine.groups"/>
             <package name="org.hibernate.validation.engine.metadata"/>
-            <package name="org.hibernate.validation.engine.validatorresolution"/>
+            <package name="org.hibernate.validation.engine.inheritance"/>
+            <package name="org.hibernate.validation.engine.resolver"/>
             <package name="org.hibernate.validation.engine.xml"/>
             <package name="org.hibernate.validation.util"/>
             <package name="org.hibernate.validation.util.annotationfactory"/>
