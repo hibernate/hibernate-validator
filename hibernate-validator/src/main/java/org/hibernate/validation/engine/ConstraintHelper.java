@@ -39,6 +39,8 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 
 import org.hibernate.validation.constraints.impl.AssertFalseValidator;
 import org.hibernate.validation.constraints.impl.AssertTrueValidator;
@@ -66,6 +68,10 @@ import org.hibernate.validation.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validation.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validation.constraints.impl.SizeValidatorForMap;
 import org.hibernate.validation.constraints.impl.SizeValidatorForString;
+import org.hibernate.validation.constraints.impl.DecimalMaxValidatorForNumber;
+import org.hibernate.validation.constraints.impl.DecimalMaxValidatorForString;
+import org.hibernate.validation.constraints.impl.DecimalMinValidatorForNumber;
+import org.hibernate.validation.constraints.impl.DecimalMinValidatorForString;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -92,6 +98,21 @@ public class ConstraintHelper {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( AssertTrueValidator.class );
 		builtinConstraints.put( AssertTrue.class, constraintList );
+
+		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList.add( DecimalMaxValidatorForNumber.class );
+		constraintList.add( DecimalMaxValidatorForString.class );
+		builtinConstraints.put( DecimalMax.class, constraintList );
+
+		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList.add( DecimalMinValidatorForNumber.class );
+		constraintList.add( DecimalMinValidatorForString.class );
+		builtinConstraints.put( DecimalMin.class, constraintList );
+
+		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList.add( DigitsValidatorForString.class );
+		constraintList.add( DigitsValidatorForNumber.class );
+		builtinConstraints.put( Digits.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( FutureValidatorForCalendar.class );
@@ -122,9 +143,8 @@ public class ConstraintHelper {
 		builtinConstraints.put( Past.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
-		constraintList.add( DigitsValidatorForString.class );
-		constraintList.add( DigitsValidatorForNumber.class );
-		builtinConstraints.put( Digits.class, constraintList );
+		constraintList.add( PatternValidator.class );
+		builtinConstraints.put( Pattern.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( SizeValidatorForString.class );
@@ -139,10 +159,6 @@ public class ConstraintHelper {
 		constraintList.add( SizeValidatorForArraysOfInt.class );
 		constraintList.add( SizeValidatorForArraysOfLong.class );
 		builtinConstraints.put( Size.class, constraintList );
-
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
-		constraintList.add( PatternValidator.class );
-		builtinConstraints.put( Pattern.class, constraintList );
 	}
 
 	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getBuiltInConstraints(Class<? extends Annotation> annotationType) {

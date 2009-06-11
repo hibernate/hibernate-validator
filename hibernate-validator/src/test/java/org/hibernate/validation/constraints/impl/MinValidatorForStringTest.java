@@ -17,11 +17,14 @@
 */
 package org.hibernate.validation.constraints.impl;
 
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintValidator;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.BeforeClass;
+import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
@@ -29,24 +32,53 @@ import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
 /**
  * @author Alaa Nassef
+ * @author Hardy Ferentschik
  */
 public class MinValidatorForStringTest {
 
-	private static MinValidatorForString constraint;
-
-	@BeforeClass
-	public static void init() {
+	@Test
+	public void testIsValidMinValidator() {
 		AnnotationDescriptor<Min> descriptor = new AnnotationDescriptor<Min>( Min.class );
 		descriptor.setValue( "value", 15l );
 		descriptor.setValue( "message", "{validator.min}" );
 		Min m = AnnotationFactory.create( descriptor );
 
-		constraint = new MinValidatorForString();
+		MinValidatorForString constraint = new MinValidatorForString();
 		constraint.initialize( m );
+		testMinValidator( constraint );
 	}
 
 	@Test
-	public void testIsValid() {
+	public void testIsValidDecimalMinValidator() {
+		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
+		descriptor.setValue( "value", "1500E-2" );
+		descriptor.setValue( "message", "{validator.min}" );
+		DecimalMin m = AnnotationFactory.create( descriptor );
+
+		DecimalMinValidatorForString constraint = new DecimalMinValidatorForString();
+		constraint.initialize( m );
+		testMinValidator( constraint );
+	}
+
+	@Test
+	public void testInitializeDecimalMaxWithInvalidValue() {
+
+		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
+		descriptor.setValue( "value", "foobar" );
+		descriptor.setValue( "message", "{validator.min}" );
+		DecimalMin m = AnnotationFactory.create( descriptor );
+
+		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
+		try {
+			constraint.initialize( m );
+			fail();
+		}
+		catch ( ConstraintDeclarationException e ) {
+			// success
+		}
+	}
+
+	private void testMinValidator(ConstraintValidator<?, String> constraint) {
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( "20", null ) );
 		assertTrue( constraint.isValid( "15", null ) );
@@ -57,5 +89,4 @@ public class MinValidatorForStringTest {
 		//number format exception
 		assertFalse( constraint.isValid( "15l", null ) );
 	}
-
 }
