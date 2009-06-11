@@ -75,7 +75,7 @@ public class ValidationTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
 		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 		ConstraintViolation<Customer> constraintViolation = constraintViolations.iterator().next();
-		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
+		assertEquals( "may not be empty", constraintViolation.getMessage(), "Wrong message" );
 
 		// get a new factory using a custom configuration
 		configuration = Validation.byDefaultProvider().configure();

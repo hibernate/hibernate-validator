@@ -24,16 +24,20 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
-
-import org.hibernate.validation.constraints.impl.NotEmptyValidator;
+import javax.validation.ReportAsSingleViolation;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * @author Emmanuel Bernard
  */
 @Documented
-@Constraint(validatedBy = NotEmptyValidator.class)
+@Constraint(validatedBy = {})
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
+@ReportAsSingleViolation
+@NotNull
+@Size(min=1)
 public @interface NotEmpty {
 	String message() default "{org.hibernate.validation.constraints.NotEmpty.message}";
 

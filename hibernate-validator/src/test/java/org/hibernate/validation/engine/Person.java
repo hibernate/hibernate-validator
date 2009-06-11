@@ -17,21 +17,17 @@
 */
 package org.hibernate.validation.engine;
 
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validation.constraints.NotEmpty;
 
 /**
  * @author Hardy Ferentschik
  */
 public interface Person {
-	@NotNull
 	@NotEmpty
 	String getFirstName();
 
 	String getMiddleName();
 
-	@NotNull
 	@NotEmpty
 	String getLastName();
 }

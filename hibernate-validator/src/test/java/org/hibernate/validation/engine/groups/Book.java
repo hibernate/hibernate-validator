@@ -31,7 +31,6 @@ import org.hibernate.validation.engine.Second;
  * @author Hardy Ferentschik
  */
 public class Book {
-	@NotNull(groups = First.class)
 	@NotEmpty(groups = First.class)
 	private String title;
 

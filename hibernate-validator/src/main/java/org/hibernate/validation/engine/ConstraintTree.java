@@ -107,26 +107,33 @@ public class ConstraintTree<A extends Annotation> {
 	 * @param <V> Type of the value to be validated.
 	 */
 	public <T, V> void validateConstraints(V value, Type type, ExecutionContext<T> executionContext, List<ConstraintViolation<T>> constraintViolations) {
+		// first validate composing constraints
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			tree.validateConstraints( value, type, executionContext, constraintViolations );
 		}
 
-		if ( log.isTraceEnabled() ) {
-			log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
-		}
-		ConstraintValidator<A, V> validator = getInitalizedValidator(
-				value, type, executionContext.getConstraintValidatorFactory()
-		);
 		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
 				executionContext.peekParentPath(), executionContext.peekProperty(), descriptor
 		);
-		if ( !validator.isValid( value, constraintValidatorContext ) ) {
-			constraintViolations.addAll(
-					executionContext.createConstraintViolations(
-							value, constraintValidatorContext
-					)
+
+		// we could have a composing constraint which does not need its own validator.
+		if ( !descriptor.getConstraintValidatorClasses().isEmpty() ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
+			}
+			ConstraintValidator<A, V> validator = getInitalizedValidator(
+					value, type, executionContext.getConstraintValidatorFactory()
 			);
+
+			if ( !validator.isValid( value, constraintValidatorContext ) ) {
+				constraintViolations.addAll(
+						executionContext.createConstraintViolations(
+								value, constraintValidatorContext
+						)
+				);
+			}
 		}
+
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
 			final String message = ( String ) getParent().getDescriptor().getAttributes().get( "message" );
@@ -150,6 +157,7 @@ public class ConstraintTree<A extends Annotation> {
 	 *
 	 * @return A initalized constraint validator matching the type of the value to be validated.
 	 */
+	@SuppressWarnings("unchecked")
 	private <V> ConstraintValidator<A, V> getInitalizedValidator(V value, Type type, ConstraintValidatorFactory constraintFactory) {
 		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( value, type );
 

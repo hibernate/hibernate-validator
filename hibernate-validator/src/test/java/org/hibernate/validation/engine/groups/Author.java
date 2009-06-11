@@ -32,7 +32,6 @@ public class Author {
 	@NotEmpty(groups = Last.class)
 	private String firstName;
 
-	@NotNull(groups = First.class)
 	@NotEmpty(groups = First.class)
 	private String lastName;
 

@@ -118,7 +118,7 @@ public class GroupTest {
 		constraintViolations = validator.validate( book, Book.All.class );
 		ConstraintViolation constraintViolation = constraintViolations.iterator().next();
 		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
-		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
+		assertEquals( "may not be empty", constraintViolation.getMessage(), "Wrong message" );
 		assertEquals( constraintViolation.getRootBean(), book, "Wrong root entity" );
 		assertEquals( constraintViolation.getInvalidValue(), book.getTitle(), "Wrong value" );
 		assertEquals( "title", constraintViolation.getPropertyPath(), "Wrong propertyName" );
