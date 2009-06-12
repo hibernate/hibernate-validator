@@ -120,12 +120,12 @@ public class ValidationXmlParser {
 				log.debug(
 						"Trying to open input stream for {}.", mappingFileName.getValue()
 				);
-				InputStream in = getInputStreamForPath( mappingFileName.getValue() );
-				if ( in == null ) {
-					throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName + "." );
-				}
-				xmlParameters.mappings.add( in );
 			}
+			InputStream in = getInputStreamForPath( mappingFileName.getValue() );
+			if ( in == null ) {
+				throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName.getValue() + "." );
+			}
+			xmlParameters.mappings.add( in );
 		}
 	}
 
@@ -212,7 +212,7 @@ public class ValidationXmlParser {
 
 		log.info( "{} found.", VALIDATION_XML_FILE );
 
-		ValidationConfigType validationConfig = null;
+		ValidationConfigType validationConfig;
 		Schema schema = getValidationConfigurationSchema();
 		try {
 			JAXBContext jc = JAXBContext.newInstance( ValidationConfigType.class );
@@ -224,7 +224,7 @@ public class ValidationXmlParser {
 		}
 		catch ( JAXBException e ) {
 			log.error( "Error parsing validation.xml: {}", e.getMessage() );
-			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE);
+			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE );
 		}
 		return validationConfig;
 	}
