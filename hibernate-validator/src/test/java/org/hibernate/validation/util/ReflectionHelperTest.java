@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import javax.validation.ValidationException;
+import javax.validation.ConstraintPayload;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
@@ -134,6 +135,12 @@ public class ReflectionHelperTest {
 
 			public Class<?>[] groups() {
 				return new Class<?>[] { Default.class };
+			}
+
+			public Class<? extends ConstraintPayload>[] payload() {
+				@SuppressWarnings( "unchecked")
+				Class<? extends ConstraintPayload>[] classes = new Class[] { };
+				return classes;
 			}
 
 			public Class<? extends Annotation> annotationType() {
