@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConstraintDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;

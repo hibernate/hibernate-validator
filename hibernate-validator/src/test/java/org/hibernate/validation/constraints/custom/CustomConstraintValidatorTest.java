@@ -21,7 +21,7 @@ import java.util.Set;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ConstraintViolation;
-import javax.validation.PropertyDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;

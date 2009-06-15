@@ -20,17 +20,14 @@ package org.hibernate.validation.engine;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
-
-import com.googlecode.jtype.TypeUtils;
 
 import org.hibernate.validation.util.ReflectionHelper;
 

@@ -21,8 +21,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Set;
-import javax.validation.BeanDescriptor;
-import javax.validation.PropertyDescriptor;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 /**
  * Interface defining the meta data about the constraints defined in a given bean.

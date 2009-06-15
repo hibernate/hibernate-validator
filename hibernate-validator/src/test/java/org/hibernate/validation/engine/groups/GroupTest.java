@@ -18,9 +18,9 @@
 package org.hibernate.validation.engine.groups;
 
 import java.util.Set;
-import javax.validation.BeanDescriptor;
+import javax.validation.metadata.BeanDescriptor;
 import javax.validation.ConstraintViolation;
-import javax.validation.PropertyDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;

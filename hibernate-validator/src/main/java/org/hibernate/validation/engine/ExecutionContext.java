@@ -28,7 +28,7 @@ import java.util.Stack;
 import java.lang.reflect.Member;
 import java.lang.reflect.Field;
 import java.lang.annotation.ElementType;
-import javax.validation.ConstraintDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;

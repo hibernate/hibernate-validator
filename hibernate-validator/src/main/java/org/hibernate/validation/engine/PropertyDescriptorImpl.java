@@ -17,7 +17,7 @@
 */
 package org.hibernate.validation.engine;
 
-import javax.validation.PropertyDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 /**
  * Describe a validated element (class, field or property).

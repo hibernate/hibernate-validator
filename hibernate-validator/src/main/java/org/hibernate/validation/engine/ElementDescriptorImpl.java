@@ -20,8 +20,8 @@ package org.hibernate.validation.engine;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.validation.ConstraintDescriptor;
-import javax.validation.ElementDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 
 /**
  * Describe a validated element (class, field or property).

@@ -1,8 +1,8 @@
 package org.hibernate.validation.engine;
 
 import java.util.Set;
-import javax.validation.BeanDescriptor;
-import javax.validation.PropertyDescriptor;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 /**
  * @author Emmanuel Bernard

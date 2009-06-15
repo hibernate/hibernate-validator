@@ -1,6 +1,6 @@
 package org.hibernate.validation.engine;
 
-import javax.validation.ConstraintDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.MessageInterpolator;
 
 /**

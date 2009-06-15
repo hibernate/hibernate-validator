@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
-import javax.validation.ConstraintDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.ReportAsSingleViolation;

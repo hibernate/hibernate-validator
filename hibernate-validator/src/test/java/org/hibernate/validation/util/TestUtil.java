@@ -19,10 +19,10 @@ package org.hibernate.validation.util;
 
 import java.io.InputStream;
 import java.util.Set;
-import javax.validation.ConstraintDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
-import javax.validation.ElementDescriptor;
-import javax.validation.PropertyDescriptor;
+import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.Validation;
 import javax.validation.Validator;
 

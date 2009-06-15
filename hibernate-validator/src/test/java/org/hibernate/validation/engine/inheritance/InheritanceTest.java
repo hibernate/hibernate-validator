@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -18,8 +18,8 @@
 package org.hibernate.validation.engine.inheritance;
 
 import java.lang.annotation.Annotation;
-import javax.validation.BeanDescriptor;
-import javax.validation.PropertyDescriptor;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 

@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.BeanDescriptor;
+import javax.validation.metadata.BeanDescriptor;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
