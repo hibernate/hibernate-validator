@@ -37,7 +37,7 @@ import org.hibernate.validation.engine.ConfigurationImpl;
 import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.engine.ValidatorFactoryImpl;
-import org.hibernate.validation.engine.metadata.Customer;
+import org.hibernate.validation.engine.Customer;
 
 /**
  * Tests the Bean Validation bootstrapping.

@@ -24,10 +24,11 @@ import java.util.Map;
 import javax.validation.ConstraintValidator;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.composition.FrenchZipcode;
-import org.hibernate.validation.constraints.composition.FrenchZipcodeConstraintValidator;
+import org.hibernate.validation.constraints.custom.Positive;
+import org.hibernate.validation.constraints.custom.PositiveConstraintValidator;
 
 /**
  * Tests for message resolution.
@@ -38,11 +39,13 @@ public class ValidatorTypeTest {
 
 	@Test
 	public void testTypeDiscovery() {
-		List<Class<? extends ConstraintValidator<FrenchZipcode, ?>>> validators =
-				new ArrayList<Class<? extends ConstraintValidator<FrenchZipcode, ?>>>();
-		validators.add( FrenchZipcodeConstraintValidator.class );
+		List<Class<? extends ConstraintValidator<Positive, ?>>> validators =
+				new ArrayList<Class<? extends ConstraintValidator<Positive, ?>>>();
+		validators.add( PositiveConstraintValidator.class );
 		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes = ValidatorTypeHelper
 				.getValidatorsTypes( validators );
-		assertEquals( FrenchZipcodeConstraintValidator.class, validatorsTypes.get( String.class ) );
+
+		assertEquals( validatorsTypes.get( Integer.class ), PositiveConstraintValidator.class );
+		assertNull( validatorsTypes.get( String.class ) );
 	}
 }

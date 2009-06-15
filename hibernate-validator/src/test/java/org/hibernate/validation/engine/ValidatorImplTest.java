@@ -32,7 +32,6 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.engine.metadata.Customer;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.TestUtil;
 import static org.hibernate.validation.util.TestUtil.assertConstraintViolation;
