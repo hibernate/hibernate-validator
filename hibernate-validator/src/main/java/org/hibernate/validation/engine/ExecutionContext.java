@@ -253,7 +253,7 @@ public class ExecutionContext<T> {
 		}
 	}
 
-	public void markCurrentPropertyAsIndexed() {
+	public void markCurrentPropertyAsIterable() {
 		String property = peekProperty();
 		property += "[]";
 		propertyPath.remove( propertyPath.size() - 1 );
@@ -284,6 +284,7 @@ public class ExecutionContext<T> {
 		return buildPath( propertyPath.size() - 2 );
 	}
 
+	@SuppressWarnings("SimplifiableIfStatement")
 	public boolean isValidationRequired(MetaConstraint metaConstraint) {
 		if ( !metaConstraint.getGroupList().contains( currentGroup ) ) {
 			return false;

@@ -17,12 +17,9 @@
 */
 package org.hibernate.validation.engine;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.Valid;
-
-import org.hibernate.validation.engine.Order;
-import org.hibernate.validation.engine.Person;
 
 /**
  * @author Hardy Ferentschik
@@ -34,14 +31,14 @@ public class Customer implements Person {
 	private String lastName;
 
 	@Valid
-	private List<Order> orderList = new ArrayList<Order>();
+	private Set<Order> orders = new HashSet<Order>();
 
 	public void addOrder(Order order) {
-		orderList.add( order );
+		orders.add( order );
 	}
 
-	public List<Order> getOrderList() {
-		return orderList;
+	public Set<Order> getOrders() {
+		return orders;
 	}
 
 	public String getFirstName() {

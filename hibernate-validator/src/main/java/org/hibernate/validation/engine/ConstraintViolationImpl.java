@@ -17,8 +17,8 @@
 */
 package org.hibernate.validation.engine;
 
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
+import javax.validation.metadata.ConstraintDescriptor;
 
 /**
  * @author Emmanuel Bernard
@@ -35,7 +35,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private final Class<T> rootBeanClass;
 
 
-	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, 
+	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass,
 								   T rootBean, Object leafBeanInstance, Object value,
 								   String propertyPath, ConstraintDescriptor constraintDescriptor) {
 		this.rawMessage = messageTemplate;
@@ -93,6 +93,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	}
 
 	@Override
+	@SuppressWarnings("SimplifiableIfStatement")
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -112,6 +113,9 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		if ( rootBean != null ? !rootBean.equals( that.rootBean ) : that.rootBean != null ) {
 			return false;
 		}
+		if ( leafBeanInstance != null ? !leafBeanInstance.equals( that.leafBeanInstance ) : that.leafBeanInstance != null ) {
+			return false;
+		}
 		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
 			return false;
 		}
@@ -122,9 +126,10 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	@Override
 	public int hashCode() {
 		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
-		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
-		result = 31 * result + ( value != null ? value.hashCode() : 0 );
 		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
+		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
+		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
+		result = 31 * result + ( value != null ? value.hashCode() : 0 );
 		return result;
 	}
 }

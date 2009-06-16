@@ -28,14 +28,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.BeanDescriptor;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
-import javax.validation.Validator;
 import javax.validation.ValidationException;
+import javax.validation.Validator;
 import javax.validation.groups.Default;
+import javax.validation.metadata.BeanDescriptor;
 
 import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ import org.hibernate.validation.engine.groups.GroupChain;
 import org.hibernate.validation.engine.groups.GroupChainGenerator;
 import org.hibernate.validation.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validation.util.LoggerFactory;
-import org.hibernate.validation.util.PropertyIterator;
+import org.hibernate.validation.util.PropertyPath;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -125,7 +125,7 @@ public class ValidatorImpl implements Validator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		List<ConstraintViolation<T>> failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
-		validateProperty( object, new PropertyIterator( propertyName ), failingConstraintViolations, groupChain );
+		validateProperty( object, new PropertyPath( propertyName ), failingConstraintViolations, groupChain );
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
@@ -140,7 +140,7 @@ public class ValidatorImpl implements Validator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		List<ConstraintViolation<T>> failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
-		validateValue( beanType, value, new PropertyIterator( propertyName ), failingConstraintViolations, groupChain );
+		validateValue( beanType, value, new PropertyPath( propertyName ), failingConstraintViolations, groupChain );
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
@@ -152,7 +152,7 @@ public class ValidatorImpl implements Validator {
 	}
 
 	public <T> T unwrap(Class<T> type) {
-		throw new ValidationException( "Type " + type + " not supported");
+		throw new ValidationException( "Type " + type + " not supported" );
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {
@@ -288,7 +288,8 @@ public class ValidatorImpl implements Validator {
 				Object value = ReflectionHelper.getValue( member, context.peekCurrentBean() );
 				if ( value != null ) {
 					Iterator<?> iter = createIteratorForCascadedValue( context, type, value );
-					validateCascadedConstraint( context, iter );
+					boolean isIndexable = isIndexable( type );
+					validateCascadedConstraint( context, iter, isIndexable );
 				}
 			}
 			context.popProperty();
@@ -309,17 +310,17 @@ public class ValidatorImpl implements Validator {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
 			iter = ( ( Iterable<?> ) value ).iterator();
-			context.markCurrentPropertyAsIndexed();
+			context.markCurrentPropertyAsIterable();
 		}
 		else if ( ReflectionHelper.isMap( type ) ) {
 			Map<?, ?> map = ( Map<?, ?> ) value;
 			iter = map.values().iterator();
-			context.markCurrentPropertyAsIndexed();
+			context.markCurrentPropertyAsIterable();
 		}
 		else if ( TypeUtils.isArray( type ) ) {
 			List<?> arrayList = Arrays.asList( value );
 			iter = arrayList.iterator();
-			context.markCurrentPropertyAsIndexed();
+			context.markCurrentPropertyAsIterable();
 		}
 		else {
 			List<Object> list = new ArrayList<Object>();
@@ -329,8 +330,30 @@ public class ValidatorImpl implements Validator {
 		return iter;
 	}
 
+	/**
+	 * Called when processing cascaded constraints. This methods inspects the type of the cascaded constraints and in case
+	 * of a list or array creates an iterator in order to validate each element.
+	 *
+	 * @param type the type of the cascaded field or property.
+	 *
+	 * @return An iterator over the value of a cascaded property.
+	 */
+	private boolean isIndexable(Type type) {
+		boolean isIndexable = false;
+		if ( ReflectionHelper.isList( type ) ) {
+			isIndexable = true;
+		}
+		else if ( ReflectionHelper.isMap( type ) ) {
+			isIndexable = true;
+		}
+		else if ( TypeUtils.isArray( type ) ) {
+			isIndexable = true;
+		}
+		return isIndexable;
+	}
+
 	@SuppressWarnings("RedundantArrayCreation")
-	private <T> void validateCascadedConstraint(ExecutionContext<T> context, Iterator<?> iter) {
+	private <T> void validateCascadedConstraint(ExecutionContext<T> context, Iterator<?> iter, boolean isIndexable) {
 		Object actualValue;
 		String propertyIndex;
 		int i = 0;
@@ -346,7 +369,9 @@ public class ValidatorImpl implements Validator {
 			}
 
 			if ( !context.isAlreadyValidated( actualValue ) ) {
-				context.setPropertyIndex( propertyIndex );
+				if ( isIndexable ) {
+					context.setPropertyIndex( propertyIndex );
+				}
 				context.pushCurrentBean( actualValue );
 				GroupChain groupChain = groupChainGenerator.getGroupChainFor( Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) );
 				validateInContext( context, groupChain );
@@ -356,13 +381,15 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T> void validateProperty(T object, PropertyIterator propertyIter, List<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T> void validateProperty(T object, PropertyPath propertyPath, List<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 
 		@SuppressWarnings("unchecked")
 		final Class<T> beanType = ( Class<T> ) object.getClass();
 
 		Set<MetaConstraint<T, ?>> metaConstraints = new HashSet<MetaConstraint<T, ?>>();
-		Object hostingBeanInstance = collectMetaConstraintsForPath( beanType, object, propertyIter, metaConstraints );
+		Object hostingBeanInstance = collectMetaConstraintsForPath(
+				beanType, object, propertyPath.iterator(), metaConstraints
+		);
 
 		if ( hostingBeanInstance == null ) {
 			throw new IllegalArgumentException( "Invalid property path." );
@@ -379,7 +406,13 @@ public class ValidatorImpl implements Validator {
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			validatePropertyForGroup(
-					object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group, cachedResolver
+					object,
+					propertyPath,
+					failingConstraintViolations,
+					metaConstraints,
+					hostingBeanInstance,
+					group,
+					cachedResolver
 			);
 		}
 
@@ -389,7 +422,13 @@ public class ValidatorImpl implements Validator {
 			int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
 			for ( Group group : sequence ) {
 				validatePropertyForGroup(
-						object, propertyIter, failingConstraintViolations, metaConstraints, hostingBeanInstance, group, cachedResolver
+						object,
+						propertyPath,
+						failingConstraintViolations,
+						metaConstraints,
+						hostingBeanInstance,
+						group,
+						cachedResolver
 				);
 
 				if ( failingConstraintViolations.size() > numberOfConstraintViolationsBefore ) {
@@ -401,7 +440,7 @@ public class ValidatorImpl implements Validator {
 
 	private <T> void validatePropertyForGroup(
 			T object,
-			PropertyIterator propertyIter,
+			PropertyPath propertyIter,
 			List<ConstraintViolation<T>> failingConstraintViolations,
 			Set<MetaConstraint<T, ?>> metaConstraints,
 			Object hostingBeanInstance,
@@ -443,9 +482,9 @@ public class ValidatorImpl implements Validator {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> void validateValue(Class<T> beanType, Object value, PropertyIterator propertyIter, List<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T> void validateValue(Class<T> beanType, Object value, PropertyPath propertyPath, List<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 		Set<MetaConstraint<T, ?>> metaConstraints = new HashSet<MetaConstraint<T, ?>>();
-		collectMetaConstraintsForPath( beanType, null, propertyIter, metaConstraints );
+		collectMetaConstraintsForPath( beanType, null, propertyPath.iterator(), metaConstraints );
 
 		if ( metaConstraints.size() == 0 ) {
 			return;
@@ -461,7 +500,7 @@ public class ValidatorImpl implements Validator {
 			validateValueForGroup(
 					beanType,
 					value,
-					propertyIter,
+					propertyPath,
 					failingConstraintViolations,
 					metaConstraints,
 					group,
@@ -478,7 +517,7 @@ public class ValidatorImpl implements Validator {
 				validateValueForGroup(
 						beanType,
 						value,
-						propertyIter,
+						propertyPath,
 						failingConstraintViolations,
 						metaConstraints,
 						group,
@@ -495,7 +534,7 @@ public class ValidatorImpl implements Validator {
 	private <T> void validateValueForGroup(
 			Class<T> beanType,
 			Object value,
-			PropertyIterator propertyIter,
+			PropertyPath propertyIter,
 			List<ConstraintViolation<T>> failingConstraintViolations,
 			Set<MetaConstraint<T, ?>> metaConstraints,
 			Group group,
@@ -546,22 +585,23 @@ public class ValidatorImpl implements Validator {
 	 * @return Returns the bean hosting the constraints which match the specified property path.
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, PropertyIterator propertyIter, Set<MetaConstraint<T, ?>> metaConstraints) {
-		propertyIter.split();
+	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<PropertyPath.PathElement> propertyIter, Set<MetaConstraint<T, ?>> metaConstraints) {
 
+		PropertyPath.PathElement elem = propertyIter.next();
 		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
 		if ( !propertyIter.hasNext() ) {
+
 			//use metadata first as ReflectionHelper#containsMember is slow
 			//TODO store some metadata here?
-			if ( metaData.getPropertyDescriptor( propertyIter.getHead() ) == null
-					&& !ReflectionHelper.containsMember( clazz, propertyIter.getHead() ) ) {
+			if ( metaData.getPropertyDescriptor( elem.value() ) == null
+					&& !ReflectionHelper.containsMember( clazz, elem.value() ) ) {
 				//TODO better error report
 				throw new IllegalArgumentException( "Invalid property path." );
 			}
 
 			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
-				if ( metaConstraint.getPropertyName().equals( propertyIter.getHead() ) ) {
+				if ( metaConstraint.getPropertyName().equals( elem.value() ) ) {
 					metaConstraints.add( metaConstraint );
 				}
 			}
@@ -569,13 +609,13 @@ public class ValidatorImpl implements Validator {
 		else {
 			List<Member> cascadedMembers = metaData.getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
-				if ( ReflectionHelper.getPropertyName( m ).equals( propertyIter.getHead() ) ) {
+				if ( ReflectionHelper.getPropertyName( m ).equals( elem.value() ) ) {
 					Type type = ReflectionHelper.typeOf( m );
 					value = value == null ? null : ReflectionHelper.getValue( m, value );
-					if ( propertyIter.isIndexed() ) {
+					if ( elem.isIndexed() ) {
 						type = ReflectionHelper.getIndexedType( type );
 						value = value == null ? null : ReflectionHelper.getIndexedValue(
-								value, propertyIter.getIndex()
+								value, elem.getIndex()
 						);
 						if ( type == null ) {
 							continue;

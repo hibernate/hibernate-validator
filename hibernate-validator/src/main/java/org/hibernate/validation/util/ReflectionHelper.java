@@ -243,7 +243,7 @@ public class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is a iterable type, <code>false</code> otherwise.
 	 */
 	public static boolean isIterable(Type type) {
-		if ( type instanceof Class && isIterableClass( ( Class ) type ) ) {
+		if ( type instanceof Class && extendsOrImplements( ( Class ) type, Iterable.class ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -262,7 +262,7 @@ public class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>Map</code>, <code>false</code> otherwise.
 	 */
 	public static boolean isMap(Type type) {
-		if ( type instanceof Class && isMapClass( ( Class ) type ) ) {
+		if ( type instanceof Class && extendsOrImplements( ( Class ) type, Map.class ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -271,6 +271,25 @@ public class ReflectionHelper {
 		if ( type instanceof WildcardType ) {
 			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
 			return upperBounds.length != 0 && isMap( upperBounds[0] );
+		}
+		return false;
+	}
+
+	/**
+	 * @param type the type to check.
+	 *
+	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>List</code>, <code>false</code> otherwise.
+	 */
+	public static boolean isList(Type type) {
+		if ( type instanceof Class && extendsOrImplements( ( Class ) type, List.class ) ) {
+			return true;
+		}
+		if ( type instanceof ParameterizedType ) {
+			return isList( ( ( ParameterizedType ) type ).getRawType() );
+		}
+		if ( type instanceof WildcardType ) {
+			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
+			return upperBounds.length != 0 && isList( upperBounds[0] );
 		}
 		return false;
 	}
@@ -438,7 +457,9 @@ public class ReflectionHelper {
 	 * Returns the autoboxed type of a primitive type.
 	 *
 	 * @param primitiveType the primitive type
-	 * @return  the autoboxed type of a primitive type.
+	 *
+	 * @return the autoboxed type of a primitive type.
+	 *
 	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not represent a primitive type.
 	 */
 	public static Class<?> boxedTyp(Type primitiveType) {
@@ -494,28 +515,16 @@ public class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the specified class parameter is an instance of a collection class.
+	 * Checks whether the specified {@code clazz} extends or inherits the specified super class or interface.
 	 *
-	 * @param clazz <code>Class</code> to check.
+	 * @param clazz @{code Class} to check.
+	 * @param superClassOrInterface The super class/interface {@code clazz}.
 	 *
-	 * @return <code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.
+	 * @return {@code true} if {@code clazz} extends or implements {@code superClassOrInterface}, {@code false} otherwise. 
 	 */
-	private static boolean isIterableClass(Class<?> clazz) {
+	private static boolean extendsOrImplements(Class<?> clazz, Class<?> superClassOrInterface) {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		computeClassHierarchy( clazz, classes );
-		return classes.contains( Iterable.class );
-	}
-
-	/**
-	 * Checks whether the specified class parameter is an instance of a collection class.
-	 *
-	 * @param clazz <code>Class</code> to check.
-	 *
-	 * @return <code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.
-	 */
-	private static boolean isMapClass(Class<?> clazz) {
-		List<Class<?>> classes = new ArrayList<Class<?>>();
-		computeClassHierarchy( clazz, classes );
-		return classes.contains( Map.class );
+		return classes.contains( superClassOrInterface );
 	}
 }

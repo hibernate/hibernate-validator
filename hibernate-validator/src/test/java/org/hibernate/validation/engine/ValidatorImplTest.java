@@ -159,7 +159,7 @@ public class ValidatorImplTest {
 		assertEquals(
 				constraintViolations.size(),
 				3,
-				"we should have been 2 not null violation for addresslines and one lenth violation for city"
+				"we should have been 2 not null violation for addresslines and one length violation for city"
 		);
 
 		constraintViolations = validator.validateProperty( address, "city" );
@@ -185,7 +185,7 @@ public class ValidatorImplTest {
 	}
 
 	@Test
-	public void testValidateList() {
+	public void testValidateSet() {
 		Validator validator = TestUtil.getValidator();
 
 		Customer customer = new Customer();
@@ -204,7 +204,7 @@ public class ValidatorImplTest {
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 		assertEquals( constraintViolation.getRootBean(), customer, "Wrong root entity" );
 		assertEquals( constraintViolation.getInvalidValue(), order.getOrderNumber(), "Wrong value" );
-		assertEquals( "orderList[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
+		assertEquals( "orders[].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 	}
 
 	@Test
@@ -248,7 +248,7 @@ public class ValidatorImplTest {
 		assertEquals( constraintViolation.getRootBean(), clint, "Wrong root entity" );
 		assertEquals( constraintViolation.getInvalidValue(), morgan.getLastName(), "Wrong value" );
 		assertEquals(
-				"playedWith[0].playedWith[1].lastName", constraintViolation.getPropertyPath(), "Wrong propertyName"
+				constraintViolation.getPropertyPath(), "playedWith[0].playedWith[1].lastName", "Wrong propertyName"
 		);
 	}
 
@@ -257,7 +257,7 @@ public class ValidatorImplTest {
 		Validator validator = TestUtil.getValidator();
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validateValue(
-				Customer.class, "orderList[0].orderNumber", null
+				Customer.class, "orders[0].orderNumber", null
 		);
 		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
@@ -267,9 +267,9 @@ public class ValidatorImplTest {
 		assertEquals( constraintViolation.getRootBean(), null, "Wrong root entity" );
 		assertEquals( constraintViolation.getRootBeanClass(), Customer.class, "Wrong root bean class" );
 		assertEquals( constraintViolation.getInvalidValue(), null, "Wrong value" );
-		assertEquals( "orderList[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
+		assertEquals( "orders[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
-		constraintViolations = validator.validateValue( Customer.class, "orderList[0].orderNumber", 1234 );
+		constraintViolations = validator.validateValue( Customer.class, "orders[0].orderNumber", 1234 );
 		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
@@ -294,7 +294,7 @@ public class ValidatorImplTest {
 		}
 
 		try {
-			validator.validateValue( Customer.class, "orderList[0].foobar", null );
+			validator.validateValue( Customer.class, "orders[0].foobar", null );
 			fail();
 		}
 		catch ( IllegalArgumentException e ) {
@@ -311,7 +311,7 @@ public class ValidatorImplTest {
 		customer.addOrder( order );
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validateProperty(
-				customer, "orderList[0].orderNumber"
+				customer, "orders[0].orderNumber"
 		);
 		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );
 
@@ -320,7 +320,7 @@ public class ValidatorImplTest {
 		assertEquals( "may not be null", constraintViolation.getMessage(), "Wrong message" );
 		assertEquals( constraintViolation.getRootBean(), customer, "Wrong root entity" );
 		assertEquals( constraintViolation.getInvalidValue(), order.getOrderNumber(), "Wrong value" );
-		assertEquals( "orderList[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
+		assertEquals( "orders[0].orderNumber", constraintViolation.getPropertyPath(), "Wrong propertyName" );
 
 		order.setOrderNumber( 1234 );
 		constraintViolations = validator.validateProperty( customer, "orderList[0].orderNumber" );
@@ -336,11 +336,11 @@ public class ValidatorImplTest {
 		customer.addOrder( order );
 
 		try {
-			validator.validateProperty( customer, "orderList[1].orderNumber" );
+			validator.validateProperty( customer, "orders[].orderNumber" );
 			fail();
 		}
 		catch ( IllegalArgumentException e ) {
-			assertEquals( "Invalid property path.", e.getMessage() );
+			// success
 		}
 
 		try {
@@ -348,7 +348,7 @@ public class ValidatorImplTest {
 			fail();
 		}
 		catch ( IllegalArgumentException e ) {
-			assertEquals( "Invalid property path.", e.getMessage() );
+			// success
 		}
 
 		try {
@@ -356,15 +356,15 @@ public class ValidatorImplTest {
 			fail();
 		}
 		catch ( IllegalArgumentException e ) {
-			assertEquals( "Invalid property path.", e.getMessage() );
+			// success
 		}
 
 		try {
-			validator.validateProperty( customer, "orderList[0].foobar" );
+			validator.validateProperty( customer, "orders[].foobar" );
 			fail();
 		}
 		catch ( IllegalArgumentException e ) {
-			assertEquals( "Invalid property path.", e.getMessage() );
+			// success
 		}
 	}
 
@@ -392,7 +392,7 @@ public class ValidatorImplTest {
 				"may not be null",
 				Customer.class,
 				null,
-				"orderList[0].orderNumber"
+				"orders[].orderNumber"
 		);
 
 		order.setOrderNumber( 123 );
