@@ -28,10 +28,6 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.engine.First;
-import org.hibernate.validation.engine.Last;
-import org.hibernate.validation.engine.Second;
-
 /**
  * @author Hardy Ferentschik
  */
