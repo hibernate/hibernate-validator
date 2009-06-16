@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -15,12 +15,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints;
+package org.hibernate.validation.constraints.impl;
 
 import java.util.Calendar;
 import java.util.Date;
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Future;
+import javax.validation.constraints.Past;
 
 /**
  * @author Hardy Ferentschik

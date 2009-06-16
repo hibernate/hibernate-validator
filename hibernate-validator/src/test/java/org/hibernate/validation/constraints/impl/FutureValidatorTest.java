@@ -24,7 +24,6 @@ import javax.validation.Validator;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.DateHolder;
 import org.hibernate.validation.util.TestUtil;
 
 /**
