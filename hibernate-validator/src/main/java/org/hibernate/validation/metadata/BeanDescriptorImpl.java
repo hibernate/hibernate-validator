@@ -1,4 +1,4 @@
-package org.hibernate.validation.engine;
+package org.hibernate.validation.metadata;
 
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;

@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -30,12 +30,12 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.slf4j.Logger;
 

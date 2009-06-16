@@ -30,8 +30,12 @@ import javax.validation.ValidatorFactory;
 import javax.validation.ValidationException;
 import javax.validation.spi.ConfigurationState;
 
-import org.hibernate.validation.engine.xml.AnnotationIgnores;
-import org.hibernate.validation.engine.xml.XmlMappingParser;
+import org.hibernate.validation.metadata.AnnotationIgnores;
+import org.hibernate.validation.xml.XmlMappingParser;
+import org.hibernate.validation.metadata.BeanMetaDataImpl;
+import org.hibernate.validation.metadata.BeanMetaDataCache;
+import org.hibernate.validation.metadata.MetaConstraint;
+import org.hibernate.validation.metadata.ConstraintHelper;
 
 /**
  * Factory returning initialized <code>Validator</code> instances.

@@ -6,6 +6,9 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 
+import org.hibernate.validation.metadata.BeanMetaDataCache;
+import org.hibernate.validation.metadata.ConstraintHelper;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

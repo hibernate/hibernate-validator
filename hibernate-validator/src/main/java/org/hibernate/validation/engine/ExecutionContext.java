@@ -35,6 +35,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 
 import org.hibernate.validation.util.IdentitySet;
+import org.hibernate.validation.metadata.MetaConstraint;
 
 /**
  * Context object keeping track of all processed objects and failing constraints.

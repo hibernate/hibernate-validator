@@ -34,8 +34,8 @@ import javax.validation.spi.ValidationProvider;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.engine.resolver.DefaultTraversableResolver;
-import org.hibernate.validation.engine.xml.ValidationBootstrapParameters;
-import org.hibernate.validation.engine.xml.ValidationXmlParser;
+import org.hibernate.validation.xml.ValidationBootstrapParameters;
+import org.hibernate.validation.xml.ValidationXmlParser;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.Version;
 

@@ -36,6 +36,8 @@ import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ValidatorTypeHelper;
+import org.hibernate.validation.engine.ExecutionContext;
+import org.hibernate.validation.engine.ConstraintValidatorContextImpl;
 
 /**
  * Due to constraint conposition a single constraint annotation can lead to a whole constraint tree beeing validated.

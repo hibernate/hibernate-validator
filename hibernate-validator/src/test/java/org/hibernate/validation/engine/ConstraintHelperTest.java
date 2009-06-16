@@ -29,6 +29,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.metadata.ConstraintHelper;
 
 /**
  * @author Hardy Ferentschik

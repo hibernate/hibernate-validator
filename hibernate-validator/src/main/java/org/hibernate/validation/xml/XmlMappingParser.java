@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.xml;
+package org.hibernate.validation.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,9 +47,10 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.hibernate.validation.engine.ConstraintDescriptorImpl;
-import org.hibernate.validation.engine.ConstraintHelper;
-import org.hibernate.validation.engine.MetaConstraint;
+import org.hibernate.validation.metadata.ConstraintDescriptorImpl;
+import org.hibernate.validation.metadata.MetaConstraint;
+import org.hibernate.validation.metadata.ConstraintHelper;
+import org.hibernate.validation.metadata.AnnotationIgnores;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;

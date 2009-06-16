@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -39,9 +39,10 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.engine.xml.AnnotationIgnores;
+import org.hibernate.validation.metadata.AnnotationIgnores;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.metadata.MetaConstraint;
 
 
 /**

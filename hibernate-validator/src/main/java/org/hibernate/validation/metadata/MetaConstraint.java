@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -30,6 +30,8 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
 
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.engine.ConstraintTree;
+import org.hibernate.validation.engine.ExecutionContext;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and gives access to
