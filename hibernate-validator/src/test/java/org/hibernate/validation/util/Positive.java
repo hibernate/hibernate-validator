@@ -15,22 +15,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.graphnavigation;
+package org.hibernate.validation.util;
 
-import javax.validation.constraints.NotNull;
+import java.lang.annotation.Target;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Documented;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import javax.validation.Constraint;
 
 /**
  * @author Emmanuel Bernard
  */
-public class Child {
-	private String name;
-
-	@NotNull(groups = ChildFirst.class)
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
+@Constraint( validatedBy = { PositiveConstraintValidator.class })
+@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+@Retention(RUNTIME)
+@Documented
+public @interface Positive {
+	public abstract String message() default "{validation.positive}";
+	public abstract Class<?>[] groups() default {};
 }

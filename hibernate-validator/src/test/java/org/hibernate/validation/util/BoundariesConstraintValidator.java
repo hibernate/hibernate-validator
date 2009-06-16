@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.constraints.custom;
+package org.hibernate.validation.util;
 
 import java.lang.annotation.Annotation;
 import javax.validation.ConstraintValidator;

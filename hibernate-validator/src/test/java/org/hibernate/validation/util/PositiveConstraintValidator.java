@@ -15,13 +15,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine.graphnavigation;
-
-import javax.validation.GroupSequence;
+package org.hibernate.validation.util;
 
 /**
  * @author Emmanuel Bernard
  */
-@GroupSequence( {ChildFirst.class, ParentSecond.class } )
-public interface ProperOrder {
+public class PositiveConstraintValidator extends BoundariesConstraintValidator<Positive> {
+	public void initialize(Positive constraintAnnotation) {
+		super.initialize( 0, Integer.MAX_VALUE );
+	}
 }

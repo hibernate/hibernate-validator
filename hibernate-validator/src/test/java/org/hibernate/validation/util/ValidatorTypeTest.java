@@ -27,9 +27,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.constraints.custom.Positive;
-import org.hibernate.validation.constraints.custom.PositiveConstraintValidator;
-
 /**
  * Tests for message resolution.
  *
