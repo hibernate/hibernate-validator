@@ -1,4 +1,4 @@
-// $Id: FutureValidatorTest.java 16528 2009-05-11 12:18:22Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
