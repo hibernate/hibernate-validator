@@ -34,20 +34,11 @@ import org.hibernate.validation.engine.ValidatorFactoryImpl;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class HibernateValidationProvider implements ValidationProvider {
+public class HibernateValidationProvider implements ValidationProvider<HibernateValidatorConfiguration> {
 
-	public boolean isSuitable(Class<? extends Configuration<?>> builderClass) {
-		return builderClass == HibernateValidatorConfiguration.class;
-	}
-
-	public <T extends Configuration<T>> T createSpecializedConfiguration(BootstrapState state, Class<T> configurationClass) {
-		if ( !isSuitable( configurationClass ) ) {
-			throw new ValidationException(
-					"Illegal call to createSpecializedConfiguration() for a non suitable provider"
-			);
-		}
+	public HibernateValidatorConfiguration createSpecializedConfiguration(BootstrapState state) {
 		//cast protected by isSuitable call
-		return configurationClass.cast( new ConfigurationImpl( this ) );
+		return HibernateValidatorConfiguration.class.cast( new ConfigurationImpl( this ) );
 	}
 
 	public Configuration<?> createGenericConfiguration(BootstrapState state) {

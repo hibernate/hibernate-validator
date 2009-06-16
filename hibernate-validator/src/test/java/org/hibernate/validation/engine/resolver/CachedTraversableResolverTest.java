@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
+import org.hibernate.validation.HibernateValidationProvider;
 
 /**
  * @author Emmanuel Bernard
@@ -39,7 +40,7 @@ public class CachedTraversableResolverTest {
 	@Test
 	public void testCache() {
 		TraversableResolver resolver = new AskOnceTR();
-		ValidatorFactory factory = Validation.byProvider( HibernateValidatorConfiguration.class )
+		ValidatorFactory factory = Validation.byProvider( HibernateValidationProvider.class )
 				.configure().traversableResolver( resolver )
 				.buildValidatorFactory();
 		Suit suit = new Suit();

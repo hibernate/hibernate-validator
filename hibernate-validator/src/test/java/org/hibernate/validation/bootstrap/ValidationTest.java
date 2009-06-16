@@ -38,6 +38,7 @@ import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.engine.ValidatorFactoryImpl;
 import org.hibernate.validation.engine.Customer;
+import org.hibernate.validation.HibernateValidationProvider;
 
 /**
  * Tests the Bean Validation bootstrapping.
@@ -49,7 +50,7 @@ public class ValidationTest {
 	@Test
 	public void testBootstrapAsServiceWithBuilder() {
 		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidatorConfiguration.class )
+				.byProvider( HibernateValidationProvider.class )
 				.configure();
 		assertDefaultBuilderAndFactory( configuration );
 	}

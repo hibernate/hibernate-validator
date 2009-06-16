@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -36,7 +36,7 @@ public class ValidationBootstrapParameters {
 	public MessageInterpolator messageInterpolator;
 	public TraversableResolver traversableResolver;
 	public ValidationProvider provider;
-	public Class<? extends Configuration<?>> providerClass = null;
+	public Class<? extends ValidationProvider<?>> providerClass = null;
 	public final Map<String, String> configProperties = new HashMap<String, String>();
 	public final Set<InputStream> mappings = new HashSet<InputStream>();
 }

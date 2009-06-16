@@ -24,6 +24,7 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
+import javax.validation.spi.ValidationProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -192,7 +193,7 @@ public class ValidationXmlParser {
 		String providerClassName = config.getDefaultProvider();
 		if ( providerClassName != null ) {
 			try {
-				xmlParamters.providerClass = ( Class<? extends Configuration<?>> ) ReflectionHelper.classForName(
+				xmlParamters.providerClass = ( Class<? extends ValidationProvider<?>> ) ReflectionHelper.classForName(
 						providerClassName, this.getClass()
 				);
 				log.info( "Using {} as validation provider.", providerClassName );

@@ -119,19 +119,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			factory = validationBootstrapParameters.provider.buildValidatorFactory( this );
 		}
 		else {
-			if ( validationBootstrapParameters.providerClass != null ) {
+			final Class<? extends ValidationProvider<?>> providerClass = validationBootstrapParameters.providerClass;
+			if ( providerClass != null ) {
 				for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
-					if ( provider.isSuitable( validationBootstrapParameters.providerClass ) ) {
+					if ( providerClass.isAssignableFrom( provider.getClass() ) ) {
 						factory = provider.buildValidatorFactory( this );
 						break;
 					}
 				}
 				if ( factory == null ) {
-					throw new ValidationException( "Unable to find provider: " + validationBootstrapParameters.providerClass );
+					throw new ValidationException( "Unable to find provider: " + providerClass );
 				}
 			}
 			else {
-				List<ValidationProvider> providers = providerResolver.getValidationProviders();
+				List<ValidationProvider<?>> providers = providerResolver.getValidationProviders();
 				assert providers.size() != 0; // I run therefore I am
 				factory = providers.get( 0 ).buildValidatorFactory( this );
 			}

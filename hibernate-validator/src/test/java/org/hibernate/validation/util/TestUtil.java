@@ -31,6 +31,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
+import org.hibernate.validation.HibernateValidationProvider;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -48,7 +49,7 @@ public class TestUtil {
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
 			HibernateValidatorConfiguration configuration = Validation
-					.byProvider( HibernateValidatorConfiguration.class )
+					.byProvider( HibernateValidationProvider.class )
 					.configure();
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
@@ -66,7 +67,7 @@ public class TestUtil {
 		Thread.currentThread().setContextClassLoader( new CustomValidationXmlClassLoader( path ) );
 
 		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidatorConfiguration.class )
+				.byProvider( HibernateValidationProvider.class )
 				.configure();
 		return configuration.buildValidatorFactory().getValidator();
 	}
@@ -78,7 +79,7 @@ public class TestUtil {
 		Thread.currentThread().setContextClassLoader( new IgnoringValidationXmlClassLoader() );
 
 		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidatorConfiguration.class )
+				.byProvider( HibernateValidationProvider.class )
 				.configure();
 		return configuration.buildValidatorFactory().getValidator();
 	}
