@@ -57,16 +57,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		initBeanMetaData( configurationState.getMappingStreams() );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Validator getValidator() {
 		return usingContext().getValidator();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
@@ -75,9 +69,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		throw new ValidationException( "Type " + type + " not supported");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ValidatorContext usingContext() {
 		return new ValidatorContextImpl(
 				constraintValidatorFactory,
@@ -95,11 +86,11 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 		AnnotationIgnores annotationIgnores = mappingParser.getAnnotationIgnores();
 		for ( Class<?> beanClass : mappingParser.getProcessedClasses() ) {
-			BeanMetaDataImpl<?> metaData = new BeanMetaDataImpl<T>(
+			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
 					( Class<T> ) beanClass, constraintHelper, annotationIgnores
 			);
 
-			for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( beanClass ) ) {
+			for ( MetaConstraint<T, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( ( Class<T> ) beanClass ) ) {
 				metaData.addMetaConstraint( constraint );
 			}
 

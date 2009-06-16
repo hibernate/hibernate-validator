@@ -128,9 +128,15 @@ public class XmlMappingParser {
 		return annotationIgnores;
 	}
 
-	public List<MetaConstraint<?, ? extends Annotation>> getConstraintsForClass(Class<?> beanClass) {
+	public <T> List<MetaConstraint<T, ? extends Annotation>> getConstraintsForClass(Class<T> beanClass) {
+		List<MetaConstraint<T, ? extends Annotation>> list = new ArrayList<MetaConstraint<T, ? extends Annotation>>();
 		if ( constraintMap.containsKey( beanClass ) ) {
-			return constraintMap.get( beanClass );
+			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
+				@SuppressWarnings( "unchecked") // safe cast since the list of meta constraints is always specific to the bean type
+				MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
+				list.add( boundMetaConstraint );
+			}
+			return list;
 		}
 		else {
 			return Collections.emptyList();

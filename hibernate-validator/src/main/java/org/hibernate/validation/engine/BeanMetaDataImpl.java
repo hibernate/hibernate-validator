@@ -30,12 +30,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
@@ -45,11 +45,10 @@ import org.hibernate.validation.util.ReflectionHelper;
 
 
 /**
- * This class encapsulates all meta data needed for validation. Implementations of <code>Validator</code> interface can
+ * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
  * instantiate an instance of this class and delegate the metadata extraction to it.
  *
  * @author Hardy Ferentschik
- * @todo check the unchecked assignment warnings in this class
  */
 
 public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
@@ -122,8 +121,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableList( metaConstraintList );
 	}
 
-	public void addMetaConstraint(MetaConstraint<?, ? extends Annotation> metaConstraint) {
-		metaConstraintList.add( ( MetaConstraint<T, ?> ) metaConstraint );
+	public void addMetaConstraint(MetaConstraint<T, ? extends Annotation> metaConstraint) {
+		metaConstraintList.add( metaConstraint );
 	}
 
 	public void addCascadedMember(Member member) {
@@ -223,17 +222,15 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		setDefaultGroupSequence( groupSequence );
 	}
 
-	private <A extends Annotation> void initFieldConstraints(Class clazz, AnnotationIgnores annotationIgnores) {
+	private void initFieldConstraints(Class clazz, AnnotationIgnores annotationIgnores) {
 		for ( Field field : clazz.getDeclaredFields() ) {
-			List<ConstraintDescriptorImpl> fieldMetadata = findConstraints( field );
-			for ( ConstraintDescriptorImpl constraintDescription : fieldMetadata ) {
+			List<ConstraintDescriptorImpl<?>> fieldMetadata = findConstraints( field );
+			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetadata ) {
 				if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
 					break;
 				}
 				ReflectionHelper.setAccessibility( field );
-				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
-						field, beanClass, constraintDescription
-				);
+				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( field, constraintDescription );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
@@ -244,17 +241,15 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private <A extends Annotation> void initMethodConstraints(Class clazz, AnnotationIgnores annotationIgnores) {
+	private void initMethodConstraints(Class clazz, AnnotationIgnores annotationIgnores) {
 		for ( Method method : clazz.getDeclaredMethods() ) {
-			List<ConstraintDescriptorImpl> methodMetadata = findConstraints( method );
-			for ( ConstraintDescriptorImpl constraintDescription : methodMetadata ) {
+			List<ConstraintDescriptorImpl<?>> methodMetadata = findConstraints( method );
+			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetadata ) {
 				if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
 					break;
 				}
 				ReflectionHelper.setAccessibility( method );
-				MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
-						method, beanClass, constraintDescription
-				);
+				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( method, constraintDescription );
 				metaConstraintList.add( metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
@@ -281,15 +276,23 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return propertyDescriptor;
 	}
 
-	private <A extends Annotation> void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
+	private void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
 		if ( annotationIgnores.isIgnoreAnnotations( clazz ) ) {
 			return;
 		}
-		List<ConstraintDescriptorImpl> classMetadata = findClassLevelConstraints( clazz );
-		for ( ConstraintDescriptorImpl constraintDescription : classMetadata ) {
-			MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>( beanClass, constraintDescription );
+		List<ConstraintDescriptorImpl<?>> classMetadata = findClassLevelConstraints( clazz );
+		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetadata ) {
+			MetaConstraint<T, ?> metaConstraint = createMetaConstraint( constraintDescription );
 			metaConstraintList.add( metaConstraint );
 		}
+	}
+
+	private <A extends Annotation> MetaConstraint<T, ?> createMetaConstraint(ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<T, A>( beanClass, descriptor );
+	}
+
+	private <A extends Annotation> MetaConstraint<T, ?> createMetaConstraint(Member m, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<T, A>( m, beanClass, descriptor );
 	}
 
 	/**
@@ -301,8 +304,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
 	 *         single nor multi value annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl> findConstraintAnnotations(Class<?> clazz, A annotation) {
-		List<ConstraintDescriptorImpl> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl>();
+	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Class<?> clazz, A annotation) {
+		List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
 		if ( constraintHelper.isConstraintAnnotation( annotation ) ||
@@ -322,7 +325,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(Class<?> clazz, A annotation) {
-		Class<?>[] groups = ReflectionHelper.getAnnotationParameter( annotation, "groups", Class[].class );
 		ConstraintDescriptorImpl constraintDescriptor;
 		if ( clazz.isInterface() ) {
 			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper, clazz );
@@ -341,8 +343,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified on the given class.
 	 */
-	private List<ConstraintDescriptorImpl> findClassLevelConstraints(Class<?> beanClass) {
-		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
+	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
+		List<ConstraintDescriptorImpl<?>> metadata = new ArrayList<ConstraintDescriptorImpl<?>>();
 		for ( Annotation annotation : beanClass.getAnnotations() ) {
 			metadata.addAll( findConstraintAnnotations( beanClass, annotation ) );
 		}
@@ -361,10 +363,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
 	 */
-	private List<ConstraintDescriptorImpl> findConstraints(Member member) {
+	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member) {
 		assert member instanceof Field || member instanceof Method;
 
-		List<ConstraintDescriptorImpl> metadata = new ArrayList<ConstraintDescriptorImpl>();
+		List<ConstraintDescriptorImpl<?>> metadata = new ArrayList<ConstraintDescriptorImpl<?>>();
 		for ( Annotation annotation : ( ( AnnotatedElement ) member ).getAnnotations() ) {
 			metadata.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation ) );
 		}

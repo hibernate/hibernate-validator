@@ -21,7 +21,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +30,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
@@ -40,11 +41,13 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
 
 import org.hibernate.validation.constraints.impl.AssertFalseValidator;
 import org.hibernate.validation.constraints.impl.AssertTrueValidator;
+import org.hibernate.validation.constraints.impl.DecimalMaxValidatorForNumber;
+import org.hibernate.validation.constraints.impl.DecimalMaxValidatorForString;
+import org.hibernate.validation.constraints.impl.DecimalMinValidatorForNumber;
+import org.hibernate.validation.constraints.impl.DecimalMinValidatorForString;
 import org.hibernate.validation.constraints.impl.DigitsValidatorForNumber;
 import org.hibernate.validation.constraints.impl.DigitsValidatorForString;
 import org.hibernate.validation.constraints.impl.FutureValidatorForCalendar;
@@ -69,10 +72,6 @@ import org.hibernate.validation.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validation.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validation.constraints.impl.SizeValidatorForMap;
 import org.hibernate.validation.constraints.impl.SizeValidatorForString;
-import org.hibernate.validation.constraints.impl.DecimalMaxValidatorForNumber;
-import org.hibernate.validation.constraints.impl.DecimalMaxValidatorForString;
-import org.hibernate.validation.constraints.impl.DecimalMinValidatorForNumber;
-import org.hibernate.validation.constraints.impl.DecimalMinValidatorForString;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -83,14 +82,10 @@ import org.hibernate.validation.util.ReflectionHelper;
  */
 public class ConstraintHelper {
 
-	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
+	private final static Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
 
-	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
-			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
-
-	public ConstraintHelper() {
-
+	static {
 		List<Class<? extends ConstraintValidator<?, ?>>> constraintList =
 				new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( AssertFalseValidator.class );
@@ -161,6 +156,9 @@ public class ConstraintHelper {
 		constraintList.add( SizeValidatorForArraysOfLong.class );
 		builtinConstraints.put( Size.class, constraintList );
 	}
+
+	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
+			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
 
 	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getBuiltInConstraints(Class<? extends Annotation> annotationType) {
 		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = getBuiltInFromAnnotationType(
@@ -276,7 +274,7 @@ public class ConstraintHelper {
 	 *
 	 * @return <code>true</code> if the annotation fulfills the above condtions, <code>false</code> otherwise.
 	 */
-	public static boolean isConstraintAnnotation(Annotation annotation) {
+	public boolean isConstraintAnnotation(Annotation annotation) {
 
 		Constraint constraint = annotation.annotationType()
 				.getAnnotation( Constraint.class );
