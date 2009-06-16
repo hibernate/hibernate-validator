@@ -15,19 +15,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
-
-import org.hibernate.validation.constraints.NotEmpty;
+package org.hibernate.validation.engine.traversableresolver;
 
 /**
- * @author Hardy Ferentschik
+ * @author Emmanuel Bernard
  */
-public interface Person {
-	@NotEmpty
-	String getFirstName();
-
-	String getMiddleName();
-
-	@NotEmpty
-	String getLastName();
+public interface Cloth {
 }
