@@ -39,10 +39,8 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.metadata.AnnotationIgnores;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.metadata.MetaConstraint;
 
 
 /**

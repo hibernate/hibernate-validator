@@ -19,19 +19,19 @@ package org.hibernate.validation.util;
 
 import java.io.InputStream;
 import java.util.Set;
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
-import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 import org.hibernate.validation.HibernateValidationProvider;
+import org.hibernate.validation.engine.HibernateValidatorConfiguration;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
