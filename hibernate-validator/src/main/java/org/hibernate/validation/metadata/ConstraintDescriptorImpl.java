@@ -122,20 +122,20 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void findConstraintValidatorClasses() {
-		if ( constraintHelper.containsConstraintValidatorDefinition( annotation.annotationType() ) ) {
-			for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : constraintHelper
-					.getConstraintValidatorDefinition( annotation.annotationType() ) ) {
-				constraintValidatorDefinitonClasses.add( ( Class<? extends ConstraintValidator<T, ?>> ) validator );
+		final Class<T> annotationType = getAnnotationType();
+		if ( constraintHelper.containsConstraintValidatorDefinition( annotationType ) ) {
+			for ( Class<? extends ConstraintValidator<T, ?>> validator : constraintHelper
+					.getConstraintValidatorDefinition( annotationType ) ) {
+				constraintValidatorDefinitonClasses.add( validator );
 			}
 			return;
 		}
 
 		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintDefinitonClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
 		if ( constraintHelper.isBuiltinConstraint( annotation.annotationType() ) ) {
-			constraintDefinitonClasses.addAll( constraintHelper.getBuiltInConstraints( annotation.annotationType() ) );
+			constraintDefinitonClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
 		}
 		else {
-			final Class<? extends Annotation> annotationType = annotation.annotationType();
 			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
 					.getAnnotation( Constraint.class )
 					.validatedBy();
@@ -151,6 +151,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			Class<? extends ConstraintValidator<T, ?>> safeValidator = ( Class<? extends ConstraintValidator<T, ?>> ) validator;
 			constraintValidatorDefinitonClasses.add( safeValidator );
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Class<T> getAnnotationType() {
+		return ( Class<T> ) annotation.annotationType();
 	}
 
 	public T getAnnotation() {
@@ -354,6 +359,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		@Override
+		@SuppressWarnings("SimplifiableIfStatement")
 		public boolean equals(Object o) {
 			if ( this == o ) {
 				return true;
@@ -362,7 +368,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				return false;
 			}
 
-			ClassIndexWrapper that = ( ClassIndexWrapper ) o;
+			@SuppressWarnings("unchecked") // safe due to the check above
+					ClassIndexWrapper that = ( ClassIndexWrapper ) o;
 
 			if ( index != that.index ) {
 				return false;

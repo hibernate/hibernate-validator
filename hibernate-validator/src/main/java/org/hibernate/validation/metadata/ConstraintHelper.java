@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
@@ -82,10 +81,10 @@ import org.hibernate.validation.util.ReflectionHelper;
  */
 public class ConstraintHelper {
 
-	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
+	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
 
-	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
+	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
 
 	public ConstraintHelper() {
@@ -160,14 +159,13 @@ public class ConstraintHelper {
 		builtinConstraints.put( Size.class, constraintList );
 	}
 
-	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getBuiltInConstraints(Class<? extends Annotation> annotationType) {
-		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = getBuiltInFromAnnotationType(
-				annotationType
-		);
+	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getBuiltInConstraints(Class<? extends Annotation> annotationClass) {
+		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = builtinConstraints.get( annotationClass );
 
 		if ( builtInList == null || builtInList.size() == 0 ) {
-			throw new ValidationException( "Unable to find constraints for  " + annotationType );
+			throw new ValidationException( "Unable to find constraints for  " + annotationClass );
 		}
+
 		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraints =
 				new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>( builtInList.size() );
 		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : builtInList ) {
@@ -178,10 +176,6 @@ public class ConstraintHelper {
 		}
 
 		return constraints;
-	}
-
-	private List<Class<? extends ConstraintValidator<?, ?>>> getBuiltInFromAnnotationType(Class<? extends Annotation> annotationType) {
-		return builtinConstraints.get( annotationType );
 	}
 
 	public boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
@@ -318,15 +312,27 @@ public class ConstraintHelper {
 		return true;
 	}
 
-	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
+	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorDefinition(Class<T> annotationClass) {
 		if ( annotationClass == null ) {
 			throw new IllegalArgumentException( "Class cannot be null" );
 		}
-		return constraintValidatorDefinitons.get( annotationClass );
+
+		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitons.get( annotationClass );
+
+		List<Class<? extends ConstraintValidator<T, ?>>> constraintsValidators =
+				new ArrayList<Class<? extends ConstraintValidator<T, ?>>>( list.size() );
+		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : list ) {
+			//safe cause all CV for a given annotation A are CV<A, ?>
+			@SuppressWarnings("unchecked")
+			Class<ConstraintValidator<T, ?>> safeValdiatorClass = ( Class<ConstraintValidator<T, ?>> ) validatorClass;
+			constraintsValidators.add( safeValdiatorClass );
+		}
+
+		return constraintsValidators;
 	}
 
 	public <A extends Annotation> void addConstraintValidatorDefinition(Class<A> annotationClass, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> definitionClasses) {
-		constraintValidatorDefinitons.put( annotationClass, definitionClasses );
+		constraintValidatorDefinitons.putIfAbsent( annotationClass, definitionClasses );
 	}
 
 	public boolean containsConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
