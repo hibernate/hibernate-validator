@@ -82,10 +82,13 @@ import org.hibernate.validation.util.ReflectionHelper;
  */
 public class ConstraintHelper {
 
-	private final static Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
+	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
 
-	static {
+	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
+			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
+
+	public ConstraintHelper() {
 		List<Class<? extends ConstraintValidator<?, ?>>> constraintList =
 				new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( AssertFalseValidator.class );
@@ -156,9 +159,6 @@ public class ConstraintHelper {
 		constraintList.add( SizeValidatorForArraysOfLong.class );
 		builtinConstraints.put( Size.class, constraintList );
 	}
-
-	private final Map<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
-			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
 
 	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getBuiltInConstraints(Class<? extends Annotation> annotationType) {
 		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = getBuiltInFromAnnotationType(
