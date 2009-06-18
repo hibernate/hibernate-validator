@@ -24,20 +24,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ValidatorTypeHelper;
-import org.hibernate.validation.engine.ExecutionContext;
-import org.hibernate.validation.engine.ConstraintValidatorContextImpl;
 
 /**
  * Due to constraint conposition a single constraint annotation can lead to a whole constraint tree beeing validated.
@@ -127,13 +125,9 @@ public class ConstraintTree<A extends Annotation> {
 					value, type, executionContext.getConstraintValidatorFactory()
 			);
 
-			if ( !validator.isValid( value, constraintValidatorContext ) ) {
-				constraintViolations.addAll(
-						executionContext.createConstraintViolations(
-								value, constraintValidatorContext
-						)
-				);
-			}
+			validateSingleConstraint(
+					value, executionContext, constraintViolations, constraintValidatorContext, validator
+			);
 		}
 
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
@@ -144,6 +138,23 @@ public class ConstraintTree<A extends Annotation> {
 					message, property
 			);
 			constraintViolations.add( executionContext.createConstraintViolation( value, error, descriptor ) );
+		}
+	}
+
+	private <T, V> void validateSingleConstraint(V value, ExecutionContext<T> executionContext, List<ConstraintViolation<T>> constraintViolations, ConstraintValidatorContextImpl constraintValidatorContext, ConstraintValidator<A, V> validator) {
+		boolean isValid;
+		try {
+			isValid = validator.isValid( value, constraintValidatorContext );
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException( "Unexpected exception during isValid call", e );
+		}
+		if ( !isValid ) {
+			constraintViolations.addAll(
+					executionContext.createConstraintViolations(
+							value, constraintValidatorContext
+					)
+			);
 		}
 	}
 
