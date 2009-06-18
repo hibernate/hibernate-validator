@@ -25,6 +25,7 @@ import javax.validation.ValidationException;
  * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 	
@@ -39,6 +40,9 @@ public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactor
 			throw new ValidationException( "Unable to instanciate " + key, e );
 		}
 		catch ( IllegalAccessException e ) {
+			throw new ValidationException( "Unable to instanciate " + key, e );
+		}
+		catch ( RuntimeException e ) {
 			throw new ValidationException( "Unable to instanciate " + key, e );
 		}
 	}
