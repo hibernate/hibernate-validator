@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
+import javax.validation.GroupDefinitionException;
 
 /**
  * Used to determine the execution order.
@@ -41,7 +42,7 @@ public class GroupChainGenerator {
 
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
-				throw new ValidationException( "A groups has to be an interface. " + clazz.getName() + " is not." );
+				throw new ValidationException( "A group has to be an interface. " + clazz.getName() + " is not." );
 			}
 		}
 
@@ -81,7 +82,7 @@ public class GroupChainGenerator {
 
 	private List<Group> resolveSequence(Class<?> group, List<Class<?>> processedSequences) {
 		if ( processedSequences.contains( group ) ) {
-			throw new ValidationException( "Cyclic dependecy in groups definition" );
+			throw new GroupDefinitionException( "Cyclic dependency in groups definition" );
 		}
 		else {
 			processedSequences.add( group );
