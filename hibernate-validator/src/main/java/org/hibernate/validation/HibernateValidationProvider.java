@@ -18,7 +18,6 @@
 package org.hibernate.validation;
 
 import javax.validation.Configuration;
-import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
@@ -37,7 +36,6 @@ import org.hibernate.validation.engine.ValidatorFactoryImpl;
 public class HibernateValidationProvider implements ValidationProvider<HibernateValidatorConfiguration> {
 
 	public HibernateValidatorConfiguration createSpecializedConfiguration(BootstrapState state) {
-		//cast protected by isSuitable call
 		return HibernateValidatorConfiguration.class.cast( new ConfigurationImpl( this ) );
 	}
 
