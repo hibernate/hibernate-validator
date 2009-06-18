@@ -180,6 +180,11 @@ public class ConstraintTree<A extends Annotation> {
 			constraintValidator = ( ConstraintValidator<A, V> ) constraintFactory.getInstance(
 					validatorClass
 			);
+			if ( constraintValidator == null ) {
+				throw new ValidationException(
+						"Constraint factory returned null when trying to create instance of " + validatorClass.getName()
+				);
+			}
 			constraintValidatorCache.put( validatorClass, constraintValidator );
 		}
 		else {
