@@ -19,9 +19,9 @@ package org.hibernate.validation.constraints.impl;
 
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
 import javax.validation.constraints.Pattern;
 
 /**
@@ -42,7 +42,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, String> {
 			pattern = java.util.regex.Pattern.compile( parameters.regexp(), intFlag );
 		}
 		catch ( PatternSyntaxException e ) {
-			throw new ValidationException( "Invalid regular expression.", e );
+			throw new ConstraintDeclarationException( "Invalid regular expression.", e );
 		}
 	}
 
