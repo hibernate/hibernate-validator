@@ -85,6 +85,14 @@ public class PropertyPath implements Iterable<PropertyPath.PathElement> {
 		return pathList.iterator();
 	}
 
+	@Override
+	public String toString() {
+		return "PropertyPath{" +
+				"originalProperty='" + originalProperty + '\'' +
+				", pathList=" + pathList +
+				'}';
+	}
+
 	public static class PathElement {
 		private final String value;
 		private final String index;
@@ -104,6 +112,14 @@ public class PropertyPath implements Iterable<PropertyPath.PathElement> {
 
 		public boolean isIndexed() {
 			return index != null;
+		}
+
+		@Override
+		public String toString() {
+			return "PathElement{" +
+					"value='" + value + '\'' +
+					", index='" + index + '\'' +
+					'}';
 		}
 	}
 }
