@@ -44,14 +44,14 @@ import org.hibernate.validation.engine.groups.Group;
 import org.hibernate.validation.engine.groups.GroupChain;
 import org.hibernate.validation.engine.groups.GroupChainGenerator;
 import org.hibernate.validation.engine.resolver.SingleThreadCachedTraversableResolver;
+import org.hibernate.validation.metadata.BeanMetaData;
+import org.hibernate.validation.metadata.BeanMetaDataCache;
+import org.hibernate.validation.metadata.BeanMetaDataImpl;
+import org.hibernate.validation.metadata.ConstraintHelper;
+import org.hibernate.validation.metadata.MetaConstraint;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.PropertyPath;
 import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.metadata.BeanMetaData;
-import org.hibernate.validation.metadata.BeanMetaDataImpl;
-import org.hibernate.validation.metadata.BeanMetaDataCache;
-import org.hibernate.validation.metadata.MetaConstraint;
-import org.hibernate.validation.metadata.ConstraintHelper;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -626,9 +626,7 @@ public class ValidatorImpl implements Validator {
 							continue;
 						}
 					}
-					collectMetaConstraintsForPath(
-							( Class<T> ) type, value, propertyIter, metaConstraints
-					);
+					return collectMetaConstraintsForPath( ( Class<T> ) type, value, propertyIter, metaConstraints );
 				}
 			}
 		}
