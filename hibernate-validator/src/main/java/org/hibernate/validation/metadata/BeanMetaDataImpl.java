@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -138,16 +139,21 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public void setDefaultGroupSequence(List<Class<?>> groupSequence) {
 		defaultGroupSequence = new ArrayList<Class<?>>();
+		boolean groupSequenceContainsDefault = false;
 		for ( Class<?> group : groupSequence ) {
 			if ( group.getName().equals( beanClass.getName() ) ) {
 				defaultGroupSequence.add( Default.class );
+				groupSequenceContainsDefault = true;
 			}
 			else if ( group.getName().equals( Default.class.getName() ) ) {
-				throw new ValidationException( "'Default.class' cannot appear in default group sequence list." );
+				throw new GroupDefinitionException( "'Default.class' cannot appear in default group sequence list." );
 			}
 			else {
 				defaultGroupSequence.add( group );
 			}
+		}
+		if ( !groupSequenceContainsDefault ) {
+			throw new GroupDefinitionException( beanClass.getName() + " must be part of the redefined default group sequence." );
 		}
 		if ( log.isTraceEnabled() ) {
 			log.trace(
