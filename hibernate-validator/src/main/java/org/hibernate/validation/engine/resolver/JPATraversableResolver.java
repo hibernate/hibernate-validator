@@ -20,6 +20,7 @@ package org.hibernate.validation.engine.resolver;
 import java.lang.annotation.ElementType;
 import javax.persistence.Persistence;
 import javax.validation.TraversableResolver;
+import javax.validation.Path;
 
 /**
  * @author Hardy Ferentschik
@@ -27,12 +28,13 @@ import javax.validation.TraversableResolver;
  */
 public class JPATraversableResolver implements TraversableResolver {
 
-	public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+	// TODO Check the call to PeristenceUtil. traversableProperty.getName() is this correct?
+	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return traversableObject == null ||
-				Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty );
+				Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
 	}
 
-	public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return true;
 	}
 }

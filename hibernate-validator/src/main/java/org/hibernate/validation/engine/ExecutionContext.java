@@ -17,25 +17,26 @@
 */
 package org.hibernate.validation.engine;
 
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.lang.reflect.Member;
-import java.lang.reflect.Field;
-import java.lang.annotation.ElementType;
-import javax.validation.metadata.ConstraintDescriptor;
+import java.util.HashSet;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.Path;
 import javax.validation.TraversableResolver;
+import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validation.util.IdentitySet;
 import org.hibernate.validation.metadata.MetaConstraint;
+import org.hibernate.validation.util.IdentitySet;
 
 /**
  * Context object keeping track of all processed objects and failing constraints.
@@ -47,10 +48,6 @@ import org.hibernate.validation.metadata.MetaConstraint;
  * in order to work.
  */
 public class ExecutionContext<T> {
-
-	public static final String PROPERTY_ROOT = "";
-
-	public static final String PROPERTY_PATH_SEPERATOR = ".";
 
 	/**
 	 * The root bean of the validation.
@@ -71,7 +68,7 @@ public class ExecutionContext<T> {
 	/**
 	 * Maps an object to a list of paths in which it has been invalidated.
 	 */
-	private final Map<Object, Set<String>> processedPaths;
+	private final Map<Object, Set<Path>> processedPaths;
 
 	/**
 	 * A list of all failing constraints so far.
@@ -79,9 +76,9 @@ public class ExecutionContext<T> {
 	private final List<ConstraintViolation<T>> failingConstraintViolations;
 
 	/**
-	 * The current property based based from the root bean.
+	 * The current property path we are validating.
 	 */
-	private List<String> propertyPath;
+	private PathImpl propertyPath;
 
 	/**
 	 * The current group we are validating.
@@ -98,7 +95,7 @@ public class ExecutionContext<T> {
 	 *
 	 * @todo Make this boolean a configurable item.
 	 */
-	private boolean allowOneValidationPerPath = true;
+	private boolean allowOneValidationPerPath = false;
 
 	/**
 	 * The message resolver which should be used in this context.
@@ -151,8 +148,8 @@ public class ExecutionContext<T> {
 
 		beanStack.push( object );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
-		processedPaths = new IdentityHashMap<Object, Set<String>>();
-		propertyPath = new ArrayList<String>();
+		processedPaths = new IdentityHashMap<Object, Set<Path>>();
+		propertyPath = new PathImpl();
 		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
 	}
 
@@ -212,20 +209,6 @@ public class ExecutionContext<T> {
 		return alreadyValidated;
 	}
 
-	private boolean isAlreadyValidatedForPath(Object value) {
-		for ( String path : processedPaths.get( value ) ) {
-			if ( path.contains( peekPropertyPath() ) || peekPropertyPath().contains( path ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isAlreadyValidatedForCurrentGroup(Object value) {
-		final IdentitySet objectsProcessedInCurrentGroups = processedObjects.get( currentGroup );
-		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
-	}
-
 	public void addConstraintFailures(List<ConstraintViolation<T>> failingConstraintViolations) {
 		for ( ConstraintViolation<T> violation : failingConstraintViolations ) {
 			addConstraintFailure( violation );
@@ -242,47 +225,34 @@ public class ExecutionContext<T> {
 	 * @param property the new property to add to the current path.
 	 */
 	public void pushProperty(String property) {
-		propertyPath.add( property );
+		propertyPath.addNode( new NodeImpl( property ) );
 	}
 
 	/**
 	 * Drops the last level of the current property path of this context.
 	 */
 	public void popProperty() {
-		if ( propertyPath.size() > 0 ) {
-			propertyPath.remove( propertyPath.size() - 1 );
-		}
+		propertyPath.removeLast();
 	}
 
 	public void markCurrentPropertyAsIterable() {
-		String property = peekProperty();
-		property += "[]";
-		propertyPath.remove( propertyPath.size() - 1 );
-		pushProperty( property );
+		((NodeImpl)propertyPath.getLast()).setInIterable( true );
 	}
 
 	public void setPropertyIndex(String index) {
-		String property = peekProperty();
-
-		// replace the last occurance of [<oldIndex>] with [<index>]
-		property = property.replaceAll( "\\[[0-9]*\\]$", "[" + index + "]" );
-		propertyPath.remove( propertyPath.size() - 1 );
-		pushProperty( property );
+		((NodeImpl)propertyPath.getLast()).setIndex( Integer.getInteger( index ) );
 	}
 
-	public String peekPropertyPath() {
-		return buildPath( propertyPath.size() - 1 );
+	public Path peekPropertyPath() {
+		return new PathImpl(propertyPath);
 	}
 
-	public String peekProperty() {
-		if ( propertyPath.size() == 0 ) {
-			return PROPERTY_ROOT;
-		}
-		return propertyPath.get( propertyPath.size() - 1 );
+	public Path.Node peekProperty() {
+		return propertyPath.getLast();
 	}
 
-	public String peekParentPath() {
-		return buildPath( propertyPath.size() - 2 );
+	public Path peekParentPath() {
+		return propertyPath.getParentPath();
 	}
 
 	@SuppressWarnings("SimplifiableIfStatement")
@@ -302,22 +272,20 @@ public class ExecutionContext<T> {
 
 	public boolean isCascadeRequired(Member member) {
 		final ElementType type = member instanceof Field ? ElementType.FIELD : ElementType.METHOD;
-		final String parentPath = peekParentPath();
 		final Class<T> rootBeanType = getRootBeanClass();
-		final String traversableProperty = peekProperty();
 		final Object traversableobject = peekCurrentBean();
 		return traversableResolver.isReachable(
 				traversableobject,
-				traversableProperty,
+				peekProperty(),
 				rootBeanType,
-				parentPath,
+				peekParentPath(),
 				type
 		)
 				&& traversableResolver.isCascadable(
 				traversableobject,
-				traversableProperty,
+				peekProperty(),
 				rootBeanType,
-				parentPath,
+				peekParentPath(),
 				type
 		);
 	}
@@ -346,21 +314,22 @@ public class ExecutionContext<T> {
 				getRootBean(),
 				peekCurrentBean(),
 				value,
-				error.getProperty(),
+				error.getPath(),
 				descriptor
 		);
 	}
 
-	private String buildPath(int index) {
-		if (index < 0) return PROPERTY_ROOT;
-		StringBuilder builder = new StringBuilder();
-		for ( int i = 0; i <= index; i++ ) {
-			builder.append( propertyPath.get( i ) );
-			if ( i < index ) {
-				builder.append( PROPERTY_PATH_SEPERATOR );
-			}
+	private boolean isAlreadyValidatedForPath(Object value) {
+		Set<Path> pathSet = processedPaths.get( value );
+		if(pathSet != null && pathSet.contains( peekPropertyPath() )) {
+			return true;
 		}
-		return builder.toString();
+		return false;
+	}
+
+	private boolean isAlreadyValidatedForCurrentGroup(Object value) {
+		final IdentitySet objectsProcessedInCurrentGroups = processedObjects.get( currentGroup );
+		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
 	}
 
 	private void markProcessed() {
@@ -375,11 +344,12 @@ public class ExecutionContext<T> {
 			processedPaths.get( peekCurrentBean() ).add( peekPropertyPath() );
 		}
 		else {
-			Set<String> set = new HashSet<String>();
+			Set<Path> set = new HashSet<Path>();
 			set.add( peekPropertyPath() );
 			processedPaths.put( peekCurrentBean(), set );
 		}
 	}
+
 
 	private void markProcessForCurrentGroup() {
 		if ( processedObjects.containsKey( currentGroup ) ) {

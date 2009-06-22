@@ -18,6 +18,7 @@
 package org.hibernate.validation.engine;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
 /**
@@ -28,7 +29,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private final String interpolatedMessage;
 	private final T rootBean;
 	private final Object value;
-	private final String propertyPath;
+	private final Path propertyPath;
 	private final Object leafBeanInstance;
 	private final ConstraintDescriptor constraintDescriptor;
 	private final String rawMessage;
@@ -37,7 +38,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 
 	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass,
 								   T rootBean, Object leafBeanInstance, Object value,
-								   String propertyPath, ConstraintDescriptor constraintDescriptor) {
+								   Path propertyPath, ConstraintDescriptor constraintDescriptor) {
 		this.rawMessage = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
@@ -48,9 +49,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		this.rootBeanClass = rootBeanClass;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public String getMessage() {
 		return interpolatedMessage;
 	}
@@ -59,9 +57,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		return rawMessage;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public T getRootBean() {
 		return rootBean;
 	}
@@ -74,17 +69,11 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		return leafBeanInstance;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Object getInvalidValue() {
 		return value;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getPropertyPath() {
+	public Path getPropertyPath() {
 		return propertyPath;
 	}
 

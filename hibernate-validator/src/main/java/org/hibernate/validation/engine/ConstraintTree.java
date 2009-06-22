@@ -113,7 +113,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 
 		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-				executionContext.peekParentPath(), executionContext.peekProperty(), descriptor
+				executionContext.peekPropertyPath(), descriptor
 		);
 
 		// we could have a composing constraint which does not need its own validator.
@@ -133,9 +133,8 @@ public class ConstraintTree<A extends Annotation> {
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
 			final String message = ( String ) getParent().getDescriptor().getAttributes().get( "message" );
-			final String property = executionContext.peekPropertyPath();
 			ConstraintValidatorContextImpl.ErrorMessage error = constraintValidatorContext.new ErrorMessage(
-					message, property
+					message, executionContext.peekPropertyPath()
 			);
 			constraintViolations.add( executionContext.createConstraintViolation( value, error, descriptor ) );
 		}

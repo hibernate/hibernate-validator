@@ -19,8 +19,9 @@ package org.hibernate.validation.engine;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.Path;
+import javax.validation.metadata.ConstraintDescriptor;
 
 /**
  * @author Hardy Ferentschik
@@ -28,15 +29,13 @@ import javax.validation.ConstraintValidatorContext;
 public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
 
 	private final List<ErrorMessage> errorMessages = new ArrayList<ErrorMessage>( 3 );
-	private final String property;
-	private final String propertyParent;
+	private final Path propertyPath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
 
-	public ConstraintValidatorContextImpl(String propertyParent, String property, ConstraintDescriptor<?> constraintDescriptor) {
-		this.property = property;
-		this.propertyParent = propertyParent;
+	public ConstraintValidatorContextImpl(Path propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
+		this.propertyPath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
 
@@ -44,16 +43,12 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		defaultDisabled = true;
 	}
 
-	public String getDefaultErrorMessage() {
+	public String getDefaultErrorMessageTemplate() {
 		return ( String ) constraintDescriptor.getAttributes().get( "message" );
 	}
 
-	public void addError(String message) {
-		errorMessages.add( new ErrorMessage( message, buildPropertyPath( propertyParent, property ) ) );
-	}
-
-	public void addError(String message, String property) {
-		errorMessages.add( new ErrorMessage( message, buildPropertyPath( propertyParent, property ) ) );
+	public ErrorBuilder buildErrorWithMessageTemplate(String messageTemplate) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	public ConstraintDescriptor<?> getConstraintDescriptor() {
@@ -68,39 +63,27 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		List<ErrorMessage> returnedErrorMessages = new ArrayList<ErrorMessage>( errorMessages );
 		if ( !defaultDisabled ) {
 			returnedErrorMessages.add(
-					new ErrorMessage( getDefaultErrorMessage(), buildPropertyPath( propertyParent, property ) )
+					new ErrorMessage( getDefaultErrorMessageTemplate(), propertyPath )
 			);
 		}
 		return returnedErrorMessages;
 	}
 
-	private String buildPropertyPath(String parent, String leaf) {
-		if ( ExecutionContext.PROPERTY_ROOT.equals( parent ) ) {
-			return leaf;
-		}
-		else {
-			return new StringBuilder().append( parent )
-					.append( ExecutionContext.PROPERTY_PATH_SEPERATOR )
-					.append( leaf )
-					.toString();
-		}
-	}
-
 	public class ErrorMessage {
 		private final String message;
-		private final String property;
+		private final Path propertyPath;
 
-		public ErrorMessage(String message, String property) {
+		public ErrorMessage(String message, Path property) {
 			this.message = message;
-			this.property = property;
+			this.propertyPath = property;
 		}
 
 		public String getMessage() {
 			return message;
 		}
 
-		public String getProperty() {
-			return property;
+		public Path getPath() {
+			return propertyPath;
 		}
 	}
 }

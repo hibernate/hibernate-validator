@@ -1,6 +1,7 @@
 package org.hibernate.validation.engine.resolver;
 
 import java.lang.annotation.ElementType;
+import javax.validation.Path;
 import javax.validation.TraversableResolver;
 
 import org.slf4j.Logger;
@@ -83,13 +84,13 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		}
 	}
 
-	public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return jpaTraversableResolver == null || jpaTraversableResolver.isReachable(
 				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
 		);
 	}
 
-	public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return jpaTraversableResolver == null || jpaTraversableResolver.isCascadable(
 				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
 		);

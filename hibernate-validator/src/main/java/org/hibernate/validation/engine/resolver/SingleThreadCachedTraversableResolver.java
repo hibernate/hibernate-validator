@@ -20,6 +20,7 @@ package org.hibernate.validation.engine.resolver;
 import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
+import javax.validation.Path;
 import javax.validation.TraversableResolver;
 
 /**
@@ -37,16 +38,19 @@ public class SingleThreadCachedTraversableResolver implements TraversableResolve
 		this.delegate = delegate;
 	}
 
-	public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
-		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType );
+	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
+		TraversableHolder currentLH = new TraversableHolder(
+				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
+		);
 		TraversableHolder cachedLH = traversables.get( currentLH );
-		if (cachedLH == null) {
+		if ( cachedLH == null ) {
 			currentLH.isReachable = delegate.isReachable(
 					traversableObject,
 					traversableProperty,
 					rootBeanType,
 					pathToTraversableObject,
-					elementType );
+					elementType
+			);
 			traversables.put( currentLH, currentLH );
 			cachedLH = currentLH;
 		}
@@ -56,21 +60,25 @@ public class SingleThreadCachedTraversableResolver implements TraversableResolve
 					traversableProperty,
 					rootBeanType,
 					pathToTraversableObject,
-					elementType );
+					elementType
+			);
 		}
 		return cachedLH.isReachable;
 	}
 
-	public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
-		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType );
+	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
+		TraversableHolder currentLH = new TraversableHolder(
+				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
+		);
 		TraversableHolder cachedLH = traversables.get( currentLH );
-		if (cachedLH == null) {
+		if ( cachedLH == null ) {
 			currentLH.isCascadable = delegate.isCascadable(
 					traversableObject,
 					traversableProperty,
 					rootBeanType,
 					pathToTraversableObject,
-					elementType );
+					elementType
+			);
 			traversables.put( currentLH, currentLH );
 			cachedLH = currentLH;
 		}
@@ -80,28 +88,29 @@ public class SingleThreadCachedTraversableResolver implements TraversableResolve
 					traversableProperty,
 					rootBeanType,
 					pathToTraversableObject,
-					elementType );
+					elementType
+			);
 		}
 		return cachedLH.isCascadable;
 	}
-	
+
 	private static class TraversableHolder {
 		private final Object traversableObject;
-		private final String traversableProperty;
+		private final Path.Node traversableProperty;
 		private final Class<?> rootBeanType;
-		private final String pathToTraversableObject;
+		private final Path pathToTraversableObject;
 		private final ElementType elementType;
 		private final int hashCode;
-		
+
 		private Boolean isReachable;
 		private Boolean isCascadable;
 
 
-		private TraversableHolder(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		private TraversableHolder(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 			this.traversableObject = traversableObject;
 			this.traversableProperty = traversableProperty;
 			this.rootBeanType = rootBeanType;
-			this.pathToTraversableObject = pathToTraversableObject == null ? "" : pathToTraversableObject;
+			this.pathToTraversableObject = pathToTraversableObject;
 			this.elementType = elementType;
 			this.hashCode = buildHashCode();
 		}

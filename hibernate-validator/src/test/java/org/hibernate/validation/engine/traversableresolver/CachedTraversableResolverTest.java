@@ -25,6 +25,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.Path;
 import javax.validation.groups.Default;
 
 import static org.testng.Assert.fail;
@@ -77,7 +78,7 @@ public class CachedTraversableResolverTest {
 		private Set<Holder> askedReach = new HashSet<Holder>();
 		private Set<Holder> askedCascade = new HashSet<Holder>();
 
-		private boolean isTraversable(Set<Holder> asked, Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		private boolean isTraversable(Set<Holder> asked, Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 			Holder h = new Holder( traversableObject, traversableProperty );
 			if ( asked.contains( h ) ) {
 				throw new IllegalStateException( "Called twice" );
@@ -86,7 +87,7 @@ public class CachedTraversableResolverTest {
 			return true;
 		}
 
-		public boolean isReachable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 			return isTraversable(
 					askedReach,
 					traversableObject,
@@ -97,7 +98,7 @@ public class CachedTraversableResolverTest {
 			);
 		}
 
-		public boolean isCascadable(Object traversableObject, String traversableProperty, Class<?> rootBeanType, String pathToTraversableObject, ElementType elementType) {
+		public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 			return isTraversable(
 					askedCascade,
 					traversableObject,
@@ -111,9 +112,9 @@ public class CachedTraversableResolverTest {
 		public static class Holder {
 			Object NULL = new Object();
 			Object to;
-			String tp;
+			Path.Node tp;
 
-			public Holder(Object traversableObject, String traversableProperty) {
+			public Holder(Object traversableObject, Path.Node traversableProperty) {
 				to = traversableObject == null ? NULL : traversableObject;
 				tp = traversableProperty;
 			}

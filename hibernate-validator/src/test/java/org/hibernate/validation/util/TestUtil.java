@@ -114,7 +114,7 @@ public class TestUtil {
 
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath) {
 		assertEquals(
-				violation.getPropertyPath(),
+				violation.getPropertyPath().toString(),
 				propertyPath,
 				"Wrong propertyPath"
 		);
