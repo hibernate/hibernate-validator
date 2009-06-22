@@ -51,7 +51,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Class<?> getType() {
+	public Class<?> getElementClass() {
 		return type;
 	}
 
@@ -60,5 +60,12 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 	 */
 	public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
 		return Collections.unmodifiableSet( constraintDescriptors );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Set<ConstraintDescriptor<?>> getUnorderdConstraintDescriptorsMatchingGroups(Class<?>... groups) {
+		throw new UnsupportedOperationException( "Not yet implemented HV-176");
 	}
 }

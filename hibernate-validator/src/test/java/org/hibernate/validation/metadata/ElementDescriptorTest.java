@@ -41,13 +41,13 @@ public class ElementDescriptorTest {
 	public void testGetTypeForConstrainedBean() {
 		Validator validator = TestUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
-		assertEquals( beanDescriptor.getType(), Customer.class, "Wrong type." );
+		assertEquals( beanDescriptor.getElementClass(), Customer.class, "Wrong type." );
 	}
 
 	@Test
 	public void testGetTypeForConstrainedProperty() {
 		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
-		assertEquals( elementDescriptor.getType(), Integer.class, "Wrong type." );
+		assertEquals( elementDescriptor.getElementClass(), Integer.class, "Wrong type." );
 	}
 
 	/**
