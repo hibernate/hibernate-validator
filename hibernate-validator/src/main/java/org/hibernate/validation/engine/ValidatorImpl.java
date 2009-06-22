@@ -141,6 +141,7 @@ public class ValidatorImpl implements Validator {
 		if ( beanType == null ) {
 			throw new IllegalArgumentException( "The bean type cannot be null." );
 		}
+
 		sanityCheckPropertyPath( propertyName );
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -615,15 +616,14 @@ public class ValidatorImpl implements Validator {
 					Type type = ReflectionHelper.typeOf( m );
 					value = value == null ? null : ReflectionHelper.getValue( m, value );
 					if ( elem.isIndexed() ) {
-						type = ReflectionHelper.getIndexedType( type );
 						value = value == null ? null : ReflectionHelper.getIndexedValue(
 								value, elem.getIndex()
 						);
-						if ( type == null ) {
-							continue;
-						}
+						type = ReflectionHelper.getIndexedType( type );
 					}
-					return collectMetaConstraintsForPath( ( Class<T> ) type, value, propertyIter, metaConstraints );
+					return collectMetaConstraintsForPath(
+							( Class<T> ) ( value == null ? type : value.getClass() ), value, propertyIter, metaConstraints
+					);
 				}
 			}
 		}
