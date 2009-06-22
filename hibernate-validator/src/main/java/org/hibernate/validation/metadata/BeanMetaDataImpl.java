@@ -331,7 +331,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(Class<?> clazz, A annotation) {
 		ConstraintDescriptorImpl constraintDescriptor;
-		if ( clazz.isInterface() ) {
+		if ( clazz.isInterface() && !clazz.equals( beanClass)) {
 			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper, clazz );
 		}
 		else {

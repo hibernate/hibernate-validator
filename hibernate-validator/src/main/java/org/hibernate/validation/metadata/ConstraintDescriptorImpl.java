@@ -93,7 +93,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup) {
 		this( annotation, constraintHelper );
-		this.groups.add( implicitGroup );
+		// if the constraint is part of the Default group it is automatically part of the implicit group as well
+		if ( groups.contains( Default.class ) ) {
+			this.groups.add( implicitGroup );
+		}
 	}
 
 

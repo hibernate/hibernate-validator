@@ -21,6 +21,9 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	public PropertyDescriptor getConstraintsForProperty(String propertyName) {
+		if ( propertyName == null ) {
+			throw new IllegalArgumentException( "The property name cannot be null" );
+		}
 		return metadataBean.getPropertyDescriptor( propertyName );
 	}
 
