@@ -335,7 +335,7 @@ public class ReflectionHelper {
 			iter = map.values().iterator();
 		}
 		else if ( TypeUtils.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( value );
+			List<?> arrayList = Arrays.asList( (Object) value );
 			iter = arrayList.iterator();
 		}
 
