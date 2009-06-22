@@ -199,7 +199,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 					parameter, bundle, locale, recurse
 			);
 
-			matcher.appendReplacement( sb, resolvedParameterValue );
+			matcher.appendReplacement( sb, escapeMetaCharacters( resolvedParameterValue ) );
 		}
 		matcher.appendTail( sb );
 		return sb.toString();
@@ -213,7 +213,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			String parameter = matcher.group( 1 );
 			Object variable = annotationParameters.get( removeCurlyBrace( parameter ) );
 			if ( variable != null ) {
-				resolvedParameterValue = variable.toString();
+				resolvedParameterValue = escapeMetaCharacters( variable.toString() );
 			}
 			else {
 				resolvedParameterValue = message;
@@ -268,5 +268,16 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			userBundlesMap.put( locale, bundle );
 		}
 		return bundle;
+	}
+
+	/**
+	 * @param s The string in which to replace the meta characters '$' and '\'.
+	 *
+	 * @return A string where meta characters relevant for {@link Matcher#appendReplacement} are escaped.
+	 */
+	private String escapeMetaCharacters(String s) {
+		String escapedString = s.replace( "\\", "\\\\" );
+		escapedString = escapedString.replace( "$", "\\$" );
+		return escapedString;
 	}
 }
