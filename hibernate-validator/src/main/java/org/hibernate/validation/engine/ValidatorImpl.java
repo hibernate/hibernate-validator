@@ -193,8 +193,6 @@ public class ValidatorImpl implements Validator {
 			return Collections.emptyList();
 		}
 
-		//FIXME if context not accessible do not call isTraversable??
-
 		// process all groups breadth-first
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
@@ -282,7 +280,6 @@ public class ValidatorImpl implements Validator {
 	}
 
 	//this method must always be called after validateConstraints for the same context
-	//TODO define a validate that calls  validateConstraints and then validateCascadedConstraints
 	private <T> void validateCascadedConstraints(ExecutionContext<T> context) {
 		List<Member> cascadedMembers = getBeanMetaData( context.peekCurrentBeanType() )
 				.getCascadedMembers();
@@ -323,7 +320,7 @@ public class ValidatorImpl implements Validator {
 			context.markCurrentPropertyAsIterable();
 		}
 		else if ( TypeUtils.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( value );
+			List<?> arrayList = Arrays.asList( ( Object[] ) value );
 			iter = arrayList.iterator();
 			context.markCurrentPropertyAsIterable();
 		}
