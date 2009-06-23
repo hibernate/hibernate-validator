@@ -22,16 +22,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.HashSet;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
-import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -68,7 +67,7 @@ public class ExecutionContext<T> {
 	/**
 	 * Maps an object to a list of paths in which it has been invalidated.
 	 */
-	private final Map<Object, Set<Path>> processedPaths;
+	private final Map<Object, Set<PathImpl>> processedPaths;
 
 	/**
 	 * A list of all failing constraints so far.
@@ -95,7 +94,7 @@ public class ExecutionContext<T> {
 	 *
 	 * @todo Make this boolean a configurable item.
 	 */
-	private boolean allowOneValidationPerPath = false;
+	private boolean allowOneValidationPerPath = true;
 
 	/**
 	 * The message resolver which should be used in this context.
@@ -148,7 +147,7 @@ public class ExecutionContext<T> {
 
 		beanStack.push( object );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
-		processedPaths = new IdentityHashMap<Object, Set<Path>>();
+		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
 		propertyPath = new PathImpl();
 		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
 	}
@@ -232,27 +231,19 @@ public class ExecutionContext<T> {
 	 * Drops the last level of the current property path of this context.
 	 */
 	public void popProperty() {
-		propertyPath.removeLast();
+		propertyPath.removeLeafNode();
 	}
 
 	public void markCurrentPropertyAsIterable() {
-		((NodeImpl)propertyPath.getLast()).setInIterable( true );
+		( ( NodeImpl ) propertyPath.getLeafNode() ).setInIterable( true );
 	}
 
 	public void setPropertyIndex(String index) {
-		((NodeImpl)propertyPath.getLast()).setIndex( Integer.getInteger( index ) );
+		( ( NodeImpl ) propertyPath.getLeafNode() ).setIndex( new Integer( index ) );
 	}
 
-	public Path peekPropertyPath() {
-		return new PathImpl(propertyPath);
-	}
-
-	public Path.Node peekProperty() {
-		return propertyPath.getLast();
-	}
-
-	public Path peekParentPath() {
-		return propertyPath.getParentPath();
+	public PathImpl peekPropertyPath() {
+		return new PathImpl( propertyPath );
 	}
 
 	@SuppressWarnings("SimplifiableIfStatement")
@@ -263,9 +254,9 @@ public class ExecutionContext<T> {
 
 		return traversableResolver.isReachable(
 				peekCurrentBean(),
-				peekProperty(),
+				propertyPath.getLeafNode(),
 				getRootBeanClass(),
-				peekParentPath(),
+				propertyPath.getPathWithoutLeafNode(),
 				metaConstraint.getElementType()
 		);
 	}
@@ -276,16 +267,16 @@ public class ExecutionContext<T> {
 		final Object traversableobject = peekCurrentBean();
 		return traversableResolver.isReachable(
 				traversableobject,
-				peekProperty(),
+				propertyPath.getLeafNode(),
 				rootBeanType,
-				peekParentPath(),
+				propertyPath.getPathWithoutLeafNode(),
 				type
 		)
 				&& traversableResolver.isCascadable(
 				traversableobject,
-				peekProperty(),
+				propertyPath.getLeafNode(),
 				rootBeanType,
-				peekParentPath(),
+				propertyPath.getPathWithoutLeafNode(),
 				type
 		);
 	}
@@ -320,10 +311,17 @@ public class ExecutionContext<T> {
 	}
 
 	private boolean isAlreadyValidatedForPath(Object value) {
-		Set<Path> pathSet = processedPaths.get( value );
-		if(pathSet != null && pathSet.contains( peekPropertyPath() )) {
-			return true;
+		Set<PathImpl> pathSet = processedPaths.get( value );
+		if ( pathSet == null ) {
+			return false;
 		}
+
+		for (PathImpl p : pathSet) {
+			if (p.isSubPathOf(peekPropertyPath()) || peekPropertyPath().isSubPathOf(p)) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -344,7 +342,7 @@ public class ExecutionContext<T> {
 			processedPaths.get( peekCurrentBean() ).add( peekPropertyPath() );
 		}
 		else {
-			Set<Path> set = new HashSet<Path>();
+			Set<PathImpl> set = new HashSet<PathImpl>();
 			set.add( peekPropertyPath() );
 			processedPaths.put( peekCurrentBean(), set );
 		}

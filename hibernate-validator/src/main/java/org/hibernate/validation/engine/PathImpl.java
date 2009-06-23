@@ -27,30 +27,35 @@ import javax.validation.Path;
  */
 public class PathImpl implements Path {
 
-	public static final String PROPERTY_PATH_SEPERATOR = ".";
+	private static final String PROPERTY_PATH_SEPERATOR = ".";
+	private static final String INDEX_OPEN = "[";
+	private static final String INDEX_CLOSE = "]";
+
+	private static final Node ROOT_NODE = new NodeImpl( ( String ) null );
 
 	private final List<Node> nodeList;
 
 	public PathImpl() {
 		nodeList = new ArrayList<Node>();
-		Node root = new NodeImpl( null );
-		nodeList.add( root );
+		nodeList.add( ROOT_NODE );
 	}
 
 	public PathImpl(PathImpl path) {
-		this();
+		this.nodeList = new ArrayList<Node>();
 		Iterator<Node> iter = path.iterator();
-		while(iter.hasNext()) {
-			Node node = iter.next();
-			nodeList.add(node);
+		while ( iter.hasNext() ) {
+			nodeList.add( new NodeImpl( iter.next() ) );
 		}
 	}
 
-	public PathImpl(List<Node> nodeList) {
-		this.nodeList = nodeList;
+	private PathImpl(List<Node> nodeList) {
+		this.nodeList = new ArrayList<Node>();
+		for ( Node node : nodeList ) {
+			this.nodeList.add( new NodeImpl( node ) );
+		}
 	}
 
-	public Path getParentPath() {
+	public Path getPathWithoutLeafNode() {
 		List<Node> nodes = new ArrayList<Node>( nodeList );
 		if ( nodes.size() > 1 ) {
 			nodes.remove( nodes.size() - 1 );
@@ -62,22 +67,41 @@ public class PathImpl implements Path {
 		nodeList.add( node );
 	}
 
-	public Node removeLast() {
-		if ( nodeList.size() < 1 ) {
-			throw new IllegalStateException();
+	public Node removeLeafNode() {
+		if ( nodeList.size() == 0 ) {
+			throw new IllegalStateException( "No nodes in path!" );
+		}
+		if ( nodeList.size() == 1 ) {
+			throw new IllegalStateException( "Root node cannot be removed!" );
 		}
 		return nodeList.remove( nodeList.size() - 1 );
 	}
 
-	public Node getLast() {
-		if ( nodeList.size() < 1 ) {
-			throw new IllegalStateException();
+	public NodeImpl getLeafNode() {
+		if ( nodeList.size() == 0 ) {
+			throw new IllegalStateException( "No nodes in path!" );
 		}
-		return nodeList.get( nodeList.size() - 1 );
+		return ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
 	}
 
 	public Iterator<Path.Node> iterator() {
 		return nodeList.iterator();
+	}
+
+	public boolean isSubPathOf(Path path) {
+		Iterator<Node> pathIter = path.iterator();
+		Iterator<Node> thisIter = iterator();
+		while ( pathIter.hasNext() ) {
+			Node pathNode = pathIter.next();
+			if ( !thisIter.hasNext() ) {
+				return false;
+			}
+			Node thisNode = thisIter.next();
+			if ( !thisNode.equals( pathNode ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -86,23 +110,12 @@ public class PathImpl implements Path {
 		Iterator<Path.Node> iter = iterator();
 		while ( iter.hasNext() ) {
 			Node node = iter.next();
-			if ( node.getName() != null ) {
-				builder.append( node.getName() );
-
-				if ( node.isInIterable() ) {
-					builder.append( "[" );
-					if ( node.getIndex() != null ) {
-						builder.append( node.getIndex() );
-					}
-					else if ( node.getKey() != null ) {
-						builder.append( node.getKey() );
-					}
-					builder.append( "]" );
-				}
-				if ( iter.hasNext() ) {
-					builder.append( PROPERTY_PATH_SEPERATOR );
-
-				}
+			if ( ROOT_NODE.equals( node ) ) {
+				continue;
+			}
+			builder.append( node.toString() );
+			if ( iter.hasNext() ) {
+				builder.append( PROPERTY_PATH_SEPERATOR );
 			}
 		}
 		return builder.toString();

@@ -234,7 +234,7 @@ public class ValidatorImpl implements Validator {
 	 */
 	private <T> void validateConstraints(ExecutionContext<T> executionContext) {
 		//casting rely on the fact that root object is at the top of the stack
-		@SuppressWarnings(" unchecked")
+		@SuppressWarnings("unchecked")
 		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) executionContext.peekCurrentBeanType() );
 		if ( executionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
 			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();

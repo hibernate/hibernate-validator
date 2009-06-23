@@ -48,7 +48,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	public ErrorBuilder buildErrorWithMessageTemplate(String messageTemplate) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return new ErrorBuilderImpl( messageTemplate, propertyPath );
 	}
 
 	public ConstraintDescriptor<?> getConstraintDescriptor() {
@@ -84,6 +84,105 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 		public Path getPath() {
 			return propertyPath;
+		}
+	}
+
+	class ErrorBuilderImpl implements ErrorBuilder {
+		String messageTemplate;
+		Path propertyPath;
+
+		ErrorBuilderImpl(String template, Path path) {
+			messageTemplate = template;
+			propertyPath = path;
+		}
+
+		public NodeBuilder inSubNode(String name) {
+			PathImpl path = new PathImpl();
+			path.addNode( new NodeImpl( name ) );
+			return new NodeBuilderImpl( messageTemplate, path );
+		}
+
+		public ConstraintValidatorContext addError() {
+			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			return ConstraintValidatorContextImpl.this;
+		}
+	}
+
+	class NodeBuilderImpl implements ErrorBuilder.NodeBuilder {
+		String messageTemplate;
+		PathImpl propertyPath;
+
+		NodeBuilderImpl(String template, PathImpl path) {
+			messageTemplate = template;
+			propertyPath = path;
+		}
+
+		public ErrorBuilder.InIterableNodeBuilder inSubNode(String name) {
+			NodeImpl node = new NodeImpl( name );
+			propertyPath.addNode( node );
+			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
+		}
+
+		public ConstraintValidatorContext addError() {
+			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			return ConstraintValidatorContextImpl.this;
+		}
+	}
+
+	class InIterableNodeBuilderImpl implements ErrorBuilder.InIterableNodeBuilder {
+		String messageTemplate;
+		PathImpl propertyPath;
+
+		InIterableNodeBuilderImpl(String template, PathImpl path) {
+			messageTemplate = template;
+			propertyPath = path;
+		}
+
+		public ErrorBuilder.InIterablePropertiesBuilder inIterable() {
+			return new InIterablePropertiesBuilderImpl(messageTemplate, propertyPath);
+		}
+
+		public ErrorBuilder.InIterableNodeBuilder inSubNode(String name) {
+			Path.Node node = new NodeImpl( name );
+			propertyPath.addNode( node );
+			return this;
+		}
+
+		public ConstraintValidatorContext addError() {
+			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			return ConstraintValidatorContextImpl.this;
+		}
+	}
+
+	class InIterablePropertiesBuilderImpl implements ErrorBuilder.InIterablePropertiesBuilder {
+		String messageTemplate;
+		PathImpl propertyPath;
+
+		InIterablePropertiesBuilderImpl(String template, PathImpl path) {
+			messageTemplate = template;
+			propertyPath = path;
+			propertyPath.getLeafNode().setInIterable( true );
+		}
+
+		public ErrorBuilder.NodeBuilder atKey(Object key) {
+			propertyPath.getLeafNode().setKey( key );
+			return new NodeBuilderImpl( messageTemplate, propertyPath );
+		}
+
+		public ErrorBuilder.NodeBuilder atIndex(Integer index) {
+			propertyPath.getLeafNode().setIndex( index );
+			return new NodeBuilderImpl( messageTemplate, propertyPath );
+		}
+
+		public ErrorBuilder.InIterableNodeBuilder inSubNode(String name) {
+			Path.Node node = new NodeImpl( name );
+			propertyPath.addNode( node );
+			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
+		}
+
+		public ConstraintValidatorContext addError() {
+			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			return ConstraintValidatorContextImpl.this;
 		}
 	}
 }

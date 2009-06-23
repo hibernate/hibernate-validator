@@ -23,6 +23,10 @@ import javax.validation.Path;
  * @author Hardy Ferentschik
  */
 public class NodeImpl implements Path.Node {
+
+	private static final String INDEX_OPEN = "[";
+	private static final String INDEX_CLOSE = "]";
+
 	private final String name;
 	private boolean isInIterable;
 	private Integer index;
@@ -31,6 +35,13 @@ public class NodeImpl implements Path.Node {
 
 	public NodeImpl(String name) {
 		this.name = name;
+	}
+
+	NodeImpl(Path.Node node) {
+		this.name = node.getName();
+		this.isInIterable = node.isInIterable();
+		this.index = node.getIndex();
+		this.key = node.getKey();
 	}
 
 	public String getName() {
@@ -50,6 +61,7 @@ public class NodeImpl implements Path.Node {
 	}
 
 	public void setIndex(Integer index) {
+		isInIterable = true;
 		this.index = index;
 	}
 
@@ -57,14 +69,25 @@ public class NodeImpl implements Path.Node {
 		return key;
 	}
 
+	public void setKey(Object key) {
+		isInIterable = true;
+		this.key = key;
+	}
+
 	@Override
 	public String toString() {
-		return "NodeImpl{" +
-				"name='" + name + '\'' +
-				", isInIterable=" + isInIterable +
-				", index=" + index +
-				", key=" + key +
-				'}';
+		StringBuilder builder = new StringBuilder( name );
+		if ( isInIterable ) {
+			builder.append( INDEX_OPEN );
+			if ( getIndex() != null ) {
+				builder.append( getIndex() );
+			}
+			else if ( getKey() != null ) {
+				builder.append( getKey() );
+			}
+			builder.append( INDEX_CLOSE );
+		}
+		return builder.toString();
 	}
 
 	@Override
