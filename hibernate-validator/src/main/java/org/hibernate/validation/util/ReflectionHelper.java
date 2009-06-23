@@ -305,50 +305,53 @@ public class ReflectionHelper {
 	 * @return The indexed value or <code>null</code> if <code>value</code> is <code>null</code> or not a collection or array.
 	 *         <code>null</code> is also returned in case the index does not exist.
 	 */
-	public static Object getIndexedValue(Object value, String index) {
+	public static Object getIndexedValue(Object value, Integer index) {
 		if ( value == null ) {
 			return null;
 		}
 
-		// try to create the index
-		int numIndex = -1;
-		try {
-			numIndex = Integer.valueOf( index );
-		}
-		catch ( NumberFormatException nfe ) {
-			// ignore
-		}
-
-		if ( numIndex == -1 ) {  // must be a map indexed by string
-			Map<?, ?> map = ( Map<?, ?> ) value;
-			//noinspection SuspiciousMethodCalls
-			return map.get( index );
-		}
-
-		Iterator<?> iter = null;
+		Iterator<?> iter;
 		Type type = value.getClass();
 		if ( isIterable( type ) ) {
 			iter = ( ( Iterable<?> ) value ).iterator();
 		}
-		else if ( isMap( type ) ) {
-			Map<?, ?> map = ( Map<?, ?> ) value;
-			iter = map.values().iterator();
-		}
 		else if ( TypeUtils.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( (Object) value );
+			List<?> arrayList = Arrays.asList( ( Object ) value );
 			iter = arrayList.iterator();
+		}
+		else {
+			return null;
 		}
 
 		int i = 0;
 		Object o;
 		while ( iter.hasNext() ) {
 			o = iter.next();
-			if ( i == numIndex ) {
+			if ( i == index ) {
 				return o;
 			}
 			i++;
 		}
 		return null;
+	}
+
+	/**
+	 * Tries to retrieve the mapped value from the specified object.
+	 *
+	 * @param value The object from which to retrieve the mapped value. The object has to be non {@code null} and
+	 * must implement the  @{code Map} interface.
+	 * @param key The map key. index.
+	 *
+	 * @return The mapped value or {@code null} if {@code value} is {@code null} or not implementing @{code Map}.
+	 */
+	public static Object getMappedValue(Object value, Object key) {
+		if ( value == null || !( value instanceof Map ) ) {
+			return null;
+		}
+
+		Map<?, ?> map = ( Map<?, ?> ) value;
+		//noinspection SuspiciousMethodCalls
+		return map.get( key );
 	}
 
 	/**
@@ -520,7 +523,7 @@ public class ReflectionHelper {
 	 * @param clazz @{code Class} to check.
 	 * @param superClassOrInterface The super class/interface {@code clazz}.
 	 *
-	 * @return {@code true} if {@code clazz} extends or implements {@code superClassOrInterface}, {@code false} otherwise. 
+	 * @return {@code true} if {@code clazz} extends or implements {@code superClassOrInterface}, {@code false} otherwise.
 	 */
 	private static boolean extendsOrImplements(Class<?> clazz, Class<?> superClassOrInterface) {
 		List<Class<?>> classes = new ArrayList<Class<?>>();

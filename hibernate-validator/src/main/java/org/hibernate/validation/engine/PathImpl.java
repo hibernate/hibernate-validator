@@ -20,6 +20,8 @@ package org.hibernate.validation.engine;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.validation.Path;
 
 /**
@@ -27,17 +29,42 @@ import javax.validation.Path;
  */
 public class PathImpl implements Path {
 
+	/**
+	 * Regular expression used to split a string path into its elements.
+	 *
+	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
+	 */
+	private static final Pattern pathPattern = Pattern.compile( "(\\w+)(\\[(\\w+)\\])?(\\.(.*))*" );
+
 	private static final String PROPERTY_PATH_SEPERATOR = ".";
-	private static final String INDEX_OPEN = "[";
-	private static final String INDEX_CLOSE = "]";
 
 	private static final Node ROOT_NODE = new NodeImpl( ( String ) null );
 
 	private final List<Node> nodeList;
 
-	public PathImpl() {
-		nodeList = new ArrayList<Node>();
-		nodeList.add( ROOT_NODE );
+	/**
+	 * Returns a {@code Path} instance representing the path described by the given string. To create a root node the empty string should be passed.
+	 *
+	 * @param propertyPath the path as string representation.
+	 *
+	 * @return a {@code Path} instance representing the path described by the given string.
+	 *
+	 * @throws IllegalArgumentException in case {@code property == null} or {@code property} cannot be parsed.
+	 */
+	public static PathImpl createPathFromString(String propertyPath) {
+		if ( propertyPath == null ) {
+			throw new IllegalArgumentException( "null is not allowed as property path." );
+		}
+
+		if ( propertyPath.length() == 0 ) {
+			return createNewRootPath();
+		}
+
+		return parseProperty( propertyPath );
+	}
+
+	public static PathImpl createNewRootPath() {
+		return new PathImpl();
 	}
 
 	public PathImpl(PathImpl path) {
@@ -46,6 +73,11 @@ public class PathImpl implements Path {
 		while ( iter.hasNext() ) {
 			nodeList.add( new NodeImpl( iter.next() ) );
 		}
+	}
+
+	private PathImpl() {
+		nodeList = new ArrayList<Node>();
+		nodeList.add( ROOT_NODE );
 	}
 
 	private PathImpl(List<Node> nodeList) {
@@ -142,5 +174,34 @@ public class PathImpl implements Path {
 	@Override
 	public int hashCode() {
 		return nodeList != null ? nodeList.hashCode() : 0;
+	}
+
+	private static PathImpl parseProperty(String property) {
+		PathImpl path = new PathImpl();
+		String tmp = property;
+		do {
+			Matcher matcher = pathPattern.matcher( tmp );
+			if ( matcher.matches() ) {
+				String value = matcher.group( 1 );
+				String index = matcher.group( 3 );
+				NodeImpl node = new NodeImpl( value );
+				if ( index != null ) {
+					node.setInIterable( true );
+					try {
+						Integer i = Integer.parseInt( index );
+						node.setIndex( i );
+					}
+					catch ( NumberFormatException e ) {
+						node.setKey( index );
+					}
+				}
+				path.addNode( node );
+				tmp = matcher.group( 5 );
+			}
+			else {
+				throw new IllegalArgumentException( "Unable to parse property path " + property );
+			}
+		} while ( tmp != null );
+		return path;
 	}
 }

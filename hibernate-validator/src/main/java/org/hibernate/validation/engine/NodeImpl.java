@@ -76,7 +76,7 @@ public class NodeImpl implements Path.Node {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder( name );
+		StringBuilder builder = new StringBuilder( name == null ? "" : name );
 		if ( isInIterable ) {
 			builder.append( INDEX_OPEN );
 			if ( getIndex() != null ) {

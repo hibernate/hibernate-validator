@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeSet;
-import javax.validation.ValidationException;
 import javax.validation.ConstraintPayload;
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
@@ -51,7 +51,7 @@ public class ReflectionHelperTest {
 		Type type = TestTypes.class.getField( "stringList" ).getGenericType();
 		assertTrue( ReflectionHelper.isIterable( type ) );
 
-		assertTrue( ReflectionHelper.isIterable( new TreeSet<Object>().getClass() ) );
+		assertTrue( ReflectionHelper.isIterable( TreeSet.class ) );
 
 		assertTrue( ReflectionHelper.isIterable( List.class ) );
 		assertTrue( ReflectionHelper.isIterable( HashSet.class ) );
@@ -93,17 +93,13 @@ public class ReflectionHelperTest {
 		String key = "key";
 		map.put( key, testObject );
 
-		Object value = ReflectionHelper.getIndexedValue( map, key );
+		Object value = ReflectionHelper.getMappedValue( map, key );
 		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
 
-		// try to get to the value by integer index
-		value = ReflectionHelper.getIndexedValue( map, "0" );
-		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
-
-		value = ReflectionHelper.getIndexedValue( map, "foo" );
+		value = ReflectionHelper.getMappedValue( map, "foo" );
 		assertNull( value, "A non existent index should return the null value" );
 
-		value = ReflectionHelper.getIndexedValue( map, "2" );
+		value = ReflectionHelper.getMappedValue( map, "2" );
 		assertNull( value, "A non existent index should return the null value" );
 	}
 
@@ -113,16 +109,16 @@ public class ReflectionHelperTest {
 		Object testObject = new Object();
 		list.add( testObject );
 
-		Object value = ReflectionHelper.getIndexedValue( list, "0" );
+		Object value = ReflectionHelper.getIndexedValue( list, 0 );
 		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
 
-		value = ReflectionHelper.getIndexedValue( list, "2" );
+		value = ReflectionHelper.getIndexedValue( list, 2 );
 		assertNull( value, "A non existent index should return the null value" );
 	}
 
 	@Test
 	public void testGetIndexedValueForNull() {
-		Object value = ReflectionHelper.getIndexedValue( null, "0" );
+		Object value = ReflectionHelper.getIndexedValue( null, 0 );
 		assertNull( value );
 	}
 
@@ -138,7 +134,7 @@ public class ReflectionHelperTest {
 			}
 
 			public Class<? extends ConstraintPayload>[] payload() {
-				@SuppressWarnings( "unchecked")
+				@SuppressWarnings("unchecked")
 				Class<? extends ConstraintPayload>[] classes = new Class[] { };
 				return classes;
 			}

@@ -32,6 +32,7 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
+import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validation.metadata.MetaConstraint;
@@ -148,7 +149,7 @@ public class ExecutionContext<T> {
 		beanStack.push( object );
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
-		propertyPath = new PathImpl();
+		propertyPath = PathImpl.createNewRootPath();
 		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
 	}
 
@@ -225,6 +226,10 @@ public class ExecutionContext<T> {
 	 */
 	public void pushProperty(String property) {
 		propertyPath.addNode( new NodeImpl( property ) );
+	}
+
+	public void setProperty(PathImpl path) {
+		propertyPath = path;
 	}
 
 	/**
@@ -316,8 +321,8 @@ public class ExecutionContext<T> {
 			return false;
 		}
 
-		for (PathImpl p : pathSet) {
-			if (p.isSubPathOf(peekPropertyPath()) || peekPropertyPath().isSubPathOf(p)) {
+		for ( PathImpl p : pathSet ) {
+			if ( p.isSubPathOf( peekPropertyPath() ) || peekPropertyPath().isSubPathOf( p ) ) {
 				return true;
 			}
 		}

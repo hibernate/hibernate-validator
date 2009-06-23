@@ -97,7 +97,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public NodeBuilder inSubNode(String name) {
-			PathImpl path = new PathImpl();
+			PathImpl path = PathImpl.createNewRootPath();
 			path.addNode( new NodeImpl( name ) );
 			return new NodeBuilderImpl( messageTemplate, path );
 		}
@@ -139,7 +139,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ErrorBuilder.InIterablePropertiesBuilder inIterable() {
-			return new InIterablePropertiesBuilderImpl(messageTemplate, propertyPath);
+			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ErrorBuilder.InIterableNodeBuilder inSubNode(String name) {
