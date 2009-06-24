@@ -95,38 +95,37 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	/**
-	 * Validates the specified value.
-	 *
-	 * @param value The value to validate
-	 * @param type The type of the value determined from the type the annotation was placed on.
-	 * @param executionContext The current execution context.
-	 * @param constraintViolations List of constraint violation into which to accumulate all constraint violation as we traverse
-	 * this <code>ConstraintTree </code>.
-	 * @param <T> Type of the root bean for the current validation.
-	 * @param <V> Type of the value to be validated.
-	 */
-	public <T, V> void validateConstraints(V value, Type type, ExecutionContext<T> executionContext, List<ConstraintViolation<T>> constraintViolations) {
+	public <T, U, V> void validateConstraints(Type type, GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, List<ConstraintViolation<T>> constraintViolations) {
 		// first validate composing constraints
 		for ( ConstraintTree<?> tree : getChildren() ) {
-			tree.validateConstraints( value, type, executionContext, constraintViolations );
+			tree.validateConstraints( type, executionContext, localExecutionContext, constraintViolations );
 		}
 
 		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-				executionContext.peekPropertyPath(), descriptor
+				localExecutionContext.getPropertyPath(), descriptor
 		);
 
 		// we could have a composing constraint which does not need its own validator.
 		if ( !descriptor.getConstraintValidatorClasses().isEmpty() ) {
 			if ( log.isTraceEnabled() ) {
-				log.trace( "Validating value {} against constraint defined by {}", value, descriptor );
+				log.trace(
+						"Validating value {} against constraint defined by {}",
+						localExecutionContext.getCurrentValidatedValue(),
+						descriptor
+				);
 			}
 			ConstraintValidator<A, V> validator = getInitalizedValidator(
-					value, type, executionContext.getConstraintValidatorFactory()
+					localExecutionContext.getCurrentValidatedValue(),
+					type,
+					executionContext.getConstraintValidatorFactory()
 			);
 
 			validateSingleConstraint(
-					value, executionContext, constraintViolations, constraintValidatorContext, validator
+					executionContext,
+					localExecutionContext,
+					constraintViolations,
+					constraintValidatorContext,
+					validator
 			);
 		}
 
@@ -134,16 +133,20 @@ public class ConstraintTree<A extends Annotation> {
 			constraintViolations.clear();
 			final String message = ( String ) getParent().getDescriptor().getAttributes().get( "message" );
 			ConstraintValidatorContextImpl.ErrorMessage error = constraintValidatorContext.new ErrorMessage(
-					message, executionContext.peekPropertyPath()
+					message, localExecutionContext.getPropertyPath()
 			);
-			constraintViolations.add( executionContext.createConstraintViolation( value, error, descriptor ) );
+			constraintViolations.add(
+					executionContext.createConstraintViolation(
+							localExecutionContext, error, descriptor
+					)
+			);
 		}
 	}
 
-	private <T, V> void validateSingleConstraint(V value, ExecutionContext<T> executionContext, List<ConstraintViolation<T>> constraintViolations, ConstraintValidatorContextImpl constraintValidatorContext, ConstraintValidator<A, V> validator) {
+	private <T, U, V> void validateSingleConstraint(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, List<ConstraintViolation<T>> constraintViolations, ConstraintValidatorContextImpl constraintValidatorContext, ConstraintValidator<A, V> validator) {
 		boolean isValid;
 		try {
-			isValid = validator.isValid( value, constraintValidatorContext );
+			isValid = validator.isValid( localExecutionContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
 		catch ( RuntimeException e ) {
 			throw new ValidationException( "Unexpected exception during isValid call", e );
@@ -151,7 +154,7 @@ public class ConstraintTree<A extends Annotation> {
 		if ( !isValid ) {
 			constraintViolations.addAll(
 					executionContext.createConstraintViolations(
-							value, constraintValidatorContext
+							localExecutionContext, constraintValidatorContext
 					)
 			);
 		}

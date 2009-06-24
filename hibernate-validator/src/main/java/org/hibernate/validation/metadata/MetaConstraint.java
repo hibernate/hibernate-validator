@@ -26,12 +26,13 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.ConstraintViolation;
+import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.engine.ConstraintTree;
-import org.hibernate.validation.engine.ExecutionContext;
+import org.hibernate.validation.engine.GlobalExecutionContext;
+import org.hibernate.validation.engine.LocalExecutionContext;
+import org.hibernate.validation.util.ReflectionHelper;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and gives access to
@@ -120,11 +121,11 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree;
 	}
 
-	public <T> boolean validateConstraint(ExecutionContext<T> executionContext) {
-		final Object leafBeanInstance = executionContext.peekCurrentBean();
-		Object value = getValue( leafBeanInstance );
+	public <T, U, V> boolean validateConstraint(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext) {
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
-		constraintTree.validateConstraints( value, typeOfAnnoatedElement(), executionContext, constraintViolations );
+		constraintTree.validateConstraints(
+				typeOfAnnoatedElement(), executionContext, localExecutionContext, constraintViolations
+		);
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
 			return false;
@@ -132,14 +133,21 @@ public class MetaConstraint<T, A extends Annotation> {
 		return true;
 	}
 
-	public <T> boolean validateConstraint(Object value, ExecutionContext<T> executionContext) {
-		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
-		constraintTree.validateConstraints( value, typeOfAnnoatedElement(), executionContext, constraintViolations );
-		if ( constraintViolations.size() > 0 ) {
-			executionContext.addConstraintFailures( constraintViolations );
-			return false;
+	/**
+	 * @param o the object from which to retrieve the value.
+	 *
+	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
+	 *         is returned of method or field access is used to access the value.
+	 */
+	public Object getValue(Object o) {
+		switch ( elementType ) {
+			case TYPE: {
+				return o;
+			}
+			default: {
+				return ReflectionHelper.getValue( member, o );
+			}
 		}
-		return true;
 	}
 
 	private Type typeOfAnnoatedElement() {
@@ -151,28 +159,11 @@ public class MetaConstraint<T, A extends Annotation> {
 			}
 			default: {
 				t = ReflectionHelper.typeOf( member );
-				if ( t instanceof Class && ((Class) t).isPrimitive()) {
+				if ( t instanceof Class && ( ( Class ) t ).isPrimitive() ) {
 					t = ReflectionHelper.boxedTyp( t );
 				}
 			}
 		}
 		return t;
-	}
-
-	/**
-	 * @param o the object from which to retrieve the value.
-	 *
-	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
-	 *         is returned of method or field access is used to access the value.
-	 */
-	private Object getValue(Object o) {
-		switch ( elementType ) {
-			case TYPE: {
-				return o;
-			}
-			default: {
-				return ReflectionHelper.getValue( member, o );
-			}
-		}
 	}
 }

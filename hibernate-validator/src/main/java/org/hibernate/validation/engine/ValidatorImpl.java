@@ -18,6 +18,8 @@
 package org.hibernate.validation.engine;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -58,21 +60,9 @@ import org.hibernate.validation.util.ReflectionHelper;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @todo Make all properties transient for serializability.
  */
 public class ValidatorImpl implements Validator {
 	private static final Logger log = LoggerFactory.make();
-
-	/**
-	 * Set of classes which can be used as index in a map.
-	 */
-	private static final Set<Class<?>> VALID_MAP_INDEX_CLASSES = new HashSet<Class<?>>();
-
-	static {
-		VALID_MAP_INDEX_CLASSES.add( Integer.class );
-		VALID_MAP_INDEX_CLASSES.add( Long.class );
-		VALID_MAP_INDEX_CLASSES.add( String.class );
-	}
 
 	/**
 	 * The default group array used in case any of the validate methods is called without a group.
@@ -82,7 +72,7 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * Used to resolve the group execution order for a validate call.
 	 */
-	private GroupChainGenerator groupChainGenerator;
+	private final transient GroupChainGenerator groupChainGenerator;
 
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final MessageInterpolator messageInterpolator;
@@ -102,26 +92,22 @@ public class ValidatorImpl implements Validator {
 		groupChainGenerator = new GroupChainGenerator();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 		if ( object == null ) {
 			throw new IllegalArgumentException( "Validation of a null object" );
 		}
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
-		ExecutionContext<T> context = ExecutionContext.getContextForValidate(
+		GlobalExecutionContext<T> context = GlobalExecutionContext.getContextForValidate(
 				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
-		List<ConstraintViolation<T>> list = validateInContext( context, groupChain );
+		List<ConstraintViolation<T>> list = validateInContext(
+				object, context, groupChain, PathImpl.createNewRootPath()
+		);
 		return new HashSet<ConstraintViolation<T>>( list );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
 		if ( object == null ) {
 			throw new IllegalArgumentException( "Validated object cannot be null." );
@@ -136,9 +122,6 @@ public class ValidatorImpl implements Validator {
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
 		if ( beanType == null ) {
 			throw new IllegalArgumentException( "The bean type cannot be null." );
@@ -185,43 +168,51 @@ public class ValidatorImpl implements Validator {
 	}
 
 	/**
-	 * Validates the object contained in <code>context</code>.
+	 * Validates the given object using the available context information.
 	 *
-	 * @param context A context object containing the object to validate together with other state information needed
-	 * for validation.
-	 * @param groupChain A <code>GroupChain</code> instance containing the resolved group sequence to execute
+	 * @param value The value to validate.
+	 * @param context Global context. Used amongst others to collect all failing constraints.
+	 * @param groupChain Contains the information which and in which oder groups have to be executed
+	 * @param path The current path of the valiation.
+	 * @param <T> The root bean type.
+	 * @param <V> The type of the current object on the validation stack.
 	 *
-	 * @return List of invalid constraints.
+	 * @return List of constraint violations or the empty set if there were no violations.
 	 */
-	private <T> List<ConstraintViolation<T>> validateInContext(ExecutionContext<T> context, GroupChain groupChain) {
-		if ( context.peekCurrentBean() == null ) {
+	private <T, U, V> List<ConstraintViolation<T>> validateInContext(U value, GlobalExecutionContext<T> context, GroupChain groupChain, PathImpl path) {
+		if ( value == null ) {
 			return Collections.emptyList();
 		}
 
-		// process all groups breadth-first
+		path = PathImpl.createShallowCopy( path );
+
+		LocalExecutionContext<U, V> localExecutionContext = LocalExecutionContext.getLocalExecutionContext( value );
+
+		// process first single groups. For these we can skip some object traversal, by first running all validations on the current bean
+		// before traversing the object.
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
-			context.setCurrentGroup( group.getGroup() );
-			validateConstraints( context );
+			localExecutionContext.setCurrentGroup( group.getGroup() );
+			validateConstraints( context, localExecutionContext, path );
 		}
 		groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
-			context.setCurrentGroup( group.getGroup() );
-			validateCascadedConstraints( context );
+			localExecutionContext.setCurrentGroup( group.getGroup() );
+			validateCascadedConstraints( context, localExecutionContext, path );
 		}
 
-		// process group sequences depth-first to guarantee that groups following a violation within a group won't get executed.
+		// now we process sequences. For sequences I have to traverse the object graph since I have to stop processing when an error occurs.
 		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			List<Group> sequence = sequenceIterator.next();
 			for ( Group group : sequence ) {
 				int numberOfViolations = context.getFailingConstraints().size();
-				context.setCurrentGroup( group.getGroup() );
+				localExecutionContext.setCurrentGroup( group.getGroup() );
 
-				validateConstraints( context );
-				validateCascadedConstraints( context );
+				validateConstraints( context, localExecutionContext, path );
+				validateCascadedConstraints( context, localExecutionContext, path );
 
 				if ( context.getFailingConstraints().size() > numberOfViolations ) {
 					break;
@@ -232,15 +223,18 @@ public class ValidatorImpl implements Validator {
 	}
 
 	/**
-	 * Validates the non-cascaded constraints.
+	 * Validates non cascaded constraints
 	 *
-	 * @param executionContext The current validation context.
+	 * @param executionContext The global execution context
+	 * @param localExecutionContext Collected information for single validation
+	 * @param path The current path of the validation
+	 * @param <T> The type of the root bean
 	 */
-	private <T> void validateConstraints(ExecutionContext<T> executionContext) {
+	private <T, U, V> void validateConstraints(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
 		//casting rely on the fact that root object is at the top of the stack
 		@SuppressWarnings("unchecked")
-		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) executionContext.peekCurrentBeanType() );
-		if ( executionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
+		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) localExecutionContext.getCurrentBeanType() );
+		if ( localExecutionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
 			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
 			if ( log.isTraceEnabled() && defaultGroupSequence.size() > 0 && defaultGroupSequence.get( 0 ) != Default.class ) {
 				log.trace(
@@ -250,56 +244,71 @@ public class ValidatorImpl implements Validator {
 				);
 			}
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
-				executionContext.setCurrentGroup( defaultSequenceMember );
-				boolean validationSuccessful = validateConstraintsForCurrentGroup( executionContext, beanMetaData );
+				localExecutionContext.setCurrentGroup( defaultSequenceMember );
+				boolean validationSuccessful = validateConstraintsForCurrentGroup(
+						executionContext, localExecutionContext, beanMetaData, path
+				);
 				if ( !validationSuccessful ) {
 					break;
 				}
 			}
 		}
 		else {
-			validateConstraintsForCurrentGroup( executionContext, beanMetaData );
+			validateConstraintsForCurrentGroup( executionContext, localExecutionContext, beanMetaData, path );
 		}
 	}
 
-	/**
-	 * Validates all constraints for the given bean using the current group set in the execution context.
-	 *
-	 * @param executionContext The execution context.
-	 * @param beanMetaData The bean metadata object for the bean to validate.
-	 *
-	 * @return <code>true</code> if the validation was successful (meaning no constraint violations), <code>false</code>
-	 *         otherwise.
-	 */
-	private <T> boolean validateConstraintsForCurrentGroup(ExecutionContext<T> executionContext, BeanMetaData<T> beanMetaData) {
+	private <T, U, V> boolean validateConstraintsForCurrentGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, BeanMetaData<T> beanMetaData, PathImpl path) {
 		boolean validationSuccessful = true;
 		for ( MetaConstraint<T, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
-			executionContext.pushProperty( metaConstraint.getPropertyName() );
-			if ( executionContext.isValidationRequired( metaConstraint ) ) {
-				boolean tmp = metaConstraint.validateConstraint( executionContext );
+			PathImpl newPath = PathImpl.createShallowCopy( path );
+			newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
+			localExecutionContext.setPropertyPath( newPath );
+			if ( isValidationRequired( globalExecutionContext, localExecutionContext, metaConstraint ) ) {
+				Object valueToValidate = metaConstraint.getValue( localExecutionContext.getCurrentBean() );
+				localExecutionContext.setCurrentValidatedValue( ( V ) valueToValidate );
+				boolean tmp = metaConstraint.validateConstraint( globalExecutionContext, localExecutionContext );
 				validationSuccessful = validationSuccessful && tmp;
 			}
-			executionContext.popProperty();
 		}
+		globalExecutionContext.markProcessed(
+				localExecutionContext.getCurrentBean(),
+				localExecutionContext.getCurrentGroup(),
+				localExecutionContext.getPropertyPath()
+		);
 		return validationSuccessful;
 	}
 
-	//this method must always be called after validateConstraints for the same context
-	private <T> void validateCascadedConstraints(ExecutionContext<T> context) {
-		List<Member> cascadedMembers = getBeanMetaData( context.peekCurrentBeanType() )
+	/**
+	 * Validates all cascaded constraints for the given bean using the current group set in the execution context.
+	 * This method must always be called after validateConstraints for the same context.
+	 *
+	 * @param globalExecutionContext The execution context
+	 * @param localExecutionContext Collected information for single validation
+	 * @param path The current path of the valiation.
+	 */
+	private <T, U, V> void validateCascadedConstraints(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
+		List<Member> cascadedMembers = getBeanMetaData( localExecutionContext.getCurrentBeanType() )
 				.getCascadedMembers();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
-			context.pushProperty( ReflectionHelper.getPropertyName( member ) );
-			if ( context.isCascadeRequired( member ) ) {
-				Object value = ReflectionHelper.getValue( member, context.peekCurrentBean() );
+			PathImpl newPath = PathImpl.createShallowCopy( path );
+			newPath.addNode( new NodeImpl( ReflectionHelper.getPropertyName( member ) ) );
+			localExecutionContext.setPropertyPath( newPath );
+			if ( isCascadeRequired( globalExecutionContext, localExecutionContext, member ) ) {
+				Object value = ReflectionHelper.getValue( member, localExecutionContext.getCurrentBean() );
 				if ( value != null ) {
-					Iterator<?> iter = createIteratorForCascadedValue( context, type, value );
+					Iterator<?> iter = createIteratorForCascadedValue( localExecutionContext, type, value );
 					boolean isIndexable = isIndexable( type );
-					validateCascadedConstraint( context, iter, isIndexable );
+					validateCascadedConstraint(
+							globalExecutionContext,
+							iter,
+							isIndexable,
+							localExecutionContext.getCurrentGroup(),
+							localExecutionContext.getPropertyPath()
+					);
 				}
 			}
-			context.popProperty();
 		}
 	}
 
@@ -313,7 +322,7 @@ public class ValidatorImpl implements Validator {
 	 *
 	 * @return An iterator over the value of a cascaded property.
 	 */
-	private <T> Iterator<?> createIteratorForCascadedValue(ExecutionContext<T> context, Type type, Object value) {
+	private <U, V> Iterator<?> createIteratorForCascadedValue(LocalExecutionContext<U, V> context, Type type, Object value) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
 			iter = ( ( Iterable<?> ) value ).iterator();
@@ -360,29 +369,35 @@ public class ValidatorImpl implements Validator {
 	}
 
 	@SuppressWarnings("RedundantArrayCreation")
-	private <T> void validateCascadedConstraint(ExecutionContext<T> context, Iterator<?> iter, boolean isIndexable) {
-		Object actualValue;
-		String propertyIndex;
+	private <T> void validateCascadedConstraint(GlobalExecutionContext<T> context, Iterator<?> iter, boolean isIndexable, Class<?> currentGroup, PathImpl currentPath) {
+		Object value;
+		Integer index;
+		Object mapKey = null;
 		int i = 0;
 		while ( iter.hasNext() ) {
-			actualValue = iter.next();
-			propertyIndex = String.valueOf( i );
-			if ( actualValue instanceof Map.Entry ) {
-				Object key = ( ( Map.Entry ) actualValue ).getKey();
-				if ( VALID_MAP_INDEX_CLASSES.contains( key.getClass() ) ) {
-					propertyIndex = key.toString();
-				}
-				actualValue = ( ( Map.Entry ) actualValue ).getValue();
+			value = iter.next();
+			index = i;
+			if ( value instanceof Map.Entry ) {
+				mapKey = ( ( Map.Entry ) value ).getKey();
+				value = ( ( Map.Entry ) value ).getValue();
 			}
 
-			if ( !context.isAlreadyValidated( actualValue ) ) {
-				if ( isIndexable ) {
-					context.setPropertyIndex( propertyIndex );
-				}
-				context.pushCurrentBean( actualValue );
-				GroupChain groupChain = groupChainGenerator.getGroupChainFor( Arrays.asList( new Class<?>[] { context.getCurrentGroup() } ) );
-				validateInContext( context, groupChain );
-				context.popCurrentBean();
+			if ( isIndexable ) {
+				// only one of the two values index/mapKey will be set. The other will stay null.
+				currentPath.getLeafNode().setIndex( index );
+				currentPath.getLeafNode().setKey( mapKey );
+			}
+
+			if ( !context.isAlreadyValidated( value, currentGroup, currentPath ) ) {
+
+				GroupChain groupChain = groupChainGenerator.getGroupChainFor(
+						Arrays.asList(
+								new Class<?>[] {
+										currentGroup
+								}
+						)
+				);
+				validateInContext( value, context, groupChain, currentPath );
 			}
 			i++;
 		}
@@ -445,12 +460,12 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T> void validatePropertyForGroup(
+	private <T, U, V> void validatePropertyForGroup(
 			T object,
 			PathImpl path,
 			List<ConstraintViolation<T>> failingConstraintViolations,
 			Set<MetaConstraint<T, ?>> metaConstraints,
-			Object hostingBeanInstance,
+			U hostingBeanInstance,
 			Group group,
 			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
@@ -467,17 +482,21 @@ public class ValidatorImpl implements Validator {
 
 		for ( Class<?> groupClass : groupList ) {
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
-				ExecutionContext<T> context = ExecutionContext.getContextForValidateProperty(
+				GlobalExecutionContext<T> context = GlobalExecutionContext.getContextForValidateProperty(
 						object,
-						hostingBeanInstance,
 						messageInterpolator,
 						constraintValidatorFactory,
 						cachedTraversableResolver
 				);
-				context.setProperty( path );
-				context.setCurrentGroup( groupClass );
-				if ( context.isValidationRequired( metaConstraint ) ) {
-					metaConstraint.validateConstraint( context );
+				LocalExecutionContext<U, V> localContext = LocalExecutionContext.getLocalExecutionContext(
+						hostingBeanInstance
+				);
+				localContext.setPropertyPath( path );
+				localContext.setCurrentGroup( groupClass );
+				if ( isValidationRequired( context, localContext, metaConstraint ) ) {
+					Object valueToValidate = metaConstraint.getValue( localContext.getCurrentBean() );
+					localContext.setCurrentValidatedValue( ( V ) valueToValidate );
+					metaConstraint.validateConstraint( context, localContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
 			}
@@ -537,16 +556,16 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T> void validateValueForGroup(
-			Class<T> beanType,
-			Object value,
+	private <U, V> void validateValueForGroup(
+			Class<U> beanType,
+			V value,
 			PathImpl path,
-			List<ConstraintViolation<T>> failingConstraintViolations,
-			Set<MetaConstraint<T, ?>> metaConstraints,
+			List<ConstraintViolation<U>> failingConstraintViolations,
+			Set<MetaConstraint<U, ?>> metaConstraints,
 			Group group,
 			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolations = failingConstraintViolations.size();
-		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
+		BeanMetaData<U> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
@@ -557,16 +576,17 @@ public class ValidatorImpl implements Validator {
 			groupList.add( group.getGroup() );
 		}
 
-
 		for ( Class<?> groupClass : groupList ) {
-			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
-				ExecutionContext<T> context = ExecutionContext.getContextForValidateValue(
-						beanType, value, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver
+			for ( MetaConstraint<U, ?> metaConstraint : metaConstraints ) {
+				GlobalExecutionContext<U> context = GlobalExecutionContext.getContextForValidateValue(
+						beanType, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver
 				);
-				context.setProperty( path );
-				context.setCurrentGroup( groupClass );
-				if ( context.isValidationRequired( metaConstraint ) ) {
-					metaConstraint.validateConstraint( value, context );
+				LocalExecutionContext<U, V> localContext = LocalExecutionContext.getLocalExecutionContext( beanType );
+				localContext.setPropertyPath( path );
+				localContext.setCurrentGroup( groupClass );
+				localContext.setCurrentValidatedValue( value );
+				if ( isValidationRequired( context, localContext, metaConstraint ) ) {
+					metaConstraint.validateConstraint( context, localContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
 			}
@@ -589,9 +609,7 @@ public class ValidatorImpl implements Validator {
 	 *
 	 * @return Returns the bean hosting the constraints which match the specified property path.
 	 */
-	@SuppressWarnings("unchecked")
 	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, Set<MetaConstraint<T, ?>> metaConstraints) {
-
 		Path.Node elem = propertyIter.next();
 		if ( elem.getName() == null ) { // skip root node
 			elem = propertyIter.next();
@@ -601,11 +619,11 @@ public class ValidatorImpl implements Validator {
 		if ( !propertyIter.hasNext() ) {
 
 			//use metadata first as ReflectionHelper#containsMember is slow
-			//TODO store some metadata here?
-			if ( metaData.getPropertyDescriptor( elem.getName() ) == null
-					&& !ReflectionHelper.containsMember( clazz, elem.getName() ) ) {
-				//TODO better error report
-				throw new IllegalArgumentException( "Invalid property path." );
+			if ( metaData.getPropertyDescriptor( elem.getName() ) == null ) {
+				throw new IllegalArgumentException(
+						"Invalid property path. There is no property " + elem.getName() + " in entity " + metaData.getBeanClass()
+								.getName()
+				);
 			}
 
 			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintList();
@@ -630,8 +648,12 @@ public class ValidatorImpl implements Validator {
 						}
 						type = ReflectionHelper.getIndexedType( type );
 					}
+
+					@SuppressWarnings("unchecked")
+					Class<T> valueClass = ( Class<T> ) ( value == null ? type : value.getClass() );
+
 					return collectMetaConstraintsForPath(
-							( Class<T> ) ( value == null ? type : value.getClass() ),
+							valueClass,
 							value,
 							propertyIter,
 							metaConstraints
@@ -642,9 +664,6 @@ public class ValidatorImpl implements Validator {
 		return value;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	private <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		BeanMetaDataImpl<T> metadata = beanMetaDataCache.getBeanMetaData( beanClass );
 		if ( metadata == null ) {
@@ -657,8 +676,43 @@ public class ValidatorImpl implements Validator {
 	/**
 	 * Must be called and stored for the duration of the stack call
 	 * A new instance is returned each time
+	 *
+	 * @return The resolver for the duration of a full validation.
 	 */
 	private TraversableResolver getCachingTraversableResolver() {
 		return new SingleThreadCachedTraversableResolver( traversableResolver );
+	}
+
+	@SuppressWarnings("SimplifiableIfStatement")
+	private boolean isValidationRequired(GlobalExecutionContext globalContext, LocalExecutionContext localContext, MetaConstraint metaConstraint) {
+		if ( !metaConstraint.getGroupList().contains( localContext.getCurrentGroup() ) ) {
+			return false;
+		}
+
+		return globalContext.getTraversableResolver().isReachable(
+				localContext.getCurrentBean(),
+				localContext.getPropertyPath().getLeafNode(),
+				globalContext.getRootBeanClass(),
+				localContext.getPropertyPath().getPathWithoutLeafNode(),
+				metaConstraint.getElementType()
+		);
+	}
+
+	private boolean isCascadeRequired(GlobalExecutionContext globalContext, LocalExecutionContext localContext, Member member) {
+		final ElementType type = member instanceof Field ? ElementType.FIELD : ElementType.METHOD;
+		return globalContext.getTraversableResolver().isReachable(
+				localContext.getCurrentBean(),
+				localContext.getPropertyPath().getLeafNode(),
+				globalContext.getRootBeanClass(),
+				localContext.getPropertyPath().getPathWithoutLeafNode(),
+				type
+		)
+				&& globalContext.getTraversableResolver().isCascadable(
+				localContext.getCurrentBean(),
+				localContext.getPropertyPath().getLeafNode(),
+				globalContext.getRootBeanClass(),
+				localContext.getPropertyPath().getPathWithoutLeafNode(),
+				type
+		);
 	}
 }

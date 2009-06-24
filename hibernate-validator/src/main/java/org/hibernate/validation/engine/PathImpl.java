@@ -67,7 +67,11 @@ public class PathImpl implements Path {
 		return new PathImpl();
 	}
 
-	public PathImpl(PathImpl path) {
+	public static PathImpl createShallowCopy(PathImpl path) {
+		return new PathImpl(path);
+	}
+
+	private PathImpl(PathImpl path) {
 		this.nodeList = new ArrayList<Node>();
 		Iterator<Node> iter = path.iterator();
 		while ( iter.hasNext() ) {
@@ -87,7 +91,7 @@ public class PathImpl implements Path {
 		}
 	}
 
-	public Path getPathWithoutLeafNode() {
+	public PathImpl getPathWithoutLeafNode() {
 		List<Node> nodes = new ArrayList<Node>( nodeList );
 		if ( nodes.size() > 1 ) {
 			nodes.remove( nodes.size() - 1 );
@@ -154,6 +158,7 @@ public class PathImpl implements Path {
 	}
 
 	@Override
+	@SuppressWarnings( "SimplifiableIfStatement")
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
