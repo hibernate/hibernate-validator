@@ -36,7 +36,7 @@ public class PatternValidatorTest {
 	public void testIsValid() {
 		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		descriptor.setValue( "regexp", "foobar" );
-		descriptor.setValue( "message", "{validator.pattern}" );
+		descriptor.setValue( "message", "pattern does not match" );
 		Pattern p = AnnotationFactory.create( descriptor );
 
 		PatternValidator constraint = new PatternValidator();
@@ -48,11 +48,28 @@ public class PatternValidatorTest {
 		assertFalse( constraint.isValid( "This test is not foobar", null ) );
 	}
 
+	@Test
+	public void testIsValidForEmptyStringRegexp() {
+		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
+		descriptor.setValue( "regexp", "|^.*foo$" );
+		descriptor.setValue( "message", "pattern does not match" );
+		Pattern p = AnnotationFactory.create( descriptor );
+
+		PatternValidator constraint = new PatternValidator();
+		constraint.initialize( p );
+
+		assertTrue( constraint.isValid( null, null ) );
+		assertTrue( constraint.isValid( "", null ) );
+		assertFalse( constraint.isValid( "bla bla", null ) );
+		assertTrue( constraint.isValid( "foo", null ) );
+		assertTrue( constraint.isValid( "a b c foo", null ) );
+	}
+
 	@Test(expectedExceptions = ValidationException.class)
 	public void testInvalidRegularExpression() {
 		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		descriptor.setValue( "regexp", "(unbalanced parentheses" );
-		descriptor.setValue( "message", "{validator.pattern}" );
+		descriptor.setValue( "message", "pattern does not match" );
 		Pattern p = AnnotationFactory.create( descriptor );
 
 		PatternValidator constraint = new PatternValidator();
