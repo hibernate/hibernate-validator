@@ -18,43 +18,41 @@
 package org.hibernate.validation.engine.groups;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import javax.validation.GroupDefinitionException;
+import javax.validation.groups.Default;
 
 /**
- * An instance of <code>GroupExecutionChain</code> defines the order in to validate groups during the validation process.
+ * An instance of {@code GroupChain} defines the group order during one full validation call.
  *
  * @author Hardy Ferentschik
  */
 public class GroupChain {
 
 	/**
-	 * The list of single groups.
+	 * The list of single groups to be used this validation.
 	 */
 	private List<Group> groupList = new ArrayList<Group>();
 
 	/**
-	 * The list of sequences.
+	 * The different sequences for this validation. The map contains the list of groups mapped to their sequence
+	 * name.
 	 */
-	private List<List<Group>> sequenceList = new ArrayList<List<Group>>();
+	private Map<Class<?>, List<Group>> sequenceMap = new HashMap<Class<?>, List<Group>>();
 
 	public Iterator<Group> getGroupIterator() {
 		return groupList.iterator();
 	}
 
 	public Iterator<List<Group>> getSequenceIterator() {
-		return sequenceList.iterator();
+		return sequenceMap.values().iterator();
 	}
 
 	public boolean containsSequence(Class<?> groupSequence) {
-		boolean result = false;
-		for ( List<Group> sequence : sequenceList ) {
-			if ( sequence.get( 0 ).getSequence().getName().equals( groupSequence.getName() ) ) {
-				result = true;
-				break;
-			}
-		}
-		return result;
+		return sequenceMap.containsKey( groupSequence );
 	}
 
 	void insertGroup(Group group) {
@@ -68,8 +66,62 @@ public class GroupChain {
 			return;
 		}
 
-		if ( !sequenceList.contains( groups ) ) {
-			sequenceList.add( groups );
+		if ( !sequenceMap.containsValue( groups ) ) {
+			sequenceMap.put( groups.get( 0 ).getSequence(), groups );
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "GroupChain{" +
+				"groupList=" + groupList +
+				", sequenceMap=" + sequenceMap +
+				'}';
+	}
+
+	public void assertDefaulGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) {
+		for ( Map.Entry<Class<?>, List<Group>> entry : sequenceMap.entrySet() ) {
+			Class<?> sequence = entry.getKey();
+			List<Group> groupList = entry.getValue();
+			List<Group> defaultGroupList = buildTempGroupList( defaultGroupSequence, sequence );
+			int defaultGroupIndex = containsDefaultGroupAtIndex( sequence, groupList );
+			if ( defaultGroupIndex != -1 ) {
+				ensureDefaultGroupSequenceIsExpandable( groupList, defaultGroupList, defaultGroupIndex );
+			}
+		}
+	}
+
+	private void ensureDefaultGroupSequenceIsExpandable(List<Group> groupList, List<Group> defaultGroupList, int defaultGroupIndex) {
+		for ( int i = 0; i < defaultGroupList.size(); i++ ) {
+			Group group = defaultGroupList.get( i );
+			if(group.getGroup().equals( Default.class )) {
+				continue; // we don't have to consider the default group since it is the one we want to replace
+			}
+			int index = groupList.indexOf( group ); // check whether the sequence contains group of the default group sequence
+			if ( index == -1 ) {
+				continue; // if the group is not in the sequence we can continue
+			}
+
+			if ( ( i == 0 && index == defaultGroupIndex - 1 ) || ( i == defaultGroupList.size() - 1 && index == defaultGroupIndex + 1 ) ) {
+				// if we are at the beginning or end of he defaultGroupSequence and the matches are either directly before resp after we can continue as well,
+				// since we basically have two groups
+				continue;
+			}
+			throw new GroupDefinitionException( "Unable to expand default group list" + defaultGroupList + " into sequence " + groupList );
+		}
+	}
+
+	private int containsDefaultGroupAtIndex(Class<?> sequence, List<Group> groupList) {
+		Group defaultGroup = new Group( Default.class, sequence );
+		return groupList.indexOf( defaultGroup );
+	}
+
+	private List<Group> buildTempGroupList(List<Class<?>> defaultGroupSequence, Class<?> sequence) {
+		List<Group> groupList = new ArrayList<Group>();
+		for ( Class<?> clazz : defaultGroupSequence ) {
+			Group g = new Group( clazz, sequence );
+			groupList.add( g );
+		}
+		return groupList;
 	}
 }

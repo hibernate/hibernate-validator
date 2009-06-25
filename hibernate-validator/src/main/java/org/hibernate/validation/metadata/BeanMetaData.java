@@ -24,8 +24,6 @@ import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validation.metadata.MetaConstraint;
-
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
  *
@@ -39,7 +37,7 @@ public interface BeanMetaData<T> {
 	Class<T> getBeanClass();
 
 	/**
-	 * @return an instance of <code>ElementDescriptor</code> describing the bean this meta data applies for.
+	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.
 	 */
 	BeanDescriptor getBeanDescriptor();
 
@@ -54,17 +52,22 @@ public interface BeanMetaData<T> {
 	List<Class<?>> getDefaultGroupSequence();
 
 	/**
-	 * @return A list of <code>MetaConstraint</code> instances encapsulating the information of all the constraints
+	 * @return {@code true} if the entity redefines the default group sequence, {@code false} otherwise.
+	 */
+	boolean defaultGroupSequenceIsRedefined();
+
+	/**
+	 * @return A list of {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 *         defined on the bean.
 	 */
 	List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintList();
 
 	/**
-	 * Return <code>PropertyDescriptor</code> for the given property.
+	 * Return {@code PropertyDescriptor} for the given property.
 	 *
 	 * @param property the property for which to retrieve the descriptor.
 	 *
-	 * @return Returns the <code>PropertyDescriptor</code> for the given property or <code>null</code> in case the
+	 * @return Returns the {@code PropertyDescriptor} for the given property or {@code null} in case the
 	 *         property does not have a descriptor.
 	 */
 	PropertyDescriptor getPropertyDescriptor(String property);

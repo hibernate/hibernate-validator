@@ -137,6 +137,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableList( defaultGroupSequence );
 	}
 
+	public boolean defaultGroupSequenceIsRedefined() {
+		return defaultGroupSequence.size() > 1;
+	}
+
 	public void setDefaultGroupSequence(List<Class<?>> groupSequence) {
 		defaultGroupSequence = new ArrayList<Class<?>>();
 		boolean groupSequenceContainsDefault = false;
@@ -331,7 +335,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(Class<?> clazz, A annotation) {
 		ConstraintDescriptorImpl constraintDescriptor;
-		if ( clazz.isInterface() && !clazz.equals( beanClass)) {
+		if ( clazz.isInterface() && !clazz.equals( beanClass ) ) {
 			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper, clazz );
 		}
 		else {

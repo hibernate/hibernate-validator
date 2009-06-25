@@ -25,7 +25,14 @@ import javax.validation.groups.Default;
  * @author Hardy Ferentschik
  */
 public class Group {
+	/**
+	 * The actual group.
+	 */
 	private Class<?> group;
+
+	/**
+	 * The sequence the group is part of ({@code null}, if this group is not part of a sequence).
+	 */
 	private Class<?> sequence;
 
 	public Group(Class<?> group) {

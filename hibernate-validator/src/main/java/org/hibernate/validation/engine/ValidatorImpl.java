@@ -75,12 +75,28 @@ public class ValidatorImpl implements Validator {
 	private final transient GroupChainGenerator groupChainGenerator;
 
 	private final ConstraintValidatorFactory constraintValidatorFactory;
-	private final MessageInterpolator messageInterpolator;
-	//never use it directly, always use getCachingTraversableResolver() to retrieved the single threaded caching wrapper.
-	private final TraversableResolver traversableResolver;
-	private final ConstraintHelper constraintHelper;
-	private final BeanMetaDataCache beanMetaDataCache;
 
+	/**
+	 * {@link MessageInterpolator} as passed to the constructor of this instance.
+	 */
+	private final MessageInterpolator messageInterpolator;
+
+	/**
+	 * {@link TraversableResolver} as passed to the constructor of this instance.
+	 * Never use it directly, always use {@link #getCachingTraversableResolver()} to retrieved the single threaded caching wrapper.
+	 */
+	private final TraversableResolver traversableResolver;
+
+	/**
+	 * Passed at creation time of this validator instance.
+	 */
+	private final ConstraintHelper constraintHelper;
+
+	/**
+	 * Used to get access to the bean meta data. Used to avoid to parsing the constraint configuration for each call
+	 * of a given entity.
+	 */
+	private final BeanMetaDataCache beanMetaDataCache;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -96,6 +112,7 @@ public class ValidatorImpl implements Validator {
 		if ( object == null ) {
 			throw new IllegalArgumentException( "Validation of a null object" );
 		}
+
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		GlobalExecutionContext<T> context = GlobalExecutionContext.getContextForValidate(
@@ -185,8 +202,12 @@ public class ValidatorImpl implements Validator {
 		}
 
 		path = PathImpl.createShallowCopy( path );
-
 		LocalExecutionContext<U, V> localExecutionContext = LocalExecutionContext.getLocalExecutionContext( value );
+
+		BeanMetaData<U> beanMetaData = getBeanMetaData( localExecutionContext.getCurrentBeanType() );
+		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+		  	groupChain.assertDefaulGroupSequenceIsExpandable(beanMetaData.getDefaultGroupSequence());
+		}
 
 		// process first single groups. For these we can skip some object traversal, by first running all validations on the current bean
 		// before traversing the object.
@@ -231,9 +252,7 @@ public class ValidatorImpl implements Validator {
 	 * @param <T> The type of the root bean
 	 */
 	private <T, U, V> void validateConstraints(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
-		//casting rely on the fact that root object is at the top of the stack
-		@SuppressWarnings("unchecked")
-		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) localExecutionContext.getCurrentBeanType() );
+		BeanMetaData<U> beanMetaData = getBeanMetaData( localExecutionContext.getCurrentBeanType() );
 		if ( localExecutionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
 			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
 			if ( log.isTraceEnabled() && defaultGroupSequence.size() > 0 && defaultGroupSequence.get( 0 ) != Default.class ) {
@@ -258,9 +277,9 @@ public class ValidatorImpl implements Validator {
 		}
 	}
 
-	private <T, U, V> boolean validateConstraintsForCurrentGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, BeanMetaData<T> beanMetaData, PathImpl path) {
+	private <T, U, V> boolean validateConstraintsForCurrentGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, BeanMetaData<U> beanMetaData, PathImpl path) {
 		boolean validationSuccessful = true;
-		for ( MetaConstraint<T, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
+		for ( MetaConstraint<U, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			PathImpl newPath = PathImpl.createShallowCopy( path );
 			if ( !"".equals( metaConstraint.getPropertyName() ) ) {
 				newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
