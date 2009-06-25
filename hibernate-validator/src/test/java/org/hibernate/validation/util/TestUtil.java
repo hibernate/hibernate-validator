@@ -32,6 +32,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validation.HibernateValidationProvider;
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
+import org.hibernate.validation.engine.PathImpl;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -114,8 +115,8 @@ public class TestUtil {
 
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath) {
 		assertEquals(
-				violation.getPropertyPath().toString(),
-				propertyPath,
+				violation.getPropertyPath(),
+				PathImpl.createPathFromString( propertyPath ),
 				"Wrong propertyPath"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBean, invalidValue );

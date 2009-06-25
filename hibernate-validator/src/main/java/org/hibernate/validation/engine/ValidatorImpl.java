@@ -262,7 +262,9 @@ public class ValidatorImpl implements Validator {
 		boolean validationSuccessful = true;
 		for ( MetaConstraint<T, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
 			PathImpl newPath = PathImpl.createShallowCopy( path );
-			newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
+			if ( !"".equals( metaConstraint.getPropertyName() ) ) {
+				newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
+			}
 			localExecutionContext.setPropertyPath( newPath );
 			if ( isValidationRequired( globalExecutionContext, localExecutionContext, metaConstraint ) ) {
 				Object valueToValidate = metaConstraint.getValue( localExecutionContext.getCurrentBean() );
