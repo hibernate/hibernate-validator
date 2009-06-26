@@ -43,11 +43,6 @@ import org.hibernate.validation.util.ReflectionHelper;
 public class MetaConstraint<T, A extends Annotation> {
 
 	/**
-	 * The constraint tree created from the constraint annotation.
-	 */
-	private final ConstraintTree<A> constraintTree;
-
-	/**
 	 * The member the constraint was defined on.
 	 */
 	private final Member member;
@@ -67,6 +62,11 @@ public class MetaConstraint<T, A extends Annotation> {
 	 * The class of the bean hosting this constraint.
 	 */
 	private final Class<T> beanClass;
+
+	/**
+	 * The constraint tree created from the constraint annotation.
+	 */
+	private final ConstraintTree<A> constraintTree;
 
 	public MetaConstraint(Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
 		this.elementType = ElementType.TYPE;
@@ -165,5 +165,18 @@ public class MetaConstraint<T, A extends Annotation> {
 			}
 		}
 		return t;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "MetaConstraint" );
+		sb.append( "{member=" ).append( member );
+		sb.append( ", propertyName='" ).append( propertyName ).append( '\'' );
+		sb.append( ", elementType=" ).append( elementType );
+		sb.append( ", beanClass=" ).append( beanClass );
+		sb.append( ", constraintTree=" ).append( constraintTree );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }

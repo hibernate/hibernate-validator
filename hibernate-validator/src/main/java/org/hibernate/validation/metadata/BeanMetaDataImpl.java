@@ -395,4 +395,19 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		return metadata;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "BeanMetaDataImpl" );
+		sb.append( "{beanClass=" ).append( beanClass );
+		sb.append( ", beanDescriptor=" ).append( beanDescriptor );
+		sb.append( ", metaConstraintList=" ).append( metaConstraintList );
+		sb.append( ", cascadedMembers=" ).append( cascadedMembers );
+		sb.append( ", propertyDescriptors=" ).append( propertyDescriptors );
+		sb.append( ", defaultGroupSequence=" ).append( defaultGroupSequence );
+		sb.append( ", constraintHelper=" ).append( constraintHelper );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }

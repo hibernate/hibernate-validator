@@ -289,4 +289,16 @@ public class ConstraintTree<A extends Annotation> {
 			throw new ValidationException( "Unable to intialize " + constraintValidator.getClass().getName(), e );
 		}
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ConstraintTree" );
+		sb.append( "{ descriptor=" ).append( descriptor );
+		sb.append( ", parent=" ).append( parent );
+		sb.append( ", children=" ).append( children );
+		sb.append( ", constraintValidatorCache=" ).append( constraintValidatorCache );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
