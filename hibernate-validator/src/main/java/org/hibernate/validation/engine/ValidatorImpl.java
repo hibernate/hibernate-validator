@@ -206,7 +206,7 @@ public class ValidatorImpl implements Validator {
 
 		BeanMetaData<U> beanMetaData = getBeanMetaData( localExecutionContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-		  	groupChain.assertDefaulGroupSequenceIsExpandable(beanMetaData.getDefaultGroupSequence());
+			groupChain.assertDefaulGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
 		}
 
 		// process first single groups. For these we can skip some object traversal, by first running all validations on the current bean
@@ -291,12 +291,12 @@ public class ValidatorImpl implements Validator {
 				boolean tmp = metaConstraint.validateConstraint( globalExecutionContext, localExecutionContext );
 				validationSuccessful = validationSuccessful && tmp;
 			}
+			globalExecutionContext.markProcessed(
+					localExecutionContext.getCurrentBean(),
+					localExecutionContext.getCurrentGroup(),
+					localExecutionContext.getPropertyPath()
+			);
 		}
-		globalExecutionContext.markProcessed(
-				localExecutionContext.getCurrentBean(),
-				localExecutionContext.getCurrentGroup(),
-				localExecutionContext.getPropertyPath()
-		);
 		return validationSuccessful;
 	}
 
