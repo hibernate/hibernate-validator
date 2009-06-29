@@ -33,10 +33,10 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validation.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validation.metadata.ConstraintHelper;
+import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
 /**
  * Tests for message resolution.
@@ -85,6 +85,25 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		expected = "{} { replacement worked }";
 		actual = interpolator.interpolate( "{} { {foo} }", context );
+		assertEquals( actual, expected, "Wrong substitution" );
+	}
+
+	@Test
+	public void testMessageLiterals() {
+
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+
+		String expected = "{";
+		String actual = interpolator.interpolate( "\\{", context );
+		assertEquals( actual, expected, "Wrong substitution" );
+
+		expected = "}";
+		actual = interpolator.interpolate( "\\}", context );
+		assertEquals( actual, expected, "Wrong substitution" );
+
+		expected = "\\";
+		actual = interpolator.interpolate( "\\", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
 

@@ -140,6 +140,11 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 		// resolve annotation attributes (step 4)
 		resolvedMessage = replaceAnnotationAttributes( resolvedMessage, annotationParameters );
+
+		// last but not least we have to take care of escaped literals
+		resolvedMessage = resolvedMessage.replace( "\\{", "{" );
+		resolvedMessage = resolvedMessage.replace( "\\}", "}" );
+		resolvedMessage = resolvedMessage.replace( "\\\\", "\\" );
 		return resolvedMessage;
 	}
 
