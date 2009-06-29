@@ -4,13 +4,10 @@ package org.hibernate.validator.test.haintegration;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.event.PreInsertEventListener;
-import org.hibernate.event.PreUpdateEventListener;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.validator.Environment;
 import org.hibernate.validator.InvalidStateException;
-import org.hibernate.validator.event.ValidateEventListener;
 import org.hibernate.validator.test.HANTestCase;
 
 /**
