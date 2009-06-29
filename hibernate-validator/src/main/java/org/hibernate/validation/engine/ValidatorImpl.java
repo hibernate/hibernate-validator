@@ -41,7 +41,6 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
 import com.googlecode.jtype.TypeUtils;
-import org.slf4j.Logger;
 
 import org.hibernate.validation.engine.groups.Group;
 import org.hibernate.validation.engine.groups.GroupChain;
@@ -52,7 +51,6 @@ import org.hibernate.validation.metadata.BeanMetaDataCache;
 import org.hibernate.validation.metadata.BeanMetaDataImpl;
 import org.hibernate.validation.metadata.ConstraintHelper;
 import org.hibernate.validation.metadata.MetaConstraint;
-import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
@@ -62,7 +60,6 @@ import org.hibernate.validation.util.ReflectionHelper;
  * @author Hardy Ferentschik
  */
 public class ValidatorImpl implements Validator {
-	private static final Logger log = LoggerFactory.make();
 
 	/**
 	 * The default group array used in case any of the validate methods is called without a group.
@@ -215,7 +212,7 @@ public class ValidatorImpl implements Validator {
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			localExecutionContext.setCurrentGroup( group.getGroup() );
-			validateConstraints( context, localExecutionContext, path );
+			validateConstraintsForCurrentGroup( context, localExecutionContext, path );
 		}
 		groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
@@ -232,7 +229,7 @@ public class ValidatorImpl implements Validator {
 				int numberOfViolations = context.getFailingConstraints().size();
 				localExecutionContext.setCurrentGroup( group.getGroup() );
 
-				validateConstraints( context, localExecutionContext, path );
+				validateConstraintsForCurrentGroup( context, localExecutionContext, path );
 				validateCascadedConstraints( context, localExecutionContext, path );
 
 				if ( context.getFailingConstraints().size() > numberOfViolations ) {
@@ -243,60 +240,99 @@ public class ValidatorImpl implements Validator {
 		return context.getFailingConstraints();
 	}
 
-	/**
-	 * Validates non cascaded constraints
-	 *
-	 * @param executionContext The global execution context
-	 * @param localExecutionContext Collected information for single validation
-	 * @param path The current path of the validation
-	 * @param <T> The type of the root bean
-	 */
-	private <T, U, V> void validateConstraints(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
+	private <T, U, V> void validateConstraintsForCurrentGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
 		BeanMetaData<U> beanMetaData = getBeanMetaData( localExecutionContext.getCurrentBeanType() );
-		if ( localExecutionContext.getCurrentGroup().getName().equals( Default.class.getName() ) ) {
-			List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
-			if ( log.isTraceEnabled() && defaultGroupSequence.size() > 0 && defaultGroupSequence.get( 0 ) != Default.class ) {
-				log.trace(
-						"Executing re-defined Default group for bean {} as sequence {}",
-						beanMetaData.getBeanClass().getName(),
-						defaultGroupSequence
-				);
-			}
+		boolean validatingDefault = localExecutionContext.validatingDefault();
+		boolean validatedBeanRedefinesDefault = beanMetaData.defaultGroupSequenceIsRedefined();
+
+		// if we are not validating the default group there is nothing slecial to consider
+		if ( !validatingDefault ) {
+			validateConstraintsForNonDefaultGroup( globalExecutionContext, localExecutionContext, path );
+			return;
+		}
+
+		// if we are validating the default group we have to distinguish between the case where the main entity type redefines the default group and
+		// where not
+		if ( validatedBeanRedefinesDefault ) {
+			validateConstraintsForRedefinedDefaultGroupOnMainEntity(
+					globalExecutionContext, localExecutionContext, path, beanMetaData
+			);
+		}
+		else {
+			validateConstraintsForRedefinedDefaultGroup(
+					globalExecutionContext, localExecutionContext, path, beanMetaData
+			);
+		}
+	}
+
+	private <T, U, V> void validateConstraintsForRedefinedDefaultGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path, BeanMetaData<U> beanMetaData) {
+		// in the case where the main entity does not redefine the default group we have to check whether the entity which defines the constraint does
+		for ( Map.Entry<Class<?>, List<MetaConstraint<U, ? extends Annotation>>> entry : beanMetaData.geMetaConstraintsAsMap()
+				.entrySet() ) {
+			Class<?> hostingBeanClass = entry.getKey();
+			List<MetaConstraint<U, ? extends Annotation>> constraints = entry.getValue();
+
+			List<Class<?>> defaultGroupSequence = getBeanMetaData( hostingBeanClass ).getDefaultGroupSequence();
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 				localExecutionContext.setCurrentGroup( defaultSequenceMember );
-				boolean validationSuccessful = validateConstraintsForCurrentGroup(
-						executionContext, localExecutionContext, beanMetaData, path
-				);
+				boolean validationSuccessful = true;
+				for ( MetaConstraint<U, ? extends Annotation> metaConstraint : constraints ) {
+					boolean tmp = validateConstraint(
+							globalExecutionContext, localExecutionContext, metaConstraint, path
+					);
+					validationSuccessful = validationSuccessful && tmp;
+				}
 				if ( !validationSuccessful ) {
 					break;
 				}
 			}
 		}
-		else {
-			validateConstraintsForCurrentGroup( executionContext, localExecutionContext, beanMetaData, path );
+	}
+
+	private <T, U, V> void validateConstraintsForRedefinedDefaultGroupOnMainEntity(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path, BeanMetaData<U> beanMetaData) {
+		// in the case where the main entity redefines the default group we can interate over all constraints independend of the bean they are
+		// defined in. The redefined group sequence applies for all constraints.
+		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
+		for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
+			localExecutionContext.setCurrentGroup( defaultSequenceMember );
+			boolean validationSuccessful = true;
+			for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.geMetaConstraintsAsList() ) {
+				boolean tmp = validateConstraint(
+						globalExecutionContext, localExecutionContext, metaConstraint, path
+				);
+				validationSuccessful = validationSuccessful && tmp;
+			}
+			if ( !validationSuccessful ) {
+				break;
+			}
 		}
 	}
 
-	private <T, U, V> boolean validateConstraintsForCurrentGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, BeanMetaData<U> beanMetaData, PathImpl path) {
-		boolean validationSuccessful = true;
-		for ( MetaConstraint<U, ?> metaConstraint : beanMetaData.geMetaConstraintList() ) {
-			PathImpl newPath = PathImpl.createShallowCopy( path );
-			if ( !"".equals( metaConstraint.getPropertyName() ) ) {
-				newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
-			}
-			localExecutionContext.setPropertyPath( newPath );
-			if ( isValidationRequired( globalExecutionContext, localExecutionContext, metaConstraint ) ) {
-				Object valueToValidate = metaConstraint.getValue( localExecutionContext.getCurrentBean() );
-				localExecutionContext.setCurrentValidatedValue( ( V ) valueToValidate );
-				boolean tmp = metaConstraint.validateConstraint( globalExecutionContext, localExecutionContext );
-				validationSuccessful = validationSuccessful && tmp;
-			}
-			globalExecutionContext.markProcessed(
-					localExecutionContext.getCurrentBean(),
-					localExecutionContext.getCurrentGroup(),
-					localExecutionContext.getPropertyPath()
-			);
+	private <T, U, V> void validateConstraintsForNonDefaultGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
+		BeanMetaData<U> beanMetaData = getBeanMetaData( localExecutionContext.getCurrentBeanType() );
+		for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.geMetaConstraintsAsList() ) {
+			validateConstraint( globalExecutionContext, localExecutionContext, metaConstraint, path );
 		}
+	}
+
+	private <T, U, V> boolean validateConstraint(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, MetaConstraint<U, ?> metaConstraint, PathImpl path) {
+		boolean validationSuccessful = true;
+		PathImpl newPath = PathImpl.createShallowCopy( path );
+		if ( !"".equals( metaConstraint.getPropertyName() ) ) {
+			newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
+		}
+		localExecutionContext.setPropertyPath( newPath );
+		if ( isValidationRequired( globalExecutionContext, localExecutionContext, metaConstraint ) ) {
+			Object valueToValidate = metaConstraint.getValue( localExecutionContext.getCurrentBean() );
+			localExecutionContext.setCurrentValidatedValue( ( V ) valueToValidate );
+			validationSuccessful = metaConstraint.validateConstraint( globalExecutionContext, localExecutionContext );
+		}
+		globalExecutionContext.markProcessed(
+				localExecutionContext.getCurrentBean(),
+				localExecutionContext.getCurrentGroup(),
+				localExecutionContext.getPropertyPath()
+		);
+
 		return validationSuccessful;
 	}
 
@@ -647,7 +683,7 @@ public class ValidatorImpl implements Validator {
 				);
 			}
 
-			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintList();
+			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintsAsList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
 				if ( metaConstraint.getPropertyName().equals( elem.getName() ) ) {
 					metaConstraints.add( metaConstraint );
@@ -685,10 +721,10 @@ public class ValidatorImpl implements Validator {
 		return value;
 	}
 
-	private <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		BeanMetaDataImpl<T> metadata = beanMetaDataCache.getBeanMetaData( beanClass );
+	private <U> BeanMetaData<U> getBeanMetaData(Class<U> beanClass) {
+		BeanMetaDataImpl<U> metadata = beanMetaDataCache.getBeanMetaData( beanClass );
 		if ( metadata == null ) {
-			metadata = new BeanMetaDataImpl<T>( beanClass, constraintHelper );
+			metadata = new BeanMetaDataImpl<U>( beanClass, constraintHelper );
 			beanMetaDataCache.addBeanMetaData( beanClass, metadata );
 		}
 		return metadata;

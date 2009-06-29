@@ -20,6 +20,7 @@ package org.hibernate.validation.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -57,10 +58,16 @@ public interface BeanMetaData<T> {
 	boolean defaultGroupSequenceIsRedefined();
 
 	/**
+	 * @return A map of {@code MetaConstraint} instances encapsulating the information of all the constraints
+	 *         defined on the bean mapped to the class in which the constraints is defined.
+	 */
+	Map<Class<?>, List<MetaConstraint<T, ? extends Annotation>>> geMetaConstraintsAsMap();
+
+	/**
 	 * @return A list of {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 *         defined on the bean.
 	 */
-	List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintList();
+	List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintsAsList();
 
 	/**
 	 * Return {@code PropertyDescriptor} for the given property.

@@ -35,7 +35,7 @@ import org.hibernate.validation.engine.LocalExecutionContext;
 import org.hibernate.validation.util.ReflectionHelper;
 
 /**
- * Instances of this class abstract the constraint type  (class, method or field constraint) and gives access to
+ * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
  * meta data about the constraint. This allows a unified handling of constraints in the validator imlpementation.
  *
  * @author Hardy Ferentschik
@@ -171,11 +171,9 @@ public class MetaConstraint<T, A extends Annotation> {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "MetaConstraint" );
-		sb.append( "{member=" ).append( member );
-		sb.append( ", propertyName='" ).append( propertyName ).append( '\'' );
+		sb.append( "{propertyName='" ).append( propertyName ).append( '\'' );
 		sb.append( ", elementType=" ).append( elementType );
 		sb.append( ", beanClass=" ).append( beanClass );
-		sb.append( ", constraintTree=" ).append( constraintTree );
 		sb.append( '}' );
 		return sb.toString();
 	}

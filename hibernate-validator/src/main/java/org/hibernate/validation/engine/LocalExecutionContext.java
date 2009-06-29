@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,12 +17,14 @@
 */
 package org.hibernate.validation.engine;
 
+import javax.validation.groups.Default;
+
 /**
  * An instance of this class is used to collect all the relevant information for validating a single entity/bean.
  *
  * @author Hardy Ferentschik
  */
-public class LocalExecutionContext<T,V> {
+public class LocalExecutionContext<T, V> {
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -49,14 +51,14 @@ public class LocalExecutionContext<T,V> {
 	 */
 	private V currentValue;
 
-	public static <T,V> LocalExecutionContext<T,V> getLocalExecutionContext(T value) {
+	public static <T, V> LocalExecutionContext<T, V> getLocalExecutionContext(T value) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = ( Class<T> ) value.getClass();
-		return new LocalExecutionContext<T,V>( value, rootBeanClass );
+		return new LocalExecutionContext<T, V>( value, rootBeanClass );
 	}
 
-	public static <T,V> LocalExecutionContext<T,V> getLocalExecutionContext(Class<T> type) {
-		return new LocalExecutionContext<T,V>( null, type );
+	public static <T, V> LocalExecutionContext<T, V> getLocalExecutionContext(Class<T> type) {
+		return new LocalExecutionContext<T, V>( null, type );
 	}
 
 	public LocalExecutionContext(T currentBean, Class<T> currentBeanType) {
@@ -98,6 +100,10 @@ public class LocalExecutionContext<T,V> {
 
 	public void markCurrentPropertyAsIterable() {
 		propertyPath.getLeafNode().setInIterable( true );
+	}
+
+	public boolean validatingDefault() {
+		return getCurrentGroup() != null && getCurrentGroup().getName().equals( Default.class.getName() );
 	}
 
 	@Override

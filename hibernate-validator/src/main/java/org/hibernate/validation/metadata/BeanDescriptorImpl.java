@@ -17,7 +17,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	public boolean isBeanConstrained() {
-		return metadataBean.geMetaConstraintList().size() > 0;
+		return metadataBean.geMetaConstraintsAsMap().size() > 0;
 	}
 
 	public PropertyDescriptor getConstraintsForProperty(String propertyName) {

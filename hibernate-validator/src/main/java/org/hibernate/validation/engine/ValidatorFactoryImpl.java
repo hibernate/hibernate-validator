@@ -24,18 +24,18 @@ import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
-import javax.validation.ValidationException;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validation.metadata.AnnotationIgnores;
-import org.hibernate.validation.xml.XmlMappingParser;
-import org.hibernate.validation.metadata.BeanMetaDataImpl;
 import org.hibernate.validation.metadata.BeanMetaDataCache;
-import org.hibernate.validation.metadata.MetaConstraint;
+import org.hibernate.validation.metadata.BeanMetaDataImpl;
 import org.hibernate.validation.metadata.ConstraintHelper;
+import org.hibernate.validation.metadata.MetaConstraint;
+import org.hibernate.validation.xml.XmlMappingParser;
 
 /**
  * Factory returning initialized <code>Validator</code> instances.
@@ -70,7 +70,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	public <T> T unwrap(Class<T> type) {
-		throw new ValidationException( "Type " + type + " not supported");
+		throw new ValidationException( "Type " + type + " not supported" );
 	}
 
 	public ValidatorContext usingContext() {
@@ -89,13 +89,14 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		mappingParser.parse( mappingStreams );
 
 		AnnotationIgnores annotationIgnores = mappingParser.getAnnotationIgnores();
-		for ( Class<?> beanClass : mappingParser.getProcessedClasses() ) {
+		for ( Class<?> clazz : mappingParser.getProcessedClasses() ) {
+			Class<T> beanClass = ( Class<T> ) clazz;
 			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
-					( Class<T> ) beanClass, constraintHelper, annotationIgnores
+					beanClass, constraintHelper, annotationIgnores
 			);
 
-			for ( MetaConstraint<T, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( ( Class<T> ) beanClass ) ) {
-				metaData.addMetaConstraint( constraint );
+			for ( MetaConstraint<T, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( beanClass ) ) {
+				metaData.addMetaConstraint( beanClass, constraint );
 			}
 
 			for ( Member m : mappingParser.getCascadedMembersForClass( beanClass ) ) {
@@ -105,7 +106,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			if ( !mappingParser.getDefaultSequenceForClass( beanClass ).isEmpty() ) {
 				metaData.setDefaultGroupSequence( mappingParser.getDefaultSequenceForClass( beanClass ) );
 			}
-			beanMetaDataCache.addBeanMetaData( ( Class<T> ) beanClass, ( BeanMetaDataImpl<T> ) metaData );
+			beanMetaDataCache.addBeanMetaData( beanClass, metaData );
 		}
 	}
 }
