@@ -262,6 +262,7 @@ public class ConstraintHelper {
 	 * <li>Has to contain a <code>ConstraintValidator</code> implementation.</li>
 	 * <li>Defines a message parameter.</li>
 	 * <li>Defines a group parameter.</li>
+	 * <li>Defines a payload parameter.</li>
 	 * </ul>
 	 *
 	 * @param annotation The annotation to test.
@@ -276,6 +277,74 @@ public class ConstraintHelper {
 			return false;
 		}
 
+		assertMessageParameterExists( annotation );
+		assertGroupsParameterExists( annotation );
+		assertPayloadParameterExists( annotation );
+
+		assertNoParameterStartsWithValid( annotation );
+
+		return true;
+	}
+
+	private void assertNoParameterStartsWithValid(Annotation annotation) {
+		Method[] methods = annotation.getClass().getMethods();
+		for ( Method m : methods ) {
+			if ( m.getName().startsWith( "valid" ) ) {
+				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
+				throw new ConstraintDefinitionException( msg );
+			}
+		}
+	}
+
+	private void assertPayloadParameterExists(Annotation annotation) {
+		try {
+			Class<?>[] defaultPayload = ( Class<?>[] ) annotation.annotationType()
+					.getMethod( "payload" )
+					.getDefaultValue();
+			if ( defaultPayload.length != 0 ) {
+				String msg = annotation.annotationType()
+						.getName() + " contains Constraint annotation, but the payload " +
+						"paramter default value is not the empty array.";
+				throw new ConstraintDefinitionException( msg );
+			}
+		}
+		catch ( ClassCastException e ) {
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but the " +
+					"payload parameter is of wrong type.";
+			throw new ConstraintDefinitionException( msg );
+		}
+		catch ( NoSuchMethodException nsme ) {
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
+					"not contain a groups parameter.";
+			throw new ConstraintDefinitionException( msg );
+		}
+	}
+
+	private void assertGroupsParameterExists(Annotation annotation) {
+		try {
+			Class<?>[] defaultGroups = ( Class<?>[] ) annotation.annotationType()
+					.getMethod( "groups" )
+					.getDefaultValue();
+			if ( defaultGroups.length != 0 ) {
+				String msg = annotation.annotationType()
+						.getName() + " contains Constraint annotation, but the groups " +
+						"paramter default value is not the empty array.";
+				throw new ConstraintDefinitionException( msg );
+			}
+		}
+		catch ( ClassCastException e ) {
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but the " +
+					"groups parameter is of wrong type.";
+			throw new ConstraintDefinitionException( msg );
+		}
+		catch ( NoSuchMethodException nsme ) {
+			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
+					"not contain a groups parameter.";
+			throw new ConstraintDefinitionException( msg );
+		}
+	}
+
+	private void assertMessageParameterExists(Annotation annotation) {
 		try {
 			ReflectionHelper.getAnnotationParameter( annotation, "message", String.class );
 		}
@@ -284,32 +353,6 @@ public class ConstraintHelper {
 					"not contain a message parameter.";
 			throw new ConstraintDefinitionException( msg );
 		}
-
-		try {
-			Class<?>[] defaultGroups = ( Class<?>[] ) annotation.annotationType()
-					.getMethod( "groups" )
-					.getDefaultValue();
-			if ( defaultGroups.length != 0 ) {
-				String msg = annotation.annotationType()
-						.getName() + " contains Constraint annotation, but the groups " +
-						"paramter default value is not empty.";
-				throw new ConstraintDefinitionException( msg );
-			}
-		}
-		catch ( NoSuchMethodException nsme ) {
-			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a groups parameter.";
-			throw new ConstraintDefinitionException( msg );
-		}
-
-		Method[] methods = annotation.getClass().getMethods();
-		for ( Method m : methods ) {
-			if ( m.getName().startsWith( "valid" ) ) {
-				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
-				throw new ConstraintDefinitionException( msg );
-			}
-		}
-		return true;
 	}
 
 	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorDefinition(Class<T> annotationClass) {
@@ -317,7 +360,9 @@ public class ConstraintHelper {
 			throw new IllegalArgumentException( "Class cannot be null" );
 		}
 
-		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitons.get( annotationClass );
+		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitons.get(
+				annotationClass
+		);
 
 		List<Class<? extends ConstraintValidator<T, ?>>> constraintsValidators =
 				new ArrayList<Class<? extends ConstraintValidator<T, ?>>>( list.size() );
