@@ -34,6 +34,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
+import javax.validation.ConstraintPayload;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -75,6 +76,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * parameter value as specified in the constraint.
 	 */
 	private final Map<String, Object> attributes;
+
+	private final Set<Class<ConstraintPayload>> payload = new HashSet<Class<ConstraintPayload>>();
 
 	/**
 	 * The composing constraints for this constraints.
@@ -119,9 +122,30 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			this.groups.addAll( Arrays.asList( groupsFromAnnotation ) );
 		}
 
+		initializePayload( annotation );
+
 		findConstraintValidatorClasses();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 		parseComposingConstraints( overrideParameters );
+	}
+
+	private void initializePayload(T annotation) {
+		Class<ConstraintPayload>[] payloadFromAnnotation;
+		try {
+			//TODO be extra safe and make sure this is an array of ConstraintPayload
+			@SuppressWarnings( "unchecked" )
+			Class<ConstraintPayload>[] unsafePayloadFromAnnotation = (Class<ConstraintPayload>[])
+					ReflectionHelper.getAnnotationParameter(annotation, "payload", Class[].class
+			);
+			payloadFromAnnotation = unsafePayloadFromAnnotation;
+		}
+		catch ( ValidationException e ) {
+			//ignore people not defining payload
+			payloadFromAnnotation = null;
+		}
+		if (payloadFromAnnotation != null) {
+			payload.addAll( Arrays.asList( payloadFromAnnotation ) );
+		}
 	}
 
 	private void findConstraintValidatorClasses() {
@@ -167,6 +191,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	public Set<Class<?>> getGroups() {
 		return Collections.unmodifiableSet( groups );
+	}
+
+	public Set<Class<ConstraintPayload>> getPayload() {
+		return Collections.unmodifiableSet( payload );
 	}
 
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
