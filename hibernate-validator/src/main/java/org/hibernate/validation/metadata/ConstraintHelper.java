@@ -315,7 +315,7 @@ public class ConstraintHelper {
 		}
 		catch ( NoSuchMethodException nsme ) {
 			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a groups parameter.";
+					"not contain a payload parameter.";
 			throw new ConstraintDefinitionException( msg );
 		}
 	}
