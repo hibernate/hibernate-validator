@@ -50,7 +50,7 @@
             <!-- This is a temporary dependency. Do not use this dependecy in production. -->
             <groupId>org.hibernate.java-persistence</groupId>
             <artifactId>jpa-api</artifactId>
-            <version>2.0.Beta2</version>
+            <version>2.0.Beta3-SNAPSHOT</version>
             <optional>true</optional>
         </dependency>
 
