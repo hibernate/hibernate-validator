@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -68,14 +68,13 @@ public class PathImpl implements Path {
 	}
 
 	public static PathImpl createShallowCopy(PathImpl path) {
-		return new PathImpl(path);
+		return new PathImpl( path );
 	}
 
 	private PathImpl(PathImpl path) {
 		this.nodeList = new ArrayList<Node>();
-		Iterator<Node> iter = path.iterator();
-		while ( iter.hasNext() ) {
-			nodeList.add( new NodeImpl( iter.next() ) );
+		for ( Object aPath : path ) {
+			nodeList.add( new NodeImpl( ( Node ) aPath ) );
 		}
 	}
 
@@ -158,7 +157,6 @@ public class PathImpl implements Path {
 	}
 
 	@Override
-	@SuppressWarnings( "SimplifiableIfStatement")
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -168,8 +166,10 @@ public class PathImpl implements Path {
 		}
 
 		PathImpl path = ( PathImpl ) o;
-
-		if ( nodeList != null ? !nodeList.equals( path.nodeList ) : path.nodeList != null ) {
+		if ( nodeList != null && !nodeList.equals( path.nodeList ) ) {
+			return false;
+		}
+		if ( nodeList == null && path.nodeList != null ) {
 			return false;
 		}
 
