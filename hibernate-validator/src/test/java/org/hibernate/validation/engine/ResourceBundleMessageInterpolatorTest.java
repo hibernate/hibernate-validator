@@ -197,7 +197,32 @@ public class ResourceBundleMessageInterpolatorTest {
 		String expected = "{replace.in.default.bundle2}";
 		String actual = interpolator.interpolate( max.message(), context );
 		assertEquals(
-				expected, actual, "Within default bundle replacement parameter evauation should not be recursive!"
+				actual, expected, "Within default bundle replacement parameter evauation should not be recursive!"
+		);
+	}
+
+	/**
+	 * HV-182
+	 */
+	@Test
+	public void testCorrectMessageInterpolationIfParameterCannotBeReplaced() {
+		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
+		String message = "Message should stay unchanged since {fubar} is not replacable";
+		descriptor.setValue( "message", message );
+		descriptor.setValue( "value", 10l );
+		Max max = AnnotationFactory.create( descriptor );
+
+
+		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
+				max, new ConstraintHelper()
+		);
+
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null );
+
+		String actual = interpolator.interpolate( max.message(), context );
+		assertEquals(
+				actual, message, "The message should not have changed."
 		);
 	}
 

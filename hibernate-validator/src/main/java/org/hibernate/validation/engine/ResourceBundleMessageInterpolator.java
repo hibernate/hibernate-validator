@@ -221,7 +221,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				resolvedParameterValue = escapeMetaCharacters( variable.toString() );
 			}
 			else {
-				resolvedParameterValue = message;
+				resolvedParameterValue = parameter;
 			}
 			matcher.appendReplacement( sb, resolvedParameterValue );
 		}

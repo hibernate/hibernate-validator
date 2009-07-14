@@ -98,7 +98,9 @@ public class ConstraintTree<A extends Annotation> {
 	public <T, U, V> void validateConstraints(Type type, GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, List<ConstraintViolation<T>> constraintViolations) {
 		// first validate composing constraints
 		for ( ConstraintTree<?> tree : getChildren() ) {
-			tree.validateConstraints( type, executionContext, localExecutionContext, constraintViolations );
+			List<ConstraintViolation<T>> tmpViolations = new ArrayList<ConstraintViolation<T>>();
+			tree.validateConstraints( type, executionContext, localExecutionContext, tmpViolations );
+			constraintViolations.addAll( tmpViolations );
 		}
 
 		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
@@ -131,15 +133,14 @@ public class ConstraintTree<A extends Annotation> {
 
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
-			final String message = ( String ) getParent().getDescriptor().getAttributes().get( "message" );
+			final String message = ( String ) getDescriptor().getAttributes().get( "message" );
 			ConstraintValidatorContextImpl.ErrorMessage error = constraintValidatorContext.new ErrorMessage(
 					message, localExecutionContext.getPropertyPath()
 			);
-			constraintViolations.add(
-					executionContext.createConstraintViolation(
-							localExecutionContext, error, descriptor
-					)
+			ConstraintViolation<T> violation = executionContext.createConstraintViolation(
+					localExecutionContext, error, descriptor
 			);
+			constraintViolations.add( violation );
 		}
 	}
 
@@ -161,8 +162,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private boolean reportAsSingleViolation() {
-		return getParent() != null
-				&& getParent().getDescriptor().isReportAsSingleViolation();
+		return getDescriptor().isReportAsSingleViolation();
 	}
 
 	/**
@@ -295,8 +295,7 @@ public class ConstraintTree<A extends Annotation> {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ConstraintTree" );
 		sb.append( "{ descriptor=" ).append( descriptor );
-		sb.append( ", parent=" ).append( parent );
-		sb.append( ", children=" ).append( children );
+		sb.append( ", isRoot=" ).append( parent == null );
 		sb.append( ", constraintValidatorCache=" ).append( constraintValidatorCache );
 		sb.append( '}' );
 		return sb.toString();

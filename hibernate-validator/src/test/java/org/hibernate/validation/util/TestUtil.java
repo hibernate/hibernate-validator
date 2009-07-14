@@ -18,8 +18,13 @@
 package org.hibernate.validation.util;
 
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -29,6 +34,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.slf4j.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.FileAssert.fail;
 
 import org.hibernate.validation.HibernateValidationProvider;
 import org.hibernate.validation.engine.HibernateValidatorConfiguration;
@@ -103,6 +109,67 @@ public class TestUtil {
 		return elementDescriptor.getConstraintDescriptors();
 	}
 
+	public static <T> void assertCorrectConstraintViolationMessages(Set<ConstraintViolation<T>> violations, String... messages) {
+		List<String> actualMessages = new ArrayList<String>();
+		for ( ConstraintViolation<?> violation : violations ) {
+			actualMessages.add( violation.getMessage() );
+		}
+
+		assertTrue( actualMessages.size() == messages.length, "Wrong number or error messages" );
+
+		for ( String expectedMessage : messages ) {
+			assertTrue(
+					actualMessages.contains( expectedMessage ),
+					"The message '" + expectedMessage + "' should have been in the list of actual messages: " + actualMessages
+			);
+			actualMessages.remove( expectedMessage );
+		}
+		assertTrue(
+				actualMessages.isEmpty(), "Actual messages contained more messages as specidied expected messages"
+		);
+	}
+
+	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations, Class<?>... expectedConsraintTypes) {
+		List<String> actualConstraintTypes = new ArrayList<String>();
+		for ( ConstraintViolation<?> violation : violations ) {
+			actualConstraintTypes.add(
+					( ( Annotation ) violation.getConstraintDescriptor().getAnnotation() ).annotationType().getName()
+			);
+		}
+
+		assertEquals(
+				expectedConsraintTypes.length, actualConstraintTypes.size(), "Wrong number of constraint types."
+		);
+
+		for ( Class<?> expectedConstraintType : expectedConsraintTypes ) {
+			assertTrue(
+					actualConstraintTypes.contains( expectedConstraintType.getName() ),
+					"The constraint type " + expectedConstraintType.getName() + " should have been violated."
+			);
+		}
+	}
+
+	public static <T> void assertCorrectPropertyPaths(Set<ConstraintViolation<T>> violations, String... propertyPaths) {
+		List<Path> propertyPathsOfViolations = new ArrayList<Path>();
+		for ( ConstraintViolation<?> violation : violations ) {
+			propertyPathsOfViolations.add( violation.getPropertyPath() );
+		}
+
+		for ( String propertyPath : propertyPaths ) {
+			Path expectedPath = PathImpl.createPathFromString( propertyPath );
+			boolean containsPath = false;
+			for ( Path actualPath : propertyPathsOfViolations ) {
+				if ( assertEqualPaths( expectedPath, actualPath ) ) {
+					containsPath = true;
+					break;
+				}
+			}
+			if ( !containsPath ) {
+				fail( expectedPath + " is not in the list of path instances contained in the actual constraint violations" );
+			}
+		}
+	}
+
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath, Class leafBean) {
 		assertEquals(
 
@@ -146,6 +213,53 @@ public class TestUtil {
 
 	public static void assertNumberOfViolations(Set violations, int expectedViolations) {
 		assertEquals( violations.size(), expectedViolations, "Wrong number of constraint violations" );
+	}
+
+	public static boolean assertEqualPaths(Path p1, Path p2) {
+		Iterator<Path.Node> p1Iterator = p1.iterator();
+		Iterator<Path.Node> p2Iterator = p2.iterator();
+		while ( p1Iterator.hasNext() ) {
+			Path.Node p1Node = p1Iterator.next();
+			if ( !p2Iterator.hasNext() ) {
+				return false;
+			}
+			Path.Node p2Node = p2Iterator.next();
+
+			// do the comparison on the node values
+			if ( p2Node.getName() == null ) {
+				if ( p1Node.getName() != null ) {
+					return false;
+				}
+			}
+			else if ( !p2Node.getName().equals( p1Node.getName() ) ) {
+				return false;
+			}
+
+			if ( p2Node.isInIterable() != p1Node.isInIterable() ) {
+				return false;
+			}
+
+
+			if ( p2Node.getIndex() == null ) {
+				if ( p1Node.getIndex() != null ) {
+					return false;
+				}
+			}
+			else if ( !p2Node.getIndex().equals( p1Node.getIndex() ) ) {
+				return false;
+			}
+
+			if ( p2Node.getKey() == null ) {
+				if ( p1Node.getKey() != null ) {
+					return false;
+				}
+			}
+			else if ( !p2Node.getKey().equals( p1Node.getKey() ) ) {
+				return false;
+			}
+		}
+
+		return !p2Iterator.hasNext();
 	}
 
 	private static class CustomValidationXmlClassLoader extends ClassLoader {
