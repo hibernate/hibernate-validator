@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.engine;
 
+import java.lang.annotation.ElementType;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -34,11 +35,12 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private final ConstraintDescriptor constraintDescriptor;
 	private final String rawMessage;
 	private final Class<T> rootBeanClass;
+	private final ElementType elementType;
 
 
 	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass,
 								   T rootBean, Object leafBeanInstance, Object value,
-								   Path propertyPath, ConstraintDescriptor constraintDescriptor) {
+								   Path propertyPath, ConstraintDescriptor constraintDescriptor, ElementType elementType) {
 		this.rawMessage = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
@@ -47,6 +49,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		this.leafBeanInstance = leafBeanInstance;
 		this.constraintDescriptor = constraintDescriptor;
 		this.rootBeanClass = rootBeanClass;
+		this.elementType = elementType;
 	}
 
 	public String getMessage() {
@@ -105,6 +108,9 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		if ( leafBeanInstance != null ? !leafBeanInstance.equals( that.leafBeanInstance ) : that.leafBeanInstance != null ) {
 			return false;
 		}
+		if ( elementType != null ? !elementType.equals( that.elementType ) : that.elementType != null ) {
+			return false;
+		}
 		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
 			return false;
 		}
@@ -119,6 +125,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
 		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );
+		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
 		return result;
 	}
 }

@@ -123,6 +123,7 @@ public class MetaConstraint<T, A extends Annotation> {
 
 	public <T, U, V> boolean validateConstraint(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext) {
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
+		localExecutionContext.setElementType( elementType );
 		constraintTree.validateConstraints(
 				typeOfAnnoatedElement(), executionContext, localExecutionContext, constraintViolations
 		);

@@ -17,6 +17,7 @@
 */
 package org.hibernate.validation.engine;
 
+import java.lang.annotation.ElementType;
 import javax.validation.groups.Default;
 
 /**
@@ -50,6 +51,11 @@ public class LocalExecutionContext<T, V> {
 	 * The value which gets currently evaluated.
 	 */
 	private V currentValue;
+
+	/**
+	 * The {@code ElementType} the constraint was defined on
+	 */
+	private ElementType elementType;
 
 	public static <T, V> LocalExecutionContext<T, V> getLocalExecutionContext(T value) {
 		@SuppressWarnings("unchecked")
@@ -106,14 +112,25 @@ public class LocalExecutionContext<T, V> {
 		return getCurrentGroup() != null && getCurrentGroup().getName().equals( Default.class.getName() );
 	}
 
+	public ElementType getElementType() {
+		return elementType;
+	}
+
+	public void setElementType(ElementType elementType) {
+		this.elementType = elementType;
+	}
+
 	@Override
 	public String toString() {
-		return "LocalExecutionContext{" +
-				"currentBean=" + currentBean +
-				", currentBeanType=" + currentBeanType +
-				", propertyPath=" + propertyPath +
-				", currentGroup=" + currentGroup +
-				", currentValue=" + currentValue +
-				'}';
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "LocalExecutionContext" );
+		sb.append( "{currentBean=" ).append( currentBean );
+		sb.append( ", currentBeanType=" ).append( currentBeanType );
+		sb.append( ", propertyPath=" ).append( propertyPath );
+		sb.append( ", currentGroup=" ).append( currentGroup );
+		sb.append( ", currentValue=" ).append( currentValue );
+		sb.append( ", elementType=" ).append( elementType );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }

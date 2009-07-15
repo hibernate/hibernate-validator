@@ -159,7 +159,8 @@ public class GlobalExecutionContext<T> {
 				localContext.getCurrentBean(),
 				localContext.getCurrentValidatedValue(),
 				error.getPath(),
-				descriptor
+				descriptor,
+				localContext.getElementType()
 		);
 	}
 
@@ -196,6 +197,7 @@ public class GlobalExecutionContext<T> {
 	}
 
 	private void addConstraintFailure(ConstraintViolation<T> failingConstraintViolation) {
+		// NOTE: we are relying on the fact that ConstraintViolation.equals() is implemented correctly.
 		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
 		if ( i == -1 ) {
 			failingConstraintViolations.add( failingConstraintViolation );
