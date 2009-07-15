@@ -387,7 +387,7 @@ public class ValidatorImpl implements Validator {
 		}
 		else if ( ReflectionHelper.isMap( type ) ) {
 			Map<?, ?> map = ( Map<?, ?> ) value;
-			iter = map.values().iterator();
+			iter = map.entrySet().iterator();
 			context.markCurrentPropertyAsIterable();
 		}
 		else if ( TypeUtils.isArray( type ) ) {
@@ -437,16 +437,13 @@ public class ValidatorImpl implements Validator {
 			if ( value instanceof Map.Entry ) {
 				mapKey = ( ( Map.Entry ) value ).getKey();
 				value = ( ( Map.Entry ) value ).getValue();
-			}
-
-			if ( isIndexable ) {
-				// only one of the two values index/mapKey will be set. The other will stay null.
-				currentPath.getLeafNode().setIndex( index );
 				currentPath.getLeafNode().setKey( mapKey );
+			}
+			else if ( isIndexable ) {
+				currentPath.getLeafNode().setIndex( index );
 			}
 
 			if ( !context.isAlreadyValidated( value, currentGroup, currentPath ) ) {
-
 				GroupChain groupChain = groupChainGenerator.getGroupChainFor(
 						Arrays.asList(
 								new Class<?>[] {
