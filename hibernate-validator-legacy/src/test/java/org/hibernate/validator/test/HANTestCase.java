@@ -68,6 +68,7 @@ public abstract class HANTestCase extends junit.framework.TestCase {
 		}
 	}
 
+	@SuppressWarnings({ "deprecation" })
 	protected void runTest() throws Throwable {
 		try {
 			super.runTest();

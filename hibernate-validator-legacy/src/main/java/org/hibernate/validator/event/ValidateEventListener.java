@@ -168,11 +168,13 @@ public class ValidateEventListener implements PreInsertEventListener, PreUpdateE
 		}
 	}
 
+	@SuppressWarnings({ "deprecation" })
 	public boolean onPreInsert(PreInsertEvent event) {
 		validate( event.getEntity(), event.getSource().getEntityMode() );
 		return false;
 	}
 
+	@SuppressWarnings({ "deprecation" })
 	public boolean onPreUpdate(PreUpdateEvent event) {
 		validate( event.getEntity(), event.getSource().getEntityMode() );
 		return false;
