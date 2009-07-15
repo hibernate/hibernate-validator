@@ -14,6 +14,7 @@ import org.hibernate.validator.test.HANTestCase;
 /**
  * @author Emmanuel Bernard
  */
+@SuppressWarnings({ "deprecation" })
 public class EmbeddedObjectTest extends HANTestCase {
 	public void testNotNullEmbeddedObject() throws Exception {
 		CreditCard cc = new CreditCard();

@@ -16,6 +16,7 @@ import org.hibernate.ejb.HibernatePersistence;
 /**
  * @author Emmanuel Bernard
  */
+@SuppressWarnings({ "deprecation" })
 public abstract class JPATestCase extends junit.framework.TestCase {
 	protected EntityManagerFactory factory;
 

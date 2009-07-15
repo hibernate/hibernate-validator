@@ -22,6 +22,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -250,6 +251,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
 		for ( Field field : clazz.getDeclaredFields() ) {
+			// HV-172
+			if ( Modifier.isStatic( field.getModifiers() ) ) {
+				continue;
+			}
 			List<ConstraintDescriptorImpl<?>> fieldMetadata = findConstraints( field );
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetadata ) {
 				if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
@@ -269,6 +274,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
 		for ( Method method : clazz.getDeclaredMethods() ) {
+			// HV-172
+			if ( Modifier.isStatic( method.getModifiers() ) ) {
+				continue;
+			}
 			List<ConstraintDescriptorImpl<?>> methodMetadata = findConstraints( method );
 			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetadata ) {
 				if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
