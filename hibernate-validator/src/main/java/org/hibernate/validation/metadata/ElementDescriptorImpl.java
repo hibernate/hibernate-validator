@@ -17,11 +17,17 @@
 */
 package org.hibernate.validation.metadata;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
+
+import org.hibernate.validation.engine.groups.Group;
+import org.hibernate.validation.engine.groups.GroupChain;
+import org.hibernate.validation.engine.groups.GroupChainGenerator;
 
 /**
  * Describe a validated element (class, field or property).
@@ -41,31 +47,34 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		constraintDescriptors.add( constraintDescriptor );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean hasConstraints() {
 		return constraintDescriptors.size() != 0;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Class<?> getElementClass() {
 		return type;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
 		return Collections.unmodifiableSet( constraintDescriptors );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Set<ConstraintDescriptor<?>> getUnorderdConstraintDescriptorsMatchingGroups(Class<?>... groups) {
-		throw new UnsupportedOperationException( "Not yet implemented HV-176");
+		Set<ConstraintDescriptor<?>> matchingDescriptors = new HashSet<ConstraintDescriptor<?>>();
+		GroupChain groupChain = new GroupChainGenerator().getGroupChainFor( Arrays.asList( groups ) );
+		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		while ( groupIterator.hasNext() ) {
+			Group g = groupIterator.next();
+			addMatchingDescriptorsForGroup( g.getGroup(), matchingDescriptors );
+		}
+		return Collections.unmodifiableSet( matchingDescriptors );
+	}
+
+	private void addMatchingDescriptorsForGroup(Class<?> group, Set<ConstraintDescriptor<?>> matchingDescriptors) {
+		for ( ConstraintDescriptor<?> descriptor : constraintDescriptors ) {
+			if ( descriptor.getGroups().contains( group ) ) {
+				matchingDescriptors.add( descriptor );
+			}
+		}
 	}
 }

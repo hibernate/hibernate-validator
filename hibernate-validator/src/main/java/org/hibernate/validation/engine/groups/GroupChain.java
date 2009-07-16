@@ -19,9 +19,11 @@ package org.hibernate.validation.engine.groups;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
 
@@ -49,6 +51,15 @@ public class GroupChain {
 
 	public Iterator<List<Group>> getSequenceIterator() {
 		return sequenceMap.values().iterator();
+	}
+
+	public Iterator<Group> getAllGroupsUnordered() {
+		Set<Group> allGroups = new HashSet<Group>();
+		allGroups.addAll( groupList );
+		for ( List<Group> sequenceList : sequenceMap.values() ) {
+			allGroups.addAll( sequenceList );
+		}
+		return allGroups.iterator();
 	}
 
 	public boolean containsSequence(Class<?> groupSequence) {
@@ -94,7 +105,7 @@ public class GroupChain {
 	private void ensureDefaultGroupSequenceIsExpandable(List<Group> groupList, List<Group> defaultGroupList, int defaultGroupIndex) {
 		for ( int i = 0; i < defaultGroupList.size(); i++ ) {
 			Group group = defaultGroupList.get( i );
-			if(group.getGroup().equals( Default.class )) {
+			if ( group.getGroup().equals( Default.class ) ) {
 				continue; // we don't have to consider the default group since it is the one we want to replace
 			}
 			int index = groupList.indexOf( group ); // check whether the sequence contains group of the default group sequence
