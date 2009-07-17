@@ -59,7 +59,12 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		return Collections.unmodifiableSet( constraintDescriptors );
 	}
 
+	//FIXME remove when HV depends on BV post CR3 (typo in the method name)
 	public Set<ConstraintDescriptor<?>> getUnorderdConstraintDescriptorsMatchingGroups(Class<?>... groups) {
+		return getUnorderedConstraintDescriptorsMatchingGroups( groups );
+	}
+
+	public Set<ConstraintDescriptor<?>> getUnorderedConstraintDescriptorsMatchingGroups(Class<?>... groups) {
 		Set<ConstraintDescriptor<?>> matchingDescriptors = new HashSet<ConstraintDescriptor<?>>();
 		GroupChain groupChain = new GroupChainGenerator().getGroupChainFor( Arrays.asList( groups ) );
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
