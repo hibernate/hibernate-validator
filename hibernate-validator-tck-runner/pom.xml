@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.hibernate.jsr303.tck</groupId>
             <artifactId>jsr303-tck</artifactId>
-            <version>1.0.0.Alpha3</version>
+            <version>1.0.0.Alpha4</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.test-harness</groupId>
