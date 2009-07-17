@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -29,7 +29,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.metadata.ConstraintHelper;
 
 /**
  * @author Hardy Ferentschik

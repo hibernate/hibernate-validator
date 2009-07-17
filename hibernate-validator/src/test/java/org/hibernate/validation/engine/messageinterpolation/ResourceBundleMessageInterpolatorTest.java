@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validation.engine;
+package org.hibernate.validation.engine.messageinterpolation;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -37,6 +37,8 @@ import org.hibernate.validation.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validation.metadata.ConstraintHelper;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validation.engine.ResourceBundleMessageInterpolator;
+import org.hibernate.validation.engine.MessageInterpolatorContext;
 
 /**
  * Tests for message resolution.

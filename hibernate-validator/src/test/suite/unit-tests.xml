@@ -7,6 +7,7 @@
             <package name="org.hibernate.validation.constraints.impl"/>
             <package name="org.hibernate.validation.constraints.composition"/>
             <package name="org.hibernate.validation.engine"/>
+            <package name="org.hibernate.validation.engine.messageinterpolation"/>
             <package name="org.hibernate.validation.engine.groups"/>
             <package name="org.hibernate.validation.engine.traversableresolver"/>
             <package name="org.hibernate.validation.util"/>
