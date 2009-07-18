@@ -13,18 +13,18 @@
   -------
 
   Prior to version 4.x Hibernate Validators was based on a different source base which 
-  is not based JSR 303. This code can be accessed via 
+  is not based on JSR 303. This code can be accessed via 
   http://anonsvn.jboss.org/repos/hibernate/validator/trunk/hibernate-validator-legacy
 
   Status
   ------
 
-  This is an beta release and even though it should be nearly feature complete there might be
-  still some variances between the specification and this implementation.
+  This is an beta release and even though it is nearly feature complete there might be
+  still variances between the specification and this implementation.
 
   You can find more information about the current state of the implementation on the
   Bean Validation RI Roadmap - http://www.hibernate.org/459.html and there is copy of
-  JSR as of the time of this release available here - http://in.relation.to/service/File/11150
+  JSR 303 -as of the time of this release- available here: http://in.relation.to/service/File/12014
 
   Documentation
   -------------
@@ -47,7 +47,8 @@
   -------------------------
 
   - Copy hibernate-validator-*.jar together will all jar files from lib into the 
-    classpath of your application 
+    classpath of your application. In case you are running on JDK5 you have to also include
+    all the jar files from the jdk5 subdirectory.
 
   or 
 

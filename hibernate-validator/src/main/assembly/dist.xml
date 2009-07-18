@@ -33,8 +33,23 @@
             <scope>runtime</scope>
             <excludes>
                 <exclude>com.googlecode.jtype:jtype</exclude>
+                <exclude>javax.xml.bind:jaxb-api</exclude>
+                <exclude>com.sun.xml.bind:jaxb-impl</exclude>
+                <exclude>javax.xml.stream:stax-api</exclude>
+                <exclude>javax.activation:activation</exclude>
             </excludes>
         </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib/jdk5</outputDirectory>
+            <scope>runtime</scope>
+            <includes>
+                <include>javax.xml.bind:jaxb-api</include>
+                <include>com.sun.xml.bind:jaxb-impl</include>
+                <include>javax.xml.stream:stax-api</include>
+                <include>javax.activation:activation</include>
+            </includes>
+        </dependencySet>        
     </dependencySets>
 
     <files>
