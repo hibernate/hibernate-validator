@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForArraysOfPrimitives {
+public abstract class SizeValidatorForArraysOfPrimitives {
 	protected int min;
 	protected int max;
 
