@@ -429,7 +429,7 @@ public class ValidatorImpl implements Validator {
 	private <T> void validateCascadedConstraint(GlobalExecutionContext<T> context, Iterator<?> iter, boolean isIndexable, Class<?> currentGroup, PathImpl currentPath) {
 		Object value;
 		Integer index;
-		Object mapKey = null;
+		Object mapKey;
 		int i = 0;
 		while ( iter.hasNext() ) {
 			value = iter.next();
@@ -737,36 +737,60 @@ public class ValidatorImpl implements Validator {
 		return new SingleThreadCachedTraversableResolver( traversableResolver );
 	}
 
-	@SuppressWarnings("SimplifiableIfStatement")
 	private boolean isValidationRequired(GlobalExecutionContext globalContext, LocalExecutionContext localContext, MetaConstraint metaConstraint) {
 		if ( !metaConstraint.getGroupList().contains( localContext.getCurrentGroup() ) ) {
 			return false;
 		}
 
-		return globalContext.getTraversableResolver().isReachable(
-				localContext.getCurrentBean(),
-				localContext.getPropertyPath().getLeafNode(),
-				globalContext.getRootBeanClass(),
-				localContext.getPropertyPath().getPathWithoutLeafNode(),
-				metaConstraint.getElementType()
-		);
+		boolean isReachable;
+
+		try {
+			isReachable = globalContext.getTraversableResolver().isReachable(
+					localContext.getCurrentBean(),
+					localContext.getPropertyPath().getLeafNode(),
+					globalContext.getRootBeanClass(),
+					localContext.getPropertyPath().getPathWithoutLeafNode(),
+					metaConstraint.getElementType()
+			);
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException( "Call to TraversableResolver.isReachable() threw an exception", e );
+		}
+
+		return isReachable;
 	}
 
 	private boolean isCascadeRequired(GlobalExecutionContext globalContext, LocalExecutionContext localContext, Member member) {
 		final ElementType type = member instanceof Field ? ElementType.FIELD : ElementType.METHOD;
-		return globalContext.getTraversableResolver().isReachable(
-				localContext.getCurrentBean(),
-				localContext.getPropertyPath().getLeafNode(),
-				globalContext.getRootBeanClass(),
-				localContext.getPropertyPath().getPathWithoutLeafNode(),
-				type
-		)
-				&& globalContext.getTraversableResolver().isCascadable(
-				localContext.getCurrentBean(),
-				localContext.getPropertyPath().getLeafNode(),
-				globalContext.getRootBeanClass(),
-				localContext.getPropertyPath().getPathWithoutLeafNode(),
-				type
-		);
+		boolean isReachable;
+		boolean isCascadable;
+
+		try {
+			isReachable = globalContext.getTraversableResolver().isReachable(
+					localContext.getCurrentBean(),
+					localContext.getPropertyPath().getLeafNode(),
+					globalContext.getRootBeanClass(),
+					localContext.getPropertyPath().getPathWithoutLeafNode(),
+					type
+			);
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException( "Call to TraversableResolver.isReachable() threw an exception", e );
+		}
+
+		try {
+			isCascadable = globalContext.getTraversableResolver().isCascadable(
+					localContext.getCurrentBean(),
+					localContext.getPropertyPath().getLeafNode(),
+					globalContext.getRootBeanClass(),
+					localContext.getPropertyPath().getPathWithoutLeafNode(),
+					type
+			);
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException( "Call to TraversableResolver.isCascadable() threw an exception", e );
+		}
+
+		return isReachable && isCascadable;
 	}
 }
