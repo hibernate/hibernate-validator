@@ -36,9 +36,6 @@ public class ValidatorContextImpl implements ValidatorContext {
 		traversableResolver( factoryTraversableResolver );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
 		if ( messageInterpolator == null ) {
 			this.messageInterpolator = factoryMessageInterpolator;
@@ -49,9 +46,6 @@ public class ValidatorContextImpl implements ValidatorContext {
 		return this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ValidatorContext traversableResolver(TraversableResolver traversableResolver) {
 		if ( traversableResolver == null ) {
 			this.traversableResolver = factoryTraversableResolver;
@@ -62,9 +56,6 @@ public class ValidatorContextImpl implements ValidatorContext {
 		return this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Validator getValidator() {
 		return new ValidatorImpl(
 				constraintValidatorFactory,

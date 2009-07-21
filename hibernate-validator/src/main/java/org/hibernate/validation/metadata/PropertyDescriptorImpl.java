@@ -36,16 +36,10 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 		this.property = property;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public boolean isCascaded() {
 		return cascaded;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public String getPropertyName() {
 		return property;
 	}
