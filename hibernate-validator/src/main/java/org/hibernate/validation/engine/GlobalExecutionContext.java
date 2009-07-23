@@ -35,7 +35,7 @@ import org.hibernate.validation.util.IdentitySet;
 /**
  * Context object keeping track of all important data for a top level {@link javax.validation.Validator#validate(Object, Class[])} },
  * {@link javax.validation.Validator#validateValue(Class, String, Object, Class[])}  } or {@link javax.validation.Validator#validateProperty(Object, String, Class[])}  call.
- *
+ * <p/>
  * we use this object to collect all failing constraints, but also to cache the caching traversable resolver for a full stack call.
  *
  * @author Hardy Ferentschik
@@ -221,7 +221,7 @@ public class GlobalExecutionContext<T> {
 		}
 
 		for ( PathImpl p : pathSet ) {
-			if ( p.isSubPathOf( path ) || path.isSubPathOf( p ) ) {
+			if ( p.isRootPath() || path.isRootPath() || p.isSubPathOf( path ) || path.isSubPathOf( p ) ) {
 				return true;
 			}
 		}
@@ -235,12 +235,19 @@ public class GlobalExecutionContext<T> {
 	}
 
 	private void markProcessedForCurrentPath(Object value, PathImpl path) {
+		// hmm - not sure if the current definiton of Path and Node are consistent. Shouldn't a simple property
+		// of a entity have a parent node?
+		PathImpl parentPath = path.getPathWithoutLeafNode();
+		if ( parentPath == null ) {
+			parentPath = PathImpl.createNewPath( null );
+		}
+
 		if ( processedPaths.containsKey( value ) ) {
-			processedPaths.get( value ).add( path.getPathWithoutLeafNode() );
+			processedPaths.get( value ).add( parentPath );
 		}
 		else {
 			Set<PathImpl> set = new HashSet<PathImpl>();
-			set.add( path.getPathWithoutLeafNode() );
+			set.add( parentPath );
 			processedPaths.put( value, set );
 		}
 	}

@@ -97,8 +97,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public NodeBuilderDefinedContext addSubNode(String name) {
-			PathImpl path = PathImpl.createNewRootPath();
-			path.addNode( new NodeImpl( name ) );
+			PathImpl path = PathImpl.createNewPath( name );
 			return new NodeBuilderImpl( messageTemplate, path );
 		}
 

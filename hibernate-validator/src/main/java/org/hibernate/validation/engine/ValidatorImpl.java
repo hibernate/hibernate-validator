@@ -116,9 +116,7 @@ public class ValidatorImpl implements Validator {
 				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
-		List<ConstraintViolation<T>> list = validateInContext(
-				object, context, groupChain, PathImpl.createNewRootPath()
-		);
+		List<ConstraintViolation<T>> list = validateInContext( object, context, groupChain, null );
 		return new HashSet<ConstraintViolation<T>>( list );
 	}
 
@@ -317,10 +315,16 @@ public class ValidatorImpl implements Validator {
 
 	private <T, U, V> boolean validateConstraint(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, MetaConstraint<U, ?> metaConstraint, PathImpl path) {
 		boolean validationSuccessful = true;
-		PathImpl newPath = PathImpl.createShallowCopy( path );
-		if ( !"".equals( metaConstraint.getPropertyName() ) ) {
+		PathImpl newPath;
+
+		if ( path == null ) {
+			newPath = PathImpl.createNewPath( metaConstraint.getPropertyName() );
+		}
+		else {
+			newPath = PathImpl.createShallowCopy( path );
 			newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
 		}
+
 		localExecutionContext.setPropertyPath( newPath );
 		if ( isValidationRequired( globalExecutionContext, localExecutionContext, metaConstraint ) ) {
 			Object valueToValidate = metaConstraint.getValue( localExecutionContext.getCurrentBean() );
@@ -349,8 +353,14 @@ public class ValidatorImpl implements Validator {
 				.getCascadedMembers();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
-			PathImpl newPath = PathImpl.createShallowCopy( path );
-			newPath.addNode( new NodeImpl( ReflectionHelper.getPropertyName( member ) ) );
+			PathImpl newPath;
+			if ( path == null ) {
+				newPath = PathImpl.createNewPath( ReflectionHelper.getPropertyName( member ) );
+			}
+			else {
+				newPath = PathImpl.createShallowCopy( path );
+				newPath.addNode( new NodeImpl( ReflectionHelper.getPropertyName( member ) ) );
+			}
 			localExecutionContext.setPropertyPath( newPath );
 			if ( isCascadeRequired( globalExecutionContext, localExecutionContext, member ) ) {
 				Object value = ReflectionHelper.getValue( member, localExecutionContext.getCurrentBean() );
@@ -665,9 +675,6 @@ public class ValidatorImpl implements Validator {
 	 */
 	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, Set<MetaConstraint<T, ?>> metaConstraints) {
 		Path.Node elem = propertyIter.next();
-		if ( elem.getName() == null ) { // skip root node
-			elem = propertyIter.next();
-		}
 
 		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
 		if ( !propertyIter.hasNext() ) {
@@ -682,7 +689,7 @@ public class ValidatorImpl implements Validator {
 
 			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintsAsList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
-				if ( metaConstraint.getPropertyName().equals( elem.getName() ) ) {
+				if ( elem.getName() != null && elem.getName().equals( metaConstraint.getPropertyName() ) ) {
 					metaConstraints.add( metaConstraint );
 				}
 			}
@@ -744,12 +751,17 @@ public class ValidatorImpl implements Validator {
 
 		boolean isReachable;
 
+		Path pathToObject = localContext.getPropertyPath().getPathWithoutLeafNode();
+		if ( pathToObject == null ) {
+			pathToObject = PathImpl.createNewPath( null );
+		}
+
 		try {
 			isReachable = globalContext.getTraversableResolver().isReachable(
 					localContext.getCurrentBean(),
 					localContext.getPropertyPath().getLeafNode(),
 					globalContext.getRootBeanClass(),
-					localContext.getPropertyPath().getPathWithoutLeafNode(),
+					pathToObject,
 					metaConstraint.getElementType()
 			);
 		}
@@ -765,12 +777,17 @@ public class ValidatorImpl implements Validator {
 		boolean isReachable;
 		boolean isCascadable;
 
+		Path pathToObject = localContext.getPropertyPath().getPathWithoutLeafNode();
+		if ( pathToObject == null ) {
+			pathToObject = PathImpl.createNewPath( null );
+		}
+
 		try {
 			isReachable = globalContext.getTraversableResolver().isReachable(
 					localContext.getCurrentBean(),
 					localContext.getPropertyPath().getLeafNode(),
 					globalContext.getRootBeanClass(),
-					localContext.getPropertyPath().getPathWithoutLeafNode(),
+					pathToObject,
 					type
 			);
 		}
@@ -783,7 +800,7 @@ public class ValidatorImpl implements Validator {
 					localContext.getCurrentBean(),
 					localContext.getPropertyPath().getLeafNode(),
 					globalContext.getRootBeanClass(),
-					localContext.getPropertyPath().getPathWithoutLeafNode(),
+					pathToObject,
 					type
 			);
 		}

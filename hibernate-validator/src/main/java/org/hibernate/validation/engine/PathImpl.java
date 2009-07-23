@@ -38,8 +38,6 @@ public class PathImpl implements Path {
 
 	private static final String PROPERTY_PATH_SEPERATOR = ".";
 
-	private static final Node ROOT_NODE = new NodeImpl( ( String ) null );
-
 	private final List<Node> nodeList;
 
 	/**
@@ -57,18 +55,21 @@ public class PathImpl implements Path {
 		}
 
 		if ( propertyPath.length() == 0 ) {
-			return createNewRootPath();
+			return createNewPath( null );
 		}
 
 		return parseProperty( propertyPath );
 	}
 
-	public static PathImpl createNewRootPath() {
-		return new PathImpl();
+	public static PathImpl createNewPath(String name) {
+		PathImpl path = new PathImpl();
+		NodeImpl node = new NodeImpl( name );
+		path.addNode( node );
+		return path;
 	}
 
 	public static PathImpl createShallowCopy(PathImpl path) {
-		return new PathImpl( path );
+		return path == null ? null : new PathImpl( path );
 	}
 
 	private PathImpl(PathImpl path) {
@@ -80,7 +81,6 @@ public class PathImpl implements Path {
 
 	private PathImpl() {
 		nodeList = new ArrayList<Node>();
-		nodeList.add( ROOT_NODE );
 	}
 
 	private PathImpl(List<Node> nodeList) {
@@ -90,12 +90,18 @@ public class PathImpl implements Path {
 		}
 	}
 
+	public boolean isRootPath() {
+		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
+	}
+
 	public PathImpl getPathWithoutLeafNode() {
 		List<Node> nodes = new ArrayList<Node>( nodeList );
+		PathImpl path = null;
 		if ( nodes.size() > 1 ) {
 			nodes.remove( nodes.size() - 1 );
+			path = new PathImpl( nodes );
 		}
-		return new PathImpl( nodes );
+		return path;
 	}
 
 	public void addNode(Node node) {
@@ -145,9 +151,6 @@ public class PathImpl implements Path {
 		Iterator<Path.Node> iter = iterator();
 		while ( iter.hasNext() ) {
 			Node node = iter.next();
-			if ( ROOT_NODE.equals( node ) ) {
-				continue;
-			}
 			builder.append( node.toString() );
 			if ( iter.hasNext() ) {
 				builder.append( PROPERTY_PATH_SEPERATOR );

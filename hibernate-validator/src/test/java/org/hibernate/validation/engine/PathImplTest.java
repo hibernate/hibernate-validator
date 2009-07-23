@@ -38,12 +38,6 @@ public class PathImplTest {
 
 		assertTrue( propIter.hasNext() );
 		Path.Node elem = propIter.next();
-		assertEquals( null, elem.getName() );
-		assertFalse( elem.isInIterable() );
-		assertEquals( property, path.toString() );
-
-		assertTrue( propIter.hasNext() );
-		elem = propIter.next();
 		assertEquals( "order", elem.getName() );
 		assertTrue( elem.isInIterable() );
 		assertEquals( new Integer( 3 ), elem.getIndex() );
@@ -71,12 +65,6 @@ public class PathImplTest {
 
 		assertTrue( propIter.hasNext() );
 		Path.Node elem = propIter.next();
-		assertEquals( null, elem.getName() );
-		assertFalse( elem.isInIterable() );
-		assertEquals( property, path.toString() );
-
-		assertTrue( propIter.hasNext() );
-		elem = propIter.next();
 		assertEquals( "order", elem.getName() );
 		assertTrue( elem.isInIterable() );
 		assertEquals( "foo", elem.getKey() );
@@ -119,11 +107,5 @@ public class PathImplTest {
 	public void testEmptyString() {
 		Path path = PathImpl.createPathFromString( "" );
 		assertTrue( path.iterator().hasNext() );
-	}
-
-	@Test
-	public void testRootPath() {
-		Path path = PathImpl.createNewRootPath();
-		assertEquals( path.toString(), "", "Wrong string representation of root property." );
 	}
 }

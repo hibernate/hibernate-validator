@@ -48,7 +48,8 @@ public class MetaConstraint<T, A extends Annotation> {
 	private final Member member;
 
 	/**
-	 * The JavaBeans name for this constraint.
+	 * The JavaBeans name of the field/property the constraint was placed on. {@code null} if this is a
+	 * class level constraint.
 	 */
 	private final String propertyName;
 
@@ -71,7 +72,7 @@ public class MetaConstraint<T, A extends Annotation> {
 	public MetaConstraint(Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
 		this.elementType = ElementType.TYPE;
 		this.member = null;
-		this.propertyName = "";
+		this.propertyName = null;
 		this.beanClass = beanClass;
 		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 	}
@@ -109,6 +110,10 @@ public class MetaConstraint<T, A extends Annotation> {
 		return beanClass;
 	}
 
+	/**
+	 * @return The JavaBeans name of the field/property the constraint was placed on. {@code null} if this is a
+	 *         class level constraint.
+	 */
 	public String getPropertyName() {
 		return propertyName;
 	}
