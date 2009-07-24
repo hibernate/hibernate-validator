@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
@@ -246,6 +248,51 @@
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>setup-jboss-as</id>
+            <activation>
+                <property>
+                    <name>setupJBoss</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>initialize</phase>
+                                <configuration>
+                                    <tasks>
+                                        <property name="jboss.home" value="/opt/java/jboss-5"/>
+                                        <property name="deploy.dir" value="${jboss.home}/server/default/deployers/webbeans.deployer"/>
+                                        <property name="remote.repo" value="http://repository.jboss.com/maven2"/>
+                                        <property name="artifact.version" value="5.2.0.Beta2"/>
+                                        <property name="artifact.name"
+                                                  value="webbeans-jboss-int-deployer-${artifact.version}"/>
+                                        <delete dir="${deploy.dir}" failonerror="false"/>
+                                        <mkdir dir="${basedir}/target/download"/>
+                                        <get src="${remote.repo}/org/jboss/webbeans/integration/webbeans-jboss-int-deployer/${artifact.version}/${artifact.name}.zip"
+                                             dest="${basedir}/target/download/${artifact.name}.zip"
+                                             verbose="true"
+                                             usetimestamp="true"/>
+                                        <unzip dest="target" src="${basedir}/target/download/${artifact.name}.zip"/>
+                                        <copy todir="${deploy.dir}">
+                                            <fileset dir="target/webbeans.deployer">
+                                                <include name="**/*"/>
+                                            </fileset>
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
