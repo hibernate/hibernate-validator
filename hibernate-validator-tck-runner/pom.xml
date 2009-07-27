@@ -43,6 +43,11 @@
         </dependency>
     </dependencies>
 
+    <properties>
+        <jboss.home>/opt/java/jboss-5</jboss.home>
+        <validation.provider>org.hibernate.validation.HibernateValidationProvider</validation.provider>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -97,6 +102,12 @@
                     </suiteXmlFiles>
                     <argLine>-Xmx128m</argLine>
                     <forkMode>once</forkMode>
+                    <systemProperties>
+                        <property>
+                            <name>validation.provider</name>
+                            <value>${validation.provider}</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>
@@ -120,49 +131,6 @@
     </build>
     <profiles>
         <profile>
-            <id>incontainer-debug</id>
-            <activation>
-                <property>
-                    <name>incontainer-debug</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <suiteXmlFiles>
-                                <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-suite.xml</suiteXmlFile>
-                            </suiteXmlFiles>
-                            <systemProperties>
-                                <property>
-                                    <name>org.jboss.testharness.standalone</name>
-                                    <value>false</value>
-                                </property>
-                                <property>
-                                    <name>org.jboss.testharness.container.extraConfigurationDir</name>
-                                    <value>../jboss-as</value>
-                                </property>
-                                <property>
-                                    <name>org.jboss.testharness.container.forceRestart</name>
-                                    <value>false</value>
-                                </property>
-                                <property>
-                                    <name>org.jboss.testharness.libraryDirectory</name>
-                                    <value>target/dependency/lib</value>
-                                </property>
-                                <property>
-                                    <name>org.jboss.testharness.runIntegrationTests</name>
-                                    <value>true</value>
-                                </property>
-                            </systemProperties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>incontainer</id>
             <activation>
                 <property>
@@ -180,12 +148,22 @@
                             </suiteXmlFiles>
                             <systemProperties>
                                 <property>
+                                    <name>validation.provider</name>
+                                    <value>${validation.provider}</value>
+                                </property>
+                                <property>
                                     <name>org.jboss.testharness.standalone</name>
                                     <value>false</value>
                                 </property>
                                 <property>
-                                    <name>org.jboss.testharness.container.extraConfigurationDir</name>
-                                    <value>src/jboss-as</value>
+                                    <name>jboss.home</name>
+                                    <value>${jboss.home}</value>
+                                </property>
+                                <property>
+                                    <name>org.jboss.testharness.container.javaOpts</name>
+                                    <value>-Xms128m -Xmx384m -XX:MaxPermSize=128m -Dorg.jboss.resolver.warning=true
+                                        -Dvalidation.provider=${validation.provider} ${remote.debug}
+                                    </value>
                                 </property>
                                 <property>
                                     <name>org.jboss.testharness.container.forceRestart</name>
@@ -208,6 +186,17 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>incontainer-debug</id>
+            <activation>
+                <property>
+                    <name>incontainer-debug</name>
+                </property>
+            </activation>
+            <properties>
+                <remote.debug>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</remote.debug>
+            </properties>
         </profile>
         <profile>
             <id>write-artifacts-to-disk</id>
@@ -268,8 +257,8 @@
                                 <phase>initialize</phase>
                                 <configuration>
                                     <tasks>
-                                        <property name="jboss.home" value="/opt/java/jboss-5"/>
-                                        <property name="deploy.dir" value="${jboss.home}/server/default/deployers/webbeans.deployer"/>
+                                        <property name="deploy.dir"
+                                                  value="${jboss.home}/server/default/deployers/tck-303.deployer"/>
                                         <property name="remote.repo" value="http://repository.jboss.com/maven2"/>
                                         <property name="artifact.version" value="5.2.0.Beta2"/>
                                         <property name="artifact.name"
