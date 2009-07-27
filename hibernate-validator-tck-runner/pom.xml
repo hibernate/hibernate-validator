@@ -162,7 +162,7 @@
                                 <property>
                                     <name>org.jboss.testharness.container.javaOpts</name>
                                     <value>-Xms128m -Xmx384m -XX:MaxPermSize=128m -Dorg.jboss.resolver.warning=true
-                                        -Dvalidation.provider=${validation.provider} ${remote.debug}
+                                        -Dvalidation.provider=${validation.provider} 
                                     </value>
                                 </property>
                                 <property>
