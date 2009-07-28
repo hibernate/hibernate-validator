@@ -105,4 +105,21 @@ public class DigitsValidatorForNumberTest {
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
 	}
+
+	@Test
+	public void testTrailingZerosAreTrimmed() {
+		AnnotationDescriptor<Digits> descriptor = new AnnotationDescriptor<Digits>( Digits.class );
+		descriptor.setValue( "integer", 12 );
+		descriptor.setValue( "fraction", 3 );
+		descriptor.setValue( "message", "{validator.digits}" );
+		Digits p = AnnotationFactory.create( descriptor );
+
+		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
+		constraint.initialize( p );
+
+		assertTrue( constraint.isValid( 0.001d, null ) );
+		assertTrue( constraint.isValid( 0.00100d, null ) );
+		assertFalse( constraint.isValid( 0.0001d, null ) );
+	}
+
 }

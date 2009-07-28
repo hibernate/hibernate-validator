@@ -52,7 +52,7 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 			bigNum = ( BigDecimal ) num;
 		}
 		else {
-			bigNum = new BigDecimal( num.toString() );
+			bigNum = new BigDecimal( num.toString() ).stripTrailingZeros();
 		}
 
 		int integerPartLength = bigNum.precision() - bigNum.scale();
