@@ -46,6 +46,7 @@
     <properties>
         <jboss.home>/opt/java/jboss-5</jboss.home>
         <validation.provider>org.hibernate.validation.HibernateValidationProvider</validation.provider>
+        <remote.debug/>
     </properties>
 
     <build>
@@ -131,6 +132,19 @@
     </build>
     <profiles>
         <profile>
+            <id>incontainer-debug</id>
+            <activation>
+                <property>
+                    <name>debug</name>
+                </property>
+            </activation>
+            <properties>
+                <remote.debug>-Xnoagent -Djava.compiler=NONE -Xdebug
+                    -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005
+                </remote.debug>
+            </properties>
+        </profile>
+        <profile>
             <id>incontainer</id>
             <activation>
                 <property>
@@ -162,7 +176,7 @@
                                 <property>
                                     <name>org.jboss.testharness.container.javaOpts</name>
                                     <value>-Xms128m -Xmx384m -XX:MaxPermSize=128m -Dorg.jboss.resolver.warning=true
-                                        -Dvalidation.provider=${validation.provider} 
+                                        -Dvalidation.provider=${validation.provider} ${remote.debug}
                                     </value>
                                 </property>
                                 <property>
@@ -186,17 +200,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>incontainer-debug</id>
-            <activation>
-                <property>
-                    <name>incontainer-debug</name>
-                </property>
-            </activation>
-            <properties>
-                <remote.debug>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</remote.debug>
-            </properties>
         </profile>
         <profile>
             <id>write-artifacts-to-disk</id>
