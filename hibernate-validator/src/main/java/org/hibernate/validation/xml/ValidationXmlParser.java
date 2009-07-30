@@ -231,11 +231,18 @@ public class ValidationXmlParser {
 
 	private InputStream getInputStreamForPath(String path) {
 		// try the context class loader first
-		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream( path );
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		boolean isContextCL = true;
+		if (loader == null) {
+			log.debug( "No default context class loader, fallbacking to Bean Validation's loader" );
+			loader = ValidationXmlParser.class.getClassLoader();
+			isContextCL = false;
+		}
+		InputStream inputStream = loader.getResourceAsStream( path );
 
 		// try the current class loader
-		if ( inputStream == null ) {
-			inputStream = this.getClass().getResourceAsStream( path );
+		if ( isContextCL && inputStream == null ) {
+			inputStream = ValidationXmlParser.class.getClassLoader().getResourceAsStream( path );
 		}
 		return inputStream;
 	}
