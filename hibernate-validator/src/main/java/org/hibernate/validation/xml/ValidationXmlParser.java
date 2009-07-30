@@ -206,7 +206,7 @@ public class ValidationXmlParser {
 	private ValidationConfigType getValidationConfig() {
 		InputStream inputStream = getInputStreamForPath( VALIDATION_XML_FILE );
 		if ( inputStream == null ) {
-			log.info( "No {} found. Using annotation based configuration only!", VALIDATION_XML_FILE );
+			log.debug( "No {} found. Using annotation based configuration only", VALIDATION_XML_FILE );
 			return null;
 		}
 
