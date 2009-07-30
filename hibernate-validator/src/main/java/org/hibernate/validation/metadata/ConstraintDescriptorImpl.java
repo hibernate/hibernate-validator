@@ -338,7 +338,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotation ) ) {
 				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
-				int index = 1;
+				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
 							constraintAnnotation, overrideParameters, index
