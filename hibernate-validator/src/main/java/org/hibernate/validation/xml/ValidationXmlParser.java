@@ -230,6 +230,11 @@ public class ValidationXmlParser {
 	}
 
 	private InputStream getInputStreamForPath(String path) {
+		//TODO not sure it's the right thing to do (ie removing '/'
+		//remove heading '/'
+		if ( path.startsWith( "/" ) ) {
+			path = path.substring( 1 );
+		}
 		// try the context class loader first
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		boolean isContextCL = true;
