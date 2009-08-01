@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -92,6 +93,9 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private final ConstraintHelper constraintHelper;
 
+	//updated on the fly, needs to be thread safe
+	//property name
+	private final Set<String> propertyNames = new HashSet<String>(30);
 
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
 		this(
@@ -149,6 +153,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public PropertyDescriptor getPropertyDescriptor(String property) {
 		return propertyDescriptors.get( property );
+	}
+
+	public boolean isPropertyPresent(String name) {
+		return propertyNames.contains( name );  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	public List<Class<?>> getDefaultGroupSequence() {
@@ -255,6 +263,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( Modifier.isStatic( field.getModifiers() ) ) {
 				continue;
 			}
+			String name = ReflectionHelper.getPropertyName( field );
+			if (name != null) {
+				propertyNames.add( name );
+			}
 			List<ConstraintDescriptorImpl<?>> fieldMetadata = findConstraints( field );
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetadata ) {
 				if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
@@ -278,6 +290,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( Modifier.isStatic( method.getModifiers() ) ) {
 				continue;
 			}
+			String name = ReflectionHelper.getPropertyName( method );
+			if (name != null) {
+				propertyNames.add( name );
+			}
+
 			List<ConstraintDescriptorImpl<?>> methodMetadata = findConstraints( method );
 			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetadata ) {
 				if ( annotationIgnores.isIgnoreAnnotations( method ) ) {

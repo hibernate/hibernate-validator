@@ -677,16 +677,15 @@ public class ValidatorImpl implements Validator {
 		Path.Node elem = propertyIter.next();
 
 		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
+		//use precomputed method list as ReflectionHelper#containsMember is slow
+		if ( ! metaData.isPropertyPresent( elem.getName() ) ) {
+			throw new IllegalArgumentException(
+					"Invalid property path. There is no property " + elem.getName() + " in entity " + metaData.getBeanClass()
+							.getName()
+			);
+		}
+
 		if ( !propertyIter.hasNext() ) {
-
-			//use metadata first as ReflectionHelper#containsMember is slow
-			if ( metaData.getPropertyDescriptor( elem.getName() ) == null ) {
-				throw new IllegalArgumentException(
-						"Invalid property path. There is no property " + elem.getName() + " in entity " + metaData.getBeanClass()
-								.getName()
-				);
-			}
-
 			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintsAsList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
 				if ( elem.getName() != null && elem.getName().equals( metaConstraint.getPropertyName() ) ) {

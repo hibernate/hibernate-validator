@@ -80,6 +80,12 @@ public interface BeanMetaData<T> {
 	PropertyDescriptor getPropertyDescriptor(String property);
 
 	/**
+	 * return true if the property exists on the object
+	 * even if the property does not host any constraint nor is cascaded
+	 */
+	boolean isPropertyPresent(String name);
+
+	/**
 	 * @return the property descriptors having at least one constraint defined or which are marked
 	 *         as cascaded (@Valid).
 	 */
