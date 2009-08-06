@@ -165,7 +165,7 @@ public class TestUtil {
 				}
 			}
 			if ( !containsPath ) {
-				fail( expectedPath + " is not in the list of path instances contained in the actual constraint violations" );
+				fail( expectedPath + " is not in the list of path instances contained in the actual constraint violations: " + propertyPathsOfViolations );
 			}
 		}
 	}

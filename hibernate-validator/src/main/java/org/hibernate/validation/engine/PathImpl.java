@@ -68,11 +68,11 @@ public class PathImpl implements Path {
 		return path;
 	}
 
-	public static PathImpl createShallowCopy(PathImpl path) {
+	public static PathImpl createShallowCopy(Path path) {
 		return path == null ? null : new PathImpl( path );
 	}
 
-	private PathImpl(PathImpl path) {
+	private PathImpl(Path path) {
 		this.nodeList = new ArrayList<Node>();
 		for ( Object aPath : path ) {
 			nodeList.add( new NodeImpl( ( Node ) aPath ) );

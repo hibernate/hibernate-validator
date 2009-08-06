@@ -322,7 +322,9 @@ public class ValidatorImpl implements Validator {
 		}
 		else {
 			newPath = PathImpl.createShallowCopy( path );
-			newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
+			if ( metaConstraint.getElementType() != ElementType.TYPE ) {
+				newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
+			}
 		}
 
 		localExecutionContext.setPropertyPath( newPath );
@@ -678,7 +680,7 @@ public class ValidatorImpl implements Validator {
 
 		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
 		//use precomputed method list as ReflectionHelper#containsMember is slow
-		if ( ! metaData.isPropertyPresent( elem.getName() ) ) {
+		if ( !metaData.isPropertyPresent( elem.getName() ) ) {
 			throw new IllegalArgumentException(
 					"Invalid property path. There is no property " + elem.getName() + " in entity " + metaData.getBeanClass()
 							.getName()

@@ -4,6 +4,7 @@
     <test name="Unit tests">
         <packages>
             <package name="org.hibernate.validation.bootstrap"/>
+            <package name="org.hibernate.validation.constraints"/>
             <package name="org.hibernate.validation.constraints.impl"/>
             <package name="org.hibernate.validation.constraints.composition"/>
             <package name="org.hibernate.validation.engine"/>
