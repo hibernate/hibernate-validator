@@ -44,7 +44,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * Regular expression used to do message interpolation.
 	 */
-	private static final Pattern messageParameterPattern = Pattern.compile( "(\\{[\\w\\.]+\\})" );
+	private static final Pattern messageParameterPattern = Pattern.compile( "(\\{[^\\}]+?\\})" );
 
 	/**
 	 * The default locale for the current user.
@@ -83,18 +83,12 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		defaultBundlesMap.put( defaultLocale, ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES, defaultLocale ) );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public String interpolate(String message, Context context) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
 		return interpolateMessage( message, context.getConstraintDescriptor().getAttributes(), defaultLocale );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public String interpolate(String message, Context context, Locale locale) {
 		return interpolateMessage( message, context.getConstraintDescriptor().getAttributes(), locale );
 	}

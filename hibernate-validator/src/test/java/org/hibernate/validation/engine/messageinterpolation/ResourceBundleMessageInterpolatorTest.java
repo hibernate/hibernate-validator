@@ -33,15 +33,15 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import org.hibernate.validation.engine.MessageInterpolatorContext;
+import org.hibernate.validation.engine.ResourceBundleMessageInterpolator;
 import org.hibernate.validation.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validation.metadata.ConstraintHelper;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validation.engine.ResourceBundleMessageInterpolator;
-import org.hibernate.validation.engine.MessageInterpolatorContext;
 
 /**
- * Tests for message resolution.
+ * Tests for message interpolation.
  *
  * @author Hardy Ferentschik
  */
@@ -73,20 +73,20 @@ public class ResourceBundleMessageInterpolatorTest {
 	public void testSuccessfulInterpolation() {
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
-		String expected = "replacement worked";
-		String actual = interpolator.interpolate( "{foo}", context );
+		String expected = "message interpolation successfull";
+		String actual = interpolator.interpolate( "{simple.key}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		expected = "replacement worked replacement worked";
-		actual = interpolator.interpolate( "{foo} {foo}", context );
+		expected = "message interpolation successfull message interpolation successfull";
+		actual = interpolator.interpolate( "{simple.key} {simple.key}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		expected = "This replacement worked just fine";
-		actual = interpolator.interpolate( "This {foo} just fine", context );
+		expected = "The message interpolation successfull completed";
+		actual = interpolator.interpolate( "The {simple.key} completed", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		expected = "{} { replacement worked }";
-		actual = interpolator.interpolate( "{} { {foo} }", context );
+		expected = "{{simple.key}}";
+		actual = interpolator.interpolate( "{{simple.key}}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
 
@@ -130,6 +130,26 @@ public class ResourceBundleMessageInterpolatorTest {
 
 		String expected = "{bar}";  // unkown token {}
 		String actual = interpolator.interpolate( "{bar}", context );
+		assertEquals( actual, expected, "Wrong substitution" );
+	}
+
+	@Test
+	public void testKeyWithDashes() {
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+
+		String expected = "message interpolation successfull";  // unkown token {}
+		String actual = interpolator.interpolate( "{key-with-dashes}", context );
+		assertEquals( actual, expected, "Wrong substitution" );
+	}
+
+	@Test
+	public void testKeyWithSpaces() {
+		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+
+		String expected = "message interpolation successfull";  // unkown token {}
+		String actual = interpolator.interpolate( "{key with spaces}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
 
@@ -239,7 +259,9 @@ public class ResourceBundleMessageInterpolatorTest {
 		public TestResourceBundle() {
 			testResources = new HashMap<String, String>();
 			// add some test messages
-			testResources.put( "foo", "replacement worked" );
+			testResources.put( "simple.key", "message interpolation successfull" );
+			testResources.put( "key-with-dashes", "message interpolation successfull" );
+			testResources.put( "key with spaces", "message interpolation successfull" );
 			testResources.put( "replace.in.user.bundle1", "{replace.in.user.bundle2}" );
 			testResources.put( "replace.in.user.bundle2", "{replace.in.default.bundle1}" );
 
