@@ -25,6 +25,7 @@ import java.lang.reflect.Proxy;
 import java.security.AccessController;
 
 import org.hibernate.validation.util.GetConstructor;
+import org.hibernate.validation.util.GetClassLoader;
 
 
 /**
@@ -38,7 +39,9 @@ public class AnnotationFactory {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		boolean isSecured = System.getSecurityManager() != null;
+		GetClassLoader action = GetClassLoader.fromContext();
+		ClassLoader classLoader = isSecured ? AccessController.doPrivileged( action ) : action.run();
         //TODO round 34ms to generate the proxy, hug! is Javassist Faster?
         Class<T> proxyClass = (Class<T>) Proxy.getProxyClass( classLoader, descriptor.type() );
 		InvocationHandler handler = new AnnotationProxy( descriptor );

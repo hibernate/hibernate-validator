@@ -198,23 +198,6 @@ public class ReflectionHelper {
 		}
 	}
 
-	public static Class<?> loadClass(String name, Class<?> caller) throws ClassNotFoundException {
-		try {
-			//try context classloader, if fails try caller classloader
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			if ( loader != null ) {
-				return loader.loadClass( name );
-			}
-		}
-		catch ( ClassNotFoundException e ) {
-			//trying caller classloader
-			if ( caller == null ) {
-				throw e;
-			}
-		}
-		return Class.forName( name, true, caller.getClassLoader() );
-	}
-
 	/**
 	 * Determines the type of elements of an <code>Iterable</code>, array or the value of a <code>Map</code>.
 	 *
@@ -380,19 +363,6 @@ public class ReflectionHelper {
 		catch ( NoSuchMethodException e ) {
 			return null;
 		}
-	}
-
-	public static Class<?> classForName(String name, Class<?> caller) throws ClassNotFoundException {
-		try {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass( name );
-			}
-		}
-		catch ( Throwable e ) {
-			// ignore
-		}
-		return Class.forName( name, true, caller.getClassLoader() );
 	}
 
 	/**

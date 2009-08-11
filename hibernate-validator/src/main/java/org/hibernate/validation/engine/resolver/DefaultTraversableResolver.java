@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.NewInstance;
+import org.hibernate.validation.util.LoadClass;
 
 /**
  * A JPA 2 aware <code>TraversableResolver</code>.
@@ -47,10 +48,10 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	 */
 	private void detectJPA() {
 		try {
-			ReflectionHelper.classForName( PERSISTENCE_UTIL_CLASS_NAME, this.getClass() );
+			loadClass( PERSISTENCE_UTIL_CLASS_NAME, this.getClass() );
 			log.debug( "Found {} on classpath.", PERSISTENCE_UTIL_CLASS_NAME );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch ( ValidationException e ) {
 			log.debug(
 					"Cannot find {} on classpath. All properties will per default be traversable.",
 					PERSISTENCE_UTIL_CLASS_NAME
@@ -61,7 +62,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		try {
 			@SuppressWarnings( "unchecked" )
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
-					ReflectionHelper.classForName(JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
+					loadClass(JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
 			NewInstance<? extends TraversableResolver> newInstance = NewInstance.action( jpaAwareResolverClass, "" );
 			if ( System.getSecurityManager() != null ) {
 				jpaTraversableResolver = AccessController.doPrivileged( newInstance );
@@ -73,17 +74,21 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					"Instantiated an instance of {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
-		catch ( ClassNotFoundException e ) {
+		catch ( ValidationException e ) {
 			log.info(
-					"Unable to load JPA aware resolver {}. All properties will per default be traversable.",
+					"Unable to load or instanciate JPA aware resolver {}. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
-		catch ( ValidationException e ) {
-			log.info(
-					"Unable to instantiate JPA aware resolver {}. All properties will per default be traversable.",
-					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
-			);
+	}
+
+	private Class<?> loadClass(String className, Class<?> caller) {
+		LoadClass action = LoadClass.action( className, caller );
+		if (System.getSecurityManager() != null) {
+			return AccessController.doPrivileged( action );
+		}
+		else {
+			return action.run();
 		}
 	}
 

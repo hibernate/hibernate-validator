@@ -24,11 +24,13 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.security.AccessController;
 import javax.validation.MessageInterpolator;
 
 import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
+import org.hibernate.validation.util.GetClassLoader;
 
 /**
  * Resource bundle backed message interpolator.
@@ -155,13 +157,18 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 */
 	private ResourceBundle getFileBasedResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		boolean isSecured = System.getSecurityManager() != null;
+		GetClassLoader action = GetClassLoader.fromContext();
+		ClassLoader classLoader = isSecured ? AccessController.doPrivileged( action ) : action.run();
+
 		if ( classLoader != null ) {
 			rb = loadBundle( classLoader, locale, USER_VALIDATION_MESSAGES + " not found by thread local classloader" );
 		}
 		if ( rb == null ) {
+			action = GetClassLoader.fromClass(ResourceBundleMessageInterpolator.class);
+			classLoader = isSecured ? AccessController.doPrivileged( action ) : action.run();
 			rb = loadBundle(
-					this.getClass().getClassLoader(),
+					classLoader,
 					locale,
 					USER_VALIDATION_MESSAGES + " not found by validator classloader"
 			);

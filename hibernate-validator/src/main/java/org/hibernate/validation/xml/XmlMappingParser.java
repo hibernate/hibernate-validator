@@ -59,6 +59,8 @@ import org.hibernate.validation.util.GetMethodFromPropertyName;
 import org.hibernate.validation.util.ContainsMethod;
 import org.hibernate.validation.util.GetMethod;
 import org.hibernate.validation.util.GetDeclaredField;
+import org.hibernate.validation.util.GetClassLoader;
+import org.hibernate.validation.util.LoadClass;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validation.xml.AnnotationType;
@@ -173,14 +175,9 @@ public class XmlMappingParser {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
 			Class<? extends Annotation> annotationClass;
-			try {
-				annotationClass = ( Class<? extends Annotation> ) ReflectionHelper.classForName(
-						annotationClassName, this.getClass()
-				);
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new ValidationException( "Unable to load class " + annotationClassName );
-			}
+			annotationClass = ( Class<? extends Annotation> ) loadClass(
+					annotationClassName, this.getClass()
+			);
 
 			if ( !annotationClass.isAnnotation() ) {
 				throw new ValidationException( annotationClassName + " is not an annotation" );
@@ -193,15 +190,11 @@ public class XmlMappingParser {
 			}
 			for ( JAXBElement<String> validatorClassName : validatedByType.getValue() ) {
 				Class<? extends ConstraintValidator<?, ?>> validatorClass;
-				try {
-					validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) ReflectionHelper.classForName(
-							validatorClassName.getValue(),
-							this.getClass()
-					);
-				}
-				catch ( ClassNotFoundException e ) {
-					throw new ValidationException( "Unable to load class " + validatorClassName );
-				}
+				validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) loadClass(
+						validatorClassName.getValue(),
+						this.getClass()
+				);
+
 
 				if ( !ConstraintValidator.class.isAssignableFrom( validatorClass ) ) {
 					throw new ValidationException( validatorClass + " is not a constraint validator class" );
@@ -212,6 +205,16 @@ public class XmlMappingParser {
 			constraintHelper.addConstraintValidatorDefinition(
 					annotationClass, constraintValidatorClasses
 			);
+		}
+	}
+
+	private Class<?> loadClass(String className, Class<?> caller) {
+		LoadClass action = LoadClass.action( className, caller );
+		if (System.getSecurityManager() != null) {
+			return AccessController.doPrivileged( action );
+		}
+		else {
+			return action.run();
 		}
 	}
 
@@ -569,12 +572,7 @@ public class XmlMappingParser {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			try {
-				returnValue = ReflectionHelper.classForName( value, this.getClass() );
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new ValidationException( "Unable to instantiate class: " + value );
-			}
+			returnValue = loadClass( value, this.getClass() );
 		}
 		else {
 			try {
@@ -615,12 +613,7 @@ public class XmlMappingParser {
 		else {
 			fullyQualifiedClass = defaultPackage + PACKAGE_SEPERATOR + clazz;
 		}
-		try {
-			return ReflectionHelper.classForName( fullyQualifiedClass, this.getClass() );
-		}
-		catch ( Exception e ) {
-			throw new ValidationException( "Unable to instantiate class " + fullyQualifiedClass );
-		}
+		return loadClass( fullyQualifiedClass, this.getClass() );
 	}
 
 	private boolean isQualifiedClass(String clazz) {
@@ -647,7 +640,10 @@ public class XmlMappingParser {
 	}
 
 	private Schema getMappingSchema() {
-		URL schemaUrl = this.getClass().getClassLoader().getResource( VALIDATION_MAPPING_XSD );
+		boolean isSecured = System.getSecurityManager() != null;
+		GetClassLoader action = GetClassLoader.fromClass( XmlMappingParser.class );
+		ClassLoader loader = isSecured ? AccessController.doPrivileged( action ) : action.run();
+		URL schemaUrl = loader.getResource( VALIDATION_MAPPING_XSD );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {
