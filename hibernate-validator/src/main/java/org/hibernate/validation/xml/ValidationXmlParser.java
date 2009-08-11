@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.util.priviledgedactions.NewInstance;
+import org.hibernate.validation.util.NewInstance;
 import org.hibernate.validation.xml.PropertyType;
 import org.hibernate.validation.xml.ValidationConfigType;
 

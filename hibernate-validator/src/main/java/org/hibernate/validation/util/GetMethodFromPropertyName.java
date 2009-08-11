@@ -1,4 +1,4 @@
-package org.hibernate.validation.util.priviledgedactions;
+package org.hibernate.validation.util;
 
 import java.lang.reflect.Method;
 import java.security.PrivilegedAction;

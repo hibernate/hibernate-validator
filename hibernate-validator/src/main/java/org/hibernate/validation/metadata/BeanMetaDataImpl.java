@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.security.AccessController;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -44,6 +44,9 @@ import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.util.GetDeclaredFields;
+import org.hibernate.validation.util.GetDeclaredMethods;
+import org.hibernate.validation.util.SetAccessibility;
 
 
 /**
@@ -258,7 +261,15 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
-		for ( Field field : clazz.getDeclaredFields() ) {
+		GetDeclaredFields action = GetDeclaredFields.action( clazz );
+		final Field[] fields;
+		if ( System.getSecurityManager() != null ) {
+			fields = AccessController.doPrivileged( action );
+		}
+		else {
+			fields = action.run();
+		}
+		for ( Field field : fields ) {
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ) {
 				continue;
@@ -272,20 +283,39 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
 					break;
 				}
-				ReflectionHelper.setAccessibility( field );
+				setAccessibility( field );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
 			if ( field.isAnnotationPresent( Valid.class ) ) {
-				ReflectionHelper.setAccessibility( field );
+				setAccessibility( field );
 				cascadedMembers.add( field );
 				addPropertyDescriptorForMember( field );
 			}
 		}
 	}
 
+	private void setAccessibility(Member member) {
+		SetAccessibility action = SetAccessibility.action( member );
+		if (System.getSecurityManager() != null) {
+			AccessController.doPrivileged( action );
+		}
+		else {
+			action.run();
+		}
+	}
+
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
-		for ( Method method : clazz.getDeclaredMethods() ) {
+		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
+		final Method[] declaredMethods;
+		if ( System.getSecurityManager() != null ) {
+			declaredMethods = AccessController.doPrivileged( action );
+		}
+		else {
+			declaredMethods = action.run();
+		}
+
+		for ( Method method : declaredMethods ) {
 			// HV-172
 			if ( Modifier.isStatic( method.getModifiers() ) ) {
 				continue;
@@ -300,12 +330,12 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
 					break;
 				}
-				ReflectionHelper.setAccessibility( method );
+				setAccessibility( method );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( method, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
-				ReflectionHelper.setAccessibility( method );
+				setAccessibility( method );
 				cascadedMembers.add( method );
 				addPropertyDescriptorForMember( method );
 			}

@@ -1,6 +1,5 @@
-package org.hibernate.validation.util.priviledgedactions;
+package org.hibernate.validation.util;
 
-import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
 import org.hibernate.validation.util.ReflectionHelper;
@@ -22,6 +21,6 @@ public class ContainsMethod implements PrivilegedAction<Boolean> {
 	}
 
 	public Boolean run() {
-		return ReflectionHelper.containsMethod( clazz, property );
+		return ReflectionHelper.getMethod( clazz, property ) != null;
 	}
 }

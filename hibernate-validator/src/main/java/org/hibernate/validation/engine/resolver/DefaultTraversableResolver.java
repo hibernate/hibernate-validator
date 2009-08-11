@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.util.priviledgedactions.NewInstance;
+import org.hibernate.validation.util.NewInstance;
 
 /**
  * A JPA 2 aware <code>TraversableResolver</code>.

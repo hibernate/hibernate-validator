@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 
-import org.hibernate.validation.util.priviledgedactions.GetConstructor;
+import org.hibernate.validation.util.GetConstructor;
 
 
 /**
@@ -64,6 +64,6 @@ public class AnnotationFactory {
 		else {
 			constructor = action.run();
 		}
-		return constructor.newInstance( new Object[]{handler} );
+		return constructor.newInstance( handler );
 	}
 }

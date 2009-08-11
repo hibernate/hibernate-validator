@@ -52,7 +52,7 @@ public class ReflectionHelper {
 
 	//run client in priviledge block
 	@SuppressWarnings("unchecked")
-	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
+	static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
 		try {
 			Method m = annotation.getClass().getMethod( parameterName );
 			Object o = m.invoke( annotation );
@@ -190,7 +190,8 @@ public class ReflectionHelper {
 		return value;
 	}
 
-	public static void setAccessibility(Member member) {
+	//run client in priviledge block
+	static void setAccessibility(Member member) {
 		if ( !Modifier.isPublic( member.getModifiers() ) ) {
 			//Sun's ease of use, sigh...
 			( ( AccessibleObject ) member ).setAccessible( true );
@@ -356,57 +357,6 @@ public class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the specified class contains a field matching the specified name.
-	 *
-	 * @param clazz The class to check.
-	 * @param fieldName The field name.
-	 *
-	 * @return Returns <code>true</code> if the cass contains a field for the specified name, <code>
-	 *         false</code> otherwise.
-	 */
-	public static boolean containsField(Class<?> clazz, String fieldName) {
-		try {
-			clazz.getDeclaredField( fieldName );
-			return true;
-		}
-		catch ( NoSuchFieldException e ) {
-			return false;
-		}
-	}
-
-	/**
-	 * Returns the field with the specified name or <code>null</code> if it does not exist.
-	 *
-	 * @param clazz The class to check.
-	 * @param fieldName The field name.
-	 *
-	 * @return Returns the field with the specified name or <code>null</code> if it does not exist.
-	 */
-	public static Field getField(Class<?> clazz, String fieldName) {
-		try {
-			Field field = clazz.getDeclaredField( fieldName );
-			setAccessibility( field );
-			return field;
-		}
-		catch ( NoSuchFieldException e ) {
-			return null;
-		}
-	}
-
-	/**
-	 * Checks whether the specified class contains a method matching the specified name.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The method name.
-	 *
-	 * @return Returns <code>true</code> if the cass contains a property for the specified name, <code>
-	 *         false</code> otherwise.
-	 */
-	public static boolean containsMethod(Class<?> clazz, String methodName) {
-		return getMethod( clazz, methodName ) != null;
-	}
-
-	/**
 	 * Returns the method with the specified name or <code>null</code> if it does not exist.
 	 *
 	 * @param clazz The class to check.
@@ -414,7 +364,8 @@ public class ReflectionHelper {
 	 *
 	 * @return Returns the method with the specified name or <code>null</code> if it does not exist.
 	 */
-	public static Method getMethod(Class<?> clazz, String methodName) {
+	//run client in priviledge block
+	static Method getMethod(Class<?> clazz, String methodName) {
 		try {
 			char string[] = methodName.toCharArray();
 			string[0] = Character.toUpperCase( string[0] );

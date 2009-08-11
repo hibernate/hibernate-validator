@@ -1,6 +1,5 @@
-package org.hibernate.validation.util.priviledgedactions;
+package org.hibernate.validation.util;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 import java.security.PrivilegedAction;
 

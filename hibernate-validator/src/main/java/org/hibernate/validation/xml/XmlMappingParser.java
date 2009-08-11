@@ -54,9 +54,11 @@ import org.hibernate.validation.metadata.ConstraintHelper;
 import org.hibernate.validation.metadata.AnnotationIgnores;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.util.priviledgedactions.GetMethodFromPropertyName;
-import org.hibernate.validation.util.priviledgedactions.ContainsMethod;
-import org.hibernate.validation.util.priviledgedactions.GetMethod;
+import org.hibernate.validation.util.ContainsField;
+import org.hibernate.validation.util.GetMethodFromPropertyName;
+import org.hibernate.validation.util.ContainsMethod;
+import org.hibernate.validation.util.GetMethod;
+import org.hibernate.validation.util.GetDeclaredField;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validation.xml.AnnotationType;
@@ -242,10 +244,25 @@ public class XmlMappingParser {
 	private void parseFieldLevelOverrides(List<FieldType> fields, Class<?> beanClass, String defaultPackage) {
 		for ( FieldType fieldType : fields ) {
 			String fieldName = fieldType.getName();
-			if ( !ReflectionHelper.containsField( beanClass, fieldName ) ) {
+			final boolean containsField;
+			ContainsField containsAction = ContainsField.action( beanClass, fieldName );
+			if ( System.getSecurityManager() != null ) {
+				containsField = AccessController.doPrivileged( containsAction );
+			}
+			else {
+				containsField = containsAction.run();
+			}
+			if ( !containsField ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the fieldType  " + fieldName );
 			}
-			Field field = ReflectionHelper.getField( beanClass, fieldName );
+			GetDeclaredField action = GetDeclaredField.action( beanClass, fieldName );
+			final Field field;
+			if ( System.getSecurityManager() != null ) {
+				field = AccessController.doPrivileged( action );
+			}
+			else {
+				field = action.run();
+			}
 
 			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.isIgnoreAnnotations() == null ? false : fieldType.isIgnoreAnnotations();

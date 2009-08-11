@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintPayload;
@@ -43,10 +42,10 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
-import org.hibernate.validation.util.ReflectionHelper;
-import org.hibernate.validation.util.priviledgedactions.GetMethods;
-import org.hibernate.validation.util.priviledgedactions.GetMethod;
-import org.hibernate.validation.util.priviledgedactions.GetAnnotationParameter;
+import org.hibernate.validation.util.GetAnnotationParameter;
+import org.hibernate.validation.util.GetMethods;
+import org.hibernate.validation.util.GetMethod;
+import org.hibernate.validation.util.GetDeclaredMethods;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
@@ -248,7 +247,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
-		Method[] declaredMethods = annotation.annotationType().getDeclaredMethods();
+		GetDeclaredMethods action = GetDeclaredMethods.action( annotation.annotationType() );
+		final Method[] declaredMethods;
+		if ( System.getSecurityManager() != null ) {
+			declaredMethods = AccessController.doPrivileged( action );
+		}
+		else {
+			declaredMethods = action.run();
+		}
 		Map<String, Object> parameters = new HashMap<String, Object>( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
 			try {

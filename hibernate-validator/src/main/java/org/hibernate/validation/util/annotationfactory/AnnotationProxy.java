@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.security.AccessController;
+
+import org.hibernate.validation.util.GetDeclaredMethods;
 
 /**
  * A concrete implementation of <code>Annotation</code> that pretends it is a
@@ -66,7 +69,15 @@ public class AnnotationProxy implements Annotation, InvocationHandler {
 	private Map<Method, Object> getAnnotationValues(AnnotationDescriptor descriptor) {
 		Map<Method, Object> result = new HashMap<Method, Object>();
 		int processedValuesFromDescriptor = 0;
-		for ( Method m : annotationType.getDeclaredMethods() ) {
+		GetDeclaredMethods action = GetDeclaredMethods.action( annotationType );
+		final Method[] declaredMethods;
+		if ( System.getSecurityManager() != null ) {
+			declaredMethods = AccessController.doPrivileged( action );
+		}
+		else {
+			declaredMethods = action.run();
+		}
+		for ( Method m : declaredMethods ) {
 			if ( descriptor.containsElement( m.getName() ) ) {
 				result.put( m, descriptor.valueOf( m.getName() ) );
 				processedValuesFromDescriptor++;
