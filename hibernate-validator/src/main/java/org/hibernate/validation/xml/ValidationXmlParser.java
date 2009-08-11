@@ -19,6 +19,7 @@ package org.hibernate.validation.xml;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -37,6 +38,7 @@ import org.xml.sax.SAXException;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.util.priviledgedactions.NewInstance;
 import org.hibernate.validation.xml.PropertyType;
 import org.hibernate.validation.xml.ValidationConfigType;
 
@@ -80,20 +82,16 @@ public class ValidationXmlParser {
 				Class<ConstraintValidatorFactory> clazz = ( Class<ConstraintValidatorFactory> ) ReflectionHelper.classForName(
 						constraintFactoryClass, this.getClass()
 				);
-				xmlParameters.constraintValidatorFactory = clazz.newInstance();
+				NewInstance<ConstraintValidatorFactory> newInstance = NewInstance.action( clazz, "constraint factory class" );
+				if ( System.getSecurityManager() != null ) {
+					xmlParameters.constraintValidatorFactory = AccessController.doPrivileged( newInstance );
+				}
+				else {
+					xmlParameters.constraintValidatorFactory = newInstance.run();
+				}
 				log.info( "Using {} as constraint factory.", constraintFactoryClass );
 			}
 			catch ( ClassNotFoundException e ) {
-				throw new ValidationException(
-						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
-				);
-			}
-			catch ( InstantiationException e ) {
-				throw new ValidationException(
-						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
-				);
-			}
-			catch ( IllegalAccessException e ) {
 				throw new ValidationException(
 						"Unable to instantiate constraint factory class " + constraintFactoryClass + ".", e
 				);

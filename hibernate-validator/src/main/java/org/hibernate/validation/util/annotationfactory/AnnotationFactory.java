@@ -22,6 +22,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.security.AccessController;
+
+import org.hibernate.validation.util.priviledgedactions.GetConstructor;
 
 
 /**
@@ -53,7 +56,14 @@ public class AnnotationFactory {
 	private static <T extends Annotation> T getProxyInstance(Class<T> proxyClass, InvocationHandler handler) throws
 			SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
 			IllegalAccessException, InvocationTargetException {
-		Constructor<T> constructor = proxyClass.getConstructor( new Class[]{InvocationHandler.class} );
+		GetConstructor<T> action = GetConstructor.action( proxyClass, InvocationHandler.class );
+		final Constructor<T> constructor;
+		if ( System.getSecurityManager() != null ) {
+			constructor = AccessController.doPrivileged( action );
+		}
+		else {
+			constructor = action.run();
+		}
 		return constructor.newInstance( new Object[]{handler} );
 	}
 }

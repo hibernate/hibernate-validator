@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintPayload;
@@ -42,6 +44,9 @@ import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.util.priviledgedactions.GetMethods;
+import org.hibernate.validation.util.priviledgedactions.GetMethod;
+import org.hibernate.validation.util.priviledgedactions.GetAnnotationParameter;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 
@@ -121,12 +126,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Class<ConstraintPayload>[] payloadFromAnnotation;
 		try {
 			//TODO be extra safe and make sure this is an array of ConstraintPayload
-			@SuppressWarnings("unchecked")
-			Class<ConstraintPayload>[] unsafePayloadFromAnnotation = ( Class<ConstraintPayload>[] )
-					ReflectionHelper.getAnnotationParameter(
-							annotation, PAYLOAD, Class[].class
-					);
-			payloadFromAnnotation = unsafePayloadFromAnnotation;
+			GetAnnotationParameter<Class[]> action = GetAnnotationParameter.action( annotation, PAYLOAD, Class[].class );
+			if (System.getSecurityManager() != null) {
+				payloadFromAnnotation = AccessController.doPrivileged( action );
+			}
+			else {
+				payloadFromAnnotation = action.run();
+			}
 		}
 		catch ( ValidationException e ) {
 			//ignore people not defining payloads
@@ -140,9 +146,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = new HashSet<Class<?>>();
-		Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
-				annotation, GROUPS, Class[].class
-		);
+		final Class<?>[] groupsFromAnnotation;
+		GetAnnotationParameter<Class[]> action = GetAnnotationParameter.action( annotation, GROUPS, Class[].class );
+		if (System.getSecurityManager() != null) {
+			groupsFromAnnotation = AccessController.doPrivileged( action );
+		}
+		else {
+			groupsFromAnnotation = action.run();
+		}
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
 		}
@@ -270,7 +281,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
-		for ( Method m : annotation.annotationType().getMethods() ) {
+		final Method[] methods;
+		final GetMethods getMethods = GetMethods.action( annotation.annotationType() );
+		if ( System.getSecurityManager() != null ) {
+			methods = AccessController.doPrivileged( getMethods );
+		}
+		else {
+			methods = getMethods.run();
+		}
+
+		for ( Method m : methods ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
 				addOverrideAttributes(
 						overrideParameters, m, m.getAnnotation( OverridesAttribute.class )
@@ -306,20 +326,24 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
-		try {
-			Class<?> returnTypeOfOverridenConstraint = overridesAttribute.constraint()
-					.getMethod( overridesAttribute.name() )
-					.getReturnType();
-			if ( !returnTypeOfOverridenConstraint.equals( m.getReturnType() ) ) {
-				String message = "The overiding type of a composite constraint must be identical to the overwridden one. Expected " + returnTypeOfOverridenConstraint
-						.getName() + " found " + m.getReturnType();
-				throw new ConstraintDefinitionException( message );
-			}
+		final GetMethod getMethod = GetMethod.action( overridesAttribute.constraint(), overridesAttribute.name() );
+		final Method method;
+		if ( System.getSecurityManager() != null ) {
+			method = AccessController.doPrivileged( getMethod );
 		}
-		catch ( NoSuchMethodException nsme ) {
+		else {
+			method = getMethod.run();
+		}
+		if (method == null) {
 			throw new ConstraintDefinitionException(
 					"Overriden constraint does not define an attribute with name " + overridesAttribute.name()
 			);
+		}
+		Class<?> returnTypeOfOverridenConstraint = method.getReturnType();
+		if ( !returnTypeOfOverridenConstraint.equals( m.getReturnType() ) ) {
+			String message = "The overiding type of a composite constraint must be identical to the overwridden one. Expected " + returnTypeOfOverridenConstraint
+					.getName() + " found " + m.getReturnType();
+			throw new ConstraintDefinitionException( message );
 		}
 	}
 

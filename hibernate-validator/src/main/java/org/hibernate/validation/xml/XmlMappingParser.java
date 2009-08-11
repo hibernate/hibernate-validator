@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.security.AccessController;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
@@ -53,6 +54,9 @@ import org.hibernate.validation.metadata.ConstraintHelper;
 import org.hibernate.validation.metadata.AnnotationIgnores;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.util.priviledgedactions.GetMethodFromPropertyName;
+import org.hibernate.validation.util.priviledgedactions.ContainsMethod;
+import org.hibernate.validation.util.priviledgedactions.GetMethod;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validation.xml.AnnotationType;
@@ -267,10 +271,25 @@ public class XmlMappingParser {
 	private void parsePropertyLevelOverrides(List<GetterType> getters, Class<?> beanClass, String defaultPackage) {
 		for ( GetterType getterType : getters ) {
 			String getterName = getterType.getName();
-			if ( !ReflectionHelper.containsMethod( beanClass, getterName ) ) {
+			ContainsMethod cmAction =  ContainsMethod.action( beanClass, getterName );
+			boolean containsMethod;
+			if ( System.getSecurityManager() != null ) {
+				containsMethod = AccessController.doPrivileged( cmAction );
+			}
+			else {
+				containsMethod = cmAction.run();
+			}
+			if ( !containsMethod ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the property  " + getterName );
 			}
-			Method method = ReflectionHelper.getMethod( beanClass, getterName );
+			final Method method;
+			GetMethodFromPropertyName action = GetMethodFromPropertyName.action( beanClass, getterName );
+			if ( System.getSecurityManager() != null ) {
+				method = AccessController.doPrivileged( action );
+			}
+			else {
+				method = action.run();
+			}
 
 			// ignore annotations
 			boolean ignoreGetterAnnotation = getterType.isIgnoreAnnotations() == null ? false : getterType.isIgnoreAnnotations();
@@ -383,10 +402,15 @@ public class XmlMappingParser {
 
 	private <A extends Annotation> Class<?> getAnnotationParamterType(Class<A> annotationClass, String name) {
 		Method m;
-		try {
-			m = annotationClass.getMethod( name );
+		GetMethod action = GetMethod.action( annotationClass, name );
+		if ( System.getSecurityManager() != null ) {
+			m = AccessController.doPrivileged( action );
 		}
-		catch ( NoSuchMethodException e ) {
+		else {
+			m = action.run();
+		}
+
+		if ( m == null ) {
 			throw new ValidationException( "Annotation of type " + annotationClass.getName() + " does not contain a paramter " + name + "." );
 		}
 		return m.getReturnType();

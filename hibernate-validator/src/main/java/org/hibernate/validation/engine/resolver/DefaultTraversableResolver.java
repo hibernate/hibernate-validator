@@ -1,13 +1,16 @@
 package org.hibernate.validation.engine.resolver;
 
 import java.lang.annotation.ElementType;
+import java.security.AccessController;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
 
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.util.priviledgedactions.NewInstance;
 
 /**
  * A JPA 2 aware <code>TraversableResolver</code>.
@@ -56,10 +59,16 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		}
 
 		try {
-			Class jpaAwareResolverClass = ReflectionHelper.classForName(
-					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass()
-			);
-			jpaTraversableResolver = ( TraversableResolver ) jpaAwareResolverClass.newInstance();
+			@SuppressWarnings( "unchecked" )
+			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
+					ReflectionHelper.classForName(JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
+			NewInstance<? extends TraversableResolver> newInstance = NewInstance.action( jpaAwareResolverClass, "" );
+			if ( System.getSecurityManager() != null ) {
+				jpaTraversableResolver = AccessController.doPrivileged( newInstance );
+			}
+			else {
+				jpaTraversableResolver = newInstance.run();
+			}
 			log.info(
 					"Instantiated an instance of {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
@@ -70,13 +79,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
-		catch ( IllegalAccessException e ) {
-			log.info(
-					"Unable to instantiate JPA aware resolver {}. All properties will per default be traversable.",
-					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
-			);
-		}
-		catch ( InstantiationException e ) {
+		catch ( ValidationException e ) {
 			log.info(
 					"Unable to instantiate JPA aware resolver {}. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME

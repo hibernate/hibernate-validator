@@ -17,9 +17,12 @@
 */
 package org.hibernate.validation.engine;
 
+import java.security.AccessController;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ValidationException;
+
+import org.hibernate.validation.util.priviledgedactions.NewInstance;
 
 /**
  * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.
@@ -30,17 +33,12 @@ import javax.validation.ValidationException;
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 
 	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		try {
-			return key.newInstance();
+		NewInstance<T> newInstance = NewInstance.action( key, "" );
+		if ( System.getSecurityManager() != null ) {
+			return AccessController.doPrivileged( newInstance );
 		}
-		catch ( InstantiationException e ) {
-			throw new ValidationException( "Unable to instanciate " + key, e );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new ValidationException( "Unable to instanciate " + key, e );
-		}
-		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to instanciate " + key, e );
+		else {
+			return newInstance.run();
 		}
 	}
 }

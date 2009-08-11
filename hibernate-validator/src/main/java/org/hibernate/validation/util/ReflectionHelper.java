@@ -50,6 +50,7 @@ public class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
+	//run client in priviledge block
 	@SuppressWarnings("unchecked")
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
 		try {
@@ -352,19 +353,6 @@ public class ReflectionHelper {
 		Map<?, ?> map = ( Map<?, ?> ) value;
 		//noinspection SuspiciousMethodCalls
 		return map.get( key );
-	}
-
-	/**
-	 * Checks whether the specified class contains a field or property matching the given name.
-	 *
-	 * @param clazz The class to check.
-	 * @param property The property name.
-	 *
-	 * @return Returns <code>true</code> if the cass contains a field or member for the specified property, <code>
-	 *         false</code> otherwise.
-	 */
-	public static boolean containsMember(Class<?> clazz, String property) {
-		return containsField( clazz, property ) || containsMethod( clazz, property );
 	}
 
 	/**
