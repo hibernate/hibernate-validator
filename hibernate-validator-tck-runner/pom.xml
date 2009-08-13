@@ -1,10 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.0.0.Beta3-SNAPSHOT</version>
+        <version>4.0.0.Beta3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hibernate-validator-tck-runner</artifactId>
@@ -46,7 +44,7 @@
     <properties>
         <jboss.home>/opt/java/jboss-5</jboss.home>
         <validation.provider>org.hibernate.validation.HibernateValidationProvider</validation.provider>
-        <remote.debug/>
+        <remote.debug />
     </properties>
 
     <build>
@@ -260,22 +258,17 @@
                                 <phase>initialize</phase>
                                 <configuration>
                                     <tasks>
-                                        <property name="deploy.dir"
-                                                  value="${jboss.home}/server/default/deployers/tck-303.deployer"/>
-                                        <property name="remote.repo" value="http://repository.jboss.com/maven2"/>
-                                        <property name="artifact.version" value="5.2.0.Beta2"/>
-                                        <property name="artifact.name"
-                                                  value="webbeans-jboss-int-deployer-${artifact.version}"/>
-                                        <delete dir="${deploy.dir}" failonerror="false"/>
-                                        <mkdir dir="${basedir}/target/download"/>
-                                        <get src="${remote.repo}/org/jboss/webbeans/integration/webbeans-jboss-int-deployer/${artifact.version}/${artifact.name}.zip"
-                                             dest="${basedir}/target/download/${artifact.name}.zip"
-                                             verbose="true"
-                                             usetimestamp="true"/>
-                                        <unzip dest="target" src="${basedir}/target/download/${artifact.name}.zip"/>
+                                        <property name="deploy.dir" value="${jboss.home}/server/default/deployers/tck-303.deployer" />
+                                        <property name="remote.repo" value="http://repository.jboss.com/maven2" />
+                                        <property name="artifact.version" value="5.2.0.Beta2" />
+                                        <property name="artifact.name" value="webbeans-jboss-int-deployer-${artifact.version}" />
+                                        <delete dir="${deploy.dir}" failonerror="false" />
+                                        <mkdir dir="${basedir}/target/download" />
+                                        <get src="${remote.repo}/org/jboss/webbeans/integration/webbeans-jboss-int-deployer/${artifact.version}/${artifact.name}.zip" dest="${basedir}/target/download/${artifact.name}.zip" verbose="true" usetimestamp="true" />
+                                        <unzip dest="target" src="${basedir}/target/download/${artifact.name}.zip" />
                                         <copy todir="${deploy.dir}">
                                             <fileset dir="target/webbeans.deployer">
-                                                <include name="**/*"/>
+                                                <include name="**/*" />
                                             </fileset>
                                         </copy>
                                     </tasks>
