@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.hibernate.jsr303.tck</groupId>
             <artifactId>jsr303-tck</artifactId>
-            <version>1.0.0.Alpha5-SNAPSHOT</version>
+            <version>1.0.0.Alpha5</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.test-harness</groupId>
