@@ -17,7 +17,6 @@
 */
 package org.hibernate.validation.xml;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -26,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.security.AccessController;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
@@ -48,33 +47,20 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.hibernate.validation.metadata.ConstraintDescriptorImpl;
-import org.hibernate.validation.metadata.MetaConstraint;
-import org.hibernate.validation.metadata.ConstraintHelper;
 import org.hibernate.validation.metadata.AnnotationIgnores;
-import org.hibernate.validation.util.LoggerFactory;
-import org.hibernate.validation.util.ReflectionHelper;
+import org.hibernate.validation.metadata.ConstraintDescriptorImpl;
+import org.hibernate.validation.metadata.ConstraintHelper;
+import org.hibernate.validation.metadata.MetaConstraint;
 import org.hibernate.validation.util.ContainsField;
-import org.hibernate.validation.util.GetMethodFromPropertyName;
 import org.hibernate.validation.util.ContainsMethod;
-import org.hibernate.validation.util.GetMethod;
-import org.hibernate.validation.util.GetDeclaredField;
 import org.hibernate.validation.util.GetClassLoader;
+import org.hibernate.validation.util.GetDeclaredField;
+import org.hibernate.validation.util.GetMethod;
+import org.hibernate.validation.util.GetMethodFromPropertyName;
 import org.hibernate.validation.util.LoadClass;
+import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validation.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validation.xml.AnnotationType;
-import org.hibernate.validation.xml.BeanType;
-import org.hibernate.validation.xml.ClassType;
-import org.hibernate.validation.xml.ConstraintDefinitionType;
-import org.hibernate.validation.xml.ConstraintMappingsType;
-import org.hibernate.validation.xml.ConstraintType;
-import org.hibernate.validation.xml.ElementType;
-import org.hibernate.validation.xml.FieldType;
-import org.hibernate.validation.xml.GetterType;
-import org.hibernate.validation.xml.GroupSequenceType;
-import org.hibernate.validation.xml.GroupsType;
-import org.hibernate.validation.xml.ValidatedByType;
 
 /**
  * @author Hardy Ferentschik
@@ -104,27 +90,17 @@ public class XmlMappingParser {
 
 	public void parse(Set<InputStream> mappingStreams) {
 		for ( InputStream in : mappingStreams ) {
-			try {
-				ConstraintMappingsType mapping = getValidationConfig( in );
-				parseConstraintDefinitions( mapping.getConstraintDefinition() );
-				String defaultPackage = mapping.getDefaultPackage();
-				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
-					checkClassHasNotBeenProcessed( processedClasses, beanClass );
-					annotationIgnores.setDefaultIgnoreAnnotation( beanClass, bean.isIgnoreAnnotations() );
-					parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
-					parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
-					parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
-					processedClasses.add( beanClass );
-				}
-			}
-			finally {
-				try {
-					in.close();
-				}
-				catch ( IOException e ) {
-					log.warn( "Error closing input stream: {}", e.getMessage() );
-				}
+			ConstraintMappingsType mapping = getValidationConfig( in );
+			parseConstraintDefinitions( mapping.getConstraintDefinition() );
+			String defaultPackage = mapping.getDefaultPackage();
+			for ( BeanType bean : mapping.getBean() ) {
+				Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
+				checkClassHasNotBeenProcessed( processedClasses, beanClass );
+				annotationIgnores.setDefaultIgnoreAnnotation( beanClass, bean.isIgnoreAnnotations() );
+				parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
+				parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
+				parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
+				processedClasses.add( beanClass );
 			}
 		}
 	}
@@ -141,8 +117,8 @@ public class XmlMappingParser {
 		List<MetaConstraint<T, ? extends Annotation>> list = new ArrayList<MetaConstraint<T, ? extends Annotation>>();
 		if ( constraintMap.containsKey( beanClass ) ) {
 			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
-				@SuppressWarnings( "unchecked") // safe cast since the list of meta constraints is always specific to the bean type
-				MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
+				@SuppressWarnings("unchecked") // safe cast since the list of meta constraints is always specific to the bean type
+						MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
 				list.add( boundMetaConstraint );
 			}
 			return list;
@@ -210,7 +186,7 @@ public class XmlMappingParser {
 
 	private Class<?> loadClass(String className, Class<?> caller) {
 		LoadClass action = LoadClass.action( className, caller );
-		if (System.getSecurityManager() != null) {
+		if ( System.getSecurityManager() != null ) {
 			return AccessController.doPrivileged( action );
 		}
 		else {
@@ -245,8 +221,15 @@ public class XmlMappingParser {
 	}
 
 	private void parseFieldLevelOverrides(List<FieldType> fields, Class<?> beanClass, String defaultPackage) {
+		List<String> fieldNames = new ArrayList<String>();
 		for ( FieldType fieldType : fields ) {
 			String fieldName = fieldType.getName();
+			if ( fieldNames.contains( fieldName ) ) {
+				throw new ValidationException( fieldName + "is defined twice in mapping xml." );
+			}
+			else {
+				fieldNames.add( fieldName );
+			}
 			final boolean containsField;
 			ContainsField containsAction = ContainsField.action( beanClass, fieldName );
 			if ( System.getSecurityManager() != null ) {
@@ -289,9 +272,16 @@ public class XmlMappingParser {
 	}
 
 	private void parsePropertyLevelOverrides(List<GetterType> getters, Class<?> beanClass, String defaultPackage) {
+		List<String> getterNames = new ArrayList<String>();
 		for ( GetterType getterType : getters ) {
 			String getterName = getterType.getName();
-			ContainsMethod cmAction =  ContainsMethod.action( beanClass, getterName );
+			if ( getterNames.contains( getterName ) ) {
+				throw new ValidationException( getterName + "is defined twice in mapping xml." );
+			}
+			else {
+				getterNames.add( getterName );
+			}
+			ContainsMethod cmAction = ContainsMethod.action( beanClass, getterName );
 			boolean containsMethod;
 			if ( System.getSecurityManager() != null ) {
 				containsMethod = AccessController.doPrivileged( cmAction );
@@ -400,7 +390,7 @@ public class XmlMappingParser {
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
 			checkNameIsValid( name );
-			Class<?> returnType = getAnnotationParamterType( annotationClass, name );
+			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
 			Object elementValue = getElementValue( elementType, returnType );
 			annotationDescriptor.setValue( name, elementValue );
 		}
@@ -420,7 +410,7 @@ public class XmlMappingParser {
 		return metaConstraint;
 	}
 
-	private <A extends Annotation> Class<?> getAnnotationParamterType(Class<A> annotationClass, String name) {
+	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
 		Method m;
 		GetMethod action = GetMethod.action( annotationClass, name );
 		if ( System.getSecurityManager() != null ) {
@@ -431,7 +421,7 @@ public class XmlMappingParser {
 		}
 
 		if ( m == null ) {
-			throw new ValidationException( "Annotation of type " + annotationClass.getName() + " does not contain a paramter " + name + "." );
+			throw new ValidationException( "Annotation of type " + annotationClass.getName() + " does not contain a parameter " + name + "." );
 		}
 		return m.getReturnType();
 	}
@@ -488,11 +478,11 @@ public class XmlMappingParser {
 				returnValue = createAnnotation( annotationType, annotationClass );
 			}
 			catch ( ClassCastException e ) {
-				throw new ValidationException( "Unexpected paramter value" );
+				throw new ValidationException( "Unexpected parameter value" );
 			}
 		}
 		else {
-			throw new ValidationException( "Unexpected paramter value" );
+			throw new ValidationException( "Unexpected parameter value" );
 		}
 		return returnValue;
 
@@ -502,7 +492,7 @@ public class XmlMappingParser {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
-			Class<?> paramterType = getAnnotationParamterType( returnType, name );
+			Class<?> paramterType = getAnnotationParameterType( returnType, name );
 			Object elementValue = getElementValue( elementType, paramterType );
 			annotationDescriptor.setValue( name, elementValue );
 		}
