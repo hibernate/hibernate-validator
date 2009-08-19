@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validation.engine.ConstraintTree;
@@ -89,6 +90,11 @@ public class MetaConstraint<T, A extends Annotation> {
 		}
 		this.member = member;
 		this.propertyName = ReflectionHelper.getPropertyName( member );
+		if ( member instanceof Method && propertyName == null ) { // can happen if member is a Method which does not follow the bean convention
+			throw new ValidationException(
+					"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
+			);
+		}
 		this.beanClass = beanClass;
 		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 	}
@@ -108,6 +114,10 @@ public class MetaConstraint<T, A extends Annotation> {
 
 	public Class<T> getBeanClass() {
 		return beanClass;
+	}
+
+	public Member getMember() {
+		return member;
 	}
 
 	/**

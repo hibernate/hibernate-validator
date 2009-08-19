@@ -18,11 +18,13 @@
 package org.hibernate.validation.metadata;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,21 +33,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.security.AccessController;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.util.LoggerFactory;
-import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.GetDeclaredFields;
 import org.hibernate.validation.util.GetDeclaredMethods;
+import org.hibernate.validation.util.LoggerFactory;
+import org.hibernate.validation.util.ReflectionHelper;
 import org.hibernate.validation.util.SetAccessibility;
 
 
@@ -98,7 +98,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	//updated on the fly, needs to be thread safe
 	//property name
-	private final Set<String> propertyNames = new HashSet<String>(30);
+	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
 		this(
@@ -139,6 +139,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public void addMetaConstraint(Class<?> clazz, MetaConstraint<T, ? extends Annotation> metaConstraint) {
+		// first we add the meta constraint to our meta constraint map
 		List<MetaConstraint<T, ? extends Annotation>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
 			constraintList = new ArrayList<MetaConstraint<T, ? extends Annotation>>();
@@ -148,6 +149,20 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			constraintList = metaConstraints.get( clazz );
 		}
 		constraintList.add( metaConstraint );
+
+		// but we also have to update the descriptors exposing the BV metadata API
+		if ( metaConstraint.getElementType() == ElementType.TYPE ) {
+			beanDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
+		}
+		else {
+			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
+					metaConstraint.getPropertyName()
+			);
+			if ( propertyDescriptor == null ) {
+				propertyDescriptor = addPropertyDescriptorForMember( metaConstraint.getMember() );
+			}
+			propertyDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
+		}
 	}
 
 	public void addCascadedMember(Member member) {
@@ -275,7 +290,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				continue;
 			}
 			String name = ReflectionHelper.getPropertyName( field );
-			if (name != null) {
+			if ( name != null ) {
 				propertyNames.add( name );
 			}
 			List<ConstraintDescriptorImpl<?>> fieldMetadata = findConstraints( field );
@@ -297,7 +312,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void setAccessibility(Member member) {
 		SetAccessibility action = SetAccessibility.action( member );
-		if (System.getSecurityManager() != null) {
+		if ( System.getSecurityManager() != null ) {
 			AccessController.doPrivileged( action );
 		}
 		else {
@@ -321,7 +336,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				continue;
 			}
 			String name = ReflectionHelper.getPropertyName( method );
-			if (name != null) {
+			if ( name != null ) {
 				propertyNames.add( name );
 			}
 
@@ -430,9 +445,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( Annotation annotation : beanClass.getAnnotations() ) {
 			metadata.addAll( findConstraintAnnotations( beanClass, annotation ) );
 		}
-		for ( ConstraintDescriptorImpl constraintDescriptor : metadata ) {
-			beanDescriptor.addConstraintDescriptor( constraintDescriptor );
-		}
 		return metadata;
 	}
 
@@ -453,19 +465,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			metadata.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation ) );
 		}
 
-		String name = ReflectionHelper.getPropertyName( member );
-		for ( ConstraintDescriptorImpl constraintDescriptor : metadata ) {
-			if ( member instanceof Method && name == null ) { // can happen if member is a Method which does not follow the bean convention
-				throw new ValidationException(
-						"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
-				);
-			}
-			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get( name );
-			if ( propertyDescriptor == null ) {
-				propertyDescriptor = addPropertyDescriptorForMember( member );
-			}
-			propertyDescriptor.addConstraintDescriptor( constraintDescriptor );
-		}
 		return metadata;
 	}
 

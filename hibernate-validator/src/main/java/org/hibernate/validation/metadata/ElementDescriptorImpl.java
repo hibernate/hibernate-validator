@@ -43,7 +43,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		this.type = type;
 	}
 
-	public void addConstraintDescriptor(ConstraintDescriptorImpl constraintDescriptor) {
+	public void addConstraintDescriptor(ConstraintDescriptor constraintDescriptor) {
 		constraintDescriptors.add( constraintDescriptor );
 	}
 
