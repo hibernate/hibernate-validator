@@ -225,7 +225,7 @@ public class XmlMappingParser {
 		for ( FieldType fieldType : fields ) {
 			String fieldName = fieldType.getName();
 			if ( fieldNames.contains( fieldName ) ) {
-				throw new ValidationException( fieldName + "is defined twice in mapping xml." );
+				throw new ValidationException( fieldName + " is defined twice in mapping xml for bean " + beanClass.getName() );
 			}
 			else {
 				fieldNames.add( fieldName );
@@ -276,7 +276,7 @@ public class XmlMappingParser {
 		for ( GetterType getterType : getters ) {
 			String getterName = getterType.getName();
 			if ( getterNames.contains( getterName ) ) {
-				throw new ValidationException( getterName + "is defined twice in mapping xml." );
+				throw new ValidationException( getterName + " is defined twice in mapping xml for bean " + beanClass.getName() );
 			}
 			else {
 				getterNames.add( getterName );

@@ -34,10 +34,10 @@ import javax.validation.spi.ValidationProvider;
 import org.slf4j.Logger;
 
 import org.hibernate.validation.engine.resolver.DefaultTraversableResolver;
-import org.hibernate.validation.xml.ValidationBootstrapParameters;
-import org.hibernate.validation.xml.ValidationXmlParser;
 import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.Version;
+import org.hibernate.validation.xml.ValidationBootstrapParameters;
+import org.hibernate.validation.xml.ValidationXmlParser;
 
 /**
  * Hibernate specific <code>Configuration</code> implementation.
@@ -181,11 +181,21 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private void parseValidationXml() {
 		if ( ignoreXmlConfiguration ) {
 			log.info( "Ignoring XML configuration." );
-			return;
+			// make sure we use the defaults in case they haven't been provided yet
+			if ( validationBootstrapParameters.messageInterpolator == null ) {
+				validationBootstrapParameters.messageInterpolator = defaultMessageInterpolator;
+			}
+			if ( validationBootstrapParameters.traversableResolver == null ) {
+				validationBootstrapParameters.traversableResolver = defaultTraversableResolver;
+			}
+			if ( validationBootstrapParameters.constraintValidatorFactory == null ) {
+				validationBootstrapParameters.constraintValidatorFactory = defaultValidatorFactory;
+			}
 		}
-
-		ValidationBootstrapParameters xmlParameters = new ValidationXmlParser().parseValidationXml();
-		applyXmlSettings( xmlParameters );
+		else {
+			ValidationBootstrapParameters xmlParameters = new ValidationXmlParser().parseValidationXml();
+			applyXmlSettings( xmlParameters );
+		}
 	}
 
 	private void applyXmlSettings(ValidationBootstrapParameters xmlParameters) {
