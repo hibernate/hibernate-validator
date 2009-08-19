@@ -91,8 +91,10 @@ public class XmlMappingParser {
 	public void parse(Set<InputStream> mappingStreams) {
 		for ( InputStream in : mappingStreams ) {
 			ConstraintMappingsType mapping = getValidationConfig( in );
-			parseConstraintDefinitions( mapping.getConstraintDefinition() );
 			String defaultPackage = mapping.getDefaultPackage();
+
+			parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
+
 			for ( BeanType bean : mapping.getBean() ) {
 				Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
 				checkClassHasNotBeenProcessed( processedClasses, beanClass );
@@ -147,17 +149,15 @@ public class XmlMappingParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList) {
+	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList, String defaultPackage) {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
-			Class<? extends Annotation> annotationClass;
-			annotationClass = ( Class<? extends Annotation> ) loadClass(
-					annotationClassName, this.getClass()
-			);
 
-			if ( !annotationClass.isAnnotation() ) {
+			Class<?> clazz = getClass( annotationClassName, defaultPackage );
+			if ( !clazz.isAnnotation() ) {
 				throw new ValidationException( annotationClassName + " is not an annotation" );
 			}
+			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
 			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
 			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
