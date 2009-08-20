@@ -40,7 +40,7 @@ public class AnnotationIgnores {
 
 	/**
 	 * Keeps track whether the 'ignore-annotations' flag is set on bean level in the xml configuration. If 'ignore-annotations'
-	 * is not specified <code>false</code> is the default.
+	 * is not specified <code>true</code> is the default.
 	 */
 	private final Map<Class<?>, Boolean> ignoreAnnotationDefaults = new HashMap<Class<?>, Boolean>();
 
@@ -55,7 +55,7 @@ public class AnnotationIgnores {
 
 	public void setDefaultIgnoreAnnotation(Class<?> clazz, Boolean b) {
 		if ( b == null ) {
-			ignoreAnnotationDefaults.put( clazz, Boolean.FALSE );
+			ignoreAnnotationDefaults.put( clazz, Boolean.TRUE );
 		}
 		else {
 			ignoreAnnotationDefaults.put( clazz, b );

@@ -71,7 +71,7 @@ public class XmlMappingParser {
 	private static final String VALIDATION_MAPPING_XSD = "META-INF/validation-mapping-1.0.xsd";
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
-	private static final String PACKAGE_SEPERATOR = ".";
+	private static final String PACKAGE_SEPARATOR = ".";
 
 	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
 	private final ConstraintHelper constraintHelper;
@@ -195,9 +195,9 @@ public class XmlMappingParser {
 	}
 
 	private List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> findConstraintValidatorClasses(Class<? extends Annotation> annotationType) {
-		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorDefinitonClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
+		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorDefinitionClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
 		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
-			constraintValidatorDefinitonClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
+			constraintValidatorDefinitionClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
 		}
 		else {
 			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
@@ -208,10 +208,10 @@ public class XmlMappingParser {
 				//FIXME if yes wrap into VE, if no we need to test the type here
 				//Once resolved,we can @SuppressWarning("unchecked") on the cast
 				Class<? extends ConstraintValidator<? extends Annotation, ?>> safeValidator = validator;
-				constraintValidatorDefinitonClasses.add( safeValidator );
+				constraintValidatorDefinitionClasses.add( safeValidator );
 			}
 		}
-		return constraintValidatorDefinitonClasses;
+		return constraintValidatorDefinitionClasses;
 	}
 
 	private void checkClassHasNotBeenProcessed(Set<Class<?>> processedClasses, Class<?> beanClass) {
@@ -492,8 +492,8 @@ public class XmlMappingParser {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
-			Class<?> paramterType = getAnnotationParameterType( returnType, name );
-			Object elementValue = getElementValue( elementType, paramterType );
+			Class<?> parameterType = getAnnotationParameterType( returnType, name );
+			Object elementValue = getElementValue( elementType, parameterType );
 			annotationDescriptor.setValue( name, elementValue );
 		}
 		return AnnotationFactory.create( annotationDescriptor );
@@ -579,7 +579,7 @@ public class XmlMappingParser {
 
 	private void checkNameIsValid(String name) {
 		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw new ValidationException( MESSAGE_PARAM + " and " + GROUPS_PARAM + " are reserved paramter names." );
+			throw new ValidationException( MESSAGE_PARAM + " and " + GROUPS_PARAM + " are reserved parameter names." );
 		}
 	}
 
@@ -601,13 +601,13 @@ public class XmlMappingParser {
 			fullyQualifiedClass = clazz;
 		}
 		else {
-			fullyQualifiedClass = defaultPackage + PACKAGE_SEPERATOR + clazz;
+			fullyQualifiedClass = defaultPackage + PACKAGE_SEPARATOR + clazz;
 		}
 		return loadClass( fullyQualifiedClass, this.getClass() );
 	}
 
 	private boolean isQualifiedClass(String clazz) {
-		return clazz.contains( PACKAGE_SEPERATOR );
+		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
 	private ConstraintMappingsType getValidationConfig(InputStream in) {
