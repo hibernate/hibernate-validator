@@ -157,7 +157,7 @@ public class XmlMappingParser {
 			if ( !clazz.isAnnotation() ) {
 				throw new ValidationException( annotationClassName + " is not an annotation" );
 			}
-			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
+			Class<? extends Annotation> annotationClass = ( Class<? extends Annotation> ) clazz;
 
 			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
 			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
@@ -328,9 +328,8 @@ public class XmlMappingParser {
 		}
 
 		// ignore annotation
-		boolean ignoreClassAnnotation = classType.isIgnoreAnnotations() == null ? false : classType.isIgnoreAnnotations();
-		if ( ignoreClassAnnotation ) {
-			annotationIgnores.setIgnoreAnnotationsOnClass( beanClass );
+		if ( classType.isIgnoreAnnotations() != null ) {
+			annotationIgnores.setIgnoreAnnotationsOnClass( beanClass, classType.isIgnoreAnnotations() );
 		}
 
 		// group sequence
@@ -370,9 +369,11 @@ public class XmlMappingParser {
 
 	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
 		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
-		for ( JAXBElement<String> groupName : groupSequenceType.getValue() ) {
-			Class<?> group = getClass( groupName.getValue(), defaultPackage );
-			groupSequence.add( group );
+		if ( groupSequenceType != null ) {
+			for ( JAXBElement<String> groupName : groupSequenceType.getValue() ) {
+				Class<?> group = getClass( groupName.getValue(), defaultPackage );
+				groupSequence.add( group );
+			}
 		}
 		return groupSequence;
 	}

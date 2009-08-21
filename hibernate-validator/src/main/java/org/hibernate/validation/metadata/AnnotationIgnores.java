@@ -51,7 +51,7 @@ public class AnnotationIgnores {
 	 */
 	private final Map<Class<?>, List<Member>> ignoreAnnotationOnMember = new HashMap<Class<?>, List<Member>>();
 
-	private final List<Class<?>> ignoreAnnotationOnClass = new ArrayList<Class<?>>();
+	private final Map<Class<?>, Boolean> ignoreAnnotationOnClass = new HashMap<Class<?>, Boolean>();
 
 	public void setDefaultIgnoreAnnotation(Class<?> clazz, Boolean b) {
 		if ( b == null ) {
@@ -105,12 +105,18 @@ public class AnnotationIgnores {
 		log.debug( type + " level annotations are getting ignored for " + clazz.getName() + "." + member.getName() );
 	}
 
-	public void setIgnoreAnnotationsOnClass(Class<?> clazz) {
-		ignoreAnnotationOnClass.add( clazz );
+	public void setIgnoreAnnotationsOnClass(Class<?> clazz, boolean b) {
+		ignoreAnnotationOnClass.put( clazz, b );
 	}
 
 	public boolean isIgnoreAnnotations(Class<?> clazz) {
-		boolean ignoreAnnotation = ignoreAnnotationOnClass.contains( clazz ) || getDefaultIgnoreAnnotation( clazz );
+		boolean ignoreAnnotation;
+		if ( ignoreAnnotationOnClass.containsKey( clazz ) ) {
+			ignoreAnnotation = ignoreAnnotationOnClass.get( clazz );
+		}
+		else {
+			ignoreAnnotation = getDefaultIgnoreAnnotation( clazz );
+		}
 		if ( log.isDebugEnabled() && ignoreAnnotation ) {
 			log.debug( "Class level annotation are getting ignored for " + clazz.getName() );
 		}
