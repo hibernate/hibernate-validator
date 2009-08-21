@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.ConstraintPayload;
 
 import org.hibernate.validation.constraints.impl.LengthValidator;
 
@@ -32,6 +33,7 @@ import org.hibernate.validation.constraints.impl.LengthValidator;
  * Validate that the string is between min and max included
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 @Documented
 @Constraint(validatedBy = LengthValidator.class)
@@ -45,4 +47,6 @@ public @interface Length {
 	String message() default "{org.hibernate.validation.constraints.Length.message}";
 
 	Class<?>[] groups() default { };
+
+	Class<? extends ConstraintPayload>[] payload() default { };
 }
