@@ -29,12 +29,12 @@ import javax.validation.metadata.ConstraintDescriptor;
 public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
 
 	private final List<ErrorMessage> errorMessages = new ArrayList<ErrorMessage>( 3 );
-	private final Path propertyPath;
+	private final PathImpl propertyPath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
 
-	public ConstraintValidatorContextImpl(Path propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
+	public ConstraintValidatorContextImpl(PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
 		this.propertyPath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -53,10 +53,6 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	public ConstraintDescriptor<?> getConstraintDescriptor() {
 		return constraintDescriptor;
-	}
-
-	public boolean isDefaultErrorDisabled() {
-		return defaultDisabled;
 	}
 
 	public List<ErrorMessage> getErrorMessages() {
@@ -89,16 +85,22 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	class ErrorBuilderImpl implements ErrorBuilder {
 		String messageTemplate;
-		Path propertyPath;
+		PathImpl propertyPath;
 
-		ErrorBuilderImpl(String template, Path path) {
+		ErrorBuilderImpl(String template, PathImpl path) {
 			messageTemplate = template;
 			propertyPath = path;
 		}
 
 		public NodeBuilderDefinedContext addSubNode(String name) {
-			PathImpl path = PathImpl.createShallowCopy( propertyPath );
-			path.addNode( new NodeImpl( name ) );
+			PathImpl path;
+			if ( propertyPath.isRootPath() ) {
+				path = PathImpl.createNewPath( name );
+			}
+			else {
+				path = PathImpl.createShallowCopy( propertyPath );
+				path.addNode( new NodeImpl( name ) );
+			}
 			return new NodeBuilderImpl( messageTemplate, path );
 		}
 

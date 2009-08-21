@@ -36,7 +36,7 @@ public class ConstraintValidatorContextTest {
 	 * HV-198
 	 */
 	@Test
-	public void testCorrectAnnotationTypeForWithReportAsSingleViolation() {
+	public void testCorrectSubNodePath() {
 		Validator validator = TestUtil.getValidator();
 
 		Item item = new Item();
@@ -47,5 +47,23 @@ public class ConstraintValidatorContextTest {
 		Set<ConstraintViolation<Item>> constraintViolations = validator.validate( item );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "interval.start" );
+	}
+
+	/**
+	 * HV-208
+	 */
+	@Test
+	public void testCorrectPath() {
+		Validator validator = TestUtil.getValidator();
+
+		Item item = new Item();
+		Interval interval = new Interval();
+		item.interval = interval;
+		item.interval.start = 10;
+		item.interval.end = 5;
+
+		Set<ConstraintViolation<Interval>> constraintViolations = validator.validate( interval );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "start" );
 	}
 }
