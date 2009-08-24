@@ -396,7 +396,16 @@ public class XmlMappingParser {
 			annotationDescriptor.setValue( name, elementValue );
 		}
 
-		A annotation = AnnotationFactory.create( annotationDescriptor );
+		A annotation;
+		try {
+			annotation = AnnotationFactory.create( annotationDescriptor );
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException(
+					"Unable to create annotation for configured constraint: " + e.getMessage(), e
+			);
+		}
+
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				annotation, constraintHelper
 		);
