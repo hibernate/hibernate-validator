@@ -159,7 +159,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					metaConstraint.getPropertyName()
 			);
 			if ( propertyDescriptor == null ) {
-				propertyDescriptor = addPropertyDescriptorForMember( metaConstraint.getMember() );
+				Member member = metaConstraint.getMember();
+				propertyDescriptor = addPropertyDescriptorForMember( member, isValidAnnotationPresent( member ) );
 			}
 			propertyDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
 		}
@@ -167,6 +168,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public void addCascadedMember(Member member) {
 		cascadedMembers.add( member );
+		addPropertyDescriptorForMember( member, true );
 	}
 
 	public PropertyDescriptor getPropertyDescriptor(String property) {
@@ -289,23 +291,26 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( Modifier.isStatic( field.getModifiers() ) ) {
 				continue;
 			}
+
+			if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
+				continue;
+			}
+
 			String name = ReflectionHelper.getPropertyName( field );
 			if ( name != null ) {
 				propertyNames.add( name );
 			}
+
 			List<ConstraintDescriptorImpl<?>> fieldMetadata = findConstraints( field );
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetadata ) {
-				if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
-					break;
-				}
 				setAccessibility( field );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
+
 			if ( field.isAnnotationPresent( Valid.class ) ) {
 				setAccessibility( field );
-				cascadedMembers.add( field );
-				addPropertyDescriptorForMember( field );
+				addCascadedMember( field );
 			}
 		}
 	}
@@ -335,6 +340,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( Modifier.isStatic( method.getModifiers() ) ) {
 				continue;
 			}
+
+			if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
+				continue;
+			}
+
 			String name = ReflectionHelper.getPropertyName( method );
 			if ( name != null ) {
 				propertyNames.add( name );
@@ -342,22 +352,18 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			List<ConstraintDescriptorImpl<?>> methodMetadata = findConstraints( method );
 			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetadata ) {
-				if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
-					break;
-				}
 				setAccessibility( method );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( method, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
 				setAccessibility( method );
-				cascadedMembers.add( method );
-				addPropertyDescriptorForMember( method );
+				addCascadedMember( method );
 			}
 		}
 	}
 
-	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member) {
+	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member, boolean isCascaded) {
 		String name = ReflectionHelper.getPropertyName( member );
 		PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
 				name
@@ -365,12 +371,16 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( propertyDescriptor == null ) {
 			propertyDescriptor = new PropertyDescriptorImpl(
 					ReflectionHelper.getType( member ),
-					( ( AnnotatedElement ) member ).isAnnotationPresent( Valid.class ),
+					isCascaded,
 					name
 			);
 			propertyDescriptors.put( name, propertyDescriptor );
 		}
 		return propertyDescriptor;
+	}
+
+	private boolean isValidAnnotationPresent(Member member) {
+		return ( ( AnnotatedElement ) member ).isAnnotationPresent( Valid.class );
 	}
 
 	private void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
