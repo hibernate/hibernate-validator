@@ -17,20 +17,21 @@
 */
 package org.hibernate.validation.engine;
 
+import java.security.AccessController;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.security.AccessController;
 import javax.validation.MessageInterpolator;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.GetClassLoader;
+import org.hibernate.validation.util.LoggerFactory;
 
 /**
  * Resource bundle backed message interpolator.
@@ -59,9 +60,14 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final Map<Locale, ResourceBundle> userBundlesMap = new ConcurrentHashMap<Locale, ResourceBundle>();
 
 	/**
-	 * Builtin resource bundles hashed against there locale.
+	 * Built-in resource bundles hashed against there locale.
 	 */
 	private final Map<Locale, ResourceBundle> defaultBundlesMap = new ConcurrentHashMap<Locale, ResourceBundle>();
+
+	/**
+	 * Step 1-3 of message interpolation can be cached. We do this in this map.
+	 */
+	private final Map<LocalisedMessage, String> resolvedMessages = new WeakHashMap<LocalisedMessage, String>();
 
 	public ResourceBundleMessageInterpolator() {
 		this( null );
@@ -87,7 +93,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 	public String interpolate(String message, Context context) {
 		// probably no need for caching, but it could be done by parameters since the map
-		// is immutable and uniquely built per Validation definition, the comparaison has to be based on == and not equals though
+		// is immutable and uniquely built per Validation definition, the comparison has to be based on == and not equals though
 		return interpolateMessage( message, context.getConstraintDescriptor().getAttributes(), defaultLocale );
 	}
 
@@ -96,11 +102,11 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	}
 
 	/**
-	 * Runs the message interpolation according to alogrithm specified in JSR 303.
+	 * Runs the message interpolation according to algorithm specified in JSR 303.
 	 * <br/>
 	 * Note:
 	 * <br/>
-	 * Lookups in user bundles is recursive whereas lookups in default bundle are not!
+	 * Look-ups in user bundles is recursive whereas look-ups in default bundle are not!
 	 *
 	 * @param message the message to interpolate
 	 * @param annotationParameters the parameters of the annotation for which to interpolate this message
@@ -109,30 +115,36 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 * @return the interpolated message.
 	 */
 	private String interpolateMessage(String message, Map<String, Object> annotationParameters, Locale locale) {
-		ResourceBundle userResourceBundle = findUserResourceBundle( locale );
-		ResourceBundle defaultResourceBundle = findDefaultResourceBundle( locale );
+		LocalisedMessage localisedMessage = new LocalisedMessage( message, locale );
+		String resolvedMessage = resolvedMessages.get( localisedMessage );
 
-		String userBundleResolvedMessage;
-		String resolvedMessage = message;
-		boolean evaluatedDefaultBundleOnce = false;
-		do {
-			// search the user bundle recursive (step1)
-			userBundleResolvedMessage = replaceVariables(
-					resolvedMessage, userResourceBundle, locale, true
-			);
+		// if the message is not already in the cache we have to run step 1-3 of the message resolution 
+		if ( resolvedMessage == null ) {
+			ResourceBundle userResourceBundle = findUserResourceBundle( locale );
+			ResourceBundle defaultResourceBundle = findDefaultResourceBundle( locale );
 
-			// exit condition - we have at least tried to vaidate against the default bundle and there was no
-			// further replacements
-			if ( evaluatedDefaultBundleOnce
-					&& !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
-				break;
-			}
+			String userBundleResolvedMessage;
+			resolvedMessage = message;
+			boolean evaluatedDefaultBundleOnce = false;
+			do {
+				// search the user bundle recursive (step1)
+				userBundleResolvedMessage = replaceVariables(
+						resolvedMessage, userResourceBundle, locale, true
+				);
 
-			// search the default bundle non recursive (step2)
-			resolvedMessage = replaceVariables( userBundleResolvedMessage, defaultResourceBundle, locale, false );
+				// exit condition - we have at least tried to validate against the default bundle and there was no
+				// further replacements
+				if ( evaluatedDefaultBundleOnce
+						&& !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
+					break;
+				}
 
-			evaluatedDefaultBundleOnce = true;
-		} while ( true );
+				// search the default bundle non recursive (step2)
+				resolvedMessage = replaceVariables( userBundleResolvedMessage, defaultResourceBundle, locale, false );
+				evaluatedDefaultBundleOnce = true;
+				resolvedMessages.put( localisedMessage, resolvedMessage );
+			} while ( true );
+		}
 
 		// resolve annotation attributes (step 4)
 		resolvedMessage = replaceAnnotationAttributes( resolvedMessage, annotationParameters );
@@ -165,7 +177,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			rb = loadBundle( classLoader, locale, USER_VALIDATION_MESSAGES + " not found by thread local classloader" );
 		}
 		if ( rb == null ) {
-			action = GetClassLoader.fromClass(ResourceBundleMessageInterpolator.class);
+			action = GetClassLoader.fromClass( ResourceBundleMessageInterpolator.class );
 			classLoader = isSecured ? AccessController.doPrivileged( action ) : action.run();
 			rb = loadBundle(
 					classLoader,
@@ -285,5 +297,51 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		String escapedString = s.replace( "\\", "\\\\" );
 		escapedString = escapedString.replace( "$", "\\$" );
 		return escapedString;
+	}
+
+	class LocalisedMessage {
+		private final String message;
+		private final Locale locale;
+
+		LocalisedMessage(String message, Locale locale) {
+			this.message = message;
+			this.locale = locale;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public Locale getLocale() {
+			return locale;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+
+			LocalisedMessage that = ( LocalisedMessage ) o;
+
+			if ( locale != null ? !locale.equals( that.locale ) : that.locale != null ) {
+				return false;
+			}
+			if ( message != null ? !message.equals( that.message ) : that.message != null ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = message != null ? message.hashCode() : 0;
+			result = 31 * result + ( locale != null ? locale.hashCode() : 0 );
+			return result;
+		}
 	}
 }
