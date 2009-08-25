@@ -8,5 +8,5 @@ import javax.validation.Configuration;
  * 
  * @author Emmanuel Bernard
  */
-public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
+public interface ValidatorConfiguration extends Configuration<ValidatorConfiguration> {
 }

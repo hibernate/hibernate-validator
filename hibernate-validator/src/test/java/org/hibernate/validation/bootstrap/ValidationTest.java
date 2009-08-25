@@ -35,9 +35,9 @@ import org.testng.annotations.Test;
 import org.hibernate.validation.constraints.impl.NotNullValidator;
 import org.hibernate.validation.engine.ConfigurationImpl;
 import org.hibernate.validation.engine.ConstraintValidatorFactoryImpl;
-import org.hibernate.validation.engine.HibernateValidatorConfiguration;
+import org.hibernate.validation.engine.ValidatorConfiguration;
 import org.hibernate.validation.engine.ValidatorFactoryImpl;
-import org.hibernate.validation.HibernateValidationProvider;
+import org.hibernate.validation.HibernateValidator;
 
 /**
  * Tests the Bean Validation bootstrapping.
@@ -48,8 +48,8 @@ public class ValidationTest {
 
 	@Test
 	public void testBootstrapAsServiceWithBuilder() {
-		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidationProvider.class )
+		ValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidator.class )
 				.configure();
 		assertDefaultBuilderAndFactory( configuration );
 	}

@@ -43,7 +43,7 @@
 
     <properties>
         <jboss.home>/opt/java/jboss-5</jboss.home>
-        <validation.provider>org.hibernate.validation.HibernateValidationProvider</validation.provider>
+        <validation.provider>org.hibernate.validation.HibernateValidator</validation.provider>
         <remote.debug />
     </properties>
 

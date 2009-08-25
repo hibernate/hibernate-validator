@@ -36,8 +36,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.FileAssert.fail;
 
-import org.hibernate.validation.HibernateValidationProvider;
-import org.hibernate.validation.engine.HibernateValidatorConfiguration;
+import org.hibernate.validation.HibernateValidator;
+import org.hibernate.validation.engine.ValidatorConfiguration;
 import org.hibernate.validation.engine.PathImpl;
 
 /**
@@ -55,8 +55,8 @@ public class TestUtil {
 
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
-			HibernateValidatorConfiguration configuration = Validation
-					.byProvider( HibernateValidationProvider.class )
+			ValidatorConfiguration configuration = Validation
+					.byProvider( HibernateValidator.class )
 					.configure();
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
@@ -73,8 +73,8 @@ public class TestUtil {
 	public static Validator getValidatorWithCustomConfiguration(String path) {
 		Thread.currentThread().setContextClassLoader( new CustomValidationXmlClassLoader( path ) );
 
-		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidationProvider.class )
+		ValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidator.class )
 				.configure();
 		return configuration.buildValidatorFactory().getValidator();
 	}
@@ -85,8 +85,8 @@ public class TestUtil {
 	public static Validator getValidatorIgnoringValidationXml() {
 		Thread.currentThread().setContextClassLoader( new IgnoringValidationXmlClassLoader() );
 
-		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidationProvider.class )
+		ValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidator.class )
 				.configure();
 		return configuration.buildValidatorFactory().getValidator();
 	}

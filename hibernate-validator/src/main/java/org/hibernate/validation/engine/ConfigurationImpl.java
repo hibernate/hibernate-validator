@@ -45,7 +45,7 @@ import org.hibernate.validation.xml.ValidationXmlParser;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
+public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationState {
 
 	static {
 		Version.touch();
@@ -80,7 +80,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		validationBootstrapParameters.provider = provider;
 	}
 
-	public HibernateValidatorConfiguration ignoreXmlConfiguration() {
+	public ValidatorConfiguration ignoreXmlConfiguration() {
 		ignoreXmlConfiguration = true;
 		return this;
 	}
@@ -100,12 +100,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	public HibernateValidatorConfiguration addMapping(InputStream stream) {
+	public ValidatorConfiguration addMapping(InputStream stream) {
 		validationBootstrapParameters.mappings.add( stream );
 		return this;
 	}
 
-	public HibernateValidatorConfiguration addProperty(String name, String value) {
+	public ValidatorConfiguration addProperty(String name, String value) {
 		if ( value != null ) {
 			validationBootstrapParameters.configProperties.put( name, value );
 		}
