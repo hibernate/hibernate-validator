@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
-import javax.validation.GroupDefinitionException;
 
 /**
  * Used to determine the execution order.
@@ -65,7 +65,7 @@ public class GroupChainGenerator {
 		for ( Class<?> extendedInterface : clazz.getInterfaces() ) {
 			Group group = new Group( extendedInterface );
 			chain.insertGroup( group );
-			insertInheritedGroups(extendedInterface, chain);
+			insertInheritedGroups( extendedInterface, chain );
 		}
 	}
 
@@ -96,10 +96,19 @@ public class GroupChainGenerator {
 			}
 			else {
 				List<Group> tmpSequence = resolveSequence( clazz, processedSequences );
-				resolvedGroupSequence.addAll( tmpSequence );
+				addTmpSequence( resolvedGroupSequence, tmpSequence );
 			}
 		}
 		resolvedSequences.put( group, resolvedGroupSequence );
 		return resolvedGroupSequence;
+	}
+
+	private void addTmpSequence(List<Group> resolvedGroupSequence, List<Group> tmpSequence) {
+		for ( Group tmpGroup : tmpSequence ) {
+			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence.size() - 1  ) {
+					throw new GroupDefinitionException( "Unable to expand group sequence." );
+			}
+			resolvedGroupSequence.add( tmpGroup );
+		}
 	}
 }

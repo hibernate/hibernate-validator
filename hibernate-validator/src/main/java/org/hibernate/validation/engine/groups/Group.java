@@ -48,10 +48,6 @@ public class Group {
 		return group;
 	}
 
-	public boolean partOfSequence() {
-		return sequence != null;
-	}
-
 	public Class<?> getSequence() {
 		return sequence;
 	}
@@ -70,10 +66,6 @@ public class Group {
 		if ( group != null ? !group.equals( group1.group ) : group1.group != null ) {
 			return false;
 		}
-		if ( sequence != null ? !sequence.equals( group1.sequence ) : group1.sequence != null ) {
-			return false;
-		}
-
 		return true;
 	}
 
@@ -83,9 +75,7 @@ public class Group {
 
 	@Override
 	public int hashCode() {
-		int result = group != null ? group.hashCode() : 0;
-		result = 31 * result + ( sequence != null ? sequence.hashCode() : 0 );
-		return result;
+		return group != null ? group.hashCode() : 0;
 	}
 
 	@Override
