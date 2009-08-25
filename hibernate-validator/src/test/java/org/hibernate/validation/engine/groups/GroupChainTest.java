@@ -53,7 +53,7 @@ public class GroupChainTest {
 		defaultSequence.add( Default.class );
 		defaultSequence.add( GroupA.class );
 		try {
-			chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
 		catch ( GroupDefinitionException e ) {
@@ -64,7 +64,7 @@ public class GroupChainTest {
 		defaultSequence.add( GroupA.class );
 		defaultSequence.add( Default.class );
 		try {
-			chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
 		catch ( GroupDefinitionException e ) {
@@ -75,7 +75,7 @@ public class GroupChainTest {
 		defaultSequence.add( Default.class );
 		defaultSequence.add( GroupC.class );
 		try {
-			chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
 		catch ( GroupDefinitionException e ) {
@@ -85,7 +85,7 @@ public class GroupChainTest {
 		defaultSequence.clear();
 		defaultSequence.add( GroupC.class );
 		defaultSequence.add( Default.class );
-		chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+		chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 	}
 
 
@@ -111,14 +111,14 @@ public class GroupChainTest {
 		List<Class<?>> defaultSequence = new ArrayList<Class<?>>();
 		defaultSequence.add( Default.class );
 		defaultSequence.add( GroupA.class );
-		chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+		chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 
 
 		defaultSequence.clear();
 		defaultSequence.add( GroupA.class );
 		defaultSequence.add( Default.class );
 		try {
-			chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
 		catch ( GroupDefinitionException e ) {
@@ -129,7 +129,7 @@ public class GroupChainTest {
 		defaultSequence.add( Default.class );
 		defaultSequence.add( GroupC.class );
 		try {
-			chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
 		catch ( GroupDefinitionException e ) {
@@ -140,7 +140,7 @@ public class GroupChainTest {
 		defaultSequence.add( GroupC.class );
 		defaultSequence.add( Default.class );
 		try {
-			chain.assertDefaulGroupSequenceIsExpandable( defaultSequence );
+			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
 		catch ( GroupDefinitionException e ) {

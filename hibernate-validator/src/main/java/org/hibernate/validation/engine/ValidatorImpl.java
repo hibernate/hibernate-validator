@@ -201,7 +201,7 @@ public class ValidatorImpl implements Validator {
 
 		BeanMetaData<U> beanMetaData = getBeanMetaData( localExecutionContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaulGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
 		}
 
 		// process first single groups. For these we can skip some object traversal, by first running all validations on the current bean

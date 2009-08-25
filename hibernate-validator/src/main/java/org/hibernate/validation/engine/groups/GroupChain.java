@@ -19,11 +19,9 @@ package org.hibernate.validation.engine.groups;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
 
@@ -53,19 +51,6 @@ public class GroupChain {
 		return sequenceMap.values().iterator();
 	}
 
-	public Iterator<Group> getAllGroupsUnordered() {
-		Set<Group> allGroups = new HashSet<Group>();
-		allGroups.addAll( groupList );
-		for ( List<Group> sequenceList : sequenceMap.values() ) {
-			allGroups.addAll( sequenceList );
-		}
-		return allGroups.iterator();
-	}
-
-	public boolean containsSequence(Class<?> groupSequence) {
-		return sequenceMap.containsKey( groupSequence );
-	}
-
 	void insertGroup(Group group) {
 		if ( !groupList.contains( group ) ) {
 			groupList.add( group );
@@ -90,7 +75,7 @@ public class GroupChain {
 				'}';
 	}
 
-	public void assertDefaulGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) {
+	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) {
 		for ( Map.Entry<Class<?>, List<Group>> entry : sequenceMap.entrySet() ) {
 			Class<?> sequence = entry.getKey();
 			List<Group> groupList = entry.getValue();
