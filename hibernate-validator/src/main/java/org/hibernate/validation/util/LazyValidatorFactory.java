@@ -50,41 +50,42 @@ public class LazyValidatorFactory implements ValidatorFactory {
 		this.configuration = configuration;
 	}
 
-	public Validator getValidator() {
-		if ( delegate == null ) {
-			initFactory();
+	private ValidatorFactory getDelegate() {
+		ValidatorFactory result = delegate;
+		if (result == null) {
+			synchronized ( this ) {
+				result = delegate;
+				if (result == null) {
+					delegate = result = initFactory();
+				}
+			}
 		}
-		return delegate.getValidator();
+		return result;
+	}
+
+	public Validator getValidator() {
+		return getDelegate().getValidator();
 	}
 
 	//we can initialize several times that's ok
-	private void initFactory() {
+	private ValidatorFactory initFactory() {
 		if ( configuration == null ) {
-			delegate = Validation.buildDefaultValidatorFactory();
+			return Validation.buildDefaultValidatorFactory();
 		}
 		else {
-			delegate = configuration.buildValidatorFactory();
+			return configuration.buildValidatorFactory();
 		}
 	}
 
 	public ValidatorContext usingContext() {
-		if ( delegate == null ) {
-			initFactory();
-		}
-		return delegate.usingContext();
+		return getDelegate().usingContext();
 	}
 
 	public MessageInterpolator getMessageInterpolator() {
-		if ( delegate == null ) {
-			initFactory();
-		}
-		return delegate.getMessageInterpolator();
+		return getDelegate().getMessageInterpolator();
 	}
 
 	public <T> T unwrap(Class<T> clazz) {
-		if ( delegate == null ) {
-			initFactory();
-		}
-		return delegate.unwrap( clazz );
+		return getDelegate().unwrap( clazz );
 	}
 }
