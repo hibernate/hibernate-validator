@@ -126,11 +126,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableList( cascadedMembers );
 	}
 
-	public Map<Class<?>, List<MetaConstraint<T, ? extends Annotation>>> geMetaConstraintsAsMap() {
+	public Map<Class<?>, List<MetaConstraint<T, ? extends Annotation>>> getMetaConstraintsAsMap() {
 		return Collections.unmodifiableMap( metaConstraints );
 	}
 
-	public List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintsAsList() {
+	public List<MetaConstraint<T, ? extends Annotation>> getMetaConstraintsAsList() {
 		List<MetaConstraint<T, ? extends Annotation>> constraintList = new ArrayList<MetaConstraint<T, ? extends Annotation>>();
 		for ( List<MetaConstraint<T, ? extends Annotation>> list : metaConstraints.values() ) {
 			constraintList.addAll( list );
@@ -219,10 +219,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	/**
-	 * Create bean desciptor, find all classes/subclasses/interfaces which have to be taken in consideration
+	 * Create bean descriptor, find all classes/subclasses/interfaces which have to be taken in consideration
 	 * for this validator and create meta data.
 	 *
-	 * @param annotationIgnores Datastructure keeping track on which annotation should be ignored.
+	 * @param annotationIgnores Data structure keeping track on which annotation should be ignored.
 	 */
 	private void createMetaData(AnnotationIgnores annotationIgnores) {
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
@@ -403,7 +403,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	/**
-	 * Examines the given annotation to see whether it is a single or multi valued constraint annotation.
+	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
 	 *
 	 * @param clazz the class we are currently processing.
 	 * @param annotation The annotation to examine.
@@ -463,7 +463,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Finds all constraint annotations defined for the given field/method and returns them in a list of
 	 * constraint descriptors.
 	 *
-	 * @param member The fiels or method to check for constraints annotations.
+	 * @param member The fields or method to check for constraints annotations.
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
 	 */

@@ -61,13 +61,13 @@ public interface BeanMetaData<T> {
 	 * @return A map of {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 *         defined on the bean mapped to the class in which the constraints is defined.
 	 */
-	Map<Class<?>, List<MetaConstraint<T, ? extends Annotation>>> geMetaConstraintsAsMap();
+	Map<Class<?>, List<MetaConstraint<T, ? extends Annotation>>> getMetaConstraintsAsMap();
 
 	/**
 	 * @return A list of {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 *         defined on the bean.
 	 */
-	List<MetaConstraint<T, ? extends Annotation>> geMetaConstraintsAsList();
+	List<MetaConstraint<T, ? extends Annotation>> getMetaConstraintsAsList();
 
 	/**
 	 * Return {@code PropertyDescriptor} for the given property.

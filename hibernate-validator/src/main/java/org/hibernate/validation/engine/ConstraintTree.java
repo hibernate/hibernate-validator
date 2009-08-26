@@ -38,7 +38,7 @@ import org.hibernate.validation.util.LoggerFactory;
 import org.hibernate.validation.util.ValidatorTypeHelper;
 
 /**
- * Due to constraint conposition a single constraint annotation can lead to a whole constraint tree beeing validated.
+ * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
  * This class encapsulates such a tree.
  *
  * @author Hardy Ferentschik
@@ -116,7 +116,7 @@ public class ConstraintTree<A extends Annotation> {
 						descriptor
 				);
 			}
-			ConstraintValidator<A, V> validator = getInitalizedValidator(
+			ConstraintValidator<A, V> validator = getInitializedValidator(
 					localExecutionContext.getCurrentValidatedValue(),
 					type,
 					executionContext.getConstraintValidatorFactory()
@@ -170,10 +170,10 @@ public class ConstraintTree<A extends Annotation> {
 	 * @param type The type of the value to be validated (the type of the member/class the constraint was placed on).
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator.
 	 *
-	 * @return A initalized constraint validator matching the type of the value to be validated.
+	 * @return A initialized constraint validator matching the type of the value to be validated.
 	 */
 	@SuppressWarnings("unchecked")
-	private <V> ConstraintValidator<A, V> getInitalizedValidator(V value, Type type, ConstraintValidatorFactory constraintFactory) {
+	private <V> ConstraintValidator<A, V> getInitializedValidator(V value, Type type, ConstraintValidatorFactory constraintFactory) {
 		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( value, type );
 
 		ConstraintValidator<A, V> constraintValidator;
@@ -209,20 +209,20 @@ public class ConstraintTree<A extends Annotation> {
 	 * @return The class of a matching validator.
 	 */
 	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Object value, Type type) {
-		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
+		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes =
 				ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
 
 		List<Type> suitableTypes = new ArrayList<Type>();
-		findSuitableValidatorTypes( type, validatorsTypes, suitableTypes );
+		findSuitableValidatorTypes( type, validatorTypes, suitableTypes );
 
 		if ( value != null ) {
-			findSuitableValidatorTypes( value.getClass(), validatorsTypes, suitableTypes );
+			findSuitableValidatorTypes( value.getClass(), validatorTypes, suitableTypes );
 		}
 
 		resolveAssignableTypes( suitableTypes );
 		verifyResolveWasUnique( type, suitableTypes );
 
-		return validatorsTypes.get( suitableTypes.get( 0 ) );
+		return validatorTypes.get( suitableTypes.get( 0 ) );
 	}
 
 	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
@@ -231,7 +231,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 		else if ( assignableClasses.size() > 1 ) {
 			StringBuilder builder = new StringBuilder();
-			builder.append( "There are multiple validators which could validate the type " );
+			builder.append( "There are multiple validator classes which could validate the type " );
 			builder.append( valueClass );
 			builder.append( ". The validator classes are: " );
 			for ( Type clazz : assignableClasses ) {
@@ -286,7 +286,7 @@ public class ConstraintTree<A extends Annotation> {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to intialize " + constraintValidator.getClass().getName(), e );
+			throw new ValidationException( "Unable to initialize " + constraintValidator.getClass().getName(), e );
 		}
 	}
 

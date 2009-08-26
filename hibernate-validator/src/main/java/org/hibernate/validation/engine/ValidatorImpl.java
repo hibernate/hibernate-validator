@@ -184,8 +184,8 @@ public class ValidatorImpl implements Validator {
 	 *
 	 * @param value The value to validate.
 	 * @param context Global context. Used amongst others to collect all failing constraints.
-	 * @param groupChain Contains the information which and in which oder groups have to be executed
-	 * @param path The current path of the valiation.
+	 * @param groupChain Contains the information which and in which order groups have to be executed
+	 * @param path The current path of the validation.
 	 * @param <T> The root bean type.
 	 * @param <V> The type of the current object on the validation stack.
 	 *
@@ -243,7 +243,7 @@ public class ValidatorImpl implements Validator {
 		boolean validatingDefault = localExecutionContext.validatingDefault();
 		boolean validatedBeanRedefinesDefault = beanMetaData.defaultGroupSequenceIsRedefined();
 
-		// if we are not validating the default group there is nothing slecial to consider
+		// if we are not validating the default group there is nothing special to consider
 		if ( !validatingDefault ) {
 			validateConstraintsForNonDefaultGroup( globalExecutionContext, localExecutionContext, path );
 			return;
@@ -265,7 +265,7 @@ public class ValidatorImpl implements Validator {
 
 	private <T, U, V> void validateConstraintsForRedefinedDefaultGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path, BeanMetaData<U> beanMetaData) {
 		// in the case where the main entity does not redefine the default group we have to check whether the entity which defines the constraint does
-		for ( Map.Entry<Class<?>, List<MetaConstraint<U, ? extends Annotation>>> entry : beanMetaData.geMetaConstraintsAsMap()
+		for ( Map.Entry<Class<?>, List<MetaConstraint<U, ? extends Annotation>>> entry : beanMetaData.getMetaConstraintsAsMap()
 				.entrySet() ) {
 			Class<?> hostingBeanClass = entry.getKey();
 			List<MetaConstraint<U, ? extends Annotation>> constraints = entry.getValue();
@@ -288,13 +288,13 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <T, U, V> void validateConstraintsForRedefinedDefaultGroupOnMainEntity(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path, BeanMetaData<U> beanMetaData) {
-		// in the case where the main entity redefines the default group we can interate over all constraints independend of the bean they are
+		// in the case where the main entity redefines the default group we can iterate over all constraints independent of the bean they are
 		// defined in. The redefined group sequence applies for all constraints.
 		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
 		for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 			localExecutionContext.setCurrentGroup( defaultSequenceMember );
 			boolean validationSuccessful = true;
-			for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.geMetaConstraintsAsList() ) {
+			for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
 				boolean tmp = validateConstraint(
 						globalExecutionContext, localExecutionContext, metaConstraint, path
 				);
@@ -308,7 +308,7 @@ public class ValidatorImpl implements Validator {
 
 	private <T, U, V> void validateConstraintsForNonDefaultGroup(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
 		BeanMetaData<U> beanMetaData = getBeanMetaData( localExecutionContext.getCurrentBeanType() );
-		for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.geMetaConstraintsAsList() ) {
+		for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
 			validateConstraint( globalExecutionContext, localExecutionContext, metaConstraint, path );
 		}
 	}
@@ -348,7 +348,7 @@ public class ValidatorImpl implements Validator {
 	 *
 	 * @param globalExecutionContext The execution context
 	 * @param localExecutionContext Collected information for single validation
-	 * @param path The current path of the valiation.
+	 * @param path The current path of the validation.
 	 */
 	private <T, U, V> void validateCascadedConstraints(GlobalExecutionContext<T> globalExecutionContext, LocalExecutionContext<U, V> localExecutionContext, PathImpl path) {
 		List<Member> cascadedMembers = getBeanMetaData( localExecutionContext.getCurrentBeanType() )
@@ -599,7 +599,7 @@ public class ValidatorImpl implements Validator {
 			);
 		}
 
-		// process squences
+		// process sequences
 		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			List<Group> sequence = sequenceIterator.next();
@@ -688,7 +688,7 @@ public class ValidatorImpl implements Validator {
 		}
 
 		if ( !propertyIter.hasNext() ) {
-			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.geMetaConstraintsAsList();
+			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.getMetaConstraintsAsList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
 				if ( elem.getName() != null && elem.getName().equals( metaConstraint.getPropertyName() ) ) {
 					metaConstraints.add( metaConstraint );
