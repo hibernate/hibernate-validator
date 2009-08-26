@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
  */
 public class GroupChainTest {
 	@Test
-	public void testAssertDefaulGroupSequenceIsExpandableWithDefaultAtEndOfSequence() {
+	public void testAssertDefaultGroupSequenceIsExpandableWithDefaultAtEndOfSequence() {
 		// create a dummy sequence
 		Group a = new Group( GroupA.class, TestSequence.class );
 		Group b = new Group( GroupB.class, TestSequence.class );
