@@ -47,13 +47,6 @@ public class XmlMappingTest {
 
 		final Set<ConstraintViolation<Customer>> violations = validator.validate( new Customer(), Default.class );
 
-		for ( final ConstraintViolation<Customer> violation : violations ) {
-			System.err.println(
-					violation.getPropertyPath() + " "
-							+ violation.getMessage()
-			);
-		}
-
 		assertEquals( violations.size(), 1 );
 	}
 }
