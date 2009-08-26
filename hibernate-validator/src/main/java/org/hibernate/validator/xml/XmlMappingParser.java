@@ -120,7 +120,7 @@ public class XmlMappingParser {
 		if ( constraintMap.containsKey( beanClass ) ) {
 			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
 				@SuppressWarnings("unchecked") // safe cast since the list of meta constraints is always specific to the bean type
-						MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
+				MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
 				list.add( boundMetaConstraint );
 			}
 			return list;

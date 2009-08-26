@@ -37,7 +37,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
- * meta data about the constraint. This allows a unified handling of constraints in the validator imlpementation.
+ * meta data about the constraint. This allows a unified handling of constraints in the validator implementation.
  *
  * @author Hardy Ferentschik
  */
@@ -108,7 +108,7 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree.getDescriptor().getGroups();
 	}
 
-	public ConstraintDescriptor getDescriptor() {
+	public ConstraintDescriptor<A> getDescriptor() {
 		return constraintTree.getDescriptor();
 	}
 
@@ -132,15 +132,11 @@ public class MetaConstraint<T, A extends Annotation> {
 		return elementType;
 	}
 
-	public ConstraintTree getConstraintTree() {
-		return constraintTree;
-	}
-
 	public <T, U, V> boolean validateConstraint(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext) {
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 		localExecutionContext.setElementType( elementType );
 		constraintTree.validateConstraints(
-				typeOfAnnoatedElement(), executionContext, localExecutionContext, constraintViolations
+				typeOfAnnotatedElement(), executionContext, localExecutionContext, constraintViolations
 		);
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );
@@ -166,7 +162,7 @@ public class MetaConstraint<T, A extends Annotation> {
 		}
 	}
 
-	private Type typeOfAnnoatedElement() {
+	private Type typeOfAnnotatedElement() {
 		Type t;
 		switch ( elementType ) {
 			case TYPE: {
@@ -176,7 +172,7 @@ public class MetaConstraint<T, A extends Annotation> {
 			default: {
 				t = ReflectionHelper.typeOf( member );
 				if ( t instanceof Class && ( ( Class ) t ).isPrimitive() ) {
-					t = ReflectionHelper.boxedTyp( t );
+					t = ReflectionHelper.boxedType( t );
 				}
 			}
 		}

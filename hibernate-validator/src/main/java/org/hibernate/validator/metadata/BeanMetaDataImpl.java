@@ -227,35 +227,14 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void createMetaData(AnnotationIgnores annotationIgnores) {
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 		initDefaultGroupSequence();
-		List<Class> classes = new ArrayList<Class>();
-		computeClassHierarchy( beanClass, classes );
-		for ( Class current : classes ) {
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		ReflectionHelper.computeClassHierarchy( beanClass, classes );
+		for ( Class<?> current : classes ) {
 			initClass( current, annotationIgnores );
 		}
 	}
 
-	/**
-	 * Get all superclasses and interfaces recursively.
-	 *
-	 * @param clazz The class to start the search with.
-	 * @param classes List of classes to which to add all found super classes and interfaces.
-	 */
-	private void computeClassHierarchy(Class clazz, List<Class> classes) {
-		if ( log.isTraceEnabled() ) {
-			log.trace( "Processing: {}", clazz );
-		}
-		for ( Class current = clazz; current != null; current = current.getSuperclass() ) {
-			if ( classes.contains( current ) ) {
-				return;
-			}
-			classes.add( current );
-			for ( Class currentInterface : current.getInterfaces() ) {
-				computeClassHierarchy( currentInterface, classes );
-			}
-		}
-	}
-
-	private void initClass(Class clazz, AnnotationIgnores annotationIgnores) {
+	private void initClass(Class<?> clazz, AnnotationIgnores annotationIgnores) {
 		initClassConstraints( clazz, annotationIgnores );
 		initMethodConstraints( clazz, annotationIgnores );
 		initFieldConstraints( clazz, annotationIgnores );

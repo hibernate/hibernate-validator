@@ -50,7 +50,7 @@ public class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
-	//run client in priviledge block
+	//run client in privileged block
 	@SuppressWarnings("unchecked")
 	static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
 		try {
@@ -126,29 +126,9 @@ public class ReflectionHelper {
 	}
 
 	/**
-	 * Returns the type of the field of return type of a method.
-	 *
-	 * @param member the member for which to get the type.
-	 *
-	 * @return Returns the type of the field of return type of a method.
-	 */
-	public static Class<?> getAnnotations(Member member) {
-
-		Class<?> type = null;
-		if ( member instanceof Field ) {
-			type = ( ( Field ) member ).getType();
-		}
-
-		if ( member instanceof Method ) {
-			type = ( ( Method ) member ).getReturnType();
-		}
-		return type;
-	}
-
-	/**
 	 * @param member The <code>Member</code> instance for which to retrieve the type.
 	 *
-	 * @return Retrurns the <code>Type</code> of the given <code>Field</code> or <code>Method</code>.
+	 * @return Returns the <code>Type</code> of the given <code>Field</code> or <code>Method</code>.
 	 *
 	 * @throws IllegalArgumentException in case <code>member</code> is not a <code>Field</code> or <code>Method</code>.
 	 */
@@ -190,7 +170,7 @@ public class ReflectionHelper {
 		return value;
 	}
 
-	//run client in priviledge block
+	//run client in privileged block
 	static void setAccessibility(Member member) {
 		if ( !Modifier.isPublic( member.getModifiers() ) ) {
 			//Sun's ease of use, sigh...
@@ -347,7 +327,7 @@ public class ReflectionHelper {
 	 *
 	 * @return Returns the method with the specified name or <code>null</code> if it does not exist.
 	 */
-	//run client in priviledge block
+	//run client in privileged block
 	static Method getMethod(Class<?> clazz, String methodName) {
 		try {
 			char string[] = methodName.toCharArray();
@@ -374,7 +354,7 @@ public class ReflectionHelper {
 	 *
 	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not represent a primitive type.
 	 */
-	public static Class<?> boxedTyp(Type primitiveType) {
+	public static Class<?> boxedType(Type primitiveType) {
 		if ( !( primitiveType instanceof Class ) && !( ( Class ) primitiveType ).isPrimitive() ) {
 			throw new IllegalArgumentException( primitiveType.getClass() + "has to be a primitive type" );
 		}
@@ -414,7 +394,7 @@ public class ReflectionHelper {
 	 * @param clazz The class to start the search with.
 	 * @param classes List of classes to which to add all found super classes and interfaces.
 	 */
-	private static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes) {
+	public static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes) {
 		for ( Class current = clazz; current != null; current = current.getSuperclass() ) {
 			if ( classes.contains( current ) ) {
 				return;

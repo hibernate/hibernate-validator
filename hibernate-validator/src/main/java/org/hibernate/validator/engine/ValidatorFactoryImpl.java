@@ -20,6 +20,8 @@ package org.hibernate.validator.engine;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -28,6 +30,7 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
+import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
@@ -35,6 +38,7 @@ import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.xml.XmlMappingParser;
 
 /**
@@ -88,25 +92,54 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
 		mappingParser.parse( mappingStreams );
 
+		Set<Class<?>> processedClasses = mappingParser.getProcessedClasses();
 		AnnotationIgnores annotationIgnores = mappingParser.getAnnotationIgnores();
-		for ( Class<?> clazz : mappingParser.getProcessedClasses() ) {
+		for ( Class<?> clazz : processedClasses ) {
+			@SuppressWarnings("unchecked")
 			Class<T> beanClass = ( Class<T> ) clazz;
 			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
 					beanClass, constraintHelper, annotationIgnores
 			);
 
-			for ( MetaConstraint<T, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( beanClass ) ) {
-				metaData.addMetaConstraint( beanClass, constraint );
-			}
-
-			for ( Member m : mappingParser.getCascadedMembersForClass( beanClass ) ) {
-				metaData.addCascadedMember( m );
+			List<Class<?>> classes = new ArrayList<Class<?>>();
+			ReflectionHelper.computeClassHierarchy( beanClass, classes );
+			for ( Class<?> classInHierarchy : classes ) {
+				if ( processedClasses.contains( classInHierarchy ) ) {
+					addXmlConfiguredConstraintToMetaData( mappingParser, beanClass, classInHierarchy, metaData );
+				}
 			}
 
 			if ( !mappingParser.getDefaultSequenceForClass( beanClass ).isEmpty() ) {
 				metaData.setDefaultGroupSequence( mappingParser.getDefaultSequenceForClass( beanClass ) );
 			}
+
 			beanMetaDataCache.addBeanMetaData( beanClass, metaData );
+		}
+	}
+
+	private <T, A extends Annotation> void addXmlConfiguredConstraintToMetaData(XmlMappingParser mappingParser, Class<T> rootClass, Class<?> hierarchyClass, BeanMetaDataImpl<T> metaData) {
+		for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
+			if ( hierarchyClass.equals( rootClass ) ) {
+				@SuppressWarnings("unchecked") // safe cast due to the class check
+						MetaConstraint<T, ? extends Annotation> castedConstrain = ( MetaConstraint<T, ? extends Annotation> ) constraint;
+				metaData.addMetaConstraint( hierarchyClass, castedConstrain );
+			}
+			else {
+				MetaConstraint<T, A> newMetaConstraint;
+				@SuppressWarnings("unchecked")
+				ConstraintDescriptor<A> descriptor = ( ConstraintDescriptor<A> ) constraint.getDescriptor();
+				if ( constraint.getMember() == null ) {
+					newMetaConstraint = new MetaConstraint<T, A>( rootClass, descriptor );
+				}
+				else {
+					newMetaConstraint = new MetaConstraint<T, A>( constraint.getMember(), rootClass, descriptor );
+				}
+				metaData.addMetaConstraint( hierarchyClass, newMetaConstraint );
+			}
+		}
+
+		for ( Member m : mappingParser.getCascadedMembersForClass( hierarchyClass ) ) {
+			metaData.addCascadedMember( m );
 		}
 	}
 }
