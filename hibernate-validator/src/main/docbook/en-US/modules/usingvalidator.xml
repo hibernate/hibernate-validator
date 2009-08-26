@@ -293,7 +293,7 @@ public class Car {
       cause each contained element to be validated, when the parent object is
       validated.</para>
 
-      <programlisting>package com.mycompany;
+      <programlisting><![CDATA[package com.mycompany;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -303,14 +303,14 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validation.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 public class Car {
 
     @NotNull
     @Valid
     private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;();
-    
+
     public Car(List&lt;Person&gt; passengers) {
 
         this.passengers = passengers;
@@ -318,7 +318,7 @@ public class Car {
 
     //getters and setters ...
 
-}</programlisting>
+}]]></programlisting>
 
       <para>If a <classname>Car</classname> instance is validated now, a
       <classname>ConstraintValidation</classname> will be raised, if any of

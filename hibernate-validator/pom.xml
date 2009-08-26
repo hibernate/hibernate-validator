@@ -101,7 +101,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <packageName>org.hibernate.validation.xml</packageName>
+                    <packageName>org.hibernate.validator.xml</packageName>
                     <outputDirectory>${basedir}/target/generated-sources</outputDirectory>
                     <extension>true</extension>
                 </configuration>
@@ -151,7 +151,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>com.googlecode.jtype</pattern>
-                                    <shadedPattern>org.hibernate.validation.jtype</shadedPattern>
+                                    <shadedPattern>org.hibernate.validator.jtype</shadedPattern>
                                 </relocation>
                             </relocations>
                             <transformers>
