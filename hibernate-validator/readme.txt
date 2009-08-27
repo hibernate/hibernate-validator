@@ -19,12 +19,11 @@
   Status
   ------
 
-  This is an beta release and even though it is nearly feature complete there might be
-  still variances between the specification and this implementation.
+  This is the first CR release of Hibernate Validator.
 
   You can find more information about the current state of the implementation on the
   Bean Validation RI Roadmap - http://www.hibernate.org/459.html and there is copy of
-  JSR 303 -as of the time of this release- available here: http://in.relation.to/service/File/12014
+  JSR 303 available here: http://in.relation.to/service/File/12014
 
   Documentation
   -------------
@@ -67,10 +66,11 @@
 
   Please see the file called license.txt
 
-  Hibernate Validator URLS
+  Hibernate Validator URLs
   ------------------------
 
   Home Page:          http://validator.hibernate.org/
+  Migration Guide:    http://www.hibernate.org/468.html
   Downloads:          http://www.hibernate.org/6.html
   Mailing Lists:      http://www.hibernate.org/20.html
   Source Code:        http://anonsvn.jboss.org/repos/hibernate/validator/trunk/
