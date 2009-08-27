@@ -83,7 +83,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final Map<String, Object> attributes;
 
-	private final Set<Class<Payload>> payloads;
+	private final Set<Class<? extends Payload>> payloads;
 
 	/**
 	 * The composing constraints for this constraints.
@@ -120,8 +120,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this( annotation, constraintHelper, null );
 	}
 
-	private Set<Class<Payload>> buildPayloadSet(T annotation) {
-		Set<Class<Payload>> payloadSet = new HashSet<Class<Payload>>();
+	private Set<Class<? extends Payload>> buildPayloadSet(T annotation) {
+		Set<Class<? extends Payload>> payloadSet = new HashSet<Class<? extends Payload>>();
 		Class<Payload>[] payloadFromAnnotation;
 		try {
 			//TODO be extra safe and make sure this is an array of Payload
@@ -216,7 +216,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return groups;
 	}
 
-	public Set<Class<Payload>> getPayload() {
+	public Set<Class< ? extends Payload>> getPayload() {
 		return payloads;
 	}
 
