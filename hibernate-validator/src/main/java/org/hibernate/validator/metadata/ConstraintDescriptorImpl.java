@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
-import javax.validation.ConstraintPayload;
+import javax.validation.Payload;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.ReportAsSingleViolation;
@@ -83,7 +83,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final Map<String, Object> attributes;
 
-	private final Set<Class<ConstraintPayload>> payloads;
+	private final Set<Class<Payload>> payloads;
 
 	/**
 	 * The composing constraints for this constraints.
@@ -120,11 +120,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this( annotation, constraintHelper, null );
 	}
 
-	private Set<Class<ConstraintPayload>> buildPayloadSet(T annotation) {
-		Set<Class<ConstraintPayload>> payloadSet = new HashSet<Class<ConstraintPayload>>();
-		Class<ConstraintPayload>[] payloadFromAnnotation;
+	private Set<Class<Payload>> buildPayloadSet(T annotation) {
+		Set<Class<Payload>> payloadSet = new HashSet<Class<Payload>>();
+		Class<Payload>[] payloadFromAnnotation;
 		try {
-			//TODO be extra safe and make sure this is an array of ConstraintPayload
+			//TODO be extra safe and make sure this is an array of Payload
 			GetAnnotationParameter<Class[]> action = GetAnnotationParameter.action(
 					annotation, PAYLOAD, Class[].class
 			);
@@ -216,7 +216,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return groups;
 	}
 
-	public Set<Class<ConstraintPayload>> getPayload() {
+	public Set<Class<Payload>> getPayload() {
 		return payloads;
 	}
 
