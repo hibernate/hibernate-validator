@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
+import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -71,6 +73,7 @@ public class XmlMappingParser {
 	private static final String VALIDATION_MAPPING_XSD = "META-INF/validation-mapping-1.0.xsd";
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
+	private static final String PAYLOAD_PARAM = "payload";
 	private static final String PACKAGE_SEPARATOR = ".";
 
 	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
@@ -120,7 +123,7 @@ public class XmlMappingParser {
 		if ( constraintMap.containsKey( beanClass ) ) {
 			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
 				@SuppressWarnings("unchecked") // safe cast since the list of meta constraints is always specific to the bean type
-				MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
+						MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
 				list.add( boundMetaConstraint );
 			}
 			return list;
@@ -203,13 +206,7 @@ public class XmlMappingParser {
 			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
 					.getAnnotation( Constraint.class )
 					.validatedBy();
-			for ( Class<? extends ConstraintValidator<?, ?>> validator : validatedBy ) {
-				//FIXME does this create a CCE at runtime?
-				//FIXME if yes wrap into VE, if no we need to test the type here
-				//Once resolved,we can @SuppressWarning("unchecked") on the cast
-				Class<? extends ConstraintValidator<? extends Annotation, ?>> safeValidator = validator;
-				constraintValidatorDefinitionClasses.add( safeValidator );
-			}
+			constraintValidatorDefinitionClasses.addAll( Arrays.asList( validatedBy ) );
 		}
 		return constraintValidatorDefinitionClasses;
 	}
@@ -387,6 +384,7 @@ public class XmlMappingParser {
 			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
 		}
 		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
+		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
 
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
@@ -589,7 +587,7 @@ public class XmlMappingParser {
 
 	private void checkNameIsValid(String name) {
 		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw new ValidationException( MESSAGE_PARAM + " and " + GROUPS_PARAM + " are reserved parameter names." );
+			throw new ValidationException( MESSAGE_PARAM + ", " + GROUPS_PARAM + ", " + PAYLOAD_PARAM + " are reserved parameter names." );
 		}
 	}
 
@@ -603,6 +601,25 @@ public class XmlMappingParser {
 			groupList.add( getClass( groupClass.getValue(), defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
+	}
+
+	@SuppressWarnings("unchecked")
+	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
+		if ( payloadType == null ) {
+			return new Class[] { };
+		}
+
+		List<Class<? extends Payload>> payloadList = new ArrayList<Class<? extends Payload>>();
+		for ( JAXBElement<String> groupClass : payloadType.getValue() ) {
+			Class<?> payload = getClass( groupClass.getValue(), defaultPackage );
+			if ( !Payload.class.isAssignableFrom( payload ) ) {
+				throw new ValidationException( "Specified payload class " + payload.getName() + " does not implement javax.validation.Payload" );
+			}
+			else {
+				payloadList.add( ( Class<? extends Payload> ) payload );
+			}
+		}
+		return payloadList.toArray( new Class[payloadList.size()] );
 	}
 
 	private Class<?> getClass(String clazz, String defaultPackage) {

@@ -2,13 +2,17 @@
 <xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
            targetNamespace="http://jboss.org/xml/ns/javax/validation/mapping"
-           xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.0">
     <xs:element name="constraint-mappings"
                 type="map:constraint-mappingsType"
                 xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
 
+    <xs:complexType name="payloadType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
     <xs:complexType name="groupsType">
         <xs:sequence>
             <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
@@ -47,6 +51,10 @@
                         name="groups"
                         minOccurs="0"
                         xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
+            <xs:element type="map:payloadType"
+                        name="payload"
+                        minOccurs="0"
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>            
             <xs:element type="map:elementType"
                         name="element"
                         maxOccurs="unbounded"
@@ -68,7 +76,10 @@
     </xs:complexType>
     <xs:complexType name="classType">
         <xs:sequence>
-            <xs:element type="groupSequenceType" name="group-sequence" minOccurs="0"/>
+            <xs:element type="map:groupSequenceType" 
+                        name="group-sequence" 
+                        minOccurs="0" 
+                        xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"/>
             <xs:element type="map:constraintType"
                         name="constraint"
                         maxOccurs="unbounded"

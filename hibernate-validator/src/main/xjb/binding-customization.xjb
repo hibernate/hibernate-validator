@@ -7,7 +7,7 @@
                 adapter="javax.xml.bind.annotation.adapters.CollapsedStringAdapter"/>
         </jxb:globalBindings>
 
-        <jxb:bindings node="//xs:complexType[8]/xs:sequence[1]/xs:element[1]">
+        <jxb:bindings node="//xs:complexType[9]/xs:sequence[1]/xs:element[1]">
             <jxb:property name="classType"/>
         </jxb:bindings>
     </jxb:bindings>
