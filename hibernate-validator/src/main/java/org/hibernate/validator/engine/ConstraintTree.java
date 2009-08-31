@@ -117,7 +117,6 @@ public class ConstraintTree<A extends Annotation> {
 				);
 			}
 			ConstraintValidator<A, V> validator = getInitializedValidator(
-					localExecutionContext.getCurrentValidatedValue(),
 					type,
 					executionContext.getConstraintValidatorFactory()
 			);
@@ -166,15 +165,14 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	/**
-	 * @param value The value to be validated.
 	 * @param type The type of the value to be validated (the type of the member/class the constraint was placed on).
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator.
 	 *
 	 * @return A initialized constraint validator matching the type of the value to be validated.
 	 */
 	@SuppressWarnings("unchecked")
-	private <V> ConstraintValidator<A, V> getInitializedValidator(V value, Type type, ConstraintValidatorFactory constraintFactory) {
-		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( value, type );
+	private <V> ConstraintValidator<A, V> getInitializedValidator(Type type, ConstraintValidatorFactory constraintFactory) {
+		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( type );
 
 		ConstraintValidator<A, V> constraintValidator;
 
@@ -203,21 +201,16 @@ public class ConstraintTree<A extends Annotation> {
 	/**
 	 * Runs the validator resolution algorithm.
 	 *
-	 * @param value The value to be validated.
 	 * @param type The type of the value to be validated (the type of the member/class the constraint was placed on).
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Object value, Type type) {
+	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Type type) {
 		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes =
 				ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
 
 		List<Type> suitableTypes = new ArrayList<Type>();
 		findSuitableValidatorTypes( type, validatorTypes, suitableTypes );
-
-		if ( value != null ) {
-			findSuitableValidatorTypes( value.getClass(), validatorTypes, suitableTypes );
-		}
 
 		resolveAssignableTypes( suitableTypes );
 		verifyResolveWasUnique( type, suitableTypes );
