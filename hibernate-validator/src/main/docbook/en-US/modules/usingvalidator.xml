@@ -27,10 +27,6 @@
 <chapter id="validator-usingvalidator">
   <title>Object validation</title>
 
-  <para>TODO: outline of the chapter. Should this be placed before <link
-  lang="" linkend="validator-customconstraints">"Creating custom
-  constraints"</link>?</para>
-
   <section id="validator-usingvalidator-annotate" revision="1">
     <title>Annotating your model</title>
 
@@ -293,7 +289,7 @@ public class Car {
       cause each contained element to be validated, when the parent object is
       validated.</para>
 
-      <programlisting><![CDATA[package com.mycompany;
+      <programlisting>package com.mycompany;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -309,16 +305,16 @@ public class Car {
 
     @NotNull
     @Valid
-    private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;();
+    private List&amp;lt;Person&amp;gt; passengers = new ArrayList&amp;lt;Person&amp;gt;();
 
-    public Car(List&lt;Person&gt; passengers) {
+    public Car(List&amp;lt;Person&amp;gt; passengers) {
 
         this.passengers = passengers;
     }
 
     //getters and setters ...
 
-}]]></programlisting>
+}</programlisting>
 
       <para>If a <classname>Car</classname> instance is validated now, a
       <classname>ConstraintValidation</classname> will be raised, if any of

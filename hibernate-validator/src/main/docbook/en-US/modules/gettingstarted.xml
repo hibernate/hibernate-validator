@@ -28,10 +28,9 @@
 <chapter id="validator-gettingstarted">
   <title id="getting-started">Getting started</title>
 
-  <para>This chapter will show you how to quickly get started with the
-  reference implementation (RI) of the Bean Validation API as specified by JSR
-  303. Be sure to fulfill the following prerequisites in order to
-  proceed:</para>
+  <para>This chapter will show you how to get started with Hibernate Validator
+  - the reference implementation (RI) of the Bean Validation API. Be sure to
+  fulfill the following prerequisites in order to proceed:</para>
 
   <itemizedlist>
     <listitem>
@@ -41,11 +40,9 @@
 
     <listitem>
       <para>As <ulink url="http://maven.apache.org/">Apache Maven</ulink> will
-      be used as build tool in the following, Maven must be installed (help
-      can be found <ulink
-      url="http://maven.apache.org/download.html">here</ulink>) and a
-      functioning internet connection is required to allow Maven for the
-      download of all dependent libraries</para>
+      be used as build tool in the following, Maven must be installed and a
+      functioning internet connection is required to allow Maven to download
+      all dependent libraries</para>
     </listitem>
 
     <listitem>
@@ -75,118 +72,34 @@
     <para>Start by creating new Maven project using the Maven archetype plugin
     as follows:</para>
 
-    <para><programlisting>mvn archetype:generate -DarchetypeArtifactId=maven-archetype-quickstart</programlisting></para>
+    <para><programlisting>mvn archetype:generate \
+  -DarchetypeCatalog=http://repository.jboss.com/maven2/archetype-catalog.xml \
+  -DgroupId=com.mycompany \
+  -DartifactId=beanvalidation-gettingstarted \
+  -Dversion=1.0-SNAPSHOT \
+  -Dpackage=com.mycompany</programlisting></para>
 
-    <para>and specify the requested properties:</para>
+    <para>When presented with the list of available archetypes in the JBoss
+    Maven Repository select the
+    <emphasis>hibernate-validator-quickstart-archetype </emphasis>and confirm
+    the properties. Maven will create your project in the directory
+    beanvalidation-gettingstarted. Change into this directory and run:</para>
 
-    <itemizedlist>
-      <listitem>
-        <para>groupId: An identifier for your company, e.g.
-        com.mycompany</para>
-      </listitem>
-
-      <listitem>
-        <para>artifactId: An identifier for the new project, e.g.
-        beanvalidation-gettingstarted</para>
-      </listitem>
-
-      <listitem>
-        <para>version: Initial version for the new project, e.g.
-        1.0-SNAPSHOT</para>
-      </listitem>
-
-      <listitem>
-        <para>package: The top-level package for the new project, e.g.
-        com.mycompany</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Finally confirm all entered values and change into the newly created
-    project directory. All properties of a Maven project (such as its
-    dependencies to other libraries, the steps to be performed during build
-    etc.) are described in a file called pom.xml (<emphasis
-    role="bold">p</emphasis>roject <emphasis role="bold">o</emphasis>bject
-    <emphasis role="bold">m</emphasis>odel), located in the project's root
-    directory. Now open the project's pom.xml and perform the following
-    changes:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Add the dependency to hibernate-validator</para>
-      </listitem>
-
-      <listitem>
-        <para>Add an SLF4J binding. As Hibernate Validator uses the logging
-        facade <ulink url="http://www.slf4j.org/">SLF4J</ulink>, it can make
-        use of your preferred logging API. In the following the binding to
-        <ulink url="http://logging.apache.org/log4j/">log4j</ulink> is
-        used.</para>
-      </listitem>
-
-      <listitem>
-        <para>Set the compiler level to 1.5 (as we want to use
-        annotations)</para>
-      </listitem>
-
-      <listitem>
-        <para>Use JUnit 4 as testing framework</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Having done this, your pom.xml should look like this:</para>
-
-    <programlisting>&lt;project 
-    xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;
-    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-    &lt;groupId&gt;com.mycompany&lt;/groupId&gt;
-    &lt;artifactId&gt;beanvalidation-gettingstarted&lt;/artifactId&gt;
-    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
-    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-            &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;
-            &lt;version&gt;4.0.0.CR1&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
-            &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
-            &lt;version&gt;1.4.2&lt;/version&gt;
-            &lt;scope&gt;runtime&lt;/scope&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;junit&lt;/groupId&gt;
-            &lt;artifactId&gt;junit&lt;/artifactId&gt;
-            &lt;version&gt;4.5&lt;/version&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-        &lt;/dependency&gt;
-    &lt;/dependencies&gt;
-    &lt;build&gt;
-        &lt;plugins&gt;
-            &lt;plugin&gt;
-                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-                &lt;configuration&gt;
-                    &lt;source&gt;1.5&lt;/source&gt;
-                    &lt;target&gt;1.5&lt;/target&gt;
-                &lt;/configuration&gt;
-            &lt;/plugin&gt;
-        &lt;/plugins&gt;
-    &lt;/build&gt;
-&lt;/project&gt;</programlisting>
+    <para><programlisting>mvn test</programlisting>You should see some
+    compiling and testing action taking place. Time to look at the actual
+    code.</para>
   </section>
 
   <section id="validator-gettingstarted-createmodel" revision="1">
     <title>Applying constraints to a model class</title>
 
-    <para>Having set up the project, it's time now to actually make use of the
-    Bean Validation API. Therefore, open the project in the IDE of your choice
-    (for Eclipse, you may type mvn eclipse:eclipse to create a standard
-    Eclipse project configuration OR you may use the <ulink
+    <para>Open the project in the IDE of your choice (for Eclipse, you may
+    type mvn eclipse:eclipse to create a standard Eclipse project
+    configuration OR you may use the <ulink
     url="http://m2eclipse.codehaus.org/">M2Eclipse</ulink> plugin. NetBeans
     has great Maven support too, as described <ulink
-    url="http://wiki.netbeans.org/MavenBestPractices">here</ulink>) and create
-    the following class as an exemplary domain object:</para>
+    url="http://wiki.netbeans.org/MavenBestPractices">here</ulink>) and open
+    the class <classname>Car</classname>:</para>
 
     <para><programlisting>package com.mycompany;
 
@@ -361,9 +274,6 @@ public class CarTest {
     <title>Where to go next?</title>
 
     <para>That concludes our 5 minute tour through the world of the Bean
-    Validation RI. We will complete this documentation in our coming releases.
-    For now we recommend to refer to the JSR 303 specification directly for
-    more examples. The 1.0.CR3 version of this specification is available
-      <ulink url="http://in.relation.to/service/File/12014">here</ulink>.</para>
+    Validation RI. </para>
   </section>
 </chapter>

@@ -62,21 +62,6 @@
 
   <toc></toc>
 
-  <preface>
-    <title>Preface Beta Release</title>
-
-    <para>This release has beta status, which means that this documenation is not yet complete.
-    You can find more information about the current state of the implementation on the <ulink
-    url="http://www.hibernate.org/459.html">Bean Validation Roadmap</ulink> or
-    you can refer to JSR 303 directly for further examples.</para>
-
-    <para>Please report any problems or bugs in either <ulink
-    url="http://opensource.atlassian.com/projects/hibernate/browse/HV">Jira
-    Hibernate Validator</ulink> or on the <ulink
-    url="http://forum.hibernate.org/viewforum.php?f=9">Validator
-    Forum</ulink>.</para>
-  </preface>
-
   <preface id="preface" revision="2">
     <title>Preface</title>
 
@@ -90,13 +75,14 @@
 
     <para>JSR 303 - Bean Validation - defines a metadata model and API for
     JavaBean validation. The default metadata source is annotations, with the
-    ability to override and extend the meta-data through the use of XML
-    validation descriptors. The API is not tied to a specific application tier
-    or programming model. It is specifically not tied to either the web tier
-    or the persistence tier, and is available for both server-side application
-    programming, as well as rich client Swing application developers.</para>
+    ability to override and extend the meta-data through the use of XML. The
+    API is not tied to a specific application tier or programming model. It is
+    specifically not tied to either the web tier or the persistence tier, and
+    is available for both server-side application programming, as well as rich
+    client Swing application developers.</para>
 
-    <para>Hibernate Validator is an implementation of this JSR.</para>
+    <para>Hibernate Validator is the reference implementation of this
+    JSR.</para>
   </preface>
 
   <!-- For the alpha release we will just include the getting started section, since the others are work in progress -->
@@ -112,14 +98,9 @@
   <xi:include href="modules/customconstraints.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 
-  <!--
   <xi:include href="modules/xmlconfiguration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/integration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/extendedri.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
--->
-
-  <!--
   <xi:include href="modules/defineconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="modules/checkconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
--->
 </book>
