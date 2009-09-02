@@ -25,14 +25,37 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-usingvalidator">
-  <title>Object validation</title>
+  <title>Basic validation</title>
+
+  <para>In this chapter we will see in more detail how to use Bean Validation
+  to validate constraints for a given entity model. We will also learn which
+  default constraints the specification provides and which additional
+  constraints are only provided by Hibernate Validator. Let's start with how
+  to add constraints to an entity.</para>
 
   <section id="validator-usingvalidator-annotate" revision="1">
     <title>Annotating your model</title>
 
-    <para>Using the Bean Validation API validation constraints are expressed
-    via Java 5 annotations. In this section we show how to annotate your
-    object model with Bean Validation constraint annotations.</para>
+    <para>Constraints in Bean Validation are expressed via Java annotations.
+    In this section we show how to annotate an object model with these
+    annotations. We have to differentiate between three different type of
+    constraint annotations - class-, field- and property-level
+    annotations.</para>
+
+    <para><note>
+        <para>Not all constraints can be placed on any of these levels. In
+        fact all the default constraints defined by Bean Validation cannot be
+        places at class level. The java.lang.annotation.Target annotation
+        placed on the constraint annotation itself determines on which
+        elements a constraint can be placed. See also </para>
+      </note></para>
+
+    <section>
+      <title id="validator-usingvalidator-classlevel">Class-level
+      annotations</title>
+
+      <para>TODO</para>
+    </section>
 
     <section>
       <title>Field level annotations</title>
@@ -113,12 +136,6 @@ public class Car {
       <para>TODO: Make it explcit that where the difference lies between filed
       and property level annotations. Depending where I place the annotation
       the value to be validated gets accessed in different ways!</para>
-    </section>
-
-    <section>
-      <title>Class-level annotations</title>
-
-      <para>TODO</para>
     </section>
 
     <section>

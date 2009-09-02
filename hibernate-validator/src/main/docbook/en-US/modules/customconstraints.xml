@@ -64,9 +64,9 @@
       <para>Let's write a constraint annotation, that can be used to express
       that a given string shall either be upper case or lower case. We'll
       apply it later on to ensure, that the <property>licensePlate</property>
-      field of the <classname>Car</classname> class from the <link
-      linkend="validator-gettingstarted">Getting started</link> chapter is
-      always an upper-case string.</para>
+      field of the <classname>Car</classname> class from <xref
+      linkend="validator-gettingstarted" /> is always an upper-case
+      string.</para>
 
       <para>First we need a way to express the two case modes. We might use
       <classname>String</classname> constants, but a better way to go is to

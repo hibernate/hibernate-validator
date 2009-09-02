@@ -29,25 +29,25 @@
   <title id="getting-started">Getting started</title>
 
   <para>This chapter will show you how to get started with Hibernate Validator
-  - the reference implementation (RI) of the Bean Validation API. Be sure to
-  fulfill the following prerequisites in order to proceed:</para>
+  - the reference implementation (RI) of Bean Validation. For the following
+  quickstart you need:</para>
 
   <itemizedlist>
     <listitem>
-      <para>As the Bean Validation API expresses constraints by the means of
-      annotations, Java version 5 or later must be installed</para>
+      <para>A JDK &gt;= 5</para>
     </listitem>
 
     <listitem>
-      <para>As <ulink url="http://maven.apache.org/">Apache Maven</ulink> will
-      be used as build tool in the following, Maven must be installed and a
-      functioning internet connection is required to allow Maven to download
-      all dependent libraries</para>
+      <para><ulink url="http://maven.apache.org/">Apache Maven</ulink></para>
     </listitem>
 
     <listitem>
-      <para>Once Maven is installed you should configure your remote
-      repository by adding the following to your
+      <para>A functioning Internet connection (Maven has to download all
+      required libraries)</para>
+    </listitem>
+
+    <listitem>
+      <para>A properly configured remote repository. Add the following to your
       <filename>settings.xml</filename>: <programlisting>&lt;repositories&gt;
     &lt;repository&gt;
         &lt;id&gt;jboss&lt;/id&gt;
@@ -81,9 +81,11 @@
 
     <para>When presented with the list of available archetypes in the JBoss
     Maven Repository select the
-    <emphasis>hibernate-validator-quickstart-archetype </emphasis>and confirm
-    the properties. Maven will create your project in the directory
-    beanvalidation-gettingstarted. Change into this directory and run:</para>
+    <emphasis>hibernate-validator-quickstart-archetype. </emphasis>After
+    downloading all dependencies confirm the settings by just pressing enter.
+    Maven will create your project in the directory
+    <filename>beanvalidation-gettingstarted</filename>. Change into this
+    directory and run:</para>
 
     <para><programlisting>mvn test</programlisting>You should see some
     compiling and testing action taking place. Time to look at the actual
@@ -93,15 +95,20 @@
   <section id="validator-gettingstarted-createmodel" revision="1">
     <title>Applying constraints to a model class</title>
 
-    <para>Open the project in the IDE of your choice (for Eclipse, you may
-    type mvn eclipse:eclipse to create a standard Eclipse project
-    configuration OR you may use the <ulink
-    url="http://m2eclipse.codehaus.org/">M2Eclipse</ulink> plugin. NetBeans
-    has great Maven support too, as described <ulink
-    url="http://wiki.netbeans.org/MavenBestPractices">here</ulink>) and open
-    the class <classname>Car</classname>:</para>
+    <para>Open the project in the IDE of your choice and have a look at the
+    class <classname>Car</classname>:</para>
 
-    <para><programlisting>package com.mycompany;
+    <note>
+      <para>Eclipse users can type mvn eclipse:eclipse to create a standard
+      Eclipse project configuration or they use the <ulink
+      url="http://m2eclipse.codehaus.org/">M2Eclipse</ulink> plugin. NetBeans
+      and Intellij have great built-in Maven support.</para>
+    </note>
+
+    <para><example xreflabel="Car-example">
+        <title>Class Car annotated with constraints</title>
+
+        <programlisting language="Java">package com.mycompany;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -109,14 +116,14 @@ import javax.validation.constraints.Size;
 
 public class Car {
 
-    @NotNull
+    <emphasis role="bold">@NotNull</emphasis>
     private String manufacturer;
 
-    @NotNull
-    @Size(min = 2, max = 14)
+    <emphasis role="bold">@NotNull</emphasis>
+    <emphasis role="bold">@Size(min = 2, max = 14)</emphasis>
     private String licensePlate;
 
-    @Min(2)
+    <emphasis role="bold">@Min(2)</emphasis>
     private int seatCount;
     
     public Car(String manufacturer, String licencePlate, int seatCount) {
@@ -127,12 +134,10 @@ public class Car {
     }
 
     //getters and setters ...
-
-}</programlisting></para>
-
-    <para><classname>@NotNull</classname>, <classname>@Size</classname> and
-    <classname>@Min</classname> are so-called constraint annotions, that we
-    use to declare constraints, which shall be applied to the fields of a
+}</programlisting>
+      </example><classname>@NotNull</classname>, <classname>@Size</classname>
+    and <classname>@Min</classname> are so-called constraint annotations, that
+    we use to declare constraints, which shall be applied to the fields of a
     <classname>Car</classname> instance:</para>
 
     <itemizedlist>
@@ -150,11 +155,14 @@ public class Car {
       </listitem>
     </itemizedlist>
 
-    <para>To perform a validation of these constraints, we use the
-    <classname>Validator</classname> interface defined by the specification.
-    Let's try it in a test for our <classname>Car</classname> class:</para>
+    <para>To perform a validation of these constraints, we use a
+    <classname>Validator</classname> instance. Let's have a look at the
+    <classname>CarTest</classname> class:</para>
 
-    <para><programlisting>package com.mycompany;
+    <example xreflabel="CarTest-example">
+      <title>Class CarTest showing validation examples</title>
+
+      <programlisting language="Java">package com.mycompany;
 
 import static org.junit.Assert.*;
 
@@ -187,8 +195,7 @@ public class CarTest {
             validator.validate(car);
 
         assertEquals(1, constraintViolations.size());
-        assertEquals(
-            "may not be null", constraintViolations.iterator().next().getMessage());
+        assertEquals("may not be null", constraintViolations.iterator().next().getMessage());
     }
 
     @Test
@@ -200,8 +207,7 @@ public class CarTest {
             validator.validate(car);
 
         assertEquals(1, constraintViolations.size());
-        assertEquals(
-            "size must be between 2 and 14", constraintViolations.iterator().next().getMessage());
+        assertEquals("size must be between 2 and 14", constraintViolations.iterator().next().getMessage());
     }
     
     @Test
@@ -213,8 +219,7 @@ public class CarTest {
             validator.validate(car);
 
         assertEquals(1, constraintViolations.size());
-        assertEquals(
-            "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage());
+        assertEquals("must be greater than or equal to 2", constraintViolations.iterator().next().getMessage());
     }
 
     @Test
@@ -227,20 +232,21 @@ public class CarTest {
 
         assertEquals(0, constraintViolations.size());
     }
-}</programlisting></para>
+}</programlisting>
+    </example>
 
     <para>In the <methodname>setUp()</methodname> method we get a
-    <classname>Validator</classname> object from the
+    <classname>Validator</classname> instance from the
     <classname>ValidatorFactory</classname>. A
     <classname>Validator</classname> instance is thread-safe and may be reused
     multiple times, therefore we store it as field of our test class. We can
-    use the validator now to validate the different car objects in the test
+    use the validator now to validate the different car instances in the test
     methods.</para>
 
     <para>The <methodname>validate()</methodname> method returns a set of
     <classname>ConstraintViolation</classname> objects, which we can iterate
-    through in order to see which validation errors occured. The first three
-    test methods show some expected constraint violations:</para>
+    in order to see which validation errors occurred. The first three test
+    methods show some expected constraint violations:</para>
 
     <itemizedlist>
       <listitem>
@@ -259,21 +265,20 @@ public class CarTest {
       </listitem>
     </itemizedlist>
 
-    <para>If the object could be validated successfully (as in
-    <methodname>carIsValid()</methodname>),
+    <para>If the object could be validated successfully,
     <methodname>validate()</methodname> returns an empty set.</para>
 
     <para>Note that we only use classes from the package
-    <package>javax.validation</package>, which stems from the Bean Validation
-    standard API. As we don't reference any classes of the RI directly, it
-    would be no problem to switch to another implementation of the API, should
-    that need arise.</para>
+    <package>javax.validation</package> from the Bean Validation API. As we
+    don't reference any classes of the RI directly, it would be no problem to
+    switch to another implementation of the API, should that need
+    arise.</para>
   </section>
 
   <section id="validator-gettingstarted-whatsnext" revision="1">
     <title>Where to go next?</title>
 
     <para>That concludes our 5 minute tour through the world of the Bean
-    Validation RI. </para>
+    Validation RI.</para>
   </section>
 </chapter>
