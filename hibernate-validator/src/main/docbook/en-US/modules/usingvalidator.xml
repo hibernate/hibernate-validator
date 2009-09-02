@@ -446,96 +446,173 @@ Validator validator = factory.getValidator();</programlisting></para>
       <title>Validator methods</title>
 
       <para>The <classname>Validator</classname> interface contains three
-      methods that can be used to validate entire objects or only single
-      object properties.</para>
+      methods that can be used to validate entire object instances or only
+      single properties of an instance.</para>
 
       <para>All of these methods return a
-      <classname>Set&lt;ConstraintViolation&gt;</classname>, which will be
+      <classname>Set&lt;ConstraintViolation&gt;</classname>. The set will be
       empty, if the validation succeeded. Otherwise a
       <classname>ConstraintViolation</classname> object for each violated
-      constraint will be contained.</para>
+      constraint will be added to the set.</para>
 
       <para>All the validation methods have a var-args parameter which can be
       used to specify, which validation groups shall be considered when
-      performing the validation. If the parameter is not specified (as in the
-      following examples) the default validation group will be used. We will
-      go into more detail on the topic of validation groups in the <link
-      linkend="validator-usingvalidator-validationgroups">following
-      section</link>.</para>
+      performing the validation. If the parameter is not specified the default
+      validation group (<classname>javax.validation.Default</classname>) will
+      be used. We will go into more detail on the topic of validation groups
+      in <xref linkend="validator-usingvalidator-validationgroups" /></para>
 
       <section>
-        <title>validate()</title>
+        <title><methodname>validate</methodname></title>
 
         <para>Use the <methodname>validate()</methodname> method to perform
-        validation of all constraints of a given object. The following listing
-        shows an example:</para>
+        validation of all constraints of a given entity instance. The
+        following listing shows an example:</para>
 
-        <programlisting>ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        <example>
+          <title>Usage of
+          <methodname>Validator.validate()</methodname></title>
+
+          <programlisting>ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 Validator validator = factory.getValidator();
 
 Car car = new Car(null);
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
-    validator.validate(car);
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validate(car);
 
 assertEquals(1, constraintViolations.size());
-assertEquals(
-    "may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
+assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
+        </example>
       </section>
 
       <section>
-        <title>validateProperty()</title>
+        <title><methodname>validateProperty</methodname></title>
 
         <para>With help of the <methodname>validateProperty()</methodname> a
-        single named property of a given object can be validated:</para>
+        single named property of a given object can be validated. The property
+        name is the JavaBeans property name. @Valid is not honored by this
+        method. </para>
 
-        <programlisting>Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        <example>
+          <title>Usage of
+          <methodname>Validator.validateProperty()</methodname></title>
+
+          <programlisting>Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 Car car = new Car(null);
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
-    validator.validateProperty(car, "manufacturer");
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateProperty(car, "manufacturer");
 
 assertEquals(1, constraintViolations.size());
-assertEquals(
-    "may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
+assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
+
+          <para><methodname>Validator.validateProperty</methodname> is for
+          example used in the integration of Bean Validation into JSF
+          2.</para>
+        </example>
       </section>
 
       <section>
-        <title>validateValue()</title>
+        <title><methodname>validateValue</methodname></title>
 
         <para>Using the <methodname>validateValue() </methodname>method you
         can check, whether a single property of a given class can be validated
         successfully, if the property had the specified value:</para>
 
-        <programlisting>Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        <example>
+          <title>Usage of
+          <methodname>Validator.validateValue()</methodname></title>
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
-    validator.validateValue(Car.class, "manufacturer", null);
+          <programlisting>Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateValue(Car.class, "manufacturer", null);
 
 assertEquals(1, constraintViolations.size());
-assertEquals(
-    "may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
-      </section>
+assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
 
-      <section>
-        <title>getConstraintsForClass()</title>
-
-        <para>TODO</para>
+          <para>@Valid is not honored by this method.</para>
+        </example>
       </section>
     </section>
 
     <section>
-      <title>Working with ConstraintViolations</title>
+      <title><classname>ConstraintViolation</classname>s explained</title>
 
-      <para>TODO: Message interpolation?</para>
+      <para>Now it is time to have a closer look at what a failing validation
+      returns - a <classname>ConstraintViolation</classname>. Using the
+      different methods of a <classname>ConstraintViolation</classname>
+      instance a lot of useful information about the reason of the validation
+      failure can be determined.</para>
+
+      <table>
+        <title>The various <classname>ConstraintViolation</classname>
+        methods</title>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>Method</entry>
+
+              <entry>Usage</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getMessage()</methodname></entry>
+
+              <entry>The interpolated error message.</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getMessageTemplate()</methodname></entry>
+
+              <entry>The non-interpolated error message.</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getRootBean()</methodname></entry>
+
+              <entry>The root bean being validated.</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getRootBeanClass()</methodname></entry>
+
+              <entry>The class of the root bean being validated.</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getLeafBean()</methodname></entry>
+
+              <entry>If a bean constraint, the bean instance the constraint is
+              applied on. If a property constraint, the bean instance hosting
+              the property the constraint is applied on.</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getPropertyPath()</methodname></entry>
+
+              <entry>The property path to the value from root bean.</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getInvalidValue()</methodname></entry>
+
+              <entry>The value failing to pass the constraint.</entry>
+            </row>
+
+            <row>
+              <entry><methodname>getConstraintDescriptor()</methodname></entry>
+
+              <entry>Constraint metadata reported to fail.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
     </section>
   </section>
 
   <section id="validator-usingvalidator-validationgroups" revision="1">
     <title>Using groups</title>
-
-    <para></para>
 
     <section revision="1">
       <title>Group sequences</title>
