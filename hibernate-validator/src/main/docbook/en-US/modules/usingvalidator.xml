@@ -614,6 +614,17 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
   <section id="validator-usingvalidator-validationgroups" revision="1">
     <title>Using groups</title>
 
+    <para>Groups allow you to restrict the set of constraints applied during
+    validation. This allows for example for wizard like validation where for
+    each step of the wizard only a specified subset of all defined constraints
+    get validated. The groups targeted are passed as var-args parameters to
+    <methodname>validate</methodname>,
+    <methodname>validateProperty</methodname> and
+    <methodname>validateValue</methodname>. All constraints belonging to the
+    targeted group are applied during the Section 3.5. When more than one
+    group is requested, the order in which the groups are evaluated is not
+    deterministic. </para>
+
     <section revision="1">
       <title>Group sequences</title>
 
@@ -625,7 +636,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator comes with some built-in constraints, which
-    covers most basic data checks. As we'll see later, you're not limited to
+    covers some basic data checks. As we'll see later, you're not limited to
     them, you can literally in a minute write your own constraints.</para>
 
     <table>
