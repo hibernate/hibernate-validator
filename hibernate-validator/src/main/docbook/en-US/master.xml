@@ -70,11 +70,11 @@
     the same validation logic is implemented in each layer, proving time
     consuming and error-prone. To avoid duplication of these validations in
     each layer, developers often bundle validation logic directly into the
-    domain model, cluttering domain classes with validation code that is, in
-    fact, metadata about the class itself.</para>
+    domain model, cluttering domain classes with validation code which in fact
+    is metadata about the class itself.</para>
 
     <para>JSR 303 - Bean Validation - defines a metadata model and API for
-    JavaBean validation. The default metadata source is annotations, with the
+    entity validation. The default metadata source is annotations, with the
     ability to override and extend the meta-data through the use of XML. The
     API is not tied to a specific application tier or programming model. It is
     specifically not tied to either the web tier or the persistence tier, and
@@ -98,9 +98,18 @@
   <xi:include href="modules/customconstraints.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 
-  <xi:include href="modules/xmlconfiguration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/integration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/extendedri.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/defineconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/checkconstraints.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/xmlconfiguration.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/integration.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/extendedri.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/defineconstraints.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/checkconstraints.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>
