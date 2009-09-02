@@ -25,7 +25,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-usingvalidator">
-  <title>Basic validation</title>
+  <title>Validation step by step</title>
 
   <para>In this chapter we will see in more detail how to use Bean Validation
   to validate constraints for a given entity model. We will also learn which
@@ -34,7 +34,7 @@
   to add constraints to an entity.</para>
 
   <section id="validator-usingvalidator-annotate" revision="1">
-    <title>Annotating your model</title>
+    <title>Defining constraints</title>
 
     <para>Constraints in Bean Validation are expressed via Java annotations.
     In this section we show how to annotate an object model with these
@@ -42,29 +42,82 @@
     constraint annotations - class-, field- and property-level
     annotations.</para>
 
-    <para><note>
-        <para>Not all constraints can be placed on any of these levels. In
-        fact all the default constraints defined by Bean Validation cannot be
-        places at class level. The java.lang.annotation.Target annotation
-        placed on the constraint annotation itself determines on which
-        elements a constraint can be placed. See also </para>
-      </note></para>
+    <note>
+      <para>Not all constraints can be placed on any of these levels. In fact
+      all the default constraints defined by Bean Validation cannot be places
+      at class level. The java.lang.annotation.Target annotation placed on the
+      constraint annotation itself determines on which elements a constraint
+      can be placed. See also <xref
+      linkend="validator-customconstraints" /></para>
+    </note>
 
     <section>
       <title id="validator-usingvalidator-classlevel">Class-level
-      annotations</title>
+      constraints</title>
 
-      <para>TODO</para>
+      <para>When a constraint annotation is placed on class level the class
+      instance itself passed to the
+      <classname>ConstraintValidator</classname>. Class level constraints are
+      useful if it is necessary to inspect more than a single property of the
+      class to validate it or if a correlation between different state
+      variables has to be evaluated. In the following example we add the
+      properties <property>horsePower</property> and
+      <property>kiloWatt</property> to the class <classname>Car</classname>.
+      We also add the constraint ValidCar to the class itself. We will later
+      see how we can actually create this custom constraint (see <xref
+      linkend="validator-customconstraints" />). For now we can just assume
+      that this constraints will for example ensure that the value for
+      <property>kiloWatt</property> is 0.7456 *
+      <property>horsePower</property>.</para>
+
+      <para><example xreflabel="Car-example">
+          <title>Class Car with added horsePower and killoWatt
+          properties</title>
+
+          <programlisting language="Java">package com.mycompany;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+<emphasis role="bold">@ValidCar</emphasis>
+public class Car {
+
+    <emphasis role="bold">@NotNull</emphasis>
+    private String manufacturer;
+
+    <emphasis role="bold">@NotNull</emphasis>
+    <emphasis role="bold">@Size(min = 2, max = 14)</emphasis>
+    private String licensePlate;
+
+    <emphasis role="bold">@Min(2)</emphasis>
+    private int seatCount;
+
+    private int horsePower;
+
+    private double kiloWatt;
+    
+    public Car(String manufacturer, String licencePlate, int seatCount) {
+        this.manufacturer = manufacturer;
+        this.licensePlate = licencePlate;
+        this.seatCount = seatCount;
+    }
+
+    //getters and setters ...
+}</programlisting>
+        </example></para>
     </section>
 
     <section>
-      <title>Field level annotations</title>
+      <title>Field-level constraints</title>
 
-      <para>One way for expressing constraints is to annotate the fields of a
-      class with constraint annotations. The following listing shows a simple
-      example:</para>
+      <para>Constraints can also be expressed by annotating a field of a
+      class. The following listing shows a simple example:</para>
 
-      <programlisting>package com.mycompany;
+      <example>
+        <title>Example for field level constraints</title>
+
+        <programlisting>package com.mycompany;
 
 import javax.validation.constraints.NotNull;
 
@@ -74,23 +127,31 @@ public class Car {
     private String manufacturer;
 
     public Car(String manufacturer) {
-
         this.manufacturer = manufacturer;
     }
 }</programlisting>
+      </example>
+
+      <para>When using field level constraints field access strategy is used
+      to access the value to be value. This means the bean validation provider
+      accesses the instance variable directly.</para>
     </section>
 
     <section>
-      <title>Property level annotations</title>
+      <title>Property-level constraints</title>
 
       <para>If your model class adheres to the <ulink type=""
       url="http://java.sun.com/javase/technologies/desktop/javabeans/index.jsp">JavaBeans</ulink>
-      standard (meaning basically, there are getter and setter methods for the
-      properties of the class), it is also possible to annotate the properties
-      of a bean class instead of its fields. Note that the property's getter
-      method has to be annotated, not its setter method:</para>
+      standard, it is also possible to annotate the properties of a bean class
+      instead of its fields. <note>
+          <para>The property's getter method has to be annotated, not its
+          setter.</para>
+        </note></para>
 
-      <programlisting>package com.mycompany;
+      <example>
+        <title>Example for property level constraints</title>
+
+        <programlisting>package com.mycompany;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
@@ -100,8 +161,7 @@ public class Car {
     private String manufacturer;
 
     private boolean isRegistered;
-    
-    
+      
     public Car(String manufacturer, boolean isRegistered) {
         super();
         this.manufacturer = manufacturer;
@@ -126,20 +186,21 @@ public class Car {
         this.isRegistered = isRegistered;
     }
 }</programlisting>
+      </example>
 
-      <para>Generally it is considered a good practice to stick either with
-      field <emphasis>or</emphasis> with property annotation within one model
-      class for the sake of readability. It is not recommended to annotate a
-      field <emphasis>and</emphasis> the accompanying getter method as this
-      would cause the field to be validated twice.</para>
+      <para>When using property level constraints property access strategy is
+      used to access the value to be validated. This means the bean validation
+      provider accesses the state via the property accessor method. </para>
 
-      <para>TODO: Make it explcit that where the difference lies between filed
-      and property level annotations. Depending where I place the annotation
-      the value to be validated gets accessed in different ways!</para>
+      <para>Generally it is recommended to stick either to field
+      <emphasis>or</emphasis> property annotation within one class. It is not
+      recommended to annotate a field <emphasis>and</emphasis> the
+      accompanying getter method as this would cause the field to be validated
+      twice.</para>
     </section>
 
     <section>
-      <title>Annotated interfaces and super-classes</title>
+      <title>Constraint inheritance</title>
 
       <para>When validating an object that implements an interface or extends
       another class, all constraint annotations on the implemented interface
@@ -147,32 +208,10 @@ public class Car {
       on the validated object itself. To make things clearer let's have a look
       at the following example:</para>
 
-      <programlisting>//class Car
-package com.mycompany;
+      <example>
+        <title>Example for constraint inheritance using RentalCar</title>
 
-import javax.validation.constraints.NotNull;
-
-public class Car {
-
-    private String manufacturer;
-    
-    public Car(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-    @NotNull
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-}
-
-//class RentalCar
-package com.mycompany;
+        <programlisting>package com.mycompany;
 
 import javax.validation.constraints.NotNull;
 
@@ -193,16 +232,17 @@ public class RentalCar extends Car {
     public void setRentalStation(String rentalStation) {
         this.rentalStation = rentalStation;
     }
-
 }</programlisting>
+      </example>
 
-      <para>Our well-known class <classname>Car</classname> is now extended by
-      <classname>RentalCar</classname> with an additional property,
-      <property>rentalStation</property>. If an instance of
-      <classname>RentalCar</classname> is validated now, not only the
-      <classname>@NotNull</classname> constraint at the
-      <property>rentalStation</property> property would be validated, but also
-      the constraint at <property>manufacturer</property> from the parent
+      <para>Our well-known class <classname>Car</classname> from <link
+      linkend="example-class-car">the getting started section</link> is now
+      extended by <classname>RentalCar</classname> with the additional
+      property <property>rentalStation</property>. If an instance of
+      <classname>RentalCar</classname> is validated, not only the
+      <classname>@NotNull</classname> constraint on
+      <property>rentalStation</property> would be validated, but also the
+      constraint at <property>manufacturer</property> from the parent
       class.</para>
 
       <para>The same would hold true, if <classname>Car</classname> was an
@@ -218,7 +258,7 @@ public class RentalCar extends Car {
     </section>
 
     <section>
-      <title>Validating object graphs</title>
+      <title>Object graphs</title>
 
       <para>The Bean Validation API does not only allow to validate single
       objects but also complete object graphs. To do so just annotate a field
@@ -228,7 +268,10 @@ public class RentalCar extends Car {
       <classname>@Valid</classname> will be validated as well (as will be
       their children etc.). The following shows a simple example:</para>
 
-      <programlisting>//class Person
+      <example>
+        <title>Class Person</title>
+
+        <programlisting>
 package com.mycompany;
 
 import javax.validation.constraints.NotNull;
@@ -250,11 +293,13 @@ public class Person {
     public void setName(String name) {
         this.name = name;
     }
-    
-}
+}</programlisting>
+      </example>
 
-//class car
-package com.mycompany;
+      <example>
+        <title>Adding a driver to the car</title>
+
+        <programlisting>package com.mycompany;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -266,13 +311,12 @@ public class Car {
     private Person driver;
     
     public Car(Person driver) {
-
         this.driver = driver;
     }
 
     //getters and setters ...
-
 }</programlisting>
+      </example>
 
       <para>If an instance of <classname>Car</classname> is validated, the
       referenced <classname>Person</classname> object will be validated as
@@ -291,14 +335,13 @@ public class Car {
         </listitem>
 
         <listitem>
-          <para>of type<classname> java.lang.Iterable</classname> (and
-          therfore its direct or indirect derivations
-          <classname>Collection</classname>, <classname>List</classname> and
-          <classname>Set</classname>)</para>
+          <para>implement <classname>java.lang.Iterable</classname>
+          (especially <classname>Collection</classname>,
+          <classname>List</classname> and <classname>Set</classname>)</para>
         </listitem>
 
         <listitem>
-          <para>of type <classname>java.util.Map</classname></para>
+          <para>implement <classname>java.util.Map</classname></para>
         </listitem>
       </itemizedlist>
 
@@ -306,7 +349,10 @@ public class Car {
       cause each contained element to be validated, when the parent object is
       validated.</para>
 
-      <programlisting>package com.mycompany;
+      <example>
+        <title>Car with a list of passengers</title>
+
+        <programlisting>package com.mycompany;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -322,40 +368,78 @@ public class Car {
 
     @NotNull
     @Valid
-    private List&amp;lt;Person&amp;gt; passengers = new ArrayList&amp;lt;Person&amp;gt;();
+    private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;();
 
-    public Car(List&amp;lt;Person&amp;gt; passengers) {
-
+    public Car(List&lt;Person&gt; passengers) {
         this.passengers = passengers;
     }
 
     //getters and setters ...
-
 }</programlisting>
+      </example>
 
       <para>If a <classname>Car</classname> instance is validated now, a
-      <classname>ConstraintValidation</classname> will be raised, if any of
+      <classname>ConstraintValidation</classname> will be created, if any of
       the <classname>Person</classname> objects contained in the
-      <property>passengers</property> list has a <code>null</code>
-      name.</para>
+      <property>passengers</property> list has a <code>null</code> name.<note>
+          <para><classname>null</classname> values are getting ignored when
+          validating object graphs. </para>
+        </note></para>
     </section>
   </section>
 
   <section id="validator-usingvalidator-validate" revision="1">
-    <title>Validating your model</title>
+    <title>Validating constraints</title>
 
     <para>The <classname>Validator</classname> interface is the main entry
-    point to the Bean Validation API. In the following we first will show how
-    to obtain <classname>Validator</classname> instances using the
-    bootstrapping mechanism that the API provides. Afterwards you'll learn how
-    to use the different methods of the <classname>Validator</classname>
-    interfaces followed by an overview of the information that
-    <classname>ConstraintViolation</classname> instances offer.</para>
+    point to Bean Validation. In the following we first will show how to
+    obtain an <classname>Validator</classname> instance using the different
+    bootstrapping mechanisms. Afterwards we will learn how to use the
+    different methods of the <classname>Validator</classname>
+    interface.</para>
 
     <section>
-      <title>Obtaining Validator instances</title>
+      <title>Obtaining a Validator instance</title>
 
-      <para>TODO: DefaultFactory, customization, note on thread safety</para>
+      <para>The first step towards validating a class instance is to get hold
+      of a <classname>Validator</classname> instance. The road to this
+      instance leads via the <classname>Validation</classname> class and a
+      <classname>ValidatorFactory</classname>. The by far easiest way is to
+      use the static
+      <methodname>Validation.buildDefaultValidatorFactory()</methodname>
+      method:<programlisting>ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+Validator validator = factory.getValidator();</programlisting>You can also use
+      the method <methodname>Validation.byDefaultProvider()</methodname> which
+      will allow you to configure several aspects of the created Validator
+      instance:<programlisting>Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure();
+config.messageInterpolator(new MyMessageInterpolator())
+    .traversableResolver( new MyTraversableResolver())
+    .constraintValidatorFactory(new MyConstraintValidatorFactory());
+
+ValidatorFactory factory = config.buildValidatorFactory();
+Validator validator = factory.getValidator();
+</programlisting>We will learn more about
+      <classname>MessageInterpolator</classname> and
+      <classname>TraversableResolver</classname> in later chapters. </para>
+
+      <para>Last but not least you can ask for a Configuration object of a
+      specific Bean Validation provider. This is useful if you have more than
+      one Bean Validation provider in your classpath. In this situation you
+      can make an explicit choice about which implementation to use. In the
+      case of Hibernate Validator the Validator creation looks
+      like:<programlisting>ValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
+config.messageInterpolator(new MyMessageInterpolator())
+    .traversableResolver( new MyTraversableResolver())
+    .constraintValidatorFactory(new MyConstraintValidatorFactory());
+
+ValidatorFactory factory = config.buildValidatorFactory();
+Validator validator = factory.getValidator();</programlisting></para>
+
+      <para><note>
+          <para>The generated <classname>Validator</classname> instance is
+          thread safe and can be cached.</para>
+        </note>Now that we have a <classname>Validator</classname> instance,
+      let's see how we can use it to validate class instances.</para>
     </section>
 
     <section>
@@ -449,7 +533,9 @@ assertEquals(
   </section>
 
   <section id="validator-usingvalidator-validationgroups" revision="1">
-    <title>Validation groups</title>
+    <title>Using groups</title>
+
+    <para></para>
 
     <section revision="1">
       <title>Group sequences</title>
@@ -458,7 +544,223 @@ assertEquals(
     </section>
   </section>
 
-  <section id="validator-usingvalidator-methodparameters" revision="1">
-    <para />
+  <section id="validator-defineconstraints-builtin" revision="2">
+    <title>Built-in constraints</title>
+
+    <para>Hibernate Validator comes with some built-in constraints, which
+    covers most basic data checks. As we'll see later, you're not limited to
+    them, you can literally in a minute write your own constraints.</para>
+
+    <table>
+      <title>Built-in constraints</title>
+
+      <tgroup cols="4">
+        <colspec align="center" />
+
+        <thead>
+          <row>
+            <entry>Annotation</entry>
+
+            <entry>Apply on</entry>
+
+            <entry>Runtime checking</entry>
+
+            <entry>Hibernate Metadata impact</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>@Length(min=, max=)</entry>
+
+            <entry>property (String)</entry>
+
+            <entry>check if the string length match the range</entry>
+
+            <entry>Column length will be set to max</entry>
+          </row>
+
+          <row>
+            <entry>@Max(value=)</entry>
+
+            <entry>property (numeric or string representation of a
+            numeric)</entry>
+
+            <entry>check if the value is less than or equals to max</entry>
+
+            <entry>Add a check constraint on the column</entry>
+          </row>
+
+          <row>
+            <entry>@Min(value=)</entry>
+
+            <entry>property (numeric or string representation of a
+            numeric)</entry>
+
+            <entry>check if the value is more than or equals to min</entry>
+
+            <entry>Add a check constraint on the column</entry>
+          </row>
+
+          <row>
+            <entry>@NotNull</entry>
+
+            <entry>property</entry>
+
+            <entry>check if the value is not null</entry>
+
+            <entry>Column(s) are not null</entry>
+          </row>
+
+          <row>
+            <entry>@NotEmpty</entry>
+
+            <entry>property</entry>
+
+            <entry>check if the string is not null nor empty. Check if the
+            connection is not null nor empty</entry>
+
+            <entry>Column(s) are not null (for String)</entry>
+          </row>
+
+          <row>
+            <entry>@Past</entry>
+
+            <entry>property (date or calendar)</entry>
+
+            <entry>check if the date is in the past</entry>
+
+            <entry>Add a check constraint on the column</entry>
+          </row>
+
+          <row>
+            <entry>@Future</entry>
+
+            <entry>property (date or calendar)</entry>
+
+            <entry>check if the date is in the future</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Pattern(regex="regexp", flag=) or @Patterns(
+            {@Pattern(...)} )</entry>
+
+            <entry>property (string)</entry>
+
+            <entry>check if the property match the regular expression given a
+            match flag (see <classname>java.util.regex.Pattern </classname>
+            )</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Range(min=, max=)</entry>
+
+            <entry>property (numeric or string representation of a
+            numeric)</entry>
+
+            <entry>check if the value is between min and max
+            (included)</entry>
+
+            <entry>Add a check constraint on the column</entry>
+          </row>
+
+          <row>
+            <entry>@Size(min=, max=)</entry>
+
+            <entry>property (array, collection, map)</entry>
+
+            <entry>check if the element size is between min and max
+            (included)</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@AssertFalse</entry>
+
+            <entry>property</entry>
+
+            <entry>check that the method evaluates to false (useful for
+            constraints expressed in code rather than annotations)</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@AssertTrue</entry>
+
+            <entry>property</entry>
+
+            <entry>check that the method evaluates to true (useful for
+            constraints expressed in code rather than annotations)</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Valid</entry>
+
+            <entry>property (object)</entry>
+
+            <entry>perform validation recursively on the associated object. If
+            the object is a Collection or an array, the elements are validated
+            recursively. If the object is a Map, the value elements are
+            validated recursively.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Email</entry>
+
+            <entry>property (String)</entry>
+
+            <entry>check whether the string is conform to the email address
+            specification</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@CreditCardNumber</entry>
+
+            <entry>property (String)</entry>
+
+            <entry>check whether the string is a well formated credit card
+            number (derivative of the Luhn algorithm)</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Digits</entry>
+
+            <entry>property (numeric or string representation of a
+            numeric)</entry>
+
+            <entry>check whether the property is a number having up to
+            <literal>integerDigits</literal> integer digits and
+            <literal>fractionalDigits</literal> fractonal digits</entry>
+
+            <entry>define column precision and scale</entry>
+          </row>
+
+          <row>
+            <entry>@EAN</entry>
+
+            <entry>property (string)</entry>
+
+            <entry>check whether the string is a properly formated EAN or
+            UPC-A code</entry>
+
+            <entry>none</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
   </section>
 </chapter>

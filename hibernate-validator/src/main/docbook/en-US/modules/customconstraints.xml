@@ -25,7 +25,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-customconstraints">
-  <title>Custom constraints</title>
+  <title>Creating custom constraints</title>
 
   <para>Though the Bean Validation API defines a whole bunch of standard
   constraint annotations such as <classname>@NotNull</classname>,
@@ -251,10 +251,10 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       <title>Using the constraint</title>
 
       <para>Now that our first custom constraint is completed, we can use it
-      in the <classname>Car</classname> class from the <link
-      linkend="validator-gettingstarted">Getting started</link> chapter to
-      specify that the <property>licensePlate</property> field shall only
-      contain upper-case strings:</para>
+      in the <classname>Car</classname> class from the <xref
+      linkend="validator-gettingstarted" /> chapter to specify that the
+      <property>licensePlate</property> field shall only contain upper-case
+      strings:</para>
 
       <programlisting>package com.mycompany;
 

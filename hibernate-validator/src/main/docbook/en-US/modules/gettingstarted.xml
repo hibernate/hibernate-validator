@@ -105,7 +105,7 @@
       and Intellij have great built-in Maven support.</para>
     </note>
 
-    <para><example xreflabel="Car-example">
+    <para><example id="example-class-car" xreflabel="">
         <title>Class Car annotated with constraints</title>
 
         <programlisting language="Java">package com.mycompany;
@@ -127,7 +127,6 @@ public class Car {
     private int seatCount;
     
     public Car(String manufacturer, String licencePlate, int seatCount) {
-
         this.manufacturer = manufacturer;
         this.licensePlate = licencePlate;
         this.seatCount = seatCount;
@@ -188,7 +187,6 @@ public class CarTest {
 
     @Test
     public void manufacturerIsNull() {
-
         Car car = new Car(null, "DD-AB-123", 4);
 
         Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
@@ -200,7 +198,6 @@ public class CarTest {
 
     @Test
     public void licensePlateTooShort() {
-
         Car car = new Car("Morris", "D", 4);
 
         Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = 
@@ -212,7 +209,6 @@ public class CarTest {
     
     @Test
     public void seatCountTooLow() {
-
         Car car = new Car("Morris", "DD-AB-123", 1);
 
         Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
@@ -224,7 +220,6 @@ public class CarTest {
 
     @Test
     public void carIsValid() {
-
         Car car = new Car("Morris", "DD-AB-123", 2);
 
         Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
