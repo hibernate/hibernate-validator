@@ -36,12 +36,10 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.NewInstance;
 import org.hibernate.validator.util.GetClassLoader;
 import org.hibernate.validator.util.LoadClass;
-import org.hibernate.validator.xml.PropertyType;
-import org.hibernate.validator.xml.ValidationConfigType;
+import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.util.NewInstance;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -64,7 +62,7 @@ public class ValidationXmlParser {
 		ValidationConfigType config = getValidationConfig();
 		ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters();
 		if ( config != null ) {
-			// collect the paramters from the xml file
+			// collect the parameters from the xml file
 			setProviderClassFromXml( config, xmlParameters );
 			setMessageInterpolatorFromXml( config, xmlParameters );
 			setTraversableResolverFromXml( config, xmlParameters );
@@ -83,7 +81,9 @@ public class ValidationXmlParser {
 				Class<ConstraintValidatorFactory> clazz = ( Class<ConstraintValidatorFactory> ) loadClass(
 						constraintFactoryClass, this.getClass()
 				);
-				NewInstance<ConstraintValidatorFactory> newInstance = NewInstance.action( clazz, "constraint factory class" );
+				NewInstance<ConstraintValidatorFactory> newInstance = NewInstance.action(
+						clazz, "constraint factory class"
+				);
 				if ( System.getSecurityManager() != null ) {
 					xmlParameters.constraintValidatorFactory = AccessController.doPrivileged( newInstance );
 				}
@@ -102,7 +102,7 @@ public class ValidationXmlParser {
 
 	private Class<?> loadClass(String className, Class<?> caller) {
 		LoadClass action = LoadClass.action( className, caller );
-		if (System.getSecurityManager() != null) {
+		if ( System.getSecurityManager() != null ) {
 			return AccessController.doPrivileged( action );
 		}
 		else {
@@ -252,9 +252,9 @@ public class ValidationXmlParser {
 		GetClassLoader action = GetClassLoader.fromContext();
 		ClassLoader loader = isSecured ? AccessController.doPrivileged( action ) : action.run();
 
-		if (loader == null) {
-			log.debug( "No default context class loader, fallbacking to Bean Validation's loader" );
-			action = GetClassLoader.fromClass(ValidationXmlParser.class);
+		if ( loader == null ) {
+			log.debug( "No default context class loader, fall back to Bean Validation's loader" );
+			action = GetClassLoader.fromClass( ValidationXmlParser.class );
 			loader = isSecured ? AccessController.doPrivileged( action ) : action.run();
 			isContextCL = false;
 		}
@@ -262,7 +262,7 @@ public class ValidationXmlParser {
 
 		// try the current class loader
 		if ( isContextCL && inputStream == null ) {
-			action = GetClassLoader.fromClass(ValidationXmlParser.class);
+			action = GetClassLoader.fromClass( ValidationXmlParser.class );
 			loader = isSecured ? AccessController.doPrivileged( action ) : action.run();
 			inputStream = loader.getResourceAsStream( path );
 		}
