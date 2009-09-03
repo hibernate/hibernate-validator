@@ -278,7 +278,7 @@ import javax.validation.constraints.NotNull;
 
 public class Person {
 
-    @NotNull
+    <emphasis role="bold">@NotNull</emphasis>
     private String name;
     
     public Person(String name) {
@@ -306,8 +306,8 @@ import javax.validation.constraints.NotNull;
 
 public class Car {
 
-    @NotNull
-    @Valid
+    <emphasis role="bold">@NotNull</emphasis>
+    <emphasis role="bold">@Valid</emphasis>
     private Person driver;
     
     public Car(Person driver) {
@@ -407,18 +407,26 @@ public class Car {
       <classname>ValidatorFactory</classname>. The by far easiest way is to
       use the static
       <methodname>Validation.buildDefaultValidatorFactory()</methodname>
-      method:<programlisting>ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-Validator validator = factory.getValidator();</programlisting>You can also use
-      the method <methodname>Validation.byDefaultProvider()</methodname> which
-      will allow you to configure several aspects of the created Validator
-      instance:<programlisting>Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure();
+      method:<example>
+          <title>Validation.buildDefaultValidatorFactory()</title>
+
+          <programlisting>ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+Validator validator = factory.getValidator();</programlisting>
+        </example>You can also use the method
+      <methodname>Validation.byDefaultProvider()</methodname> which will allow
+      you to configure several aspects of the created Validator
+      instance:<example>
+          <title>Validation.byDefaultProvider()</title>
+
+          <programlisting>Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure();
 config.messageInterpolator(new MyMessageInterpolator())
     .traversableResolver( new MyTraversableResolver())
     .constraintValidatorFactory(new MyConstraintValidatorFactory());
 
 ValidatorFactory factory = config.buildValidatorFactory();
 Validator validator = factory.getValidator();
-</programlisting>We will learn more about
+</programlisting>
+        </example>We will learn more about
       <classname>MessageInterpolator</classname> and
       <classname>TraversableResolver</classname> in later chapters.</para>
 
@@ -426,14 +434,17 @@ Validator validator = factory.getValidator();
       specific Bean Validation provider. This is useful if you have more than
       one Bean Validation provider in your classpath. In this situation you
       can make an explicit choice about which implementation to use. In the
-      case of Hibernate Validator the Validator creation looks
-      like:<programlisting>ValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
+      case of Hibernate Validator the Validator creation looks like:<example>
+          <title>Validation.byProvider( HibernateValidator.class )</title>
+
+          <programlisting>ValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure;
 config.messageInterpolator(new MyMessageInterpolator())
     .traversableResolver( new MyTraversableResolver())
     .constraintValidatorFactory(new MyConstraintValidatorFactory());
 
 ValidatorFactory factory = config.buildValidatorFactory();
-Validator validator = factory.getValidator();</programlisting></para>
+Validator validator = factory.getValidator();</programlisting>
+        </example></para>
 
       <para><note>
           <para>The generated <classname>Validator</classname> instance is
@@ -505,11 +516,10 @@ Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.valid
 
 assertEquals(1, constraintViolations.size());
 assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
-
-          <para><methodname>Validator.validateProperty</methodname> is for
-          example used in the integration of Bean Validation into JSF
-          2.</para>
         </example>
+
+        <para><methodname>Validator.validateProperty</methodname> is for
+        example used in the integration of Bean Validation into JSF 2.</para>
       </section>
 
       <section>
@@ -529,9 +539,9 @@ Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.valid
 
 assertEquals(1, constraintViolations.size());
 assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
-
-          <para>@Valid is not honored by this method.</para>
         </example>
+
+        <para>@Valid is not honored by this method.</para>
       </section>
     </section>
 
@@ -549,13 +559,15 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
         methods</title>
 
         <tgroup cols="2">
-          <tbody>
+          <thead>
             <row>
               <entry>Method</entry>
 
               <entry>Usage</entry>
             </row>
+          </thead>
 
+          <tbody>
             <row>
               <entry><methodname>getMessage()</methodname></entry>
 
@@ -616,19 +628,137 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
     <para>Groups allow you to restrict the set of constraints applied during
     validation. This allows for example for wizard like validation where for
-    each step of the wizard only a specified subset of all defined constraints
-    get validated. The groups targeted are passed as var-args parameters to
+    each step only a specified subset of the defined constraints get
+    validated. The groups targeted are passed as var-args parameters to
     <methodname>validate</methodname>,
     <methodname>validateProperty</methodname> and
-    <methodname>validateValue</methodname>. All constraints belonging to the
-    targeted group are applied during the Section 3.5. When more than one
-    group is requested, the order in which the groups are evaluated is not
-    deterministic.</para>
+    <methodname>validateValue</methodname>. When more than one group is
+    requested, the order in which the groups are evaluated is not
+    deterministic. If no group is specified the default group
+    <classname>javax.validation.Default</classname> is assumed. Let's have a
+    look at a slightly extended <classname>Car</classname> with
+    <classname>Driver</classname> example.</para>
+
+    <para><example>
+        <title>Person</title>
+
+        <programlisting>public class Person {
+    @NotNull
+    private String name;
+
+    public Person(String name) {
+        this.name = name;
+    }
+
+    // getters and setters ...
+}</programlisting>
+      </example><example>
+        <title>Driver</title>
+
+        <programlisting>public class Driver extends Person {
+    <emphasis role="bold">@Min(value = 18, message = "You have to be 18 to drive a car", groups = DriverChecks.class)</emphasis>
+    public int age;
+
+    <emphasis role="bold">@AssertTrue(message = "You first have to pass the driving test", groups = DriverChecks.class)</emphasis>
+    public boolean hasDrivingLicense;
+
+    public Driver(String name) {
+        super( name );
+    }
+
+    public void passedDrivingTest(boolean b) {
+        hasDrivingLicense = b;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}</programlisting>
+      </example><example>
+        <title>Car</title>
+
+        <programlisting>public class Car {
+    @NotNull
+    private String manufacturer;
+
+    @NotNull
+    @Size(min = 2, max = 14)
+    private String licensePlate;
+
+    @Min(2)
+    private int seatCount;
+
+    <emphasis role="bold">@AssertTrue(message = "The car has to pass the vehicle inspection first", groups = CarChecks.class)</emphasis>
+    private boolean passedVehicleInspection;
+
+    <emphasis role="bold">@Valid</emphasis>
+    private Driver driver;
+
+    public Car(String manufacturer, String licencePlate, int seatCount) {
+        this.manufacturer = manufacturer;
+        this.licensePlate = licencePlate;
+        this.seatCount = seatCount;
+    }
+}</programlisting>
+      </example><example>
+        <title>Drive away</title>
+
+        <programlisting>public class GroupTest {
+
+    private static Validator validator;
+
+    @BeforeClass
+    public static void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @Test
+    public void driveAway() {
+        // create a car and check that everything is ok with it.
+        Car car = new Car( "Morris", "DD-AB-123", 2 );
+        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validate( car );
+        assertEquals( 0, constraintViolations.size() );
+
+        // but has it passed the vehicle inspection?
+        constraintViolations = validator.validate( car, CarChecks.class );
+        assertEquals( 1, constraintViolations.size() );
+        assertEquals("The car has to pass the vehicle inspection first", constraintViolations.iterator().next().getMessage());
+
+        // let's go to the vehicle inspection
+        car.setPassedVehicleInspection( true );
+        assertEquals( 0, validator.validate( car ).size() );
+
+        // now let's add a driver. He is 18, but has not passed the driving test yet
+        Driver john = new Driver( "John Doe" );
+        john.setAge( 18 );
+        car.setDriver( john );
+        constraintViolations = validator.validate( car, DriverChecks.class );
+        assertEquals( 1, constraintViolations.size() );
+        assertEquals( "You first have to pass the driving test", constraintViolations.iterator().next().getMessage() );
+
+        // ok, John passes the test
+        john.passedDrivingTest( true );
+        assertEquals( 0, validator.validate( car, DriverChecks.class ).size() );
+
+        // just checking that everything is in order now
+        assertEquals( 0, validator.validate( car, Default.class, CarChecks.class, DriverChecks.class ).size() );
+    }
+}</programlisting>
+      </example></para>
 
     <section revision="1">
       <title>Group sequences</title>
 
-      <para></para>
+      <para>By default, constraints are evaluated in no particular order and
+      this regardless of which groups they belong to. It is however useful in
+      some situations to control the order of constraints evaluation. There
+      are often scenarios where a preliminary set of constraints should be
+      evaluated prior to other constraints. ...</para>
     </section>
   </section>
 
@@ -636,11 +766,11 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator implements all of the constraints specified in
-    Bean Validation and also includes some custom constraints. As we'll see
-    later, you're not limited to them, you can literally in a minute write
-    your own constraints.</para>
+    Bean Validation as well as some custom constraints. <xref
+    linkend="table-builtin-constraints" /> list all built-in constraints
+    available in Hibernate Validator.</para>
 
-    <table>
+    <table id="table-builtin-constraints">
       <title>Built-in constraints</title>
 
       <tgroup cols="5">
@@ -666,7 +796,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
             <entry>yes</entry>
 
-            <entry>field/property</entry>
+            <entry>field/propertyß</entry>
 
             <entry>check that the annotated element is
             <constant>false</constant>.</entry>
@@ -688,7 +818,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           </row>
 
           <row>
-            <entry>@DecimalMax(value=)</entry>
+            <entry>@DecimalMax</entry>
 
             <entry>yes</entry>
 
@@ -704,11 +834,11 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
             the string representation of the max value according to the
             <classname>BigDecimal</classname> string representation.</entry>
 
-            <entry>?</entry>
+            <entry></entry>
           </row>
 
           <row>
-            <entry>@DecimalMin(value=)</entry>
+            <entry>@DecimalMin</entry>
 
             <entry>yes</entry>
 
@@ -724,7 +854,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
             the string representation of the min value according to the
             <classname>BigDecimal</classname> string representation.</entry>
 
-            <entry>?</entry>
+            <entry></entry>
           </row>
 
           <row>
@@ -775,7 +905,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           </row>
 
           <row>
-            <entry>@Max(value=)</entry>
+            <entry>@Max</entry>
 
             <entry>yes</entry>
 
@@ -793,7 +923,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           </row>
 
           <row>
-            <entry>@Min(value=)</entry>
+            <entry>@Min</entry>
 
             <entry>yes</entry>
 
@@ -894,5 +1024,17 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
         </tbody>
       </tgroup>
     </table>
+
+    <note>
+      <para>On top of the parameters indicated in <xref
+      linkend="table-builtin-constraints" /> each constraint supports the
+      parameters <parameter>message</parameter>, <parameter>groups</parameter>
+      and <parameter>payload</parameter>.</para>
+    </note>
+
+    <para>In some cases these built-in constraints will not fulfill your
+    requirements. In this case you can literally in a minute write your own
+    constraints. We will discuss this in <xref
+    linkend="validator-customconstraints" /></para>
   </section>
 </chapter>
