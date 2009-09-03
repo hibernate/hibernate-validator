@@ -13,18 +13,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */	
+ */
 package org.hibernate.validator.quickstart;
 
-import static org.junit.Assert.*;
-
 import java.util.Set;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -43,8 +41,9 @@ import org.junit.Test;
  * In case the object in question could be validated successfully this set will
  * be empty.
  * </p>
- * 
+ *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class CarTest {
 
@@ -52,80 +51,69 @@ public class CarTest {
 	 * The validator to be used for object validation. Will be retrieved once
 	 * for all test methods.
 	 */
-    private static Validator validator;
+	private static Validator validator;
 
-    /**
-     * Retrieves the validator instance.
-     */
-    @BeforeClass
-    public static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
+	/**
+	 * Retrieves the validator instance.
+	 */
+	@BeforeClass
+	public static void setUp() {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
+	}
 
-    /**
+	/**
 	 * One constraint violation due to the manufacturer field being null
 	 * expected.
 	 */
-    @Test
-    public void manufacturerIsNull() {
+	@Test
+	public void manufacturerIsNull() {
+		Car car = new Car( null, "DD-AB-123", 4 );
 
-        Car car = new Car(null, "DD-AB-123", 4);
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
 
-        Set<ConstraintViolation<Car>> constraintViolations =
-            validator.validate(car);
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
+	}
 
-        assertEquals(1, constraintViolations.size());
-        assertEquals(
-            "may not be null", constraintViolations.iterator().next().getMessage());
-    }
-
-    /**
+	/**
 	 * One constraint violation due to the licensePlate field being too short
 	 * expected.
 	 */
-    @Test
-    public void licensePlateTooShort() {
+	@Test
+	public void licensePlateTooShort() {
+		Car car = new Car( "Morris", "D", 4 );
 
-        Car car = new Car("Morris", "D", 4);
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
 
-        Set<ConstraintViolation<Car>> constraintViolations = 
-            validator.validate(car);
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "size must be between 2 and 14", constraintViolations.iterator().next().getMessage() );
+	}
 
-        assertEquals(1, constraintViolations.size());
-        assertEquals(
-            "size must be between 2 and 14", constraintViolations.iterator().next().getMessage());
-    }
-    
-    /**
+	/**
 	 * One constraint violation due to the seatCount field being too low
 	 * expected.
 	 */
-    @Test
-    public void seatCountTooLow() {
+	@Test
+	public void seatCountTooLow() {
+		Car car = new Car( "Morris", "DD-AB-123", 1 );
 
-        Car car = new Car("Morris", "DD-AB-123", 1);
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
 
-        Set<ConstraintViolation<Car>> constraintViolations =
-            validator.validate(car);
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
+	}
 
-        assertEquals(1, constraintViolations.size());
-        assertEquals(
-            "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage());
-    }
-
-    /**
+	/**
 	 * No constraint violation expected, as all fields of the validated Car
 	 * instance have proper values.
 	 */
-    @Test
-    public void carIsValid() {
+	@Test
+	public void carIsValid() {
+		Car car = new Car( "Morris", "DD-AB-123", 2 );
 
-        Car car = new Car("Morris", "DD-AB-123", 2);
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
 
-        Set<ConstraintViolation<Car>> constraintViolations =
-            validator.validate(car);
-
-        assertEquals(0, constraintViolations.size());
-    }
+		assertEquals( 0, constraintViolations.size() );
+	}
 }

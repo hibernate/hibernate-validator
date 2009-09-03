@@ -13,20 +13,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */	
+ */
 package org.hibernate.validator.quickstart;
 
+import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * An exemplary model class, which is enriched with constraint annotations from
+ * An example entity class enriched with constraint annotations from
  * the Bean Validation API (<a href="http://jcp.org/en/jsr/detail?id=303">JSR
- * 303</a>). Have a look at {@link CarTest} to learn, how the Bean Validation
- * API can be used to validate Car instances.
- * 
+ * 303</a>). Have a look at {@link org.hibernate.validator.quickstart.CarTest} to learn, how the Bean Validation
+ * API can be used to validate {@code Car} instances.
+ *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class Car {
 
@@ -34,29 +37,34 @@ public class Car {
 	 * By annotating the field with @NotNull we specify, that null is not a valid
 	 * value.
 	 */
-    @NotNull
-    private String manufacturer;
+	@NotNull
+	private String manufacturer;
 
-    /**
-     * This String field shall not only not allowed to be null, it shall also between
-     * 2 and 14 characters long. 
-     */
-    @NotNull
-    @Size(min = 2, max = 14)
-    private String licensePlate;
+	/**
+	 * This String field shall not only not allowed to be null, it shall also between
+	 * 2 and 14 characters long.
+	 */
+	@NotNull
+	@Size(min = 2, max = 14)
+	private String licensePlate;
 
-    /**
-     * This int field shall have a value of at least 2.
-     */
-    @Min(2)
-    private int seatCount;
-    
-    public Car(String manufacturer, String licencePlate, int seatCount) {
+	/**
+	 * This int field shall have a value of at least 2.
+	 */
+	@Min(2)
+	private int seatCount;
 
-        this.manufacturer = manufacturer;
-        this.licensePlate = licencePlate;
-        this.seatCount = seatCount;
-    }
+	@AssertTrue(message = "The car has to pass the vehicle inspection first", groups = CarChecks.class)
+	private boolean passedVehicleInspection;
+
+	@Valid
+	private Driver driver;
+
+	public Car(String manufacturer, String licencePlate, int seatCount) {
+		this.manufacturer = manufacturer;
+		this.licensePlate = licencePlate;
+		this.seatCount = seatCount;
+	}
 
 	public String getManufacturer() {
 		return manufacturer;
@@ -82,4 +90,19 @@ public class Car {
 		this.seatCount = seatCount;
 	}
 
+	public boolean getPassedVehicleInspection() {
+		return passedVehicleInspection;
+	}
+
+	public void setPassedVehicleInspection(boolean passed) {
+		this.passedVehicleInspection = passed;
+	}
+
+	public Driver getDriver() {
+		return driver;
+	}
+
+	public void setDriver(Driver driver) {
+		this.driver = driver;
+	}
 }
