@@ -103,13 +103,4 @@
 
   <xi:include href="modules/integration.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
-
-  <xi:include href="modules/extendedri.xml"
-              xmlns:xi="http://www.w3.org/2001/XInclude" />
-
-  <xi:include href="modules/defineconstraints.xml"
-              xmlns:xi="http://www.w3.org/2001/XInclude" />
-
-  <xi:include href="modules/checkconstraints.xml"
-              xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

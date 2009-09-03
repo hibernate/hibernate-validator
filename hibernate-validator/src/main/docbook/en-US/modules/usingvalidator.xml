@@ -190,7 +190,7 @@ public class Car {
 
       <para>When using property level constraints property access strategy is
       used to access the value to be validated. This means the bean validation
-      provider accesses the state via the property accessor method. </para>
+      provider accesses the state via the property accessor method.</para>
 
       <para>Generally it is recommended to stick either to field
       <emphasis>or</emphasis> property annotation within one class. It is not
@@ -383,7 +383,7 @@ public class Car {
       the <classname>Person</classname> objects contained in the
       <property>passengers</property> list has a <code>null</code> name.<note>
           <para><classname>null</classname> values are getting ignored when
-          validating object graphs. </para>
+          validating object graphs.</para>
         </note></para>
     </section>
   </section>
@@ -420,7 +420,7 @@ ValidatorFactory factory = config.buildValidatorFactory();
 Validator validator = factory.getValidator();
 </programlisting>We will learn more about
       <classname>MessageInterpolator</classname> and
-      <classname>TraversableResolver</classname> in later chapters. </para>
+      <classname>TraversableResolver</classname> in later chapters.</para>
 
       <para>Last but not least you can ask for a Configuration object of a
       specific Bean Validation provider. This is useful if you have more than
@@ -491,7 +491,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
         <para>With help of the <methodname>validateProperty()</methodname> a
         single named property of a given object can be validated. The property
         name is the JavaBeans property name. @Valid is not honored by this
-        method. </para>
+        method.</para>
 
         <example>
           <title>Usage of
@@ -623,7 +623,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     <methodname>validateValue</methodname>. All constraints belonging to the
     targeted group are applied during the Section 3.5. When more than one
     group is requested, the order in which the groups are evaluated is not
-    deterministic. </para>
+    deterministic.</para>
 
     <section revision="1">
       <title>Group sequences</title>
@@ -635,23 +635,26 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
   <section id="validator-defineconstraints-builtin" revision="2">
     <title>Built-in constraints</title>
 
-    <para>Hibernate Validator comes with some built-in constraints, which
-    covers some basic data checks. As we'll see later, you're not limited to
-    them, you can literally in a minute write your own constraints.</para>
+    <para>Hibernate Validator implements all of the constraints specified in
+    Bean Validation and also includes some custom constraints. As we'll see
+    later, you're not limited to them, you can literally in a minute write
+    your own constraints.</para>
 
     <table>
       <title>Built-in constraints</title>
 
-      <tgroup cols="4">
-        <colspec align="center" />
+      <tgroup cols="5">
+        <colspec align="left" />
 
         <thead>
           <row>
             <entry>Annotation</entry>
 
+            <entry>Part of Bean Validation Specification</entry>
+
             <entry>Apply on</entry>
 
-            <entry>Runtime checking</entry>
+            <entry>Use</entry>
 
             <entry>Hibernate Metadata impact</entry>
           </row>
@@ -659,121 +662,14 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
         <tbody>
           <row>
-            <entry>@Length(min=, max=)</entry>
-
-            <entry>property (String)</entry>
-
-            <entry>check if the string length match the range</entry>
-
-            <entry>Column length will be set to max</entry>
-          </row>
-
-          <row>
-            <entry>@Max(value=)</entry>
-
-            <entry>property (numeric or string representation of a
-            numeric)</entry>
-
-            <entry>check if the value is less than or equals to max</entry>
-
-            <entry>Add a check constraint on the column</entry>
-          </row>
-
-          <row>
-            <entry>@Min(value=)</entry>
-
-            <entry>property (numeric or string representation of a
-            numeric)</entry>
-
-            <entry>check if the value is more than or equals to min</entry>
-
-            <entry>Add a check constraint on the column</entry>
-          </row>
-
-          <row>
-            <entry>@NotNull</entry>
-
-            <entry>property</entry>
-
-            <entry>check if the value is not null</entry>
-
-            <entry>Column(s) are not null</entry>
-          </row>
-
-          <row>
-            <entry>@NotEmpty</entry>
-
-            <entry>property</entry>
-
-            <entry>check if the string is not null nor empty. Check if the
-            connection is not null nor empty</entry>
-
-            <entry>Column(s) are not null (for String)</entry>
-          </row>
-
-          <row>
-            <entry>@Past</entry>
-
-            <entry>property (date or calendar)</entry>
-
-            <entry>check if the date is in the past</entry>
-
-            <entry>Add a check constraint on the column</entry>
-          </row>
-
-          <row>
-            <entry>@Future</entry>
-
-            <entry>property (date or calendar)</entry>
-
-            <entry>check if the date is in the future</entry>
-
-            <entry>none</entry>
-          </row>
-
-          <row>
-            <entry>@Pattern(regex="regexp", flag=) or @Patterns(
-            {@Pattern(...)} )</entry>
-
-            <entry>property (string)</entry>
-
-            <entry>check if the property match the regular expression given a
-            match flag (see <classname>java.util.regex.Pattern </classname>
-            )</entry>
-
-            <entry>none</entry>
-          </row>
-
-          <row>
-            <entry>@Range(min=, max=)</entry>
-
-            <entry>property (numeric or string representation of a
-            numeric)</entry>
-
-            <entry>check if the value is between min and max
-            (included)</entry>
-
-            <entry>Add a check constraint on the column</entry>
-          </row>
-
-          <row>
-            <entry>@Size(min=, max=)</entry>
-
-            <entry>property (array, collection, map)</entry>
-
-            <entry>check if the element size is between min and max
-            (included)</entry>
-
-            <entry>none</entry>
-          </row>
-
-          <row>
             <entry>@AssertFalse</entry>
 
-            <entry>property</entry>
+            <entry>yes</entry>
 
-            <entry>check that the method evaluates to false (useful for
-            constraints expressed in code rather than annotations)</entry>
+            <entry>field/property</entry>
+
+            <entry>check that the annotated element is
+            <constant>false</constant>.</entry>
 
             <entry>none</entry>
           </row>
@@ -781,10 +677,204 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           <row>
             <entry>@AssertTrue</entry>
 
-            <entry>property</entry>
+            <entry>yes</entry>
 
-            <entry>check that the method evaluates to true (useful for
-            constraints expressed in code rather than annotations)</entry>
+            <entry>field/property</entry>
+
+            <entry>check that the annotated element is
+            <constant>true</constant>.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@DecimalMax(value=)</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>BigDecimal</classname>,
+            <classname>BigInteger</classname>, <classname>String</classname>,
+            <classname>byte</classname>, <classname>short</classname>,
+            <classname>int</classname>, <classname>long</classname> and the
+            respective warppers of the primtive types. </entry>
+
+            <entry>The annotated element must be a number whose value must be
+            lower or equal to the specified maximum. The parameter value is
+            the string representation of the max value according to the
+            <classname>BigDecimal</classname> string representation.</entry>
+
+            <entry>?</entry>
+          </row>
+
+          <row>
+            <entry>@DecimalMin(value=)</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>BigDecimal</classname>,
+            <classname>BigInteger</classname>, <classname>String</classname>,
+            <classname>byte</classname>, <classname>short</classname>,
+            <classname>int</classname>, <classname>long</classname> and the
+            respective warppers of the primtive types.</entry>
+
+            <entry>The annotated element must be a number whose value must be
+            higher or equal to the specified maximum. The parameter value is
+            the string representation of the min value according to the
+            <classname>BigDecimal</classname> string representation.</entry>
+
+            <entry>?</entry>
+          </row>
+
+          <row>
+            <entry>@Digits(integer=, fraction=)</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>BigDecimal</classname>,
+            <classname>BigInteger</classname>, <classname>String</classname>,
+            <classname>byte</classname>, <classname>short</classname>,
+            <classname>int</classname>, <classname>long</classname> and the
+            respective warppers of the primtive types. </entry>
+
+            <entry>Check whether the property is a number having up to
+            <literal>integer</literal> digits and <literal>fraction</literal>
+            fractional digits.</entry>
+
+            <entry>Define column precision and scale.</entry>
+          </row>
+
+          <row>
+            <entry>@Future</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>java.util.Date</classname> and
+            <classname>java.util.Calendar</classname>.</entry>
+
+            <entry>Checks whether the annotated date is in the future.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Length(min=, max=)</entry>
+
+            <entry>no</entry>
+
+            <entry>field/property. Needs to be a string.</entry>
+
+            <entry>Validate that the annotated string is between
+            <parameter>min</parameter> and <parameter>max</parameter>
+            included.</entry>
+
+            <entry>Column length will be set to max.</entry>
+          </row>
+
+          <row>
+            <entry>@Max(value=)</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>BigDecimal</classname>,
+            <classname>BigInteger</classname>, <classname>String</classname>,
+            <classname>byte</classname>, <classname>short</classname>,
+            <classname>int</classname>, <classname>long</classname> and the
+            respective warppers of the primtive types.</entry>
+
+            <entry>Checks whether the annoated value is less than or equal to
+            the specified maximum.</entry>
+
+            <entry>Add a check constraint on the column.</entry>
+          </row>
+
+          <row>
+            <entry>@Min(value=)</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>BigDecimal</classname>,
+            <classname>BigInteger</classname>, <classname>String</classname>,
+            <classname>byte</classname>, <classname>short</classname>,
+            <classname>int</classname>, <classname>long</classname> and the
+            respective warppers of the primtive types.</entry>
+
+            <entry>Check whether the annoated value is higher than or equal to
+            the specified minimum.</entry>
+
+            <entry>Add a check constraint on the column.</entry>
+          </row>
+
+          <row>
+            <entry>@NotNull</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property</entry>
+
+            <entry>Check that the annoated value is not
+            <constant>null.</constant></entry>
+
+            <entry>Column(s) are not null.</entry>
+          </row>
+
+          <row>
+            <entry>@NotEmpty</entry>
+
+            <entry>no</entry>
+
+            <entry>field/property. Needs to be a string.</entry>
+
+            <entry>Check if the string is not <constant>null</constant> nor
+            empty. </entry>
+
+            <entry>Column(s) are not null (for String).</entry>
+          </row>
+
+          <row>
+            <entry>@Past</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>java.util.Date</classname> and
+            <classname>java.util.Calendar</classname>.</entry>
+
+            <entry>Checks whether the annotated date is in the past.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Pattern(regex=, flag=)</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Needs to be a string.</entry>
+
+            <entry>Check if the annotated string match the regular
+            expression.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Size(min=, max=)</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property. Supported types are
+            <classname>String</classname>, <classname>Collection</classname>,
+            <classname>Map</classname> and
+            <classname>arrays</classname>.</entry>
+
+            <entry>Check if the annotated element size is between min and max
+            (inclusive).</entry>
 
             <entry>none</entry>
           </row>
@@ -792,58 +882,12 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           <row>
             <entry>@Valid</entry>
 
-            <entry>property (object)</entry>
+            <entry>yes</entry>
 
-            <entry>perform validation recursively on the associated object. If
-            the object is a Collection or an array, the elements are validated
-            recursively. If the object is a Map, the value elements are
-            validated recursively.</entry>
+            <entry>field/property</entry>
 
-            <entry>none</entry>
-          </row>
-
-          <row>
-            <entry>@Email</entry>
-
-            <entry>property (String)</entry>
-
-            <entry>check whether the string is conform to the email address
-            specification</entry>
-
-            <entry>none</entry>
-          </row>
-
-          <row>
-            <entry>@CreditCardNumber</entry>
-
-            <entry>property (String)</entry>
-
-            <entry>check whether the string is a well formated credit card
-            number (derivative of the Luhn algorithm)</entry>
-
-            <entry>none</entry>
-          </row>
-
-          <row>
-            <entry>@Digits</entry>
-
-            <entry>property (numeric or string representation of a
-            numeric)</entry>
-
-            <entry>check whether the property is a number having up to
-            <literal>integerDigits</literal> integer digits and
-            <literal>fractionalDigits</literal> fractonal digits</entry>
-
-            <entry>define column precision and scale</entry>
-          </row>
-
-          <row>
-            <entry>@EAN</entry>
-
-            <entry>property (string)</entry>
-
-            <entry>check whether the string is a properly formated EAN or
-            UPC-A code</entry>
+            <entry>Perform validation recursively on the associated
+            object.</entry>
 
             <entry>none</entry>
           </row>
