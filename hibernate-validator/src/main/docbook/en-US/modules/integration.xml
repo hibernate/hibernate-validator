@@ -49,28 +49,31 @@
 
     <para>If, for some reason, the feature needs to be disabled, set
     <literal>hibernate.validator.apply_to_ddl</literal> to
-    <literal>false</literal>.</para>
+    <literal>false</literal>. See also <xref
+    linkend="table-builtin-constraints" /></para>
   </section>
 
   <section id="validator-checkconstraints-orm">
     <title>ORM integration</title>
 
     <para>Hibernate Validator integrates with both Hibernate and all pure Java
-    Persistence providers</para>
+    Persistence providers.</para>
 
     <section id="validator-checkconstraints-orm-hibernateevent" revision="1">
       <title>Hibernate event-based validation</title>
 
-      <para>Hibernate Validator has two built-in Hibernate event listeners.
-      Whenever a <literal>PreInsertEvent</literal> or
-      <literal>PreUpdateEvent</literal> occurs, the listeners will verify all
-      constraints of the entity instance and throw an exception if any
-      constraint is violated. Basically, objects will be checked before any
-      inserts and before any updates made by Hibernate. This includes changes
-      applied by cascade! This is the most convenient and the easiest way to
-      activate the validation process. On constraint violation, the event will
-      raise a runtime <classname>InvalidStateException</classname> which
-      contains an array of <literal>InvalidValue</literal>s describing each
+      <para>Hibernate Validator has a built-in Hibernate event listener -
+      <classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>
+      - which is part of Hibernate Annotations. Whenever a
+      <literal>PreInsertEvent</literal> or <literal>PreUpdateEvent</literal>
+      occurs, the listener will verify all constraints of the entity instance
+      and throw an exception if any constraint is violated. Basically, objects
+      will be checked before any inserts and before any updates are made by
+      Hibernate. This includes changes applied by cascade! This is the most
+      convenient and the easiest way to activate the validation process. On
+      constraint violation, the event will raise a runtime
+      <classname>ConstraintViolationException</classname> which contains a set
+      of <literal>ConstraintViolation</literal>s describing each
       failure.</para>
 
       <para>If Hibernate Validator is present in the classpath, Hibernate
@@ -92,11 +95,11 @@
     ...
     &lt;event type="pre-update"&gt;
         &lt;listener 
-          class="org.hibernate.validator.event.ValidateEventListener"/&gt;
+          class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
     &lt;/event&gt;
     &lt;event type="pre-insert"&gt;
         &lt;listener 
-          class="org.hibernate.validator.event.ValidateEventListener"/&gt;
+          class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
     &lt;/event&gt;
 &lt;/hibernate-configuration&gt;</programlisting>
     </section>
@@ -130,40 +133,6 @@ public class Submarine {
           reflect the constraints.</para>
         </note></para>
     </section>
-  </section>
-
-  <section>
-    <title>Application-level validation</title>
-
-    <para>Hibernate Validator can be applied anywhere in your application
-    code.</para>
-
-    <programlisting>ClassValidator personValidator = new ClassValidator( Person.class );
-ClassValidator addressValidator = new ClassValidator( Address.class, ResourceBundle.getBundle("messages", Locale.ENGLISH) );
-
-InvalidValue[] validationMessages = addressValidator.getInvalidValues(address);</programlisting>
-
-    <para>The first two lines prepare the Hibernate Validator for class
-    checking. The first one relies upon the error messages embedded in
-    Hibernate Validator (see <xref
-    linkend="validator-defineconstraints-error" />), the second one uses a
-    resource bundle for these messages. It is considered a good practice to
-    execute these lines once and cache the validator instances.</para>
-
-    <para>The third line actually validates the <literal>Address</literal>
-    instance and returns an array of <literal>InvalidValue</literal>s. Your
-    application logic will then be able to react to the failure.</para>
-
-    <para>You can also check a particular property instead of the whole bean.
-    This might be useful for property per property user interaction</para>
-
-    <programlisting>ClassValidator addressValidator = new ClassValidator( Address.class, ResourceBundle.getBundle("messages", Locale.ENGLISH) );
-
-//only get city property invalid values
-InvalidValue[] validationMessages = addressValidator.getInvalidValues(address, "city");
-
-//only get potential city property invalid values
-InvalidValue[] validationMessages = addressValidator.getPotentialInvalidValues("city", "Paris")</programlisting>
   </section>
 
   <section>

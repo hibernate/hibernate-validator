@@ -633,17 +633,21 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     <title>Using groups</title>
 
     <para>Groups allow you to restrict the set of constraints applied during
-    validation. This allows for example for wizard like validation where for
-    each step only a specified subset of the defined constraints get
-    validated. The groups targeted are passed as var-args parameters to
+    validation. This allows for example for wizard like validation where in
+    each step only a specified subset of constraints get validated. The groups
+    targeted are passed as var-args parameters to
     <methodname>validate</methodname>,
     <methodname>validateProperty</methodname> and
     <methodname>validateValue</methodname>. When more than one group is
     requested, the order in which the groups are evaluated is not
     deterministic. If no group is specified the default group
     <classname>javax.validation.Default</classname> is assumed. Let's have a
-    look at a slightly extended <classname>Car</classname> with
-    <classname>Driver</classname> example.</para>
+    look at an extended <classname>Car</classname> with
+    <classname>Driver</classname> example. First we have the class
+    <classname>Person</classname> which has a <classname>@NotNull
+    </classname>constraint on name. Since no group is specified for this
+    annoation its default groups is
+    <classname>javax.validation.Default</classname>.</para>
 
     <para><example>
         <title>Person</title>
@@ -658,7 +662,16 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
     // getters and setters ...
 }</programlisting>
-      </example><example>
+      </example>Next we have the class <classname>Driver</classname> extending
+    <classname>Person</classname>. Here we are adding the properties
+    <property>age</property> and <property>hasDrivingLicense</property>. In
+    order to drive you must be at least 18 (<classname>@Min(18)</classname>)
+    and you must have a driving license (<classname>@AssertTrue</classname>).
+    Both of consraints defined on these properties belong to the group
+    <classname>DriverChecks</classname>. As you can the group is just a simple
+    interface. Using interfaces makes the group feature type safe and allows
+    for easy refactoring. It also means that groups can inherit from each
+    other by simple class inheritance.<example>
         <title>Driver</title>
 
         <programlisting>public class Driver extends Person {
@@ -685,6 +698,17 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     }
 }</programlisting>
       </example><example>
+        <title>The actual group interfaces</title>
+
+        <programlisting>public interface DriverChecks {
+}
+
+public interface CarChecks {
+}</programlisting>
+      </example>Last but not least we add the property
+    <property>passedVehicleInspection</property> to the
+    <classname>Car</classname> class indecating whether a car passed the road
+    worthy tests.<example>
         <title>Car</title>
 
         <programlisting>public class Car {
@@ -710,16 +734,17 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
         this.seatCount = seatCount;
     }
 }</programlisting>
-      </example><example>
-        <title>The actual group interfaces</title>
-
-        <programlisting>public interface DriverChecks {
-}
-
-
-public interface CarChecks {
-}</programlisting>
-      </example><example>
+      </example>Overall three different groups are used in our example.
+    <property>Person.name</property>, <property>Car.manufacturer</property>,
+    <property>Car.licenseplate</property> and
+    <property>Car.seatCount</property> all belong to the
+    <classname>Default</classname> group. <property>Driver.age</property> and
+    <property>Driver.hasDrivingLicense</property> belong to
+    <classname>DriverChecks</classname> and last but not least
+    <property>Car.passedVehicleInspection</property> belongs to the group
+    <classname>CarChecks</classname>. The following example shows how passing
+    different group combinations to the Validator.validate method result in
+    different validation results.<example>
         <title>Drive away</title>
 
         <programlisting>public class GroupTest {
@@ -774,6 +799,12 @@ public interface CarChecks {
       some situations to control the order of constraints evaluation. There
       are often scenarios where a preliminary set of constraints should be
       evaluated prior to other constraints. ...</para>
+
+      <section>
+        <title>Redefining the default group sequence of a class</title>
+
+        <para></para>
+      </section>
     </section>
   </section>
 
@@ -849,7 +880,7 @@ public interface CarChecks {
             the string representation of the max value according to the
             <classname>BigDecimal</classname> string representation.</entry>
 
-            <entry></entry>
+            <entry>none</entry>
           </row>
 
           <row>
@@ -869,7 +900,7 @@ public interface CarChecks {
             the string representation of the min value according to the
             <classname>BigDecimal</classname> string representation.</entry>
 
-            <entry></entry>
+            <entry>none</entry>
           </row>
 
           <row>
