@@ -30,7 +30,17 @@
   <section>
     <title><filename>validation.xml</filename></title>
 
-    <para><mediaobject>
+    <para>The key to enable XML configuration for Hibernate Validator the the
+    file <filename>validation.xml</filename>. If this file exists in the
+    classpath the configuration specified in it will be considered when the
+    <classname>ValidationFactory</classname> gets created. <warning>
+        <para>There can only be one <filename>validation.xml</filename> in the
+        classpath. If more than one is found an exception is thrown.</para>
+      </warning>The <xref linkend="image-validation-configuration" /> shows a
+    model view of the validation-configuration xsd and <xref
+    linkend="example-validation-xml" /> shows a valid
+    <filename>validation.xml</filename>. Let's have a look at the different
+    settings. <mediaobject id="image-validation-configuration">
         <imageobject role="fo">
           <imagedata align="center" fileref="validation-configuration-1.0.png"
                      scalefit="1" />
@@ -44,6 +54,21 @@
         <caption><para>Model view
         validation-configuration-1.0.xsd</para></caption>
       </mediaobject></para>
+
+    <para></para>
+
+    <example id="example-validation-xml">
+      <title>validation.xml</title>
+
+      <programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;        
+&lt;validation-config xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+                   xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+    &lt;constraint-mapping&gt;org/hibernate/jsr303/tck/tests/xmlconfiguration/order-constraints.xml&lt;/constraint-mapping&gt;
+    &lt;constraint-mapping&gt;org/hibernate/jsr303/tck/tests/xmlconfiguration/user-constraints.xml&lt;/constraint-mapping&gt;
+    &lt;property name="javax.validation.test"&gt;foobar&lt;/property&gt;
+&lt;/validation-config&gt;</programlisting>
+    </example>
   </section>
 
   <section>
@@ -61,6 +86,73 @@
         </imageobject>
 
         <caption><para>Model view validation-mapping-1.0.xsd</para></caption>
-      </mediaobject></para>
+      </mediaobject><example>
+        <title>XML configuration of Car TODO!</title>
+
+        <programlisting>&lt;constraint-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
+                     xmlns="http://jboss.org/xml/ns/javax/validation/mapping"&gt;
+    &lt;default-package&gt;org.hibernate.jsr303.tck.tests.xmlconfiguration&lt;/default-package&gt;
+    &lt;bean class="User" ignore-annotations="false"&gt;
+        &lt;class ignore-annotations="true"&gt;
+            &lt;group-sequence&gt;
+                &lt;value&gt;User&lt;/value&gt;
+                &lt;value&gt;Optional&lt;/value&gt;
+            &lt;/group-sequence&gt;
+            &lt;constraint annotation="org.hibernate.jsr303.tck.tests.xmlconfiguration.ConsistentUserInformation"&gt;
+                &lt;message&gt;Message from xml&lt;/message&gt;
+                &lt;groups&gt;
+                    &lt;value&gt;javax.validation.groups.Default&lt;/value&gt;
+                &lt;/groups&gt;
+                &lt;payload&gt;
+                    &lt;value&gt;org.hibernate.jsr303.tck.tests.xmlconfiguration.Error&lt;/value&gt;
+                &lt;/payload&gt;
+                &lt;element name="stringParam"&gt;foobar&lt;/element&gt;
+                &lt;element name="classParam"&gt;java.lang.String&lt;/element&gt;
+                &lt;element name="stringArrayParam"&gt;
+                    &lt;value&gt;foo&lt;/value&gt;
+                    &lt;value&gt;bar&lt;/value&gt;
+                &lt;/element&gt;
+                &lt;element name="intParam"&gt;
+                    &lt;value&gt;42&lt;/value&gt;
+                &lt;/element&gt;
+                &lt;element name="patterns"&gt;
+                    &lt;annotation&gt;
+                        &lt;element name="regexp"&gt;myRegExp1&lt;/element&gt;
+                    &lt;/annotation&gt;
+                    &lt;annotation&gt;
+                        &lt;element name="regexp"&gt;myRegExp2&lt;/element&gt;
+                    &lt;/annotation&gt;
+                &lt;/element&gt;
+                &lt;element name="userType"&gt;SELLER&lt;/element&gt;
+            &lt;/constraint&gt;
+        &lt;/class&gt;
+        &lt;field name="lastname"&gt;
+            &lt;constraint annotation="javax.validation.constraints.Pattern"&gt;
+                &lt;message&gt;Last name has to start with with a capital letter.&lt;/message&gt;
+                &lt;element name="regexp"&gt;^[A-Z][a-z]+&lt;/element&gt;
+            &lt;/constraint&gt;
+        &lt;/field&gt;
+        &lt;field name="creditcard"&gt;
+            &lt;valid/&gt;
+        &lt;/field&gt;
+        &lt;getter name="firstname" ignore-annotations="true"&gt;
+            &lt;constraint annotation="javax.validation.constraints.Size"&gt;
+                &lt;message&gt;Size is limited!&lt;/message&gt;
+                &lt;groups&gt;
+                    &lt;value&gt;org.hibernate.jsr303.tck.tests.xmlconfiguration.TestGroup&lt;/value&gt;
+                    &lt;value&gt;javax.validation.groups.Default&lt;/value&gt;
+                &lt;/groups&gt;
+                &lt;element name="max"&gt;10&lt;/element&gt;
+            &lt;/constraint&gt;
+        &lt;/getter&gt;
+    &lt;/bean&gt;
+    &lt;constraint-definition annotation="ConsistentUserInformation"&gt;
+        &lt;validated-by include-existing-validators="false"&gt;
+            &lt;value&gt;org.hibernate.jsr303.tck.tests.xmlconfiguration.CustomConsistentUserValidator&lt;/value&gt;
+        &lt;/validated-by&gt;
+    &lt;/constraint-definition&gt;
+&lt;/constraint-mappings&gt;</programlisting>
+      </example></para>
   </section>
 </chapter>

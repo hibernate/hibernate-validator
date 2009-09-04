@@ -271,8 +271,7 @@ public class RentalCar extends Car {
       <example>
         <title>Class Person</title>
 
-        <programlisting>
-package com.mycompany;
+        <programlisting>package com.mycompany;
 
 import javax.validation.constraints.NotNull;
 
@@ -743,8 +742,9 @@ public interface CarChecks {
     <classname>DriverChecks</classname> and last but not least
     <property>Car.passedVehicleInspection</property> belongs to the group
     <classname>CarChecks</classname>. The following example shows how passing
-    different group combinations to the Validator.validate method result in
-    different validation results.<example>
+    different group combinations to the
+    <methodname>Validator.validate</methodname> method result in different
+    validation results.<example>
         <title>Drive away</title>
 
         <programlisting>public class GroupTest {
@@ -789,7 +789,24 @@ public interface CarChecks {
         assertEquals( 0, validator.validate( car, Default.class, CarChecks.class, DriverChecks.class ).size() );
     }
 }</programlisting>
-      </example></para>
+      </example>First we create a car and validate it using no explicit group.
+    There are no validation errors, even though the property
+    <property>passedVehicleInspection</property> is false. However, the
+    constraint defined on this property does not belong to the default
+    group.</para>
+
+    <para>Next we just validate the <classname>CarChecks</classname> group
+    which will fail until we make sure that the case passes the vehicle
+    inspection.</para>
+
+    <para>When we then add a driver to the car and validate against
+    <classname>DriverChecks</classname> we get again a constraint violation
+    due to the fact that the driver has not yet passed the driving test. Only
+    after setting <property>passedDrivingTest</property> to true the
+    validation against <classname>DriverChecks</classname> will pass.</para>
+
+    <para>Last but not least, we show that all constraints are passing by
+    validating against all defined groups.</para>
 
     <section revision="1">
       <title>Group sequences</title>
@@ -873,7 +890,7 @@ public interface CarChecks {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective warppers of the primtive types. </entry>
+            respective warppers of the primtive types.</entry>
 
             <entry>The annotated element must be a number whose value must be
             lower or equal to the specified maximum. The parameter value is
@@ -913,7 +930,7 @@ public interface CarChecks {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective warppers of the primtive types. </entry>
+            respective warppers of the primtive types.</entry>
 
             <entry>Check whether the property is a number having up to
             <literal>integer</literal> digits and <literal>fraction</literal>
@@ -1007,7 +1024,7 @@ public interface CarChecks {
             <entry>field/property. Needs to be a string.</entry>
 
             <entry>Check if the string is not <constant>null</constant> nor
-            empty. </entry>
+            empty.</entry>
 
             <entry>Column(s) are not null (for String).</entry>
           </row>
