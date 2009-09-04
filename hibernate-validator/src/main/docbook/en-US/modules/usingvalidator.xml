@@ -705,6 +705,15 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     }
 }</programlisting>
       </example><example>
+        <title>The actual group interfaces</title>
+
+        <programlisting>public interface DriverChecks {
+}
+
+
+public interface CarChecks {
+}</programlisting>
+      </example><example>
         <title>Drive away</title>
 
         <programlisting>public class GroupTest {
