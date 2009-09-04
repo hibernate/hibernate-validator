@@ -41,18 +41,6 @@
 
     <productnumber>&versionNumber;</productnumber>
 
-    <issuenum>1</issuenum>
-
-    <mediaobject>
-      <imageobject role="fo">
-        <imagedata align="center" fileref="hibernate_logo_a.png" />
-      </imageobject>
-
-      <imageobject role="html">
-        <imagedata depth="3cm" fileref="hibernate_logo_a.png" />
-      </imageobject>
-    </mediaobject>
-
     <copyright>
       <year>&copyrightYear;</year>
 
@@ -103,4 +91,15 @@
 
   <xi:include href="modules/integration.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <chapter>
+    <title>Further reading</title>
+
+    <para>Last but not least, a few pointers to further information. A great
+    source for examples is the Bean Validation TCK which can is available for
+    anonymous access in the Hibernate SVN repository - <ulink
+    url="https://svn.jboss.org/repos/hibernate/validator/trunk">https://svn.jboss.org/repos/hibernate/validator/trunk</ulink>.
+    Alternatively you can view the tests using fisheye and this url: <ulink
+    url="http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests">http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests</ulink>.</para>
+  </chapter>
 </book>

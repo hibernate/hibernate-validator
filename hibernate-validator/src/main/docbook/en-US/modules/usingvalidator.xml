@@ -621,6 +621,12 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
         </tgroup>
       </table>
     </section>
+
+    <section>
+      <title>A word about message interpolation</title>
+
+      <para></para>
+    </section>
   </section>
 
   <section id="validator-usingvalidator-validationgroups" revision="1">

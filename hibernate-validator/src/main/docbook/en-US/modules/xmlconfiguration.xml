@@ -26,4 +26,41 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-xmlconfiguration">
   <title>XML configuration</title>
+
+  <section>
+    <title><filename>validation.xml</filename></title>
+
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center" fileref="validation-configuration-1.0.png"
+                     scalefit="1" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata depth="" fileref="validation-configuration-1.0.png"
+                     scalefit="1" />
+        </imageobject>
+
+        <caption><para>Model view
+        validation-configuration-1.0.xsd</para></caption>
+      </mediaobject></para>
+  </section>
+
+  <section>
+    <title>Constraints mapped in XML</title>
+
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center" fileref="validation-mapping-1.0.png"
+                     scalefit="1" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata depth="" fileref="validation-mapping-1.0.png"
+                     scalefit="1" />
+        </imageobject>
+
+        <caption><para>Model view validation-mapping-1.0.xsd</para></caption>
+      </mediaobject></para>
+  </section>
 </chapter>
