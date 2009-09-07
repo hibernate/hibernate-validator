@@ -624,7 +624,49 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     <section>
       <title>Message interpolation</title>
 
-      <para></para>
+      <para>As we will see in <xref linkend="validator-customconstraints" />
+      each constraint definition must define a default message descriptor for
+      that constraint. This message can be overridden at declaration time
+      using the <methodname>message</methodname> attribute of the constraint.
+      You can see this in <xref linkend="example-driver" />. This message
+      descriptors get interpolated when a constaint validation fails using a
+      default <classname>MessageInterpolator</classname>. This interpolator
+      will try to resolve any message parameters, meaning string literals
+      enclosed in braces. In order to resolve these parameters Hibernate
+      Validator first recusively resolves parameters against a custom
+      <classname>ResourceBundle</classname> called
+      <filename>ValidationMessages.properties</filename> at the root of the
+      classpath (It is up to you to create this file). If no further
+      replacements are possible against the custom bundle the default
+      <classname>ResourceBundle</classname> under
+      <filename>/org/hibernate/validator/ValidationMessages.properties</filename>gets
+      inspected. If a replacement occurs against the default bundle the
+      algorithm looks again at the custom bundle. Once no further replacements
+      against these two resource bundles are possible remaining parameters are
+      getting resolved against the attributes of the constraint to be
+      validated.</para>
+
+      <para>Since the braces ('{' and '}') have special meaning in the
+      messages they need to be escpaped if they have to be taken literally.
+      The following The following rules apply:<itemizedlist>
+          <listitem>
+            <para>\{ is considered as the literal {</para>
+          </listitem>
+
+          <listitem>
+            <para>\} is considered as the literal }</para>
+          </listitem>
+
+          <listitem>
+            <para>\} is considered as the literal }</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>If the default message interpolator does ot fit your requirements
+      it is possible to plug a custom
+      <classname>MessageInterpolator</classname> when the
+      <classname>ValidatorFactory</classname> gets created. This can be seen
+      in <xref linkend="validator-bootstrapping" />.</para>
     </section>
   </section>
 
@@ -675,7 +717,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
         <para>The Bean Validation specification does not enforce that groups
         have to be interfaces. Other classes could be used as well, but we
         recommend to stick to interfaces.</para>
-      </note><example>
+      </note><example id="example-driver">
         <title>Driver</title>
 
         <programlisting>public class Driver extends Person {
@@ -842,12 +884,67 @@ public interface OrderedChecks {
           indirectly, either through cascaded sequence definition or group
           inheritance. If a group containing such a circularity is evaluated,
           a GroupDefinitionException is raised. </para>
-        </warning></para>
+        </warning>The usage of the new sequence could then look like in <xref
+      linkend="example-group-sequence" />.</para>
+
+      <example id="example-group-sequence">
+        <title>Usage of a group sequence</title>
+
+        <programlisting>@Test
+public void testOrderedChecks() {
+    Car car = new Car( "Morris", "DD-AB-123", 2 );
+    car.setPassedVehicleInspection( true );
+
+    Driver john = new Driver( "John Doe" );
+    john.setAge( 18 );
+    john.passedDrivingTest( true );
+    car.setDriver( john );
+
+    assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
+}</programlisting>
+      </example>
 
       <section>
         <title>Redefining the default group sequence of a class</title>
 
-        <para></para>
+        <para>The @groupSequence annotation also fulfills a second purpose. It
+        allows you to redefine what the Default group means for a given class.
+        To redefine <classname>Default</classname> for a class, place a
+        <classname>@GroupSequence</classname> annotation on the class. The
+        defined groups in the annotation expresse the sequence of groups that
+        substitute <classname>Default</classname> for this class. <xref
+        linkend="example-rental-car" /> introduces a new class RentalCar with
+        a redfined default group. With this definition the check for all three
+        groups can be rewritten as seen in <xref
+        linkend="example-testOrderedChecksWithRedefinedDefault" />.</para>
+
+        <example>
+          <title>RentalCar</title>
+
+          <programlisting>@GroupSequence({ RentalCar.class, CarChecks.class })
+public class RentalCar extends Car {
+    public RentalCar(String manufacturer, String licencePlate, int seatCount) {
+        super( manufacturer, licencePlate, seatCount );
+    }
+}</programlisting>
+        </example>
+
+        <example id="example-testOrderedChecksWithRedefinedDefault">
+          <title>testOrderedChecksWithRedefinedDefault</title>
+
+          <programlisting>@Test
+public void testOrderedChecksWithRedefinedDefault() {
+    RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
+    rentalCar.setPassedVehicleInspection( true );
+
+    Driver john = new Driver( "John Doe" );
+    john.setAge( 18 );
+    john.passedDrivingTest( true );
+    rentalCar.setDriver( john );
+
+    assertEquals( 0, validator.validate( rentalCar, Default.class, DriverChecks.class ).size() );
+}</programlisting>
+        </example>
       </section>
     </section>
   </section>
