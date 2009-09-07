@@ -44,7 +44,7 @@ public class GroupTest {
 	}
 
 	@Test
-	public void driveAway() {
+	public void testDriveAway() {
 		// create a car and check that everything is ok with it.
 		Car car = new Car( "Morris", "DD-AB-123", 2 );
 		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
@@ -75,5 +75,31 @@ public class GroupTest {
 
 		// just checking that everything is in order now
 		assertEquals( 0, validator.validate( car, Default.class, CarChecks.class, DriverChecks.class ).size() );
+	}
+
+	@Test
+	public void testOrderedChecks() {
+		Car car = new Car( "Morris", "DD-AB-123", 2 );
+		car.setPassedVehicleInspection( true );
+
+		Driver john = new Driver( "John Doe" );
+		john.setAge( 18 );
+		john.passedDrivingTest( true );
+		car.setDriver( john );
+
+		assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
+	}
+
+	@Test
+	public void testOrderedChecksWithRedefinedDefault() {
+		RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
+		rentalCar.setPassedVehicleInspection( true );
+
+		Driver john = new Driver( "John Doe" );
+		john.setAge( 18 );
+		john.passedDrivingTest( true );
+		rentalCar.setDriver( john );
+
+		assertEquals( 0, validator.validate( rentalCar, Default.class, DriverChecks.class ).size() );
 	}
 }
