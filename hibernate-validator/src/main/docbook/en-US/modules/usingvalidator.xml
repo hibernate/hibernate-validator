@@ -754,7 +754,7 @@ public interface CarChecks {
       </example>Last but not least we add the property
     <property>passedVehicleInspection</property> to the
     <classname>Car</classname> class indicating whether a car passed the road
-    worthy tests.<example>
+    worthy tests.<example id="example-car">
         <title>Car</title>
 
         <programlisting>public class Car {
@@ -918,7 +918,7 @@ public void testOrderedChecks() {
         groups can be rewritten as seen in <xref
         linkend="example-testOrderedChecksWithRedefinedDefault" />.</para>
 
-        <example>
+        <example id="example-rental-car">
           <title>RentalCar</title>
 
           <programlisting>@GroupSequence({ RentalCar.class, CarChecks.class })
@@ -945,6 +945,14 @@ public void testOrderedChecksWithRedefinedDefault() {
     assertEquals( 0, validator.validate( rentalCar, Default.class, DriverChecks.class ).size() );
 }</programlisting>
         </example>
+
+        <note>
+          <para>Due to the fact that there cannot be a cyclic dependecy in the
+          group and group sequence defintions one cannot just at
+          <classname>Default</classname> to the sequence redefining
+          <classname>Default</classname> for a class. Instead the class itself
+          should be added!</para>
+        </note>
       </section>
     </section>
   </section>
