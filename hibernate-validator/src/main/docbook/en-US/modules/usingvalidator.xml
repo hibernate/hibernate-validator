@@ -622,7 +622,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     </section>
 
     <section>
-      <title>A word about message interpolation</title>
+      <title>Message interpolation</title>
 
       <para></para>
     </section>
@@ -644,21 +644,20 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     look at an extended <classname>Car</classname> with
     <classname>Driver</classname> example. First we have the class
     <classname>Person</classname> which has a <classname>@NotNull
-    </classname>constraint on name. Since no group is specified for this
-    annoation its default groups is
+    </classname>constraint on <property>name</property>. Since no group is
+    specified for this annoation its default groups is
     <classname>javax.validation.Default</classname>.</para>
 
     <para><example>
         <title>Person</title>
 
         <programlisting>public class Person {
-    @NotNull
+    <emphasis role="bold">@NotNull</emphasis>
     private String name;
 
     public Person(String name) {
         this.name = name;
     }
-
     // getters and setters ...
 }</programlisting>
       </example>Next we have the class <classname>Driver</classname> extending
@@ -666,11 +665,17 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     <property>age</property> and <property>hasDrivingLicense</property>. In
     order to drive you must be at least 18 (<classname>@Min(18)</classname>)
     and you must have a driving license (<classname>@AssertTrue</classname>).
-    Both of consraints defined on these properties belong to the group
-    <classname>DriverChecks</classname>. As you can the group is just a simple
-    interface. Using interfaces makes the group feature type safe and allows
-    for easy refactoring. It also means that groups can inherit from each
-    other by simple class inheritance.<example>
+    Both consraints defined on these properties belong to the group
+    <classname>DriverChecks</classname>. As you can see in <xref
+    linkend="example-group-interfaces" /> the group
+    <classname>DriverChecks</classname> is just a simple interface. Using
+    interfaces makes the usage pf groups type safe and allows for easy
+    refactoring. It also means that groups can inherit from each other by
+    simple class inheritance.<note>
+        <para>The Bean Validation specification does not enforce that groups
+        have to be interfaces. Other classes could be used as well, but we
+        recommend to stick to interfaces.</para>
+      </note><example>
         <title>Driver</title>
 
         <programlisting>public class Driver extends Person {
@@ -696,8 +701,8 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
         this.age = age;
     }
 }</programlisting>
-      </example><example>
-        <title>The actual group interfaces</title>
+      </example><example id="example-group-interfaces">
+        <title>Group interfaces</title>
 
         <programlisting>public interface DriverChecks {
 }
@@ -706,7 +711,7 @@ public interface CarChecks {
 }</programlisting>
       </example>Last but not least we add the property
     <property>passedVehicleInspection</property> to the
-    <classname>Car</classname> class indecating whether a car passed the road
+    <classname>Car</classname> class indicating whether a car passed the road
     worthy tests.<example>
         <title>Car</title>
 
@@ -724,7 +729,7 @@ public interface CarChecks {
     <emphasis role="bold">@AssertTrue(message = "The car has to pass the vehicle inspection first", groups = CarChecks.class)</emphasis>
     private boolean passedVehicleInspection;
 
-    <emphasis role="bold">@Valid</emphasis>
+    @Valid
     private Driver driver;
 
     public Car(String manufacturer, String licencePlate, int seatCount) {
@@ -741,10 +746,10 @@ public interface CarChecks {
     <property>Driver.hasDrivingLicense</property> belong to
     <classname>DriverChecks</classname> and last but not least
     <property>Car.passedVehicleInspection</property> belongs to the group
-    <classname>CarChecks</classname>. The following example shows how passing
-    different group combinations to the
+    <classname>CarChecks</classname>. <xref linkend="example-drive-away" />
+    shows how passing different group combinations to the
     <methodname>Validator.validate</methodname> method result in different
-    validation results.<example>
+    validation results.<example id="example-drive-away">
         <title>Drive away</title>
 
         <programlisting>public class GroupTest {
@@ -791,12 +796,12 @@ public interface CarChecks {
 }</programlisting>
       </example>First we create a car and validate it using no explicit group.
     There are no validation errors, even though the property
-    <property>passedVehicleInspection</property> is false. However, the
-    constraint defined on this property does not belong to the default
-    group.</para>
+    <property>passedVehicleInspection</property> is per default false.
+    However, the constraint defined on this property does not belong to the
+    default group.</para>
 
     <para>Next we just validate the <classname>CarChecks</classname> group
-    which will fail until we make sure that the case passes the vehicle
+    which will fail until we make sure that the car passes the vehicle
     inspection.</para>
 
     <para>When we then add a driver to the car and validate against
@@ -813,9 +818,31 @@ public interface CarChecks {
 
       <para>By default, constraints are evaluated in no particular order and
       this regardless of which groups they belong to. It is however useful in
-      some situations to control the order of constraints evaluation. There
-      are often scenarios where a preliminary set of constraints should be
-      evaluated prior to other constraints. ...</para>
+      some situations to control the order of constraints evaluation. In our
+      example from <xref
+      linkend="validator-usingvalidator-validationgroups" /> we could for
+      example require that first all requirements that we actually have a car
+      are passed before we check the road worthiness. Finally before we drive
+      away we check the actual driver requirements. In order to implement such
+      an order one would define a new interface and annotate it with
+      @GroupSequence defining the order in which the groups have to be
+      validated.</para>
+
+      <para><example>
+          <title>Interface with @GroupSequence</title>
+
+          <programlisting><emphasis role="bold">@GroupSequence({Default.class, CarChecks.class, DriverChecks.class})</emphasis>
+public interface OrderedChecks {
+}</programlisting>
+        </example> </para>
+
+      <para><warning>
+          <para>Groups defining a sequence and groups composing a sequence
+          must not be involved in a cyclic dependency either directly or
+          indirectly, either through cascaded sequence definition or group
+          inheritance. If a group containing such a circularity is evaluated,
+          a GroupDefinitionException is raised. </para>
+        </warning></para>
 
       <section>
         <title>Redefining the default group sequence of a class</title>
