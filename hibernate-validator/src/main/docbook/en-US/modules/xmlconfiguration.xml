@@ -140,7 +140,6 @@
                      xmlns="http://jboss.org/xml/ns/javax/validation/mapping"&gt;
     &lt;default-package&gt;org.hibernate.validator.quickstart&lt;/default-package&gt;
     &lt;bean class="Car" ignore-annotations="true"&gt;
-        &lt;class ignore-annotations="true"&gt;
         &lt;field name="manufacturer"&gt;
             &lt;constraint annotation="javax.validation.constraints.NotNull"/&gt;
         &lt;/field&gt;
@@ -173,7 +172,7 @@
             &lt;/group-sequence&gt;
         &lt;/class&gt;
     &lt;/bean&gt;
-    &lt;constraint-definition annotation="org.mycompany.CheckCase"&gt;
+    &lt;constraint-definition annotation="org.mycompany.CheckCase" include-existing-validator="false"&gt;
         &lt;validated-by include-existing-validators="false"&gt;
             &lt;value&gt;org.mycompany.CheckCaseValidator&lt;/value&gt;
         &lt;/validated-by&gt;
@@ -181,8 +180,50 @@
 &lt;/constraint-mappings&gt;</programlisting>
     </example>
 
-    <para>The mapping xml is closely related to the programmatic API. For this
-    reason it should suffice to add some comments regarding the
-    configuration.</para>
+    <para>The xml configurtion is closely mirroring the programmatic API. For
+    this reason it should suffice to just add some comments.
+    <property>default-package</property> is used for all fields where a
+    classname is expected. If the specified class is not fully qualified the
+    configured default package will be used. Every mapping file can then have
+    several <property>bean</property> nodes, each describing the constraints
+    on the entity with the specified class name.<warning>
+        <para>A given entity can only be configured once across all
+        configuration files. If the same class is configured more than once an
+        exception is thrown.</para>
+      </warning>Settings <property>ignore-annotations</property> to true means
+    that constraint annotations placed on the configured bean are ignored. The
+    default for this value is <constant>true</constant>. ignore-annotations is
+    also available for the nodes <property>class</property>,
+    <property>fields</property> and <property>getter</property>. If not
+    explicitly specified on these levels the configured
+    <property>bean</property> value applies. Otherwise do the nodes
+    <property>class</property>, <property>fields</property> and
+    <property>getter</property> determine on which level the constraints are
+    placed (see <xref linkend="validator-usingvalidator-annotate" />). The
+    <property>constraint</property> node is then used to add a constraint on
+    the corresponding level. Each constraint definition must define the class
+    via the annotation attribute. The constraint attributes required by the
+    Bean Validation specification (<property>message</property>,
+    <property>groups</property> and <property>payload</property>) have
+    dedicated nodes. All other constraint specific attributes are configured
+    using the the <property>element</property> node.</para>
+
+    <para>The class node also allows to reconfigure the default group sequence
+    (see <xref linkend="section-default-group-class" />) via the
+    <property>group-sequence</property> node.</para>
+
+    <para>Last but not least, constraint annotations cannot be configured in
+    xml. However, the list of <classname>ConstraintValidator</classname>s
+    associated to a given constraint can be altered via the
+    <property>constraint-definition</property> node. The
+    <property>annotation</property> attribute represents the constraint
+    annotation being altered. The <property>validated-by</property> elements
+    represent the (ordered) list of <classname>ConstraintValidator</classname>
+    implementations associated to the constraint. If
+    <property>include-existing-validator</property> is set to
+    <constant>false</constant>, validators defined on the constraint
+    annotation are ignored. If set to <constant>true</constant>, the list of
+    ConstraintValidators described in XML are concatenated to the list of
+    validators described on the annotation.</para>
   </section>
 </chapter>

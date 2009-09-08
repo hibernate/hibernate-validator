@@ -938,7 +938,7 @@ public void testOrderedChecks() {
       </example>
     </section>
 
-    <section>
+    <section id="section-default-group-class">
       <title>Redefining the default group sequence of a class</title>
 
       <para>The @GroupSequence annotation also fulfills a second purpose. It
