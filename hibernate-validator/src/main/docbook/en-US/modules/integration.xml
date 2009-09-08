@@ -103,7 +103,8 @@
     &lt;/event&gt;
 &lt;/hibernate-configuration&gt;</programlisting>
     </section>
-<!--
+
+    <!--
     <section id="validator-checkconstraints-orm-jpaevent">
       <title>Java Persistence event-based validation</title>
 
@@ -135,7 +136,8 @@ public class Submarine {
     </section>
     -->
   </section>
-  <section>
+
+  <section id="section-presentation-layer">
     <title>Presentation layer validation</title>
 
     <para>When working with JSF and <productname>JBoss Seam</productname>, one

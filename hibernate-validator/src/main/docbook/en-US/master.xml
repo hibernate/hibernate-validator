@@ -53,13 +53,24 @@
   <preface id="preface" revision="2">
     <title>Preface</title>
 
-    <para>Validating data is a common task that occurs throughout an
+    <para>Validating data is a common task that occurs throughout any
     application, from the presentation layer to the persistence layer. Often
     the same validation logic is implemented in each layer, proving time
     consuming and error-prone. To avoid duplication of these validations in
     each layer, developers often bundle validation logic directly into the
-    domain model, cluttering domain classes with validation code which in fact
-    is metadata about the class itself.</para>
+    domain model, cluttering domain classes with validation code which is
+    really metadata about the class itself.</para>
+
+    <mediaobject>
+      <imageobject role="fo">
+        <imagedata align="center" contentdepth="" contentwidth="150mm"
+                   fileref="application-layers.png" scalefit="" />
+      </imageobject>
+
+      <imageobject role="html">
+        <imagedata depth="" fileref="application-layers.png" scalefit="1" />
+      </imageobject>
+    </mediaobject>
 
     <para>JSR 303 - Bean Validation - defines a metadata model and API for
     entity validation. The default metadata source is annotations, with the
@@ -88,7 +99,7 @@
 
   <xi:include href="modules/xmlconfiguration.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
-  
+
   <xi:include href="modules/bootstrapping.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 
@@ -96,7 +107,7 @@
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 
   <chapter>
-    <title>Further reading</title>
+    <title id="chapter-further-reading">Further reading</title>
 
     <para>Last but not least, a few pointers to further information. A great
     source for examples is the Bean Validation TCK which can is available for

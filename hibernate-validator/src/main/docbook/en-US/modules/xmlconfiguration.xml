@@ -30,13 +30,13 @@
   <section>
     <title><filename>validation.xml</filename></title>
 
-    <para>The key to enable XML configuration for Hibernate Validator the the
+    <para>The key to enable XML configuration for Hibernate Validator is the
     file <filename>validation.xml</filename>. If this file exists in the
-    classpath it wille be read and its configuration applied when the
+    classpath its configuration will be applied when the
     <classname>ValidationFactory</classname> gets created. <xref
     linkend="image-validation-configuration" /> shows a model view of the xsd
-    and <xref linkend="example-validation-xml" /> shows the available
-    configuration options.<example id="image-validation-configuration">
+    <filename>valiation.xml</filename> has to adhere to.<example
+        id="image-validation-configuration">
         <title>validation-configuration-1.0.xsd</title>
 
         <mediaobject>
@@ -51,6 +51,9 @@
           </imageobject>
         </mediaobject>
       </example></para>
+
+    <para> <xref linkend="example-validation-xml" /> shows the several
+    configuration options of <filename>validation.xml</filename>.</para>
 
     <example id="example-validation-xml">
       <title>validation.xml</title>
@@ -77,8 +80,8 @@
     optional and in the case of <xref linkend="example-validation-xml" /> show
     the defaults used within Hibernate Validator. The node
     <property>default-provider</property> allows to chose the Bean Validation
-    provider to use. This is especially useful if there are more than one
-    providers in the classpath. <property>message-interpolator</property>,
+    provider. This is useful if there are more than one providers in the
+    classpath. <property>message-interpolator</property>,
     <property>traversable-resolver</property> and
     <property>constraint-validator-factory</property> allow to customize the
     <classname>javax.validation.MessageInterpolator</classname>,
@@ -93,7 +96,7 @@
 
     <para>Via the <property>constraint-mapping</property> you can list an
     abritrary number of additional xml files containing the actual constraint
-    configuration. See <xref linkend="section-mapping-constraints" />. </para>
+    configuration. See <xref linkend="section-mapping-constraints" />.</para>
 
     <para>Last but not least, you can specify provider specific properties via
     the <property>property</property> nodes. Hibernate Validator does
@@ -103,19 +106,19 @@
   <section>
     <title id="section-mapping-constraints">Mapping constraints</title>
 
-    <para>Expressing constraint in XML is possible via files adhering to the
+    <para>Expressing constraints in XML is possible via files adhering to the
     xsd seen in <xref linkend="image-mapping-configuration" />. Note that
     these mapping files are only processed if listed via
     <property>constraint-mapping</property> in your
-    <filename>validation.xml</filename>. </para>
+    <filename>validation.xml</filename>.</para>
 
     <example id="image-mapping-configuration">
       <title>validation-mapping-1.0.xsd</title>
 
       <mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" fileref="validation-mapping-1.0.png"
-                     scalefit="1" />
+          <imagedata align="center" contentdepth="240mm"
+                     fileref="validation-mapping-1.0.png" scalefit="" />
         </imageobject>
 
         <imageobject role="html">
@@ -125,8 +128,8 @@
       </mediaobject>
     </example>
 
-    <para><xref linkend="example-constraints-car" /> shows exemplary how our
-    classes Car and RentalCar from <xref linkend="example-car" /> resp. <xref
+    <para><xref linkend="example-constraints-car" /> shows how our classes Car
+    and RentalCar from <xref linkend="example-car" /> resp. <xref
     linkend="example-rental-car" /> could be mapped in xml.</para>
 
     <example id="example-constraints-car">

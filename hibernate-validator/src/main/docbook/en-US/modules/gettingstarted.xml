@@ -28,9 +28,9 @@
 <chapter id="validator-gettingstarted">
   <title id="getting-started">Getting started</title>
 
-  <para>This chapter will show you how to get started with Hibernate Validator
-  - the reference implementation (RI) of Bean Validation. For the following
-  quickstart you need:</para>
+  <para>This chapter will show you how to get started with Hibernate
+  Validator, the reference implementation (RI) of Bean Validation. For the
+  following quickstart you need:</para>
 
   <itemizedlist>
     <listitem>
@@ -87,23 +87,16 @@
     <filename>beanvalidation-gettingstarted</filename>. Change into this
     directory and run:</para>
 
-    <para><programlisting>mvn test</programlisting>You should see some
-    compiling and testing action taking place. Time to look at the actual
+    <para><programlisting>mvn test</programlisting>Maven will compile the
+    example code and run some unit tests. Let's have a look at the actual
     code.</para>
   </section>
 
   <section id="validator-gettingstarted-createmodel" revision="1">
-    <title>Applying constraints to a model class</title>
+    <title>Applying constraints</title>
 
     <para>Open the project in the IDE of your choice and have a look at the
     class <classname>Car</classname>:</para>
-
-    <note>
-      <para>Eclipse users can type mvn eclipse:eclipse to create a standard
-      Eclipse project configuration or they use the <ulink
-      url="http://m2eclipse.codehaus.org/">M2Eclipse</ulink> plugin. NetBeans
-      and Intellij have great built-in Maven support.</para>
-    </note>
 
     <para><example id="example-class-car" xreflabel="">
         <title>Class Car annotated with constraints</title>
@@ -153,6 +146,10 @@ public class Car {
         <para><property>seatCount</property> shall be at least 2.</para>
       </listitem>
     </itemizedlist>
+  </section>
+
+  <section>
+    <title>Validating constraints</title>
 
     <para>To perform a validation of these constraints, we use a
     <classname>Validator</classname> instance. Let's have a look at the
@@ -239,7 +236,7 @@ public class CarTest {
     methods.</para>
 
     <para>The <methodname>validate()</methodname> method returns a set of
-    <classname>ConstraintViolation</classname> objects, which we can iterate
+    <classname>ConstraintViolation</classname> instances, which we can iterate
     in order to see which validation errors occurred. The first three test
     methods show some expected constraint violations:</para>
 
@@ -260,7 +257,7 @@ public class CarTest {
       </listitem>
     </itemizedlist>
 
-    <para>If the object could be validated successfully,
+    <para>If the object validates successfully,
     <methodname>validate()</methodname> returns an empty set.</para>
 
     <para>Note that we only use classes from the package
@@ -273,7 +270,12 @@ public class CarTest {
   <section id="validator-gettingstarted-whatsnext" revision="1">
     <title>Where to go next?</title>
 
-    <para>That concludes our 5 minute tour through the world of the Bean
-    Validation RI.</para>
+    <para>That concludes our 5 minute tour through the world of Hibernate
+    Validator. Continue exploring the code or look at further examples
+    referenced in <xref linkend="chapter-further-reading" />. To get a deeper
+    understanding of the Bean Validation just continue reading .<xref
+    linkend="validator-usingvalidator" />. In case your application has
+    specific validation requirements have a look at <xref
+    linkend="validator-customconstraints" />.</para>
   </section>
 </chapter>

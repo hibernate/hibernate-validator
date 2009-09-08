@@ -59,7 +59,7 @@
 
     <section id="validator-customconstraints-constraintannotation"
              revision="1">
-      <title>Creating a constraint annotation</title>
+      <title>The constraint annotation</title>
 
       <para>Let's write a constraint annotation, that can be used to express
       that a given string shall either be upper case or lower case. We'll
@@ -165,7 +165,7 @@ public @interface CheckCase {
     </section>
 
     <section id="validator-customconstraints-validator" revision="1">
-      <title>Implementing the constraint validator</title>
+      <title>The constraint validator</title>
 
       <para>Next, we need to implement a constraint validator, that's able to
       validate elements with a <classname>@CheckCase</classname> annotation.
@@ -230,7 +230,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
     </section>
 
     <section id="validator-customconstraints-errormessage" revision="1">
-      <title>Defining the error message</title>
+      <title>The error message</title>
 
       <para>Finally we need to specify the error message, that shall be used,
       in case a <classname>@CheckCase</classname> constraint is violated. To
@@ -429,160 +429,6 @@ public @interface ValidLicensePlate {
 
     Class&lt;?&gt;[] groups() default {};
 
-}</programlisting>
-  </section>
-
-  <section id="validator-customconstraints-classlevel" revision="1">
-    <title>Class-level constraints</title>
-
-    <para>A common requirement with constraints is that wether the value of a
-    given property is valid or not can not be determined by solely inspecting
-    the property itself but depends on the value of annother property of the
-    object owning the property.</para>
-
-    <para>This is where class-level constraints come into play. They are
-    annotated not at the fields of a class but at the class definition itself,
-    allowing for the accompanying validators having access to all properties
-    of the object to be validated.</para>
-
-    <para>As example let's create a constraint, that ensures, that no more
-    passengers sit in a car than its seat count allows. The constraint
-    annotation looks as follows:</para>
-
-    <programlisting>package com.mycompany;
-
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.validation.Constraint;
-
-@Target( { TYPE, ANNOTATION_TYPE })
-@Retention(RUNTIME)
-@Constraint(validatedBy = {ValidPassengerCountValidator.class})
-@Documented
-public @interface ValidPassengerCount {
-
-    String message() default "{validator.validpassengercount}";
-
-    Class&lt;?&gt;[] groups() default {};
-
-}</programlisting>
-
-    <para>Note, that within the @Target annotation TYPE instead of METHOD and
-    FIELD is specified as possible target for the annotation (besides
-    ANNOTATION_TYPE, which allows for @ValidPassengerCount to be used in
-    constraint composition). The validator implementation is fairly
-    easy:</para>
-
-    <programlisting>package com.mycompany;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
-public class ValidPassengerCountValidator implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {
-
-    public void initialize(ValidPassengerCount constraintAnnotation) {
-    }
-
-    public boolean isValid(Car object,
-        ConstraintValidatorContext constraintContext) {
-
-        return object.getPassengers().size() &lt;= object.getSeatCount();
-    }
-
-}</programlisting>
-
-    <para>As with the first constraint an error text in
-    ValidationMessages.properties is required:</para>
-
-    <programlisting>validator.validpassengercount=Passenger count must be less than or equal to seat count.</programlisting>
-
-    <para>The @ValidPassengerCount annotation can now be used at the car
-    class:</para>
-
-    <programlisting>package com.mycompany;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
-@ValidPassengerCount
-public class Car {
-
-    @Min(2)
-    private int seatCount;
-
-    @NotNull
-    List&lt;String&gt; passengers;
-
-    public Car(int seatCount, String... passengers) {
-
-        this.seatCount = seatCount;
-        this.passengers = new ArrayList&lt;String&gt;();
-
-        for (String onePassenger : passengers) {
-            this.passengers.add(onePassenger);
-        }
-    }
-
-    //getters and setters ...
-}</programlisting>
-
-    <para>Finally let's try our new class-level annotation in a test:</para>
-
-    <programlisting>package com.mycompany;
-
-import static org.junit.Assert.*;
-
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-public class CarTest {
-
-    private static Validator validator;
-
-    @BeforeClass
-    public static void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
-
-    @Test
-    public void tooManyPassengers() {
-
-        Car car = new Car(2, "Jupiter", "Pete", "Bob");
-
-        Set&lt;ConstraintViolation&lt;Car3&gt;&gt; constraintViolations =
-            validator.validate(car);
-        assertEquals(1, constraintViolations.size());
-        assertEquals(
-            "Passenger count must be less than or equal to seat count.",
-            constraintViolations.iterator().next().getMessage());
-    }
-
-    @Test
-    public void carIsValid() {
-
-        Car car = new Car(2, "Jupiter", "Pete");
-
-        Set&lt;ConstraintViolation&lt;Car3&gt;&gt; constraintViolations =
-            validator.validate(car);
-
-        assertEquals(0, constraintViolations.size());
-    }
 }</programlisting>
   </section>
 </chapter>

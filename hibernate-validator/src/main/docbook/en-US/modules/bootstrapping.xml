@@ -26,5 +26,24 @@
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="validator-bootstrapping">
   <title>Bootstrapping</title>
+
   <para></para>
+
+  <section>
+    <title><classname>MessageInterpolator</classname></title>
+
+    <para></para>
+  </section>
+
+  <section>
+    <title><classname>TraversableResolver</classname></title>
+
+    <para></para>
+  </section>
+
+  <section>
+    <title><classname>ConstraintValidatorFactory</classname></title>
+
+    <para></para>
+  </section>
 </chapter>

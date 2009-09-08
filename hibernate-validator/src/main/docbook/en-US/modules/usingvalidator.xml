@@ -27,11 +27,11 @@
 <chapter id="validator-usingvalidator">
   <title>Validation step by step</title>
 
-  <para>In this chapter we will see in more detail how to use Bean Validation
-  to validate constraints for a given entity model. We will also learn which
-  default constraints the specification provides and which additional
-  constraints are only provided by Hibernate Validator. Let's start with how
-  to add constraints to an entity.</para>
+  <para>In this chapter we will see in more detail how to use Hibernate
+  Validator to validate constraints for a given entity model. We will also
+  learn which default constraints the specification provides and which
+  additional constraints are only provided by Hibernate Validator. Let's start
+  with how to add constraints to an entity.</para>
 
   <section id="validator-usingvalidator-annotate" revision="1">
     <title>Defining constraints</title>
@@ -44,11 +44,11 @@
 
     <note>
       <para>Not all constraints can be placed on any of these levels. In fact
-      all the default constraints defined by Bean Validation cannot be places
-      at class level. The java.lang.annotation.Target annotation placed on the
-      constraint annotation itself determines on which elements a constraint
-      can be placed. See also <xref
-      linkend="validator-customconstraints" /></para>
+      none of the default constraints defined by Bean Validation can be placed
+      at class level. The <classname>java.lang.annotation.Target</classname>
+      annotation in the constraint annotation itself determines on which
+      elements a constraint can be placed. See <xref
+      linkend="validator-customconstraints" /> for more information.</para>
     </note>
 
     <section>
@@ -63,11 +63,12 @@
       variables has to be evaluated. In the following example we add the
       properties <property>horsePower</property> and
       <property>kiloWatt</property> to the class <classname>Car</classname>.
-      We also add the constraint ValidCar to the class itself. We will later
-      see how we can actually create this custom constraint (see <xref
-      linkend="validator-customconstraints" />). For now we can just assume
-      that this constraints will for example ensure that the value for
-      <property>kiloWatt</property> is 0.7456 *
+      We also add the constraint <classname>ValidCar</classname> to the class
+      itself. We will later see how we can actually create this custom
+      constraint (see <xref linkend="validator-customconstraints" />). For now
+      we it is enough to know that <classname>ValidCar</classname> will ensure
+      that the following holds <constant>true</constant>:
+      <property>kiloWatt</property> == 0.7456 *
       <property>horsePower</property>.</para>
 
       <para><example xreflabel="Car-example">
@@ -83,14 +84,14 @@ import javax.validation.constraints.Size;
 <emphasis role="bold">@ValidCar</emphasis>
 public class Car {
 
-    <emphasis role="bold">@NotNull</emphasis>
+    @NotNull
     private String manufacturer;
 
-    <emphasis role="bold">@NotNull</emphasis>
-    <emphasis role="bold">@Size(min = 2, max = 14)</emphasis>
+    @NotNull
+    @Size(min = 2, max = 14)
     private String licensePlate;
 
-    <emphasis role="bold">@Min(2)</emphasis>
+    @Min(2)
     private int seatCount;
 
     private int horsePower;
@@ -112,9 +113,10 @@ public class Car {
       <title>Field-level constraints</title>
 
       <para>Constraints can also be expressed by annotating a field of a
-      class. The following listing shows a simple example:</para>
+      class. <xref linkend="example-field-level" /> shows a field level
+      configuration example:</para>
 
-      <example>
+      <example id="example-field-level">
         <title>Example for field level constraints</title>
 
         <programlisting>package com.mycompany;
@@ -126,15 +128,29 @@ public class Car {
     <emphasis role="bold">@NotNull</emphasis>
     private String manufacturer;
 
-    public Car(String manufacturer) {
+    <emphasis role="bold">@AssertTrue</emphasis>
+    private boolean isRegistered;
+
+    public Car(String manufacturer, boolean isRegistered) {
+        super();
         this.manufacturer = manufacturer;
+        this.isRegistered = isRegistered;
     }
 }</programlisting>
       </example>
 
       <para>When using field level constraints field access strategy is used
-      to access the value to be value. This means the bean validation provider
-      accesses the instance variable directly.</para>
+      to access the value to be validated. This means the bean validation
+      provider accesses the instance variable directly.</para>
+
+      <note>
+        <para>The access type (private, protected or plublic) does not
+        matter.</para>
+      </note>
+
+      <note>
+        <para>Static fields and properties cannot be validated.</para>
+      </note>
     </section>
 
     <section>
@@ -143,12 +159,14 @@ public class Car {
       <para>If your model class adheres to the <ulink type=""
       url="http://java.sun.com/javase/technologies/desktop/javabeans/index.jsp">JavaBeans</ulink>
       standard, it is also possible to annotate the properties of a bean class
-      instead of its fields. <note>
+      instead of its fields. <xref linkend="example-property-level" /> uses
+      the same entity as in the field-level constraint, however, property
+      level constraints are used.<note>
           <para>The property's getter method has to be annotated, not its
           setter.</para>
         </note></para>
 
-      <example>
+      <example id="example-property-level">
         <title>Example for property level constraints</title>
 
         <programlisting>package com.mycompany;
@@ -192,11 +210,13 @@ public class Car {
       used to access the value to be validated. This means the bean validation
       provider accesses the state via the property accessor method.</para>
 
-      <para>Generally it is recommended to stick either to field
-      <emphasis>or</emphasis> property annotation within one class. It is not
-      recommended to annotate a field <emphasis>and</emphasis> the
-      accompanying getter method as this would cause the field to be validated
-      twice.</para>
+      <tip>
+        <para>It is recommended to stick either to field
+        <emphasis>or</emphasis> property annotation within one class. It is
+        not recommended to annotate a field <emphasis>and</emphasis> the
+        accompanying getter method as this would cause the field to be
+        validated twice.</para>
+      </tip>
     </section>
 
     <section>
@@ -209,7 +229,7 @@ public class Car {
       at the following example:</para>
 
       <example>
-        <title>Example for constraint inheritance using RentalCar</title>
+        <title>Constraint inheritance using RentalCar</title>
 
         <programlisting>package com.mycompany;
 
@@ -235,19 +255,17 @@ public class RentalCar extends Car {
 }</programlisting>
       </example>
 
-      <para>Our well-known class <classname>Car</classname> from <link
-      linkend="example-class-car">the getting started section</link> is now
-      extended by <classname>RentalCar</classname> with the additional
-      property <property>rentalStation</property>. If an instance of
+      <para>Our well-known class <classname>Car</classname> from <xref
+      linkend="example-class-car" /> is now extended by
+      <classname>RentalCar</classname> with the additional property
+      <property>rentalStation</property>. If an instance of
       <classname>RentalCar</classname> is validated, not only the
       <classname>@NotNull</classname> constraint on
-      <property>rentalStation</property> would be validated, but also the
-      constraint at <property>manufacturer</property> from the parent
-      class.</para>
+      <property>rentalStation</property> is validated, but also the constraint
+      on <property>manufacturer</property> from the parent class.</para>
 
-      <para>The same would hold true, if <classname>Car</classname> was an
-      interface, that is implemented by
-      <classname>RentalCar</classname>.</para>
+      <para>The same would holds true, if <classname>Car</classname> were an
+      interface implemented by <classname>RentalCar</classname>.</para>
 
       <para>Constraint annotations are aggregated if methods are overridden.
       If <classname>RentalCar</classname> would override the
@@ -261,12 +279,12 @@ public class RentalCar extends Car {
       <title>Object graphs</title>
 
       <para>The Bean Validation API does not only allow to validate single
-      objects but also complete object graphs. To do so just annotate a field
+      objects but also complete object graphs. To do so, just annotate a field
       or property representing a reference to another object with
       <classname>@Valid</classname>. If the parent object is validated, all
-      objects referenced by a field/property annotated with
-      <classname>@Valid</classname> will be validated as well (as will be
-      their children etc.). The following shows a simple example:</para>
+      referenced objects annotated with <classname>@Valid</classname> will be
+      validated as well (as will be their children etc.). See <xref
+      linkend="example-car-with-driver" />.</para>
 
       <example>
         <title>Class Person</title>
@@ -295,7 +313,7 @@ public class Person {
 }</programlisting>
       </example>
 
-      <example>
+      <example id="example-car-with-driver">
         <title>Adding a driver to the car</title>
 
         <programlisting>package com.mycompany;
@@ -366,8 +384,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class Car {
 
     @NotNull
-    @Valid
-    private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;();
+    <emphasis role="bold">@Valid
+    private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;();</emphasis>
 
     public Car(List&lt;Person&gt; passengers) {
         this.passengers = passengers;
@@ -377,7 +395,7 @@ public class Car {
 }</programlisting>
       </example>
 
-      <para>If a <classname>Car</classname> instance is validated now, a
+      <para>If a <classname>Car</classname> instance is validated, a
       <classname>ConstraintValidation</classname> will be created, if any of
       the <classname>Person</classname> objects contained in the
       <property>passengers</property> list has a <code>null</code> name.<note>
@@ -391,20 +409,20 @@ public class Car {
     <title>Validating constraints</title>
 
     <para>The <classname>Validator</classname> interface is the main entry
-    point to Bean Validation. In the following we first will show how to
-    obtain an <classname>Validator</classname> instance using the different
-    bootstrapping mechanisms. Afterwards we will learn how to use the
-    different methods of the <classname>Validator</classname>
-    interface.</para>
+    point to Bean Validation. In <xref linkend="section-validator-instance" />
+    we will first show how to obtain an <classname>Validator</classname>
+    instance using the different bootstrapping mechanisms. Afterwards we will
+    learn how to use the different methods of the
+    <classname>Validator</classname> interface.</para>
 
-    <section>
+    <section id="section-validator-instance">
       <title>Obtaining a Validator instance</title>
 
-      <para>The first step towards validating a class instance is to get hold
-      of a <classname>Validator</classname> instance. The road to this
+      <para>The first step towards validating an entity instance is to get
+      hold of a <classname>Validator</classname> instance. The road to this
       instance leads via the <classname>Validation</classname> class and a
-      <classname>ValidatorFactory</classname>. The by far easiest way is to
-      use the static
+      <classname>ValidatorFactory</classname>. The easiest way is to use the
+      static
       <methodname>Validation.buildDefaultValidatorFactory()</methodname>
       method:<example>
           <title>Validation.buildDefaultValidatorFactory()</title>
@@ -427,7 +445,8 @@ Validator validator = factory.getValidator();
 </programlisting>
         </example>We will learn more about
       <classname>MessageInterpolator</classname> and
-      <classname>TraversableResolver</classname> in later chapters.</para>
+      <classname>TraversableResolver</classname> in <xref
+      linkend="validator-bootstrapping" />.</para>
 
       <para>Last but not least you can ask for a Configuration object of a
       specific Bean Validation provider. This is useful if you have more than
@@ -445,11 +464,11 @@ ValidatorFactory factory = config.buildValidatorFactory();
 Validator validator = factory.getValidator();</programlisting>
         </example></para>
 
-      <para><note>
+      <para><tip>
           <para>The generated <classname>Validator</classname> instance is
           thread safe and can be cached.</para>
-        </note>Now that we have a <classname>Validator</classname> instance,
-      let's see how we can use it to validate class instances.</para>
+        </tip>Now that we have a <classname>Validator</classname> instance,
+      let's see how we can use it to validate entity instances.</para>
     </section>
 
     <section>
@@ -459,11 +478,11 @@ Validator validator = factory.getValidator();</programlisting>
       methods that can be used to validate entire object instances or only
       single properties of an instance.</para>
 
-      <para>All of these methods return a
-      <classname>Set&lt;ConstraintViolation&gt;</classname>. The set will be
-      empty, if the validation succeeded. Otherwise a
-      <classname>ConstraintViolation</classname> object for each violated
-      constraint will be added to the set.</para>
+      <para>All of three methods return a
+      <classname>Set&lt;ConstraintViolation&gt;</classname>. The set is empty,
+      if the validation succeedes. Otherwise a
+      <classname>ConstraintViolation</classname> instance is added to the set
+      for each violated constraint.</para>
 
       <para>All the validation methods have a var-args parameter which can be
       used to specify, which validation groups shall be considered when
@@ -476,10 +495,10 @@ Validator validator = factory.getValidator();</programlisting>
         <title><methodname>validate</methodname></title>
 
         <para>Use the <methodname>validate()</methodname> method to perform
-        validation of all constraints of a given entity instance. The
-        following listing shows an example:</para>
+        validation of all constraints of a given entity instance (see <xref
+        linkend="example-validator-validate" /> ).</para>
 
-        <example>
+        <example id="example-validator-validate">
           <title>Usage of
           <methodname>Validator.validate()</methodname></title>
 
@@ -488,7 +507,8 @@ Validator validator = factory.getValidator();
 
 Car car = new Car(null);
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validate(car);
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = <emphasis
+              role="bold">validator.validate(car)</emphasis>;
 
 assertEquals(1, constraintViolations.size());
 assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
@@ -500,8 +520,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
         <para>With help of the <methodname>validateProperty()</methodname> a
         single named property of a given object can be validated. The property
-        name is the JavaBeans property name. @Valid is not honored by this
-        method.</para>
+        name is the JavaBeans property name. </para>
 
         <example>
           <title>Usage of
@@ -511,14 +530,16 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
 Car car = new Car(null);
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateProperty(car, "manufacturer");
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = <emphasis
+              role="bold">validator.validateProperty(car, "manufacturer")</emphasis>;
 
 assertEquals(1, constraintViolations.size());
 assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
         </example>
 
         <para><methodname>Validator.validateProperty</methodname> is for
-        example used in the integration of Bean Validation into JSF 2.</para>
+        example used in the integration of Bean Validation into JSF 2 (see
+        <xref linkend="section-presentation-layer" />).</para>
       </section>
 
       <section>
@@ -534,26 +555,32 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
           <programlisting>Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateValue(Car.class, "manufacturer", null);
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = <emphasis
+              role="bold">validator.validateValue(Car.class, "manufacturer", null)</emphasis>;
 
 assertEquals(1, constraintViolations.size());
 assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
         </example>
 
-        <para>@Valid is not honored by this method.</para>
+        <note>
+          <para><classname>@Valid</classname> is not honored by
+          <methodname>validateProperty()</methodname> or
+          <methodname>validateValue()</methodname>.</para>
+        </note>
       </section>
     </section>
 
     <section>
-      <title><classname>ConstraintViolation</classname>s explained</title>
+      <title><classname>ConstraintViolation</classname> methods</title>
 
       <para>Now it is time to have a closer look at what a failing validation
-      returns - a <classname>ConstraintViolation</classname>. Using the
-      different methods of a <classname>ConstraintViolation</classname>
-      instance a lot of useful information about the reason of the validation
-      failure can be determined.</para>
+      returns. Using the different methods of a
+      <classname>ConstraintViolation</classname> instance a lot of useful
+      information about the cause of the validation failure can be determined.
+      <xref linkend="table-constraint-violation" /> gived an overview of these
+      methods:</para>
 
-      <table>
+      <table id="table-constraint-violation">
         <title>The various <classname>ConstraintViolation</classname>
         methods</title>
 
@@ -625,30 +652,31 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       <title>Message interpolation</title>
 
       <para>As we will see in <xref linkend="validator-customconstraints" />
-      each constraint definition must define a default message descriptor for
-      that constraint. This message can be overridden at declaration time
-      using the <methodname>message</methodname> attribute of the constraint.
-      You can see this in <xref linkend="example-driver" />. This message
-      descriptors get interpolated when a constaint validation fails using a
-      default <classname>MessageInterpolator</classname>. This interpolator
-      will try to resolve any message parameters, meaning string literals
-      enclosed in braces. In order to resolve these parameters Hibernate
-      Validator first recusively resolves parameters against a custom
+      each constraint definition must define a default message descriptor.
+      This message can be overridden at declaration time using the
+      <methodname>message</methodname> attribute of the constraint. You can
+      see this in <xref linkend="example-driver" />. This message descriptors
+      get interpolated when a constraint validation fails using the configured
+      <classname>MessageInterpolator</classname>. The interpolator will try to
+      resolve any message parameters, meaning string literals enclosed in
+      braces. In order to resolve these parameters Hibernate Validator's
+      default <classname>MessageInterpolator</classname> first recusively
+      resolves parameters against a custom
       <classname>ResourceBundle</classname> called
       <filename>ValidationMessages.properties</filename> at the root of the
       classpath (It is up to you to create this file). If no further
       replacements are possible against the custom bundle the default
       <classname>ResourceBundle</classname> under
-      <filename>/org/hibernate/validator/ValidationMessages.properties</filename>gets
-      inspected. If a replacement occurs against the default bundle the
-      algorithm looks again at the custom bundle. Once no further replacements
-      against these two resource bundles are possible remaining parameters are
-      getting resolved against the attributes of the constraint to be
-      validated.</para>
+      <filename>/org/hibernate/validator/ValidationMessages.properties</filename>
+      gets inspected. If a replacement occurs against the default bundle the
+      algorithm looks again at the custom bundle (and so on). Once no further
+      replacements against these two resource bundles are possible remaining
+      parameters are getting resolved against the attributes of the constraint
+      to be validated.</para>
 
-      <para>Since the braces ('{' and '}') have special meaning in the
-      messages they need to be escpaped if they have to be taken literally.
-      The following The following rules apply:<itemizedlist>
+      <para>Since the braces { and } have special meaning in the messages they
+      need to be escpaped if they are used literally. The following The
+      following rules apply:<itemizedlist>
           <listitem>
             <para>\{ is considered as the literal {</para>
           </listitem>
@@ -674,23 +702,27 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     <title>Using groups</title>
 
     <para>Groups allow you to restrict the set of constraints applied during
-    validation. This allows for example for wizard like validation where in
-    each step only a specified subset of constraints get validated. The groups
-    targeted are passed as var-args parameters to
+    validation. This makes for example wizard like validation possible where
+    in each step only a specified subset of constraints get validated. The
+    groups targeted are passed as var-args parameters to
     <methodname>validate</methodname>,
     <methodname>validateProperty</methodname> and
-    <methodname>validateValue</methodname>. When more than one group is
-    requested, the order in which the groups are evaluated is not
-    deterministic. If no group is specified the default group
-    <classname>javax.validation.Default</classname> is assumed. Let's have a
-    look at an extended <classname>Car</classname> with
-    <classname>Driver</classname> example. First we have the class
-    <classname>Person</classname> which has a <classname>@NotNull
+    <methodname>validateValue</methodname>. Let's have a look at an extended
+    <classname>Car</classname> with <classname>Driver</classname> example.
+    First we have the class <classname>Person</classname> (<xref
+    linkend="example-person" />) which has a <classname>@NotNull
     </classname>constraint on <property>name</property>. Since no group is
     specified for this annoation its default groups is
     <classname>javax.validation.Default</classname>.</para>
 
-    <para><example>
+    <note>
+      <para>When more than one group is requested, the order in which the
+      groups are evaluated is not deterministic. If no group is specified the
+      default group <classname>javax.validation.Default</classname> is
+      assumed.</para>
+    </note>
+
+    <para><example id="example-person">
         <title>Person</title>
 
         <programlisting>public class Person {
@@ -702,21 +734,21 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     }
     // getters and setters ...
 }</programlisting>
-      </example>Next we have the class <classname>Driver</classname> extending
-    <classname>Person</classname>. Here we are adding the properties
-    <property>age</property> and <property>hasDrivingLicense</property>. In
-    order to drive you must be at least 18 (<classname>@Min(18)</classname>)
-    and you must have a driving license (<classname>@AssertTrue</classname>).
-    Both consraints defined on these properties belong to the group
-    <classname>DriverChecks</classname>. As you can see in <xref
-    linkend="example-group-interfaces" /> the group
+      </example>Next we have the class <classname>Driver</classname> (<xref
+    linkend="example-driver" />) extending <classname>Person</classname>. Here
+    we are adding the properties <property>age</property> and
+    <property>hasDrivingLicense</property>. In order to drive you must be at
+    least 18 (<classname>@Min(18)</classname>) and you must have a driving
+    license (<classname>@AssertTrue</classname>). Both constraints defined on
+    these properties belong to the group <classname>DriverChecks</classname>.
+    As you can see in <xref linkend="example-group-interfaces" /> the group
     <classname>DriverChecks</classname> is just a simple interface. Using
-    interfaces makes the usage pf groups type safe and allows for easy
-    refactoring. It also means that groups can inherit from each other by
-    simple class inheritance.<note>
+    interfaces makes the usage of groups type safe and allows for easy
+    refactoring. It also means that groups can inherit from each other via
+    class inheritance.<note>
         <para>The Bean Validation specification does not enforce that groups
-        have to be interfaces. Other classes could be used as well, but we
-        recommend to stick to interfaces.</para>
+        have to be interfaces. Non interface classes could be used as well,
+        but we recommend to stick to interfaces.</para>
       </note><example id="example-driver">
         <title>Driver</title>
 
@@ -753,8 +785,9 @@ public interface CarChecks {
 }</programlisting>
       </example>Last but not least we add the property
     <property>passedVehicleInspection</property> to the
-    <classname>Car</classname> class indicating whether a car passed the road
-    worthy tests.<example id="example-car">
+    <classname>Car</classname> class (<xref linkend="example-car" />)
+    indicating whether a car passed the road worthy tests.<example
+        id="example-car">
         <title>Car</title>
 
         <programlisting>public class Car {
@@ -838,9 +871,9 @@ public interface CarChecks {
 }</programlisting>
       </example>First we create a car and validate it using no explicit group.
     There are no validation errors, even though the property
-    <property>passedVehicleInspection</property> is per default false.
-    However, the constraint defined on this property does not belong to the
-    default group.</para>
+    <property>passedVehicleInspection</property> is per default
+    <constant>false</constant>. However, the constraint defined on this
+    property does not belong to the default group.</para>
 
     <para>Next we just validate the <classname>CarChecks</classname> group
     which will fail until we make sure that the car passes the vehicle
@@ -859,16 +892,16 @@ public interface CarChecks {
       <title>Group sequences</title>
 
       <para>By default, constraints are evaluated in no particular order and
-      this regardless of which groups they belong to. It is however useful in
-      some situations to control the order of constraints evaluation. In our
-      example from <xref
+      this regardless of which groups they belong to. In some situations,
+      however, it is useful to control the order of the constraints
+      evaluation. In our example from <xref
       linkend="validator-usingvalidator-validationgroups" /> we could for
-      example require that first all requirements that we actually have a car
-      are passed before we check the road worthiness. Finally before we drive
-      away we check the actual driver requirements. In order to implement such
+      example require that first all default car constraints are passing
+      before we check the road worthiness of the car. Finally before we drive
+      away we check the actual driver constraints. In order to implement such
       an order one would define a new interface and annotate it with
-      @GroupSequence defining the order in which the groups have to be
-      validated.</para>
+      <classname>@GroupSequence</classname> defining the order in which the
+      groups have to be validated.</para>
 
       <para><example>
           <title>Interface with @GroupSequence</title>
@@ -876,14 +909,14 @@ public interface CarChecks {
           <programlisting><emphasis role="bold">@GroupSequence({Default.class, CarChecks.class, DriverChecks.class})</emphasis>
 public interface OrderedChecks {
 }</programlisting>
-        </example> </para>
+        </example></para>
 
       <para><warning>
           <para>Groups defining a sequence and groups composing a sequence
           must not be involved in a cyclic dependency either directly or
           indirectly, either through cascaded sequence definition or group
           inheritance. If a group containing such a circularity is evaluated,
-          a GroupDefinitionException is raised. </para>
+          a GroupDefinitionException is raised.</para>
         </warning>The usage of the new sequence could then look like in <xref
       linkend="example-group-sequence" />.</para>
 
@@ -903,36 +936,37 @@ public void testOrderedChecks() {
     assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
 }</programlisting>
       </example>
+    </section>
 
-      <section>
-        <title>Redefining the default group sequence of a class</title>
+    <section>
+      <title>Redefining the default group sequence of a class</title>
 
-        <para>The @groupSequence annotation also fulfills a second purpose. It
-        allows you to redefine what the Default group means for a given class.
-        To redefine <classname>Default</classname> for a class, place a
-        <classname>@GroupSequence</classname> annotation on the class. The
-        defined groups in the annotation expresse the sequence of groups that
-        substitute <classname>Default</classname> for this class. <xref
-        linkend="example-rental-car" /> introduces a new class RentalCar with
-        a redfined default group. With this definition the check for all three
-        groups can be rewritten as seen in <xref
-        linkend="example-testOrderedChecksWithRedefinedDefault" />.</para>
+      <para>The @GroupSequence annotation also fulfills a second purpose. It
+      allows you to redefine what the Default group means for a given class.
+      To redefine <classname>Default</classname> for a class, place a
+      <classname>@GroupSequence</classname> annotation on the class. The
+      defined groups in the annotation expresse the sequence of groups that
+      substitute <classname>Default</classname> for this class. <xref
+      linkend="example-rental-car" /> introduces a new class RentalCar with a
+      redfined default group. With this definition the check for all three
+      groups can be rewritten as seen in <xref
+      linkend="example-testOrderedChecksWithRedefinedDefault" />.</para>
 
-        <example id="example-rental-car">
-          <title>RentalCar</title>
+      <example id="example-rental-car">
+        <title>RentalCar</title>
 
-          <programlisting>@GroupSequence({ RentalCar.class, CarChecks.class })
+        <programlisting>@GroupSequence({ RentalCar.class, CarChecks.class })
 public class RentalCar extends Car {
     public RentalCar(String manufacturer, String licencePlate, int seatCount) {
         super( manufacturer, licencePlate, seatCount );
     }
 }</programlisting>
-        </example>
+      </example>
 
-        <example id="example-testOrderedChecksWithRedefinedDefault">
-          <title>testOrderedChecksWithRedefinedDefault</title>
+      <example id="example-testOrderedChecksWithRedefinedDefault">
+        <title>testOrderedChecksWithRedefinedDefault</title>
 
-          <programlisting>@Test
+        <programlisting>@Test
 public void testOrderedChecksWithRedefinedDefault() {
     RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
     rentalCar.setPassedVehicleInspection( true );
@@ -944,24 +978,23 @@ public void testOrderedChecksWithRedefinedDefault() {
 
     assertEquals( 0, validator.validate( rentalCar, Default.class, DriverChecks.class ).size() );
 }</programlisting>
-        </example>
+      </example>
 
-        <note>
-          <para>Due to the fact that there cannot be a cyclic dependecy in the
-          group and group sequence defintions one cannot just at
-          <classname>Default</classname> to the sequence redefining
-          <classname>Default</classname> for a class. Instead the class itself
-          should be added!</para>
-        </note>
-      </section>
+      <note>
+        <para>Due to the fact that there cannot be a cyclic dependecy in the
+        group and group sequence defintions one cannot just at
+        <classname>Default</classname> to the sequence redefining
+        <classname>Default</classname> for a class. Instead the class itself
+        should be added!</para>
+      </note>
     </section>
   </section>
 
   <section id="validator-defineconstraints-builtin" revision="2">
     <title>Built-in constraints</title>
 
-    <para>Hibernate Validator implements all of the constraints specified in
-    Bean Validation as well as some custom constraints. <xref
+    <para>Hibernate Validator implements all of the default constraints
+    specified in Bean Validation as well as some custom ones. <xref
     linkend="table-builtin-constraints" /> list all built-in constraints
     available in Hibernate Validator.</para>
 
@@ -1224,7 +1257,8 @@ public void testOrderedChecksWithRedefinedDefault() {
       <para>On top of the parameters indicated in <xref
       linkend="table-builtin-constraints" /> each constraint supports the
       parameters <parameter>message</parameter>, <parameter>groups</parameter>
-      and <parameter>payload</parameter>.</para>
+      and <parameter>payload</parameter>. This is a requirement of the Bean
+      Validation specification.</para>
     </note>
 
     <para>In some cases these built-in constraints will not fulfill your
