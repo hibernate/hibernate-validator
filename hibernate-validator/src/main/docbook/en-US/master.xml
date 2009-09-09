@@ -111,9 +111,10 @@
 
     <para>Last but not least, a few pointers to further information. A great
     source for examples is the Bean Validation TCK which can is available for
-    anonymous access in the Hibernate SVN repository - <ulink
-    url="https://svn.jboss.org/repos/hibernate/validator/trunk">https://svn.jboss.org/repos/hibernate/validator/trunk</ulink>.
-    Alternatively you can view the tests using fisheye and this url: <ulink
-    url="http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests">http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests</ulink>.</para>
+    anonymous access in the Hibernate <ulink
+    url="http://anonsvn.jboss.org/repos/hibernate/validator/trunk">SVN
+    repository</ulink>. Alternatively you can view the tests using <ulink
+    url="http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests">Hibernate's
+    fisheye</ulink> installation.</para>
   </chapter>
 </book>

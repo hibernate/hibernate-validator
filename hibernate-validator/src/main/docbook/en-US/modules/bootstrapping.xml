@@ -27,23 +27,47 @@
 <chapter id="validator-bootstrapping">
   <title>Bootstrapping</title>
 
-  <para></para>
+  <para>We already discussed in <xref linkend="section-validator-instance" />
+  how to create a <classname>Validator</classname> instance using the
+  different methods in <classname>javax.validation.Validation</classname>. In
+  this chapter we will discuss the underlying mechanisms and have a closer
+  look at the different configuration possibilties available via the
+  <classname>Configuration</classname> object.</para>
 
   <section>
     <title><classname>MessageInterpolator</classname></title>
 
-    <para></para>
+    <para>The message interpolator is provided to the ValidatorFactory at
+    construction time using Configuration.messageInterpolator(). This message
+    interpolator is shared by all validators gener- ated by this
+    ValidatorFactory. It is recommended that MessageInterpolator
+    implementations delegate final interpolation to the Bean Validation
+    default MessageInterpolator to ensure standard Bean Validation
+    interpolation rules are followed. The default implementation is accessible
+    through Configuration.getDefaultMessageInterpolator(). </para>
   </section>
 
   <section>
     <title><classname>TraversableResolver</classname></title>
 
-    <para></para>
+    <para>The Bean Validation provider must not access the state of a
+    property, nor validate its constraints if the property is not traversable.
+    A property is traversable if TraversableResolver returns true for this
+    property. </para>
   </section>
 
   <section>
     <title><classname>ConstraintValidatorFactory</classname></title>
 
-    <para></para>
+    <para>The default ConstraintValidatorFactory provided by the Bean
+    Validation provider implementation uses the pub- lic constraint no-arg
+    constructor. A custom ConstraintValidatorFactory can be provided for
+    example to benefit from dependency injection control in constraint
+    implementations. Any constraint implementation relying on Con-
+    straintValidatorFactory behaviors specific to an implementation
+    (dependency injection, no no-arg constructor and so on) are not considered
+    portable, hence great care should be given before walking that path.
+    ConstraintValidatorFactory should not cache instances as the state of each
+    instance can be altered in the ini- tialize method. </para>
   </section>
 </chapter>

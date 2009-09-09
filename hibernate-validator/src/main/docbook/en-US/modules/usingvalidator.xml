@@ -416,7 +416,7 @@ public class Car {
     <classname>Validator</classname> interface.</para>
 
     <section id="section-validator-instance">
-      <title>Obtaining a Validator instance</title>
+      <title>Obtaining a <classname>Validator</classname> instance</title>
 
       <para>The first step towards validating an entity instance is to get
       hold of a <classname>Validator</classname> instance. The road to this
@@ -427,7 +427,7 @@ public class Car {
       method:<example>
           <title>Validation.buildDefaultValidatorFactory()</title>
 
-          <programlisting>ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+          <programlisting>ValidatorFactory factory = <emphasis role="bold">Validation.buildDefaultValidatorFactory()</emphasis>;
 Validator validator = factory.getValidator();</programlisting>
         </example>You can also use the method
       <methodname>Validation.byDefaultProvider()</methodname> which will allow
@@ -435,7 +435,8 @@ Validator validator = factory.getValidator();</programlisting>
       instance:<example>
           <title>Validation.byDefaultProvider()</title>
 
-          <programlisting>Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure();
+          <programlisting>Configuration&lt;?&gt; config = <emphasis
+              role="bold">Validation.byDefaultProvider()</emphasis>.configure();
 config.messageInterpolator(new MyMessageInterpolator())
     .traversableResolver( new MyTraversableResolver())
     .constraintValidatorFactory(new MyConstraintValidatorFactory());
@@ -455,7 +456,8 @@ Validator validator = factory.getValidator();
       case of Hibernate Validator the Validator creation looks like:<example>
           <title>Validation.byProvider( HibernateValidator.class )</title>
 
-          <programlisting>ValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure;
+          <programlisting>ValidatorConfiguration config = <emphasis
+              role="bold">Validation.byProvider( HibernateValidator.class )</emphasis>.configure();
 config.messageInterpolator(new MyMessageInterpolator())
     .traversableResolver( new MyTraversableResolver())
     .constraintValidatorFactory(new MyConstraintValidatorFactory());
