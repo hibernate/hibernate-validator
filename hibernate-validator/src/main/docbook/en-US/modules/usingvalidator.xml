@@ -145,7 +145,7 @@ public class Car {
       provider accesses the instance variable directly.</para>
 
       <note>
-        <para>The access type (private, protected or plublic) does not
+        <para>The access type (private, protected or public) does not
         matter.</para>
       </note>
 
@@ -483,7 +483,7 @@ Validator validator = factory.getValidator();</programlisting>
 
       <para>All of three methods return a
       <classname>Set&lt;ConstraintViolation&gt;</classname>. The set is empty,
-      if the validation succeedes. Otherwise a
+      if the validation succeeds. Otherwise a
       <classname>ConstraintViolation</classname> instance is added to the set
       for each violated constraint.</para>
 
@@ -523,7 +523,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
         <para>With help of the <methodname>validateProperty()</methodname> a
         single named property of a given object can be validated. The property
-        name is the JavaBeans property name. </para>
+        name is the JavaBeans property name.</para>
 
         <example>
           <title>Usage of
@@ -580,7 +580,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       returns. Using the different methods of a
       <classname>ConstraintViolation</classname> instance a lot of useful
       information about the cause of the validation failure can be determined.
-      <xref linkend="table-constraint-violation" /> gived an overview of these
+      <xref linkend="table-constraint-violation" /> gives an overview of these
       methods:</para>
 
       <table id="table-constraint-violation">
@@ -651,7 +651,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       </table>
     </section>
 
-    <section>
+    <section id="section-message-interpolation">
       <title>Message interpolation</title>
 
       <para>As we will see in <xref linkend="validator-customconstraints" />
@@ -663,7 +663,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       <classname>MessageInterpolator</classname>. The interpolator will try to
       resolve any message parameters, meaning string literals enclosed in
       braces. In order to resolve these parameters Hibernate Validator's
-      default <classname>MessageInterpolator</classname> first recusively
+      default <classname>MessageInterpolator</classname> first recursively
       resolves parameters against a custom
       <classname>ResourceBundle</classname> called
       <filename>ValidationMessages.properties</filename> at the root of the
@@ -678,7 +678,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       to be validated.</para>
 
       <para>Since the braces { and } have special meaning in the messages they
-      need to be escpaped if they are used literally. The following The
+      need to be escaped if they are used literally. The following The
       following rules apply:<itemizedlist>
           <listitem>
             <para>\{ is considered as the literal {</para>
@@ -693,7 +693,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           </listitem>
         </itemizedlist></para>
 
-      <para>If the default message interpolator does ot fit your requirements
+      <para>If the default message interpolator does not fit your requirements
       it is possible to plug a custom
       <classname>MessageInterpolator</classname> when the
       <classname>ValidatorFactory</classname> gets created. This can be seen
@@ -715,7 +715,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     First we have the class <classname>Person</classname> (<xref
     linkend="example-person" />) which has a <classname>@NotNull
     </classname>constraint on <property>name</property>. Since no group is
-    specified for this annoation its default groups is
+    specified for this annotation its default groups is
     <classname>javax.validation.Default</classname>.</para>
 
     <note>
@@ -919,7 +919,7 @@ public interface OrderedChecks {
           must not be involved in a cyclic dependency either directly or
           indirectly, either through cascaded sequence definition or group
           inheritance. If a group containing such a circularity is evaluated,
-          a GroupDefinitionException is raised.</para>
+          a <classname>GroupDefinitionException</classname> is raised.</para>
         </warning>The usage of the new sequence could then look like in <xref
       linkend="example-group-sequence" />.</para>
 
@@ -984,8 +984,8 @@ public void testOrderedChecksWithRedefinedDefault() {
       </example>
 
       <note>
-        <para>Due to the fact that there cannot be a cyclic dependecy in the
-        group and group sequence defintions one cannot just at
+        <para>Due to the fact that there cannot be a cyclic dependency in the
+        group and group sequence definitions one cannot just at
         <classname>Default</classname> to the sequence redefining
         <classname>Default</classname> for a class. Instead the class itself
         should be added!</para>
@@ -1058,7 +1058,7 @@ public void testOrderedChecksWithRedefinedDefault() {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective warppers of the primtive types.</entry>
+            respective wrappers of the primitive types.</entry>
 
             <entry>The annotated element must be a number whose value must be
             lower or equal to the specified maximum. The parameter value is
@@ -1078,7 +1078,7 @@ public void testOrderedChecksWithRedefinedDefault() {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective warppers of the primtive types.</entry>
+            respective wrappers of the primitive types.</entry>
 
             <entry>The annotated element must be a number whose value must be
             higher or equal to the specified maximum. The parameter value is
@@ -1098,7 +1098,7 @@ public void testOrderedChecksWithRedefinedDefault() {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective warppers of the primtive types.</entry>
+            respective wrappers of the primitive types.</entry>
 
             <entry>Check whether the property is a number having up to
             <literal>integer</literal> digits and <literal>fraction</literal>
@@ -1145,9 +1145,9 @@ public void testOrderedChecksWithRedefinedDefault() {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective warppers of the primtive types.</entry>
+            respective wrappers of the primitive types.</entry>
 
-            <entry>Checks whether the annoated value is less than or equal to
+            <entry>Checks whether the annotated value is less than or equal to
             the specified maximum.</entry>
 
             <entry>Add a check constraint on the column.</entry>
@@ -1163,10 +1163,10 @@ public void testOrderedChecksWithRedefinedDefault() {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective warppers of the primtive types.</entry>
+            respective wrappers of the primitive types.</entry>
 
-            <entry>Check whether the annoated value is higher than or equal to
-            the specified minimum.</entry>
+            <entry>Check whether the annotated value is higher than or equal
+            to the specified minimum.</entry>
 
             <entry>Add a check constraint on the column.</entry>
           </row>
@@ -1178,7 +1178,7 @@ public void testOrderedChecksWithRedefinedDefault() {
 
             <entry>field/property</entry>
 
-            <entry>Check that the annoated value is not
+            <entry>Check that the annotated value is not
             <constant>null.</constant></entry>
 
             <entry>Column(s) are not null.</entry>

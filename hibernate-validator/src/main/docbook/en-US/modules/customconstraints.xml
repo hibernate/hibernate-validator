@@ -166,7 +166,8 @@ public @interface CheckCase {
     </section>
 
     <section id="validator-customconstraints-validator" revision="1">
-      <title>The constraint validator</title>
+      <title id="section-constraint-validator">The constraint
+      validator</title>
 
       <para>Next, we need to implement a constraint validator, that's able to
       validate elements with a <classname>@CheckCase</classname> annotation.

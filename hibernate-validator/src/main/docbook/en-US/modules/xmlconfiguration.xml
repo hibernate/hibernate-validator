@@ -53,7 +53,7 @@
         </mediaobject>
       </example></para>
 
-    <para> <xref linkend="example-validation-xml" /> shows the several
+    <para><xref linkend="example-validation-xml" /> shows the several
     configuration options of <filename>validation.xml</filename>.</para>
 
     <example id="example-validation-xml">
@@ -91,12 +91,12 @@
     These are the same configuration option as available programmatically
     through the <classname>javax.validation.Configuration</classname>. In fact
     XML configuration will be overriden by values explicitly specified via the
-    API. It is even possible to ignore the xml configuration completely via
+    API. It is even possible to ignore the XML configuration completely via
     <methodname> Configuration.ignoreXmlConfiguration()</methodname>. See also
     <xref linkend="validator-bootstrapping" />.</para>
 
     <para>Via the <property>constraint-mapping</property> you can list an
-    abritrary number of additional xml files containing the actual constraint
+    arbitrary number of additional XML files containing the actual constraint
     configuration. See <xref linkend="section-mapping-constraints" />.</para>
 
     <para>Last but not least, you can specify provider specific properties via
@@ -131,7 +131,7 @@
 
     <para><xref linkend="example-constraints-car" /> shows how our classes Car
     and RentalCar from <xref linkend="example-car" /> resp. <xref
-    linkend="example-rental-car" /> could be mapped in xml.</para>
+    linkend="example-rental-car" /> could be mapped in XML.</para>
 
     <example id="example-constraints-car">
       <title>constraints-car.xml</title>
@@ -181,7 +181,7 @@
 &lt;/constraint-mappings&gt;</programlisting>
     </example>
 
-    <para>The xml configurtion is closely mirroring the programmatic API. For
+    <para>The XML configuration is closely mirroring the programmatic API. For
     this reason it should suffice to just add some comments.
     <property>default-package</property> is used for all fields where a
     classname is expected. If the specified class is not fully qualified the
@@ -214,7 +214,7 @@
     <property>group-sequence</property> node.</para>
 
     <para>Last but not least, constraint annotations cannot be configured in
-    xml. However, the list of <classname>ConstraintValidator</classname>s
+    XML. However, the list of <classname>ConstraintValidator</classname>s
     associated to a given constraint can be altered via the
     <property>constraint-definition</property> node. The
     <property>annotation</property> attribute represents the constraint

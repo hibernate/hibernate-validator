@@ -232,8 +232,8 @@ public class CarTest {
     <classname>ValidatorFactory</classname>. A
     <classname>Validator</classname> instance is thread-safe and may be reused
     multiple times, therefore we store it as field of our test class. We can
-    use the validator now to validate the different car instances in the test
-    methods.</para>
+    use the <classname>Validator</classname> now to validate the different car
+    instances in the test methods.</para>
 
     <para>The <methodname>validate()</methodname> method returns a set of
     <classname>ConstraintViolation</classname> instances, which we can iterate
