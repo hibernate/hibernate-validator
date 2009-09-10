@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Path;
+import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
 /**
@@ -56,6 +57,10 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	public List<ErrorMessage> getErrorMessages() {
+		if(defaultDisabled && errorMessages.size() == 0) {
+			throw new ValidationException("At least one custom message must be created if the default error message gets disabled.");
+		}
+
 		List<ErrorMessage> returnedErrorMessages = new ArrayList<ErrorMessage>( errorMessages );
 		if ( !defaultDisabled ) {
 			returnedErrorMessages.add(
