@@ -179,16 +179,6 @@ public class ResourceBundleMessageInterpolatorTest {
 	}
 
 	@Test
-	public void testFallbackToDefaultLocale() {
-		interpolator = new ResourceBundleMessageInterpolator();
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
-
-		String expected = "may not be null";
-		String actual = interpolator.interpolate( notNull.message(), context, Locale.JAPAN );
-		assertEquals( actual, expected, "Wrong substitution" );
-	}
-
-	@Test
 	public void testUserResourceBundle() {
 		interpolator = new ResourceBundleMessageInterpolator();
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
