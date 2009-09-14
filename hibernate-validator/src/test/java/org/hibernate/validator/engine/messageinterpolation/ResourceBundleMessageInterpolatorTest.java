@@ -73,15 +73,15 @@ public class ResourceBundleMessageInterpolatorTest {
 	public void testSuccessfulInterpolation() {
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
-		String expected = "message interpolation successfull";
+		String expected = "message interpolation successful";
 		String actual = interpolator.interpolate( "{simple.key}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		expected = "message interpolation successfull message interpolation successfull";
+		expected = "message interpolation successful message interpolation successful";
 		actual = interpolator.interpolate( "{simple.key} {simple.key}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		expected = "The message interpolation successfull completed";
+		expected = "The message interpolation successful completed";
 		actual = interpolator.interpolate( "The {simple.key} completed", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
@@ -124,11 +124,11 @@ public class ResourceBundleMessageInterpolatorTest {
 	}
 
 	@Test
-	public void testUnkownTokenInterpolation() {
+	public void testUnknownTokenInterpolation() {
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
-		String expected = "{bar}";  // unkown token {}
+		String expected = "{bar}";  // unknown token {}
 		String actual = interpolator.interpolate( "{bar}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -138,7 +138,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
-		String expected = "message interpolation successfull";  // unkown token {}
+		String expected = "message interpolation successful";  // unknown token {}
 		String actual = interpolator.interpolate( "{key-with-dashes}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -148,7 +148,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
-		String expected = "message interpolation successfull";  // unkown token {}
+		String expected = "message interpolation successful";  // unknown token {}
 		String actual = interpolator.interpolate( "{key with spaces}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -162,7 +162,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		String actual = interpolator.interpolate( notNull.message(), context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
-		expected = "size must be between 0 and 2147483647";  // unkown token {}
+		expected = "size must be between 0 and 2147483647";  // unknown token {}
 		context = new MessageInterpolatorContext( sizeDescriptor, null );
 		actual = interpolator.interpolate( size.message(), context );
 		assertEquals( actual, expected, "Wrong substitution" );
@@ -202,7 +202,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	 * HV-102
 	 */
 	@Test
-	public void testRecursiveMessageInterpoliation() {
+	public void testRecursiveMessageInterpolation() {
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
 		descriptor.setValue( "message", "{replace.in.user.bundle1}" );
 		descriptor.setValue( "value", 10l );
@@ -219,7 +219,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		String expected = "{replace.in.default.bundle2}";
 		String actual = interpolator.interpolate( max.message(), context );
 		assertEquals(
-				actual, expected, "Within default bundle replacement parameter evauation should not be recursive!"
+				actual, expected, "Within default bundle replacement parameter evaluation should not be recursive!"
 		);
 	}
 
@@ -229,7 +229,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	public void testCorrectMessageInterpolationIfParameterCannotBeReplaced() {
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
-		String message = "Message should stay unchanged since {fubar} is not replacable";
+		String message = "Message should stay unchanged since {fubar} is not replaceable";
 		descriptor.setValue( "message", message );
 		descriptor.setValue( "value", 10l );
 		Max max = AnnotationFactory.create( descriptor );
@@ -259,9 +259,9 @@ public class ResourceBundleMessageInterpolatorTest {
 		public TestResourceBundle() {
 			testResources = new HashMap<String, String>();
 			// add some test messages
-			testResources.put( "simple.key", "message interpolation successfull" );
-			testResources.put( "key-with-dashes", "message interpolation successfull" );
-			testResources.put( "key with spaces", "message interpolation successfull" );
+			testResources.put( "simple.key", "message interpolation successful" );
+			testResources.put( "key-with-dashes", "message interpolation successful" );
+			testResources.put( "key with spaces", "message interpolation successful" );
 			testResources.put( "replace.in.user.bundle1", "{replace.in.user.bundle2}" );
 			testResources.put( "replace.in.user.bundle2", "{replace.in.default.bundle1}" );
 
