@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -20,8 +20,11 @@ package org.hibernate.validator.engine;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import javax.validation.metadata.BeanDescriptor;
 
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.util.TestUtil;
@@ -45,8 +48,27 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "b" );
 	}
 
+	/**
+	 * HV-132 - supper hasBoolean format
+	 */
+	@Test
+	public void testHasBoolean() {
+		Validator validator = TestUtil.getValidator();
+		BeanDescriptor beanDescr = validator.getConstraintsForClass( B.class );
+		assertTrue( beanDescr.isBeanConstrained() );
+	}
+
 	class A {
 		@NotNull
 		String b;
+	}
+
+	class B {
+		private boolean b;
+
+		@AssertTrue
+		public boolean hasB() {
+			return b;
+		}
 	}
 }

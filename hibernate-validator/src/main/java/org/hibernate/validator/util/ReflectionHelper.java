@@ -98,6 +98,9 @@ public class ReflectionHelper {
 			if ( methodName.startsWith( "is" ) ) {
 				name = Introspector.decapitalize( methodName.substring( 2 ) );
 			}
+			else if ( methodName.startsWith( "has" ) ) {
+				name = Introspector.decapitalize( methodName.substring( 3 ) );
+			}
 			else if ( methodName.startsWith( "get" ) ) {
 				name = Introspector.decapitalize( methodName.substring( 3 ) );
 			}

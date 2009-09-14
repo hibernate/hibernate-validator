@@ -123,7 +123,7 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
-	public void testGetMessageParamter() {
+	public void testGetMessageParameter() {
 		NotNull testAnnotation = new NotNull() {
 			public String message() {
 				return "test";
