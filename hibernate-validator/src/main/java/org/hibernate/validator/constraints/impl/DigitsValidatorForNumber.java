@@ -20,7 +20,6 @@ package org.hibernate.validator.constraints.impl;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
 import javax.validation.constraints.Digits;
 
 /**
@@ -63,10 +62,10 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 
 	private void validateParameters() {
 		if ( maxIntegerLength < 0 ) {
-			throw new ValidationException( "The length of the interger part cannot be negative." );
+			throw new IllegalArgumentException( "The length of the integer part cannot be negative." );
 		}
 		if ( maxFractionLength < 0 ) {
-			throw new ValidationException( "The length of the fraction part cannot be negative." );
+			throw new IllegalArgumentException( "The length of the fraction part cannot be negative." );
 		}
 	}
 }

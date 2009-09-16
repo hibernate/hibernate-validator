@@ -17,7 +17,6 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
@@ -74,7 +73,7 @@ public class MaxValidatorForStringTest {
 			constraint.initialize( m );
 			fail();
 		}
-		catch ( ConstraintDeclarationException e ) {
+		catch ( IllegalArgumentException e ) {
 			// success
 		}
 	}

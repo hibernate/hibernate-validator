@@ -18,7 +18,6 @@
 package org.hibernate.validator.constraints.impl;
 
 import java.math.BigDecimal;
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.DecimalMax;
@@ -38,7 +37,7 @@ public class DecimalMaxValidatorForString implements ConstraintValidator<Decimal
 			this.maxValue = new BigDecimal( maxValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw new ConstraintDeclarationException( maxValue.value() + " does not represent a valid BigDemcimal formt" );
+			throw new IllegalArgumentException( maxValue.value() + " does not represent a valid BigDecimal format" );
 		}
 	}
 

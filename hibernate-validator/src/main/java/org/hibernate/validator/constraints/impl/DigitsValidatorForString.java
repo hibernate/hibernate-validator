@@ -71,10 +71,10 @@ public class DigitsValidatorForString implements ConstraintValidator<Digits, Str
 
 	private void validateParameters() {
 		if ( maxIntegerLength < 0 ) {
-			throw new ValidationException( "The length of the interger part cannot be negative." );
+			throw new IllegalArgumentException( "The length of the integer part cannot be negative." );
 		}
 		if ( maxFractionLength < 0 ) {
-			throw new ValidationException( "The length of the fraction part cannot be negative." );
+			throw new IllegalArgumentException( "The length of the fraction part cannot be negative." );
 		}
 	}
 }

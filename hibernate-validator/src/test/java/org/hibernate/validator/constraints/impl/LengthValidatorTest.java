@@ -17,8 +17,6 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import javax.validation.ValidationException;
-
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
@@ -51,7 +49,7 @@ public class LengthValidatorTest {
 		assertFalse( constraint.isValid( "foobar", null ) );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeMinValue() {
 		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
 		descriptor.setValue( "min", -1 );
@@ -63,7 +61,7 @@ public class LengthValidatorTest {
 		constraint.initialize( p );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeMaxValue() {
 		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
 		descriptor.setValue( "min", 1 );
@@ -75,7 +73,7 @@ public class LengthValidatorTest {
 		constraint.initialize( p );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeLength() {
 		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
 		descriptor.setValue( "min", 5 );

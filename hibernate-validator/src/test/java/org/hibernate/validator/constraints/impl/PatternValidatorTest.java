@@ -17,7 +17,6 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import javax.validation.ValidationException;
 import javax.validation.constraints.Pattern;
 
 import static org.testng.Assert.assertFalse;
@@ -65,7 +64,7 @@ public class PatternValidatorTest {
 		assertTrue( constraint.isValid( "a b c foo", null ) );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testInvalidRegularExpression() {
 		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		descriptor.setValue( "regexp", "(unbalanced parentheses" );

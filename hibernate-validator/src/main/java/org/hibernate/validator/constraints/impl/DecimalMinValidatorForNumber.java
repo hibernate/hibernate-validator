@@ -19,7 +19,6 @@ package org.hibernate.validator.constraints.impl;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.DecimalMin;
@@ -39,7 +38,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw new ConstraintDeclarationException( minValue.value() + " does not represent a valid BigDemcimal formt" );
+			throw new IllegalArgumentException( minValue.value() + " does not represent a valid BigDecimal format" );
 		}
 	}
 
