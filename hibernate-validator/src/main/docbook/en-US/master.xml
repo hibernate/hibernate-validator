@@ -80,6 +80,17 @@
     is available for both server-side application programming, as well as rich
     client Swing application developers.</para>
 
+    <para><mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center" contentdepth="" contentwidth="150mm"
+                     fileref="application-layers2.png" scalefit="" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata depth="" fileref="application-layers2.png" scalefit="1" />
+        </imageobject>
+      </mediaobject></para>
+
     <para>Hibernate Validator is the reference implementation of this
     JSR.</para>
   </preface>
@@ -115,6 +126,8 @@
     url="http://anonsvn.jboss.org/repos/hibernate/validator/trunk">SVN
     repository</ulink>. Alternatively you can view the tests using <ulink
     url="http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests">Hibernate's
-    fisheye</ulink> installation.</para>
+    fisheye</ulink> installation. The JSR 303 specification itself is also a
+    great way to deepen your understanding of Bean Validation resp. Hibernate
+    Validator.</para>
   </chapter>
 </book>

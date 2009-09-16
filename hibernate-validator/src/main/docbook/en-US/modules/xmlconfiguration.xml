@@ -61,7 +61,7 @@
 
       <programlisting>&lt;validation-config xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration file:/Users/hardy/work/hibernate/beanvalidation/trunk/validation-api/src/test/resources/validation-configuration-1.0.xsd"&gt;
+ xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration"&gt;
     &lt;default-provider&gt;org.hibernate.validator.HibernateValidator&lt;/default-provider&gt;
     &lt;message-interpolator&gt;org.hibernate.validator.engine.ResourceBundleMessageInterpolator&lt;/message-interpolator&gt;
     &lt;traversable-resolver&gt;org.hibernate.validator.engine.resolver.DefaultTraversableResolver&lt;/traversable-resolver&gt;
@@ -80,17 +80,17 @@
     <para>All settings shown in the <filename>validation.xml</filename> are
     optional and in the case of <xref linkend="example-validation-xml" /> show
     the defaults used within Hibernate Validator. The node
-    <property>default-provider</property> allows to chose the Bean Validation
-    provider. This is useful if there are more than one providers in the
+    <property>default-provider</property> allows to choose the Bean Validation
+    provider. This is useful if there is more than one provider in the
     classpath. <property>message-interpolator</property>,
     <property>traversable-resolver</property> and
     <property>constraint-validator-factory</property> allow to customize the
     <classname>javax.validation.MessageInterpolator</classname>,
     <classname>javax.validation.TraversableResolver</classname> resp.
-    <classname>javax.validation.ConstraintValidatorFactory</classname> to use.
-    These are the same configuration option as available programmatically
-    through the <classname>javax.validation.Configuration</classname>. In fact
-    XML configuration will be overriden by values explicitly specified via the
+    <classname>javax.validation.ConstraintValidatorFactory</classname>. The
+    same configuration options are also available programmatically through the
+    <classname>javax.validation.Configuration</classname>. In fact XML
+    configuration will be overriden by values explicitly specified via the
     API. It is even possible to ignore the XML configuration completely via
     <methodname> Configuration.ignoreXmlConfiguration()</methodname>. See also
     <xref linkend="validator-bootstrapping" />.</para>
@@ -213,9 +213,9 @@
     (see <xref linkend="section-default-group-class" />) via the
     <property>group-sequence</property> node.</para>
 
-    <para>Last but not least, constraint annotations cannot be configured in
-    XML. However, the list of <classname>ConstraintValidator</classname>s
-    associated to a given constraint can be altered via the
+    <para>Last but not least, the list of
+    <classname>ConstraintValidator</classname>s associated to a given
+    constraint can be altered via the
     <property>constraint-definition</property> node. The
     <property>annotation</property> attribute represents the constraint
     annotation being altered. The <property>validated-by</property> elements

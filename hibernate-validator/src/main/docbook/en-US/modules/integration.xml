@@ -33,9 +33,6 @@
   annotated domain model) and checked in various different layers of the
   application.</para>
 
-  <para>This chapter will cover Hibernate Validator usage for different
-  layers</para>
-
   <section id="validator-checkconstraints-db" revision="2">
     <title>Database schema-level validation</title>
 
