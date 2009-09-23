@@ -94,6 +94,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
+import javax.validation.ConstraintPayload;
 
 @Target( { METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
@@ -101,9 +102,11 @@ import javax.validation.Constraint;
 @Documented
 public @interface CheckCase {
 
-    String message() default "{validator.checkcase}";
+    String message() default "{com.mycompany.constraints.checkcase}";
 
     Class&lt;?&gt;[] groups() default {};
+
+    Class&lt;? extends Payload&gt;[] payload() default {};
     
     CaseMode value();
 
@@ -127,11 +130,17 @@ public @interface CheckCase {
           default to an empty array of type
           <classname>Class&lt;?&gt;</classname>.</para>
         </listitem>
+
+        <listitem>
+          <para>an attribute "payload" that can be used by clients of the Bean
+          Validation API to asign custom payload objects to a constraint. This
+          attribute is not used by the API itself.</para>
+        </listitem>
       </itemizedlist>
 
-      <para>Besides those two mandatory attributes we add another one allowing
-      for the required case mode to be specified. The name "value" is a
-      special one, which can be omitted upon using the annotation, if it is
+      <para>Besides those three mandatory attributes we add another one
+      allowing for the required case mode to be specified. The name "value" is
+      a special one, which can be omitted upon using the annotation, if it is
       the only attribute specified, as e.g. in
       <code>@CheckCase(CaseMode.UPPER)</code>.</para>
 
@@ -227,8 +236,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
 
       <para>The passed-in <classname>ConstraintValidatorContext</classname>
       could be used to raise any custom validation errors, but as we are fine
-      with the default behavior, we can ignore that parameter for now (TODO
-      GM: example for usage).</para>
+      with the default behavior, we can ignore that parameter for now.</para>
     </section>
 
     <section id="validator-customconstraints-errormessage" revision="1">
@@ -241,7 +249,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       <filename>src/main/resources</filename> with the following
       content:</para>
 
-      <programlisting>validator.checkcase=Case mode must be {value}.</programlisting>
+      <programlisting>com.mycompany.constraints.checkcase=Case mode must be {value}.</programlisting>
 
       <para>If a validation error occurs, the validation runtime will use the
       default value, that we specified for the message attribute of the
@@ -370,6 +378,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
+import javax.validation.ConstraintPayload;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -382,9 +391,11 @@ import javax.validation.constraints.Size;
 @Documented
 public @interface ValidLicensePlate {
 
-    String message() default "{validator.validlicenseplate}";
+    String message() default "{com.mycompany.constraints.validlicenseplate}";
 
     Class&lt;?&gt;[] groups() default {};
+
+    Class&lt;? extends Payload&gt;[] payload() default {};
 
 }</programlisting>
 
@@ -395,8 +406,6 @@ public @interface ValidLicensePlate {
     <classname>@ValidLicensePlate</classname> annotation itself, we don't
     declare a validator within the <classname>@Constraint </classname>meta
     annotation.</para>
-
-    <para>TODO GM: Specifying no validator does not yet work.</para>
 
     <para>Using the new compound constraint at the
     <property>licensePlate</property> field now is fully equivalent to the
@@ -427,9 +436,11 @@ public class Car {
 @ReportAsSingleViolation
 public @interface ValidLicensePlate {
 
-    String message() default "{validator.validlicenseplate}";
+    String message() default "{com.mycompany.constraints.validlicenseplate}";
 
     Class&lt;?&gt;[] groups() default {};
+
+    Class&lt;? extends Payload&gt;[] payload() default {};
 
 }</programlisting>
   </section>

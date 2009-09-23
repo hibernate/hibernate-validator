@@ -261,7 +261,7 @@ public class RentalCar extends Car {
       <property>rentalStation</property> is validated, but also the constraint
       on <property>manufacturer</property> from the parent class.</para>
 
-      <para>The same would holds true, if <classname>Car</classname> were an
+      <para>The same would hold true, if <classname>Car</classname> were an
       interface implemented by <classname>RentalCar</classname>.</para>
 
       <para>Constraint annotations are aggregated if methods are overridden.
@@ -372,11 +372,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.NotEmpty;
 
 public class Car {
 
