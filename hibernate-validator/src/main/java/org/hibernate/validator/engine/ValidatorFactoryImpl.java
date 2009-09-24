@@ -73,6 +73,14 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		return messageInterpolator;
 	}
 
+	public TraversableResolver getTraversableResolver() {
+		return traversableResolver;
+	}
+
+	public ConstraintValidatorFactory getConstraintValidatorFactory() {
+		return constraintValidatorFactory;
+	}
+
 	public <T> T unwrap(Class<T> type) {
 		throw new ValidationException( "Type " + type + " not supported" );
 	}

@@ -55,7 +55,7 @@ public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationS
 
 	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();
 	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
-	private final ConstraintValidatorFactory defaultValidatorFactory = new ConstraintValidatorFactoryImpl();
+	private final ConstraintValidatorFactory defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 	private final ValidationProviderResolver providerResolver;
 
 	private ValidationBootstrapParameters validationBootstrapParameters;
@@ -171,6 +171,14 @@ public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationS
 		return defaultMessageInterpolator;
 	}
 
+	public TraversableResolver getDefaultTraversableResolver() {
+		return defaultTraversableResolver;
+	}
+
+	public ConstraintValidatorFactory getDefaultConstraintValidatorFactory() {
+		return defaultConstraintValidatorFactory;
+	}
+
 	private boolean isSpecificProvider() {
 		return validationBootstrapParameters.provider != null;
 	}
@@ -189,7 +197,7 @@ public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationS
 				validationBootstrapParameters.traversableResolver = defaultTraversableResolver;
 			}
 			if ( validationBootstrapParameters.constraintValidatorFactory == null ) {
-				validationBootstrapParameters.constraintValidatorFactory = defaultValidatorFactory;
+				validationBootstrapParameters.constraintValidatorFactory = defaultConstraintValidatorFactory;
 			}
 		}
 		else {
@@ -224,7 +232,7 @@ public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationS
 				validationBootstrapParameters.constraintValidatorFactory = xmlParameters.constraintValidatorFactory;
 			}
 			else {
-				validationBootstrapParameters.constraintValidatorFactory = defaultValidatorFactory;
+				validationBootstrapParameters.constraintValidatorFactory = defaultConstraintValidatorFactory;
 			}
 		}
 

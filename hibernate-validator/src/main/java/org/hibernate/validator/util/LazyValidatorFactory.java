@@ -23,6 +23,8 @@ import javax.validation.ValidatorContext;
 import javax.validation.MessageInterpolator;
 import javax.validation.Configuration;
 import javax.validation.Validation;
+import javax.validation.TraversableResolver;
+import javax.validation.ConstraintValidatorFactory;
 
 /**
  * This class lazily initialize the ValidatorFactory on the first usage
@@ -83,6 +85,14 @@ public class LazyValidatorFactory implements ValidatorFactory {
 
 	public MessageInterpolator getMessageInterpolator() {
 		return getDelegate().getMessageInterpolator();
+	}
+
+	public TraversableResolver getTraversableResolver() {
+		return getDelegate().getTraversableResolver();
+	}
+
+	public ConstraintValidatorFactory getConstraintValidatorFactory() {
+		return getDelegate().getConstraintValidatorFactory();
 	}
 
 	public <T> T unwrap(Class<T> clazz) {
