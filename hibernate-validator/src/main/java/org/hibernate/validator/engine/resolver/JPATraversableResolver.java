@@ -28,7 +28,7 @@ import javax.validation.Path;
  */
 public class JPATraversableResolver implements TraversableResolver {
 
-	// TODO Check the call to PeristenceUtil. traversableProperty.getName() is this correct?
+	// TODO Check the call to PersistenceUtil. traversableProperty.getName() is this correct?
 	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return traversableObject == null ||
 				Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
