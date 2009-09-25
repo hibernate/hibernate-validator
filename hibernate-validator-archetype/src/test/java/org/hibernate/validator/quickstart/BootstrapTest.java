@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.engine.ValidatorConfiguration;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 
 /**
  * A module test that shows the different bootstrap possibilities of Hibernate Validator.
@@ -64,7 +64,7 @@ public class BootstrapTest {
 
 	@Test
 	public void testByProvider() {
-		ValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
+		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
 		config.messageInterpolator( new MyMessageInterpolator() )
 				.traversableResolver( new MyTraversableResolver() )
 				.constraintValidatorFactory( new MyConstraintValidatorFactory() );

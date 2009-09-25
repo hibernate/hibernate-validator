@@ -24,7 +24,7 @@ import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.engine.ConfigurationImpl;
-import org.hibernate.validator.engine.ValidatorConfiguration;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.ValidatorFactoryImpl;
 
 /**
@@ -33,10 +33,10 @@ import org.hibernate.validator.engine.ValidatorFactoryImpl;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class HibernateValidator implements ValidationProvider<ValidatorConfiguration> {
+public class HibernateValidator implements ValidationProvider<HibernateValidatorConfiguration> {
 
-	public ValidatorConfiguration createSpecializedConfiguration(BootstrapState state) {
-		return ValidatorConfiguration.class.cast( new ConfigurationImpl( this ) );
+	public HibernateValidatorConfiguration createSpecializedConfiguration(BootstrapState state) {
+		return HibernateValidatorConfiguration.class.cast( new ConfigurationImpl( this ) );
 	}
 
 	public Configuration<?> createGenericConfiguration(BootstrapState state) {

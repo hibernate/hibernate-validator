@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.impl.NotNullValidator;
 import org.hibernate.validator.engine.ConfigurationImpl;
 import org.hibernate.validator.engine.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.engine.ValidatorConfiguration;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.HibernateValidator;
 
@@ -48,7 +48,7 @@ public class ValidationTest {
 
 	@Test
 	public void testBootstrapAsServiceWithBuilder() {
-		ValidatorConfiguration configuration = Validation
+		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
 				.configure();
 		assertDefaultBuilderAndFactory( configuration );

@@ -38,6 +38,7 @@ import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.Version;
 import org.hibernate.validator.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.xml.ValidationXmlParser;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 
 /**
  * Hibernate specific <code>Configuration</code> implementation.
@@ -45,7 +46,7 @@ import org.hibernate.validator.xml.ValidationXmlParser;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationState {
+public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
 	static {
 		Version.touch();
@@ -80,7 +81,7 @@ public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationS
 		validationBootstrapParameters.provider = provider;
 	}
 
-	public ValidatorConfiguration ignoreXmlConfiguration() {
+	public HibernateValidatorConfiguration ignoreXmlConfiguration() {
 		ignoreXmlConfiguration = true;
 		return this;
 	}
@@ -100,12 +101,12 @@ public class ConfigurationImpl implements ValidatorConfiguration, ConfigurationS
 		return this;
 	}
 
-	public ValidatorConfiguration addMapping(InputStream stream) {
+	public HibernateValidatorConfiguration addMapping(InputStream stream) {
 		validationBootstrapParameters.mappings.add( stream );
 		return this;
 	}
 
-	public ValidatorConfiguration addProperty(String name, String value) {
+	public HibernateValidatorConfiguration addProperty(String name, String value) {
 		if ( value != null ) {
 			validationBootstrapParameters.configProperties.put( name, value );
 		}

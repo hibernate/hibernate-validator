@@ -37,7 +37,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.FileAssert.fail;
 
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.engine.ValidatorConfiguration;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.PathImpl;
 
 /**
@@ -55,7 +55,7 @@ public class TestUtil {
 
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
-			ValidatorConfiguration configuration = Validation
+			HibernateValidatorConfiguration configuration = Validation
 					.byProvider( HibernateValidator.class )
 					.configure();
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
@@ -73,7 +73,7 @@ public class TestUtil {
 	public static Validator getValidatorWithCustomConfiguration(String path) {
 		Thread.currentThread().setContextClassLoader( new CustomValidationXmlClassLoader( path ) );
 
-		ValidatorConfiguration configuration = Validation
+		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
 				.configure();
 		return configuration.buildValidatorFactory().getValidator();
@@ -85,7 +85,7 @@ public class TestUtil {
 	public static Validator getValidatorIgnoringValidationXml() {
 		Thread.currentThread().setContextClassLoader( new IgnoringValidationXmlClassLoader() );
 
-		ValidatorConfiguration configuration = Validation
+		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
 				.configure();
 		return configuration.buildValidatorFactory().getValidator();

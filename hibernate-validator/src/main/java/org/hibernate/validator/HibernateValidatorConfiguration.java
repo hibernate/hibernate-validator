@@ -1,4 +1,4 @@
-package org.hibernate.validator.engine;
+package org.hibernate.validator;
 
 import javax.validation.Configuration;
 
@@ -8,5 +8,5 @@ import javax.validation.Configuration;
  * 
  * @author Emmanuel Bernard
  */
-public interface ValidatorConfiguration extends Configuration<ValidatorConfiguration> {
+public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
 }
