@@ -33,7 +33,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	private final Path propertyPath;
 	private final Object leafBeanInstance;
 	private final ConstraintDescriptor constraintDescriptor;
-	private final String rawMessage;
+	private final String messageTemplate;
 	private final Class<T> rootBeanClass;
 	private final ElementType elementType;
 
@@ -41,7 +41,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass,
 								   T rootBean, Object leafBeanInstance, Object value,
 								   Path propertyPath, ConstraintDescriptor constraintDescriptor, ElementType elementType) {
-		this.rawMessage = messageTemplate;
+		this.messageTemplate = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
 		this.value = value;
@@ -57,7 +57,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 	}
 
 	public String getMessageTemplate() {
-		return rawMessage;
+		return messageTemplate;
 	}
 
 	public T getRootBean() {
@@ -127,5 +127,17 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );
 		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ConstraintViolationImpl" );
+		sb.append( "{interpolatedMessage='" ).append( interpolatedMessage ).append( '\'' );
+		sb.append( ", propertyPath=" ).append( propertyPath );
+		sb.append( ", rootBeanClass=" ).append( rootBeanClass );
+		sb.append( ", messageTemplate='" ).append( messageTemplate ).append( '\'' );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
