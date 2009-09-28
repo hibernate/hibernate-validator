@@ -220,7 +220,17 @@ public class ConstraintTree<A extends Annotation> {
 
 	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
 		if ( assignableClasses.size() == 0 ) {
-			throw new UnexpectedTypeException( "No validator could be found for type: " + valueClass );
+			String className = valueClass.toString();
+			if ( valueClass instanceof Class ) {
+				Class<?> clazz = ( Class<?> ) valueClass;
+				if ( clazz.isArray() ) {
+					className = clazz.getComponentType().toString() + "[]";
+				}
+				else {
+					className = clazz.getName();
+				}
+			}
+			throw new UnexpectedTypeException( "No validator could be found for type: " + className );
 		}
 		else if ( assignableClasses.size() > 1 ) {
 			StringBuilder builder = new StringBuilder();

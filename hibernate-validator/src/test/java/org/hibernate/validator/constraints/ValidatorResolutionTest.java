@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -112,5 +112,101 @@ public class ValidatorResolutionTest {
 		suburb.setBoundingBox( boundingBox );
 		constraintViolations = validator.validate( suburb );
 		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	/**
+	 * HV-233
+	 */
+	@Test
+	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfObject() {
+		Validator validator = TestUtil.getValidator();
+
+		Foo testEntity = new Foo( new Object[] { }, new int[] { } );
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( testEntity );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	/**
+	 * HV-233
+	 */
+	@Test
+	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfClonable() {
+		Validator validator = TestUtil.getValidator();
+
+		Bar testEntity = new Bar( new Object[] { }, new int[] { } );
+		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( testEntity );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	/**
+	 * HV-233
+	 */
+	@Test
+	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfSerializable() {
+		Validator validator = TestUtil.getValidator();
+
+		Fubar testEntity = new Fubar( new Object[] { }, new int[] { } );
+		Set<ConstraintViolation<Fubar>> constraintViolations = validator.validate( testEntity );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	/**
+	 * HV-233
+	 */
+	@Test
+	public void testSubTypeArrayIsSubtypeOfSuperTypeArray() {
+		Validator validator = TestUtil.getValidator();
+
+		SubTypeEntity testEntity = new SubTypeEntity( new SubType[] { } );
+		Set<ConstraintViolation<SubTypeEntity>> constraintViolations = validator.validate( testEntity );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	public class Foo {
+		@Object
+		private Object[] objectArray;
+
+		@Object
+		private int[] intArray;
+
+		public Foo(Object[] objectArray, int[] intArray) {
+			this.objectArray = objectArray;
+			this.intArray = intArray;
+		}
+	}
+
+	public class Bar {
+		@Cloneable
+		private Object[] objectArray;
+
+		@Cloneable
+		private int[] intArray;
+
+		public Bar(Object[] objectArray, int[] intArray) {
+			this.objectArray = objectArray;
+			this.intArray = intArray;
+		}
+	}
+
+	public class Fubar {
+		@Serializable
+		private Object[] objectArray;
+
+		@Serializable
+		private int[] intArray;
+
+		public Fubar(Object[] objectArray, int[] intArray) {
+			this.objectArray = objectArray;
+			this.intArray = intArray;
+		}
+	}
+
+	public class SubTypeEntity {
+		@SuperTypeArray
+		private SubType[] subTypeArray;
+
+		public SubTypeEntity(SubType[] subTypeArray) {
+			this.subTypeArray = subTypeArray;
+		}
 	}
 }
