@@ -48,7 +48,11 @@
 
     <listitem>
       <para>A properly configured remote repository. Add the following to your
-      <filename>settings.xml</filename>: <programlisting>&lt;repositories&gt;
+      <filename>settings.xml</filename>: <example>
+          <title>Configuring the JBoss Maven repository in
+          <filename>settings.xml</filename></title>
+
+          <programlisting>&lt;repositories&gt;
     &lt;repository&gt;
         &lt;id&gt;jboss&lt;/id&gt;
         &lt;url&gt;http://repository.jboss.com/maven2&lt;/url&gt;
@@ -59,8 +63,9 @@
             &lt;enabled&gt;false&lt;/enabled&gt;
         &lt;/snapshots&gt;
     &lt;/repository&gt;
-&lt;/repositories&gt;</programlisting>More information about
-      <filename>settings.xml</filename> can be found in the <ulink
+&lt;/repositories&gt;</programlisting>
+        </example>More information about <filename>settings.xml</filename> can
+      be found in the <ulink
       url="http://maven.apache.org/ref/2.0.8/maven-settings/settings.html">Maven
       Local Settings Model</ulink>.</para>
     </listitem>
@@ -72,12 +77,17 @@
     <para>Start by creating new Maven project using the Maven archetype plugin
     as follows:</para>
 
-    <para><programlisting>mvn archetype:generate \
+    <para><example>
+        <title>Using Maven's archetype plugin to create a sample project using
+        Hibernate Validator</title>
+
+        <programlisting>mvn archetype:generate \
   -DarchetypeCatalog=http://repository.jboss.com/maven2/archetype-catalog.xml \
   -DgroupId=com.mycompany \
   -DartifactId=beanvalidation-gettingstarted \
   -Dversion=1.0-SNAPSHOT \
-  -Dpackage=com.mycompany</programlisting></para>
+  -Dpackage=com.mycompany</programlisting>
+      </example></para>
 
     <para>When presented with the list of available archetypes in the JBoss
     Maven Repository select the

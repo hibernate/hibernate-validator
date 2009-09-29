@@ -28,14 +28,11 @@
 <chapter id="validator-customconstraints">
   <title>Creating custom constraints</title>
 
-  <para>Though the Bean Validation API defines a whole bunch of standard
-  constraint annotations such as <classname>@NotNull</classname>,
-  <classname>@Size</classname>, <classname>@Min</classname> or
-  <classname>@AssertTrue</classname>, one can easily think of situations, for
-  which these standard annotations won't suffice. But as the specification was
-  designed with extensibility in mind, you are able to create custom
-  constraints tailored to your specific validation requirements in a simple
-  and timely manner.</para>
+  <para>Though the Bean Validation API defines a whole set of standard
+  constraint annotations one can easily think of situations in which these
+  standard annotations won't suffice. For these cases you are able to create
+  custom constraints tailored to your specific validation requirements in a
+  simple manner.</para>
 
   <section id="validator-customconstraints-simple" revision="1">
     <title>Creating a simple constraint</title>
@@ -49,8 +46,7 @@
       </listitem>
 
       <listitem>
-        <para>Implement a validator, that's able to evaluate that
-        annotation</para>
+        <para>Implement a validator</para>
       </listitem>
 
       <listitem>
@@ -64,27 +60,35 @@
 
       <para>Let's write a constraint annotation, that can be used to express
       that a given string shall either be upper case or lower case. We'll
-      apply it later on to ensure, that the <property>licensePlate</property>
-      field of the <classname>Car</classname> class from <xref
-      linkend="validator-gettingstarted" /> is always an upper-case
-      string.</para>
+      apply it later on to the <property>licensePlate</property> field of the
+      <classname>Car</classname> class from <xref
+      linkend="validator-gettingstarted" /> to ensure, that the field is
+      always an upper-case string.</para>
 
       <para>First we need a way to express the two case modes. We might use
       <classname>String</classname> constants, but a better way to go is to
       use a Java 5 enum for that purpose:</para>
 
-      <programlisting>package com.mycompany;
+      <example>
+        <title>Enum <classname>CaseMode</classname> to express upper vs. lower
+        case</title>
+
+        <programlisting>package com.mycompany;
 
 public enum CaseMode {
     UPPER, 
     LOWER;
 }</programlisting>
+      </example>
 
       <para>Now we can define the actual constraint annotation. If you've
       never designed an annotation before, this may look a bit scary, but
       actually it's not that hard:</para>
 
-      <programlisting>package com.mycompany;
+      <example>
+        <title>Defining CheckCase constraint annotation</title>
+
+        <programlisting>package com.mycompany;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
@@ -111,6 +115,7 @@ public @interface CheckCase {
     CaseMode value();
 
 }</programlisting>
+      </example>
 
       <para>An annotation type is defined using the <code>@interface</code>
       keyword. All attributes of an annotation type are declared in a
@@ -119,29 +124,31 @@ public @interface CheckCase {
 
       <itemizedlist>
         <listitem>
-          <para>an attribute "message" that returns the default key for
-          creating error messages in case the constraint is violated</para>
+          <para>an attribute <property>message</property> that returns the
+          default key for creating error messages in case the constraint is
+          violated</para>
         </listitem>
 
         <listitem>
-          <para>an attribute "groups" that allows the specification of
-          validation groups, to which this constraint belongs (see <xref
-          linkend="validator-usingvalidator-validationgroups" />). This must
-          default to an empty array of type
+          <para>an attribute <property>groups</property> that allows the
+          specification of validation groups, to which this constraint belongs
+          (see <xref linkend="validator-usingvalidator-validationgroups" />).
+          This must default to an empty array of type
           <classname>Class&lt;?&gt;</classname>.</para>
         </listitem>
 
         <listitem>
-          <para>an attribute "payload" that can be used by clients of the Bean
-          Validation API to asign custom payload objects to a constraint. This
-          attribute is not used by the API itself.</para>
+          <para>an attribute <classname>payload</classname> that can be used
+          by clients of the Bean Validation API to asign custom payload
+          objects to a constraint. This attribute is not used by the API
+          itself.</para>
         </listitem>
       </itemizedlist>
 
       <para>Besides those three mandatory attributes we add another one
-      allowing for the required case mode to be specified. The name "value" is
-      a special one, which can be omitted upon using the annotation, if it is
-      the only attribute specified, as e.g. in
+      allowing for the required case mode to be specified. The name
+      <property>value</property> is a special one, which can be omitted upon
+      using the annotation, if it is the only attribute specified, as e.g. in
       <code>@CheckCase(CaseMode.UPPER)</code>.</para>
 
       <para>In addition we annotate the annotation type with a couple of
@@ -183,7 +190,11 @@ public @interface CheckCase {
       To do so, we implement the interface ConstraintValidator as shown
       below:</para>
 
-      <programlisting>package com.mycompany;
+      <example>
+        <title>Implementing a constraint validator for the constraint
+        <classname>CheckCase</classname></title>
+
+        <programlisting>package com.mycompany;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -208,12 +219,14 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
     }
 
 }</programlisting>
+      </example>
 
       <para>The <classname>ConstraintValidator</classname> interface defines
       two type parameters, which we set in our implementation. The first one
       specifies the annotation type to be validated (in our example
-      CheckCase), the second one the type of elements, which the validator can
-      handle (here String).</para>
+      <classname>CheckCase</classname>), the second one the type of elements,
+      which the validator can handle (here
+      <classname>String</classname>).</para>
 
       <para>In case a constraint annotation is allowed at elements of
       different types, a <classname>ConstraintValidator</classname> for each
@@ -223,7 +236,8 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       <para>The implementation of the validator is straightforward. The
       <methodname>initialize()</methodname> method gives us access to the
       attribute values of the annotation to be validated. In the example we
-      store the CaseMode in a field of the validator for further usage.</para>
+      store the <classname>CaseMode</classname> in a field of the validator
+      for further usage.</para>
 
       <para>In the <methodname>isValid()</methodname> method we implement the
       logic, that determines, whether a <classname>String</classname> is valid
@@ -244,12 +258,16 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
 
       <para>Finally we need to specify the error message, that shall be used,
       in case a <classname>@CheckCase</classname> constraint is violated. To
-      do so, we create a file named
-      <filename>ValidationMessages.properties</filename> under
-      <filename>src/main/resources</filename> with the following
-      content:</para>
+      do so, we add the following to our custom
+      <filename>ValidationMessages.properties</filename> (see also <xref
+      linkend="section-message-interpolation" />)</para>
 
-      <programlisting>com.mycompany.constraints.checkcase=Case mode must be {value}.</programlisting>
+      <example>
+        <title>Defining a custom error message for the
+        <classname>CheckCase</classname> constraint</title>
+
+        <programlisting>com.mycompany.constraints.CheckCase.message=Case mode must be {value}.</programlisting>
+      </example>
 
       <para>If a validation error occurs, the validation runtime will use the
       default value, that we specified for the message attribute of the
@@ -266,7 +284,11 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       <property>licensePlate</property> field shall only contain upper-case
       strings:</para>
 
-      <programlisting>package com.mycompany;
+      <example id="example-car-with-checkcase">
+        <title>Applying the <classname>CheckCase</classname>
+        constraint</title>
+
+        <programlisting>package com.mycompany;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -295,12 +317,17 @@ public class Car {
     //getters and setters ...
 
 }</programlisting>
+      </example>
 
       <para>Finally let's demonstrate in a little test that the
       <classname>@CheckCase</classname> constraint is properly
       validated:</para>
 
-      <programlisting>package com.mycompany;
+      <example>
+        <title>Testcase demonstrating the <classname>CheckCase</classname>
+        validation</title>
+
+        <programlisting>package com.mycompany;
 
 import static org.junit.Assert.*;
 
@@ -348,6 +375,7 @@ public class CarTest {
         assertEquals(0, constraintViolations.size());
     }
 }</programlisting>
+      </example>
     </section>
   </section>
 
@@ -355,9 +383,10 @@ public class CarTest {
     <title>Constraint composition</title>
 
     <para>Looking at the <property>licensePlate</property> field of the
-    <classname>Car</classname> class, we see three constraint annotations
-    already. In complexer scenarios, where even more constraints could be
-    applied to one element, this might become a bit confusing easily.
+    <classname>Car</classname> class in <xref
+    linkend="example-car-with-checkcase" />, we see three constraint
+    annotations already. In complexer scenarios, where even more constraints
+    could be applied to one element, this might become a bit confusing easily.
     Furthermore, if we had a <property>licensePlate</property> field in
     another class, we would have to copy all constraint declarations to the
     other class as well, violating the DRY principle.</para>
@@ -368,7 +397,11 @@ public class CarTest {
     <classname>@NotNull</classname>, <classname>@Size</classname> and
     <classname>@CheckCase</classname>:</para>
 
-    <programlisting>package com.mycompany;
+    <example>
+      <title>Creating a composing constraint
+      <classname>ValidLicensePlate</classname></title>
+
+      <programlisting>package com.mycompany;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
@@ -398,6 +431,7 @@ public @interface ValidLicensePlate {
     Class&lt;? extends Payload&gt;[] payload() default {};
 
 }</programlisting>
+    </example>
 
     <para>To do so, we just have to annotate the constraint declaration with
     its comprising constraints (btw. that's exactly why we allowed annotation
@@ -412,7 +446,11 @@ public @interface ValidLicensePlate {
     previous version, where we declared the three constraints directly at the
     field itself:</para>
 
-    <programlisting>package com.mycompany;
+    <example>
+      <title>Application of composing constraint
+      <classname>ValidLicensePlate</classname></title>
+
+      <programlisting>package com.mycompany;
 
 public class Car {
 
@@ -422,6 +460,7 @@ public class Car {
     //...
 
 }</programlisting>
+    </example>
 
     <para>The set of <classname>ConstraintViolations</classname> retrieved
     when validating a <classname>Car</classname> instance will contain an
@@ -432,7 +471,10 @@ public class Car {
     <classname>@ReportAsSingleViolation</classname> meta constraint can be
     used as follows:</para>
 
-    <programlisting>//...
+    <example>
+      <title>Usage of <classname>@ReportAsSingleViolation</classname></title>
+
+      <programlisting>//...
 @ReportAsSingleViolation
 public @interface ValidLicensePlate {
 
@@ -443,5 +485,6 @@ public @interface ValidLicensePlate {
     Class&lt;? extends Payload&gt;[] payload() default {};
 
 }</programlisting>
+    </example>
   </section>
 </chapter>

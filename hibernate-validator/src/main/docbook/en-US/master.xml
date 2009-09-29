@@ -50,54 +50,8 @@
 
   <toc></toc>
 
-  <preface id="preface" revision="2">
-    <title>Preface</title>
-
-    <para>Validating data is a common task that occurs throughout any
-    application, from the presentation layer to the persistence layer. Often
-    the same validation logic is implemented in each layer, proving time
-    consuming and error-prone. To avoid duplication of these validations in
-    each layer, developers often bundle validation logic directly into the
-    domain model, cluttering domain classes with validation code which is
-    really metadata about the class itself.</para>
-
-    <mediaobject>
-      <imageobject role="fo">
-        <imagedata align="center" contentdepth="" contentwidth="150mm"
-                   fileref="application-layers.png" scalefit="" />
-      </imageobject>
-
-      <imageobject role="html">
-        <imagedata depth="" fileref="application-layers.png" scalefit="1" />
-      </imageobject>
-    </mediaobject>
-
-    <para>JSR 303 - Bean Validation - defines a metadata model and API for
-    entity validation. The default metadata source is annotations, with the
-    ability to override and extend the meta-data through the use of XML. The
-    API is not tied to a specific application tier or programming model. It is
-    specifically not tied to either the web tier or the persistence tier, and
-    is available for both server-side application programming, as well as rich
-    client Swing application developers.</para>
-
-    <para><mediaobject>
-        <imageobject role="fo">
-          <imagedata align="center" contentdepth="" contentwidth="150mm"
-                     fileref="application-layers2.png" scalefit="" />
-        </imageobject>
-
-        <imageobject role="html">
-          <imagedata depth="" fileref="application-layers2.png" scalefit="1" />
-        </imageobject>
-      </mediaobject></para>
-
-    <para>Hibernate Validator is the reference implementation of this
-    JSR.</para>
-  </preface>
-
-  <!-- For the alpha release we will just include the getting started section, since the others are work in progress -->
-
-  <!--xi:include href="modules/introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" /-->
+  <xi:include href="modules/preface.xml" 
+               xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
   <xi:include href="modules/gettingstarted.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
@@ -117,17 +71,6 @@
   <xi:include href="modules/integration.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 
-  <chapter>
-    <title id="chapter-further-reading">Further reading</title>
-
-    <para>Last but not least, a few pointers to further information. A great
-    source for examples is the Bean Validation TCK which can is available for
-    anonymous access in the Hibernate <ulink
-    url="http://anonsvn.jboss.org/repos/hibernate/validator/trunk">SVN
-    repository</ulink>. Alternatively you can view the tests using <ulink
-    url="http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests">Hibernate's
-    fisheye</ulink> installation. The JSR 303 specification itself is also a
-    great way to deepen your understanding of Bean Validation resp. Hibernate
-    Validator.</para>
-  </chapter>
+  <xi:include href="modules/furtherreading.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>
