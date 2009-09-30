@@ -33,9 +33,10 @@ import org.hibernate.validator.metadata.ConstraintHelper;
 public class ValidatorContextImpl implements ValidatorContext {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
+	private ConstraintValidatorFactory constraintValidatorFactory;
 	private final MessageInterpolator factoryMessageInterpolator;
 	private final TraversableResolver factoryTraversableResolver;
-	private final ConstraintValidatorFactory constraintValidatorFactory;
+	private final ConstraintValidatorFactory factoryConstraintValidatorFactory;
 	private final ConstraintHelper constraintHelper;
 	private final BeanMetaDataCache beanMetaDataCache;
 
@@ -44,13 +45,14 @@ public class ValidatorContextImpl implements ValidatorContext {
 								TraversableResolver factoryTraversableResolver,
 								ConstraintHelper constraintHelper,
 								BeanMetaDataCache beanMetaDataCache) {
-		this.constraintValidatorFactory = constraintValidatorFactory;
+		this.factoryConstraintValidatorFactory = constraintValidatorFactory;
 		this.factoryMessageInterpolator = factoryMessageInterpolator;
 		this.factoryTraversableResolver = factoryTraversableResolver;
 		this.constraintHelper = constraintHelper;
 		this.beanMetaDataCache = beanMetaDataCache;
 		messageInterpolator( factoryMessageInterpolator );
 		traversableResolver( factoryTraversableResolver );
+		constraintValidatorFactory( factoryConstraintValidatorFactory );
 	}
 
 	public ValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
@@ -69,6 +71,16 @@ public class ValidatorContextImpl implements ValidatorContext {
 		}
 		else {
 			this.traversableResolver = traversableResolver;
+		}
+		return this;
+	}
+
+	public ValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory) {
+		if ( constraintValidatorFactory == null ) {
+			this.constraintValidatorFactory = factoryConstraintValidatorFactory;
+		}
+		else {
+			this.constraintValidatorFactory = factory;
 		}
 		return this;
 	}
