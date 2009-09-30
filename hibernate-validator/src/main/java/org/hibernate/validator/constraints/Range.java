@@ -1,4 +1,4 @@
-// $Id$
+//$Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -18,36 +18,42 @@
 package org.hibernate.validator.constraints;
 
 import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
-
-import org.hibernate.validator.constraints.impl.LengthValidator;
+import javax.validation.ReportAsSingleViolation;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 /**
- * Validate that the string is between min and max included.
+ * The annotated element has to be in the appropriate range. Apply on numeric values or string
+ * representation of the numeric value.
  *
- * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 @Documented
-@Constraint(validatedBy = LengthValidator.class)
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface Length {
-	int min() default 0;
+@Min(0)
+@Max(Long.MAX_VALUE)
+@ReportAsSingleViolation
+public @interface Range {
+	@OverridesAttribute(constraint = Min.class, name = "value")
+	long min() default 0;
 
-	int max() default Integer.MAX_VALUE;
+	@OverridesAttribute(constraint = Max.class, name = "value")
+	long max() default Long.MAX_VALUE;
 
-	String message() default "{org.hibernate.validator.constraints.Length.message}";
+	String message() default "{org.hibernate.validator.constraints.Range.message}";
 
 	Class<?>[] groups() default { };
 
