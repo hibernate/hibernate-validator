@@ -48,7 +48,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		return ( String ) constraintDescriptor.getAttributes().get( "message" );
 	}
 
-	public ConstraintViolationBuilder buildConstraintViolationWithMessageTemplate(String messageTemplate) {
+	public ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new ErrorBuilderImpl( messageTemplate, propertyPath );
 	}
 
