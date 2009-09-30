@@ -36,13 +36,13 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.test-harness</groupId>
-            <artifactId>jboss-test-harness-jboss-as-50</artifactId>
-            <version>1.0.0.BETA3</version>
+            <artifactId>jboss-test-harness-jboss-as-51</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
     <properties>
-        <jboss.home>/opt/java/jboss-5</jboss.home>
+        <jboss.home>/opt/java/jboss-5.1.0.GA</jboss.home>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
     </properties>
@@ -238,46 +238,6 @@
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>setup-jboss-as</id>
-            <activation>
-                <property>
-                    <name>setupJBoss</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>initialize</phase>
-                                <configuration>
-                                    <tasks>
-                                        <property name="deploy.dir" value="${jboss.home}/server/default/deployers/tck-303.deployer" />
-                                        <property name="remote.repo" value="http://repository.jboss.com/maven2" />
-                                        <property name="artifact.version" value="5.2.0.Beta2" />
-                                        <property name="artifact.name" value="webbeans-jboss-int-deployer-${artifact.version}" />
-                                        <delete dir="${deploy.dir}" failonerror="false" />
-                                        <mkdir dir="${basedir}/target/download" />
-                                        <get src="${remote.repo}/org/jboss/webbeans/integration/webbeans-jboss-int-deployer/${artifact.version}/${artifact.name}.zip" dest="${basedir}/target/download/${artifact.name}.zip" verbose="true" usetimestamp="true" />
-                                        <unzip dest="target" src="${basedir}/target/download/${artifact.name}.zip" />
-                                        <copy todir="${deploy.dir}">
-                                            <fileset dir="target/webbeans.deployer">
-                                                <include name="**/*" />
-                                            </fileset>
-                                        </copy>
-                                    </tasks>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
