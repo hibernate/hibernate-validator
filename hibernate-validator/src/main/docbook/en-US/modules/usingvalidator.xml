@@ -1086,6 +1086,19 @@ public void testOrderedChecksWithRedefinedDefault() {
           </row>
 
           <row>
+            <entry>@Email</entry>
+
+            <entry>no</entry>
+
+            <entry>field/property. Needs to be a string.</entry>
+
+            <entry>Check whether the specified string is a valid email
+            address.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
             <entry>@Future</entry>
 
             <entry>yes</entry>
@@ -1110,7 +1123,7 @@ public void testOrderedChecksWithRedefinedDefault() {
             <parameter>min</parameter> and <parameter>max</parameter>
             included.</entry>
 
-            <entry>Column length will be set to max.</entry>
+            <entry>none</entry>
           </row>
 
           <row>
@@ -1172,7 +1185,20 @@ public void testOrderedChecksWithRedefinedDefault() {
             <entry>Check if the string is not <constant>null</constant> nor
             empty.</entry>
 
-            <entry>Column(s) are not null (for String).</entry>
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@Null</entry>
+
+            <entry>yes</entry>
+
+            <entry>field/property</entry>
+
+            <entry>Check that the annotated value is
+            <constant>null.</constant></entry>
+
+            <entry>none</entry>
           </row>
 
           <row>
@@ -1203,6 +1229,24 @@ public void testOrderedChecksWithRedefinedDefault() {
           </row>
 
           <row>
+            <entry>@Range(min=, max=)</entry>
+
+            <entry>no</entry>
+
+            <entry>field/property. Supported types are
+            <classname>BigDecimal</classname>,
+            <classname>BigInteger</classname>, <classname>String</classname>,
+            <classname>byte</classname>, <classname>short</classname>,
+            <classname>int</classname>, <classname>long</classname> and the
+            respective wrappers of the primitive types.</entry>
+
+            <entry>Check whether the annotated value lies between (inclusive)
+            the specified minimum and maximum.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
             <entry>@Size(min=, max=)</entry>
 
             <entry>yes</entry>
@@ -1215,7 +1259,7 @@ public void testOrderedChecksWithRedefinedDefault() {
             <entry>Check if the annotated element size is between min and max
             (inclusive).</entry>
 
-            <entry>none</entry>
+            <entry>Column length will be set to max.</entry>
           </row>
 
           <row>
