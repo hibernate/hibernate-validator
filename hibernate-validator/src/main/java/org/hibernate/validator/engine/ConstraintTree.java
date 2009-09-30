@@ -20,10 +20,10 @@ package org.hibernate.validator.engine;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -51,7 +51,7 @@ public class ConstraintTree<A extends Annotation> {
 	private final List<ConstraintTree<?>> children;
 	private final ConstraintDescriptor<A> descriptor;
 
-	private final Map<Class<? extends ConstraintValidator<?, ?>>, ConstraintValidator<A, ?>> constraintValidatorCache;
+	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
 	public ConstraintTree(ConstraintDescriptor<A> descriptor) {
 		this( descriptor, null );
@@ -60,7 +60,7 @@ public class ConstraintTree<A extends Annotation> {
 	private ConstraintTree(ConstraintDescriptor<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		this.constraintValidatorCache = new HashMap<Class<? extends ConstraintValidator<?, ?>>, ConstraintValidator<A, ?>>();
+		this.constraintValidatorCache = new ConcurrentHashMap<ValidatorCacheKey, ConstraintValidator<A, ?>>();
 
 		final Set<ConstraintDescriptor<?>> composingConstraints = descriptor.getComposingConstraints();
 		children = new ArrayList<ConstraintTree<?>>( composingConstraints.size() );
@@ -174,26 +174,37 @@ public class ConstraintTree<A extends Annotation> {
 	private <V> ConstraintValidator<A, V> getInitializedValidator(Type type, ConstraintValidatorFactory constraintFactory) {
 		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( type );
 
-		ConstraintValidator<A, V> constraintValidator;
+		// check if we have the default validator factory. If not we don't use caching (see HV-242)
+		if(! (constraintFactory instanceof ConstraintValidatorFactoryImpl)) {
+			return createAndInitializeValidator( constraintFactory, validatorClass );
+		}
 
-		if ( !constraintValidatorCache.containsKey( validatorClass ) ) {
-			constraintValidator = ( ConstraintValidator<A, V> ) constraintFactory.getInstance(
-					validatorClass
-			);
-			if ( constraintValidator == null ) {
-				throw new ValidationException(
-						"Constraint factory returned null when trying to create instance of " + validatorClass.getName()
-				);
-			}
-			constraintValidatorCache.put( validatorClass, constraintValidator );
+		ConstraintValidator<A, V> constraintValidator;
+		ValidatorCacheKey key = new ValidatorCacheKey( constraintFactory, validatorClass );
+		if ( !constraintValidatorCache.containsKey( key ) ) {
+			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass );
+			constraintValidatorCache.put( key, constraintValidator );
 		}
 		else {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "Constraint validator {} found in cache" );
 			}
-			constraintValidator = ( ConstraintValidator<A, V> ) constraintValidatorCache.get( validatorClass );
+			constraintValidator = ( ConstraintValidator<A, V> ) constraintValidatorCache.get( key );
 		}
+		return constraintValidator;
+	}
 
+	@SuppressWarnings("unchecked")
+	private <V> ConstraintValidator<A, V> createAndInitializeValidator(ConstraintValidatorFactory constraintFactory, Class<? extends ConstraintValidator<?, ?>> validatorClass) {
+		ConstraintValidator<A, V> constraintValidator;
+		constraintValidator = ( ConstraintValidator<A, V> ) constraintFactory.getInstance(
+				validatorClass
+		);
+		if ( constraintValidator == null ) {
+			throw new ValidationException(
+					"Constraint factory returned null when trying to create instance of " + validatorClass.getName()
+			);
+		}
 		initializeConstraint( descriptor, constraintValidator );
 		return constraintValidator;
 	}
@@ -302,5 +313,43 @@ public class ConstraintTree<A extends Annotation> {
 		sb.append( ", constraintValidatorCache=" ).append( constraintValidatorCache );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private static class ValidatorCacheKey {
+		private ConstraintValidatorFactory constraintValidatorFactory;
+		private Class<? extends ConstraintValidator<?, ?>> validatorType;
+
+		private ValidatorCacheKey(ConstraintValidatorFactory constraintValidatorFactory, Class<? extends ConstraintValidator<?, ?>> validatorType) {
+			this.constraintValidatorFactory = constraintValidatorFactory;
+			this.validatorType = validatorType;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+
+			ValidatorCacheKey that = ( ValidatorCacheKey ) o;
+
+			if ( constraintValidatorFactory != null ? !constraintValidatorFactory.equals( that.constraintValidatorFactory ) : that.constraintValidatorFactory != null ) {
+				return false;
+			}
+			if ( validatorType != null ? !validatorType.equals( that.validatorType ) : that.validatorType != null ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = constraintValidatorFactory != null ? constraintValidatorFactory.hashCode() : 0;
+			result = 31 * result + ( validatorType != null ? validatorType.hashCode() : 0 );
+			return result;
+		}
 	}
 }
