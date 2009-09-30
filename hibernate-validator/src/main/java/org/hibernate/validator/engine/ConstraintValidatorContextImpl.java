@@ -40,15 +40,15 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		this.constraintDescriptor = constraintDescriptor;
 	}
 
-	public void disableDefaultError() {
+	public void disableDefaultConstraintViolation() {
 		defaultDisabled = true;
 	}
 
-	public String getDefaultErrorMessageTemplate() {
+	public String getDefaultConstraintMessageTemplate() {
 		return ( String ) constraintDescriptor.getAttributes().get( "message" );
 	}
 
-	public ErrorBuilder buildErrorWithMessageTemplate(String messageTemplate) {
+	public ConstraintViolationBuilder buildConstraintViolationWithMessageTemplate(String messageTemplate) {
 		return new ErrorBuilderImpl( messageTemplate, propertyPath );
 	}
 
@@ -64,7 +64,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		List<ErrorMessage> returnedErrorMessages = new ArrayList<ErrorMessage>( errorMessages );
 		if ( !defaultDisabled ) {
 			returnedErrorMessages.add(
-					new ErrorMessage( getDefaultErrorMessageTemplate(), propertyPath )
+					new ErrorMessage( getDefaultConstraintMessageTemplate(), propertyPath )
 			);
 		}
 		return returnedErrorMessages;
@@ -88,7 +88,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 	}
 
-	class ErrorBuilderImpl implements ErrorBuilder {
+	class ErrorBuilderImpl implements ConstraintViolationBuilder {
 		String messageTemplate;
 		PathImpl propertyPath;
 
@@ -97,7 +97,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath = path;
 		}
 
-		public NodeBuilderDefinedContext addSubNode(String name) {
+		public NodeBuilderDefinedContext addNode(String name) {
 			PathImpl path;
 			if ( propertyPath.isRootPath() ) {
 				path = PathImpl.createNewPath( name );
@@ -109,13 +109,13 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			return new NodeBuilderImpl( messageTemplate, path );
 		}
 
-		public ConstraintValidatorContext addError() {
+		public ConstraintValidatorContext addConstraintViolation() {
 			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
 
-	class NodeBuilderImpl implements ErrorBuilder.NodeBuilderDefinedContext {
+	class NodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderDefinedContext {
 		String messageTemplate;
 		PathImpl propertyPath;
 
@@ -124,19 +124,19 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath = path;
 		}
 
-		public ErrorBuilder.NodeBuilderCustomizableContext addSubNode(String name) {
+		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			NodeImpl node = new NodeImpl( name );
 			propertyPath.addNode( node );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
-		public ConstraintValidatorContext addError() {
+		public ConstraintValidatorContext addConstraintViolation() {
 			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
 
-	class InIterableNodeBuilderImpl implements ErrorBuilder.NodeBuilderCustomizableContext {
+	class InIterableNodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderCustomizableContext {
 		String messageTemplate;
 		PathImpl propertyPath;
 
@@ -145,23 +145,23 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath = path;
 		}
 
-		public ErrorBuilder.NodeContextBuilder inIterable() {
+		public ConstraintViolationBuilder.NodeContextBuilder inIterable() {
 			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath );
 		}
 
-		public ErrorBuilder.NodeBuilderCustomizableContext addSubNode(String name) {
+		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			Path.Node node = new NodeImpl( name );
 			propertyPath.addNode( node );
 			return this;
 		}
 
-		public ConstraintValidatorContext addError() {
+		public ConstraintValidatorContext addConstraintViolation() {
 			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
 
-	class InIterablePropertiesBuilderImpl implements ErrorBuilder.NodeContextBuilder {
+	class InIterablePropertiesBuilderImpl implements ConstraintViolationBuilder.NodeContextBuilder {
 		String messageTemplate;
 		PathImpl propertyPath;
 
@@ -171,23 +171,23 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath.getLeafNode().setInIterable( true );
 		}
 
-		public ErrorBuilder.NodeBuilderDefinedContext atKey(Object key) {
+		public ConstraintViolationBuilder.NodeBuilderDefinedContext atKey(Object key) {
 			propertyPath.getLeafNode().setKey( key );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
-		public ErrorBuilder.NodeBuilderDefinedContext atIndex(Integer index) {
+		public ConstraintViolationBuilder.NodeBuilderDefinedContext atIndex(Integer index) {
 			propertyPath.getLeafNode().setIndex( index );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
-		public ErrorBuilder.NodeBuilderCustomizableContext addSubNode(String name) {
+		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			Path.Node node = new NodeImpl( name );
 			propertyPath.addNode( node );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
-		public ConstraintValidatorContext addError() {
+		public ConstraintValidatorContext addConstraintViolation() {
 			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
