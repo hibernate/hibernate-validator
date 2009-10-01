@@ -17,12 +17,13 @@
 */
 package org.hibernate.validator.engine;
 
+import java.io.Serializable;
 import javax.validation.Path;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NodeImpl implements Path.Node {
+public class NodeImpl implements Path.Node, Serializable {
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";

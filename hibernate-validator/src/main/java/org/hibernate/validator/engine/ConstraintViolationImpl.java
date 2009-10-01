@@ -26,7 +26,7 @@ import javax.validation.metadata.ConstraintDescriptor;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConstraintViolationImpl<T> implements ConstraintViolation<T> {
+public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.io.Serializable {
 	private final String interpolatedMessage;
 	private final T rootBean;
 	private final Object value;

@@ -22,12 +22,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.Serializable;
 import javax.validation.Path;
 
 /**
  * @author Hardy Ferentschik
  */
-public class PathImpl implements Path {
+public class PathImpl implements Path, Serializable {
 
 	/**
 	 * Regular expression used to split a string path into its elements.

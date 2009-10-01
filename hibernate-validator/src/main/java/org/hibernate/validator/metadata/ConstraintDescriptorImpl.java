@@ -17,6 +17,7 @@
 */
 package org.hibernate.validator.metadata;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,9 +32,9 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
-import javax.validation.Payload;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
+import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
@@ -55,7 +56,7 @@ import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T> {
+public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 	private static final Logger log = LoggerFactory.make();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 	private static final String GROUPS = "groups";
@@ -98,7 +99,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * Handle to the built-in constraint implementations.
 	 */
-	private final ConstraintHelper constraintHelper;
+	private transient final ConstraintHelper constraintHelper;
 
 	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup) {
 		this.annotation = annotation;
@@ -216,7 +217,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return groups;
 	}
 
-	public Set<Class< ? extends Payload>> getPayload() {
+	public Set<Class<? extends Payload>> getPayload() {
 		return payloads;
 	}
 
@@ -418,7 +419,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		// groups get inherited from the parent
 		annotationDescriptor.setValue( GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
 
-	    // HV-183 - payloads are propagated to composing constraints
+		// HV-183 - payloads are propagated to composing constraints
 		annotationDescriptor.setValue( PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
