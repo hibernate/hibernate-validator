@@ -145,8 +145,8 @@ public class GlobalExecutionContext<T> {
 		return messageInterpolator;
 	}
 
-	public <U, V> ConstraintViolationImpl<T> createConstraintViolation(LocalExecutionContext<U, V> localContext, ConstraintValidatorContextImpl.ErrorMessage error, ConstraintDescriptor<?> descriptor) {
-		String messageTemplate = error.getMessage();
+	public <U, V> ConstraintViolationImpl<T> createConstraintViolation(LocalExecutionContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
+		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentBean() )
@@ -158,7 +158,7 @@ public class GlobalExecutionContext<T> {
 				getRootBean(),
 				localContext.getCurrentBean(),
 				localContext.getCurrentValidatedValue(),
-				error.getPath(),
+				messageAndPath.getPath(),
 				descriptor,
 				localContext.getElementType()
 		);
@@ -166,9 +166,9 @@ public class GlobalExecutionContext<T> {
 
 	public <U, V> List<ConstraintViolationImpl<T>> createConstraintViolations(LocalExecutionContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
-		for ( ConstraintValidatorContextImpl.ErrorMessage error : constraintValidatorContext.getErrorMessages() ) {
+		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
 			ConstraintViolationImpl<T> violation = createConstraintViolation(
-					localContext, error, constraintValidatorContext.getConstraintDescriptor()
+					localContext, messageAndPath, constraintValidatorContext.getConstraintDescriptor()
 			);
 			constraintViolations.add( violation );
 		}

@@ -75,20 +75,8 @@ public class ConstraintTree<A extends Annotation> {
 		return new ConstraintTree<U>( composingDescriptor, this );
 	}
 
-	public boolean isRoot() {
-		return parent == null;
-	}
-
-	public ConstraintTree getParent() {
-		return parent;
-	}
-
 	public List<ConstraintTree<?>> getChildren() {
 		return children;
-	}
-
-	public boolean hasChildren() {
-		return children.size() > 0;
 	}
 
 	public ConstraintDescriptor<A> getDescriptor() {
@@ -133,11 +121,9 @@ public class ConstraintTree<A extends Annotation> {
 		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
 			constraintViolations.clear();
 			final String message = ( String ) getDescriptor().getAttributes().get( "message" );
-			ConstraintValidatorContextImpl.ErrorMessage error = constraintValidatorContext.new ErrorMessage(
-					message, localExecutionContext.getPropertyPath()
-			);
+			MessageAndPath messageAndPath = new MessageAndPath( message, localExecutionContext.getPropertyPath() );
 			ConstraintViolation<T> violation = executionContext.createConstraintViolation(
-					localExecutionContext, error, descriptor
+					localExecutionContext, messageAndPath, descriptor
 			);
 			constraintViolations.add( violation );
 		}
@@ -175,7 +161,7 @@ public class ConstraintTree<A extends Annotation> {
 		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( type );
 
 		// check if we have the default validator factory. If not we don't use caching (see HV-242)
-		if(! (constraintFactory instanceof ConstraintValidatorFactoryImpl)) {
+		if ( !( constraintFactory instanceof ConstraintValidatorFactoryImpl ) ) {
 			return createAndInitializeValidator( constraintFactory, validatorClass );
 		}
 

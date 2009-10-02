@@ -57,6 +57,8 @@ import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
  * @author Hardy Ferentschik
  */
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
+
+	private static final long serialVersionUID = -2563102960314069246L;
 	private static final Logger log = LoggerFactory.make();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 	private static final String GROUPS = "groups";
@@ -84,10 +86,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final Map<String, Object> attributes;
 
+	/**
+	 * The specified payload of the constraint.
+	 */
 	private final Set<Class<? extends Payload>> payloads;
 
 	/**
-	 * The composing constraints for this constraints.
+	 * The composing constraints for this constraint.
 	 */
 	private final Set<ConstraintDescriptor<?>> composingConstraints;
 
@@ -99,6 +104,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * Handle to the built-in constraint implementations.
 	 */
+	//TODO Can be made transient since it is only used during object construction. It would be better if we would not have to pass it at all
 	private transient final ConstraintHelper constraintHelper;
 
 	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup) {

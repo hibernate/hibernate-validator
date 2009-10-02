@@ -299,7 +299,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return escapedString;
 	}
 
-	class LocalisedMessage {
+	private static class LocalisedMessage {
 		private final String message;
 		private final Locale locale;
 

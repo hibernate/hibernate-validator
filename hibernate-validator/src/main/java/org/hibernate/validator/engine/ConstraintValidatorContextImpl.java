@@ -29,7 +29,7 @@ import javax.validation.metadata.ConstraintDescriptor;
  */
 public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
 
-	private final List<ErrorMessage> errorMessages = new ArrayList<ErrorMessage>( 3 );
+	private final List<MessageAndPath> messageAndPaths = new ArrayList<MessageAndPath>( 3 );
 	private final PathImpl propertyPath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
@@ -56,36 +56,18 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		return constraintDescriptor;
 	}
 
-	public List<ErrorMessage> getErrorMessages() {
-		if(defaultDisabled && errorMessages.size() == 0) {
+	public List<MessageAndPath> getMessageAndPathList() {
+		if(defaultDisabled && messageAndPaths.size() == 0) {
 			throw new ValidationException("At least one custom message must be created if the default error message gets disabled.");
 		}
 
-		List<ErrorMessage> returnedErrorMessages = new ArrayList<ErrorMessage>( errorMessages );
+		List<MessageAndPath> returnedMessageAndPaths = new ArrayList<MessageAndPath>( messageAndPaths );
 		if ( !defaultDisabled ) {
-			returnedErrorMessages.add(
-					new ErrorMessage( getDefaultConstraintMessageTemplate(), propertyPath )
+			returnedMessageAndPaths.add(
+					new MessageAndPath( getDefaultConstraintMessageTemplate(), propertyPath )
 			);
 		}
-		return returnedErrorMessages;
-	}
-
-	public class ErrorMessage {
-		private final String message;
-		private final Path propertyPath;
-
-		public ErrorMessage(String message, Path property) {
-			this.message = message;
-			this.propertyPath = property;
-		}
-
-		public String getMessage() {
-			return message;
-		}
-
-		public Path getPath() {
-			return propertyPath;
-		}
+		return returnedMessageAndPaths;
 	}
 
 	class ErrorBuilderImpl implements ConstraintViolationBuilder {
@@ -110,7 +92,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
-			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
@@ -131,7 +113,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
-			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
@@ -156,7 +138,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
-			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
@@ -188,7 +170,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
-			errorMessages.add( new ErrorMessage( messageTemplate, propertyPath ) );
+			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
