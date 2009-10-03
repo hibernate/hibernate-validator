@@ -727,12 +727,12 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <U> BeanMetaData<U> getBeanMetaData(Class<U> beanClass) {
-		BeanMetaDataImpl<U> metadata = beanMetaDataCache.getBeanMetaData( beanClass );
-		if ( metadata == null ) {
-			metadata = new BeanMetaDataImpl<U>( beanClass, constraintHelper );
-			beanMetaDataCache.addBeanMetaData( beanClass, metadata );
+		BeanMetaDataImpl<U> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
+		if ( beanMetaData == null ) {
+			beanMetaData = new BeanMetaDataImpl<U>( beanClass, constraintHelper );
+			beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
 		}
-		return metadata;
+		return beanMetaData;
 	}
 
 	/**
