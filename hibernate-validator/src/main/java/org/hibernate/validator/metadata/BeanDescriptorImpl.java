@@ -26,25 +26,25 @@ import javax.validation.metadata.PropertyDescriptor;
  * @author Hardy Ferentschik
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
-	private final BeanMetaData<T> metadataBean;
+	private final BeanMetaData<T> metaDataBean;
 
-	public BeanDescriptorImpl(BeanMetaData<T> metadataBean) {
-		super( metadataBean.getBeanClass() );
-		this.metadataBean = metadataBean;
+	public BeanDescriptorImpl(BeanMetaData<T> beanMetaData) {
+		super( beanMetaData.getBeanClass() );
+		this.metaDataBean = beanMetaData;
 	}
 
 	public boolean isBeanConstrained() {
-		return metadataBean.getMetaConstraintsAsMap().size() > 0;
+		return metaDataBean.getMetaConstraintsAsMap().size() > 0;
 	}
 
 	public PropertyDescriptor getConstraintsForProperty(String propertyName) {
 		if ( propertyName == null ) {
 			throw new IllegalArgumentException( "The property name cannot be null" );
 		}
-		return metadataBean.getPropertyDescriptor( propertyName );
+		return metaDataBean.getPropertyDescriptor( propertyName );
 	}
 
 	public Set<PropertyDescriptor> getConstrainedProperties() {
-		return metadataBean.getConstrainedProperties();
+		return metaDataBean.getConstrainedProperties();
 	}
 }
