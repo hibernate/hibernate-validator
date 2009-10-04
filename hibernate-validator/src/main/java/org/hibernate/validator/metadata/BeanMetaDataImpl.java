@@ -61,7 +61,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private static final Logger log = LoggerFactory.make();
 
 	/**
-	 * The root bean class for this validator.
+	 * The root bean class for this meta data.
 	 */
 	private final Class<T> beanClass;
 
@@ -97,7 +97,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final ConstraintHelper constraintHelper;
 
 	//updated on the fly, needs to be thread safe
-	//property name
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
@@ -280,8 +279,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				propertyNames.add( name );
 			}
 
-			List<ConstraintDescriptorImpl<?>> fieldMetadata = findConstraints( field );
-			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetadata ) {
+			List<ConstraintDescriptorImpl<?>> fieldMetaData = findConstraints( field, ElementType.FIELD );
+			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetaData ) {
 				setAccessibility( field );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
@@ -329,8 +328,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				propertyNames.add( name );
 			}
 
-			List<ConstraintDescriptorImpl<?>> methodMetadata = findConstraints( method );
-			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetadata ) {
+			List<ConstraintDescriptorImpl<?>> methodMetaData = findConstraints( method, ElementType.METHOD );
+			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetaData ) {
 				setAccessibility( method );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( method, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
@@ -368,29 +367,26 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		List<ConstraintDescriptorImpl<?>> classMetadata = findClassLevelConstraints( clazz );
 		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetadata ) {
-			MetaConstraint<T, ?> metaConstraint = createMetaConstraint( constraintDescription );
+			MetaConstraint<T, ?> metaConstraint = createMetaConstraint( null, constraintDescription );
 			addMetaConstraint( clazz, metaConstraint );
 		}
 	}
 
-	private <A extends Annotation> MetaConstraint<T, ?> createMetaConstraint(ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<T, A>( beanClass, descriptor );
-	}
-
 	private <A extends Annotation> MetaConstraint<T, ?> createMetaConstraint(Member m, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<T, A>( m, beanClass, descriptor );
+		return new MetaConstraint<T, A>( beanClass, m, descriptor );
 	}
 
 	/**
 	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
 	 *
-	 * @param clazz the class we are currently processing.
-	 * @param annotation The annotation to examine.
+	 * @param clazz the class we are currently processing
+	 * @param annotation The annotation to examine
+	 * @param type the element type on which the annotation/constraint is placed on
 	 *
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
-	 *         single nor multi value annotation.
+	 *         single nor multi-valued annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Class<?> clazz, A annotation) {
+	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Class<?> clazz, A annotation, ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
@@ -399,24 +395,27 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			constraints.add( annotation );
 		}
 
-		// check if we have a multi value constraint
+		// check if we have a multi-valued constraint
 		constraints.addAll( constraintHelper.getMultiValueConstraints( annotation ) );
 
 		for ( Annotation constraint : constraints ) {
-			final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( clazz, constraint );
+			final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( clazz, constraint, type );
 			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(Class<?> clazz, A annotation) {
+	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
 		ConstraintDescriptorImpl constraintDescriptor;
+		ConstraintOrigin definedIn = determineOrigin( clazz );
 		if ( clazz.isInterface() && !clazz.equals( beanClass ) ) {
-			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper, clazz );
+			constraintDescriptor = new ConstraintDescriptorImpl(
+					annotation, constraintHelper, clazz, type, definedIn
+			);
 		}
 		else {
-			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper );
+			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper, type, definedIn );
 		}
 		return constraintDescriptor;
 	}
@@ -430,11 +429,11 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @return A list of constraint descriptors for all constraint specified on the given class.
 	 */
 	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
-		List<ConstraintDescriptorImpl<?>> metadata = new ArrayList<ConstraintDescriptorImpl<?>>();
+		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 		for ( Annotation annotation : beanClass.getAnnotations() ) {
-			metadata.addAll( findConstraintAnnotations( beanClass, annotation ) );
+			metaData.addAll( findConstraintAnnotations( beanClass, annotation, ElementType.TYPE ) );
 		}
-		return metadata;
+		return metaData;
 	}
 
 
@@ -443,18 +442,28 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * constraint descriptors.
 	 *
 	 * @param member The fields or method to check for constraints annotations.
+	 * @param type The element type the constraint/annotation is placed on.
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member) {
+	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
 		assert member instanceof Field || member instanceof Method;
 
-		List<ConstraintDescriptorImpl<?>> metadata = new ArrayList<ConstraintDescriptorImpl<?>>();
+		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 		for ( Annotation annotation : ( ( AnnotatedElement ) member ).getAnnotations() ) {
-			metadata.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation ) );
+			metaData.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation, type ) );
 		}
 
-		return metadata;
+		return metaData;
+	}
+
+	private ConstraintOrigin determineOrigin(Class<?> clazz) {
+		if ( clazz.equals( beanClass ) ) {
+			return ConstraintOrigin.DEFINED_LOCALLY;
+		}
+		else {
+			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
+		}
 	}
 
 	@Override

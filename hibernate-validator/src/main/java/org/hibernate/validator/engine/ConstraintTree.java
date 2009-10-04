@@ -20,6 +20,7 @@ package org.hibernate.validator.engine;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
+import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ValidatorTypeHelper;
 
@@ -49,29 +51,33 @@ public class ConstraintTree<A extends Annotation> {
 
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
-	private final ConstraintDescriptor<A> descriptor;
+	private final ConstraintDescriptorImpl<A> descriptor;
 
 	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
-	public ConstraintTree(ConstraintDescriptor<A> descriptor) {
+	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
 	}
 
-	private ConstraintTree(ConstraintDescriptor<A> descriptor, ConstraintTree<?> parent) {
+	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
 		this.constraintValidatorCache = new ConcurrentHashMap<ValidatorCacheKey, ConstraintValidator<A, ?>>();
 
-		final Set<ConstraintDescriptor<?>> composingConstraints = descriptor.getComposingConstraints();
+		final Set<ConstraintDescriptorImpl<?>> composingConstraints = new HashSet<ConstraintDescriptorImpl<?>>();
+		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
+			composingConstraints.add( ( ConstraintDescriptorImpl<?> ) composingConstraint );
+		}
+		
 		children = new ArrayList<ConstraintTree<?>>( composingConstraints.size() );
 
-		for ( ConstraintDescriptor<?> composingDescriptor : composingConstraints ) {
+		for ( ConstraintDescriptorImpl<?> composingDescriptor : composingConstraints ) {
 			ConstraintTree<?> treeNode = createConstraintTree( composingDescriptor );
 			children.add( treeNode );
 		}
 	}
 
-	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptor<U> composingDescriptor) {
+	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
 		return new ConstraintTree<U>( composingDescriptor, this );
 	}
 
@@ -79,7 +85,7 @@ public class ConstraintTree<A extends Annotation> {
 		return children;
 	}
 
-	public ConstraintDescriptor<A> getDescriptor() {
+	public ConstraintDescriptorImpl<A> getDescriptor() {
 		return descriptor;
 	}
 

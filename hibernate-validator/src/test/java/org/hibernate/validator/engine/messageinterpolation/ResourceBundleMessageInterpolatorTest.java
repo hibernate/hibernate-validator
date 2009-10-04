@@ -37,6 +37,7 @@ import org.hibernate.validator.engine.MessageInterpolatorContext;
 import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
@@ -59,13 +60,16 @@ public class ResourceBundleMessageInterpolatorTest {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
 		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
-				notNull, new ConstraintHelper()
+				notNull,
+				new ConstraintHelper(),
+				java.lang.annotation.ElementType.FIELD,
+				ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
 		size = AnnotationFactory.create( sizeAnnotationDescriptor );
 		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
-				size, new ConstraintHelper()
+				size, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
 		);
 	}
 
@@ -200,7 +204,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
-				max, new ConstraintHelper()
+				max, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
@@ -226,7 +230,7 @@ public class ResourceBundleMessageInterpolatorTest {
 
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
-				max, new ConstraintHelper()
+				max, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );

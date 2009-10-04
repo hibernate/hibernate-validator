@@ -8,8 +8,9 @@
             <package name="org.hibernate.validator.constraints.impl"/>
             <package name="org.hibernate.validator.constraints.composition"/>
             <package name="org.hibernate.validator.engine"/>
-            <package name="org.hibernate.validator.engine.messageinterpolation"/>
             <package name="org.hibernate.validator.engine.groups"/>
+            <package name="org.hibernate.validator.engine.messageinterpolation"/>
+            <package name="org.hibernate.validator.engine.serialization"/>
             <package name="org.hibernate.validator.engine.traversableresolver"/>
             <package name="org.hibernate.validator.metadata"/>
             <package name="org.hibernate.validator.util"/>

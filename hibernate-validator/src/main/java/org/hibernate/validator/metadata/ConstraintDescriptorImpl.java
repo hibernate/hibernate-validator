@@ -19,6 +19,7 @@ package org.hibernate.validator.metadata;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -102,14 +103,28 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final boolean isReportAsSingleInvalidConstraint;
 
 	/**
+	 * Describes on which level (<code>TYPE</code>, <code>METHOD</code>, <code>FIELD</code>) the constraint was
+	 * defined on.
+	 */
+	private final ElementType elementType;
+
+	/**
+	 * The oririgin of the constraint. Defined on the actual root class or somehwere in the class hierarchy
+	 */
+	private final ConstraintOrigin definedOn;
+
+
+	/**
 	 * Handle to the built-in constraint implementations.
 	 */
 	//TODO Can be made transient since it is only used during object construction. It would be better if we would not have to pass it at all
 	private transient final ConstraintHelper constraintHelper;
 
-	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup) {
+	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup, ElementType type, ConstraintOrigin definedOn) {
 		this.annotation = annotation;
 		this.constraintHelper = constraintHelper;
+		this.elementType = type;
+		this.definedOn = definedOn;
 		this.isReportAsSingleInvalidConstraint = annotation.annotationType().isAnnotationPresent(
 				ReportAsSingleViolation.class
 		);
@@ -123,8 +138,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.composingConstraints = parseComposingConstraints();
 	}
 
-	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper) {
-		this( annotation, constraintHelper, null );
+	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, ElementType type, ConstraintOrigin definedOn) {
+		this( annotation, constraintHelper, null, type, definedOn );
 	}
 
 	private Set<Class<? extends Payload>> buildPayloadSet(T annotation) {
@@ -243,16 +258,28 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return isReportAsSingleInvalidConstraint;
 	}
 
+	public ElementType getElementType() {
+		return elementType;
+	}
+
+	public ConstraintOrigin getDefinedOn() {
+		return definedOn;
+	}
+
 	@Override
 	public String toString() {
-		return "ConstraintDescriptorImpl{" +
-				"annotation=" + annotation +
-				", constraintValidatorDefinitionClasses=" + constraintValidatorDefinitionClasses.toString() +
-				", groups=" + groups +
-				", attributes=" + attributes +
-				", composingConstraints=" + composingConstraints +
-				", isReportAsSingleInvalidConstraint=" + isReportAsSingleInvalidConstraint +
-				'}';
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ConstraintDescriptorImpl" );
+		sb.append( "{annotation=" ).append( annotation.annotationType().getName() );
+		sb.append( ", payloads=" ).append( payloads );
+		sb.append( ", hasComposingConstraints=" ).append( composingConstraints.isEmpty() );
+		sb.append( ", isReportAsSingleInvalidConstraint=" ).append( isReportAsSingleInvalidConstraint );
+		sb.append( ", elementType=" ).append( elementType );
+		sb.append( ", definedOn=" ).append( definedOn );
+		sb.append( ", groups=" ).append( groups );
+		sb.append( ", attributes=" ).append( attributes );		
+		sb.append( '}' );
+		return sb.toString();
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
@@ -430,7 +457,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
 		return new ConstraintDescriptorImpl<U>(
-				annotationProxy, constraintHelper
+				annotationProxy, constraintHelper, elementType, definedOn
 		);
 	}
 

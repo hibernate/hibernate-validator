@@ -19,7 +19,6 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
-import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.engine.ConstraintTree;
 import org.hibernate.validator.engine.GlobalExecutionContext;
@@ -55,12 +53,6 @@ public class MetaConstraint<T, A extends Annotation> {
 	private final String propertyName;
 
 	/**
-	 * Describes on which level (<code>TYPE</code>, <code>METHOD</code>, <code>FIELD</code>) the constraint was
-	 * defined on.
-	 */
-	private final ElementType elementType;
-
-	/**
 	 * The class of the bean hosting this constraint.
 	 */
 	private final Class<T> beanClass;
@@ -70,35 +62,26 @@ public class MetaConstraint<T, A extends Annotation> {
 	 */
 	private final ConstraintTree<A> constraintTree;
 
-	public MetaConstraint(Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
-		this.elementType = ElementType.TYPE;
-		this.member = null;
-		this.propertyName = null;
-		this.beanClass = beanClass;
-		constraintTree = new ConstraintTree<A>( constraintDescriptor );
-	}
-
-	public MetaConstraint(Member member, Class<T> beanClass, ConstraintDescriptor<A> constraintDescriptor) {
-		if ( member instanceof Method ) {
-			this.elementType = ElementType.METHOD;
-		}
-		else if ( member instanceof Field ) {
-			this.elementType = ElementType.FIELD;
-		}
-		else {
-			throw new IllegalArgumentException( "Non allowed member type: " + member );
-		}
+	/**
+	 * @param beanClass The class in which the constraint is defined on
+	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
+	 * @param constraintDescriptor The constraint descriptor for this constraint
+	 */
+	public MetaConstraint(Class<T> beanClass, Member member, ConstraintDescriptorImpl<A> constraintDescriptor) {
 		this.member = member;
-		this.propertyName = ReflectionHelper.getPropertyName( member );
-		if ( member instanceof Method && propertyName == null ) { // can happen if member is a Method which does not follow the bean convention
-			throw new ValidationException(
-					"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
-			);
+		if ( this.member != null ) {
+			this.propertyName = ReflectionHelper.getPropertyName( member );
+			if ( member instanceof Method && propertyName == null ) { // can happen if member is a Method which does not follow the bean convention
+				throw new ValidationException(
+						"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
+				);
+			}
+		} else {
+			this.propertyName = null;
 		}
 		this.beanClass = beanClass;
 		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 	}
-
 
 	/**
 	 * @return Returns the list of groups this constraint is part of. This might include the default group even when
@@ -108,7 +91,7 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree.getDescriptor().getGroups();
 	}
 
-	public ConstraintDescriptor<A> getDescriptor() {
+	public ConstraintDescriptorImpl<A> getDescriptor() {
 		return constraintTree.getDescriptor();
 	}
 
@@ -129,12 +112,12 @@ public class MetaConstraint<T, A extends Annotation> {
 	}
 
 	public ElementType getElementType() {
-		return elementType;
+		return constraintTree.getDescriptor().getElementType();
 	}
 
 	public <T, U, V> boolean validateConstraint(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext) {
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
-		localExecutionContext.setElementType( elementType );
+		localExecutionContext.setElementType( getElementType() );
 		constraintTree.validateConstraints(
 				typeOfAnnotatedElement(), executionContext, localExecutionContext, constraintViolations
 		);
@@ -152,7 +135,7 @@ public class MetaConstraint<T, A extends Annotation> {
 	 *         is returned of method or field access is used to access the value.
 	 */
 	public Object getValue(Object o) {
-		switch ( elementType ) {
+		switch ( getElementType() ) {
 			case TYPE: {
 				return o;
 			}
@@ -164,7 +147,7 @@ public class MetaConstraint<T, A extends Annotation> {
 
 	private Type typeOfAnnotatedElement() {
 		Type t;
-		switch ( elementType ) {
+		switch ( getElementType() ) {
 			case TYPE: {
 				t = beanClass;
 				break;
@@ -183,9 +166,9 @@ public class MetaConstraint<T, A extends Annotation> {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "MetaConstraint" );
-		sb.append( "{propertyName='" ).append( propertyName ).append( '\'' );
-		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", beanClass=" ).append( beanClass );
+		sb.append( "{beanClass=" ).append( beanClass );
+		sb.append( ", member=" ).append( member );
+		sb.append( ", propertyName='" ).append( propertyName ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
 	}

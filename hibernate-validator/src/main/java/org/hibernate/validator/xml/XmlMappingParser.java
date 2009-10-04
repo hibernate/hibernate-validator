@@ -52,6 +52,7 @@ import org.xml.sax.SAXException;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.util.ContainsField;
 import org.hibernate.validator.util.ContainsMethod;
@@ -404,18 +405,21 @@ public class XmlMappingParser {
 			);
 		}
 
+		java.lang.annotation.ElementType type = java.lang.annotation.ElementType.TYPE;
+		if ( member instanceof Method ) {
+			type = java.lang.annotation.ElementType.METHOD;
+		}
+		else if ( member instanceof Field ) {
+			type = java.lang.annotation.ElementType.FIELD;
+		}
+
+		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
+		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				annotation, constraintHelper
+				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		MetaConstraint<T, A> metaConstraint;
-		if ( member == null ) {
-			metaConstraint = new MetaConstraint<T, A>( beanClass, constraintDescriptor );
-		}
-		else {
-			metaConstraint = new MetaConstraint<T, A>( member, beanClass, constraintDescriptor );
-		}
-		return metaConstraint;
+		return new MetaConstraint<T, A>( beanClass, member, constraintDescriptor );
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {

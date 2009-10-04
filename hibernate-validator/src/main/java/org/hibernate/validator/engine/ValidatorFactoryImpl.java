@@ -30,13 +30,14 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
+import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.xml.XmlMappingParser;
@@ -125,29 +126,33 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T, A extends Annotation> void addXmlConfiguredConstraintToMetaData(XmlMappingParser mappingParser, Class<T> rootClass, Class<?> hierarchyClass, BeanMetaDataImpl<T> metaData) {
 		for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
-			if ( hierarchyClass.equals( rootClass ) ) {
-				@SuppressWarnings("unchecked") // safe cast due to the class check
-						MetaConstraint<T, ? extends Annotation> castedConstrain = ( MetaConstraint<T, ? extends Annotation> ) constraint;
-				metaData.addMetaConstraint( hierarchyClass, castedConstrain );
-			}
-			else {
-				MetaConstraint<T, A> newMetaConstraint;
-				@SuppressWarnings("unchecked")
-				ConstraintDescriptor<A> descriptor = ( ConstraintDescriptor<A> ) constraint.getDescriptor();
-				if ( constraint.getMember() == null ) {
-					newMetaConstraint = new MetaConstraint<T, A>( rootClass, descriptor );
-				}
-				else {
-					newMetaConstraint = new MetaConstraint<T, A>( constraint.getMember(), rootClass, descriptor );
-				}
-				metaData.addMetaConstraint( hierarchyClass, newMetaConstraint );
-			}
+			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
+			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
+					( A ) constraint.getDescriptor().getAnnotation(),
+					constraintHelper,
+					constraint.getElementType(),
+					definedIn
+			);
+			MetaConstraint<T, A> newMetaConstraint = new MetaConstraint<T, A>(
+					rootClass, constraint.getMember(), descriptor
+			);
+			metaData.addMetaConstraint( hierarchyClass, newMetaConstraint );
 		}
 
 		for ( Member m : mappingParser.getCascadedMembersForClass( hierarchyClass ) ) {
 			metaData.addCascadedMember( m );
+		}
+	}
+
+	private ConstraintOrigin definedIn(Class<?> rootClass, Class<?> hierarchyClass) {
+		if ( hierarchyClass.equals( rootClass ) ) {
+			return ConstraintOrigin.DEFINED_LOCALLY;
+		}
+		else {
+			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
 		}
 	}
 }
