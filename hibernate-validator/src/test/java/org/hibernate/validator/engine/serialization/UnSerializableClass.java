@@ -1,7 +1,7 @@
 // $Id:$
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2008, Red Hat Middleware LLC, and individual contributors
+* Copyright 2009, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
