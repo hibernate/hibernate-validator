@@ -26,11 +26,9 @@ import javax.validation.metadata.PropertyDescriptor;
  * @author Hardy Ferentschik
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
-	private final BeanMetaData<T> metaDataBean;
 
 	public BeanDescriptorImpl(BeanMetaData<T> beanMetaData) {
-		super( beanMetaData.getBeanClass() );
-		this.metaDataBean = beanMetaData;
+		super( beanMetaData.getBeanClass(), beanMetaData );
 	}
 
 	public boolean isBeanConstrained() {

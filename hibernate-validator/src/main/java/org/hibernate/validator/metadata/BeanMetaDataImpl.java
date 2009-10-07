@@ -350,7 +350,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			propertyDescriptor = new PropertyDescriptorImpl(
 					ReflectionHelper.getType( member ),
 					isCascaded,
-					name
+					name,
+					this
 			);
 			propertyDescriptors.put( name, propertyDescriptor );
 		}

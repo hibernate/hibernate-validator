@@ -18,12 +18,14 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.annotation.ElementType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.Scope;
@@ -39,10 +41,12 @@ import org.hibernate.validator.engine.groups.GroupChainGenerator;
  * @author Hardy Ferentschik
  */
 public class ElementDescriptorImpl implements ElementDescriptor {
+	protected final BeanMetaData<?> metaDataBean;
 	private final Class<?> type;
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors = new HashSet<ConstraintDescriptorImpl<?>>();
 
-	public ElementDescriptorImpl(Class<?> type) {
+	public ElementDescriptorImpl(Class<?> type, BeanMetaData<?> metaDataBean) {
+		this.metaDataBean = metaDataBean;
 		this.type = type;
 	}
 
@@ -83,7 +87,15 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		}
 
 		public ConstraintFinder unorderedAndMatchingGroups(Class<?>... classes) {
-			this.groups = Arrays.asList( classes );
+			this.groups = new ArrayList<Class<?>>();
+			for ( Class<?> clazz : classes ) {
+				if ( Default.class.equals( clazz ) && metaDataBean.defaultGroupSequenceIsRedefined() ) {
+					this.groups.addAll( metaDataBean.getDefaultGroupSequence() );
+				}
+				else {
+					groups.add( clazz );
+				}
+			}
 			return this;
 		}
 

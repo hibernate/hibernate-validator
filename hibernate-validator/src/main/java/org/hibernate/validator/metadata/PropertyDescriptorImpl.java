@@ -30,8 +30,8 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	private final String property;
 
 
-	public PropertyDescriptorImpl(Class<?> returnType, boolean cascaded, String property) {
-		super( returnType );
+	public PropertyDescriptorImpl(Class<?> returnType, boolean cascaded, String property, BeanMetaData<?> beanMetaData) {
+		super( returnType, beanMetaData );
 		this.cascaded = cascaded;
 		this.property = property;
 	}
