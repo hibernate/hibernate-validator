@@ -47,7 +47,7 @@
             <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
-                <version>1.0.0.GA-SNAPSHOT</version>
+                <version>1.0.0.GA</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

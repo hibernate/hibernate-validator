@@ -19,23 +19,19 @@
   Status
   ------
 
-  This is the first CR release of Hibernate Validator.
-
-  You can find more information about the current state of the implementation on the
-  Bean Validation RI Roadmap - http://www.hibernate.org/459.html and there is copy of
-  JSR 303 available here: http://in.relation.to/service/File/12014
+  This is the first GA release of Hibernate Validator 4.
 
   Documentation
   -------------
 
-  The documentation available as of the date of this release is included in
-  HTML and PDf format in the docs directory.
+  The documentation for this release is included in the docs directory of distribution package
+  or online under https://www.hibernate.org/5.html
 
   Release Notes
   -------------
 
-  The full list of changes can be found at 
-  http://opensource.atlassian.com/projects/hibernate/secure/ConfigureReleaseNote.jspa?projectId=10060.
+  The full list of changes can be found at
+  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=10894
 
   System Requirements
   -------------------
