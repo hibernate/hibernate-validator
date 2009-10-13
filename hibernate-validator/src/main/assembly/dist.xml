@@ -81,8 +81,8 @@
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>  
         <fileSet>
-            <directory>target/docbook/publish/en-US</directory>
-            <outputDirectory>docs/manual</outputDirectory>
+            <directory>target/docbook/publish</directory>
+            <outputDirectory>docs/reference</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>.</directory>
