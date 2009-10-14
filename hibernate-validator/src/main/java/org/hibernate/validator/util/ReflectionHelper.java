@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -136,13 +137,20 @@ public class ReflectionHelper {
 	 * @throws IllegalArgumentException in case <code>member</code> is not a <code>Field</code> or <code>Method</code>.
 	 */
 	public static Type typeOf(Member member) {
+		Type type;
 		if ( member instanceof Field ) {
-			return ( ( Field ) member ).getGenericType();
+			type = ( ( Field ) member ).getGenericType();
 		}
-		if ( member instanceof Method ) {
-			return ( ( Method ) member ).getGenericReturnType();
+		else if ( member instanceof Method ) {
+			type = ( ( Method ) member ).getGenericReturnType();
 		}
-		throw new IllegalArgumentException( "Member " + member + " is neither a field nor a method" );
+		else {
+			throw new IllegalArgumentException( "Member " + member + " is neither a field nor a method" );
+		}
+		if ( type instanceof TypeVariable ) {
+			type = TypeUtils.getErasedType( type );
+		}
+		return type;
 	}
 
 

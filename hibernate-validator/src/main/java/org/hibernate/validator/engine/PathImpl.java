@@ -17,12 +17,12 @@
 */
 package org.hibernate.validator.engine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.Serializable;
 import javax.validation.Path;
 
 /**
@@ -30,12 +30,14 @@ import javax.validation.Path;
  */
 public class PathImpl implements Path, Serializable {
 
+	private static final long serialVersionUID = 7564511574909882392L;
+
 	/**
 	 * Regular expression used to split a string path into its elements.
 	 *
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
-	private static final Pattern pathPattern = Pattern.compile( "(\\w+)(\\[(\\w+)\\])?(\\.(.*))*" );
+	private static final Pattern pathPattern = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
 
 	private static final String PROPERTY_PATH_SEPERATOR = ".";
 
@@ -192,10 +194,13 @@ public class PathImpl implements Path, Serializable {
 			Matcher matcher = pathPattern.matcher( tmp );
 			if ( matcher.matches() ) {
 				String value = matcher.group( 1 );
+				String indexed = matcher.group( 2 );
 				String index = matcher.group( 3 );
 				NodeImpl node = new NodeImpl( value );
-				if ( index != null ) {
+				if ( indexed != null ) {
 					node.setInIterable( true );
+				}
+				if ( index != null && index.length() > 0 ) {
 					try {
 						Integer i = Integer.parseInt( index );
 						node.setIndex( i );
@@ -213,4 +218,5 @@ public class PathImpl implements Path, Serializable {
 		} while ( tmp != null );
 		return path;
 	}
+
 }
