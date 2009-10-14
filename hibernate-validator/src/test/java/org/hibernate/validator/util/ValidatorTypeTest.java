@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.validation.ConstraintValidator;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.AssertJUnit.assertNull;
+import static org.testng.Assert.assertNull;
 import org.testng.annotations.Test;
 
 /**

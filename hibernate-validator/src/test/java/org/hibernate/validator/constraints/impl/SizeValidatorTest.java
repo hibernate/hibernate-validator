@@ -26,7 +26,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.Size;
 
 import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.Assert.assertFalse;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
