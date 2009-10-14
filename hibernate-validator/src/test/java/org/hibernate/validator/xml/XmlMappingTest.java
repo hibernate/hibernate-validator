@@ -17,6 +17,8 @@
 */
 package org.hibernate.validator.xml;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
@@ -48,5 +50,29 @@ public class XmlMappingTest {
 		final Set<ConstraintViolation<Customer>> violations = validator.validate( new Customer(), Default.class );
 
 		assertEquals( violations.size(), 1 );
+	}
+
+	@Test
+	/**
+	 * HV-252
+	 */
+	public void testListOfString() {
+
+		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "properties-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+
+		List<String> listOfString = new ArrayList<String>();
+		listOfString.add( "one" );
+		listOfString.add( "two" );
+		listOfString.add( "three" );
+
+		final Set<ConstraintViolation<Properties>> violations = validator.validateValue(
+				Properties.class, "listOfString", listOfString
+		);
+
+		assertEquals( violations.size(), 0 );
 	}
 }

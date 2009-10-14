@@ -96,7 +96,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private final ConstraintHelper constraintHelper;
 
-	//updated on the fly, needs to be thread safe
+	/**
+	 * A list of all property names in the class (constraint and un-constraint).
+	 */
+	// Used to avoid ReflectionHelper#containsMembe which is slow
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
@@ -166,6 +169,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public void addCascadedMember(Member member) {
+		setAccessibility( member );
 		cascadedMembers.add( member );
 		addPropertyDescriptorForMember( member, true );
 	}
@@ -175,7 +179,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public boolean isPropertyPresent(String name) {
-		return propertyNames.contains( name );  //To change body of implemented methods use File | Settings | File Templates.
+		return propertyNames.contains( name );
 	}
 
 	public List<Class<?>> getDefaultGroupSequence() {
@@ -265,6 +269,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			fields = action.run();
 		}
 		for ( Field field : fields ) {
+			addToPropertyNameList( field );
+
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ) {
 				continue;
@@ -272,11 +278,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
 				continue;
-			}
-
-			String name = ReflectionHelper.getPropertyName( field );
-			if ( name != null ) {
-				propertyNames.add( name );
 			}
 
 			List<ConstraintDescriptorImpl<?>> fieldMetaData = findConstraints( field, ElementType.FIELD );
@@ -287,9 +288,15 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			if ( field.isAnnotationPresent( Valid.class ) ) {
-				setAccessibility( field );
 				addCascadedMember( field );
 			}
+		}
+	}
+
+	private void addToPropertyNameList(Member member) {
+		String name = ReflectionHelper.getPropertyName( member );
+		if ( name != null ) {
+			propertyNames.add( name );
 		}
 	}
 
@@ -314,6 +321,8 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		for ( Method method : declaredMethods ) {
+			addToPropertyNameList( method );
+
 			// HV-172
 			if ( Modifier.isStatic( method.getModifiers() ) ) {
 				continue;
@@ -323,11 +332,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				continue;
 			}
 
-			String name = ReflectionHelper.getPropertyName( method );
-			if ( name != null ) {
-				propertyNames.add( name );
-			}
-
 			List<ConstraintDescriptorImpl<?>> methodMetaData = findConstraints( method, ElementType.METHOD );
 			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetaData ) {
 				setAccessibility( method );
@@ -335,7 +339,6 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				addMetaConstraint( clazz, metaConstraint );
 			}
 			if ( method.isAnnotationPresent( Valid.class ) ) {
-				setAccessibility( method );
 				addCascadedMember( method );
 			}
 		}
