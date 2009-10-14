@@ -706,7 +706,10 @@ public class ValidatorImpl implements Validator {
 							value = ReflectionHelper.getIndexedValue( value, elem.getIndex() );
 						}
 						else if ( value != null && elem.getKey() != null ) {
-
+							value = ReflectionHelper.getMappedValue( value, elem.getKey() );
+						}
+						else if ( value != null ) {
+							throw new IllegalArgumentException( "Property path must provide index or map key" );
 						}
 						type = ReflectionHelper.getIndexedType( type );
 					}

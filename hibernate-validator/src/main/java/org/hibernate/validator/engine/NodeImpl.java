@@ -25,6 +25,8 @@ import javax.validation.Path;
  */
 public class NodeImpl implements Path.Node, Serializable {
 
+	private static final long serialVersionUID = 2075466571633860499L;
+
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
 
@@ -32,7 +34,6 @@ public class NodeImpl implements Path.Node, Serializable {
 	private boolean isInIterable;
 	private Integer index;
 	private Object key;
-
 
 	public NodeImpl(String name) {
 		this.name = name;
