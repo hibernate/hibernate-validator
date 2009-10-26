@@ -141,14 +141,36 @@ public @interface CheckCase {
           <para>an attribute <classname>payload</classname> that can be used
           by clients of the Bean Validation API to asign custom payload
           objects to a constraint. This attribute is not used by the API
-          itself.</para>
+          itself. <tip>
+              <para>An examle for a custom payload could be the definition of
+              a severity. <programlisting>public class Severity {
+    public static class Info extends ConstraintPayload {};
+    public static class Error extends ConstraintPayload {};
+}
+
+public class ContactDetails {
+    @NotNull(message="Name is mandatory", payload=Severity.Error.class)
+    private String name;
+
+    @NotNull(message="Phone number not specified, but not mandatory", payload=Severity.Info.class)
+    private String phoneNumber;
+
+    // ...
+}</programlisting>Now a client can after the validation of a
+              <classname>ContactDetails</classname> instance access the
+              severity of a constraint using
+              <methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname>
+              and adjust its behaviour depending on the severity.</para>
+            </tip></para>
         </listitem>
       </itemizedlist>
 
-      <para>Besides those three mandatory attributes we add another one
-      allowing for the required case mode to be specified. The name
-      <property>value</property> is a special one, which can be omitted upon
-      using the annotation, if it is the only attribute specified, as e.g. in
+      <para>Besides those three mandatory attributes
+      (<property>messge</property>, <property>groups</property> and
+      <property>payload</property>) we add another one allowing for the
+      required case mode to be specified. The name <property>value</property>
+      is a special one, which can be omitted upon using the annotation, if it
+      is the only attribute specified, as e.g. in
       <code>@CheckCase(CaseMode.UPPER)</code>.</para>
 
       <para>In addition we annotate the annotation type with a couple of
