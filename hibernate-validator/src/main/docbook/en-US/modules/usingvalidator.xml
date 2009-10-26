@@ -172,8 +172,8 @@ public class Car {
       <classname>ConstraintValidator</classname>. Class level constraints are
       useful if it is necessary to inspect more than a single property of the
       class to validate it or if a correlation between different state
-      variables has to be evaluated. In <xref linkend="Car-example" /> we add
-      the property <property>passengers</property> to the class
+      variables has to be evaluated. In <xref linkend="example-class-level" />
+      we add the property <property>passengers</property> to the class
       <classname>Car</classname>. We also add the constraint
       <classname>PassengerCount</classname> on the class level. We will later
       see how we can actually create this custom constraint (see <xref
@@ -181,7 +181,7 @@ public class Car {
       know that <classname>PassengerCount</classname> will ensure that there
       cannot be more passengers in a car than there are seats.</para>
 
-      <para><example xreflabel="Car-example">
+      <para><example id="example-class-level">
           <title>Class level constraint</title>
 
           <programlisting language="Java">package com.mycompany;
