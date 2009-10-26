@@ -181,10 +181,14 @@ public class ReflectionHelper {
 		return value;
 	}
 
-	//run client in privileged block
 	static void setAccessibility(Member member) {
-		if ( !Modifier.isPublic( member.getModifiers() ) ) {
-			//Sun's ease of use, sigh...
+		// HV-257
+		// Also set accessibility in case of public abstract members. If you proxy an interface using java.lang.reflect.Proxy
+		// per default you will get a IllegalAccessException since you are not allowed to access public abstract methods.
+		// Seems odd. One could argue that the proxy 'is' the implementation for the interface method and hence they
+		// should be accessible. Maybe this is a JVM bug !?
+		if ( !Modifier.isPublic( member.getModifiers() )
+				|| ( Modifier.isPublic( member.getModifiers() ) && Modifier.isAbstract( member.getModifiers() ) ) ) {
 			( ( AccessibleObject ) member ).setAccessible( true );
 		}
 	}
