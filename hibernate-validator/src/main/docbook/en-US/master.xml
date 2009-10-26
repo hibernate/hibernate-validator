@@ -25,7 +25,7 @@
   -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY versionNumber "4.0.0.GA">
+<!ENTITY versionNumber "4.0.1.GA">
 <!ENTITY copyrightYear "2009">
 <!ENTITY copyrightHolder "Red Hat Middleware, LLC. &amp; Gunnar Morling">
 ]>

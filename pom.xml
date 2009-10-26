@@ -3,7 +3,7 @@
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.1.GA-SNAPSHOT</version>
     <name>Hibernate Validator Parent</name>
     <url>http://validator.hibernate.org</url>
 
