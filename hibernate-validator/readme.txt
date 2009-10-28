@@ -31,7 +31,7 @@
   -------------
 
   The full list of changes can be found at
-  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=10894
+  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=10971
 
   System Requirements
   -------------------
