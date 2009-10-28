@@ -75,4 +75,36 @@ public class XmlMappingTest {
 
 		assertEquals( violations.size(), 0 );
 	}
+
+	@Test
+	/**
+	 * HV-262
+	 */
+	public void testInterfaceConfiguration() {
+
+		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl());
+
+		assertEquals( violations.size(), 1);
+	}
+
+	@Test
+	/**
+	 * HV-262
+	 */
+	public void testInterfaceImplementationConfiguration() {
+
+		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-impl-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl());
+
+		assertEquals( violations.size(), 1);
+	}
 }

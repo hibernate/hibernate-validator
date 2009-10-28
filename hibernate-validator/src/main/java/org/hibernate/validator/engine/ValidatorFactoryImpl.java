@@ -107,7 +107,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			@SuppressWarnings("unchecked")
 			Class<T> beanClass = ( Class<T> ) clazz;
 			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
-					beanClass, constraintHelper, annotationIgnores
+					beanClass, constraintHelper, annotationIgnores, beanMetaDataCache
 			);
 
 			List<Class<?>> classes = new ArrayList<Class<?>>();

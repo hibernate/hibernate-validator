@@ -102,18 +102,19 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	// Used to avoid ReflectionHelper#containsMembe which is slow
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
-	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper) {
+	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this(
 				beanClass,
 				constraintHelper,
-				new AnnotationIgnores()
+				new AnnotationIgnores(),
+				beanMetaDataCache
 		);
 	}
 
-	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
+	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
-		createMetaData( annotationIgnores );
+		createMetaData( annotationIgnores, beanMetaDataCache );
 	}
 
 	public Class<T> getBeanClass() {
@@ -225,22 +226,23 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Create bean descriptor, find all classes/subclasses/interfaces which have to be taken in consideration
 	 * for this validator and create meta data.
 	 *
-	 * @param annotationIgnores Data structure keeping track on which annotation should be ignored.
+	 * @param annotationIgnores Data structure keeping track on which annotation should be ignored
+	 * @param beanMetaDataCache The bean meta data cache
 	 */
-	private void createMetaData(AnnotationIgnores annotationIgnores) {
+	private void createMetaData(AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 		initDefaultGroupSequence();
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		ReflectionHelper.computeClassHierarchy( beanClass, classes );
 		for ( Class<?> current : classes ) {
-			initClass( current, annotationIgnores );
+			initClass( current, annotationIgnores, beanMetaDataCache );
 		}
 	}
 
-	private void initClass(Class<?> clazz, AnnotationIgnores annotationIgnores) {
-		initClassConstraints( clazz, annotationIgnores );
-		initMethodConstraints( clazz, annotationIgnores );
-		initFieldConstraints( clazz, annotationIgnores );
+	private void initClass(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
+		initClassConstraints( clazz, annotationIgnores, beanMetaDataCache );
+		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
+		initFieldConstraints( clazz, annotationIgnores, beanMetaDataCache );
 	}
 
 	/**
@@ -259,7 +261,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		setDefaultGroupSequence( groupSequence );
 	}
 
-	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
+	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		GetDeclaredFields action = GetDeclaredFields.action( clazz );
 		final Field[] fields;
 		if ( System.getSecurityManager() != null ) {
@@ -280,14 +282,32 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				continue;
 			}
 
-			List<ConstraintDescriptorImpl<?>> fieldMetaData = findConstraints( field, ElementType.FIELD );
+			// HV-262
+			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
+			List<ConstraintDescriptorImpl<?>> fieldMetaData;
+			boolean cachedFieldIsCascaded = false;
+			if ( cachedMetaData != null ) {
+				fieldMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
+				cachedFieldIsCascaded = cachedMetaData.getCascadedMembers().contains( field );
+				for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
+					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
+					if ( descriptor.getElementType() == ElementType.FIELD
+							&& metaConstraint.getPropertyName().equals( ReflectionHelper.getPropertyName( field ) ) ) {
+						fieldMetaData.add( descriptor );
+					}
+				}
+			}
+			else {
+				fieldMetaData = findConstraints( field, ElementType.FIELD );
+			}
+
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetaData ) {
 				setAccessibility( field );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
 
-			if ( field.isAnnotationPresent( Valid.class ) ) {
+			if ( cachedFieldIsCascaded || field.isAnnotationPresent( Valid.class ) ) {
 				addCascadedMember( field );
 			}
 		}
@@ -310,7 +330,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
+	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
 		final Method[] declaredMethods;
 		if ( System.getSecurityManager() != null ) {
@@ -332,13 +352,32 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				continue;
 			}
 
-			List<ConstraintDescriptorImpl<?>> methodMetaData = findConstraints( method, ElementType.METHOD );
+			// HV-262
+			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
+			List<ConstraintDescriptorImpl<?>> methodMetaData;
+			boolean cachedMethodIsCascaded = false;
+			if ( cachedMetaData != null ) {
+				cachedMethodIsCascaded = cachedMetaData.getCascadedMembers().contains( method );
+				methodMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
+				for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
+					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
+					if ( descriptor.getElementType() == ElementType.METHOD
+							&& metaConstraint.getPropertyName().equals( ReflectionHelper.getPropertyName( method ) ) ) {
+						methodMetaData.add( descriptor );
+					}
+				}
+			}
+			else {
+				methodMetaData = findConstraints( method, ElementType.METHOD );
+			}
+
 			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetaData ) {
 				setAccessibility( method );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( method, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
-			if ( method.isAnnotationPresent( Valid.class ) ) {
+
+			if ( cachedMethodIsCascaded || method.isAnnotationPresent( Valid.class ) ) {
 				addCascadedMember( method );
 			}
 		}
@@ -365,12 +404,28 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return ( ( AnnotatedElement ) member ).isAnnotationPresent( Valid.class );
 	}
 
-	private void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
+	private void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		if ( annotationIgnores.isIgnoreAnnotations( clazz ) ) {
 			return;
 		}
-		List<ConstraintDescriptorImpl<?>> classMetadata = findClassLevelConstraints( clazz );
-		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetadata ) {
+
+		// HV-262
+		BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
+		List<ConstraintDescriptorImpl<?>> classMetaData;
+		if ( cachedMetaData != null ) {
+			classMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
+			for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
+				ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
+				if ( descriptor.getElementType() == ElementType.TYPE ) {
+					classMetaData.add( descriptor );
+				}
+			}
+		}
+		else {
+			classMetaData = findClassLevelConstraints( clazz );
+		}
+
+		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
 			MetaConstraint<T, ?> metaConstraint = createMetaConstraint( null, constraintDescription );
 			addMetaConstraint( clazz, metaConstraint );
 		}
