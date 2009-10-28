@@ -4,13 +4,13 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.0.1.GA</version>
+        <version>4.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>hibernate-validator-legacy</artifactId>
     <packaging>jar</packaging>
     <name>Hibernate Validator Legacy</name>
-    <version>4.0.1.GA</version>
+    <version>3.1.0.GA</version>
     <url>http://validator.hibernate.org</url>
     <licenses>
         <license>
