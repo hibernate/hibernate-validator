@@ -107,4 +107,20 @@ public class XmlMappingTest {
 
 		assertEquals( violations.size(), 1);
 	}
+	
+	@Test
+	/**
+	 * HV-263
+	 */
+	public void testEmptyInterfaceConfiguration() {
+
+		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "empty-my-interface-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl());
+
+		assertEquals( violations.size(), 0);
+	}	
 }

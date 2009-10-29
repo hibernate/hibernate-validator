@@ -286,7 +286,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
 			List<ConstraintDescriptorImpl<?>> fieldMetaData;
 			boolean cachedFieldIsCascaded = false;
-			if ( cachedMetaData != null ) {
+			if ( cachedMetaData != null && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
 				fieldMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 				cachedFieldIsCascaded = cachedMetaData.getCascadedMembers().contains( field );
 				for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
@@ -356,7 +356,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
 			List<ConstraintDescriptorImpl<?>> methodMetaData;
 			boolean cachedMethodIsCascaded = false;
-			if ( cachedMetaData != null ) {
+			if ( cachedMetaData != null && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
 				cachedMethodIsCascaded = cachedMetaData.getCascadedMembers().contains( method );
 				methodMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 				for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
@@ -412,7 +412,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		// HV-262
 		BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
 		List<ConstraintDescriptorImpl<?>> classMetaData;
-		if ( cachedMetaData != null ) {
+		if ( cachedMetaData != null && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
 			classMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 			for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
 				ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
