@@ -16,6 +16,7 @@
             <package name="org.hibernate.validator.util"/>
             <package name="org.hibernate.validator.util.annotationfactory"/>
             <package name="org.hibernate.validator.xml"/>
+            <package name="org.hibernate.validator.xml.mixedconfiguration"/>
         </packages>
     </test>
 </suite>

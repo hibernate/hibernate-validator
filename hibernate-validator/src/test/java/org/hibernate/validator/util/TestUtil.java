@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.Validation;
@@ -55,12 +56,14 @@ public class TestUtil {
 
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
-			HibernateValidatorConfiguration configuration = Validation
-					.byProvider( HibernateValidator.class )
-					.configure();
+			Configuration configuration = getConfiguration();
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
 		return hibernateValidator;
+	}
+
+	public static Configuration<?> getConfiguration() {
+		return Validation.byProvider( HibernateValidator.class ).configure();
 	}
 
 	/**

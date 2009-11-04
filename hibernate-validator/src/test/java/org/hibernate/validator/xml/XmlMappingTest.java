@@ -22,13 +22,14 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
+
+import org.hibernate.validator.util.TestUtil;
 
 /**
  * @author Hardy Ferentschik
@@ -41,7 +42,7 @@ public class XmlMappingTest {
 	 */
 	public void testConstraintInheritanceWithXmlConfiguration() {
 
-		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		final Configuration<?> configuration = TestUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
@@ -58,7 +59,7 @@ public class XmlMappingTest {
 	 */
 	public void testListOfString() {
 
-		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		final Configuration<?> configuration = TestUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "properties-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
@@ -82,14 +83,14 @@ public class XmlMappingTest {
 	 */
 	public void testInterfaceConfiguration() {
 
-		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		final Configuration<?> configuration = TestUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
 		final Validator validator = validatorFactory.getValidator();
-		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl());
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1);
+		assertEquals( violations.size(), 1 );
 	}
 
 	@Test
@@ -98,29 +99,29 @@ public class XmlMappingTest {
 	 */
 	public void testInterfaceImplementationConfiguration() {
 
-		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		final Configuration<?> configuration = TestUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-impl-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
 		final Validator validator = validatorFactory.getValidator();
-		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl());
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 1);
+		assertEquals( violations.size(), 1 );
 	}
-	
+
 	@Test
 	/**
 	 * HV-263
 	 */
 	public void testEmptyInterfaceConfiguration() {
 
-		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		final Configuration<?> configuration = TestUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "empty-my-interface-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
 		final Validator validator = validatorFactory.getValidator();
-		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl());
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertEquals( violations.size(), 0);
-	}	
+		assertEquals( violations.size(), 0 );
+	}
 }
