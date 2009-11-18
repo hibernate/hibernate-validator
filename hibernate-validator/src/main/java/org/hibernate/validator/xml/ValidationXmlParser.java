@@ -124,15 +124,15 @@ public class ValidationXmlParser {
 	}
 
 	private void setMappingStreamsFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
-		for ( JAXBElement<String> mappingFileName : config.getConstraintMapping() ) {
+		for ( String mappingFileName : config.getConstraintMapping() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debug(
-						"Trying to open input stream for {}.", mappingFileName.getValue()
+						"Trying to open input stream for {}.", mappingFileName
 				);
 			}
-			InputStream in = getInputStreamForPath( mappingFileName.getValue() );
+			InputStream in = getInputStreamForPath( mappingFileName );
 			if ( in == null ) {
-				throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName.getValue() + "." );
+				throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName + "." );
 			}
 			xmlParameters.mappings.add( in );
 		}

@@ -168,10 +168,10 @@ public class XmlMappingParser {
 			if ( validatedByType.isIncludeExistingValidators() != null && validatedByType.isIncludeExistingValidators() ) {
 				constraintValidatorClasses.addAll( findConstraintValidatorClasses( annotationClass ) );
 			}
-			for ( JAXBElement<String> validatorClassName : validatedByType.getValue() ) {
+			for ( String validatorClassName : validatedByType.getValue() ) {
 				Class<? extends ConstraintValidator<?, ?>> validatorClass;
 				validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) loadClass(
-						validatorClassName.getValue(),
+						validatorClassName,
 						this.getClass()
 				);
 
@@ -368,8 +368,8 @@ public class XmlMappingParser {
 	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
 		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
 		if ( groupSequenceType != null ) {
-			for ( JAXBElement<String> groupName : groupSequenceType.getValue() ) {
-				Class<?> group = getClass( groupName.getValue(), defaultPackage );
+			for ( String groupName : groupSequenceType.getValue() ) {
+				Class<?> group = getClass( groupName, defaultPackage );
 				groupSequence.add( group );
 			}
 		}
@@ -601,8 +601,8 @@ public class XmlMappingParser {
 		}
 
 		List<Class<?>> groupList = new ArrayList<Class<?>>();
-		for ( JAXBElement<String> groupClass : groupsType.getValue() ) {
-			groupList.add( getClass( groupClass.getValue(), defaultPackage ) );
+		for ( String groupClass : groupsType.getValue() ) {
+			groupList.add( getClass( groupClass, defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}
@@ -614,8 +614,8 @@ public class XmlMappingParser {
 		}
 
 		List<Class<? extends Payload>> payloadList = new ArrayList<Class<? extends Payload>>();
-		for ( JAXBElement<String> groupClass : payloadType.getValue() ) {
-			Class<?> payload = getClass( groupClass.getValue(), defaultPackage );
+		for ( String groupClass : payloadType.getValue() ) {
+			Class<?> payload = getClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
 				throw new ValidationException( "Specified payload class " + payload.getName() + " does not implement javax.validation.Payload" );
 			}

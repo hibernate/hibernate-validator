@@ -42,7 +42,7 @@
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>lib/jdk5</outputDirectory>
-            <scope>runtime</scope>
+            <scope>provided</scope>
             <includes>
                 <include>javax.xml.bind:jaxb-api</include>
                 <include>com.sun.xml.bind:jaxb-impl</include>

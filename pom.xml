@@ -76,6 +76,28 @@
                 <version>1.0-beta-2</version>
             </extension>
         </extensions>
+        <plugins>
+	          <plugin>
+	                <groupId>org.apache.maven.plugins</groupId>
+	                <artifactId>maven-enforcer-plugin</artifactId>
+	                <executions>
+	                    <execution>
+	                        <id>enforce-java</id>
+	                        <goals>
+	                            <goal>enforce</goal>
+	                        </goals>
+	                    </execution>
+	                </executions>
+	                <configuration>
+	                    <rules>
+	                        <requireJavaVersion>
+	                            <!-- require JDK 1.6 to run the build -->
+	                            <version>[1.6,)</version>
+	                        </requireJavaVersion>
+	                    </rules>
+	                </configuration>
+	            </plugin>
+	    </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -143,7 +165,7 @@
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                         <remoteTagging>true</remoteTagging>
-                        <goals>package site assembly:assembly deploy</goals>
+                        <goals>deploy</goals>
                     </configuration>
                 </plugin>
             </plugins>

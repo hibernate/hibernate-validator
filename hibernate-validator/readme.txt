@@ -16,11 +16,6 @@
   is not based on JSR 303. This code can be accessed via 
   http://anonsvn.jboss.org/repos/hibernate/validator/trunk/hibernate-validator-legacy
 
-  Status
-  ------
-
-  This is the first GA release of Hibernate Validator 4.
-
   Documentation
   -------------
 
@@ -41,9 +36,9 @@
   Using Hibernate Validator
   -------------------------
 
-  - Copy hibernate-validator-*.jar together will all jar files from lib into the 
-    classpath of your application. In case you are running on JDK5 you have to also include
-    all the jar files from the jdk5 subdirectory.
+  - In case you use the distribution archive from the download sire, copy hibernate-validator-*.jar together
+    with all jar files from lib into the classpath of your application.
+    In case you are using Java 5 you have to also include all the jar files from the jdk5 subdirectory.
 
   or 
 
@@ -55,7 +50,7 @@
         <version>${project.version}</version>
     </dependency>
 
-    Hibernate Validator can be found in this repository: http://repository.jboss.com/maven2/  
+    Hibernate Validator can be found in the JBoss Maven repository: http://repository.jboss.com/maven2/
 
   Licensing
   ---------
