@@ -40,6 +40,7 @@
         <module>hibernate-validator-archetype</module>
         <module>hibernate-validator-legacy</module>
         <module>hibernate-validator-tck-runner</module>
+        <module>hibernate-validator-annotation-processor</module>
     </modules>
 
     <dependencyManagement>
