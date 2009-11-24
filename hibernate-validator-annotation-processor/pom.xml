@@ -10,6 +10,17 @@
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-annotation-processor</artifactId>
     <name>Hibernate Validator Annotation Processor</name>
+    <build>
+	    <plugins>
+		    <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgument>-proc:none</compilerArgument>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
