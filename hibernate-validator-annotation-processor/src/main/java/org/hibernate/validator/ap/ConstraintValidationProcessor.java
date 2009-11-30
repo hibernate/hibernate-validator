@@ -1,4 +1,4 @@
-// $Id: JPAMetaModelEntityProcessor.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id: ConstraintValidationProcessor.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -17,52 +17,68 @@
 */
 package org.hibernate.validator.ap;
 
-
+import java.util.List;
 import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
-import static javax.lang.model.SourceVersion.RELEASE_6;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-import javax.tools.Diagnostic;
+import org.hibernate.validator.ap.util.AnnotationApiHelper;
+import org.hibernate.validator.ap.util.ConstraintHelper;
 
 
 /**
  * Annotation processor for validating Bean Validation constraints.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 @SupportedAnnotationTypes("*")
-@SupportedSourceVersion(RELEASE_6)
+@SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class ConstraintValidationProcessor extends AbstractProcessor {
-	private static final Boolean ALLOW_OTHER_PROCESSORS_TO_CLAIM_ANNOTATIONS = Boolean.FALSE;
-	private Messager messager;
-
-	public void init(ProcessingEnvironment env) {
-		super.init( env );
-		messager = env.getMessager();
-		messager.printMessage( Diagnostic.Kind.NOTE, "Init Processor " + this );
-	}
-
+	
+	/**
+	 * Whether this processor claims all processed annotations exclusively or not.
+	 */
+	private static final boolean ANNOTATIONS_CLAIMED_EXCLUSIVELY = false;
+	
+	
 	@Override
-	public boolean process(final Set<? extends TypeElement> annotations,
-						   final RoundEnvironment roundEnvironment) {
-
-		if ( roundEnvironment.processingOver() ) {
-			messager.printMessage( Diagnostic.Kind.NOTE, "Last processing round." );
-			return ALLOW_OTHER_PROCESSORS_TO_CLAIM_ANNOTATIONS;
-		}
-
-		Set<? extends Element> elements = roundEnvironment.getRootElements();
-		for ( Element element : elements ) {
-			messager.printMessage( Diagnostic.Kind.NOTE, "Processing " + element.toString() );
-		}
-
-		return ALLOW_OTHER_PROCESSORS_TO_CLAIM_ANNOTATIONS;
+	public boolean process(
+		final Set<? extends TypeElement> annotations,
+		final RoundEnvironment roundEnvironment) {
+		
+		AnnotationApiHelper typeHelper = new AnnotationApiHelper(processingEnv.getElementUtils(), processingEnv.getTypeUtils());
+		ConstraintAnnotationVisitor v = new ConstraintAnnotationVisitor(processingEnv);
+		ConstraintHelper constraintHelper = new ConstraintHelper(processingEnv.getElementUtils(), processingEnv.getTypeUtils());
+		
+		for (TypeElement oneAnnotation : annotations) {
+			
+			//only constraint annotations are relevant
+			if(!constraintHelper.isConstraintAnnotation(oneAnnotation)) {
+				continue;
+			}
+			
+			Set<? extends Element> elementsWithConstraintAnnotation = 
+				roundEnvironment.getElementsAnnotatedWith(oneAnnotation);
+			
+			for (Element oneAnnotatedElement : elementsWithConstraintAnnotation) {
+				
+				List<AnnotationMirror> mirrorsOfCurrentAnnotation = 
+					typeHelper.filterByType(oneAnnotatedElement.getAnnotationMirrors(), oneAnnotation.asType());
+				
+				
+				oneAnnotatedElement.accept(v, mirrorsOfCurrentAnnotation);			
+			}
+		}	
+		
+		return ANNOTATIONS_CLAIMED_EXCLUSIVELY;
 	}
+	
 }
