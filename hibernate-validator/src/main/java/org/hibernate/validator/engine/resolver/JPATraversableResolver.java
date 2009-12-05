@@ -28,10 +28,10 @@ import javax.validation.Path;
  */
 public class JPATraversableResolver implements TraversableResolver {
 
-	// TODO Check the call to PersistenceUtil. traversableProperty.getName() is this correct?
+	// we have to check traversableProperty.getName() against null to check the root gets validated (see HV-266)
 	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		return traversableObject == null ||
-				Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
+		return traversableObject == null || traversableProperty.getName() == null || Persistence.getPersistenceUtil()
+				.isLoaded( traversableObject, traversableProperty.getName() );
 	}
 
 	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
