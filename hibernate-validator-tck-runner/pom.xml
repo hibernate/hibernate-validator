@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
@@ -17,7 +19,6 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -32,19 +33,17 @@
         <dependency>
             <groupId>org.hibernate.jsr303.tck</groupId>
             <artifactId>jsr303-tck</artifactId>
-            <version>1.0.3.GA</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.test-harness</groupId>
             <artifactId>jboss-test-harness-jboss-as-51</artifactId>
-            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
     <properties>
         <jboss.home>/opt/java/jboss-5.1.0.GA</jboss.home>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug />
+        <remote.debug/>
     </properties>
 
     <build>
