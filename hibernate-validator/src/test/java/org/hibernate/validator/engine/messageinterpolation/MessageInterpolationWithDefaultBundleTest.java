@@ -101,7 +101,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectConstraintViolationMessages(
-				constraintViolations, "Address email mal form\u00E9e", "doit \u00EAtre entre 18 et 21"
+				constraintViolations, "Addresse email mal form\u00E9e", "doit \u00EAtre entre 18 et 21"
 		);
 	}
 }
