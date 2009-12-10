@@ -22,17 +22,15 @@ import javax.tools.Diagnostic.Kind;
 
 /**
  * Expectation value to be matched against a given {@link Diagnostic}.
- * 
+ *
  * @author Gunnar Morling
  */
 public class DiagnosticExpection {
-	
 	private final Kind kind;
-	
+
 	private final long lineNumber;
-	
+
 	public DiagnosticExpection(Kind kind, long lineNumber) {
-		
 		this.kind = kind;
 		this.lineNumber = lineNumber;
 	}
@@ -43,5 +41,10 @@ public class DiagnosticExpection {
 
 	public long getLineNumber() {
 		return lineNumber;
+	}
+
+	@Override
+	public String toString() {
+		return "DiagnosticExpection [kind=" + kind + ", lineNumber=" + lineNumber + "]";
 	}
 }

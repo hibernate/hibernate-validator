@@ -1,4 +1,4 @@
-// $Id: MethodLevelValidationUsingBuiltInConstraints.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id: ValidationUsingBoxing.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -15,44 +15,58 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel;
+package org.hibernate.validator.ap.testmodel.boxing;
 
-import java.util.Date;
-import javax.validation.constraints.Size;
+public class ValidationUsingBoxing {
 
-public class MethodLevelValidationUsingBuiltInConstraints {
-	@Size(min = 10)
-	public String getString() {
-		return null;
+	@ValidLong
+	public long primitiveLongField;
+
+	@ValidLong
+	public Long longField;
+
+	/**
+	 * Not allowed.
+	 */
+	@ValidLong
+	public int intField;
+
+	/**
+	 * Not allowed.
+	 */
+	@ValidLong
+	public Integer integerField;
+
+	/**
+	 * Not allowed.
+	 */
+	@ValidLong
+	public double doubleField;
+
+	@ValidLong
+	public long getPrimitiveLong() {
+		return 0;
+	}
+
+	@ValidLong
+	public Long getLong() {
+		return Long.MIN_VALUE;
 	}
 
 	/**
-	 * Not allowed. Method is no getter.
+	 * Not allowed.
 	 */
-	@Size(min = 10)
-	public void setString() {
+	@ValidLong
+	public int getInt() {
+		return 0;
 	}
 
 	/**
-	 * Not allowed. Return type doesn't match.
+	 * Not allowed.
 	 */
-	@Size(min = 10)
-	public Date getDate() {
-		return null;
+	@ValidLong
+	public Integer getInteger() {
+		return Integer.MIN_VALUE;
 	}
 
-	/**
-	 * Not allowed. No return type.
-	 */
-	@Size(min = 10)
-	public void getAnotherString() {
-	}
-
-	/**
-	 * Not allowed. Static method.
-	 */
-	@Size(min = 10)
-	public static String getStringStatically() {
-		return null;
-	}
 }

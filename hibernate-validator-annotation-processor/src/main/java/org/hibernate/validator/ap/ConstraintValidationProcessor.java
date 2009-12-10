@@ -19,7 +19,6 @@ package org.hibernate.validator.ap;
 
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -27,11 +26,11 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.TypeElement;
 
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
-
 
 /**
  * Annotation processor for validating Bean Validation constraints.
@@ -42,43 +41,44 @@ import org.hibernate.validator.ap.util.ConstraintHelper;
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class ConstraintValidationProcessor extends AbstractProcessor {
-	
 	/**
 	 * Whether this processor claims all processed annotations exclusively or not.
 	 */
 	private static final boolean ANNOTATIONS_CLAIMED_EXCLUSIVELY = false;
-	
-	
+
+
 	@Override
 	public boolean process(
-		final Set<? extends TypeElement> annotations,
-		final RoundEnvironment roundEnvironment) {
-		
-		AnnotationApiHelper typeHelper = new AnnotationApiHelper(processingEnv.getElementUtils(), processingEnv.getTypeUtils());
-		ConstraintAnnotationVisitor v = new ConstraintAnnotationVisitor(processingEnv);
-		ConstraintHelper constraintHelper = new ConstraintHelper(processingEnv.getElementUtils(), processingEnv.getTypeUtils());
-		
-		for (TypeElement oneAnnotation : annotations) {
-			
+			final Set<? extends TypeElement> annotations,
+			final RoundEnvironment roundEnvironment) {
+
+		AnnotationApiHelper typeHelper = new AnnotationApiHelper(
+				processingEnv.getElementUtils(), processingEnv.getTypeUtils()
+		);
+		ElementVisitor<Void, List<AnnotationMirror>> visitor = new ConstraintAnnotationVisitor( processingEnv );
+		ConstraintHelper constraintHelper = new ConstraintHelper(
+				processingEnv.getElementUtils(), processingEnv.getTypeUtils()
+		);
+
+		for ( TypeElement oneAnnotation : annotations ) {
+
 			//only constraint annotations are relevant
-			if(!constraintHelper.isConstraintAnnotation(oneAnnotation)) {
+			if ( !constraintHelper.isConstraintAnnotation( oneAnnotation ) ) {
 				continue;
 			}
-			
-			Set<? extends Element> elementsWithConstraintAnnotation = 
-				roundEnvironment.getElementsAnnotatedWith(oneAnnotation);
-			
-			for (Element oneAnnotatedElement : elementsWithConstraintAnnotation) {
-				
-				List<AnnotationMirror> mirrorsOfCurrentAnnotation = 
-					typeHelper.filterByType(oneAnnotatedElement.getAnnotationMirrors(), oneAnnotation.asType());
-				
-				
-				oneAnnotatedElement.accept(v, mirrorsOfCurrentAnnotation);			
+
+			Set<? extends Element> elementsWithConstraintAnnotation =
+					roundEnvironment.getElementsAnnotatedWith( oneAnnotation );
+
+			for ( Element oneAnnotatedElement : elementsWithConstraintAnnotation ) {
+
+				List<AnnotationMirror> mirrorsOfCurrentAnnotation =
+						typeHelper.filterByType( oneAnnotatedElement.getAnnotationMirrors(), oneAnnotation.asType() );
+
+				oneAnnotatedElement.accept( visitor, mirrorsOfCurrentAnnotation );
 			}
-		}	
-		
+		}
+
 		return ANNOTATIONS_CLAIMED_EXCLUSIVELY;
 	}
-	
 }

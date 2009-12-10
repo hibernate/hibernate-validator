@@ -1,4 +1,4 @@
-// $Id: CheckCase.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id: ComposedConstraint.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel.customconstraints;
+package org.hibernate.validator.ap.testmodel.composedconstraint2;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -28,16 +28,16 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+@ComposingConstraint1
+@ComposingConstraint2
 @Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = CheckCaseValidator.class)
+@Constraint(validatedBy = { })
 @Documented
-public @interface CheckCase {
+public @interface ComposedConstraint {
 	String message() default "";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
-
-	CaseMode value();
 }

@@ -1,4 +1,4 @@
-// $Id: MethodLevelValidationUsingBuiltInConstraints.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id: FieldLevelValidationUsingComplexComposedConstraint.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -15,44 +15,45 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel;
+package org.hibernate.validator.ap.testmodel.composedconstraint2;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
-import javax.validation.constraints.Size;
+import java.util.GregorianCalendar;
+import java.util.List;
 
-public class MethodLevelValidationUsingBuiltInConstraints {
-	@Size(min = 10)
-	public String getString() {
-		return null;
-	}
+public class FieldLevelValidationUsingComplexComposedConstraint {
 
+	@ComposedConstraint
+	public String string;
+	
+	@ComposedConstraint
+	public List<?> list;
+	
 	/**
-	 * Not allowed. Method is no getter.
+	 * Allowed
 	 */
-	@Size(min = 10)
-	public void setString() {
-	}
-
+	@ComposedConstraint
+	public GregorianCalendar gregorianCalendar;
+	
+	@ComposedConstraint
+	public Collection<?> collection;
+	
 	/**
-	 * Not allowed. Return type doesn't match.
+	 * Allowed
 	 */
-	@Size(min = 10)
-	public Date getDate() {
-		return null;
-	}
-
+	@ComposedConstraint
+	public ArrayList<?> arrayList;
+	
+	@ComposedConstraint
+	public Calendar calendar;
+		
 	/**
-	 * Not allowed. No return type.
+	 * Not allowed.
 	 */
-	@Size(min = 10)
-	public void getAnotherString() {
-	}
+	@ComposedConstraint
+	public Date date;
 
-	/**
-	 * Not allowed. Static method.
-	 */
-	@Size(min = 10)
-	public static String getStringStatically() {
-		return null;
-	}
 }

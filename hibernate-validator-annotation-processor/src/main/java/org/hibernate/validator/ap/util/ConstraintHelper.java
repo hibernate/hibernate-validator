@@ -18,8 +18,10 @@
 package org.hibernate.validator.ap.util;
 
 import java.lang.annotation.Annotation;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,15 +33,29 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.SimpleAnnotationValueVisitor6;
+import javax.lang.model.util.TypeKindVisitor6;
 import javax.lang.model.util.Types;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
+import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
@@ -58,7 +74,7 @@ public class ConstraintHelper {
 	 */
 	private final Name CONSTRAINT_ANNOTATION_PACKAGE_NAME;
 
-	private static Map<Name, Set<TypeElement>> builtInConstraints;
+	private static Map<Name, Set<TypeMirror>> builtInConstraints;
 
 	private Elements elementUtils;
 
@@ -73,11 +89,21 @@ public class ConstraintHelper {
 
 		builtInConstraints = CollectionHelper.newHashMap();
 
-		//TODO GM: register all types
-		registerAllowedTypesForBuiltInConstraint(Size.class, CollectionHelper.<Class<?>>asSet(Collection.class, String.class));
-		registerAllowedTypesForBuiltInConstraint(AssertTrue.class, CollectionHelper.<Class<?>>asSet(Boolean.class, boolean.class));
+		registerAllowedTypesForBuiltInConstraint(AssertFalse.class, CollectionHelper.<Class<?>>asSet(Boolean.class));
+		registerAllowedTypesForBuiltInConstraint(AssertTrue.class, CollectionHelper.<Class<?>>asSet(Boolean.class));
+		registerAllowedTypesForBuiltInConstraint(DecimalMax.class, CollectionHelper.<Class<?>>asSet(Number.class, String.class));
+		registerAllowedTypesForBuiltInConstraint(DecimalMin.class, CollectionHelper.<Class<?>>asSet(Number.class, String.class));
+		registerAllowedTypesForBuiltInConstraint(Digits.class, CollectionHelper.<Class<?>>asSet(Number.class, String.class));
+		registerAllowedTypesForBuiltInConstraint(Future.class, CollectionHelper.<Class<?>>asSet(Calendar.class, Date.class));
+		registerAllowedTypesForBuiltInConstraint(Max.class, CollectionHelper.<Class<?>>asSet(Number.class, String.class));
+		registerAllowedTypesForBuiltInConstraint(Min.class, CollectionHelper.<Class<?>>asSet(Number.class, String.class));
 		registerAllowedTypesForBuiltInConstraint(NotNull.class, CollectionHelper.<Class<?>>asSet(Object.class));
-		registerAllowedTypesForBuiltInConstraint(Min.class, CollectionHelper.<Class<?>>asSet(Integer.class, Long.class));
+		registerAllowedTypesForBuiltInConstraint(Null.class, CollectionHelper.<Class<?>>asSet(Object.class));
+		registerAllowedTypesForBuiltInConstraint(Past.class, CollectionHelper.<Class<?>>asSet(Calendar.class, Date.class));
+		registerAllowedTypesForBuiltInConstraint(Pattern.class, CollectionHelper.<Class<?>>asSet(String.class));
+
+		//TODO GM: register all array types
+		registerAllowedTypesForBuiltInConstraint(Size.class, CollectionHelper.<Class<?>>asSet(Collection.class, Map.class, String.class, boolean[].class));
 	}
 
 	/**
@@ -86,7 +112,8 @@ public class ConstraintHelper {
 	 * {@link Constraint} meta-annotation (which is only allowed at annotation
 	 * declarations).
 	 *
-	 * @param typeElement The element of interest.
+	 * @param The
+	 *            element of interest.
 	 * @return True, if the given element is a constraint annotation type, false
 	 *         otherwise.
 	 */
@@ -94,46 +121,76 @@ public class ConstraintHelper {
 		return typeElement.getAnnotation(Constraint.class) != null;
 	}
 
-	public boolean isAnnotationAllowedAtElement(DeclaredType annotationType, Element annotatedElement) {
+	public boolean isAnnotationAllowedAtType(DeclaredType annotationType, TypeElement annotatedType) {
 
-		Set<TypeElement> allowedTypesForConstraint = getAllowedTypesForConstraint(annotationType);
+		return isAnnotationAllowed(annotationType, annotatedType.asType());
+	}
 
-		if(allowedTypesForConstraint.isEmpty()) {
-			return false;
-		}
+	public boolean isAnnotationAllowedAtMethod(DeclaredType annotationType, ExecutableElement annotatedMethod) {
 
-		Element typeElementOfAnnotatedElement = typeUtils.asElement(annotatedElement.asType());
+		return isAnnotationAllowed(annotationType, annotatedMethod.getReturnType());
+	}
 
+	public boolean isAnnotationAllowedAtField(DeclaredType annotationType, VariableElement annotatedField) {
 
-		if(allowedTypesForConstraint.contains(typeElementOfAnnotatedElement)) {
-			return true;
-		}
-
-		List<? extends TypeMirror> directSupertypes = typeUtils.directSupertypes(annotatedElement.asType());
-
-		while(!directSupertypes.isEmpty()) {
-			List<TypeMirror> nextSupertypes = CollectionHelper.newArrayList();
-			for (TypeMirror oneSuperType : directSupertypes) {
-
-				Element oneSuperTypeAsElement = typeUtils.asElement(oneSuperType);
-
-				if(allowedTypesForConstraint.contains(oneSuperTypeAsElement)) {
-					return true;
-				}
-
-				nextSupertypes.addAll(typeUtils.directSupertypes(oneSuperType));
-			}
-
-			directSupertypes = nextSupertypes;
-		}
-
-
-		return false;
+		return isAnnotationAllowed(annotationType, annotatedField.asType());
 	}
 
 	// ==================================
 	// private API below
 	// ==================================
+
+	private Set<TypeMirror> getAllSuperTypes(TypeMirror type) {
+
+		Set<TypeMirror> allSuperTypes = CollectionHelper.newHashSet();
+
+		List<? extends TypeMirror> directSupertypes = typeUtils.directSupertypes(type);
+
+		while(!directSupertypes.isEmpty()) {
+
+			for (TypeMirror typeMirror : directSupertypes) {
+				allSuperTypes.add(typeMirror);
+			}
+
+			List<TypeMirror> nextSuperTypes = CollectionHelper.newArrayList();
+
+			for (TypeMirror typeMirror : directSupertypes) {
+				nextSuperTypes.addAll(typeUtils.directSupertypes(typeMirror));
+			}
+			directSupertypes = nextSuperTypes;
+		}
+
+
+		return allSuperTypes;
+	}
+
+	/**
+	 * Checks whether the given annotation type may be specified at elements of
+	 * the specified type.
+	 */
+	private boolean isAnnotationAllowed(DeclaredType annotationType, TypeMirror typeOfAnnotatedElement) {
+
+		//TODO GM: implement array type checking
+		if(typeOfAnnotatedElement.getKind() == TypeKind.ARRAY) {
+			return true;
+		}
+
+		//convert primitive types into their corresponding boxed type
+		if(typeOfAnnotatedElement.getKind().isPrimitive()) {
+			typeOfAnnotatedElement = (DeclaredType)typeUtils.boxedClass((PrimitiveType)typeOfAnnotatedElement).asType();
+		}
+
+		Set<TypeMirror> allowedTypesForConstraint = getAllowedTypesForConstraint(annotationType);
+
+		//is the annotation allowed at the given type?
+		for (TypeMirror oneAllowedType : allowedTypesForConstraint) {
+			if(typeUtils.isAssignable(typeOfAnnotatedElement, oneAllowedType)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * Returns a set with all those type elements, at which the given constraint annotation
@@ -142,19 +199,23 @@ public class ConstraintHelper {
 	 * @param annotationType
 	 * @return
 	 */
-	private Set<TypeElement> getAllowedTypesForConstraint(DeclaredType annotationType) {
+	private Set<TypeMirror> getAllowedTypesForConstraint(DeclaredType annotationType) {
+
+		Set<TypeMirror> theValue;
 
 		if(isBuiltInConstraint(annotationType)) {
-			return getAllowedTypesFromBuiltInConstraint(annotationType);
+			theValue = getAllowedTypesFromBuiltInConstraint(annotationType);
 		}
 		else {
-			return getAllowedTypesFromCustomConstraint(annotationType);
+			theValue = getAllowedTypesFromCustomConstraint(annotationType);
 		}
+
+		return theValue;
 	}
 
-	private Set<TypeElement> getAllowedTypesFromBuiltInConstraint(DeclaredType builtInAnnotationType) {
+	private Set<TypeMirror> getAllowedTypesFromBuiltInConstraint(DeclaredType builtInAnnotationType) {
 
-		Set<TypeElement> theValue = builtInConstraints.get(builtInAnnotationType.asElement().getSimpleName());
+		Set<TypeMirror> theValue = builtInConstraints.get(builtInAnnotationType.asElement().getSimpleName());
 
 		if(theValue == null) {
 			theValue = Collections.emptySet();
@@ -167,24 +228,22 @@ public class ConstraintHelper {
 	 * Returns a set containing all those types, at which the specified custom
 	 * constraint-annotation is allowed.
 	 *
-	 * @param customInAnnotationType
+	 * @param customAnnotationType
 	 *            A custom constraint type.
 	 *
 	 * @return A set with all types supported by the given constraint. May be
 	 *         empty in case of constraint composition, if there is no common
 	 *         type supported by all composing constraints.
-	 *
-	 *         TODO GM: consider constraint composition
 	 */
-	private Set<TypeElement> getAllowedTypesFromCustomConstraint(DeclaredType customInAnnotationType) {
+	private Set<TypeMirror> getAllowedTypesFromCustomConstraint(DeclaredType customAnnotationType) {
 
-		Set<TypeElement> theValue = CollectionHelper.newHashSet();
+		Set<TypeMirror> theValue = null;
 
 		//the Constraint meta-annotation at the type declaration, e.g. "@Constraint(validatedBy = CheckCaseValidator.class)"
-		AnnotationMirror constraintMetaAnnotation = getConstraintMetaAnnotation(customInAnnotationType);
+		AnnotationMirror constraintMetaAnnotation = getConstraintMetaAnnotation(customAnnotationType);
 
 		if(constraintMetaAnnotation == null) {
-			return theValue;
+			throw new IllegalArgumentException("Given type " + customAnnotationType + " isn't a constraint annotation type.");
 		}
 
 		//the validator classes, e.g. [CheckCaseValidator.class]
@@ -192,34 +251,125 @@ public class ConstraintHelper {
 
 		for (AnnotationValue oneValidatorClassReference : validatorClassReferences) {
 
-			DeclaredType validatorType = (DeclaredType)oneValidatorClassReference.getValue();
+			if(theValue == null) {
+				theValue = CollectionHelper.newHashSet();
+			}
 
-			//contains the bindings of the type parameters from the implemented ConstraintValidator
-			//interface, e.g. "ConstraintValidator<CheckCase, String>"
-			DeclaredType constraintValidatorImplementation = getConstraintValidatorSuperType(validatorType);
+			theValue.add(getSupportedType(oneValidatorClassReference));
+		}
 
-			if(constraintValidatorImplementation != null) {
+		Set<AnnotationMirror> composingConstraints = getComposingConstraints(customAnnotationType);
 
+		for (AnnotationMirror oneComposingConstraint : composingConstraints) {
+
+			Set<TypeMirror> allowedTypesForComposingConstraint = getAllowedTypesForConstraint(oneComposingConstraint.getAnnotationType());
+
+			if(theValue == null) {
+				theValue = allowedTypesForComposingConstraint;
+			}
+			else {
+				theValue = intersect(theValue, allowedTypesForComposingConstraint);
+			}
+		}
+
+		if(theValue == null) {
+			theValue = Collections.emptySet();
+		}
+
+		return theValue;
+	}
+
+	private TypeMirror getSupportedType(AnnotationValue oneValidatorClassReference) {
+
+		TypeMirror validatorType = oneValidatorClassReference.accept(new SimpleAnnotationValueVisitor6<TypeMirror, Void>() {
+
+			@Override
+			public TypeMirror visitType(TypeMirror t, Void p) {
+				return t;
+			}
+		}, null);
+
+		//contains the bindings of the type parameters from the implemented ConstraintValidator
+		//interface, e.g. "ConstraintValidator<CheckCase, String>"
+		TypeMirror constraintValidatorImplementation = getConstraintValidatorSuperType(validatorType);
+
+
+		TypeMirror supportedType = constraintValidatorImplementation.accept(new TypeKindVisitor6<TypeMirror, Void>() {
+
+			@Override
+			public TypeMirror visitDeclared(DeclaredType constraintValidatorImplementation, Void p) {
 				//2nd type parameter contains the data type supported by current validator class, e.g. "String"
-				TypeMirror supportedTypeParameter = constraintValidatorImplementation.getTypeArguments().get(1);
-				theValue.add((TypeElement)typeUtils.asElement(supportedTypeParameter));
+				return constraintValidatorImplementation.getTypeArguments().get(1);
+			}
+
+		}, null);
+
+		return supportedType;
+	}
+
+	private Set<TypeMirror> intersect(Set<TypeMirror> set1, Set<TypeMirror> set2) {
+
+		Set<TypeMirror> theValue = keepThoseWithSuperTypeAndNoSubType(set1, set2);
+
+		theValue.addAll(keepThoseWithSuperTypeAndNoSubType(set2, set1));
+
+		return theValue;
+	}
+
+	//TODO GM: refactor
+	private Set<TypeMirror> keepThoseWithSuperTypeAndNoSubType(Set<TypeMirror> set1, Set<TypeMirror> set2) {
+
+		Set<TypeMirror> theValue = CollectionHelper.newHashSet();
+
+		for (TypeMirror oneType : set1) {
+
+			for (TypeMirror typeMirror : set2) {
+				if(typeUtils.isSameType(oneType, typeMirror)) {
+					theValue.add(oneType);
+					continue;
+				}
+			}
+
+			Set<TypeMirror> superTypes = getAllSuperTypes(oneType);
+			for (TypeMirror oneSuperType : superTypes) {
+				
+				for (TypeMirror typeMirror : set2) {
+					if(typeUtils.isSameType(oneSuperType, typeMirror)) {
+
+						if(!containsSubType(oneType, set2)) {
+							theValue.add(oneType);
+						}
+					}
+				}
 			}
 		}
 
 		return theValue;
 	}
 
-	private DeclaredType getConstraintValidatorSuperType(DeclaredType type) {
+	private boolean containsSubType(TypeMirror type, Set<TypeMirror> potentialSubTypes) {
+
+		for (TypeMirror onePotentialSubType : potentialSubTypes) {
+			
+			if(typeUtils.isAssignable(onePotentialSubType, type)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private TypeMirror getConstraintValidatorSuperType(TypeMirror type) {
 
 		List<? extends TypeMirror> directSupertypes = typeUtils.directSupertypes(type);
 
 		for (TypeMirror typeMirror : directSupertypes) {
 			if(typeUtils.asElement(typeMirror).getSimpleName().contentEquals(ConstraintValidator.class.getSimpleName())) {
-				return (DeclaredType)typeMirror;
+				return typeMirror;
 			}
 		}
 
-		return null;
+		throw new AssertionError("Class " + type + " specified in @Constraint.validatedBy doesn't implement ConstraintValidator.");
 	}
 
 	/**
@@ -257,13 +407,19 @@ public class ConstraintHelper {
 
 	private void registerAllowedTypesForBuiltInConstraint(Class<? extends Annotation> annotation, Set<Class<?>> allowedTypes) {
 
-		Set<TypeElement> allowedTypesAsElements = CollectionHelper.newHashSet();
+		Set<TypeMirror> allowedTypesAsElements = CollectionHelper.newHashSet();
 
 		for (Class<?> oneType : allowedTypes) {
-			TypeElement typeElement = elementUtils.getTypeElement(oneType.getCanonicalName());
+			if(oneType.isArray()) {
+					
+				//TODO GM: handle array types
+			}
+			else {
+				TypeElement typeElement = elementUtils.getTypeElement(oneType.getCanonicalName());
 
-			if(typeElement != null) {
-				allowedTypesAsElements.add(typeElement);
+				if(typeElement != null) {
+					allowedTypesAsElements.add(typeUtils.getDeclaredType(typeElement));
+				}
 			}
 		}
 
@@ -290,4 +446,20 @@ public class ConstraintHelper {
 
 		return CONSTRAINT_ANNOTATION_PACKAGE_NAME.equals(elementUtils.getPackageOf(element).getQualifiedName());
 	}
+
+	private Set<AnnotationMirror> getComposingConstraints(DeclaredType constraintAnnotationType) {
+
+		Set<AnnotationMirror> theValue = CollectionHelper.newHashSet();
+
+		List<? extends AnnotationMirror> annotationMirrors = constraintAnnotationType.asElement().getAnnotationMirrors();
+
+		for (AnnotationMirror oneAnnotationMirror : annotationMirrors) {
+			if(getConstraintMetaAnnotation(oneAnnotationMirror.getAnnotationType()) != null) {
+				theValue.add(oneAnnotationMirror);
+			}
+		}
+
+		return theValue;
+	}
+	
 }

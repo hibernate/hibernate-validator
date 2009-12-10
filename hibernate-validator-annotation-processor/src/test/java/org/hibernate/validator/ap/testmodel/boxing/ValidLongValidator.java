@@ -1,4 +1,4 @@
-// $Id: MethodLevelValidationUsingBuiltInConstraints.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id: ValidLongValidator.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -15,44 +15,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel;
+package org.hibernate.validator.ap.testmodel.boxing;
 
-import java.util.Date;
-import javax.validation.constraints.Size;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-public class MethodLevelValidationUsingBuiltInConstraints {
-	@Size(min = 10)
-	public String getString() {
-		return null;
+public class ValidLongValidator implements ConstraintValidator<ValidLong, Long> {
+	public void initialize(ValidLong constraintAnnotation) {
 	}
 
-	/**
-	 * Not allowed. Method is no getter.
-	 */
-	@Size(min = 10)
-	public void setString() {
-	}
-
-	/**
-	 * Not allowed. Return type doesn't match.
-	 */
-	@Size(min = 10)
-	public Date getDate() {
-		return null;
-	}
-
-	/**
-	 * Not allowed. No return type.
-	 */
-	@Size(min = 10)
-	public void getAnotherString() {
-	}
-
-	/**
-	 * Not allowed. Static method.
-	 */
-	@Size(min = 10)
-	public static String getStringStatically() {
-		return null;
+	public boolean isValid(Long object, ConstraintValidatorContext constraintContext) {
+		return true;
 	}
 }

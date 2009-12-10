@@ -20,32 +20,29 @@ package org.hibernate.validator.ap.testmodel;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
 import javax.validation.constraints.Size;
 
 public class FieldLevelValidationUsingBuiltInConstraints {
-
-	@Size(min=10)
+	@Size(min = 10)
 	public String string;
-	
-	@Size(min=10)
+
+	@Size(min = 10)
 	public Collection<String> collection;
-	
+
 	//TODO GM: support array-typed elements
-	
-//	@Size(min=10)
-//	public boolean[] array;
-	
+
 	/**
 	 * Allowed, as List extends Collection.
 	 */
-	@Size(min=10)
+	@Size(min = 10)
 	public List<String> list;
-	
+
 	/**
 	 * Not allowed.
 	 */
-	@Size(min=10)
+	@Size(min = 10)
 	public Date date;
 
+	@Size(min = 10)
+	public static String staticString;
 }

@@ -20,25 +20,23 @@ package org.hibernate.validator.ap.testmodel.customconstraints;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class CheckCaseValidator implements
-ConstraintValidator<CheckCase, String> {
-
+public class CheckCaseValidator implements ConstraintValidator<CheckCase, String> {
 	private CaseMode caseMode;
 
 	public void initialize(CheckCase constraintAnnotation) {
 		this.caseMode = constraintAnnotation.value();
 	}
 
-	public boolean isValid(String object,
-			ConstraintValidatorContext constraintContext) {
-
-		if (object == null)
+	public boolean isValid(String object, ConstraintValidatorContext constraintContext) {
+		if ( object == null ) {
 			return true;
+		}
 
-		if (caseMode == CaseMode.UPPER)
-			return object.equals(object.toUpperCase());
-		else
-			return object.equals(object.toLowerCase());
+		if ( caseMode == CaseMode.UPPER ) {
+			return object.equals( object.toUpperCase() );
+		}
+		else {
+			return object.equals( object.toLowerCase() );
+		}
 	}
-
 }

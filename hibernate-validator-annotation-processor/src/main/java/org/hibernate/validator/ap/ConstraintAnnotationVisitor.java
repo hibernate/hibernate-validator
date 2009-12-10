@@ -20,14 +20,17 @@ package org.hibernate.validator.ap;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.tools.Diagnostic.Kind;
+import javax.validation.Constraint;
 
 import org.hibernate.validator.ap.util.ConstraintHelper;
 
@@ -35,52 +38,72 @@ import org.hibernate.validator.ap.util.ConstraintHelper;
  * An {@link ElementVisitor} that visits elements (type declarations, methods
  * and fields) annotated with constraint annotations from the Bean Validation
  * API.
- * 
- * TODO GM: visit type declarations.
- * 
+ *
  * @author Gunnar Morling.
- * 
  */
-final class ConstraintAnnotationVisitor extends
-		ElementKindVisitor6<Void, List<AnnotationMirror>> {
-	
-	private ProcessingEnvironment processingEnvironment;
-	
-	private ResourceBundle errorMessages;
+final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<AnnotationMirror>> {
+	private final ProcessingEnvironment processingEnvironment;
+
+	private final ResourceBundle errorMessages;
 
 	//TODO GM: make configurable using Options API
-	private Kind messagingKind = Kind.ERROR;
+	private final Kind messagingKind = Kind.ERROR;
+
+	private final ConstraintHelper constraintHelper;
 
 	public ConstraintAnnotationVisitor(ProcessingEnvironment processingEnvironment) {
-		
+
 		this.processingEnvironment = processingEnvironment;
-		errorMessages = ResourceBundle.getBundle("org.hibernate.validator.ap.ValidationProcessorMessages");
+
+		errorMessages = ResourceBundle.getBundle( "org.hibernate.validator.ap.ValidationProcessorMessages" );
+		constraintHelper = new ConstraintHelper(
+				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
+		);
 	}
-	
+
 	/**
 	 * <p>
 	 * Checks whether the given mirrors representing one or more constraint annotations are correctly
 	 * specified at the given method. The following checks are performed:</p>
 	 * <ul>
 	 * <li>
-	 * The method must be a JavaBeans getter method.
-	 * </li> 
+	 * The method must be a JavaBeans getter method (name starts with "is", "get" or "has", no parameters)
+	 * </li>
 	 * <li>
-	 * TODO GM:
 	 * The return type of the method must be supported by the constraints.
+	 * </li>
+	 * <li>
+	 * The method must not be static.
 	 * </li>
 	 * </ul>
 	 */
 	@Override
 	public Void visitExecutableAsMethod(ExecutableElement element,
-			List<AnnotationMirror> mirrors) {
-		
-		for (AnnotationMirror oneAnnotationMirror : mirrors) {
-			if(!isJavaBeanGetterName(element.getSimpleName().toString())) {
-				
-				processingEnvironment.getMessager().printMessage(
-					messagingKind,
-					errorMessages.getString("ONLY_GETTERS_MAY_BE_ANNOTATED"), element, oneAnnotationMirror);
+										List<AnnotationMirror> mirrors) {
+
+		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
+
+			if ( !isJavaBeanGetterName( element.getSimpleName().toString() ) ||
+					hasParameters( element ) ) {
+
+				reportError( element, oneAnnotationMirror, "ONLY_GETTERS_MAY_BE_ANNOTATED" );
+
+				continue;
+			}
+
+			if ( isStaticMethod( element ) ) {
+
+				reportError( element, oneAnnotationMirror, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
+
+				continue;
+			}
+
+			if ( !constraintHelper.isAnnotationAllowedAtMethod( oneAnnotationMirror.getAnnotationType(), element ) ) {
+
+				reportError(
+						element, oneAnnotationMirror, "NOT_SUPPORTED_RETURN_TYPE",
+						oneAnnotationMirror.getAnnotationType().asElement().getSimpleName()
+				);
 			}
 		}
 		return null;
@@ -98,27 +121,124 @@ final class ConstraintAnnotationVisitor extends
 	 */
 	@Override
 	public Void visitVariableAsField(VariableElement annotatedField, List<AnnotationMirror> mirrors) {
-		
-		for (AnnotationMirror oneAnnotationMirror : mirrors) {
-			
-			ConstraintHelper builtInConstraintHelper = 
-				new ConstraintHelper(processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils());
-			
-			boolean annotationAllowedAtElementType = 
-				builtInConstraintHelper.isAnnotationAllowedAtElement(oneAnnotationMirror.getAnnotationType(), annotatedField);
-			
-			if(!annotationAllowedAtElementType) {
-				processingEnvironment.getMessager().printMessage(
-					messagingKind,
-					MessageFormat.format(errorMessages.getString("NOT_SUPPORTED_TYPE"), oneAnnotationMirror.getAnnotationType().asElement().getSimpleName()), annotatedField, oneAnnotationMirror);
+
+		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
+
+			if ( !constraintHelper.isAnnotationAllowedAtField(
+					oneAnnotationMirror.getAnnotationType(), annotatedField
+			) ) {
+
+				reportError(
+						annotatedField, oneAnnotationMirror, "NOT_SUPPORTED_TYPE",
+						oneAnnotationMirror.getAnnotationType().asElement().getSimpleName()
+				);
 			}
 		}
-		
+
 		return null;
 	}
-	
-	private boolean isJavaBeanGetterName(String name) {
-		return name.startsWith("is") || name.startsWith("has") || name.startsWith("get");
+
+	/**
+	 * <p>
+	 * Checks whether the given mirrors representing one or more constraint
+	 * annotations are correctly specified at the given annotation type
+	 * declaration. The only annotation types allowed to be annotated with a
+	 * constraint annotation are other (composed) constraint annotation type
+	 * declarations.
+	 * </p>
+	 */
+	@Override
+	public Void visitTypeAsAnnotationType(TypeElement e,
+										  List<AnnotationMirror> mirrors) {
+
+		if ( !isConstraintAnnotation( e ) ) {
+
+			for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
+				reportError( e, oneAnnotationMirror, "ONLY_CONSTRAINT_ANNOTATIONS_MAY_BE_ANNOTATED" );
+			}
+		}
+
+		return null;
 	}
-	
+
+	@Override
+	public Void visitTypeAsClass(TypeElement e, List<AnnotationMirror> p) {
+		return visitClassOrInterfaceOrEnumType( e, p );
+	}
+
+	@Override
+	public Void visitTypeAsEnum(TypeElement e, List<AnnotationMirror> p) {
+		return visitClassOrInterfaceOrEnumType( e, p );
+	}
+
+	@Override
+	public Void visitTypeAsInterface(TypeElement e, List<AnnotationMirror> p) {
+		return visitClassOrInterfaceOrEnumType( e, p );
+	}
+
+	// ==================================
+	// private API below
+	// ==================================
+
+	private Void visitClassOrInterfaceOrEnumType(TypeElement annotatedType,
+												 List<AnnotationMirror> mirrors) {
+
+		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
+
+			if ( !constraintHelper.isAnnotationAllowedAtType(
+					oneAnnotationMirror.getAnnotationType(), annotatedType
+			) ) {
+
+				reportError(
+						annotatedType, oneAnnotationMirror, "NOT_SUPPORTED_TYPE",
+						oneAnnotationMirror.getAnnotationType().asElement().getSimpleName()
+				);
+			}
+		}
+
+		return null;
+	}
+
+	private boolean hasParameters(ExecutableElement method) {
+		return !method.getParameters().isEmpty();
+	}
+
+	private boolean isJavaBeanGetterName(String methodName) {
+		return methodName.startsWith( "is" ) || methodName.startsWith( "has" ) || methodName.startsWith( "get" );
+	}
+
+	private boolean isStaticMethod(ExecutableElement method) {
+		return method.getModifiers().contains( Modifier.STATIC );
+	}
+
+	private boolean isConstraintAnnotation(TypeElement e) {
+		return e.getAnnotation( Constraint.class ) != null;
+	}
+
+	/**
+	 * Reports an error at the given location using the given message key and
+	 * optionally the given message parameters.
+	 *
+	 * @param element The element at which the error shall be reported.
+	 * @param annotationMirror The annotation mirror at which the error shall be reported.
+	 * @param messageKey The message key to be used to retrieve the text.
+	 * @param messageParameters An optional array of message parameters to be put into the
+	 * message using a {@link MessageFormat}.
+	 */
+	private void reportError(Element element, AnnotationMirror annotationMirror, String messageKey, Object... messageParameters) {
+
+		String message;
+
+		if ( messageParameters == null ) {
+			message = errorMessages.getString( messageKey );
+		}
+		else {
+			message = MessageFormat.format( errorMessages.getString( messageKey ), messageParameters );
+		}
+
+		processingEnvironment.getMessager().printMessage(
+				messagingKind, message, element, annotationMirror
+		);
+	}
+
 }
