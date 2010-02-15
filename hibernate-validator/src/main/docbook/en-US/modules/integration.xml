@@ -105,19 +105,20 @@
         <programlisting>&lt;hibernate-configuration&gt;
     &lt;session-factory&gt;
        ...
-       &lt;property name="javax.persistence.validation.group.pre-persist"&gt;javax.validation.Default&lt;/property&gt;
-       &lt;property name="javax.persistence.validation.group.pre-update"&gt;javax.validation.Default&lt;/property&gt;
+       &lt;property name="javax.persistence.validation.group.pre-persist"&gt;javax.validation.groups.Default&lt;/property&gt;
+       &lt;property name="javax.persistence.validation.group.pre-update"&gt;javax.validation.groups.Default&lt;/property&gt;
        &lt;property name="javax.persistence.validation.group.pre-remove"&gt;&lt;/property&gt;
+       ...
+       &lt;event type="pre-update"&gt;
+         &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
+       &lt;/event&gt;
+       &lt;event type="pre-insert"&gt;
+         &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
+       &lt;/event&gt;
+       &lt;event type="pre-delete"&gt;
+         &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
+       &lt;/event&gt;
     &lt;/session-factory&gt;
-    &lt;event type="pre-update"&gt;
-       &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
-    &lt;/event&gt;
-    &lt;event type="pre-insert"&gt;
-        &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
-    &lt;/event&gt;
-    &lt;event type="pre-delete"&gt;
-        &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
-    &lt;/event&gt;
 &lt;/hibernate-configuration&gt;</programlisting>
       </example>
     </section>
