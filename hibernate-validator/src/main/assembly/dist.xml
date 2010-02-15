@@ -37,6 +37,7 @@
                 <exclude>com.sun.xml.bind:jaxb-impl</exclude>
                 <exclude>javax.xml.stream:stax-api</exclude>
                 <exclude>javax.activation:activation</exclude>
+                <exclude>org.hibernate.java-persistence:jpa-api</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
@@ -49,7 +50,7 @@
                 <include>javax.xml.stream:stax-api</include>
                 <include>javax.activation:activation</include>
             </includes>
-        </dependencySet>        
+        </dependencySet>      
     </dependencySets>
 
     <files>
