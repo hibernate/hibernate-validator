@@ -436,7 +436,7 @@ Validator validator = factory.getValidator();</programlisting>
       <para>All the validation methods have a var-args parameter which can be
       used to specify, which validation groups shall be considered when
       performing the validation. If the parameter is not specified the default
-      validation group (<classname>javax.validation.Default</classname>) will
+      validation group (<classname>javax.validation.groups.Default</classname>) will
       be used. We will go into more detail on the topic of validation groups
       in <xref linkend="validator-usingvalidator-validationgroups" /></para>
 
@@ -681,12 +681,12 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     linkend="example-person" />) which has a <classname>@NotNull
     </classname>constraint on <property>name</property>. Since no group is
     specified for this annotation its default group is
-    <classname>javax.validation.Default</classname>.</para>
+    <classname>javax.validation.groups.Default</classname>.</para>
 
     <note>
       <para>When more than one group is requested, the order in which the
       groups are evaluated is not deterministic. If no group is specified the
-      default group <classname>javax.validation.Default</classname> is
+      default group <classname>javax.validation.groups.Default</classname> is
       assumed.</para>
     </note>
 
