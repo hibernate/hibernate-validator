@@ -15,22 +15,21 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel.invalidcomposedconstraint;
+package org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution;
 
-import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.Set;
 
-/**
- * Constraint annotations are not allowed here, as ValidCustomerNumber isn't a
- * proper constraint type definition.
- */
-@NotNull
-@Size(min = 10, max = 10)
-public @interface ValidCustomerNumber {
-	String message() default "";
+public class NoUniqueValidatorResolution {
 
-	Class<?>[] groups() default { };
+	/**
+	 * Allowed, as there is one maximally specific validator.
+	 */
+	@Size
+	public Set<?> set;
 
-	Class<? extends Payload>[] payload() default { };
+	/**
+	 * Not allowed, as two maximally specific validators exist.
+	 */
+	@Size
+	public SerializableCollection<?> serializableCollection;
 }

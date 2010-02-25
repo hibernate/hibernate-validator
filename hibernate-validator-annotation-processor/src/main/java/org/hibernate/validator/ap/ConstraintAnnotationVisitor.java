@@ -1,4 +1,4 @@
-// $Id: ConstraintAnnotationVisitor.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -30,9 +30,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.tools.Diagnostic.Kind;
-import javax.validation.Constraint;
 
+import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
+import org.hibernate.validator.ap.util.ConstraintHelper.ConstraintCheckResult;
 
 /**
  * An {@link ElementVisitor} that visits elements (type declarations, methods
@@ -42,23 +43,73 @@ import org.hibernate.validator.ap.util.ConstraintHelper;
  * @author Gunnar Morling.
  */
 final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<AnnotationMirror>> {
+
+	/**
+	 * The name of the processor option for setting the diagnostic kind to be
+	 * used when reporting errors during annotation processing. Can be set on
+	 * the command line using the -A option, e.g.
+	 * <code>-AdiagnosticKind=ERROR</code>.
+	 */
+	public final static String DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME = "diagnosticKind";
+
+	/**
+	 * The diagnostic kind to be used if no or an invalid kind is given as processor option.
+	 */
+	public final static Kind DEFAULT_DIAGNOSTIC_KIND = Kind.ERROR;
+
+	/**
+	 * The kind of diagnostic to be used when reporting any problems.
+	 */
+	private Kind diagnosticKind;
+
 	private final ProcessingEnvironment processingEnvironment;
 
 	private final ResourceBundle errorMessages;
 
-	//TODO GM: make configurable using Options API
-	private final Kind messagingKind = Kind.ERROR;
-
 	private final ConstraintHelper constraintHelper;
+
+	private final AnnotationApiHelper annotationApiHelper;
 
 	public ConstraintAnnotationVisitor(ProcessingEnvironment processingEnvironment) {
 
 		this.processingEnvironment = processingEnvironment;
 
 		errorMessages = ResourceBundle.getBundle( "org.hibernate.validator.ap.ValidationProcessorMessages" );
-		constraintHelper = new ConstraintHelper(
+
+		annotationApiHelper = new AnnotationApiHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
 		);
+
+		constraintHelper = new ConstraintHelper(
+				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils(), annotationApiHelper
+		);
+
+		initializeDiagnosticKind();
+	}
+
+	private void initializeDiagnosticKind() {
+
+		String diagnosticKindFromOptions = processingEnvironment.getOptions()
+				.get( DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME );
+
+		if ( diagnosticKindFromOptions != null ) {
+			try {
+				diagnosticKind = Kind.valueOf( diagnosticKindFromOptions );
+			}
+			catch ( IllegalArgumentException e ) {
+
+				processingEnvironment.getMessager().printMessage(
+						Kind.ERROR, MessageFormat.format(
+								errorMessages.getString( "INVALID_DIAGNOSTIC_KIND_GIVEN" ), diagnosticKindFromOptions
+						)
+				);
+
+				diagnosticKind = DEFAULT_DIAGNOSTIC_KIND;
+			}
+		}
+		else {
+			diagnosticKind = DEFAULT_DIAGNOSTIC_KIND;
+		}
 	}
 
 	/**
@@ -78,32 +129,21 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	 * </ul>
 	 */
 	@Override
-	public Void visitExecutableAsMethod(ExecutableElement element,
+	public Void visitExecutableAsMethod(ExecutableElement method,
 										List<AnnotationMirror> mirrors) {
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			if ( !isJavaBeanGetterName( element.getSimpleName().toString() ) ||
-					hasParameters( element ) ) {
+			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
 
-				reportError( element, oneAnnotationMirror, "ONLY_GETTERS_MAY_BE_ANNOTATED" );
-
-				continue;
+				checkConstraintAtMethod( method, oneAnnotationMirror );
 			}
-
-			if ( isStaticMethod( element ) ) {
-
-				reportError( element, oneAnnotationMirror, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
-
-				continue;
-			}
-
-			if ( !constraintHelper.isAnnotationAllowedAtMethod( oneAnnotationMirror.getAnnotationType(), element ) ) {
-
-				reportError(
-						element, oneAnnotationMirror, "NOT_SUPPORTED_RETURN_TYPE",
-						oneAnnotationMirror.getAnnotationType().asElement().getSimpleName()
-				);
+			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
+				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
+						oneAnnotationMirror
+				) ) {
+					checkConstraintAtMethod( method, onePartOfMultiValuedConstraint );
+				}
 			}
 		}
 		return null;
@@ -117,6 +157,9 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	 * <li>
 	 * The type of the field must be supported by the constraints.
 	 * </li>
+	 * <li>
+	 * The field must not be static.
+	 * </li>
 	 * </ul>
 	 */
 	@Override
@@ -124,14 +167,16 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			if ( !constraintHelper.isAnnotationAllowedAtField(
-					oneAnnotationMirror.getAnnotationType(), annotatedField
-			) ) {
+			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
 
-				reportError(
-						annotatedField, oneAnnotationMirror, "NOT_SUPPORTED_TYPE",
-						oneAnnotationMirror.getAnnotationType().asElement().getSimpleName()
-				);
+				checkConstraintAtField( annotatedField, oneAnnotationMirror );
+			}
+			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
+				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
+						oneAnnotationMirror
+				) ) {
+					checkConstraintAtField( annotatedField, onePartOfMultiValuedConstraint );
+				}
 			}
 		}
 
@@ -147,14 +192,31 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	 * declarations.
 	 * </p>
 	 */
+	// TODO GM: do a more complete check of constraint annotation type
+	// declarations:
+	// 
+	// - check, existence of groups(), message(), payload()
+	// - check, retention policy
+	// - check, that the set of supported types is not empty
+	// - optionally check, that validated types resolve to non-parametrized types
 	@Override
-	public Void visitTypeAsAnnotationType(TypeElement e,
+	public Void visitTypeAsAnnotationType(TypeElement annotationType,
 										  List<AnnotationMirror> mirrors) {
 
-		if ( !isConstraintAnnotation( e ) ) {
+		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
-				reportError( e, oneAnnotationMirror, "ONLY_CONSTRAINT_ANNOTATIONS_MAY_BE_ANNOTATED" );
+			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
+
+				checkConstraintAtAnnotationType( annotationType, oneAnnotationMirror );
+
+			}
+			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
+
+				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
+						oneAnnotationMirror
+				) ) {
+					checkConstraintAtAnnotationType( annotationType, onePartOfMultiValuedConstraint );
+				}
 			}
 		}
 
@@ -185,18 +247,89 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			if ( !constraintHelper.isAnnotationAllowedAtType(
-					oneAnnotationMirror.getAnnotationType(), annotatedType
-			) ) {
+			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
 
-				reportError(
-						annotatedType, oneAnnotationMirror, "NOT_SUPPORTED_TYPE",
-						oneAnnotationMirror.getAnnotationType().asElement().getSimpleName()
-				);
+				checkConstraintAtType( annotatedType, oneAnnotationMirror );
+			}
+			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
+				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
+						oneAnnotationMirror
+				) ) {
+					checkConstraintAtType( annotatedType, onePartOfMultiValuedConstraint );
+				}
 			}
 		}
 
 		return null;
+	}
+
+	private void checkConstraintAtType(TypeElement annotatedType, AnnotationMirror mirror) {
+
+		if ( constraintHelper.checkConstraint(
+				mirror.getAnnotationType(), annotatedType.asType()
+		) != ConstraintCheckResult.ALLOWED ) {
+
+			reportError(
+					annotatedType, mirror, "NOT_SUPPORTED_TYPE",
+					mirror.getAnnotationType().asElement().getSimpleName()
+			);
+		}
+	}
+
+	private void checkConstraintAtField(VariableElement annotatedField, AnnotationMirror annotationMirror) {
+
+		if ( isStaticElement( annotatedField ) ) {
+
+			reportError( annotatedField, annotationMirror, "STATIC_FIELDS_MAY_NOT_BE_ANNOTATED" );
+
+			return;
+		}
+
+		if ( constraintHelper.checkConstraint(
+				annotationMirror.getAnnotationType(), annotatedField.asType()
+		) != ConstraintCheckResult.ALLOWED ) {
+
+			reportError(
+					annotatedField, annotationMirror, "NOT_SUPPORTED_TYPE",
+					annotationMirror.getAnnotationType().asElement().getSimpleName()
+			);
+		}
+	}
+
+	private void checkConstraintAtMethod(ExecutableElement method, AnnotationMirror mirror) {
+
+		if ( !isJavaBeanGetterName( method.getSimpleName().toString() ) ||
+				hasParameters( method ) ) {
+
+			reportError( method, mirror, "ONLY_GETTERS_MAY_BE_ANNOTATED" );
+
+			return;
+		}
+
+		if ( isStaticElement( method ) ) {
+
+			reportError( method, mirror, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
+
+			return;
+		}
+
+		if ( constraintHelper.checkConstraint(
+				mirror.getAnnotationType(), method.getReturnType()
+		) != ConstraintCheckResult.ALLOWED ) {
+
+			reportError(
+					method, mirror, "NOT_SUPPORTED_RETURN_TYPE",
+					mirror.getAnnotationType().asElement().getSimpleName()
+			);
+		}
+	}
+
+	private void checkConstraintAtAnnotationType(TypeElement annotationType, AnnotationMirror annotationMirror) {
+
+		if ( !constraintHelper.isConstraintAnnotation( annotationType ) ) {
+			reportError( annotationType, annotationMirror, "ONLY_CONSTRAINT_ANNOTATIONS_MAY_BE_ANNOTATED" );
+		}
+
 	}
 
 	private boolean hasParameters(ExecutableElement method) {
@@ -207,12 +340,8 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 		return methodName.startsWith( "is" ) || methodName.startsWith( "has" ) || methodName.startsWith( "get" );
 	}
 
-	private boolean isStaticMethod(ExecutableElement method) {
-		return method.getModifiers().contains( Modifier.STATIC );
-	}
-
-	private boolean isConstraintAnnotation(TypeElement e) {
-		return e.getAnnotation( Constraint.class ) != null;
+	private boolean isStaticElement(Element element) {
+		return element.getModifiers().contains( Modifier.STATIC );
 	}
 
 	/**
@@ -237,7 +366,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 		}
 
 		processingEnvironment.getMessager().printMessage(
-				messagingKind, message, element, annotationMirror
+				diagnosticKind, message, element, annotationMirror
 		);
 	}
 

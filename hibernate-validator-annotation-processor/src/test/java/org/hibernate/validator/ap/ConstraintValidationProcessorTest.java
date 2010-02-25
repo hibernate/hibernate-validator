@@ -1,4 +1,4 @@
-// $Id: ConstraintValidationProcessorTest.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -24,10 +24,12 @@ import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
+import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLong;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLongValidator;
 import org.hibernate.validator.ap.testmodel.boxing.ValidationUsingBoxing;
@@ -51,12 +53,19 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
 import org.hibernate.validator.ap.testmodel.invalidcomposedconstraint.ValidCustomerNumber;
+import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.NoUniqueValidatorResolution;
+import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SerializableCollection;
+import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.Size;
+import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForCollection;
+import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSerializable;
+import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
 import org.hibernate.validator.ap.testutil.CompilerTestHelper;
 import org.hibernate.validator.ap.util.DiagnosticExpection;
 
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertDiagnostics;
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Test for {@link ConstraintValidationProcessor} using the Java compiler
@@ -65,7 +74,10 @@ import static org.testng.Assert.assertNotNull;
  * @author Gunnar Morling.
  */
 public class ConstraintValidationProcessorTest {
+
 	private static CompilerTestHelper compilerHelper;
+
+	private DiagnosticCollector<JavaFileObject> diagnostics;
 
 	@BeforeClass
 	public static void setUpCompilerHelper() {
@@ -88,10 +100,13 @@ public class ConstraintValidationProcessorTest {
 				);
 	}
 
+	@BeforeMethod
+	public void setUp() {
+		diagnostics = new DiagnosticCollector<JavaFileObject>();
+	}
+
 	@Test
 	public void fieldLevelValidationUsingBuiltInConstraints() {
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
 		File sourceFile = compilerHelper.getSourceFile( FieldLevelValidationUsingBuiltInConstraints.class );
 
@@ -99,13 +114,27 @@ public class ConstraintValidationProcessorTest {
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
 
 		assertFalse( compilationResult );
-		assertDiagnostics( diagnostics, new DiagnosticExpection( Kind.ERROR, 43 ) );
+		assertThatDiagnosticsMatch(
+				diagnostics, new DiagnosticExpection( Kind.ERROR, 54 ), new DiagnosticExpection( Kind.ERROR, 60 )
+		);
+	}
+
+	@Test
+	public void compilationSucceedsDueToDiagnosticKindWarning() {
+
+		File sourceFile = compilerHelper.getSourceFile( FieldLevelValidationUsingBuiltInConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, Kind.WARNING, sourceFile );
+
+		assertTrue( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics, new DiagnosticExpection( Kind.WARNING, 54 ), new DiagnosticExpection( Kind.WARNING, 60 )
+		);
 	}
 
 	@Test
 	public void fieldLevelValidationUsingCustomConstraints() {
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
 		File sourceFile1 = compilerHelper.getSourceFile( FieldLevelValidationUsingCustomConstraints.class );
 		File sourceFile2 = compilerHelper.getSourceFile( CheckCase.class );
@@ -123,13 +152,11 @@ public class ConstraintValidationProcessorTest {
 				);
 
 		assertFalse( compilationResult );
-		assertDiagnostics( diagnostics, new DiagnosticExpection( Kind.ERROR, 30 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpection( Kind.ERROR, 30 ) );
 	}
 
 	@Test
 	public void methodLevelValidationUsingBuiltInConstraints() {
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
 		File sourceFile = compilerHelper.getSourceFile( MethodLevelValidationUsingBuiltInConstraints.class );
 
@@ -137,7 +164,7 @@ public class ConstraintValidationProcessorTest {
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
 
 		assertFalse( compilationResult );
-		assertDiagnostics(
+		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpection( Kind.ERROR, 32 ),
 				new DiagnosticExpection( Kind.ERROR, 39 ),
@@ -149,8 +176,6 @@ public class ConstraintValidationProcessorTest {
 	@Test
 	public void classLevelValidation() {
 
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-
 		File sourceFile1 = compilerHelper.getSourceFile( ClassLevelValidation.class );
 		File sourceFile2 = compilerHelper.getSourceFile( ValidCustomer.class );
 		File sourceFile3 = compilerHelper.getSourceFile( ValidCustomerValidator.class );
@@ -161,13 +186,11 @@ public class ConstraintValidationProcessorTest {
 				);
 
 		assertFalse( compilationResult );
-		assertDiagnostics( diagnostics, new DiagnosticExpection( Kind.ERROR, 28 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpection( Kind.ERROR, 28 ) );
 	}
 
 	@Test
 	public void validationUsingComposedConstraint() {
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
 		File sourceFile1 = compilerHelper.getSourceFile( FieldLevelValidationUsingComposedConstraint.class );
 		File sourceFile2 = compilerHelper.getSourceFile( ValidOrderNumber.class );
@@ -176,13 +199,11 @@ public class ConstraintValidationProcessorTest {
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
 
 		assertFalse( compilationResult );
-		assertDiagnostics( diagnostics, new DiagnosticExpection( Kind.ERROR, 29 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpection( Kind.ERROR, 29 ) );
 	}
 
 	@Test
 	public void validationUsingComplexComposedConstraint() {
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
 		File sourceFile1 = compilerHelper.getSourceFile( FieldLevelValidationUsingComplexComposedConstraint.class );
 		File sourceFile2 = compilerHelper.getSourceFile( ComposedConstraint.class );
@@ -212,10 +233,9 @@ public class ConstraintValidationProcessorTest {
 				);
 
 		assertFalse( compilationResult );
-		assertDiagnostics(
+		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpection( Kind.ERROR, 29 ),
-				new DiagnosticExpection( Kind.ERROR, 32 ),
 				new DiagnosticExpection( Kind.ERROR, 41 ),
 				new DiagnosticExpection( Kind.ERROR, 50 ),
 				new DiagnosticExpection( Kind.ERROR, 56 )
@@ -224,8 +244,6 @@ public class ConstraintValidationProcessorTest {
 
 	@Test
 	public void validationUsingBoxing() {
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
 		File sourceFile1 = compilerHelper.getSourceFile( ValidationUsingBoxing.class );
 		File sourceFile2 = compilerHelper.getSourceFile( ValidLong.class );
@@ -237,7 +255,7 @@ public class ConstraintValidationProcessorTest {
 				);
 
 		assertFalse( compilationResult );
-		assertDiagnostics(
+		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpection( Kind.ERROR, 31 ),
 				new DiagnosticExpection( Kind.ERROR, 37 ),
@@ -248,9 +266,7 @@ public class ConstraintValidationProcessorTest {
 	}
 
 	@Test
-	public void constraintAnnotationGivenAtNonConstraintAnnotationType() {
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+	public void testThatSpecifyingConstraintAnnotationAtNonConstraintAnnotationTypeCausesCompilationError() {
 
 		File sourceFile = compilerHelper.getSourceFile( ValidCustomerNumber.class );
 
@@ -258,8 +274,58 @@ public class ConstraintValidationProcessorTest {
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
 
 		assertFalse( compilationResult );
-		assertDiagnostics(
+		assertThatDiagnosticsMatch(
 				diagnostics, new DiagnosticExpection( Kind.ERROR, 28 ), new DiagnosticExpection( Kind.ERROR, 29 )
+		);
+	}
+
+	@Test
+	public void testThatNonUniqueValidatorResolutionCausesCompilationError() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( NoUniqueValidatorResolution.class );
+		File sourceFile2 = compilerHelper.getSourceFile( Size.class );
+		File sourceFile3 = compilerHelper.getSourceFile( SizeValidatorForCollection.class );
+		File sourceFile4 = compilerHelper.getSourceFile( SizeValidatorForSerializable.class );
+		File sourceFile5 = compilerHelper.getSourceFile( SerializableCollection.class );
+		File sourceFile6 = compilerHelper.getSourceFile( SizeValidatorForSet.class );
+
+		boolean compilationResult =
+				compilerHelper.compile(
+						new ConstraintValidationProcessor(),
+						diagnostics,
+						sourceFile1,
+						sourceFile2,
+						sourceFile3,
+						sourceFile4,
+						sourceFile5,
+						sourceFile6
+				);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics, new DiagnosticExpection(
+						Kind.ERROR, 33
+				)
+		);
+	}
+
+	@Test
+	public void testThatMultiValuedConstrainedIsOnlyGivenAtSupportedType() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( MultipleConstraintsOfSameType.class );
+
+		boolean compilationResult =
+				compilerHelper.compile(
+						new ConstraintValidationProcessor(),
+						diagnostics,
+						sourceFile1
+				);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics, new DiagnosticExpection(
+						Kind.ERROR, 33
+				), new DiagnosticExpection( Kind.ERROR, 33 )
 		);
 	}
 }

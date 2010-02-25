@@ -15,19 +15,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel.invalidcomposedconstraint;
+package org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-/**
- * Constraint annotations are not allowed here, as ValidCustomerNumber isn't a
- * proper constraint type definition.
- */
-@NotNull
-@Size(min = 10, max = 10)
-public @interface ValidCustomerNumber {
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+@Retention(RUNTIME)
+@Constraint(validatedBy = {
+		SizeValidatorForCollection.class, SizeValidatorForSerializable.class, SizeValidatorForSet.class
+})
+@Documented
+public @interface Size {
 	String message() default "";
 
 	Class<?>[] groups() default { };

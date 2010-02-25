@@ -15,22 +15,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel.invalidcomposedconstraint;
+package org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution;
 
-import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.Set;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-/**
- * Constraint annotations are not allowed here, as ValidCustomerNumber isn't a
- * proper constraint type definition.
- */
-@NotNull
-@Size(min = 10, max = 10)
-public @interface ValidCustomerNumber {
-	String message() default "";
+public class SizeValidatorForSet implements ConstraintValidator<Size, Set> {
 
-	Class<?>[] groups() default { };
+	public void initialize(Size constraintAnnotation) {
+	}
 
-	Class<? extends Payload>[] payload() default { };
+	public boolean isValid(Set object, ConstraintValidatorContext constraintContext) {
+		return true;
+	}
 }

@@ -1,4 +1,4 @@
-// $Id: ConstraintValidationProcessor.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
@@ -30,22 +31,34 @@ import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.TypeElement;
 
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
-import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
- * Annotation processor for validating Bean Validation constraints.
+ * An annotation processor for checking <a
+ * href="http://jcp.org/en/jsr/detail?id=303">Bean Validation</a> constraints.
+ * The processor supports the following options:
+ * <ul>
+ * <li><code>diagnosticKind</code>: the severity with which any occured problems
+ * shall be reported. Must be given in form of the string representation of a
+ * value from {@link javax.tools.Diagnostic.Kind}, e.g.
+ * "diagnosticKind=WARNING". Default is Kind.ERROR.</li>
+ * <li>TODO GM: validationMode: whether spec compliance shall be checked
+ * strictly or loosely (e.g. by allowing validators for parametrized types)</li>
+ * </ul>
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
+// TODO GM: check @Valid annotation
+// TODO GM: add documentation for AP to HV reference guide
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
+@SupportedOptions(ConstraintAnnotationVisitor.DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME)
 public class ConstraintValidationProcessor extends AbstractProcessor {
+
 	/**
 	 * Whether this processor claims all processed annotations exclusively or not.
 	 */
 	private static final boolean ANNOTATIONS_CLAIMED_EXCLUSIVELY = false;
-
 
 	@Override
 	public boolean process(
@@ -55,17 +68,10 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 		AnnotationApiHelper typeHelper = new AnnotationApiHelper(
 				processingEnv.getElementUtils(), processingEnv.getTypeUtils()
 		);
+
 		ElementVisitor<Void, List<AnnotationMirror>> visitor = new ConstraintAnnotationVisitor( processingEnv );
-		ConstraintHelper constraintHelper = new ConstraintHelper(
-				processingEnv.getElementUtils(), processingEnv.getTypeUtils()
-		);
 
 		for ( TypeElement oneAnnotation : annotations ) {
-
-			//only constraint annotations are relevant
-			if ( !constraintHelper.isConstraintAnnotation( oneAnnotation ) ) {
-				continue;
-			}
 
 			Set<? extends Element> elementsWithConstraintAnnotation =
 					roundEnvironment.getElementsAnnotatedWith( oneAnnotation );
@@ -81,4 +87,5 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 
 		return ANNOTATIONS_CLAIMED_EXCLUSIVELY;
 	}
+
 }

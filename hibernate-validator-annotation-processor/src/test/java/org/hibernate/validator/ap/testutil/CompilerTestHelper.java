@@ -1,4 +1,4 @@
-// $Id: CompilerTestHelper.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.processing.Processor;
 import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
@@ -40,6 +41,7 @@ import static org.testng.Assert.assertTrue;
  * @author Gunnar Morling
  */
 public class CompilerTestHelper {
+
 	private final JavaCompiler compiler;
 
 	private final String sourceBaseDir;
@@ -57,6 +59,13 @@ public class CompilerTestHelper {
 		this.pathToBeanValidationApiJar = pathToBeanValidationApiJar;
 	}
 
+	/**
+	 * Retrieves a file object containing the source of the given class.
+	 *
+	 * @param clazz The class of interest.
+	 *
+	 * @return A file with the source of the given class.
+	 */
 	public File getSourceFile(Class<?> clazz) {
 
 		String sourceFileName =
@@ -65,8 +74,37 @@ public class CompilerTestHelper {
 		return new File( sourceBaseDir + sourceFileName );
 	}
 
+	/**
+	 * Creates and executes a {@link CompilationTask} using the given input.
+	 *
+	 * @param annotationProcessor An annotation processor to be attached to the task.
+	 * @param diagnostics An diagnostics listener to be attached to the task.
+	 * @param sourceFiles The source files to be compiled.
+	 *
+	 * @return True, if the source files could be compiled successfully (meaning
+	 *         in especially, that the given annotation processor didn't raise
+	 *         any errors), false otherwise.
+	 */
 	public boolean compile(
 			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, File... sourceFiles) {
+
+		return compile( annotationProcessor, diagnostics, Kind.ERROR, sourceFiles );
+	}
+
+	/**
+	 * Creates and executes a {@link CompilationTask} using the given input.
+	 *
+	 * @param annotationProcessor An annotation processor to be attached to the task.
+	 * @param diagnostics An diagnostics listener to be attached to the task.
+	 * @param diagnosticKind A value for the "diagnosticKind" option.
+	 * @param sourceFiles The source files to be compiled.
+	 *
+	 * @return True, if the source files could be compiled successfully (meaning
+	 *         in especially, that the given annotation processor didn't raise
+	 *         any errors), false otherwise.
+	 */
+	public boolean compile(
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, File... sourceFiles) {
 
 		StandardJavaFileManager fileManager =
 				compiler.getStandardFileManager( null, null, null );
@@ -74,7 +112,11 @@ public class CompilerTestHelper {
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( sourceFiles );
 
 		List<String> optionList = new ArrayList<String>();
-		optionList.addAll( Arrays.asList( "-classpath", pathToBeanValidationApiJar ) );
+		optionList.addAll(
+				Arrays.asList(
+						"-classpath", pathToBeanValidationApiJar, "-AdiagnosticKind=" + diagnosticKind, "-d", "target"
+				)
+		);
 
 		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, optionList, null, compilationUnits );
 		task.setProcessors( Arrays.asList( annotationProcessor ) );
@@ -82,7 +124,21 @@ public class CompilerTestHelper {
 		return task.call();
 	}
 
-	public static void assertDiagnostics(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpection... expections) {
+	/**
+	 * <p>
+	 * Asserts, that the given diagnostics match with the given expectations.
+	 * </p>
+	 * <p>
+	 * First checks, whether the number of actual diagnostics matches with the
+	 * number of given expectations. If that's the case, {@link Kind} and line
+	 * number of each expectation are compared.
+	 * </p>
+	 *
+	 * @param diagnostics The actual diagnostics as populated by the executed
+	 * {@link CompilationTask}.
+	 * @param expections The expectations to compare against.
+	 */
+	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpection... expections) {
 
 		List<Diagnostic<? extends JavaFileObject>> diagnosticsList = diagnostics.getDiagnostics();
 
@@ -95,7 +151,7 @@ public class CompilerTestHelper {
 				System.out.println( diagnosticsList );
 			}
 
-			assertEquals( diagnosticsList.size(), expections.length, "Wrong number of diagnostic expections." );
+			assertEquals( diagnosticsList.size(), expections.length, "Wrong number of diagnostics." );
 
 			int i = 0;
 			for ( DiagnosticExpection oneExpection : expections ) {

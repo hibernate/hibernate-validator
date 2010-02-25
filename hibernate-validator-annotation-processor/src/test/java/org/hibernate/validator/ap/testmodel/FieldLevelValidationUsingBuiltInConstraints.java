@@ -1,4 +1,4 @@
-// $Id: FieldLevelValidationUsingBuiltInConstraints.java 17946 2009-11-06 18:23:48Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -23,26 +23,49 @@ import java.util.List;
 import javax.validation.constraints.Size;
 
 public class FieldLevelValidationUsingBuiltInConstraints {
+
 	@Size(min = 10)
 	public String string;
 
 	@Size(min = 10)
-	public Collection<String> collection;
+	public Collection collection1;
 
-	//TODO GM: support array-typed elements
+	@Size(min = 10)
+	public Collection<?> collection2;
+
+	@Size(min = 10)
+	public Collection<String> stringCollection;
 
 	/**
 	 * Allowed, as List extends Collection.
 	 */
 	@Size(min = 10)
-	public List<String> list;
+	public List list1;
+
+	@Size(min = 10)
+	public List<?> list2;
+
+	@Size(min = 10)
+	public List<String> stringList;
 
 	/**
-	 * Not allowed.
+	 * Not allowed (unsupported type).
 	 */
 	@Size(min = 10)
 	public Date date;
 
+	/**
+	 * Not allowed (static field).
+	 */
 	@Size(min = 10)
 	public static String staticString;
+
+	@Size(min = 10)
+	public Object[] objectArray;
+
+	@Size(min = 10)
+	public Integer[] integerArray;
+
+	@Size(min = 10)
+	public int[] intArray;
 }

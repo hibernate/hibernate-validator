@@ -15,22 +15,21 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel.invalidcomposedconstraint;
+package org.hibernate.validator.ap.testmodel;
 
-import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.Date;
 
-/**
- * Constraint annotations are not allowed here, as ValidCustomerNumber isn't a
- * proper constraint type definition.
- */
-@NotNull
-@Size(min = 10, max = 10)
-public @interface ValidCustomerNumber {
-	String message() default "";
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Pattern.List;
 
-	Class<?>[] groups() default { };
+public class MultipleConstraintsOfSameType {
+	
+	@List(value = { @Pattern(regexp = ""), @Pattern(regexp = "") })
+	public String string;
 
-	Class<? extends Payload>[] payload() default { };
+	/**
+	 * Not allowed.
+	 */
+	@List(value = { @Pattern(regexp = ""), @Pattern(regexp = "") })
+	public Date date;
 }
