@@ -18,9 +18,9 @@
 -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY versionNumber "4.0.2.GA">
+<!ENTITY version "WORKING">
 <!ENTITY copyrightYear "2009">
-<!ENTITY copyrightHolder "Red Hat Middleware, LLC. &amp; Gunnar Morling">
+<!ENTITY copyrightHolder "Red Hat, Inc. &amp; Gunnar Morling">
 ]>
 <book lang="en">
   <bookinfo>
@@ -30,9 +30,9 @@
 
     <subtitle>Reference Guide</subtitle>
 
-    <releaseinfo>&versionNumber;</releaseinfo>
+    <releaseinfo>&version;</releaseinfo>
 
-    <productnumber>&versionNumber;</productnumber>
+    <productnumber>&version;</productnumber>
 
     <copyright>
       <year>&copyrightYear;</year>

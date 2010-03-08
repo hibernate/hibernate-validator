@@ -27,7 +27,7 @@
   and which additional constraints are only provided by Hibernate Validator.
   Let's start with how to add constraints to an entity.</para>
 
-  <section id="validator-usingvalidator-annotate" revision="1">
+  <section id="validator-usingvalidator-annotate">
     <title>Defining constraints</title>
 
     <para>Constraints in Bean Validation are expressed via Java annotations.
@@ -391,7 +391,7 @@ public class Car {
     </section>
   </section>
 
-  <section id="validator-usingvalidator-validate" revision="1">
+  <section id="validator-usingvalidator-validate">
     <title>Validating constraints</title>
 
     <para>The <classname>Validator</classname> interface is the main entry
@@ -666,7 +666,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     </section>
   </section>
 
-  <section id="validator-usingvalidator-validationgroups" revision="1">
+  <section id="validator-usingvalidator-validationgroups">
     <title>Validating groups</title>
 
     <para>Groups allow you to restrict the set of constraints applied during
@@ -856,7 +856,7 @@ public interface CarChecks {
     <para>Last but not least, we show that all constraints are passing by
     validating against all defined groups.</para>
 
-    <section revision="1">
+    <section>
       <title>Group sequences</title>
 
       <para>By default, constraints are evaluated in no particular order and
@@ -964,7 +964,7 @@ public void testOrderedChecksWithRedefinedDefault() {
     </section>
   </section>
 
-  <section id="validator-defineconstraints-builtin" revision="2">
+  <section id="validator-defineconstraints-builtin">
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator implements all of the default constraints

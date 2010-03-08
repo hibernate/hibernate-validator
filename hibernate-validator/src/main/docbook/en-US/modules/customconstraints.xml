@@ -27,7 +27,7 @@
   custom constraints tailored to your specific validation requirements in a
   simple manner.</para>
 
-  <section id="validator-customconstraints-simple" revision="1">
+  <section id="validator-customconstraints-simple">
     <title>Creating a simple constraint</title>
 
     <para>To create a custom constraint, the following three steps are
@@ -47,8 +47,7 @@
       </listitem>
     </itemizedlist>
 
-    <section id="validator-customconstraints-constraintannotation"
-             revision="1">
+    <section id="validator-customconstraints-constraintannotation">
       <title>The constraint annotation</title>
 
       <para>Let's write a constraint annotation, that can be used to express
@@ -196,9 +195,8 @@ public class ContactDetails {
       </itemizedlist>
     </section>
 
-    <section id="validator-customconstraints-validator" revision="1">
-      <title id="section-constraint-validator">The constraint
-      validator</title>
+    <section id="validator-customconstraints-validator">
+      <title id="section-constraint-validator">The constraint validator</title>
 
       <para>Next, we need to implement a constraint validator, that's able to
       validate elements with a <classname>@CheckCase</classname> annotation.
@@ -268,7 +266,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       with the default behavior, we can ignore that parameter for now.</para>
     </section>
 
-    <section id="validator-customconstraints-errormessage" revision="1">
+    <section id="validator-customconstraints-errormessage">
       <title>The error message</title>
 
       <para>Finally we need to specify the error message, that shall be used,
@@ -290,7 +288,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       message in this file.</para>
     </section>
 
-    <section id="validator-customconstraints-using" revision="1">
+    <section id="validator-customconstraints-using">
       <title>Using the constraint</title>
 
       <para>Now that our first custom constraint is completed, we can use it
@@ -394,7 +392,7 @@ public class CarTest {
     </section>
   </section>
 
-  <section id="validator-customconstraints-compound" revision="1">
+  <section id="validator-customconstraints-compound">
     <title>Constraint composition</title>
 
     <para>Looking at the <property>licensePlate</property> field of the

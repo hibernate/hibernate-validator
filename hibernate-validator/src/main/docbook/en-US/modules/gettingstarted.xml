@@ -64,7 +64,7 @@
     </listitem>
   </itemizedlist>
 
-  <section id="validator-gettingstarted-createproject" revision="1">
+  <section id="validator-gettingstarted-createproject">
     <title>Setting up a new Maven project</title>
 
     <para>Start by creating new Maven project using the Maven archetype plugin
@@ -95,13 +95,13 @@
     actual code.</para>
   </section>
 
-  <section id="validator-gettingstarted-createmodel" revision="1">
+  <section id="validator-gettingstarted-createmodel">
     <title>Applying constraints</title>
 
     <para>Open the project in the IDE of your choice and have a look at the
     class <classname>Car</classname>:</para>
 
-    <para><example id="example-class-car" xreflabel="">
+    <para><example id="example-class-car">
         <title>Class Car annotated with constraints</title>
 
         <programlisting language="Java">package com.mycompany;
@@ -158,7 +158,7 @@ public class Car {
     <classname>Validator</classname> instance. Let's have a look at the
     <classname>CarTest</classname> class:</para>
 
-    <example xreflabel="CarTest-example">
+    <example>
       <title>Class CarTest showing validation examples</title>
 
       <programlisting language="Java">package com.mycompany;
@@ -270,7 +270,7 @@ public class CarTest {
     arise.</para>
   </section>
 
-  <section id="validator-gettingstarted-whatsnext" revision="1">
+  <section id="validator-gettingstarted-whatsnext">
     <title>Where to go next?</title>
 
     <para>That concludes our 5 minute tour through the world of Hibernate

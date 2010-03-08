@@ -26,7 +26,7 @@
   annotated domain model) and checked in various different layers of the
   application.</para>
 
-  <section id="validator-checkconstraints-db" revision="2">
+  <section id="validator-checkconstraints-db">
     <title>Database schema-level validation</title>
 
     <para>Out of the box, Hibernate Annotations (as of Hibernate 3.5.x) will
@@ -54,7 +54,7 @@
     <para>Hibernate Validator integrates with both Hibernate and all pure Java
     Persistence providers.</para>
 
-    <section id="validator-checkconstraints-orm-hibernateevent" revision="1">
+    <section id="validator-checkconstraints-orm-hibernateevent">
       <title>Hibernate event-based validation</title>
 
       <para>Hibernate Validator has a built-in Hibernate event listener -

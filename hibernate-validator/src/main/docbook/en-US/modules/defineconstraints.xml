@@ -21,7 +21,7 @@
 <chapter id="validator-defineconstraints">
   <title>Defining constraints</title>
 
-  <section id="validator-defineconstraints-definition" revision="1">
+  <section id="validator-defineconstraints-definition">
     <title>What is a constraint?</title>
 
     <para>A constraint is a rule that a given element (field, property or
@@ -31,7 +31,7 @@
     element.</para>
   </section>
 
-  <section id="foo" revision="2">
+  <section id="foo">
     <title>Built in constraints</title>
 
     <para>Hibernate Validator comes with some built-in constraints, which
@@ -251,7 +251,7 @@
     </table>
   </section>
 
-  <section id="validator-defineconstraints-error" xreflabel="Error messages">
+  <section id="validator-defineconstraints-error">
     <title>Error messages</title>
 
     <para>Hibernate Validator comes with a default set of error messages
@@ -272,7 +272,7 @@
     JavaDoc for more informations).</para>
   </section>
 
-  <section id="validator-defineconstraints-own" revision="1">
+  <section id="validator-defineconstraints-own">
     <title>Writing your own constraints</title>
 
     <para>Extending the set of built-in constraints is extremely easy. Any
