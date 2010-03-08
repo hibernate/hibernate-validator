@@ -118,7 +118,7 @@ public class TestUtil {
 			actualMessages.add( violation.getMessage() );
 		}
 
-		assertTrue( actualMessages.size() == messages.length, "Wrong number or error messages" );
+		assertTrue( actualMessages.size() == messages.length, "Wrong number of error messages" );
 
 		for ( String expectedMessage : messages ) {
 			assertTrue(
@@ -128,11 +128,11 @@ public class TestUtil {
 			actualMessages.remove( expectedMessage );
 		}
 		assertTrue(
-				actualMessages.isEmpty(), "Actual messages contained more messages as specidied expected messages"
+				actualMessages.isEmpty(), "Actual messages contained more messages as specified expected messages"
 		);
 	}
 
-	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations, Class<?>... expectedConsraintTypes) {
+	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations, Class<?>... expectedConstraintTypes) {
 		List<String> actualConstraintTypes = new ArrayList<String>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualConstraintTypes.add(
@@ -141,10 +141,10 @@ public class TestUtil {
 		}
 
 		assertEquals(
-				expectedConsraintTypes.length, actualConstraintTypes.size(), "Wrong number of constraint types."
+				expectedConstraintTypes.length, actualConstraintTypes.size(), "Wrong number of constraint types."
 		);
 
-		for ( Class<?> expectedConstraintType : expectedConsraintTypes ) {
+		for ( Class<?> expectedConstraintType : expectedConstraintTypes ) {
 			assertTrue(
 					actualConstraintTypes.contains( expectedConstraintType.getName() ),
 					"The constraint type " + expectedConstraintType.getName() + " should have been violated."

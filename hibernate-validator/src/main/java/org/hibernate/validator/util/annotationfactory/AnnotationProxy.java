@@ -17,15 +17,15 @@
 */
 package org.hibernate.validator.util.annotationfactory;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Comparator;
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.security.AccessController;
 
 import org.hibernate.validator.util.GetDeclaredMethods;
 
@@ -53,21 +53,20 @@ import org.hibernate.validator.util.GetDeclaredMethods;
  * @author Davide Marchignoli
  * @see java.lang.annotation.Annotation
  */
-public class AnnotationProxy implements Annotation, InvocationHandler {
+public class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
+	private static final long serialVersionUID = 6907601010599429454L;
 	private final Class<? extends Annotation> annotationType;
-	//FIXME it's probably better to use String as a key rather than Method
-	//      to speed up and avoid any fancy permsize/GC issue
-	//      I'd better check the litterature on the subject
-	private final Map<Method, Object> values;
+	private final Map<String, Object> values;
+
 
 	public AnnotationProxy(AnnotationDescriptor descriptor) {
 		this.annotationType = descriptor.type();
 		values = getAnnotationValues( descriptor );
 	}
 
-	private Map<Method, Object> getAnnotationValues(AnnotationDescriptor descriptor) {
-		Map<Method, Object> result = new HashMap<Method, Object>();
+	private Map<String, Object> getAnnotationValues(AnnotationDescriptor descriptor) {
+		Map<String, Object> result = new HashMap<String, Object>();
 		int processedValuesFromDescriptor = 0;
 		GetDeclaredMethods action = GetDeclaredMethods.action( annotationType );
 		final Method[] declaredMethods;
@@ -79,25 +78,25 @@ public class AnnotationProxy implements Annotation, InvocationHandler {
 		}
 		for ( Method m : declaredMethods ) {
 			if ( descriptor.containsElement( m.getName() ) ) {
-				result.put( m, descriptor.valueOf( m.getName() ) );
+				result.put( m.getName(), descriptor.valueOf( m.getName() ) );
 				processedValuesFromDescriptor++;
 			}
 			else if ( m.getDefaultValue() != null ) {
-				result.put( m, m.getDefaultValue() );
+				result.put( m.getName(), m.getDefaultValue() );
 			}
 			else {
 				throw new IllegalArgumentException( "No value provided for " + m.getName() );
 			}
 		}
 		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
-			throw new RuntimeException( "Trying to instanciate " + annotationType + " with unknown paramters." );
+			throw new RuntimeException( "Trying to instantiate " + annotationType + " with unknown paramters." );
 		}
 		return result;
 	}
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		if ( values.containsKey( method ) ) {
-			return values.get( method );
+		if ( values.containsKey( method.getName() ) ) {
+			return values.get( method.getName() );
 		}
 		return method.invoke( this, args );
 	}
@@ -109,8 +108,8 @@ public class AnnotationProxy implements Annotation, InvocationHandler {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		result.append( '@' ).append( annotationType().getName() ).append( '(' );
-		for ( Method m : getRegisteredMethodsInAlphabeticalOrder() ) {
-			result.append( m.getName() ).append( '=' ).append( values.get( m ) ).append( ", " );
+		for ( String s : getRegisteredMethodsInAlphabeticalOrder() ) {
+			result.append( s ).append( '=' ).append( values.get( s ) ).append( ", " );
 		}
 		// remove last separator:
 		if ( values.size() > 0 ) {
@@ -124,15 +123,8 @@ public class AnnotationProxy implements Annotation, InvocationHandler {
 		return result.toString();
 	}
 
-	private SortedSet<Method> getRegisteredMethodsInAlphabeticalOrder() {
-		SortedSet<Method> result = new TreeSet<Method>(
-				new Comparator<Method>() {
-					public int compare(Method o1, Method o2) {
-						return o1.getName().compareTo( o2.getName() );
-					}
-				}
-		);
-		//List<Method> result = new LinkedList<Method>();
+	private SortedSet<String> getRegisteredMethodsInAlphabeticalOrder() {
+		SortedSet<String> result = new TreeSet<String>();
 		result.addAll( values.keySet() );
 		return result;
 	}
