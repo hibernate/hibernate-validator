@@ -40,6 +40,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)
 public @interface URL {
+	public abstract String protocol() default "";
+
+	public abstract String host() default "";
+
+	public abstract int port() default -1;
+
 	public abstract String message() default "{org.hibernate.validator.constraints.URL.message}";
 
 	public abstract Class<?>[] groups() default { };

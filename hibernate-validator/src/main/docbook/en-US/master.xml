@@ -19,26 +19,32 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY version "WORKING">
+<!ENTITY today "TODAY">
 <!ENTITY copyrightYear "2009">
 <!ENTITY copyrightHolder "Red Hat, Inc. &amp; Gunnar Morling">
 ]>
 <book lang="en">
   <bookinfo>
     <title>Hibernate Validator</title>
-
     <subtitle>JSR 303 Reference Implementation</subtitle>
-
     <subtitle>Reference Guide</subtitle>
-
     <releaseinfo>&version;</releaseinfo>
-
+    <pubdate>&today;</pubdate>          
     <productnumber>&version;</productnumber>
-
     <copyright>
       <year>&copyrightYear;</year>
-
       <holder>&copyrightHolder;</holder>
     </copyright>
+    <authorgroup>
+      <author>
+        <firstname>Hardy</firstname>
+        <surname>Ferentschik</surname>
+      </author>
+      <author>
+        <firstname>Gunnar</firstname>
+        <surname>Morling</surname>
+      </author>               
+    </authorgroup>             
   </bookinfo>
 
   <toc></toc>

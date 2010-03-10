@@ -281,7 +281,7 @@
     <emphasis>validator</emphasis> (the implementation class). Here is a
     simple user-defined descriptor:</para>
 
-    <programlisting>@ValidatorClass(CapitalizedValidator.class)
+    <programlisting role="JAVA" language="JAVA">@ValidatorClass(CapitalizedValidator.class)
 @Target(METHOD)
 @Retention(RUNTIME)
 @Documented
@@ -305,7 +305,7 @@ public @interface Capitalized {
     good practice. See <xref linkend="validator-defineconstraints-error" />
     .</para>
 
-    <programlisting>@ValidatorClass(CapitalizedValidator.class)
+    <programlisting role="JAVA" language="JAVA">@ValidatorClass(CapitalizedValidator.class)
 @Target(METHOD)
 @Retention(RUNTIME)
 @Documented
@@ -333,7 +333,7 @@ validator.capitalized = <literal>Capitalization is not {type}</literal>
     database level (by implementing
     <literal>PersistentClassConstraint</literal> )</para>
 
-    <programlisting>public class CapitalizedValidator
+    <programlisting role="JAVA" language="JAVA">public class CapitalizedValidator
         implements Validator&lt;Capitalized&gt;, PropertyConstraint {
     private CapitalizeType type;
 
@@ -372,7 +372,7 @@ validator.capitalized = <literal>Capitalization is not {type}</literal>
     parameters) on the same property or type, you can use the following
     annotation form:</para>
 
-    <programlisting>@Target(METHOD)
+    <programlisting role="JAVA" language="JAVA">@Target(METHOD)
 @Retention(RUNTIME)
 @Documented
 <emphasis role="bold">public @interface Patterns {</emphasis>
@@ -397,7 +397,7 @@ public @interface Pattern {
     <para>Since you are already familiar with annotations now, the syntax
     should be very familiar</para>
 
-    <programlisting>public class Address {
+    <programlisting role="JAVA" language="JAVA">public class Address {
     private String line1;
     private String line2;
     private String zip;
@@ -456,7 +456,7 @@ public @interface Pattern {
     <para>While the example only shows public property validation, you can
     also annotate fields of any kind of visibility</para>
 
-    <programlisting>@MyBeanConstraint(max=45
+    <programlisting role="JAVA" language="JAVA">@MyBeanConstraint(max=45
 public class Dog {
     @AssertTrue private boolean isMale;
     @NotNull protected String getName() { ... };
@@ -467,7 +467,7 @@ public class Dog {
     superclasses and interfaces extended or implemented by a given bean to
     read the appropriate validator annotations.</para>
 
-    <programlisting>public interface Named {
+    <programlisting role="JAVA" language="JAVA">public interface Named {
     @NotNull String getName();
     ...
 }

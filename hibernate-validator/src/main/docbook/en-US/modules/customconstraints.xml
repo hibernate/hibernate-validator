@@ -65,7 +65,7 @@
         <title>Enum <classname>CaseMode</classname> to express upper vs. lower
         case</title>
 
-        <programlisting>package com.mycompany;
+        <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 public enum CaseMode {
     UPPER, 
@@ -80,7 +80,7 @@ public enum CaseMode {
       <example>
         <title>Defining CheckCase constraint annotation</title>
 
-        <programlisting>package com.mycompany;
+        <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
@@ -135,7 +135,7 @@ public @interface CheckCase {
           objects to a constraint. This attribute is not used by the API
           itself. <tip>
               <para>An examle for a custom payload could be the definition of
-              a severity. <programlisting>public class Severity {
+              a severity.</para> <programlisting>public class Severity {
     public static class Info extends ConstraintPayload {};
     public static class Error extends ConstraintPayload {};
 }
@@ -148,7 +148,7 @@ public class ContactDetails {
     private String phoneNumber;
 
     // ...
-}</programlisting>Now a client can after the validation of a
+}</programlisting><para>Now a client can after the validation of a
               <classname>ContactDetails</classname> instance access the
               severity of a constraint using
               <methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname>
@@ -207,7 +207,7 @@ public class ContactDetails {
         <title>Implementing a constraint validator for the constraint
         <classname>CheckCase</classname></title>
 
-        <programlisting>package com.mycompany;
+        <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -301,7 +301,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
         <title>Applying the <classname>CheckCase</classname>
         constraint</title>
 
-        <programlisting>package com.mycompany;
+        <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -340,7 +340,7 @@ public class Car {
         <title>Testcase demonstrating the <classname>CheckCase</classname>
         validation</title>
 
-        <programlisting>package com.mycompany;
+        <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 import static org.junit.Assert.*;
 
@@ -414,7 +414,7 @@ public class CarTest {
       <title>Creating a composing constraint
       <classname>ValidLicensePlate</classname></title>
 
-      <programlisting>package com.mycompany;
+      <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
@@ -463,7 +463,7 @@ public @interface ValidLicensePlate {
       <title>Application of composing constraint
       <classname>ValidLicensePlate</classname></title>
 
-      <programlisting>package com.mycompany;
+      <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 public class Car {
 
@@ -487,7 +487,7 @@ public class Car {
     <example>
       <title>Usage of <classname>@ReportAsSingleViolation</classname></title>
 
-      <programlisting>//...
+      <programlisting role="JAVA" language="JAVA">//...
 @ReportAsSingleViolation
 public @interface ValidLicensePlate {
 

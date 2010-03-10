@@ -102,7 +102,7 @@
         <title>Manual configuration of
         <classname>BeanValidationEvenListener</classname></title>
 
-        <programlisting>&lt;hibernate-configuration&gt;
+        <programlisting role="XML" language="XML">&lt;hibernate-configuration&gt;
     &lt;session-factory&gt;
        ...
        &lt;property name="javax.persistence.validation.group.pre-persist"&gt;javax.validation.groups.Default&lt;/property&gt;
@@ -110,13 +110,13 @@
        &lt;property name="javax.persistence.validation.group.pre-remove"&gt;&lt;/property&gt;
        ...
        &lt;event type="pre-update"&gt;
-         &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
+         &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
        &lt;/event&gt;
        &lt;event type="pre-insert"&gt;
-         &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
+         &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
        &lt;/event&gt;
        &lt;event type="pre-delete"&gt;
-         &lt;listener class="<classname>org.hibernate.cfg.beanvalidation.BeanValidationEventListener</classname>"/&gt;
+         &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
        &lt;/event&gt;
     &lt;/session-factory&gt;
 &lt;/hibernate-configuration&gt;</programlisting>

@@ -52,7 +52,7 @@
     <example id="example-validation-xml">
       <title>validation.xml</title>
 
-      <programlisting>&lt;validation-config xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+      <programlisting role="XML" language="XML">&lt;validation-config xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration"&gt;
     &lt;default-provider&gt;org.hibernate.validator.HibernateValidator&lt;/default-provider&gt;
@@ -129,7 +129,7 @@
     <example id="example-constraints-car">
       <title>constraints-car.xml</title>
 
-      <programlisting>&lt;constraint-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      <programlisting role="XML" language="XML">&lt;constraint-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
                      xmlns="http://jboss.org/xml/ns/javax/validation/mapping"&gt;
     &lt;default-package&gt;org.hibernate.validator.quickstart&lt;/default-package&gt;

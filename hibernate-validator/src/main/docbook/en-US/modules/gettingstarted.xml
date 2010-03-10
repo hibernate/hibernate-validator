@@ -101,10 +101,10 @@
     <para>Open the project in the IDE of your choice and have a look at the
     class <classname>Car</classname>:</para>
 
-    <para><example id="example-class-car">
+    <example id="example-class-car">
         <title>Class Car annotated with constraints</title>
 
-        <programlisting language="Java">package com.mycompany;
+        <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -112,14 +112,14 @@ import javax.validation.constraints.Size;
 
 public class Car {
 
-    <emphasis role="bold">@NotNull</emphasis>
+    @NotNull
     private String manufacturer;
 
-    <emphasis role="bold">@NotNull</emphasis>
-    <emphasis role="bold">@Size(min = 2, max = 14)</emphasis>
+    @NotNull
+    @Size(min = 2, max = 14)
     private String licensePlate;
 
-    <emphasis role="bold">@Min(2)</emphasis>
+    @Min(2)
     private int seatCount;
     
     public Car(String manufacturer, String licencePlate, int seatCount) {
@@ -130,7 +130,7 @@ public class Car {
 
     //getters and setters ...
 }</programlisting>
-      </example><classname>@NotNull</classname>, <classname>@Size</classname>
+      </example><para><classname>@NotNull</classname>, <classname>@Size</classname>
     and <classname>@Min</classname> are so-called constraint annotations, that
     we use to declare constraints, which shall be applied to the fields of a
     <classname>Car</classname> instance:</para>
@@ -161,7 +161,7 @@ public class Car {
     <example>
       <title>Class CarTest showing validation examples</title>
 
-      <programlisting language="Java">package com.mycompany;
+      <programlisting role="JAVA" language="JAVA">package com.mycompany;
 
 import static org.junit.Assert.*;
 

@@ -176,7 +176,7 @@
                         <format>
                             <formatName>pdf</formatName>
                             <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl</stylesheetResource>
-                            <finalName>hibernate_reference.pdf</finalName>
+                            <finalName>hibernate_validator_reference.pdf</finalName>
                         </format>
                         <format>
                             <formatName>html_single</formatName>

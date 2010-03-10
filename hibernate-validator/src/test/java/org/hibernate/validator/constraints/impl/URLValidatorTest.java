@@ -17,16 +17,17 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 /**
- * Tests the {@code Url} constraint.
+ * Tests the {@code URL} constraint. See HV-229
  *
  * @author Hardy Ferentschik
  */
@@ -35,14 +36,73 @@ public class URLValidatorTest {
 	@Test
 	public void testIsValidUrl() {
 		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
-		descriptor.setValue( "message", "{org.hibernate.validator.constraints.URL.message}" );
 		URL url = AnnotationFactory.create( descriptor );
 		URLValidator validator = new URLValidator();
 		validator.initialize( url );
+
 		assertTrue( validator.isValid( null, null ) );
 		assertFalse( validator.isValid( "", null ) );
 		assertFalse( validator.isValid( "http", null ) );
 		assertFalse( validator.isValid( "ftp//abc.de", null ) );
 		assertTrue( validator.isValid( "ftp://abc.de", null ) );
+	}
+
+
+	@Test
+	public void testIsValidUrlWithProtocolSpecified() {
+		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
+		descriptor.setValue( "protocol", "http" );
+		URL url = AnnotationFactory.create( descriptor );
+		URLValidator validator = new URLValidator();
+		validator.initialize( url );
+
+		assertFalse( validator.isValid( "ftp://abc.de", null ) );
+		assertTrue( validator.isValid( "http://abc.de", null ) );
+
+		descriptor = new AnnotationDescriptor<URL>( URL.class );
+		descriptor.setValue( "protocol", "file" );
+		url = AnnotationFactory.create( descriptor );
+		validator = new URLValidator();                             
+		validator.initialize( url );
+		assertFalse( validator.isValid( "http://abc.de", null ) );
+		assertTrue( validator.isValid( "file://Users/foobar/tmp", null ) );
+	}
+
+	@Test
+	public void testIsValidUrlWithPortSpecified() {
+		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
+		descriptor.setValue( "port", 21 );
+		URL url = AnnotationFactory.create( descriptor );
+		URLValidator validator = new URLValidator();
+		validator.initialize( url );
+
+		assertFalse( validator.isValid( "ftp://abc.de", null ) );
+		assertTrue( validator.isValid( "ftp://abc.de:21", null ) );
+	}
+
+	@Test
+	public void testIsValidUrlWithHostSpecified() {
+		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
+		descriptor.setValue( "host", "foobar.com" );
+		URL url = AnnotationFactory.create( descriptor );
+		URLValidator validator = new URLValidator();
+		validator.initialize( url );
+
+		assertFalse( validator.isValid( "http://fubar.com/this/is/foobar.html", null ) );
+		assertTrue( validator.isValid( "http://foobar.com/this/is/foobar.html", null ) );
+	}
+
+	@Test
+	public void testIsValidUrlWithProtocolHostAndPort() {
+		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
+		descriptor.setValue( "protocol", "http" );
+		descriptor.setValue( "host", "www.hibernate.org" );
+		descriptor.setValue( "port", 80 );
+		URL url = AnnotationFactory.create( descriptor );
+		URLValidator validator = new URLValidator();
+		validator.initialize( url );
+
+		assertFalse( validator.isValid( "ftp://www#hibernate#org:80", null ) );
+		assertTrue( validator.isValid( "http://www.hibernate.org:80", null ) );
 	}
 }
