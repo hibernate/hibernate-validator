@@ -1,7 +1,7 @@
-// $Id: Length.java 17427 2009-08-27 09:47:28Z hardy.ferentschik $
+//$Id$
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2008, Red Hat Middleware LLC, and individual contributors
+* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import org.hibernate.validator.constraints.impl.URLValidator;
+import org.hibernate.validator.constraints.impl.CreditCardNumberValidator;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -33,22 +33,18 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validate that the string is a valid URL.
+ * The annotated element has to represent a valid
+ * credit card number. This is the Luhn algorithm implementation
+ * which aims to check for user mistake, not credit card validity!
  *
- * @author Hardy Ferentschik
+ * @author Emmanuel Bernard
  */
 @Documented
-@Constraint(validatedBy = URLValidator.class)
+@Constraint(validatedBy = CreditCardNumberValidator.class)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface URL {
-	public abstract String protocol() default "";
-
-	public abstract String host() default "";
-
-	public abstract int port() default -1;
-
-	public abstract String message() default "{org.hibernate.validator.constraints.URL.message}";
+public @interface CreditCardNumber {
+	public abstract String message() default "{org.hibernate.validator.constraints.CreditCardNumber.message}";
 
 	public abstract Class<?>[] groups() default { };
 
