@@ -64,6 +64,24 @@
     </listitem>
   </itemizedlist>
 
+  <note>
+    <para>Hibernate Validator uses JAXB for XML parsing. JAXB is part of the
+    Java Class Library since Java 6 which means that if you run Hibernate
+    Validator with Java 5 you will have to add additional JAXB dependecies.
+    Using maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;
+    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;
+    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;
+    &lt;version&gt;2.2&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;
+    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;
+    &lt;version&gt;2.1.12&lt;/version&gt;
+&lt;/dependency&gt;
+</programlisting> if you are using the SourceForge package you find the
+    necessary libraries in the <filename>lib/jdk5</filename> directory.</para>
+  </note>
+
   <section id="validator-gettingstarted-createproject">
     <title>Setting up a new Maven project</title>
 
@@ -102,9 +120,9 @@
     class <classname>Car</classname>:</para>
 
     <example id="example-class-car">
-        <title>Class Car annotated with constraints</title>
+      <title>Class Car annotated with constraints</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+      <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -130,9 +148,11 @@ public class Car {
 
     //getters and setters ...
 }</programlisting>
-      </example><para><classname>@NotNull</classname>, <classname>@Size</classname>
-    and <classname>@Min</classname> are so-called constraint annotations, that
-    we use to declare constraints, which shall be applied to the fields of a
+    </example>
+
+    <para><classname>@NotNull</classname>, <classname>@Size</classname> and
+    <classname>@Min</classname> are so-called constraint annotations, that we
+    use to declare constraints, which shall be applied to the fields of a
     <classname>Car</classname> instance:</para>
 
     <itemizedlist>
@@ -161,7 +181,7 @@ public class Car {
     <example>
       <title>Class CarTest showing validation examples</title>
 
-      <programlisting role="JAVA" language="JAVA">package com.mycompany;
+      <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import static org.junit.Assert.*;
 
@@ -274,10 +294,10 @@ public class CarTest {
     <title>Where to go next?</title>
 
     <para>That concludes our 5 minute tour through the world of Hibernate
-    Validator. Continue exploring the code or look at further examples
-    referenced in <xref linkend="chapter-further-reading" />. To get a deeper
-    understanding of the Bean Validation just continue reading.<xref
-    linkend="validator-usingvalidator" />. In case your application has
+    Validator. Continue exploring the code examples or look at further
+    examples referenced in <xref linkend="chapter-further-reading" />. To
+    deepen your understanding of Hibernate Validator just continue reading
+    <xref linkend="validator-usingvalidator" />. In case your application has
     specific validation requirements have a look at <xref
     linkend="validator-customconstraints" />.</para>
   </section>
