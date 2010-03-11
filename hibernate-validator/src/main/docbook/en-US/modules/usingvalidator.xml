@@ -55,7 +55,7 @@
       <example id="example-field-level">
         <title>Field level constraint</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.constraints.NotNull;
 
@@ -105,7 +105,7 @@ public class Car {
       <example id="example-property-level">
         <title>Property level constraint</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
@@ -175,9 +175,9 @@ public class Car {
       cannot be more passengers in a car than there are seats.</para>
 
       <example id="example-class-level">
-          <title>Class level constraint</title>
+        <title>Class level constraint</title>
 
-          <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -206,7 +206,7 @@ public class Car {
 
     //getters and setters ...
 }</programlisting>
-        </example>
+      </example>
     </section>
 
     <section>
@@ -221,7 +221,7 @@ public class Car {
       <example>
         <title>Constraint inheritance using RentalCar</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.constraints.NotNull;
 
@@ -246,7 +246,7 @@ public class RentalCar extends Car {
       </example>
 
       <para>Our well-known class <classname>Car</classname> from <xref
-        linkend="example-class-car" /> is now extended by
+      linkend="example-class-car" /> is now extended by
       <classname>RentalCar</classname> with the additional property
       <property>rentalStation</property>. If an instance of
       <classname>RentalCar</classname> is validated, not only the
@@ -279,7 +279,7 @@ public class RentalCar extends Car {
       <example>
         <title>Class Person</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.constraints.NotNull;
 
@@ -306,7 +306,7 @@ public class Person {
       <example id="example-car-with-driver">
         <title>Adding a driver to the car</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -359,7 +359,7 @@ public class Car {
       <example>
         <title>Car with a list of passengers</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -409,12 +409,16 @@ public class Car {
       <classname>ValidatorFactory</classname>. The easiest way is to use the
       static
       <methodname>Validation.buildDefaultValidatorFactory()</methodname>
-      method:</para><example>
-          <title>Validation.buildDefaultValidatorFactory()</title>
+      method:</para>
 
-          <programlisting role="JAVA" language="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+      <example>
+        <title>Validation.buildDefaultValidatorFactory()</title>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 Validator validator = factory.getValidator();</programlisting>
-        </example><para>For other ways of obtaining a Validator instance see <xref
+      </example>
+
+      <para>For other ways of obtaining a Validator instance see <xref
       linkend="validator-bootstrapping" />. For now we just want to see how we
       can use the <classname>Validator</classname> instance to validate entity
       instances.</para>
@@ -452,7 +456,7 @@ Validator validator = factory.getValidator();</programlisting>
           <title>Usage of
           <methodname>Validator.validate()</methodname></title>
 
-          <programlisting role="JAVA" language="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+          <programlisting language="JAVA" role="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 Validator validator = factory.getValidator();
 
 Car car = new Car(null);
@@ -475,7 +479,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           <title>Usage of
           <methodname>Validator.validateProperty()</methodname></title>
 
-          <programlisting role="JAVA" language="JAVA">Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+          <programlisting language="JAVA" role="JAVA">Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 Car car = new Car(null);
 
@@ -501,7 +505,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           <title>Usage of
           <methodname>Validator.validateValue()</methodname></title>
 
-          <programlisting role="JAVA" language="JAVA">Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+          <programlisting language="JAVA" role="JAVA">Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateValue(Car.class, "manufacturer", null);
 
@@ -666,6 +670,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
   <section id="validator-usingvalidator-validationgroups">
     <title>Validating groups</title>
+
     <para>Groups allow you to restrict the set of constraints applied during
     validation. This makes for example wizard like validation possible where
     in each step only a specified subset of constraints get validated. The
@@ -679,15 +684,18 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     </classname>constraint on <property>name</property>. Since no group is
     specified for this annotation its default group is
     <classname>javax.validation.groups.Default</classname>.</para>
+
     <note>
       <para>When more than one group is requested, the order in which the
       groups are evaluated is not deterministic. If no group is specified the
       default group <classname>javax.validation.groups.Default</classname> is
       assumed.</para>
     </note>
+
     <example id="example-person">
-        <title>Person</title>
-        <programlisting role="JAVA" language="JAVA">public class Person {
+      <title>Person</title>
+
+      <programlisting language="JAVA" role="JAVA">public class Person {
     @NotNull
     private String name;
 
@@ -697,7 +705,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     // getters and setters ...
 }</programlisting>
     </example>
-    
+
     <para>Next we have the class <classname>Driver</classname> (<xref
     linkend="example-driver" />) extending <classname>Person</classname>. Here
     we are adding the properties <property>age</property> and
@@ -710,15 +718,17 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     Using interfaces makes the usage of groups type safe and allows for easy
     refactoring. It also means that groups can inherit from each other via
     class inheritance.</para>
+
     <note>
-        <para>The Bean Validation specification does not enforce that groups
-        have to be interfaces. Non interface classes could be used as well,
-        but we recommend to stick to interfaces.
-        </para>
+      <para>The Bean Validation specification does not enforce that groups
+      have to be interfaces. Non interface classes could be used as well, but
+      we recommend to stick to interfaces.</para>
     </note>
+
     <example id="example-driver">
-        <title>Driver</title>
-        <programlisting role="JAVA" language="JAVA">public class Driver extends Person {
+      <title>Driver</title>
+
+      <programlisting language="JAVA" role="JAVA">public class Driver extends Person {
     @Min(value = 18, message = "You have to be 18 to drive a car", groups = DriverChecks.class)
     public int age;
 
@@ -742,24 +752,26 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     }
 }</programlisting>
     </example>
+
     <example id="example-group-interfaces">
-        <title>Group interfaces</title>
-        <programlisting role="JAVA" language="JAVA">public interface DriverChecks {
+      <title>Group interfaces</title>
+
+      <programlisting language="JAVA" role="JAVA">public interface DriverChecks {
 }
 
 public interface CarChecks {
 }</programlisting>
     </example>
+
     <para>Last but not least we add the property
     <property>passedVehicleInspection</property> to the
     <classname>Car</classname> class (<xref linkend="example-car" />)
-    indicating whether a car passed the road worthy tests.
-    </para>
-    <example
-        id="example-car">
-        <title>Car</title>
+    indicating whether a car passed the road worthy tests.</para>
 
-        <programlisting role="JAVA" language="JAVA">public class Car {
+    <example id="example-car">
+      <title>Car</title>
+
+      <programlisting language="JAVA" role="JAVA">public class Car {
     @NotNull
     private String manufacturer;
 
@@ -782,7 +794,8 @@ public interface CarChecks {
         this.seatCount = seatCount;
     }
 }</programlisting>
-     </example>
+    </example>
+
     <para>Overall three different groups are used in our example.
     <property>Person.name</property>, <property>Car.manufacturer</property>,
     <property>Car.licensePlate</property> and
@@ -794,11 +807,12 @@ public interface CarChecks {
     <classname>CarChecks</classname>. <xref linkend="example-drive-away" />
     shows how passing different group combinations to the
     <methodname>Validator.validate</methodname> method result in different
-    validation results.
-    </para>
+    validation results.</para>
+
     <example id="example-drive-away">
-        <title>Drive away</title>
-        <programlisting role="JAVA" language="JAVA">public class GroupTest {
+      <title>Drive away</title>
+
+      <programlisting language="JAVA" role="JAVA">public class GroupTest {
 
     private static Validator validator;
 
@@ -841,25 +855,22 @@ public interface CarChecks {
     }
 }</programlisting>
     </example>
-    <para>First we create a car and validate it using no explicit group.
-    There are no validation errors, even though the property
+
+    <para>First we create a car and validate it using no explicit group. There
+    are no validation errors, even though the property
     <property>passedVehicleInspection</property> is per default
     <constant>false</constant>. However, the constraint defined on this
-    property does not belong to the default group.
-
-    Next we just validate the <classname>CarChecks</classname> group
-    which will fail until we make sure that the car passes the vehicle
-    inspection.
-
-    When we then add a driver to the car and validate against
-    <classname>DriverChecks</classname> we get again a constraint violation
-    due to the fact that the driver has not yet passed the driving test. Only
-    after setting <property>passedDrivingTest</property> to true the
-    validation against <classname>DriverChecks</classname> will pass.</para>
+    property does not belong to the default group. Next we just validate the
+    <classname>CarChecks</classname> group which will fail until we make sure
+    that the car passes the vehicle inspection. When we then add a driver to
+    the car and validate against <classname>DriverChecks</classname> we get
+    again a constraint violation due to the fact that the driver has not yet
+    passed the driving test. Only after setting
+    <property>passedDrivingTest</property> to true the validation against
+    <classname>DriverChecks</classname> will pass.</para>
 
     <para>Last but not least, we show that all constraints are passing by
-    validating against all defined groups.
-    </para>
+    validating against all defined groups.</para>
 
     <section>
       <title>Group sequences</title>
@@ -883,12 +894,12 @@ public interface CarChecks {
       </note>
 
       <example>
-          <title>Interface with @GroupSequence</title>
+        <title>Interface with @GroupSequence</title>
 
-          <programlisting role="JAVA" language="JAVA">@GroupSequence({Default.class, CarChecks.class, DriverChecks.class})
+        <programlisting language="JAVA" role="JAVA">@GroupSequence({Default.class, CarChecks.class, DriverChecks.class})
 public interface OrderedChecks {
 }</programlisting>
-        </example>
+      </example>
 
       <para><warning>
           <para>Groups defining a sequence and groups composing a sequence
@@ -902,7 +913,7 @@ public interface OrderedChecks {
       <example id="example-group-sequence">
         <title>Usage of a group sequence</title>
 
-        <programlisting role="JAVA" language="JAVA">@Test
+        <programlisting language="JAVA" role="JAVA">@Test
 public void testOrderedChecks() {
     Car car = new Car( "Morris", "DD-AB-123", 2 );
     car.setPassedVehicleInspection( true );
@@ -934,7 +945,7 @@ public void testOrderedChecks() {
       <example id="example-rental-car">
         <title>RentalCar</title>
 
-        <programlisting role="JAVA" language="JAVA">@GroupSequence({ RentalCar.class, CarChecks.class })
+        <programlisting language="JAVA" role="JAVA">@GroupSequence({ RentalCar.class, CarChecks.class })
 public class RentalCar extends Car {
     public RentalCar(String manufacturer, String licencePlate, int seatCount) {
         super( manufacturer, licencePlate, seatCount );
@@ -945,7 +956,7 @@ public class RentalCar extends Car {
       <example id="example-testOrderedChecksWithRedefinedDefault">
         <title>testOrderedChecksWithRedefinedDefault</title>
 
-        <programlisting role="JAVA" language="JAVA">@Test
+        <programlisting language="JAVA" role="JAVA">@Test
 public void testOrderedChecksWithRedefinedDefault() {
     RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
     rentalCar.setPassedVehicleInspection( true );
@@ -1005,7 +1016,7 @@ public void testOrderedChecksWithRedefinedDefault() {
 
             <entry>field/property</entry>
 
-            <entry>check that the annotated element is
+            <entry>Check that the annotated element is
             <constant>false</constant>.</entry>
 
             <entry>none</entry>
@@ -1018,8 +1029,25 @@ public void testOrderedChecksWithRedefinedDefault() {
 
             <entry>field/property</entry>
 
-            <entry>check that the annotated element is
+            <entry>Check that the annotated element is
             <constant>true</constant>.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
+            <entry>@CreditCardNumber</entry>
+
+            <entry>no</entry>
+
+            <entry>field/property. The supported type is
+            <classname>String</classname>.</entry>
+
+            <entry>Check that the annotated string passes the Luhn checksum
+            test. Note, this validation aims to check for user mistake, not
+            credit card validity! See also <ulink
+            url="http://www.merriampark.com/anatomycc.htm">Anatomy of Credit
+            Card Numbers</ulink>.</entry>
 
             <entry>none</entry>
           </row>
@@ -1263,9 +1291,9 @@ public void testOrderedChecksWithRedefinedDefault() {
           <row>
             <entry>@URL(protocol=, host=, port=)</entry>
 
-            <entry>yes</entry>
+            <entry>no</entry>
 
-            <entry>field/property. Supported types are
+            <entry>field/property. The supported type is
             <classname>String</classname>.</entry>
 
             <entry>Check if the annotated string is a valid URL. If any of
