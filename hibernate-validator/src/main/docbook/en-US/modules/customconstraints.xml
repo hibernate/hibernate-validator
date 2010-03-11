@@ -65,7 +65,7 @@
         <title>Enum <classname>CaseMode</classname> to express upper vs. lower
         case</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 public enum CaseMode {
     UPPER, 
@@ -80,7 +80,7 @@ public enum CaseMode {
       <example>
         <title>Defining CheckCase constraint annotation</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
@@ -135,7 +135,9 @@ public @interface CheckCase {
           objects to a constraint. This attribute is not used by the API
           itself. <tip>
               <para>An examle for a custom payload could be the definition of
-              a severity.</para> <programlisting>public class Severity {
+              a severity.</para>
+
+              <programlisting>public class Severity {
     public static class Info extends ConstraintPayload {};
     public static class Error extends ConstraintPayload {};
 }
@@ -148,7 +150,9 @@ public class ContactDetails {
     private String phoneNumber;
 
     // ...
-}</programlisting><para>Now a client can after the validation of a
+}</programlisting>
+
+              <para>Now a client can after the validation of a
               <classname>ContactDetails</classname> instance access the
               severity of a constraint using
               <methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname>
@@ -196,18 +200,19 @@ public class ContactDetails {
     </section>
 
     <section id="validator-customconstraints-validator">
-      <title id="section-constraint-validator">The constraint validator</title>
+      <title id="section-constraint-validator">The constraint
+      validator</title>
 
       <para>Next, we need to implement a constraint validator, that's able to
       validate elements with a <classname>@CheckCase</classname> annotation.
       To do so, we implement the interface ConstraintValidator as shown
       below:</para>
 
-      <example>
+      <example id="example-constraint-validator">
         <title>Implementing a constraint validator for the constraint
         <classname>CheckCase</classname></title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -261,9 +266,98 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       valid. If <code>null</code> is not a valid value for an element, it
       should be annotated with <code>@NotNull</code> explicitely.</para>
 
-      <para>The passed-in <classname>ConstraintValidatorContext</classname>
-      could be used to raise any custom validation errors, but as we are fine
-      with the default behavior, we can ignore that parameter for now.</para>
+      <section>
+        <title>The ConstraintValidatorContext</title>
+
+        <para><xref linkend="example-constraint-validator" /> relies on the
+        default error message generation by just returning
+        <constant>true</constant> or <constant>false</constant> from the
+        <methodname>isValid</methodname> call. Using the passed
+        <classname>ConstraintValidatorContext</classname> object it is
+        possible to either add additional error messages or completely disable
+        the default error message generation and solely define custom error
+        messages. The <classname>ConstraintValidatorContext</classname> API is
+        modeled as fluent interface and is best demonstrated with an
+        example:</para>
+
+        <example id="example-constraint-validator-context">
+          <title>Use of ConstraintValidatorContext to define custom error
+          messages</title>
+
+          <programlisting language="JAVA" role="JAVA">package com.mycompany;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {
+
+    private CaseMode caseMode;
+
+    public void initialize(CheckCase constraintAnnotation) {
+        this.caseMode = constraintAnnotation.value();
+    }
+
+    public boolean isValid(String object, ConstraintValidatorContext constraintContext) {
+
+        if (object == null)
+            return true;
+        
+        boolean isValid;
+        if (caseMode == CaseMode.UPPER) {
+            isValid = object.equals(object.toUpperCase());
+        }
+        else {
+            isValid = object.equals(object.toLowerCase());
+        }
+        
+        if(!isValid) {
+            constraintContext.disableDefaultConstraintViolation();
+            constraintContext.buildConstraintViolationWithTemplate( "{com.mycompany.constraints.CheckCase.message}"  ).addConstraintViolation();
+        }
+        return result;
+    }
+
+}</programlisting>
+        </example>
+
+        <para><xref linkend="example-constraint-validator-context" os="" />
+        shows how you can disable the default error message generation and add
+        a custom error message using a specified message template. In this
+        example the use of the
+        <classname>ConstraintValidatorContext</classname> results in the same
+        error message as the default error message generation. <tip>
+            <para>It is important to end each new constraint violation with
+            <methodname>addConstraintViolation</methodname>. Only after that
+            the new constraint violation will be created.</para>
+          </tip></para>
+
+        <para>In case you are implementing a
+        <classname>ConstraintValidator</classname> a class level constraint it
+        is also possible to adjust set the property path for the created
+        constraint violations. This is important for the case where you
+        validate multiple properties of the class or even traverse the object
+        graph. A custom property path creation could look like <xref
+        linkend="example-custom-error" />.</para>
+
+        <example id="example-custom-error">
+          <title>Adding new <classname>ConstraintViolation</classname> with
+          custom property path</title>
+
+          <programlisting language="JAVA" role="JAVA">public boolean isValid(Group group, ConstraintValidatorContext constraintValidatorContext) {
+    boolean isValid = false;
+    ...
+
+    if(!isValid) {
+        constraintValidatorContext
+            .buildConstraintViolationWithTemplate( "{my.custom.template}" )
+            .addNode( "myProperty" ).addConstraintViolation();
+    }
+    return isValid;
+}
+
+</programlisting>
+        </example>
+      </section>
     </section>
 
     <section id="validator-customconstraints-errormessage">
@@ -301,7 +395,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
         <title>Applying the <classname>CheckCase</classname>
         constraint</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -340,7 +434,7 @@ public class Car {
         <title>Testcase demonstrating the <classname>CheckCase</classname>
         validation</title>
 
-        <programlisting role="JAVA" language="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import static org.junit.Assert.*;
 
@@ -414,7 +508,7 @@ public class CarTest {
       <title>Creating a composing constraint
       <classname>ValidLicensePlate</classname></title>
 
-      <programlisting role="JAVA" language="JAVA">package com.mycompany;
+      <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
@@ -463,7 +557,7 @@ public @interface ValidLicensePlate {
       <title>Application of composing constraint
       <classname>ValidLicensePlate</classname></title>
 
-      <programlisting role="JAVA" language="JAVA">package com.mycompany;
+      <programlisting language="JAVA" role="JAVA">package com.mycompany;
 
 public class Car {
 
@@ -487,7 +581,7 @@ public class Car {
     <example>
       <title>Usage of <classname>@ReportAsSingleViolation</classname></title>
 
-      <programlisting role="JAVA" language="JAVA">//...
+      <programlisting language="JAVA" role="JAVA">//...
 @ReportAsSingleViolation
 public @interface ValidLicensePlate {
 
