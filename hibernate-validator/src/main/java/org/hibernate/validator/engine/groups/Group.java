@@ -80,9 +80,6 @@ public class Group {
 
 	@Override
 	public String toString() {
-		return "Group{" +
-				"groups=" + group +
-				", sequence=" + sequence +
-				'}';
+		return "Group{" + "group=" + group.getName() + '}';
 	}
 }

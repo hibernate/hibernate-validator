@@ -33,7 +33,6 @@ public class Try {
 	@NotNull(message = "field3", groups = OtherComponent.class)
 	public String field3;
 
-
 	public interface BaseComponent {
 	}
 

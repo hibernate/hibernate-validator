@@ -90,7 +90,7 @@ public class GroupChainTest {
 
 
 	@Test
-	public void testAssertDefaulGroupSequenceIsExpandableWithDefaultAtBeginningOfSequence() {
+	public void testAssertDefaultGroupSequenceIsExpandableWithDefaultAtBeginningOfSequence() {
 		// create a dummy sequence
 		Group a = new Group( GroupA.class, TestSequence.class );
 		Group b = new Group( GroupB.class, TestSequence.class );

@@ -21,12 +21,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.validation.GroupDefinitionException;
+import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
@@ -97,14 +100,25 @@ public class GroupChainGeneratorTest {
 		assertEquals( count, 2, "Wrong number of groups" );
 	}
 
-	private int countGroups(GroupChain chain) {
-		Iterator<Group> groupIterator = chain.getGroupIterator();
-		int count = 0;
-		while ( groupIterator.hasNext() ) {
-			groupIterator.next();
-			count++;
-		}
-		return count;
+	@Test(expectedExceptions = GroupDefinitionException.class)
+	public void testGroupDefiningSequencePartOfGroupComposingSequence() {
+		Set<Class<?>> groups = new HashSet<Class<?>>();
+		groups.add( Sequence1.class );
+		generator.getGroupChainFor( groups );
+	}
+
+	@Test(expectedExceptions = GroupDefinitionException.class)
+	public void testUnexpandableSequence() {
+		Set<Class<?>> groups = new HashSet<Class<?>>();
+		groups.add( Sequence3.class );
+		generator.getGroupChainFor( groups );
+	}
+
+	@Test
+	public void testExpandableSequenceWithInheritance() {
+		Set<Class<?>> groups = new HashSet<Class<?>>();
+		groups.add( Sequence4.class );
+		generator.getGroupChainFor( groups );
 	}
 
 	@Test
@@ -117,5 +131,41 @@ public class GroupChainGeneratorTest {
 
 		assertEquals( sequence.get( 0 ).getGroup(), Default.class, "Wrong group" );
 		assertEquals( sequence.get( 1 ).getGroup(), Address.HighLevelCoherence.class, "Wrong group" );
+	}
+
+	private int countGroups(GroupChain chain) {
+		Iterator<Group> groupIterator = chain.getGroupIterator();
+		int count = 0;
+		while ( groupIterator.hasNext() ) {
+			groupIterator.next();
+			count++;
+		}
+		return count;
+	}
+
+
+	interface GroupA extends Default {
+	}
+
+	interface GroupB {
+	}
+
+	interface GroupC extends Sequence2 {
+	}
+
+	@GroupSequence({ GroupA.class, GroupC.class })
+	interface Sequence1 {
+	}
+
+	@GroupSequence({ GroupB.class, GroupA.class })
+	interface Sequence2 {
+	}
+
+	@GroupSequence({ Sequence2.class, GroupB.class })
+	interface Sequence3 {
+	}
+
+	@GroupSequence({ Sequence2.class, GroupA.class })
+	interface Sequence4 {
 	}
 }

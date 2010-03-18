@@ -27,7 +27,7 @@ import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
 
 /**
- * Used to determine the execution order.
+ * Helper class used to resolve groups and sequences into a single chain of groups which can then be validated.
  *
  * @author Hardy Ferentschik
  */
@@ -35,6 +35,13 @@ public class GroupChainGenerator {
 
 	private final Map<Class<?>, List<Group>> resolvedSequences = new HashMap<Class<?>, List<Group>>();
 
+	/**
+	 * Generates a chain of groups to be validated given the specified validation groups.
+	 *
+	 * @param groups The groups specified at the validation call.
+	 *
+	 * @return an instance of {@code GroupChain} defining the order in which validation has to occur.
+	 */
 	public GroupChain getGroupChainFor(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
 			throw new IllegalArgumentException( "At least one groups has to be specified." );
@@ -48,24 +55,34 @@ public class GroupChainGenerator {
 
 		GroupChain chain = new GroupChain();
 		for ( Class<?> clazz : groups ) {
-			if ( clazz.getAnnotation( GroupSequence.class ) == null ) {
+			if ( isGroupSequence( clazz ) ) {
+				insertSequence( clazz, chain );
+			}
+			else {
 				Group group = new Group( clazz );
 				chain.insertGroup( group );
 				insertInheritedGroups( clazz, chain );
-			}
-			else {
-				insertSequence( clazz, chain );
 			}
 		}
 
 		return chain;
 	}
 
+	private boolean isGroupSequence(Class<?> clazz) {
+		return clazz.getAnnotation( GroupSequence.class ) != null;
+	}
+
+	/**
+	 * Recursively add inherited groups into the group chain.
+	 *
+	 * @param clazz The group interface
+	 * @param chain The group chain we are currently building.
+	 */
 	private void insertInheritedGroups(Class<?> clazz, GroupChain chain) {
-		for ( Class<?> extendedInterface : clazz.getInterfaces() ) {
-			Group group = new Group( extendedInterface );
+		for ( Class<?> inheritedGroup : clazz.getInterfaces() ) {
+			Group group = new Group( inheritedGroup );
 			chain.insertGroup( group );
-			insertInheritedGroups( extendedInterface, chain );
+			insertInheritedGroups( inheritedGroup, chain );
 		}
 	}
 
@@ -76,8 +93,32 @@ public class GroupChainGenerator {
 		}
 		else {
 			sequence = resolveSequence( clazz, new ArrayList<Class<?>>() );
+			// we expand the inherited groups only after we determined whether the sequence is expandable
+			sequence = expandInhertitedGroups( sequence );
 		}
 		chain.insertSequence( sequence );
+	}
+
+	private List<Group> expandInhertitedGroups(List<Group> sequence) {
+		List<Group> expandedGroup = new ArrayList<Group>();
+		for ( Group group : sequence ) {
+			expandedGroup.add( group );
+			addInheritedGroups( group, expandedGroup );
+		}
+		return expandedGroup;
+	}
+
+	private void addInheritedGroups(Group group, List<Group> expandedGroups) {
+		for ( Class<?> inheritedGroup : group.getGroup().getInterfaces() ) {
+			if ( isGroupSequence( inheritedGroup ) ) {
+				throw new GroupDefinitionException(
+						"Sequence definitions are not allowed as composing parts of a sequence."
+				);
+			}
+			Group g = new Group( inheritedGroup, group.getSequence() );
+			expandedGroups.add( g );
+			addInheritedGroups( g, expandedGroups );
+		}
 	}
 
 	private List<Group> resolveSequence(Class<?> group, List<Class<?>> processedSequences) {
@@ -91,24 +132,36 @@ public class GroupChainGenerator {
 		GroupSequence sequenceAnnotation = group.getAnnotation( GroupSequence.class );
 		Class<?>[] sequenceArray = sequenceAnnotation.value();
 		for ( Class<?> clazz : sequenceArray ) {
-			if ( clazz.getAnnotation( GroupSequence.class ) == null ) {
-				resolvedGroupSequence.add( new Group( clazz, group ) );
+			if ( isGroupSequence( clazz ) ) {
+				List<Group> tmpSequence = resolveSequence( clazz, processedSequences );
+				addGroups( resolvedGroupSequence, tmpSequence );
 			}
 			else {
-				List<Group> tmpSequence = resolveSequence( clazz, processedSequences );
-				addTmpSequence( resolvedGroupSequence, tmpSequence );
+				List<Group> list = new ArrayList<Group>();
+				list.add( new Group( clazz, group ) );
+				addGroups( resolvedGroupSequence, list );
 			}
 		}
 		resolvedSequences.put( group, resolvedGroupSequence );
 		return resolvedGroupSequence;
 	}
 
-	private void addTmpSequence(List<Group> resolvedGroupSequence, List<Group> tmpSequence) {
-		for ( Group tmpGroup : tmpSequence ) {
-			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence.size() - 1  ) {
-					throw new GroupDefinitionException( "Unable to expand group sequence." );
+	private void addGroups(List<Group> resolvedGroupSequence, List<Group> groups) {
+		for ( Group tmpGroup : groups ) {
+			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence
+					.size() - 1 ) {
+				throw new GroupDefinitionException( "Unable to expand group sequence." );
 			}
 			resolvedGroupSequence.add( tmpGroup );
 		}
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "GroupChainGenerator" );
+		sb.append( "{resolvedSequences=" ).append( resolvedSequences );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }

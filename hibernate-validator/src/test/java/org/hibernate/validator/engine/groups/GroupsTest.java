@@ -32,6 +32,9 @@ import static org.hibernate.validator.util.TestUtil.assertCorrectConstraintViola
  */
 public class GroupsTest {
 
+	/**
+	 * HV-288
+	 */
 	@Test
 	public void testGroupInheritance() {
 		Validator validator = TestUtil.getValidator();
@@ -40,6 +43,6 @@ public class GroupsTest {
 		tryMe.field3 = "bar";
 
 		Set<ConstraintViolation<Try>> violations = validator.validate( tryMe, Try.GlobalCheck.class );
-		//assertCorrectConstraintViolationMessages(violations, "field1");
+		assertCorrectConstraintViolationMessages(violations, "field1");
 	}
 }
