@@ -68,7 +68,7 @@ public class ConstraintTree<A extends Annotation> {
 		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
 			composingConstraints.add( ( ConstraintDescriptorImpl<?> ) composingConstraint );
 		}
-		
+
 		children = new ArrayList<ConstraintTree<?>>( composingConstraints.size() );
 
 		for ( ConstraintDescriptorImpl<?> composingDescriptor : composingConstraints ) {
@@ -90,7 +90,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	public <T, U, V> void validateConstraints(Type type, GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, List<ConstraintViolation<T>> constraintViolations) {
-		// first validate composing constraints
+		// first validate composing constraints (recursively)
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			List<ConstraintViolation<T>> tmpViolations = new ArrayList<ConstraintViolation<T>>();
 			tree.validateConstraints( type, executionContext, localExecutionContext, tmpViolations );
@@ -100,6 +100,20 @@ public class ConstraintTree<A extends Annotation> {
 		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
 				localExecutionContext.getPropertyPath(), descriptor
 		);
+
+		// check whether we have constraints violations, but we should only report the single message of the
+		// main constraint. We already have to generate the message here, since the composing constraints might
+		// not have its own ConstraintValidator.
+		// Also we want to leave it open to the final ConstraintValidator to generate a custom message. 
+		if ( constraintViolations.size() > 0 && reportAsSingleViolation() ) {
+			constraintViolations.clear();
+			final String message = ( String ) getDescriptor().getAttributes().get( "message" );
+			MessageAndPath messageAndPath = new MessageAndPath( message, localExecutionContext.getPropertyPath() );
+			ConstraintViolation<T> violation = executionContext.createConstraintViolation(
+					localExecutionContext, messageAndPath, descriptor
+			);
+			constraintViolations.add( violation );
+		}
 
 		// we could have a composing constraint which does not need its own validator.
 		if ( !descriptor.getConstraintValidatorClasses().isEmpty() ) {
@@ -122,16 +136,6 @@ public class ConstraintTree<A extends Annotation> {
 					constraintValidatorContext,
 					validator
 			);
-		}
-
-		if ( reportAsSingleViolation() && constraintViolations.size() > 0 ) {
-			constraintViolations.clear();
-			final String message = ( String ) getDescriptor().getAttributes().get( "message" );
-			MessageAndPath messageAndPath = new MessageAndPath( message, localExecutionContext.getPropertyPath() );
-			ConstraintViolation<T> violation = executionContext.createConstraintViolation(
-					localExecutionContext, messageAndPath, descriptor
-			);
-			constraintViolations.add( violation );
 		}
 	}
 

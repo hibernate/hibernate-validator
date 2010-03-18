@@ -86,6 +86,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 
 	@Override
 	@SuppressWarnings("SimplifiableIfStatement")
+	// IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method!
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;

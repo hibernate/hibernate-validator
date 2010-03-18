@@ -118,7 +118,7 @@ public class TestUtil {
 			actualMessages.add( violation.getMessage() );
 		}
 
-		assertTrue( actualMessages.size() == messages.length, "Wrong number of error messages" );
+		assertEquals( actualMessages.size(), messages.length, "Wrong number of error messages" );
 
 		for ( String expectedMessage : messages ) {
 			assertTrue(
