@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
+import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLong;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLongValidator;
 import org.hibernate.validator.ap.testmodel.boxing.ValidationUsingBoxing;
@@ -314,18 +315,37 @@ public class ConstraintValidationProcessorTest {
 
 		File sourceFile1 = compilerHelper.getSourceFile( MultipleConstraintsOfSameType.class );
 
-		boolean compilationResult =
-				compilerHelper.compile(
-						new ConstraintValidationProcessor(),
-						diagnostics,
-						sourceFile1
-				);
+		boolean compilationResult = compilerHelper.compile(
+				new ConstraintValidationProcessor(), diagnostics, sourceFile1
+		);
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpection(
-						Kind.ERROR, 33
-				), new DiagnosticExpection( Kind.ERROR, 33 )
+				diagnostics,
+				new DiagnosticExpection( Kind.ERROR, 33 ),
+				new DiagnosticExpection( Kind.ERROR, 33 )
+		);
+	}
+
+	@Test
+	public void testThatAtValidAnnotationGivenAtNotSupportedTypesCausesCompilationErrors() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( ValidationUsingAtValidAnnotation.class );
+
+		boolean compilationResult = compilerHelper.compile(
+				new ConstraintValidationProcessor(), diagnostics, sourceFile1
+		);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpection( Kind.ERROR, 34 ),
+				new DiagnosticExpection( Kind.ERROR, 40 ),
+				new DiagnosticExpection( Kind.ERROR, 56 ),
+				new DiagnosticExpection( Kind.ERROR, 64 ),
+				new DiagnosticExpection( Kind.ERROR, 72 ),
+				new DiagnosticExpection( Kind.ERROR, 80 ),
+				new DiagnosticExpection( Kind.ERROR, 88 )
 		);
 	}
 }

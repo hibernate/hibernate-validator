@@ -20,6 +20,7 @@ package org.hibernate.validator.ap;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -28,6 +29,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.tools.Diagnostic.Kind;
 
@@ -68,15 +71,13 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 	private final ConstraintHelper constraintHelper;
 
-	private final AnnotationApiHelper annotationApiHelper;
-
 	public ConstraintAnnotationVisitor(ProcessingEnvironment processingEnvironment) {
 
 		this.processingEnvironment = processingEnvironment;
 
 		errorMessages = ResourceBundle.getBundle( "org.hibernate.validator.ap.ValidationProcessorMessages" );
 
-		annotationApiHelper = new AnnotationApiHelper(
+		AnnotationApiHelper annotationApiHelper = new AnnotationApiHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
 		);
 
@@ -118,7 +119,8 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	 * specified at the given method. The following checks are performed:</p>
 	 * <ul>
 	 * <li>
-	 * The method must be a JavaBeans getter method (name starts with "is", "get" or "has", no parameters)
+	 * The method must be a JavaBeans getter method (name starts with "is", "get" or "has",
+	 * method has return type, but no parameters).
 	 * </li>
 	 * <li>
 	 * The return type of the method must be supported by the constraints.
@@ -134,18 +136,26 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
+			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
 
-				checkConstraintAtMethod( method, oneAnnotationMirror );
+				case CONSTRAINT_ANNOTATION:
+					checkConstraintAtMethod( method, oneAnnotationMirror );
+					break;
+
+				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
+					for ( AnnotationMirror onePartOfMultiValuedConstraint :
+							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
+
+						checkConstraintAtMethod( method, onePartOfMultiValuedConstraint );
+					}
+					break;
+
+				case GRAPH_VALIDATION_ANNOTATION:
+					checkGraphValidationAnnotationAtMethod( method, oneAnnotationMirror );
 			}
-			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
-				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
-						oneAnnotationMirror
-				) ) {
-					checkConstraintAtMethod( method, onePartOfMultiValuedConstraint );
-				}
-			}
+
 		}
+
 		return null;
 	}
 
@@ -167,16 +177,22 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
+			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
 
-				checkConstraintAtField( annotatedField, oneAnnotationMirror );
-			}
-			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
-				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
-						oneAnnotationMirror
-				) ) {
-					checkConstraintAtField( annotatedField, onePartOfMultiValuedConstraint );
-				}
+				case CONSTRAINT_ANNOTATION:
+					checkConstraintAtField( annotatedField, oneAnnotationMirror );
+					break;
+
+				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
+					for ( AnnotationMirror onePartOfMultiValuedConstraint :
+							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
+
+						checkConstraintAtField( annotatedField, onePartOfMultiValuedConstraint );
+					}
+					break;
+
+				case GRAPH_VALIDATION_ANNOTATION:
+					checkGraphValidationAnnotationAtField( annotatedField, oneAnnotationMirror );
 			}
 		}
 
@@ -195,8 +211,8 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	// TODO GM: do a more complete check of constraint annotation type
 	// declarations:
 	// 
-	// - check, existence of groups(), message(), payload()
-	// - check, retention policy
+	// - check existence of groups(), message(), payload()
+	// - check retention policy
 	// - check, that the set of supported types is not empty
 	// - optionally check, that validated types resolve to non-parametrized types
 	@Override
@@ -205,18 +221,19 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
+			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
 
-				checkConstraintAtAnnotationType( annotationType, oneAnnotationMirror );
+				case CONSTRAINT_ANNOTATION:
+					checkConstraintAtAnnotationType( annotationType, oneAnnotationMirror );
+					break;
 
-			}
-			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
+				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
+					for ( AnnotationMirror onePartOfMultiValuedConstraint :
+							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
 
-				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
-						oneAnnotationMirror
-				) ) {
-					checkConstraintAtAnnotationType( annotationType, onePartOfMultiValuedConstraint );
-				}
+						checkConstraintAtAnnotationType( annotationType, onePartOfMultiValuedConstraint );
+					}
+					break;
 			}
 		}
 
@@ -247,17 +264,20 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			if ( constraintHelper.isConstraintAnnotation( oneAnnotationMirror ) ) {
+			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
 
-				checkConstraintAtType( annotatedType, oneAnnotationMirror );
+				case CONSTRAINT_ANNOTATION:
+					checkConstraintAtType( annotatedType, oneAnnotationMirror );
+					break;
+
+				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
+					for ( AnnotationMirror onePartOfMultiValuedConstraint :
+							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
+						checkConstraintAtType( annotatedType, onePartOfMultiValuedConstraint );
+					}
+					break;
 			}
-			else if ( constraintHelper.isMultiValuedConstraint( oneAnnotationMirror ) ) {
-				for ( AnnotationMirror onePartOfMultiValuedConstraint : constraintHelper.getPartsOfMultiValuedConstraint(
-						oneAnnotationMirror
-				) ) {
-					checkConstraintAtType( annotatedType, onePartOfMultiValuedConstraint );
-				}
-			}
+
 		}
 
 		return null;
@@ -298,8 +318,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 	private void checkConstraintAtMethod(ExecutableElement method, AnnotationMirror mirror) {
 
-		if ( !isJavaBeanGetterName( method.getSimpleName().toString() ) ||
-				hasParameters( method ) ) {
+		if ( !isGetterMethod( method ) ) {
 
 			reportError( method, mirror, "ONLY_GETTERS_MAY_BE_ANNOTATED" );
 
@@ -332,6 +351,69 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 	}
 
+	private void checkGraphValidationAnnotationAtField(
+			VariableElement annotatedField, AnnotationMirror annotationMirror) {
+
+		if ( isStaticElement( annotatedField ) ) {
+
+			reportError(
+					annotatedField, annotationMirror,
+					"STATIC_FIELDS_MAY_NOT_BE_ANNOTATED"
+			);
+
+			return;
+		}
+
+		if ( isPrimitiveType( annotatedField.asType() ) ) {
+
+			reportError(
+					annotatedField, annotationMirror,
+					"ATVALID_NOT_ALLOWED_AT_PRIMITIVE_FIELD"
+			);
+		}
+	}
+
+	private void checkGraphValidationAnnotationAtMethod(
+			ExecutableElement method, AnnotationMirror annotationMirror) {
+
+		if ( !isGetterMethod( method ) ) {
+
+			reportError(
+					method, annotationMirror,
+					"ONLY_GETTERS_MAY_BE_ANNOTATED"
+			);
+
+			return;
+		}
+
+		if ( isStaticElement( method ) ) {
+
+			reportError(
+					method, annotationMirror,
+					"STATIC_METHODS_MAY_NOT_BE_ANNOTATED"
+			);
+
+			return;
+		}
+
+		if ( isPrimitiveType( method.getReturnType() ) ) {
+
+			reportError(
+					method, annotationMirror,
+					"ATVALID_NOT_ALLOWED_AT_METHOD_RETURNING_PRIMITIVE_TYPE"
+			);
+		}
+	}
+
+	private boolean isGetterMethod(ExecutableElement method) {
+		return isJavaBeanGetterName( method.getSimpleName().toString() )
+				&& !hasParameters( method ) && hasReturnValue( method );
+	}
+
+	private boolean hasReturnValue(ExecutableElement method) {
+		return method.getReturnType().getKind() != TypeKind.VOID;
+	}
+
 	private boolean hasParameters(ExecutableElement method) {
 		return !method.getParameters().isEmpty();
 	}
@@ -342,6 +424,10 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 	private boolean isStaticElement(Element element) {
 		return element.getModifiers().contains( Modifier.STATIC );
+	}
+
+	private boolean isPrimitiveType(TypeMirror typeMirror) {
+		return typeMirror.getKind().isPrimitive();
 	}
 
 	/**

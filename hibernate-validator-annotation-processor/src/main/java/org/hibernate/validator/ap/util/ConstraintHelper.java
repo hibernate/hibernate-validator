@@ -37,6 +37,7 @@ import javax.lang.model.util.TypeKindVisitor6;
 import javax.lang.model.util.Types;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
+import javax.validation.Valid;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.DecimalMax;
@@ -83,6 +84,41 @@ public class ConstraintHelper {
 		 * constrained at the evaluated type.
 		 */
 		MULTIPLE_VALIDATORS_FOUND
+	}
+
+	/**
+	 * The type of an annotation with respect to the BV API.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public enum AnnotationType {
+
+		/**
+		 * Given annotation is a constraint annotation (e.g. @Min).
+		 */
+		CONSTRAINT_ANNOTATION,
+
+		/**
+		 * Given annotation is a multi-valued annotation (e.g.
+		 * <code>
+		 *
+		 * @List({
+		 * @Min(10),
+		 * @Min(value=20, groups= Special.class})
+		 * })
+		 * </code>.
+		 */
+		MULTI_VALUED_CONSTRAINT_ANNOTATION,
+
+		/**
+		 * Given annotation is the @Valid annotation.
+		 */
+		GRAPH_VALIDATION_ANNOTATION,
+
+		/**
+		 * Given annotation is not related to the BV API (e.g. @Resource).
+		 */
+		NO_CONSTRAINT_ANNOTATION
 	}
 
 	/**
@@ -171,61 +207,27 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given annotation mirror represents a constraint
-	 * annotation or not. That's the case, if the given mirror is annotated with
-	 * the {@link Constraint} meta-annotation (which is only allowed at
-	 * annotation declarations).
+	 * Returns the {@link AnnotationType} of the given annotation.
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
 	 *
-	 * @return True, if the given mirror represents a constraint annotation
-	 *         type, false otherwise.
+	 * @return The given mirror's annotation type.
 	 */
-	public boolean isConstraintAnnotation(AnnotationMirror annotationMirror) {
-		return isConstraintAnnotation(
-				annotationMirror.getAnnotationType()
-						.asElement()
-		);
-	}
+	public AnnotationType getAnnotationType(AnnotationMirror annotationMirror) {
 
-	/**
-	 * Checks, whether the given annotation mirror represents a multi-valued
-	 * constraint such as {@link javax.validation.constraints.Pattern.List}.
-	 * That is the case if the annotation has an array-typed attribute with name
-	 * "value", that exclusively contains constraint annotations.
-	 *
-	 * @param annotationMirror The annotation mirror of interest.
-	 *
-	 * @return True, if the given mirror represents a multi-valued constraint,
-	 *         false otherwise.
-	 */
-	public boolean isMultiValuedConstraint(AnnotationMirror annotationMirror) {
-
-		List<? extends AnnotationValue> annotationArrayValue = annotationApiHelper.getAnnotationArrayValue(
-				annotationMirror, "value"
-		);
-
-		for ( AnnotationValue oneAnnotationValue : annotationArrayValue ) {
-
-			Boolean isConstraintAnnotation = oneAnnotationValue.accept(
-					new SimpleAnnotationValueVisitor6<Boolean, Void>() {
-
-						@Override
-						public Boolean visitAnnotation(
-								AnnotationMirror a, Void p) {
-
-							return isConstraintAnnotation( a.getAnnotationType().asElement() );
-						}
-					}, null
-			);
-
-			//TODO GM: have all parts of the array to be constraint annotations?
-			if ( Boolean.TRUE != isConstraintAnnotation ) {
-				return false;
-			}
+		if ( isConstraintAnnotation( annotationMirror ) ) {
+			return AnnotationType.CONSTRAINT_ANNOTATION;
+		}
+		else if ( isMultiValuedConstraint( annotationMirror ) ) {
+			return AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION;
+		}
+		else if ( isGraphValidationAnnotation( annotationMirror ) ) {
+			return AnnotationType.GRAPH_VALIDATION_ANNOTATION;
+		}
+		else {
+			return AnnotationType.NO_CONSTRAINT_ANNOTATION;
 		}
 
-		return true;
 	}
 
 	/**
@@ -246,18 +248,19 @@ public class ConstraintHelper {
 
 		final List<AnnotationMirror> theValue = CollectionHelper.newArrayList();
 
-		for ( AnnotationValue oneValuePart : annotationApiHelper.getAnnotationArrayValue(
-				annotationMirror, "value"
-		) ) {
+		for ( AnnotationValue oneValuePart : annotationApiHelper
+				.getAnnotationArrayValue( annotationMirror, "value" ) ) {
 
 			oneValuePart.accept(
 					new SimpleAnnotationValueVisitor6<Void, Void>() {
 
 						@Override
-						public Void visitAnnotation(
-								AnnotationMirror a, Void p) {
+						public Void visitAnnotation(AnnotationMirror a, Void p) {
 
-							if ( isConstraintAnnotation( a.getAnnotationType().asElement() ) ) {
+							if ( isConstraintAnnotation(
+									a.getAnnotationType()
+											.asElement()
+							) ) {
 								theValue.add( a );
 							}
 
@@ -283,16 +286,102 @@ public class ConstraintHelper {
 	 * @return Whether the given constraint annotation may be specified at
 	 *         elements of the given type.
 	 */
-	public ConstraintCheckResult checkConstraint(DeclaredType constraintAnnotationType, TypeMirror typeOfAnnotatedElement) {
+	public ConstraintCheckResult checkConstraint(
+			DeclaredType constraintAnnotationType,
+			TypeMirror typeOfAnnotatedElement) {
 
-		return isBuiltInConstraint( constraintAnnotationType ) ?
-				checkBuiltInConstraint( constraintAnnotationType, typeOfAnnotatedElement ) :
-				checkCustomConstraint( constraintAnnotationType, typeOfAnnotatedElement );
+		return isBuiltInConstraint( constraintAnnotationType ) ? checkBuiltInConstraint(
+				constraintAnnotationType, typeOfAnnotatedElement
+		)
+				: checkCustomConstraint(
+				constraintAnnotationType,
+				typeOfAnnotatedElement
+		);
 	}
 
 	// ==================================
 	// private API below
 	// ==================================
+
+	/**
+	 * Checks, whether the given annotation mirror represents a constraint
+	 * annotation or not. That's the case, if the given mirror is annotated with
+	 * the {@link Constraint} meta-annotation (which is only allowed at
+	 * annotation declarations).
+	 *
+	 * @param annotationMirror The annotation mirror of interest.
+	 *
+	 * @return True, if the given mirror represents a constraint annotation
+	 *         type, false otherwise.
+	 */
+	private boolean isConstraintAnnotation(AnnotationMirror annotationMirror) {
+		return isConstraintAnnotation(
+				annotationMirror.getAnnotationType()
+						.asElement()
+		);
+	}
+
+	/**
+	 * Checks, whether the given annotation mirror represents a multi-valued
+	 * constraint such as {@link javax.validation.constraints.Pattern.List}.
+	 * That is the case if the annotation has an array-typed attribute with name
+	 * "value", that exclusively contains constraint annotations.
+	 *
+	 * @param annotationMirror The annotation mirror of interest.
+	 *
+	 * @return True, if the given mirror represents a multi-valued constraint,
+	 *         false otherwise.
+	 */
+	private boolean isMultiValuedConstraint(AnnotationMirror annotationMirror) {
+
+		List<? extends AnnotationValue> annotationArrayValue = annotationApiHelper.getAnnotationArrayValue(
+				annotationMirror, "value"
+		);
+
+		// a multi-valued constraint must have at least one value
+		if ( annotationArrayValue.isEmpty() ) {
+			return false;
+		}
+
+		for ( AnnotationValue oneAnnotationValue : annotationArrayValue ) {
+
+			Boolean isConstraintAnnotation = oneAnnotationValue.accept(
+					new SimpleAnnotationValueVisitor6<Boolean, Void>() {
+
+						@Override
+						public Boolean visitAnnotation(
+								AnnotationMirror a, Void p) {
+
+							return isConstraintAnnotation( a.getAnnotationType().asElement() );
+						}
+					}, null
+			);
+
+			//TODO GM: have all parts of the array to be constraint annotations?
+			if ( Boolean.TRUE != isConstraintAnnotation ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks, whether the given mirror represents the {@link Valid} annotation.
+	 *
+	 * @param annotationMirror The annotation mirror of interest.
+	 *
+	 * @return True, if the given mirror represents the @Valid annotation, false
+	 *         otherwise.
+	 */
+	private boolean isGraphValidationAnnotation(
+			AnnotationMirror annotationMirror) {
+
+		return typeUtils.isSameType(
+				annotationMirror.getAnnotationType(),
+				annotationApiHelper.getMirrorForType( Valid.class )
+		);
+	}
 
 	private ConstraintCheckResult checkBuiltInConstraint(DeclaredType builtInAnnotationType, TypeMirror typeOfAnnotatedElement) {
 
@@ -323,7 +412,7 @@ public class ConstraintHelper {
 	 * constraint-annotation is allowed.
 	 *
 	 * @param customAnnotationType A custom constraint type.
-	 * @param typeOfAnnotatedElement
+	 * @param typeOfAnnotatedElement The type of the annotated element
 	 *
 	 * @return A set with all types supported by the given constraint. May be
 	 *         empty in case of constraint composition, if there is no common
@@ -414,23 +503,44 @@ public class ConstraintHelper {
 				}, null
 		);
 
-		//contains the bindings of the type parameters from the implemented ConstraintValidator
-		//interface, e.g. "ConstraintValidator<CheckCase, String>"
+		TypeMirror supportedType;
+
+		supportedType = getSupportedTypeUsingAnnotationApi( validatorType );
+
+		// TODO GM: Due to HV-293 the type supported by a given validator can't
+		// always be determined when using
+		// the AP within Eclipse. As work around
+		// reflection might be used in such cases (meaning that the validator
+		// and its supported type have to be on
+		// the AP classpath, which normally wasn't required).
+
+		if ( supportedType == null ) {
+			throw new AssertionError(
+					"Couldn't determine the type supported by validator " + validatorType + "."
+			);
+		}
+		return supportedType;
+	}
+
+	private TypeMirror getSupportedTypeUsingAnnotationApi(
+			TypeMirror validatorType) {
+
+		// contains the bindings of the type parameters from the implemented
+		// ConstraintValidator
+		// interface, e.g. "ConstraintValidator<CheckCase, String>"
 		TypeMirror constraintValidatorImplementation = getConstraintValidatorSuperType( validatorType );
 
-		TypeMirror supportedType = constraintValidatorImplementation.accept(
+		return constraintValidatorImplementation.accept(
 				new TypeKindVisitor6<TypeMirror, Void>() {
 
 					@Override
 					public TypeMirror visitDeclared(DeclaredType constraintValidatorImplementation, Void p) {
-						//2nd type parameter contains the data type supported by current validator class, e.g. "String"
+						// 2nd type parameter contains the data type supported by current validator class, e.g. "String"
 						return constraintValidatorImplementation.getTypeArguments().get( 1 );
 					}
 
 				}, null
 		);
-
-		return supportedType;
 	}
 
 	private TypeMirror getConstraintValidatorSuperType(TypeMirror type) {
@@ -445,7 +555,7 @@ public class ConstraintHelper {
 			}
 		}
 
-		throw new AssertionError( "Class " + type + " specified in @Constraint.validatedBy doesn't implement ConstraintValidator." );
+		return null;
 	}
 
 	/**
