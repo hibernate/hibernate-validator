@@ -17,32 +17,27 @@
 */
 package org.hibernate.validator.engine;
 
-import java.security.AccessController;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
-import org.slf4j.Logger;
-
-import org.hibernate.validator.util.GetClassLoader;
-import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.engine.resourceloading.CachingResourceBundleLocator;
+import org.hibernate.validator.engine.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
 
 /**
  * Resource bundle backed message interpolator.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ResourceBundleMessageInterpolator implements MessageInterpolator {
-	private static final String DEFAULT_VALIDATION_MESSAGES = "org.hibernate.validator.ValidationMessages";
-	private static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
-	private static final Logger log = LoggerFactory.make();
 
 	/**
 	 * Regular expression used to do message interpolation.
@@ -55,14 +50,14 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final Locale defaultLocale;
 
 	/**
-	 * User specified resource bundles hashed against their locale.
+	 * Loads user-specified resource bundles.
 	 */
-	private final Map<Locale, ResourceBundle> userBundlesMap = new ConcurrentHashMap<Locale, ResourceBundle>();
+	private final ResourceBundleLocator userResourceBundleLocator;
 
 	/**
-	 * Built-in resource bundles hashed against there locale.
+	 * Loads built-in resource bundles.
 	 */
-	private final Map<Locale, ResourceBundle> defaultBundlesMap = new ConcurrentHashMap<Locale, ResourceBundle>();
+	private final ResourceBundleLocator defaultResourceBundleLocator;
 
 	/**
 	 * Step 1-3 of message interpolation can be cached. We do this in this map.
@@ -70,25 +65,40 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final Map<LocalisedMessage, String> resolvedMessages = new WeakHashMap<LocalisedMessage, String>();
 
 	public ResourceBundleMessageInterpolator() {
-		this( null );
+		this( ( ResourceBundleLocator ) null );
 	}
 
-	public ResourceBundleMessageInterpolator(ResourceBundle resourceBundle) {
+	/**
+	 * @param resourceBundle the resource bundle to use
+	 *
+	 * @deprecated Use {@link ResourceBundleMessageInterpolator#ResourceBundleMessageInterpolator(ResourceBundleLocator)} instead.
+	 */
+	// TODO GM: Do we still need this? It was only used in tests, but there might be 3rd party code using it.
+	@Deprecated
+	public ResourceBundleMessageInterpolator(final ResourceBundle resourceBundle) {
+		this(
+				new PlatformResourceBundleLocator( Constants.USER_VALIDATION_MESSAGES ) {
+					public ResourceBundle getResourceBundle(Locale locale) {
+						return locale == Locale.getDefault() ? resourceBundle : super.getResourceBundle( locale );
+					}
+				}
+		);
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
 
 		defaultLocale = Locale.getDefault();
 
-		if ( resourceBundle == null ) {
-			ResourceBundle bundle = getFileBasedResourceBundle( defaultLocale );
-			if ( bundle != null ) {
-				userBundlesMap.put( defaultLocale, bundle );
-			}
-
-		}
-		else {
-			userBundlesMap.put( defaultLocale, resourceBundle );
+		if ( userResourceBundleLocator == null ) {
+			userResourceBundleLocator = new PlatformResourceBundleLocator( Constants.USER_VALIDATION_MESSAGES );
 		}
 
-		defaultBundlesMap.put( defaultLocale, ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES, defaultLocale ) );
+		this.userResourceBundleLocator = new CachingResourceBundleLocator( userResourceBundleLocator );
+
+		this.defaultResourceBundleLocator =
+				new CachingResourceBundleLocator(
+						new PlatformResourceBundleLocator( Constants.DEFAULT_VALIDATION_MESSAGES )
+				);
 	}
 
 	public String interpolate(String message, Context context) {
@@ -120,8 +130,10 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 		// if the message is not already in the cache we have to run step 1-3 of the message resolution 
 		if ( resolvedMessage == null ) {
-			ResourceBundle userResourceBundle = findUserResourceBundle( locale );
-			ResourceBundle defaultResourceBundle = findDefaultResourceBundle( locale );
+			ResourceBundle userResourceBundle = userResourceBundleLocator
+					.getResourceBundle( locale );
+			ResourceBundle defaultResourceBundle = defaultResourceBundleLocator
+					.getResourceBundle( locale );
 
 			String userBundleResolvedMessage;
 			resolvedMessage = message;
@@ -158,53 +170,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 	private boolean hasReplacementTakenPlace(String origMessage, String newMessage) {
 		return !origMessage.equals( newMessage );
-	}
-
-	/**
-	 * Search current thread classloader for the resource bundle. If not found, search validator (this) classloader.
-	 *
-	 * @param locale The locale of the bundle to load.
-	 *
-	 * @return the resource bundle or <code>null</code> if none is found.
-	 */
-	private ResourceBundle getFileBasedResourceBundle(Locale locale) {
-		ResourceBundle rb = null;
-		boolean isSecured = System.getSecurityManager() != null;
-		GetClassLoader action = GetClassLoader.fromContext();
-		ClassLoader classLoader = isSecured ? AccessController.doPrivileged( action ) : action.run();
-
-		if ( classLoader != null ) {
-			rb = loadBundle( classLoader, locale, USER_VALIDATION_MESSAGES + " not found by thread local classloader" );
-		}
-		if ( rb == null ) {
-			action = GetClassLoader.fromClass( ResourceBundleMessageInterpolator.class );
-			classLoader = isSecured ? AccessController.doPrivileged( action ) : action.run();
-			rb = loadBundle(
-					classLoader,
-					locale,
-					USER_VALIDATION_MESSAGES + " not found by validator classloader"
-			);
-		}
-		if ( log.isDebugEnabled() ) {
-			if ( rb != null ) {
-				log.debug( USER_VALIDATION_MESSAGES + " found" );
-			}
-			else {
-				log.debug( USER_VALIDATION_MESSAGES + " not found. Delegating to " + DEFAULT_VALIDATION_MESSAGES );
-			}
-		}
-		return rb;
-	}
-
-	private ResourceBundle loadBundle(ClassLoader classLoader, Locale locale, String message) {
-		ResourceBundle rb = null;
-		try {
-			rb = ResourceBundle.getBundle( USER_VALIDATION_MESSAGES, locale, classLoader );
-		}
-		catch ( MissingResourceException e ) {
-			log.trace( message );
-		}
-		return rb;
 	}
 
 	private String replaceVariables(String message, ResourceBundle bundle, Locale locale, boolean recurse) {
@@ -266,28 +231,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return parameter.substring( 1, parameter.length() - 1 );
 	}
 
-	private ResourceBundle findDefaultResourceBundle(Locale locale) {
-		if ( defaultBundlesMap.containsKey( locale ) ) {
-			return defaultBundlesMap.get( locale );
-		}
-
-		ResourceBundle bundle = ResourceBundle.getBundle( DEFAULT_VALIDATION_MESSAGES, locale );
-		defaultBundlesMap.put( locale, bundle );
-		return bundle;
-	}
-
-	private ResourceBundle findUserResourceBundle(Locale locale) {
-		if ( userBundlesMap.containsKey( locale ) ) {
-			return userBundlesMap.get( locale );
-		}
-
-		ResourceBundle bundle = getFileBasedResourceBundle( locale );
-		if ( bundle != null ) {
-			userBundlesMap.put( locale, bundle );
-		}
-		return bundle;
-	}
-
 	/**
 	 * @param s The string in which to replace the meta characters '$' and '\'.
 	 *
@@ -306,14 +249,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		LocalisedMessage(String message, Locale locale) {
 			this.message = message;
 			this.locale = locale;
-		}
-
-		public String getMessage() {
-			return message;
-		}
-
-		public Locale getLocale() {
-			return locale;
 		}
 
 		@Override

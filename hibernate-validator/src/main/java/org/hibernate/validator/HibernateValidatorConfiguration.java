@@ -19,11 +19,48 @@ package org.hibernate.validator;
 
 import javax.validation.Configuration;
 
+import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+
 /**
- * Uniquely identify Hibernate Validator in the Bean Validation bootstrap strategy
- * Also contains Hibernate Validator specific configurations
- * 
+ * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
+ * strategy. Also contains Hibernate Validator specific configurations.
+ *
  * @author Emmanuel Bernard
+ * @author Gunnar Morling
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
+
+	/**
+	 * <p>
+	 * Returns the {@link ResourceBundleLocator} used by the
+	 * {@link Configuration#getDefaultMessageInterpolator() default message
+	 * interpolator} to load user-provided resource bundles. In conformance with
+	 * the specification this default locator retrieves the bundle
+	 * "ValidationMessages".
+	 * </p>
+	 * <p>
+	 * This locator can be used as delegate for custom locators when setting a
+	 * customized {@link ResourceBundleMessageInterpolator}:
+	 * </p>
+	 * <p/>
+	 * <pre>
+	 * {@code
+	 * 	HibernateValidatorConfiguration configure =
+	 *    Validation.byProvider(HibernateValidator.class).configure();
+	 * <p/>
+	 *  ResourceBundleLocator defaultResourceBundleLocator =
+	 *    configure.getDefaultResourceBundleLocator();
+	 *  ResourceBundleLocator myResourceBundleLocator =
+	 *    new MyResourceBundleLocator(defaultResourceBundleLocator);
+	 * <p/>
+	 *  configure.messageInterpolator(
+	 *    new ResourceBundleMessageInterpolator(myResourceBundleLocator));
+	 * }
+	 * </pre>
+	 *
+	 * @return The default {@link ResourceBundleLocator}. Never null.
+	 */
+	ResourceBundleLocator getDefaultResourceBundleLocator();
+
 }

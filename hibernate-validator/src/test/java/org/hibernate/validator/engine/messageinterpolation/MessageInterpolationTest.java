@@ -18,6 +18,7 @@
 package org.hibernate.validator.engine.messageinterpolation;
 
 import java.io.ByteArrayInputStream;
+import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import javax.validation.Configuration;
@@ -28,11 +29,13 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Tests for HV-184
@@ -52,10 +55,19 @@ public class MessageInterpolationTest {
 		final ResourceBundle bundle = new PropertyResourceBundle(
 				new ByteArrayInputStream( lines.toString().getBytes() )
 		);
-		Configuration<?> config = ( Configuration<?> ) Validation.byDefaultProvider()
+		Configuration<?> config = Validation.byDefaultProvider()
 				.configure()
 				.messageInterpolator(
-						new ResourceBundleMessageInterpolator( bundle )
+						new ResourceBundleMessageInterpolator(
+								new ResourceBundleLocator() {
+
+									public ResourceBundle getResourceBundle(
+											Locale locale) {
+										return bundle;
+									}
+
+								}
+						)
 				);
 
 		ValidatorFactory factory = config.buildValidatorFactory();

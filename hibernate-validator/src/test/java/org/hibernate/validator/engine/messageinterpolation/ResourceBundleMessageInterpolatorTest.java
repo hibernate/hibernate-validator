@@ -29,17 +29,19 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.MessageInterpolatorContext;
 import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Tests for message interpolation.
@@ -75,7 +77,9 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testSuccessfulInterpolation() {
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 		String expected = "message interpolation successful";
 		String actual = interpolator.interpolate( "{simple.key}", context );
@@ -97,7 +101,9 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	public void testMessageLiterals() {
 
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "{";
@@ -115,7 +121,9 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUnSuccessfulInterpolation() {
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "foo";  // missing {}
@@ -129,7 +137,9 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testUnknownTokenInterpolation() {
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "{bar}";  // unknown token {}
@@ -139,7 +149,9 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testKeyWithDashes() {
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "message interpolation successful";  // unknown token {}
@@ -149,7 +161,9 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testKeyWithSpaces() {
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "message interpolation successful";  // unknown token {}
@@ -159,7 +173,9 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testDefaultInterpolation() {
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 
 		String expected = "may not be null";
@@ -207,7 +223,9 @@ public class ResourceBundleMessageInterpolatorTest {
 				max, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
 		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null );
 
 		String expected = "{replace.in.default.bundle2}";
@@ -233,7 +251,10 @@ public class ResourceBundleMessageInterpolatorTest {
 				max, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		interpolator = new ResourceBundleMessageInterpolator( new TestResourceBundle() );
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator()
+		);
+
 		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null );
 
 		String actual = interpolator.interpolate( max.message(), context );
@@ -243,10 +264,22 @@ public class ResourceBundleMessageInterpolatorTest {
 	}
 
 	/**
+	 * A dummy locator always returning a {@link TestResourceBundle}.
+	 */
+	private static class TestResourceBundleLocator implements ResourceBundleLocator {
+
+		private TestResourceBundle resourceBundle = new TestResourceBundle();
+
+		public ResourceBundle getResourceBundle(Locale locale) {
+			return resourceBundle;
+		}
+	}
+
+	/**
 	 * A dummy resource bundle which can be passed to the constructor of ResourceBundleMessageInterpolator to replace
 	 * the user specified resource bundle.
 	 */
-	class TestResourceBundle extends ResourceBundle implements Enumeration<String> {
+	private static class TestResourceBundle extends ResourceBundle implements Enumeration<String> {
 		private Map<String, String> testResources;
 		Iterator<String> iter;
 

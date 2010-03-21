@@ -1,7 +1,7 @@
 // $Id$
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -33,18 +33,21 @@ import javax.validation.spi.ValidationProvider;
 
 import org.slf4j.Logger;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.resolver.DefaultTraversableResolver;
+import org.hibernate.validator.engine.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.Version;
 import org.hibernate.validator.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.xml.ValidationXmlParser;
-import org.hibernate.validator.HibernateValidatorConfiguration;
 
 /**
  * Hibernate specific <code>Configuration</code> implementation.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -54,7 +57,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private static final Logger log = LoggerFactory.make();
 
-	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator();
+	private final ResourceBundleLocator defaultResourceBundleLocator = new PlatformResourceBundleLocator( Constants.USER_VALIDATION_MESSAGES );
+	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator(
+			defaultResourceBundleLocator
+	);
 	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 	private final ValidationProviderResolver providerResolver;
@@ -178,6 +184,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ConstraintValidatorFactory getDefaultConstraintValidatorFactory() {
 		return defaultConstraintValidatorFactory;
+	}
+
+	public ResourceBundleLocator getDefaultResourceBundleLocator() {
+		return defaultResourceBundleLocator;
 	}
 
 	private boolean isSpecificProvider() {
