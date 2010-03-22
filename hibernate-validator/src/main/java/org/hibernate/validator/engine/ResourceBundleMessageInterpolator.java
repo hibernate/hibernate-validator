@@ -73,7 +73,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 *
 	 * @deprecated Use {@link ResourceBundleMessageInterpolator#ResourceBundleMessageInterpolator(ResourceBundleLocator)} instead.
 	 */
-	// TODO GM: Do we still need this? It was only used in tests, but there might be 3rd party code using it.
 	@Deprecated
 	public ResourceBundleMessageInterpolator(final ResourceBundle resourceBundle) {
 		this(
