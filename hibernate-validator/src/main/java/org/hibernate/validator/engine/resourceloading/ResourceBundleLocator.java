@@ -33,8 +33,9 @@ import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
  * of this interface, alternative ways of bundle loading can be realized, e.g.
  * by loading bundles based on XML files or from a database.
  * </p>
- * <p/>
- * TODO GM: Note, that all implementations must be thread-safe?
+ * <p>
+ * A {@code ResourceBundleLocator} implementation must be thread-safe.
+ * </p>
  *
  * @author Gunnar Morling
  */
@@ -50,5 +51,4 @@ public interface ResourceBundleLocator {
 	 *         bundle exists.
 	 */
 	ResourceBundle getResourceBundle(Locale locale);
-
 }
