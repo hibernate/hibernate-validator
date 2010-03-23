@@ -1,4 +1,4 @@
-// $Id: AnnotationFactoryTest.java 17620 2009-10-04 19:19:28Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors

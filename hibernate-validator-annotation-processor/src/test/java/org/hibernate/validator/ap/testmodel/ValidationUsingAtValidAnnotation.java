@@ -1,4 +1,4 @@
-// $Id: ValidationUsingAtValidAnnotation.java 18897 2010-02-25 19:12:35Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors

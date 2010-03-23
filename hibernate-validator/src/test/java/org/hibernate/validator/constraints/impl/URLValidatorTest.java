@@ -1,4 +1,4 @@
-// $Id: LengthValidatorTest.java 17521 2009-09-16 12:50:41Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors

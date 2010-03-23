@@ -1202,14 +1202,30 @@ public void testOrderedChecksWithRedefinedDefault() {
           </row>
 
           <row>
+            <entry>@NotBlank</entry>
+
+            <entry>no</entry>
+
+            <entry>field/property</entry>
+
+            <entry>Check that the annotated string is not null and the trimmed
+            length is greater than 0. The difference to @NotEmpty is that this
+            constraint can only be applied on strings and that trailing
+            whitespaces are ignored.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
             <entry>@NotEmpty</entry>
 
             <entry>no</entry>
 
-            <entry>field/property. Needs to be a string.</entry>
+            <entry>field/property. Supported types are String, Collection, Map
+            and arrays.</entry>
 
-            <entry>Check if the string is not <constant>null</constant> nor
-            empty.</entry>
+            <entry>Check whether is annoated element is not
+            <constant>null</constant> nor empty.</entry>
 
             <entry>none</entry>
           </row>

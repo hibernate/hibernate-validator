@@ -11,6 +11,9 @@
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator</artifactId>
     <name>Hibernate Validator</name>
+    <description>
+        Hibernate's Bean Validation (JSR-303) reference implementation.
+    </description>
     <distributionManagement>
         <site>
             <id>site</id>

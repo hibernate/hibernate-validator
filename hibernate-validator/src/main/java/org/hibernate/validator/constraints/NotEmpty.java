@@ -33,7 +33,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * Asserts that the annotated string, collection, map or array is not {@code null} or empty.
+ *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 @Documented
 @Constraint(validatedBy = { })

@@ -1,4 +1,4 @@
-// $Id: Length.java 17427 2009-08-27 09:47:28Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
