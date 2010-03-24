@@ -221,7 +221,7 @@
                     <version>2.2-beta-4</version>
                     <configuration>
                         <descriptorRefs>
-                            <descriptorRef>project</descriptorRef>
+                            <descriptorRef>dist</descriptorRef>
                         </descriptorRefs>
                     </configuration>
                 </plugin>
@@ -234,6 +234,7 @@
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                         <remoteTagging>true</remoteTagging>
+                        <goal>deploy</goal>
                     </configuration>
                 </plugin>
                 <plugin>
