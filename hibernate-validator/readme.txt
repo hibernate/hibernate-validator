@@ -26,7 +26,7 @@
   -------------
 
   The full list of changes can be found at
-  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=10982
+  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11023
 
   System Requirements
   -------------------
@@ -62,9 +62,8 @@
   Hibernate Validator URLs
   ------------------------
 
-  Home Page:          http://validator.hibernate.org/
-  Migration Guide:    http://www.hibernate.org/468.html
-  Downloads:          http://www.hibernate.org/6.html
-  Mailing Lists:      http://www.hibernate.org/20.html
+  Home Page:          http://validator.hibernate.org
+  Downloads:          http://www.hibernate.org/subprojects/validator/download.html
+  Mailing Lists:      http://www.hibernate.org/community/mailinglists.html
   Source Code:        http://anonsvn.jboss.org/repos/hibernate/validator/trunk/
   Issue Tracking:     http://opensource.atlassian.com/projects/hibernate/browse/HV
