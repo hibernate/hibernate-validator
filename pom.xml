@@ -234,7 +234,6 @@
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                         <remoteTagging>true</remoteTagging>
-                        <goals>deploy</goals>
                     </configuration>
                 </plugin>
                 <plugin>
