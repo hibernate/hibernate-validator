@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.1.0.Beta1</version>
     <name>Hibernate Validator Aggregator</name>
     <url>http://validator.hibernate.org</url>
 
@@ -283,7 +281,12 @@
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.0.1</version>
-                </plugin>    
+                </plugin>  
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-archetype-plugin</artifactId>
+                    <version>2.0-alpha-4</version>
+                </plugin>  
             </plugins>
         </pluginManagement>
     </build>
@@ -308,8 +311,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk</connection>
-        <url>http://fisheye.jboss.org/browse/Hibernate/validator/trunk</url>
+        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/tags/v4_1_0_Beta1</connection>
+        <url>http://fisheye.jboss.org/browse/Hibernate/validator/tags/v4_1_0_Beta1</url>
     </scm>
 
     <distributionManagement>
@@ -318,7 +321,8 @@
             <!-- It is anticipated that ${maven.repository.root} be set in user's settings.xml -->
             <!-- todo : replace this with direct svn access once the svnkit providers are available -->
             <id>repository.jboss.org</id>
-            <url>file://${maven.repository.root}</url>
+            <!--url>file://${maven.repository.root}</url-->
+            <url>file:///Users/hardy/tmp/snapshot/org/hibernate</url>
         </repository>
         <snapshotRepository>
             <id>snapshots.jboss.org</id>
