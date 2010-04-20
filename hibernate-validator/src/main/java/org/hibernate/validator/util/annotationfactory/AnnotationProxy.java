@@ -1,7 +1,7 @@
 // $Id$
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -89,7 +89,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 			}
 		}
 		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
-			throw new RuntimeException( "Trying to instantiate " + annotationType + " with unknown paramters." );
+			throw new RuntimeException( "Trying to instantiate " + annotationType + " with unknown parameters." );
 		}
 		return result;
 	}

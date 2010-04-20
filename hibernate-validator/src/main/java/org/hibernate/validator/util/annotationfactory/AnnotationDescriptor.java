@@ -1,7 +1,7 @@
 // $Id$
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -39,6 +39,31 @@ public class AnnotationDescriptor<T extends Annotation> {
 
 	private final Map<String, Object> elements = new HashMap<String, Object>();
 
+	/**
+	 * Returns a new descriptor for the given annotation type.
+	 * 
+	 * @param <S> The type of the annotation.
+	 * @param annotationType The annotation's class.
+	 * 
+	 * @return A new descriptor for the given annotation type.
+	 */
+	public static <S extends Annotation> AnnotationDescriptor<S> getInstance(Class<S> annotationType) {
+		return new AnnotationDescriptor<S>(annotationType);
+	}
+	
+	/**
+	 * Returns a new descriptor for the given annotation type.
+	 * 
+	 * @param <S> The type of the annotation.
+	 * @param annotationType The annotation's class.
+	 * @param elements A map with attribute values for the annotation to be created.
+	 * 
+	 * @return A new descriptor for the given annotation type.
+	 */
+	public static <S extends Annotation> AnnotationDescriptor<S> getInstance(Class<S> annotationType, Map<String, Object> elements) {
+		return new AnnotationDescriptor<S>(annotationType, elements);
+	}
+	
 	public AnnotationDescriptor(Class<T> annotationType) {
 		this.type = annotationType;
 	}

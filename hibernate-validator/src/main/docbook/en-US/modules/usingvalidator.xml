@@ -1182,7 +1182,7 @@ public void testOrderedChecksWithRedefinedDefault() {
             <classname>int</classname>, <classname>long</classname> and the
             respective wrappers of the primitive types.</entry>
 
-            <entry>Check whether the annotated value is higher than or equal
+            <entry>Checks whether the annotated value is higher than or equal
             to the specified minimum.</entry>
 
             <entry>Add a check constraint on the column.</entry>
@@ -1224,7 +1224,7 @@ public void testOrderedChecksWithRedefinedDefault() {
             <entry>field/property. Supported types are String, Collection, Map
             and arrays.</entry>
 
-            <entry>Check whether is annoated element is not
+            <entry>Check whether the annotated element is not
             <constant>null</constant> nor empty.</entry>
 
             <entry>none</entry>
@@ -1264,8 +1264,9 @@ public void testOrderedChecksWithRedefinedDefault() {
 
             <entry>field/property. Needs to be a string.</entry>
 
-            <entry>Check if the annotated string match the regular expression
-            <parameter>regex</parameter>.</entry>
+            <entry>Checks if the annotated string matches the regular
+            expression <parameter>regex</parameter> considering the given flag
+            <parameter>match</parameter>.</entry>
 
             <entry>none</entry>
           </row>
@@ -1305,6 +1306,27 @@ public void testOrderedChecksWithRedefinedDefault() {
           </row>
 
           <row>
+            <entry>@ScriptAssert(lang=, script=, alias=)</entry>
+
+            <entry>no</entry>
+
+            <entry>type</entry>
+
+            <entry>Checks whether the given script can successfully be
+            evaluated against the annotated element. In order to use this
+            constraint, an implementation of the Java Scripting API as defined
+            by JSR 223 ("Scripting for the Java<superscript>TM</superscript>
+            Platform") must part of the class path. This is automatically the
+            case when running on Java 6. For older Java versions, the JSR 223
+            RI can be added manually to the class path.The expressions to be
+            evaluated can be written in any scripting or expression language,
+            for which a JSR 223 compatible engine can be found in the class
+            path.</entry>
+
+            <entry>none</entry>
+          </row>
+
+          <row>
             <entry>@URL(protocol=, host=, port=)</entry>
 
             <entry>no</entry>
@@ -1326,10 +1348,13 @@ public void testOrderedChecksWithRedefinedDefault() {
 
             <entry>yes</entry>
 
-            <entry>field/property</entry>
+            <entry>field/property. Any non-primitive types are
+            supported.</entry>
 
-            <entry>Perform validation recursively on the associated
-            object.</entry>
+            <entry>Performs validation recursively on the associated object. If
+            the object is a collection or an array, the elements are validated
+            recursively. If the object is a map, the value elements are
+            validated recursively.</entry>
 
             <entry>none</entry>
           </row>
