@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
@@ -281,12 +283,12 @@
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.0.1</version>
-                </plugin>  
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-archetype-plugin</artifactId>
                     <version>2.0-alpha-4</version>
-                </plugin>  
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -317,16 +319,14 @@
 
     <distributionManagement>
         <repository>
-            <!-- Copy the dist to the local checkout of the JBoss maven2 repo ${maven.repository.root} -->
-            <!-- It is anticipated that ${maven.repository.root} be set in user's settings.xml -->
-            <!-- todo : replace this with direct svn access once the svnkit providers are available -->
-            <id>repository.jboss.org</id>
-            <url>file://${maven.repository.root}</url>
+            <id>jboss-releases-repository</id>
+            <name>JBoss Releases Repository</name>
+            <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
-            <id>snapshots.jboss.org</id>
-            <name>JBoss Snapshot Repository</name>
-            <url>dav:https://snapshots.jboss.org/maven2</url>
+            <id>jboss-snapshots-repository</id>
+            <name>JBoss Snapshots Repository</name>
+            <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
