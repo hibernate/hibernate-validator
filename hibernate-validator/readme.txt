@@ -41,6 +41,8 @@
     jars for log4j (log4j-<version>.jar and slf4j-log4j12-<version>.jar) with the slf4j binding files of
     your choice. See http://www.slf4j.org/manual.html
     In case you are using Java 5 you have to also include all the jar files from the jdk5 subdirectory.
+    The jar files contain the classes needed for using JAXB. If XML configuration is disabled via
+    Configuration.ignoreXmlConfiguration the jar files from the jdk5 subdirectory don't have to be added. 
 
   or 
 

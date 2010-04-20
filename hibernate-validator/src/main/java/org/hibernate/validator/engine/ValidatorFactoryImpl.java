@@ -57,13 +57,17 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final BeanMetaDataCache beanMetaDataCache;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
+
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.constraintHelper = new ConstraintHelper();
 		this.beanMetaDataCache = new BeanMetaDataCache();
 
-		initBeanMetaData( configurationState.getMappingStreams() );
+		//HV-302; don't load XmlMappingParser if not necessary
+		if ( !configurationState.getMappingStreams().isEmpty() ) {
+			initBeanMetaData( configurationState.getMappingStreams() );
+		}
 	}
 
 	public Validator getValidator() {

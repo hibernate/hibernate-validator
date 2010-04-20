@@ -47,7 +47,8 @@
 
         <!--
         Provided dependencies.
-        JAXB is needed when running on Java5. In this environment these dependencies have to be added 
+        JAXB is needed when running on Java5. In this environment these dependencies have to be added (unless
+        xml configuration is explicitly disabled via Configuration.ignoreXmlConfiguration)
         On Java6 jaxb is part of the runtime environment                                                                                                           
         -->
         <dependency>

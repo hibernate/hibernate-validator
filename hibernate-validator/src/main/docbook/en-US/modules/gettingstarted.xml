@@ -79,7 +79,12 @@
     &lt;version&gt;2.1.12&lt;/version&gt;
 &lt;/dependency&gt;
 </programlisting> if you are using the SourceForge package you find the
-    necessary libraries in the <filename>lib/jdk5</filename> directory.</para>
+    necessary libraries in the <filename>lib/jdk5</filename> directory. In
+    case you are not using the XML configuration you can also disable it
+    explicitly by calling
+    <methodname>Configuration.ignoreXmlConfiguration()</methodname> during
+    <classname>ValidationFactory</classname> creation. In this case the JAXB
+    dependencies are not needed.</para>
   </note>
 
   <section id="validator-gettingstarted-createproject">
