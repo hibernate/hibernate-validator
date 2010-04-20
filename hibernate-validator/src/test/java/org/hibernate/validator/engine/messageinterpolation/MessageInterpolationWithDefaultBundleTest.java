@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -29,11 +29,15 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.util.TestUtil;
+
 import static org.hibernate.validator.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.util.TestUtil.assertNumberOfViolations;
 
 /**
+ * Tests for correct message interpolation for messages from the default bundle.
+ *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class MessageInterpolationWithDefaultBundleTest {
 	private Locale defaultLocale;
@@ -54,7 +58,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	@Test
 	public void testEmailAndRangeMessageEnglishLocale() {
 		Locale.setDefault( Locale.ENGLISH );
-		Configuration config = TestUtil.getConfiguration();
+		Configuration<?> config = TestUtil.getConfiguration();
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -73,7 +77,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	@Test
 	public void testEmailAndRangeMessageGermanLocale() {
 		Locale.setDefault( Locale.GERMAN );
-		Configuration config = TestUtil.getConfiguration();
+		Configuration<?> config = TestUtil.getConfiguration();
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -92,7 +96,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	@Test
 	public void testEmailAndRangeMessageFrenchLocale() {
 		Locale.setDefault( Locale.FRENCH );
-		Configuration config = TestUtil.getConfiguration();
+		Configuration<?> config = TestUtil.getConfiguration();
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -104,6 +108,45 @@ public class MessageInterpolationWithDefaultBundleTest {
 				constraintViolations, "Addresse email mal form\u00E9e", "doit \u00EAtre entre 18 et 21"
 		);
 	}
+
+	/**
+	 * HV-306. If English is explicitly set as locale for message interpolation, it
+	 * must take precedence over the system's default locale.
+	 */
+	@Test
+	public void testThatExplicitlySetEnglishLocaleHasPrecedenceOverDefaultLocale() {
+
+		Locale.setDefault( Locale.FRENCH );
+		Configuration<?> config = TestUtil.getConfiguration();
+		config.messageInterpolator( new LocalizedMessageInterpolator( Locale.ENGLISH ) );
+		Validator validator = config.buildValidatorFactory().getValidator();
+		User user = new User();
+		user.setEmail( "foo" );
+		user.setAge( 16 );
+		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
+		assertNumberOfViolations( constraintViolations, 2 );
+		assertCorrectConstraintViolationMessages(
+				constraintViolations, "not a well-formed email address", "must be between 18 and 21"
+		);
+	}
+
+	/**
+	 * A message interpolator that enforces one given locale to be used for message
+	 * interpolation.
+	 *
+	 * @author Gunnar Morling
+	 */
+	private static class LocalizedMessageInterpolator extends ResourceBundleMessageInterpolator {
+
+		private Locale locale;
+
+		public LocalizedMessageInterpolator(Locale locale) {
+			this.locale = locale;
+		}
+
+		@Override
+		public String interpolate(String messageTemplate, Context context) {
+			return interpolate( messageTemplate, context, this.locale );
+		}
+	}
 }
-
-
