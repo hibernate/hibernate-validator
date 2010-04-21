@@ -28,6 +28,13 @@
             <organization>JBoss, a division of Red Hat</organization>
             <url>http://in.relation.to/Bloggers/Hardy</url>
         </developer>
+        <developer>
+            <id>gunnar.morling</id>
+            <name>Gunnar Morling</name>
+            <email>gunnar.morling@googlemail.com</email>
+            <organization>Individual</organization>
+            <url>http://musingsofaprogrammingaddict.blogspot.com/</url>
+        </developer>        
     </developers>
 
     <mailingLists>
