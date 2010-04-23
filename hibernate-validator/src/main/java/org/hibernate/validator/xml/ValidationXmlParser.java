@@ -17,6 +17,7 @@
 */
 package org.hibernate.validator.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.AccessController;
@@ -234,6 +235,13 @@ public class ValidationXmlParser {
 		catch ( JAXBException e ) {
 			log.error( "Error parsing validation.xml: {}", e.getMessage() );
 			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE );
+		}
+		finally {
+			try {
+				inputStream.close();
+			}   catch ( IOException io) {
+				log.warn( "Unable to close input stream for " + VALIDATION_XML_FILE);
+			}
 		}
 		return validationConfig;
 	}

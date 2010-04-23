@@ -17,7 +17,9 @@
 */
 package org.hibernate.validator.engine;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +69,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
+
+	private Set<InputStream> configurationStreams = new HashSet<InputStream>();
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -122,26 +126,39 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
 		ValidatorFactory factory = null;
-		if ( isSpecificProvider() ) {
-			factory = validationBootstrapParameters.provider.buildValidatorFactory( this );
-		}
-		else {
-			final Class<? extends ValidationProvider<?>> providerClass = validationBootstrapParameters.providerClass;
-			if ( providerClass != null ) {
-				for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
-					if ( providerClass.isAssignableFrom( provider.getClass() ) ) {
-						factory = provider.buildValidatorFactory( this );
-						break;
-					}
-				}
-				if ( factory == null ) {
-					throw new ValidationException( "Unable to find provider: " + providerClass );
-				}
+		try {
+			if ( isSpecificProvider() ) {
+				factory = validationBootstrapParameters.provider.buildValidatorFactory( this );
 			}
 			else {
-				List<ValidationProvider<?>> providers = providerResolver.getValidationProviders();
-				assert providers.size() != 0; // I run therefore I am
-				factory = providers.get( 0 ).buildValidatorFactory( this );
+				final Class<? extends ValidationProvider<?>> providerClass = validationBootstrapParameters.providerClass;
+				if ( providerClass != null ) {
+					for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
+						if ( providerClass.isAssignableFrom( provider.getClass() ) ) {
+							factory = provider.buildValidatorFactory( this );
+							break;
+						}
+					}
+					if ( factory == null ) {
+						throw new ValidationException( "Unable to find provider: " + providerClass );
+					}
+				}
+				else {
+					List<ValidationProvider<?>> providers = providerResolver.getValidationProviders();
+					assert providers.size() != 0; // I run therefore I am
+					factory = providers.get( 0 ).buildValidatorFactory( this );
+				}
+			}
+		}
+		finally {
+			// close all input streams opened by this configuration
+			for ( InputStream in : configurationStreams ) {
+				try {
+					in.close();
+				}
+				catch ( IOException io ) {
+					log.warn( "Unable to close input stream." );
+				}
 			}
 		}
 
@@ -248,6 +265,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 
 		validationBootstrapParameters.mappings.addAll( xmlParameters.mappings );
+		configurationStreams.addAll( xmlParameters.mappings );
 
 		for ( Map.Entry<String, String> entry : xmlParameters.configProperties.entrySet() ) {
 			if ( validationBootstrapParameters.configProperties.get( entry.getKey() ) == null ) {
