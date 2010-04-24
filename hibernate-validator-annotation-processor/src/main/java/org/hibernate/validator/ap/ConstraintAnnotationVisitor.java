@@ -17,10 +17,7 @@
 */
 package org.hibernate.validator.ap;
 
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.ResourceBundle;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -32,11 +29,11 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
-import javax.tools.Diagnostic.Kind;
 
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper.ConstraintCheckResult;
+import org.hibernate.validator.ap.util.MessagerAdapter;
 
 /**
  * An {@link ElementVisitor} that visits elements (type declarations, methods
@@ -47,35 +44,13 @@ import org.hibernate.validator.ap.util.ConstraintHelper.ConstraintCheckResult;
  */
 final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<AnnotationMirror>> {
 
-	/**
-	 * The name of the processor option for setting the diagnostic kind to be
-	 * used when reporting errors during annotation processing. Can be set on
-	 * the command line using the -A option, e.g.
-	 * <code>-AdiagnosticKind=ERROR</code>.
-	 */
-	public final static String DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME = "diagnosticKind";
-
-	/**
-	 * The diagnostic kind to be used if no or an invalid kind is given as processor option.
-	 */
-	public final static Kind DEFAULT_DIAGNOSTIC_KIND = Kind.ERROR;
-
-	/**
-	 * The kind of diagnostic to be used when reporting any problems.
-	 */
-	private Kind diagnosticKind;
-
-	private final ProcessingEnvironment processingEnvironment;
-
-	private final ResourceBundle errorMessages;
-
 	private final ConstraintHelper constraintHelper;
 
-	public ConstraintAnnotationVisitor(ProcessingEnvironment processingEnvironment) {
+	private final MessagerAdapter messager;
 
-		this.processingEnvironment = processingEnvironment;
+	public ConstraintAnnotationVisitor(ProcessingEnvironment processingEnvironment, MessagerAdapter messager) {
 
-		errorMessages = ResourceBundle.getBundle( "org.hibernate.validator.ap.ValidationProcessorMessages" );
+		this.messager = messager;
 
 		AnnotationApiHelper annotationApiHelper = new AnnotationApiHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
@@ -84,33 +59,6 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 		constraintHelper = new ConstraintHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils(), annotationApiHelper
 		);
-
-		initializeDiagnosticKind();
-	}
-
-	private void initializeDiagnosticKind() {
-
-		String diagnosticKindFromOptions = processingEnvironment.getOptions()
-				.get( DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME );
-
-		if ( diagnosticKindFromOptions != null ) {
-			try {
-				diagnosticKind = Kind.valueOf( diagnosticKindFromOptions );
-			}
-			catch ( IllegalArgumentException e ) {
-
-				processingEnvironment.getMessager().printMessage(
-						Kind.ERROR, MessageFormat.format(
-								errorMessages.getString( "INVALID_DIAGNOSTIC_KIND_GIVEN" ), diagnosticKindFromOptions
-						)
-				);
-
-				diagnosticKind = DEFAULT_DIAGNOSTIC_KIND;
-			}
-		}
-		else {
-			diagnosticKind = DEFAULT_DIAGNOSTIC_KIND;
-		}
 	}
 
 	/**
@@ -135,6 +83,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 										List<AnnotationMirror> mirrors) {
 
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
+
 
 			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
 
@@ -208,13 +157,6 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	 * declarations.
 	 * </p>
 	 */
-	// TODO GM: do a more complete check of constraint annotation type
-	// declarations:
-	// 
-	// - check existence of groups(), message(), payload()
-	// - check retention policy
-	// - check, that the set of supported types is not empty
-	// - optionally check, that validated types resolve to non-parametrized types
 	@Override
 	public Void visitTypeAsAnnotationType(TypeElement annotationType,
 										  List<AnnotationMirror> mirrors) {
@@ -289,7 +231,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 				mirror.getAnnotationType(), annotatedType.asType()
 		) != ConstraintCheckResult.ALLOWED ) {
 
-			reportError(
+			messager.reportError(
 					annotatedType, mirror, "NOT_SUPPORTED_TYPE",
 					mirror.getAnnotationType().asElement().getSimpleName()
 			);
@@ -300,7 +242,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		if ( isStaticElement( annotatedField ) ) {
 
-			reportError( annotatedField, annotationMirror, "STATIC_FIELDS_MAY_NOT_BE_ANNOTATED" );
+			messager.reportError( annotatedField, annotationMirror, "STATIC_FIELDS_MAY_NOT_BE_ANNOTATED" );
 
 			return;
 		}
@@ -309,7 +251,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 				annotationMirror.getAnnotationType(), annotatedField.asType()
 		) != ConstraintCheckResult.ALLOWED ) {
 
-			reportError(
+			messager.reportError(
 					annotatedField, annotationMirror, "NOT_SUPPORTED_TYPE",
 					annotationMirror.getAnnotationType().asElement().getSimpleName()
 			);
@@ -320,14 +262,14 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		if ( !isGetterMethod( method ) ) {
 
-			reportError( method, mirror, "ONLY_GETTERS_MAY_BE_ANNOTATED" );
+			messager.reportError( method, mirror, "ONLY_GETTERS_MAY_BE_ANNOTATED" );
 
 			return;
 		}
 
 		if ( isStaticElement( method ) ) {
 
-			reportError( method, mirror, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
+			messager.reportError( method, mirror, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
 
 			return;
 		}
@@ -336,7 +278,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 				mirror.getAnnotationType(), method.getReturnType()
 		) != ConstraintCheckResult.ALLOWED ) {
 
-			reportError(
+			messager.reportError(
 					method, mirror, "NOT_SUPPORTED_RETURN_TYPE",
 					mirror.getAnnotationType().asElement().getSimpleName()
 			);
@@ -346,7 +288,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	private void checkConstraintAtAnnotationType(TypeElement annotationType, AnnotationMirror annotationMirror) {
 
 		if ( !constraintHelper.isConstraintAnnotation( annotationType ) ) {
-			reportError( annotationType, annotationMirror, "ONLY_CONSTRAINT_ANNOTATIONS_MAY_BE_ANNOTATED" );
+			messager.reportError( annotationType, annotationMirror, "ONLY_CONSTRAINT_ANNOTATIONS_MAY_BE_ANNOTATED" );
 		}
 
 	}
@@ -356,7 +298,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		if ( isStaticElement( annotatedField ) ) {
 
-			reportError(
+			messager.reportError(
 					annotatedField, annotationMirror,
 					"STATIC_FIELDS_MAY_NOT_BE_ANNOTATED"
 			);
@@ -366,7 +308,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		if ( isPrimitiveType( annotatedField.asType() ) ) {
 
-			reportError(
+			messager.reportError(
 					annotatedField, annotationMirror,
 					"ATVALID_NOT_ALLOWED_AT_PRIMITIVE_FIELD"
 			);
@@ -378,7 +320,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		if ( !isGetterMethod( method ) ) {
 
-			reportError(
+			messager.reportError(
 					method, annotationMirror,
 					"ONLY_GETTERS_MAY_BE_ANNOTATED"
 			);
@@ -388,7 +330,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		if ( isStaticElement( method ) ) {
 
-			reportError(
+			messager.reportError(
 					method, annotationMirror,
 					"STATIC_METHODS_MAY_NOT_BE_ANNOTATED"
 			);
@@ -398,7 +340,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 		if ( isPrimitiveType( method.getReturnType() ) ) {
 
-			reportError(
+			messager.reportError(
 					method, annotationMirror,
 					"ATVALID_NOT_ALLOWED_AT_METHOD_RETURNING_PRIMITIVE_TYPE"
 			);
@@ -428,32 +370,6 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 	private boolean isPrimitiveType(TypeMirror typeMirror) {
 		return typeMirror.getKind().isPrimitive();
-	}
-
-	/**
-	 * Reports an error at the given location using the given message key and
-	 * optionally the given message parameters.
-	 *
-	 * @param element The element at which the error shall be reported.
-	 * @param annotationMirror The annotation mirror at which the error shall be reported.
-	 * @param messageKey The message key to be used to retrieve the text.
-	 * @param messageParameters An optional array of message parameters to be put into the
-	 * message using a {@link MessageFormat}.
-	 */
-	private void reportError(Element element, AnnotationMirror annotationMirror, String messageKey, Object... messageParameters) {
-
-		String message;
-
-		if ( messageParameters == null ) {
-			message = errorMessages.getString( messageKey );
-		}
-		else {
-			message = MessageFormat.format( errorMessages.getString( messageKey ), messageParameters );
-		}
-
-		processingEnvironment.getMessager().printMessage(
-				diagnosticKind, message, element, annotationMirror
-		);
 	}
 
 }
