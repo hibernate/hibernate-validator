@@ -1,4 +1,4 @@
-// $Id: MessagerAdapter.java 19033 2010-03-19 21:27:15Z gunnar.morling $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -19,10 +19,11 @@ package org.hibernate.validator.ap.util;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.annotation.processing.Messager;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 import javax.tools.Diagnostic.Kind;
+
+import org.hibernate.validator.ap.checks.ConstraintCheckError;
 
 /**
  * Wrapper around {@link Messager}, which adds the ability to format error messages using {@link MessageFormat}.
@@ -58,30 +59,43 @@ public class MessagerAdapter {
 	}
 
 	/**
-	 * Reports an error at the given location using the given message key and
-	 * optionally the given message parameters.
+	 * Returns the messager used by this adapter.
 	 *
-	 * @param element The element at which the error shall be reported.
-	 * @param annotation The annotation mirror at which the error shall be reported.
-	 * @param messageKey The message key to be used to retrieve the text.
-	 * @param messageParameters An optional array of message parameters to be put into the
-	 * message using a {@link MessageFormat}.
+	 * @return The underlying messager.
 	 */
-	public void reportError(Element element, AnnotationMirror annotation, String messageKey, Object... messageParameters) {
+	public Messager getDelegate() {
+		return messager;
+	}
 
-		String message = errorMessages.getString( messageKey );
-
-		if ( message != null &&
-				messageParameters != null ) {
-
-			message = MessageFormat.format( errorMessages.getString( messageKey ), messageParameters );
+	/**
+	 * Reports the given errors against the underlying {@link Messager} using
+	 * the specified {@link Kind}.
+	 *
+	 * @param errors A set with errors to report. May be empty but must not be
+	 * null.
+	 */
+	public void reportErrors(Set<ConstraintCheckError> errors) {
+		for ( ConstraintCheckError oneError : errors ) {
+			reportError( oneError );
 		}
-		else {
-			message = messageKey;
+	}
+
+	/**
+	 * Reports the given error. Message parameters will be put into the template
+	 * retrieved from the resource bundle if applicable.
+	 *
+	 * @param error The error to report.
+	 */
+	private void reportError(ConstraintCheckError error) {
+
+		String message = errorMessages.getString( error.getMessageKey() );
+
+		if ( error.getMessageParameters() != null ) {
+			message = MessageFormat.format( message, error.getMessageParameters() );
 		}
 
 		messager.printMessage(
-				diagnosticKind, message, element, annotation
+				diagnosticKind, message, error.getElement(), error.getAnnotationMirror()
 		);
 	}
 

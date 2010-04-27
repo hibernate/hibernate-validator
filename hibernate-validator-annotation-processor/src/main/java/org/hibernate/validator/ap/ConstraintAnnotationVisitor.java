@@ -18,27 +18,31 @@
 package org.hibernate.validator.ap;
 
 import java.util.List;
+import java.util.Set;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
+import javax.tools.Diagnostic.Kind;
 
+import org.hibernate.validator.ap.checks.ConstraintCheck;
+import org.hibernate.validator.ap.checks.ConstraintCheckError;
+import org.hibernate.validator.ap.checks.ConstraintCheckFactory;
+import org.hibernate.validator.ap.checks.ConstraintChecks;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
-import org.hibernate.validator.ap.util.ConstraintHelper.ConstraintCheckResult;
 import org.hibernate.validator.ap.util.MessagerAdapter;
 
 /**
- * An {@link ElementVisitor} that visits elements (type declarations, methods
- * and fields) annotated with constraint annotations from the Bean Validation
- * API.
+ * An {@link ElementVisitor} that visits annotated elements (type declarations,
+ * methods and fields) and applies different {@link ConstraintCheck}s to them.
+ * Each {@link ConstraintCheckError} occurred will be reported using the
+ * {@link Messager} API.
  *
  * @author Gunnar Morling.
  */
@@ -47,6 +51,11 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	private final ConstraintHelper constraintHelper;
 
 	private final MessagerAdapter messager;
+
+	private ConstraintCheckFactory constraintCheckFactory;
+
+	//TODO GM: establish processor option for this
+	private boolean verbose = true;
 
 	public ConstraintAnnotationVisitor(ProcessingEnvironment processingEnvironment, MessagerAdapter messager) {
 
@@ -59,317 +68,156 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 		constraintHelper = new ConstraintHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils(), annotationApiHelper
 		);
+
+		constraintCheckFactory = new ConstraintCheckFactory( constraintHelper );
 	}
 
 	/**
 	 * <p>
-	 * Checks whether the given mirrors representing one or more constraint annotations are correctly
-	 * specified at the given method. The following checks are performed:</p>
+	 * Checks whether the given annotations are correctly specified at the given
+	 * method. The following checks are performed:
+	 * </p>
 	 * <ul>
 	 * <li>
-	 * The method must be a JavaBeans getter method (name starts with "is", "get" or "has",
-	 * method has return type, but no parameters).
-	 * </li>
+	 * Constraint annotations may only be given at non-static, JavaBeans getter
+	 * methods which's return type is supported by the constraints.</li>
 	 * <li>
-	 * The return type of the method must be supported by the constraints.
-	 * </li>
-	 * <li>
-	 * The method must not be static.
-	 * </li>
+	 * The <code>@Valid</code> annotation may only be given at non-static,
+	 * non-primitive JavaBeans getter methods.</li>
 	 * </ul>
 	 */
 	@Override
 	public Void visitExecutableAsMethod(ExecutableElement method,
 										List<AnnotationMirror> mirrors) {
 
-		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
-
-
-			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
-
-				case CONSTRAINT_ANNOTATION:
-					checkConstraintAtMethod( method, oneAnnotationMirror );
-					break;
-
-				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
-					for ( AnnotationMirror onePartOfMultiValuedConstraint :
-							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
-
-						checkConstraintAtMethod( method, onePartOfMultiValuedConstraint );
-					}
-					break;
-
-				case GRAPH_VALIDATION_ANNOTATION:
-					checkGraphValidationAnnotationAtMethod( method, oneAnnotationMirror );
-			}
-
-		}
+		checkConstraints( method, mirrors );
 
 		return null;
 	}
 
 	/**
 	 * <p>
-	 * Checks whether the given mirrors representing one or more constraint annotations are correctly
-	 * specified at the given field. The following checks are performed:</p>
+	 * Checks whether the given annotations are correctly specified at the given
+	 * field. The following checks are performed:
+	 * </p>
 	 * <ul>
 	 * <li>
-	 * The type of the field must be supported by the constraints.
-	 * </li>
+	 * Constraint annotations may only be given at non-static fields which's
+	 * type is supported by the constraints.</li>
 	 * <li>
-	 * The field must not be static.
-	 * </li>
+	 * The <code>@Valid</code> annotation may only be given at non-static,
+	 * non-primitive fields.</li>
 	 * </ul>
 	 */
 	@Override
 	public Void visitVariableAsField(VariableElement annotatedField, List<AnnotationMirror> mirrors) {
 
-		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
-
-			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
-
-				case CONSTRAINT_ANNOTATION:
-					checkConstraintAtField( annotatedField, oneAnnotationMirror );
-					break;
-
-				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
-					for ( AnnotationMirror onePartOfMultiValuedConstraint :
-							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
-
-						checkConstraintAtField( annotatedField, onePartOfMultiValuedConstraint );
-					}
-					break;
-
-				case GRAPH_VALIDATION_ANNOTATION:
-					checkGraphValidationAnnotationAtField( annotatedField, oneAnnotationMirror );
-			}
-		}
+		checkConstraints( annotatedField, mirrors );
 
 		return null;
 	}
 
 	/**
 	 * <p>
-	 * Checks whether the given mirrors representing one or more constraint
-	 * annotations are correctly specified at the given annotation type
-	 * declaration. The only annotation types allowed to be annotated with a
-	 * constraint annotation are other (composed) constraint annotation type
-	 * declarations.
+	 * Checks whether the given annotations are correctly specified at the given
+	 * annotation type declaration. The following checks are performed:
 	 * </p>
+	 * <ul>
+	 * <li>
+	 * The only annotation types allowed to be annotated with other constraint
+	 * annotations are composed constraint annotation type declarations.</li>
+	 * </ul>
 	 */
 	@Override
 	public Void visitTypeAsAnnotationType(TypeElement annotationType,
 										  List<AnnotationMirror> mirrors) {
 
-		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
-
-			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
-
-				case CONSTRAINT_ANNOTATION:
-					checkConstraintAtAnnotationType( annotationType, oneAnnotationMirror );
-					break;
-
-				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
-					for ( AnnotationMirror onePartOfMultiValuedConstraint :
-							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
-
-						checkConstraintAtAnnotationType( annotationType, onePartOfMultiValuedConstraint );
-					}
-					break;
-			}
-		}
+		checkConstraints( annotationType, mirrors );
 
 		return null;
 	}
 
+	/**
+	 * <p>
+	 * Checks whether the given annotations are correctly specified at the given
+	 * class type declaration. The following checks are performed:
+	 * </p>
+	 * <ul>
+	 * <li>
+	 * Constraint annotations may at types supported by the constraints.</li>
+	 * <li>
+	 * </ul>
+	 */
 	@Override
 	public Void visitTypeAsClass(TypeElement e, List<AnnotationMirror> p) {
-		return visitClassOrInterfaceOrEnumType( e, p );
-	}
 
-	@Override
-	public Void visitTypeAsEnum(TypeElement e, List<AnnotationMirror> p) {
-		return visitClassOrInterfaceOrEnumType( e, p );
-	}
-
-	@Override
-	public Void visitTypeAsInterface(TypeElement e, List<AnnotationMirror> p) {
-		return visitClassOrInterfaceOrEnumType( e, p );
-	}
-
-	// ==================================
-	// private API below
-	// ==================================
-
-	private Void visitClassOrInterfaceOrEnumType(TypeElement annotatedType,
-												 List<AnnotationMirror> mirrors) {
-
-		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
-
-			switch ( constraintHelper.getAnnotationType( oneAnnotationMirror ) ) {
-
-				case CONSTRAINT_ANNOTATION:
-					checkConstraintAtType( annotatedType, oneAnnotationMirror );
-					break;
-
-				case MULTI_VALUED_CONSTRAINT_ANNOTATION:
-					for ( AnnotationMirror onePartOfMultiValuedConstraint :
-							constraintHelper.getPartsOfMultiValuedConstraint( oneAnnotationMirror ) ) {
-						checkConstraintAtType( annotatedType, onePartOfMultiValuedConstraint );
-					}
-					break;
-			}
-
-		}
-
+		checkConstraints( e, p );
 		return null;
 	}
 
-	private void checkConstraintAtType(TypeElement annotatedType, AnnotationMirror mirror) {
+	/**
+	 * <p>
+	 * Checks whether the given annotations are correctly specified at the given
+	 * enum type declaration. The following checks are performed:
+	 * </p>
+	 * <ul>
+	 * <li>
+	 * Constraint annotations may at types supported by the constraints.</li>
+	 * <li>
+	 * </ul>
+	 */
+	@Override
+	public Void visitTypeAsEnum(TypeElement e, List<AnnotationMirror> p) {
 
-		if ( constraintHelper.checkConstraint(
-				mirror.getAnnotationType(), annotatedType.asType()
-		) != ConstraintCheckResult.ALLOWED ) {
-
-			messager.reportError(
-					annotatedType, mirror, "NOT_SUPPORTED_TYPE",
-					mirror.getAnnotationType().asElement().getSimpleName()
-			);
-		}
+		checkConstraints( e, p );
+		return null;
 	}
 
-	private void checkConstraintAtField(VariableElement annotatedField, AnnotationMirror annotationMirror) {
+	/**
+	 * <p>
+	 * Checks whether the given annotations are correctly specified at the given
+	 * interface type declaration. The following checks are performed:
+	 * </p>
+	 * <ul>
+	 * <li>
+	 * Constraint annotations may at types supported by the constraints.</li>
+	 * <li>
+	 * </ul>
+	 */
+	@Override
+	public Void visitTypeAsInterface(TypeElement e, List<AnnotationMirror> p) {
 
-		if ( isStaticElement( annotatedField ) ) {
-
-			messager.reportError( annotatedField, annotationMirror, "STATIC_FIELDS_MAY_NOT_BE_ANNOTATED" );
-
-			return;
-		}
-
-		if ( constraintHelper.checkConstraint(
-				annotationMirror.getAnnotationType(), annotatedField.asType()
-		) != ConstraintCheckResult.ALLOWED ) {
-
-			messager.reportError(
-					annotatedField, annotationMirror, "NOT_SUPPORTED_TYPE",
-					annotationMirror.getAnnotationType().asElement().getSimpleName()
-			);
-		}
+		checkConstraints( e, p );
+		return null;
 	}
 
-	private void checkConstraintAtMethod(ExecutableElement method, AnnotationMirror mirror) {
+	/**
+	 * Retrieves the checks required for the given element and annotations,
+	 * executes them and reports all occurred errors.
+	 *
+	 * @param annotatedElement The element to check.
+	 * @param mirrors The annotations to check.
+	 */
+	private void checkConstraints(Element annotatedElement, List<AnnotationMirror> mirrors) {
 
-		if ( !isGetterMethod( method ) ) {
+		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
 
-			messager.reportError( method, mirror, "ONLY_GETTERS_MAY_BE_ANNOTATED" );
+			try {
 
-			return;
+				ConstraintChecks constraintChecks = constraintCheckFactory.getConstraintChecks(
+						annotatedElement, oneAnnotationMirror
+				);
+				Set<ConstraintCheckError> errors = constraintChecks.execute( annotatedElement, oneAnnotationMirror );
+				messager.reportErrors( errors );
+			}
+			catch ( Exception e ) {
+
+				if ( verbose ) {
+					messager.getDelegate()
+							.printMessage( Kind.NOTE, e.getMessage(), annotatedElement, oneAnnotationMirror );
+				}
+			}
 		}
-
-		if ( isStaticElement( method ) ) {
-
-			messager.reportError( method, mirror, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
-
-			return;
-		}
-
-		if ( constraintHelper.checkConstraint(
-				mirror.getAnnotationType(), method.getReturnType()
-		) != ConstraintCheckResult.ALLOWED ) {
-
-			messager.reportError(
-					method, mirror, "NOT_SUPPORTED_RETURN_TYPE",
-					mirror.getAnnotationType().asElement().getSimpleName()
-			);
-		}
-	}
-
-	private void checkConstraintAtAnnotationType(TypeElement annotationType, AnnotationMirror annotationMirror) {
-
-		if ( !constraintHelper.isConstraintAnnotation( annotationType ) ) {
-			messager.reportError( annotationType, annotationMirror, "ONLY_CONSTRAINT_ANNOTATIONS_MAY_BE_ANNOTATED" );
-		}
-
-	}
-
-	private void checkGraphValidationAnnotationAtField(
-			VariableElement annotatedField, AnnotationMirror annotationMirror) {
-
-		if ( isStaticElement( annotatedField ) ) {
-
-			messager.reportError(
-					annotatedField, annotationMirror,
-					"STATIC_FIELDS_MAY_NOT_BE_ANNOTATED"
-			);
-
-			return;
-		}
-
-		if ( isPrimitiveType( annotatedField.asType() ) ) {
-
-			messager.reportError(
-					annotatedField, annotationMirror,
-					"ATVALID_NOT_ALLOWED_AT_PRIMITIVE_FIELD"
-			);
-		}
-	}
-
-	private void checkGraphValidationAnnotationAtMethod(
-			ExecutableElement method, AnnotationMirror annotationMirror) {
-
-		if ( !isGetterMethod( method ) ) {
-
-			messager.reportError(
-					method, annotationMirror,
-					"ONLY_GETTERS_MAY_BE_ANNOTATED"
-			);
-
-			return;
-		}
-
-		if ( isStaticElement( method ) ) {
-
-			messager.reportError(
-					method, annotationMirror,
-					"STATIC_METHODS_MAY_NOT_BE_ANNOTATED"
-			);
-
-			return;
-		}
-
-		if ( isPrimitiveType( method.getReturnType() ) ) {
-
-			messager.reportError(
-					method, annotationMirror,
-					"ATVALID_NOT_ALLOWED_AT_METHOD_RETURNING_PRIMITIVE_TYPE"
-			);
-		}
-	}
-
-	private boolean isGetterMethod(ExecutableElement method) {
-		return isJavaBeanGetterName( method.getSimpleName().toString() )
-				&& !hasParameters( method ) && hasReturnValue( method );
-	}
-
-	private boolean hasReturnValue(ExecutableElement method) {
-		return method.getReturnType().getKind() != TypeKind.VOID;
-	}
-
-	private boolean hasParameters(ExecutableElement method) {
-		return !method.getParameters().isEmpty();
-	}
-
-	private boolean isJavaBeanGetterName(String methodName) {
-		return methodName.startsWith( "is" ) || methodName.startsWith( "has" ) || methodName.startsWith( "get" );
-	}
-
-	private boolean isStaticElement(Element element) {
-		return element.getModifiers().contains( Modifier.STATIC );
-	}
-
-	private boolean isPrimitiveType(TypeMirror typeMirror) {
-		return typeMirror.getKind().isPrimitive();
 	}
 
 }
