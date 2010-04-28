@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id$
  *
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -22,7 +22,7 @@ import javax.validation.Validation;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
 import static org.testng.Assert.assertNotNull;
 

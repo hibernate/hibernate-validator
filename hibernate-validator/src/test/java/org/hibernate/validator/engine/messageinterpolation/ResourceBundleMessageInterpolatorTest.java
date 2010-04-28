@@ -33,8 +33,8 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.MessageInterpolatorContext;
-import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;

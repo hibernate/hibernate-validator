@@ -27,7 +27,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.util.TestUtil;
 
 import static org.hibernate.validator.util.TestUtil.assertCorrectConstraintViolationMessages;

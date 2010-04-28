@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.engine.resourceloading;
+package org.hibernate.validator.resourceloading;
 
 import java.util.Arrays;
 import java.util.Locale;

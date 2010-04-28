@@ -1,4 +1,4 @@
-// $Id$
+// $Id: ResourceBundleMessageInterpolator.java 19081 2010-03-22 20:19:52Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.engine;
+package org.hibernate.validator.messageinterpolation;
 
 import java.util.Locale;
 import java.util.Map;
@@ -26,9 +26,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
-import org.hibernate.validator.engine.resourceloading.CachingResourceBundleLocator;
-import org.hibernate.validator.engine.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.resourceloading.CachingResourceBundleLocator;
+import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
 /**
  * Resource bundle backed message interpolator.
@@ -38,6 +38,16 @@ import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
  * @author Gunnar Morling
  */
 public class ResourceBundleMessageInterpolator implements MessageInterpolator {
+
+	/**
+	 * The name of the default message bundle.
+	 */
+	public static final String DEFAULT_VALIDATION_MESSAGES = "org.hibernate.validator.ValidationMessages";
+
+	/**
+	 * The name of the user-provided message bundle as defined in the specification.
+	 */
+	public static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
 
 	/**
 	 * Regular expression used to do message interpolation.
@@ -76,7 +86,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	@Deprecated
 	public ResourceBundleMessageInterpolator(final ResourceBundle resourceBundle) {
 		this(
-				new PlatformResourceBundleLocator( Constants.USER_VALIDATION_MESSAGES ) {
+				new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES ) {
 					public ResourceBundle getResourceBundle(Locale locale) {
 						return locale == Locale.getDefault() ? resourceBundle : super.getResourceBundle( locale );
 					}
@@ -89,14 +99,14 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		defaultLocale = Locale.getDefault();
 
 		if ( userResourceBundleLocator == null ) {
-			userResourceBundleLocator = new PlatformResourceBundleLocator( Constants.USER_VALIDATION_MESSAGES );
+			userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES );
 		}
 
 		this.userResourceBundleLocator = new CachingResourceBundleLocator( userResourceBundleLocator );
 
 		this.defaultResourceBundleLocator =
 				new CachingResourceBundleLocator(
-						new PlatformResourceBundleLocator( Constants.DEFAULT_VALIDATION_MESSAGES )
+						new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES )
 				);
 	}
 

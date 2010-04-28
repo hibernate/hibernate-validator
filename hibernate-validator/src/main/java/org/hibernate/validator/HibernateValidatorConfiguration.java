@@ -19,8 +19,7 @@ package org.hibernate.validator;
 
 import javax.validation.Configuration;
 
-import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -41,7 +40,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * </p>
 	 * <p>
 	 * This locator can be used as delegate for custom locators when setting a
-	 * customized {@link ResourceBundleMessageInterpolator}:
+	 * customized {@link org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator}:
 	 * </p>
 	 * <p/>
 	 * <pre>

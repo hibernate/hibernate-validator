@@ -37,8 +37,9 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.resolver.DefaultTraversableResolver;
-import org.hibernate.validator.engine.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.Version;
 import org.hibernate.validator.xml.ValidationBootstrapParameters;
@@ -59,7 +60,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private static final Logger log = LoggerFactory.make();
 
-	private final ResourceBundleLocator defaultResourceBundleLocator = new PlatformResourceBundleLocator( Constants.USER_VALIDATION_MESSAGES );
+	private final ResourceBundleLocator defaultResourceBundleLocator = new PlatformResourceBundleLocator(
+			ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
+	);
 	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator(
 			defaultResourceBundleLocator
 	);

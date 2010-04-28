@@ -15,16 +15,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.engine.resourceloading;
+package org.hibernate.validator.resourceloading;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
-
 /**
  * <p>
- * Used by {@link ResourceBundleMessageInterpolator} to load resource bundles
+ * Used by {@link org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator} to load resource bundles
  * containing message texts to be displayed in case of validation errors.
  * </p>
  * <p>

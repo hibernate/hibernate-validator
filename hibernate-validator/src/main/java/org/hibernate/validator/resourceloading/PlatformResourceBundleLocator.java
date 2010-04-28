@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.engine.resourceloading;
+package org.hibernate.validator.resourceloading;
 
 import java.security.AccessController;
 import java.util.Locale;
@@ -24,7 +24,6 @@ import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.util.GetClassLoader;
 import org.hibernate.validator.util.LoggerFactory;
 
@@ -67,7 +66,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		}
 		if ( rb == null ) {
 			action = GetClassLoader
-					.fromClass( ResourceBundleMessageInterpolator.class );
+					.fromClass( PlatformResourceBundleLocator.class );
 			classLoader = isSecured ? AccessController.doPrivileged( action )
 					: action.run();
 			rb = loadBundle(

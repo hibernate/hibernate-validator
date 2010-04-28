@@ -135,7 +135,12 @@
                             org.xml.sax.*;version="0",
                             org.slf4j.*;version="[1.5.6,2.0.0)"
                         </Import-Package>
-                        <Export-Package>org.hibernate.validator.*;version="${pom.version}"</Export-Package>
+                        <Export-Package>
+                            org.hibernate.validator;version="${pom.version}",
+                            org.hibernate.validator.constraints;version="${pom.version}",
+                            org.hibernate.validator.messageinterpolation;version="${pom.version}",
+                            org.hibernate.validator.resourceloading;version="${pom.version}",
+                        </Export-Package>
                     </instructions>
                 </configuration>
                 <executions>

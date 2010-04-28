@@ -32,8 +32,8 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.engine.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.engine.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
 import static org.testng.Assert.assertEquals;
 

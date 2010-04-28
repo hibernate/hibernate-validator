@@ -15,7 +15,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.engine.resourceloading;
+package org.hibernate.validator.resourceloading;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.engine.resourceloading.AggregateResourceBundleLocator.AggregateBundle;
+import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator.AggregateBundle;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
