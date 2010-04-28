@@ -55,8 +55,7 @@ import org.hibernate.validator.util.SetAccessibility;
  *
  * @author Hardy Ferentschik
  */
-
-public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
+public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static final Logger log = LoggerFactory.make();
 
@@ -87,7 +86,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<String, PropertyDescriptor>();
 
 	/**
-	 * Maps group sequences to the list of group/sequences.
+	 * The default groups sequence for this bean class.
 	 */
 	private List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 
@@ -99,22 +98,43 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * A list of all property names in the class (constraint and un-constraint).
 	 */
-	// Used to avoid ReflectionHelper#containsMembe which is slow
+	// Used to avoid ReflectionHelper#containsMember which is slow
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this(
 				beanClass,
 				constraintHelper,
+				new ArrayList<Class<?>>(),
+				new HashMap<Class<?>, List<MetaConstraint<T, ?>>>(),
+				new ArrayList<Member>(),
 				new AnnotationIgnores(),
 				beanMetaDataCache
 		);
 	}
 
-	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
+	public BeanMetaDataImpl(Class<T> beanClass,
+							ConstraintHelper constraintHelper,
+							List<Class<?>> defaultGroupSequence,
+							Map<Class<?>, List<MetaConstraint<T, ?>>> xmlConfiguredConstraints,
+							List<Member> xmlConfiguredMember,
+							AnnotationIgnores annotationIgnores,
+							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
 		createMetaData( annotationIgnores, beanMetaDataCache );
+		if ( !defaultGroupSequence.isEmpty() ) {
+			setDefaultGroupSequence( defaultGroupSequence );
+		}
+		for ( Map.Entry<Class<?>, List<MetaConstraint<T, ?>>> entry : xmlConfiguredConstraints.entrySet() ) {
+			Class<?> clazz = entry.getKey();
+			for(MetaConstraint<T,?> constraint : entry.getValue()) {
+				addMetaConstraint( clazz, constraint );
+			}
+		}
+		for ( Member member : xmlConfiguredMember ) {
+			addCascadedMember( member );
+		}
 	}
 
 	public Class<T> getBeanClass() {
@@ -141,7 +161,54 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableList( constraintList );
 	}
 
-	public void addMetaConstraint(Class<?> clazz, MetaConstraint<T, ? extends Annotation> metaConstraint) {
+	public PropertyDescriptor getPropertyDescriptor(String property) {
+		return propertyDescriptors.get( property );
+	}
+
+	public boolean isPropertyPresent(String name) {
+		return propertyNames.contains( name );
+	}
+
+	public List<Class<?>> getDefaultGroupSequence() {
+		return Collections.unmodifiableList( defaultGroupSequence );
+	}
+
+	public boolean defaultGroupSequenceIsRedefined() {
+		return defaultGroupSequence.size() > 1;
+	}
+
+	public Set<PropertyDescriptor> getConstrainedProperties() {
+		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
+	}
+
+	private void setDefaultGroupSequence(List<Class<?>> groupSequence) {
+		defaultGroupSequence = new ArrayList<Class<?>>();
+		boolean groupSequenceContainsDefault = false;
+		for ( Class<?> group : groupSequence ) {
+			if ( group.getName().equals( beanClass.getName() ) ) {
+				defaultGroupSequence.add( Default.class );
+				groupSequenceContainsDefault = true;
+			}
+			else if ( group.getName().equals( Default.class.getName() ) ) {
+				throw new GroupDefinitionException( "'Default.class' cannot appear in default group sequence list." );
+			}
+			else {
+				defaultGroupSequence.add( group );
+			}
+		}
+		if ( !groupSequenceContainsDefault ) {
+			throw new GroupDefinitionException( beanClass.getName() + " must be part of the redefined default group sequence." );
+		}
+		if ( log.isTraceEnabled() ) {
+			log.trace(
+					"Members of the default group sequence for bean {} are: {}",
+					beanClass.getName(),
+					defaultGroupSequence
+			);
+		}
+	}
+
+	private void addMetaConstraint(Class<?> clazz, MetaConstraint<T, ? extends Annotation> metaConstraint) {
 		// first we add the meta constraint to our meta constraint map
 		List<MetaConstraint<T, ? extends Annotation>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
@@ -169,57 +236,10 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	public void addCascadedMember(Member member) {
+	private void addCascadedMember(Member member) {
 		setAccessibility( member );
 		cascadedMembers.add( member );
 		addPropertyDescriptorForMember( member, true );
-	}
-
-	public PropertyDescriptor getPropertyDescriptor(String property) {
-		return propertyDescriptors.get( property );
-	}
-
-	public boolean isPropertyPresent(String name) {
-		return propertyNames.contains( name );
-	}
-
-	public List<Class<?>> getDefaultGroupSequence() {
-		return Collections.unmodifiableList( defaultGroupSequence );
-	}
-
-	public boolean defaultGroupSequenceIsRedefined() {
-		return defaultGroupSequence.size() > 1;
-	}
-
-	public void setDefaultGroupSequence(List<Class<?>> groupSequence) {
-		defaultGroupSequence = new ArrayList<Class<?>>();
-		boolean groupSequenceContainsDefault = false;
-		for ( Class<?> group : groupSequence ) {
-			if ( group.getName().equals( beanClass.getName() ) ) {
-				defaultGroupSequence.add( Default.class );
-				groupSequenceContainsDefault = true;
-			}
-			else if ( group.getName().equals( Default.class.getName() ) ) {
-				throw new GroupDefinitionException( "'Default.class' cannot appear in default group sequence list." );
-			}
-			else {
-				defaultGroupSequence.add( group );
-			}
-		}
-		if ( !groupSequenceContainsDefault ) {
-			throw new GroupDefinitionException( beanClass.getName() + " must be part of the redefined default group sequence." );
-		}
-		if ( log.isTraceEnabled() ) {
-			log.trace(
-					"Members of the default group sequence for bean {} are: {}",
-					beanClass.getName(),
-					defaultGroupSequence
-			);
-		}
-	}
-
-	public Set<PropertyDescriptor> getConstrainedProperties() {
-		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
 	}
 
 	/**
@@ -258,6 +278,7 @@ public class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		else {
 			groupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
 		}
+
 		setDefaultGroupSequence( groupSequence );
 	}
 

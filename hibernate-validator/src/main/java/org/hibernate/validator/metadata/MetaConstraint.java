@@ -29,8 +29,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.engine.ConstraintTree;
-import org.hibernate.validator.engine.GlobalExecutionContext;
-import org.hibernate.validator.engine.LocalExecutionContext;
+import org.hibernate.validator.engine.ValidationContext;
+import org.hibernate.validator.engine.ValueContext;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -115,11 +115,11 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree.getDescriptor().getElementType();
 	}
 
-	public <T, U, V> boolean validateConstraint(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext) {
+	public <T, U, V> boolean validateConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
-		localExecutionContext.setElementType( getElementType() );
+		valueContext.setElementType( getElementType() );
 		constraintTree.validateConstraints(
-				typeOfAnnotatedElement(), executionContext, localExecutionContext, constraintViolations
+				typeOfAnnotatedElement(), executionContext, valueContext, constraintViolations
 		);
 		if ( constraintViolations.size() > 0 ) {
 			executionContext.addConstraintFailures( constraintViolations );

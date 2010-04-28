@@ -21,7 +21,9 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -110,28 +112,34 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		for ( Class<?> clazz : processedClasses ) {
 			@SuppressWarnings("unchecked")
 			Class<T> beanClass = ( Class<T> ) clazz;
-			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
-					beanClass, constraintHelper, annotationIgnores, beanMetaDataCache
-			);
 
 			List<Class<?>> classes = new ArrayList<Class<?>>();
 			ReflectionHelper.computeClassHierarchy( beanClass, classes );
+			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = new HashMap<Class<?>, List<MetaConstraint<T, ?>>>();
+			List<Member> cascadedMembers = new ArrayList<Member>();
 			for ( Class<?> classInHierarchy : classes ) {
 				if ( processedClasses.contains( classInHierarchy ) ) {
-					addXmlConfiguredConstraintToMetaData( mappingParser, beanClass, classInHierarchy, metaData );
+					addXmlConfiguredConstraints( mappingParser, beanClass, classInHierarchy, constraints );
+					addXmlCascadedMember( mappingParser, classInHierarchy, cascadedMembers );
 				}
 			}
 
-			if ( !mappingParser.getDefaultSequenceForClass( beanClass ).isEmpty() ) {
-				metaData.setDefaultGroupSequence( mappingParser.getDefaultSequenceForClass( beanClass ) );
-			}
+			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
+					beanClass,
+					constraintHelper,
+					mappingParser.getDefaultSequenceForClass( beanClass ),
+					constraints,
+					cascadedMembers,
+					annotationIgnores,
+					beanMetaDataCache
+			);
 
 			beanMetaDataCache.addBeanMetaData( beanClass, metaData );
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addXmlConfiguredConstraintToMetaData(XmlMappingParser mappingParser, Class<T> rootClass, Class<?> hierarchyClass, BeanMetaDataImpl<T> metaData) {
+	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser, Class<T> rootClass, Class<?> hierarchyClass, Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
 		for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
@@ -143,11 +151,18 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			MetaConstraint<T, A> newMetaConstraint = new MetaConstraint<T, A>(
 					rootClass, constraint.getMember(), descriptor
 			);
-			metaData.addMetaConstraint( hierarchyClass, newMetaConstraint );
+			List<MetaConstraint<T, ?>> constraintList = constraints.get( hierarchyClass );
+			if ( constraintList == null ) {
+				constraintList = new ArrayList<MetaConstraint<T, ?>>();
+				constraints.put( hierarchyClass, constraintList );
+			}
+			constraintList.add( newMetaConstraint );
 		}
+	}
 
+	private void addXmlCascadedMember(XmlMappingParser mappingParser, Class<?> hierarchyClass, List<Member> cascadedMembers) {
 		for ( Member m : mappingParser.getCascadedMembersForClass( hierarchyClass ) ) {
-			metaData.addCascadedMember( m );
+			cascadedMembers.add( m );
 		}
 	}
 

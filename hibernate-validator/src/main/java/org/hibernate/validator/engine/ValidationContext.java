@@ -41,7 +41,7 @@ import org.hibernate.validator.util.IdentitySet;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-public class GlobalExecutionContext<T> {
+public class ValidationContext<T> {
 
 	/**
 	 * The root bean of the validation.
@@ -91,24 +91,24 @@ public class GlobalExecutionContext<T> {
 	 */
 	private final TraversableResolver traversableResolver;
 
-	public static <T> GlobalExecutionContext<T> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> ValidationContext<T> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
-		return new GlobalExecutionContext<T>(
+		return new ValidationContext<T>(
 				rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
 	}
 
-	public static <T> GlobalExecutionContext<T> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> ValidationContext<T> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = ( Class<T> ) rootBean.getClass();
-		return new GlobalExecutionContext<T>(
+		return new ValidationContext<T>(
 				rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
 	}
 
-	public static <T> GlobalExecutionContext<T> getContextForValidateValue(Class<T> rootBeanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
-		return new GlobalExecutionContext<T>(
+	public static <T> ValidationContext<T> getContextForValidateValue(Class<T> rootBeanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		return new ValidationContext<T>(
 				rootBeanClass,
 				null,
 				messageInterpolator,
@@ -117,7 +117,7 @@ public class GlobalExecutionContext<T> {
 		);
 	}
 
-	private GlobalExecutionContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	private ValidationContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.messageInterpolator = messageInterpolator;
@@ -145,7 +145,7 @@ public class GlobalExecutionContext<T> {
 		return messageInterpolator;
 	}
 
-	public <U, V> ConstraintViolationImpl<T> createConstraintViolation(LocalExecutionContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
+	public <U, V> ConstraintViolationImpl<T> createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
@@ -164,7 +164,7 @@ public class GlobalExecutionContext<T> {
 		);
 	}
 
-	public <U, V> List<ConstraintViolationImpl<T>> createConstraintViolations(LocalExecutionContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
+	public <U, V> List<ConstraintViolationImpl<T>> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
 		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
 		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
 			ConstraintViolationImpl<T> violation = createConstraintViolation(

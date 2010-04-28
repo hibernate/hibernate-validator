@@ -89,16 +89,16 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public <T, U, V> void validateConstraints(Type type, GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, List<ConstraintViolation<T>> constraintViolations) {
+	public <T, U, V> void validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations) {
 		// first validate composing constraints (recursively)
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			List<ConstraintViolation<T>> tmpViolations = new ArrayList<ConstraintViolation<T>>();
-			tree.validateConstraints( type, executionContext, localExecutionContext, tmpViolations );
+			tree.validateConstraints( type, executionContext, valueContext, tmpViolations );
 			constraintViolations.addAll( tmpViolations );
 		}
 
 		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-				localExecutionContext.getPropertyPath(), descriptor
+				valueContext.getPropertyPath(), descriptor
 		);
 
 		// check whether we have constraints violations, but we should only report the single message of the
@@ -108,9 +108,9 @@ public class ConstraintTree<A extends Annotation> {
 		if ( constraintViolations.size() > 0 && reportAsSingleViolation() ) {
 			constraintViolations.clear();
 			final String message = ( String ) getDescriptor().getAttributes().get( "message" );
-			MessageAndPath messageAndPath = new MessageAndPath( message, localExecutionContext.getPropertyPath() );
+			MessageAndPath messageAndPath = new MessageAndPath( message, valueContext.getPropertyPath() );
 			ConstraintViolation<T> violation = executionContext.createConstraintViolation(
-					localExecutionContext, messageAndPath, descriptor
+					valueContext, messageAndPath, descriptor
 			);
 			constraintViolations.add( violation );
 		}
@@ -120,7 +120,7 @@ public class ConstraintTree<A extends Annotation> {
 			if ( log.isTraceEnabled() ) {
 				log.trace(
 						"Validating value {} against constraint defined by {}",
-						localExecutionContext.getCurrentValidatedValue(),
+						valueContext.getCurrentValidatedValue(),
 						descriptor
 				);
 			}
@@ -131,7 +131,7 @@ public class ConstraintTree<A extends Annotation> {
 
 			validateSingleConstraint(
 					executionContext,
-					localExecutionContext,
+					valueContext,
 					constraintViolations,
 					constraintValidatorContext,
 					validator
@@ -139,10 +139,10 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private <T, U, V> void validateSingleConstraint(GlobalExecutionContext<T> executionContext, LocalExecutionContext<U, V> localExecutionContext, List<ConstraintViolation<T>> constraintViolations, ConstraintValidatorContextImpl constraintValidatorContext, ConstraintValidator<A, V> validator) {
+	private <T, U, V> void validateSingleConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations, ConstraintValidatorContextImpl constraintValidatorContext, ConstraintValidator<A, V> validator) {
 		boolean isValid;
 		try {
-			isValid = validator.isValid( localExecutionContext.getCurrentValidatedValue(), constraintValidatorContext );
+			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
 		catch ( RuntimeException e ) {
 			throw new ValidationException( "Unexpected exception during isValid call", e );
@@ -150,7 +150,7 @@ public class ConstraintTree<A extends Annotation> {
 		if ( !isValid ) {
 			constraintViolations.addAll(
 					executionContext.createConstraintViolations(
-							localExecutionContext, constraintValidatorContext
+							valueContext, constraintValidatorContext
 					)
 			);
 		}

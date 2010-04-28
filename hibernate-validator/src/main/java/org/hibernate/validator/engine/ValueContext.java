@@ -25,7 +25,7 @@ import javax.validation.groups.Default;
  *
  * @author Hardy Ferentschik
  */
-public class LocalExecutionContext<T, V> {
+public class ValueContext<T, V> {
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -57,17 +57,17 @@ public class LocalExecutionContext<T, V> {
 	 */
 	private ElementType elementType;
 
-	public static <T, V> LocalExecutionContext<T, V> getLocalExecutionContext(T value) {
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = ( Class<T> ) value.getClass();
-		return new LocalExecutionContext<T, V>( value, rootBeanClass );
+		return new ValueContext<T, V>( value, rootBeanClass );
 	}
 
-	public static <T, V> LocalExecutionContext<T, V> getLocalExecutionContext(Class<T> type) {
-		return new LocalExecutionContext<T, V>( null, type );
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type) {
+		return new ValueContext<T, V>( null, type );
 	}
 
-	public LocalExecutionContext(T currentBean, Class<T> currentBeanType) {
+	public ValueContext(T currentBean, Class<T> currentBeanType) {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
 	}
@@ -123,7 +123,7 @@ public class LocalExecutionContext<T, V> {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "LocalExecutionContext" );
+		sb.append( "ValueContext" );
 		sb.append( "{currentBean=" ).append( currentBean );
 		sb.append( ", currentBeanType=" ).append( currentBeanType );
 		sb.append( ", propertyPath=" ).append( propertyPath );
