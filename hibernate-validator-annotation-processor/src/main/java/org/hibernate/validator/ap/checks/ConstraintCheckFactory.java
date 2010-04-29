@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -39,7 +39,7 @@ public class ConstraintCheckFactory {
 	private final Map<AnnotationType, ConstraintChecks> fieldChecks;
 
 	/**
-	 * Holds the checks to be executed for method elements keyed.
+	 * Holds the checks to be executed for method elements.
 	 */
 	private final Map<AnnotationType, ConstraintChecks> methodChecks;
 

@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -31,8 +31,6 @@ import org.hibernate.validator.ap.util.CollectionHelper;
  * @author Gunnar Morling
  */
 public class GetterCheck extends AbstractConstraintCheck {
-
-	@Override
 	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
 												 AnnotationMirror annotation) {
 
