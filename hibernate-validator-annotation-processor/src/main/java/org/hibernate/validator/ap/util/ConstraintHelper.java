@@ -63,7 +63,7 @@ public class ConstraintHelper {
 
 	/**
 	 * Possible results of a constraint check as returned by
-	 * {@link ConstraintHelper#checkConstraint(DeclaredType, TypeMirror)}.	 *
+	 * {@link ConstraintHelper#checkConstraint(DeclaredType, TypeMirror)}.
 	 *
 	 * @author Gunnar Morling
 	 */
@@ -503,31 +503,8 @@ public class ConstraintHelper {
 				}, null
 		);
 
-		TypeMirror supportedType;
-
-		supportedType = getSupportedTypeUsingAnnotationApi( validatorType );
-
-		// TODO GM: Due to HV-293 the type supported by a given validator can't
-		// always be determined when using
-		// the AP within Eclipse. As work around
-		// reflection might be used in such cases (meaning that the validator
-		// and its supported type have to be on
-		// the AP classpath, which normally wasn't required).
-
-		if ( supportedType == null ) {
-			throw new AssertionError(
-					"Couldn't determine the type supported by validator " + validatorType + "."
-			);
-		}
-		return supportedType;
-	}
-
-	private TypeMirror getSupportedTypeUsingAnnotationApi(
-			TypeMirror validatorType) {
-
 		// contains the bindings of the type parameters from the implemented
-		// ConstraintValidator
-		// interface, e.g. "ConstraintValidator<CheckCase, String>"
+		// ConstraintValidator interface, e.g. "ConstraintValidator<CheckCase, String>"
 		TypeMirror constraintValidatorImplementation = getConstraintValidatorSuperType( validatorType );
 
 		return constraintValidatorImplementation.accept(
@@ -545,17 +522,31 @@ public class ConstraintHelper {
 
 	private TypeMirror getConstraintValidatorSuperType(TypeMirror type) {
 
-		List<? extends TypeMirror> directSupertypes = typeUtils.directSupertypes( type );
+		List<? extends TypeMirror> superTypes = typeUtils.directSupertypes( type );
+		List<TypeMirror> nextSuperTypes = CollectionHelper.newArrayList();
 
-		for ( TypeMirror typeMirror : directSupertypes ) {
-			if ( typeUtils.asElement( typeMirror )
-					.getSimpleName()
-					.contentEquals( ConstraintValidator.class.getSimpleName() ) ) {
-				return typeMirror;
+		//follow the type hierarchy upwards, until we have found the ConstraintValidator IF
+		while ( !superTypes.isEmpty() ) {
+
+			for ( TypeMirror oneSuperType : superTypes ) {
+				if ( typeUtils.asElement( oneSuperType ).getSimpleName()
+						.contentEquals( ConstraintValidator.class.getSimpleName() ) ) {
+
+					return oneSuperType;
+				}
+
+				nextSuperTypes.addAll( typeUtils.directSupertypes( oneSuperType ) );
 			}
+
+			superTypes = nextSuperTypes;
+			nextSuperTypes = CollectionHelper.newArrayList();
 		}
 
-		return null;
+		//HV-293: Actually this should never happen, as we can have only ConstraintValidator implementations
+		//here. The Eclipse JSR 269 implementation unfortunately doesn't always create the type hierarchy 
+		//properly though.
+		//TODO GM: create and report an isolated test case
+		throw new IllegalStateException( "Expected type " + type + " to implement javax.validation.ConstraintValidator, but it doesn't." );
 	}
 
 	/**

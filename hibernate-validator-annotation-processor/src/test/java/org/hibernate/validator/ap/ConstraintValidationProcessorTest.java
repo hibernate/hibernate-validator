@@ -53,6 +53,10 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CaseMode;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
+import org.hibernate.validator.ap.testmodel.inheritedvalidator.AbstractCustomConstraintValidator;
+import org.hibernate.validator.ap.testmodel.inheritedvalidator.CustomConstraint;
+import org.hibernate.validator.ap.testmodel.inheritedvalidator.CustomConstraintValidator;
+import org.hibernate.validator.ap.testmodel.inheritedvalidator.FieldLevelValidationUsingInheritedValidator;
 import org.hibernate.validator.ap.testmodel.invalidcomposedconstraint.ValidCustomerNumber;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.NoUniqueValidatorResolution;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SerializableCollection;
@@ -141,6 +145,28 @@ public class ConstraintValidationProcessorTest {
 		File sourceFile2 = compilerHelper.getSourceFile( CheckCase.class );
 		File sourceFile3 = compilerHelper.getSourceFile( CaseMode.class );
 		File sourceFile4 = compilerHelper.getSourceFile( CheckCaseValidator.class );
+
+		boolean compilationResult =
+				compilerHelper.compile(
+						new ConstraintValidationProcessor(),
+						diagnostics,
+						sourceFile1,
+						sourceFile2,
+						sourceFile3,
+						sourceFile4
+				);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpection( Kind.ERROR, 30 ) );
+	}
+
+	@Test
+	public void testThatInheritedValidatorClassesAreHandledCorrectly() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( FieldLevelValidationUsingInheritedValidator.class );
+		File sourceFile2 = compilerHelper.getSourceFile( CustomConstraint.class );
+		File sourceFile3 = compilerHelper.getSourceFile( AbstractCustomConstraintValidator.class );
+		File sourceFile4 = compilerHelper.getSourceFile( CustomConstraintValidator.class );
 
 		boolean compilationResult =
 				compilerHelper.compile(

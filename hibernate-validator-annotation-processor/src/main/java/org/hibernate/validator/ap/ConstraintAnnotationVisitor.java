@@ -210,6 +210,8 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 				Set<ConstraintCheckError> errors = constraintChecks.execute( annotatedElement, oneAnnotationMirror );
 				messager.reportErrors( errors );
 			}
+			//HV-293: if single constraints can't be properly checked, report this and
+			//proceed with next constraints
 			catch ( Exception e ) {
 
 				if ( verbose ) {
