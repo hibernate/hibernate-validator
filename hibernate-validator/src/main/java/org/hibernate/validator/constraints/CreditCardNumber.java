@@ -37,6 +37,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * credit card number. This is the Luhn algorithm implementation
  * which aims to check for user mistake, not credit card validity!
  *
+ * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
 @Documented
@@ -49,4 +50,14 @@ public @interface CreditCardNumber {
 	public abstract Class<?>[] groups() default { };
 
 	public abstract Class<? extends Payload>[] payload() default { };
+
+	/**
+	 * Defines several {@code @CreditCardNumber} annotations on the same element.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface List {
+		CreditCardNumber[] value();
+	}
 }

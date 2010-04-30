@@ -53,4 +53,14 @@ public @interface URL {
 	public abstract Class<?>[] groups() default { };
 
 	public abstract Class<? extends Payload>[] payload() default { };
+
+	/**
+	 * Defines several {@code @URL} annotations on the same element.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface List {
+		URL[] value();
+	}
 }

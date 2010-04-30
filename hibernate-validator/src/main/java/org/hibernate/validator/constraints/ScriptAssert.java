@@ -125,10 +125,7 @@ public @interface ScriptAssert {
 	String alias() default "_this";
 
 	/**
-	 * Defines several @ScriptAssert annotations on the same element.
-	 *
-	 * @author Gunnar Morling
-	 * @see ScriptAssert
+	 * Defines several {@code @ScriptAssert} annotations on the same element.
 	 */
 	@Target({ TYPE })
 	@Retention(RUNTIME)

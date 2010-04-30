@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id$
  *
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -53,4 +53,14 @@ public @interface NotBlank {
 	public abstract Class<?>[] groups() default { };
 
 	public abstract Class<? extends Payload>[] payload() default { };
+
+	/**
+	 * Defines several {@code @NotBlank} annotations on the same element.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface List {
+		NotBlank[] value();
+	}
 }
