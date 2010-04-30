@@ -26,6 +26,19 @@
   annotated domain model) and checked in various different layers of the
   application.</para>
 
+  <section>
+    <title>OSGi</title>
+
+    <para>The Hibernate Validator jar file is conform to the OSGi
+    specification and can be used within any OSGi container. The classes in
+    the following packages are exported by Hibernate Validator and are
+    considered part of the public API -
+    <package>org.hibernate.validator</package>,
+    <package>org.hibernate.validator.constraints</package>,
+    <package>org.hibernate.validator.messageinterpolation</package> and
+    <package>org.hibernate.validator.resourceloading</package>.</para>
+  </section>
+
   <section id="validator-checkconstraints-db">
     <title>Database schema-level validation</title>
 
@@ -102,7 +115,7 @@
         <title>Manual configuration of
         <classname>BeanValidationEvenListener</classname></title>
 
-        <programlisting role="XML" language="XML">&lt;hibernate-configuration&gt;
+        <programlisting language="XML" role="XML">&lt;hibernate-configuration&gt;
     &lt;session-factory&gt;
        ...
        &lt;property name="javax.persistence.validation.group.pre-persist"&gt;javax.validation.groups.Default&lt;/property&gt;
@@ -124,7 +137,7 @@
     </section>
 
     <section>
-      <title>JPA </title>
+      <title>JPA</title>
 
       <para>If you are using JPA 2 and Hibernate Validator is in the classpath
       the JPA2 specification requires that Bean Validation gets enabled. The
@@ -138,7 +151,7 @@
       <filename>persistence.xml</filename> also defines a node validation-mode
       while can be set to <constant>AUTO</constant>,
       <constant>CALLBACK</constant>, <constant>NONE</constant>. The default is
-      <constant>AUTO</constant>. </para>
+      <constant>AUTO</constant>.</para>
 
       <para>In a JPA 1 you will have to create and register Hibernate
       Validator yourself. In case you are using Hibernate EntityManager you

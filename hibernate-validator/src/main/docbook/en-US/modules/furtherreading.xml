@@ -34,9 +34,10 @@
 
   <para>If you have any furhter questions to Hibernate Validator or want to
   share some of your use cases have a look at the <ulink
-  url="http://www.hibernate.org/469.html">Hibernate Validator Wiki</ulink> and
-  the <ulink url="https://forum.hibernate.org/viewforum.php?f=9">Hibernate
-  Validator Forum</ulink>.</para>
+  url="http://community.jboss.org/en/hibernate/validator">Hibernate Validator
+  Wiki</ulink> and the <ulink
+  url="https://forum.hibernate.org/viewforum.php?f=9">Hibernate Validator
+  Forum</ulink>.</para>
 
   <para>In case you would like to report a bug use <ulink
   url="http://opensource.atlassian.com/projects/hibernate/browse/HV">Hibernate's
