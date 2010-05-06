@@ -547,15 +547,15 @@ public class ValidatorImpl implements Validator {
 						constraintValidatorFactory,
 						cachedTraversableResolver
 				);
-				ValueContext<U, V> localContext = ValueContext.getLocalExecutionContext(
+				ValueContext<U, V> valueContext = ValueContext.getLocalExecutionContext(
 						hostingBeanInstance
 				);
-				localContext.setPropertyPath( path );
-				localContext.setCurrentGroup( groupClass );
-				if ( isValidationRequired( context, localContext, metaConstraint ) ) {
-					Object valueToValidate = metaConstraint.getValue( localContext.getCurrentBean() );
-					localContext.setCurrentValidatedValue( ( V ) valueToValidate );
-					metaConstraint.validateConstraint( context, localContext );
+				valueContext.setPropertyPath( path );
+				valueContext.setCurrentGroup( groupClass );
+				if ( isValidationRequired( context, valueContext, metaConstraint ) ) {
+					Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
+					valueContext.setCurrentValidatedValue( ( V ) valueToValidate );
+					metaConstraint.validateConstraint( context, valueContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
 			}
@@ -640,12 +640,12 @@ public class ValidatorImpl implements Validator {
 				ValidationContext<U> context = ValidationContext.getContextForValidateValue(
 						beanType, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver
 				);
-				ValueContext<U, V> localContext = ValueContext.getLocalExecutionContext( beanType );
-				localContext.setPropertyPath( path );
-				localContext.setCurrentGroup( groupClass );
-				localContext.setCurrentValidatedValue( value );
-				if ( isValidationRequired( context, localContext, metaConstraint ) ) {
-					metaConstraint.validateConstraint( context, localContext );
+				ValueContext<U, V> valueContext = ValueContext.getLocalExecutionContext( beanType );
+				valueContext.setPropertyPath( path );
+				valueContext.setCurrentGroup( groupClass );
+				valueContext.setCurrentValidatedValue( value );
+				if ( isValidationRequired( context, valueContext, metaConstraint ) ) {
+					metaConstraint.validateConstraint( context, valueContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
 			}
@@ -741,22 +741,22 @@ public class ValidatorImpl implements Validator {
 		return new SingleThreadCachedTraversableResolver( traversableResolver );
 	}
 
-	private boolean isValidationRequired(ValidationContext validationContext, ValueContext localContext, MetaConstraint metaConstraint) {
-		if ( !metaConstraint.getGroupList().contains( localContext.getCurrentGroup() ) ) {
+	private boolean isValidationRequired(ValidationContext validationContext, ValueContext valueContext, MetaConstraint metaConstraint) {
+		if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 			return false;
 		}
 
 		boolean isReachable;
 
-		Path pathToObject = localContext.getPropertyPath().getPathWithoutLeafNode();
+		Path pathToObject = valueContext.getPropertyPath().getPathWithoutLeafNode();
 		if ( pathToObject == null ) {
 			pathToObject = PathImpl.createNewPath( null );
 		}
 
 		try {
 			isReachable = validationContext.getTraversableResolver().isReachable(
-					localContext.getCurrentBean(),
-					localContext.getPropertyPath().getLeafNode(),
+					valueContext.getCurrentBean(),
+					valueContext.getPropertyPath().getLeafNode(),
 					validationContext.getRootBeanClass(),
 					pathToObject,
 					metaConstraint.getElementType()
@@ -769,20 +769,20 @@ public class ValidatorImpl implements Validator {
 		return isReachable;
 	}
 
-	private boolean isCascadeRequired(ValidationContext validationContext, ValueContext localContext, Member member) {
+	private boolean isCascadeRequired(ValidationContext validationContext, ValueContext valueContext, Member member) {
 		final ElementType type = member instanceof Field ? ElementType.FIELD : ElementType.METHOD;
 		boolean isReachable;
 		boolean isCascadable;
 
-		Path pathToObject = localContext.getPropertyPath().getPathWithoutLeafNode();
+		Path pathToObject = valueContext.getPropertyPath().getPathWithoutLeafNode();
 		if ( pathToObject == null ) {
 			pathToObject = PathImpl.createNewPath( null );
 		}
 
 		try {
 			isReachable = validationContext.getTraversableResolver().isReachable(
-					localContext.getCurrentBean(),
-					localContext.getPropertyPath().getLeafNode(),
+					valueContext.getCurrentBean(),
+					valueContext.getPropertyPath().getLeafNode(),
 					validationContext.getRootBeanClass(),
 					pathToObject,
 					type
@@ -794,8 +794,8 @@ public class ValidatorImpl implements Validator {
 
 		try {
 			isCascadable = validationContext.getTraversableResolver().isCascadable(
-					localContext.getCurrentBean(),
-					localContext.getPropertyPath().getLeafNode(),
+					valueContext.getCurrentBean(),
+					valueContext.getPropertyPath().getLeafNode(),
 					validationContext.getRootBeanClass(),
 					pathToObject,
 					type

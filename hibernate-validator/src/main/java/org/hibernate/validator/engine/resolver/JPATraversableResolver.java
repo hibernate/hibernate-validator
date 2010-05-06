@@ -19,19 +19,48 @@ package org.hibernate.validator.engine.resolver;
 
 import java.lang.annotation.ElementType;
 import javax.persistence.Persistence;
-import javax.validation.TraversableResolver;
 import javax.validation.Path;
+import javax.validation.TraversableResolver;
+
+import org.slf4j.Logger;
+
+import org.hibernate.validator.util.LoggerFactory;
 
 /**
+ * An implementation of {@code TraversableResolver} which is aware of JPA 2 and utilizes {@code PersistenceUtil} to get
+ * query the reachability of a property.
+ * This resolver will be automatically enabled if JPA 2 is on the classpath and the {@code DefaultTraversableResolver} is
+ * used.
+ *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
 public class JPATraversableResolver implements TraversableResolver {
+	private static final Logger log = LoggerFactory.make();
 
-	// we have to check traversableProperty.getName() against null to check the root gets validated (see HV-266)
-	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		return traversableObject == null || traversableProperty.getName() == null || Persistence.getPersistenceUtil()
-				.isLoaded( traversableObject, traversableProperty.getName() );
+	public boolean isReachable(Object traversableObject,
+							   Path.Node traversableProperty,
+							   Class<?> rootBeanType,
+							   Path pathToTraversableObject,
+							   ElementType elementType) {
+		if ( log.isTraceEnabled() ) {
+			log.trace(
+					"Calling isReachable on object {} with node name {}",
+					traversableObject,
+					traversableProperty.getName()
+			);
+		}
+
+		// we have to check traversableProperty.getName() against null to check the root gets validated (see HV-266)
+		// also check the element type, if it is ElementType.TYPE then we don't have to call is reachable since we have
+		// a class level constraint (HV-305)
+		if ( traversableObject == null || traversableProperty.getName() == null
+				|| ElementType.TYPE.equals( elementType ) ) {
+			return true;
+		}
+		else {
+			return Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
+		}
 	}
 
 	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {

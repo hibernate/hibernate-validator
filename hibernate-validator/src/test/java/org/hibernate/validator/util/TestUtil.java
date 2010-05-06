@@ -33,13 +33,14 @@ import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.FileAssert.fail;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.PathImpl;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.FileAssert.fail;
 
 /**
  * Tests for the <code>ReflectionHelper</code>.
@@ -57,6 +58,7 @@ public class TestUtil {
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
 			Configuration configuration = getConfiguration();
+			configuration.traversableResolver( new DummyTraversableResolver() );
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
 		return hibernateValidator;

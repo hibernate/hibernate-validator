@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
-                <version>${project.parent.version}</version>
+                <version>${version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.validation</groupId>

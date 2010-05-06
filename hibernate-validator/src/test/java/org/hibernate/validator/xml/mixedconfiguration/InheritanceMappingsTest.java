@@ -25,11 +25,13 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.FileAssert.fail;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.util.DummyTraversableResolver;
 import org.hibernate.validator.util.TestUtil;
+
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.FileAssert.fail;
 
 
 /**
@@ -43,7 +45,7 @@ public class InheritanceMappingsTest {
 	public void defaultConfigurationNoExplicitAnnotationDefinition1() {
 		validateAnnotatedFixture(
 				new org.hibernate.validator.xml.mixedconfiguration.annotation.PersonCompetition(),
-				configure()
+				TestUtil.getValidator()
 		);
 	}
 
@@ -51,7 +53,7 @@ public class InheritanceMappingsTest {
 	public void defaultConfigurationNoExplicitAnnotationDefinition2() {
 		validateAnnotatedFixture(
 				new org.hibernate.validator.xml.mixedconfiguration.annotation.TeamCompetition(),
-				configure()
+				TestUtil.getValidator()
 		);
 	}
 
@@ -87,12 +89,9 @@ public class InheritanceMappingsTest {
 		);
 	}
 
-	private Validator configure() {
-		return TestUtil.getValidator();
-	}
-
 	private Validator configure(String mappingsUrl) {
 		Configuration<?> configuration = TestUtil.getConfiguration();
+		configuration.traversableResolver( new DummyTraversableResolver() );
 		configuration.addMapping( InheritanceMappingsTest.class.getResourceAsStream( mappingsUrl ) );
 
 		ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
