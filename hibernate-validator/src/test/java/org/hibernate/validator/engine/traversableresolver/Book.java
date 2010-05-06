@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -20,7 +20,6 @@ package org.hibernate.validator.engine.traversableresolver;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik
@@ -32,7 +31,6 @@ public class Book {
 	public Long id;
 
 	@ManyToOne
-	@NotNull
 	public Author author;
 }
 
