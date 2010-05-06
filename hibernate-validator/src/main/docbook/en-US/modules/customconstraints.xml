@@ -90,7 +90,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
-import javax.validation.ConstraintPayload;
+import javax.validation.Payload;
 
 @Target( { METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
@@ -138,8 +138,8 @@ public @interface CheckCase {
               a severity.</para>
 
               <programlisting>public class Severity {
-    public static class Info extends ConstraintPayload {};
-    public static class Error extends ConstraintPayload {};
+    public static class Info extends Payload {};
+    public static class Error extends Payload {};
 }
 
 public class ContactDetails {
@@ -518,7 +518,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
-import javax.validation.ConstraintPayload;
+import javax.validation.Payload;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
