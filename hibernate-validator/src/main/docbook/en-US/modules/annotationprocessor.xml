@@ -48,10 +48,28 @@
     </itemizedlist>
 
     <para>Then the Hibernate Validator Annotation Processor is the right thing
-        for you. It helps in preventing such mistakes by plugging in into the build
+        for you. It helps in preventing such mistakes by plugging into the build
         process and raising compilation errors whenever constraint annotations are
         incorrectly used.
     </para>
+
+    <warning>
+        <para>A first version of the Hibernate Validator Annotation Processor is
+            part of Hibernate Validator since release 4.1. It is currently still under
+            development and should therefore be considered as an experimental feature.
+            Some
+            <link linkend="section-known-issues">known issues</link>
+            can be found
+            at the end of this chapter. In case any problems arise when using the
+            processor feel free to ask for help at the
+            <ulink
+                    url="https://forum.hibernate.org/viewforum.php?f=9">forum
+            </ulink>
+            or
+            create an issue within<ulink
+                    url="http://opensource.atlassian.com/projects/hibernate/browse/HV/component/10356">JIRA</ulink>.
+        </para>
+    </warning>
 
     <section>
         <title>Prerequisites</title>
@@ -62,8 +80,6 @@
             of the Java Platform since Java 6. So be sure to use this or a later
             version.
         </para>
-
-        <para>TODO GM: add note on experimental state of the AP</para>
     </section>
 
     <section id="section-features-of-the-ap">
@@ -81,7 +97,7 @@
             </listitem>
 
             <listitem>
-                <para>that for JavaBean properties the getter method is
+                <para>that in case of property validation JavaBean getter methods are
                     annotated
                 </para>
             </listitem>
@@ -144,7 +160,7 @@
                             <classname>ERROR</classname>
                             will cause compilation to halt
                             whenever the AP detects a constraint problem. Defaults to
-                            ERROR.
+                            <classname>ERROR</classname>.
                         </entry>
                     </row>
 
@@ -153,12 +169,10 @@
                             <varname>verbose</varname>
                         </entry>
 
-                        <entry>TODO GM: NOT YET IMPLEMENTED. Controls whether detailed
-                            processing information shall be displayed or not, useful for
-                            debugging purposes. Must be either
+                        <entry>Controls whether detailed processing information shall be
+                            displayed or not, useful for debugging purposes. Must be either
                             <varname>true</varname>
-                            or
-                            <varname>false</varname>. Defaults to
+                            or<varname>false</varname>. Defaults to
                             <varname>false</varname>.
                         </entry>
                     </row>
@@ -177,320 +191,372 @@
         </para>
 
         <section>
-            <title>javac</title>
+            <title>Command line builds</title>
 
-            <para>When compiling on the command line using<ulink
-                    url="http://java.sun.com/javase/6/docs/technotes/guides/javac/index.html">javac</ulink>,
-                specify the following JARs using the "processorpath" option:
-            </para>
+            <section>
+                <title>javac</title>
 
-            <itemizedlist>
-                <listitem>
-                    <para>validation-api-1.0.0.GA.jar</para>
-                </listitem>
+                <para>When compiling on the command line using<ulink
+                        url="http://java.sun.com/javase/6/docs/technotes/guides/javac/index.html">javac</ulink>,
+                    specify the following JARs using the "processorpath" option:
+                </para>
 
-                <listitem>
-                    <para>hibernate-validator-annotation-processor-4.1.0.GA.jar</para>
-                </listitem>
-            </itemizedlist>
+                <itemizedlist>
+                    <listitem>
+                        <para>validation-api-1.0.0.GA.jar</para>
+                    </listitem>
 
-            <para>The following example shows the compilation of one class. The
-                processor will be detected automatically by the compiler and invoked
-                during compilation.
-            </para>
+                    <listitem>
+                        <para>hibernate-validator-annotation-processor-4.1.0.GA.jar</para>
+                    </listitem>
+                </itemizedlist>
 
-            <example>
-                <title>Using the annotation processor with javac</title>
+                <para>The following listing shows an example. The processor will be
+                    detected automatically by the compiler and invoked during
+                    compilation.
+                </para>
 
-                <programlisting>javac src/main/java/org/hibernate/validator/ap/demo/Car.java
-                    -cp /path/to/validation-api-1.0.0.GA.jar
-                    -processorpath
-                    /path/to/validation-api-1.0.0.GA.jar:/path/to/hibernate-validator-annotation-processor-4.1.0.GA.jar
-                </programlisting>
-            </example>
-        </section>
-
-        <section>
-            <title>Apache Ant</title>
-
-            <para>Similar to directly working with javac, the annotation processor
-                can be added as as compiler argument when invoking the
-                <ulink
-                        url="http://ant.apache.org/manual/CoreTasks/javac.html">javac
-                    task
-                </ulink>
-                for<ulink url="http://ant.apache.org/">Apache
-                    Ant</ulink>:
-            </para>
-
-            <example>
-                <title>Using the annotation processor with Ant</title>
-
-                <programlisting>&lt;javac
-                    srcdir="src/main"
-                    destdir="build/classes"
-                    classpath="/path/to/validation-api-1.0.0.GA.jar"&gt;
-
-                    &lt;compilerarg value="-processorpath" /&gt;
-                    &lt;compilerarg
-                    value="/path/to/validation-api-1.0.0.GA.jar:/path/to/hibernate-validator-annotation-processor-4.1.0-SNAPSHOT.jar"
-                    /&gt;
-                    &lt;/javac&gt;</programlisting>
-            </example>
-        </section>
-
-        <section>
-            <title>Maven</title>
-
-            <para>There are several options for integrating the annotation processor
-                with<ulink url="http://maven.apache.org/">Apache Maven</ulink>.
-                Generally it is sufficient to add the Hibernate Validator Annotation
-                Processor as dependency to your project:
-            </para>
-
-            <example>
-                <title>Adding the HV Annotation Processor as dependency</title>
-
-                <programlisting>...
-                    &lt;dependency&gt;
-                    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-                    &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
-                    &lt;version&gt;4.1.0.GA&lt;/version&gt;
-                    &lt;scope&gt;compile&lt;/scope&gt;
-                    &lt;/dependency&gt;
-                    ...
-                </programlisting>
-            </example>
-
-            <para>The processor will then be executed automatically by the compiler.
-                This basically works, but comes with the disadavantage that in some
-                cases messages from the annotation processor are not displayed (see
-                <ulink url="???">MCOMPILER-66</ulink>).
-            </para>
-
-            <para>Another option is using the<ulink
-                    url="http://code.google.com/p/maven-annotation-plugin/">Maven Annotation
-                Plugin</ulink>. At the time of this writing the plugin is not yet
-                available in any of the well-known repositories. Therefore you have to
-                add the project's own repository to your settings.xml or pom.xml:
-            </para>
-
-            <para>
                 <example>
-                    <title>Adding the Maven Annotation Plugin repository</title>
+                    <title>Using the annotation processor with javac</title>
+
+                    <programlisting>javac src/main/java/org/hibernate/validator/ap/demo/Car.java
+                        -cp /path/to/validation-api-1.0.0.GA.jar
+                        -processorpath
+                        /path/to/validation-api-1.0.0.GA.jar:/path/to/hibernate-validator-annotation-processor-4.1.0.GA.jar
+                    </programlisting>
+                </example>
+            </section>
+
+            <section>
+                <title>Apache Ant</title>
+
+                <para>Similar to directly working with javac, the annotation processor
+                    can be added as as compiler argument when invoking the
+                    <ulink
+                            url="http://ant.apache.org/manual/CoreTasks/javac.html">javac
+                        task
+                    </ulink>
+                    for<ulink url="http://ant.apache.org/">Apache
+                        Ant</ulink>:
+                </para>
+
+                <example>
+                    <title>Using the annotation processor with Ant</title>
+
+                    <programlisting>&lt;javac
+                        srcdir="src/main"
+                        destdir="build/classes"
+                        classpath="/path/to/validation-api-1.0.0.GA.jar"&gt;
+
+                        &lt;compilerarg value="-processorpath" /&gt;
+                        &lt;compilerarg
+                        value="/path/to/validation-api-1.0.0.GA.jar:/path/to/hibernate-validator-annotation-processor-4.1.0-SNAPSHOT.jar"
+                        /&gt;
+                        &lt;/javac&gt;</programlisting>
+                </example>
+            </section>
+
+            <section>
+                <title>Maven</title>
+
+                <para>There are several options for integrating the annotation
+                    processor with<ulink url="http://maven.apache.org/">Apache
+                        Maven</ulink>. Generally it is sufficient to add the Hibernate
+                    Validator Annotation Processor as dependency to your project:
+                </para>
+
+                <example>
+                    <title>Adding the HV Annotation Processor as dependency</title>
 
                     <programlisting>...
-                        &lt;pluginRepositories&gt;
-                        &lt;pluginRepository&gt;
-                        &lt;id&gt;maven-annotation-plugin-repo&lt;/id&gt;
-                        &lt;url&gt;http://maven-annotation-plugin.googlecode.com/svn/trunk/mavenrepo&lt;/url&gt;
-                        &lt;/pluginRepository&gt;
-                        &lt;/pluginRepositories&gt;
+                        &lt;dependency&gt;
+                        &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+                        &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
+                        &lt;version&gt;4.1.0.GA&lt;/version&gt;
+                        &lt;scope&gt;compile&lt;/scope&gt;
+                        &lt;/dependency&gt;
                         ...
                     </programlisting>
                 </example>
-                Now disable the standard annotation processing performed by
-                the compiler plugin and configure the annotation plugin by specifying an
-                execution and adding the Hibernate Validator annotation processor as
-                plugin dependency (that way the AP is not visible on the project's
-                actual classpath):
-            </para>
 
-            <example>
-                <title>Configuring the Maven Annotation Plugin</title>
+                <para>The processor will then be executed automatically by the
+                    compiler. This basically works, but comes with the disadavantage that
+                    in some cases messages from the annotation processor are not displayed
+                    (see<ulink url="???">MCOMPILER-66</ulink>).
+                </para>
 
-                <programlisting>...
-                    &lt;plugin&gt;
-                    &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-                    &lt;configuration&gt;
-                    &lt;source&gt;1.6&lt;/source&gt;
-                    &lt;target&gt;1.6&lt;/target&gt;
-                    &lt;compilerArgument&gt;-proc:none&lt;/compilerArgument&gt;
-                    &lt;/configuration&gt;
-                    &lt;/plugin&gt;
-                    &lt;plugin&gt;
-                    &lt;groupId&gt;org.bsc.maven&lt;/groupId&gt;
-                    &lt;artifactId&gt;maven-processor-plugin&lt;/artifactId&gt;
-                    &lt;version&gt;1.3.4&lt;/version&gt;
-                    &lt;executions&gt;
-                    &lt;execution&gt;
-                    &lt;id&gt;process&lt;/id&gt;
-                    &lt;goals&gt;
-                    &lt;goal&gt;process&lt;/goal&gt;
-                    &lt;/goals&gt;
-                    &lt;phase&gt;process-sources&lt;/phase&gt;
-                    &lt;/execution&gt;
-                    &lt;/executions&gt;
-                    &lt;dependencies&gt;
-                    &lt;dependency&gt;
-                    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-                    &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
-                    &lt;version&gt;4.1.0.GA&lt;/version&gt;
-                    &lt;scope&gt;compile&lt;/scope&gt;
-                    &lt;/dependency&gt;
-                    &lt;/dependencies&gt;
-                    &lt;/plugin&gt;
-                    ...
-                </programlisting>
-            </example>
+                <para>Another option is using the<ulink
+                        url="http://code.google.com/p/maven-annotation-plugin/">Maven
+                    Annotation Plugin</ulink>. At the time of this writing the plugin is
+                    not yet available in any of the well-known repositories. Therefore you
+                    have to add the project's own repository to your settings.xml or
+                    pom.xml:
+                </para>
+
+                <para>
+                    <example>
+                        <title>Adding the Maven Annotation Plugin repository</title>
+
+                        <programlisting>...
+                            &lt;pluginRepositories&gt;
+                            &lt;pluginRepository&gt;
+                            &lt;id&gt;maven-annotation-plugin-repo&lt;/id&gt;
+                            &lt;url&gt;http://maven-annotation-plugin.googlecode.com/svn/trunk/mavenrepo&lt;/url&gt;
+                            &lt;/pluginRepository&gt;
+                            &lt;/pluginRepositories&gt;
+                            ...
+                        </programlisting>
+                    </example>
+                    Now disable the standard annotation processing performed
+                    by the compiler plugin and configure the annotation plugin by
+                    specifying an execution and adding the Hibernate Validator annotation
+                    processor as plugin dependency (that way the AP is not visible on the
+                    project's actual classpath):
+                </para>
+
+                <example>
+                    <title>Configuring the Maven Annotation Plugin</title>
+
+                    <programlisting>...
+                        &lt;plugin&gt;
+                        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                        &lt;configuration&gt;
+                        &lt;source&gt;1.6&lt;/source&gt;
+                        &lt;target&gt;1.6&lt;/target&gt;
+                        &lt;compilerArgument&gt;-proc:none&lt;/compilerArgument&gt;
+                        &lt;/configuration&gt;
+                        &lt;/plugin&gt;
+                        &lt;plugin&gt;
+                        &lt;groupId&gt;org.bsc.maven&lt;/groupId&gt;
+                        &lt;artifactId&gt;maven-processor-plugin&lt;/artifactId&gt;
+                        &lt;version&gt;1.3.4&lt;/version&gt;
+                        &lt;executions&gt;
+                        &lt;execution&gt;
+                        &lt;id&gt;process&lt;/id&gt;
+                        &lt;goals&gt;
+                        &lt;goal&gt;process&lt;/goal&gt;
+                        &lt;/goals&gt;
+                        &lt;phase&gt;process-sources&lt;/phase&gt;
+                        &lt;/execution&gt;
+                        &lt;/executions&gt;
+                        &lt;dependencies&gt;
+                        &lt;dependency&gt;
+                        &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+                        &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
+                        &lt;version&gt;4.1.0.GA&lt;/version&gt;
+                        &lt;scope&gt;compile&lt;/scope&gt;
+                        &lt;/dependency&gt;
+                        &lt;/dependencies&gt;
+                        &lt;/plugin&gt;
+                        ...
+                    </programlisting>
+                </example>
+            </section>
         </section>
 
         <section>
-            <title>Eclipse</title>
+            <title>IDE builds</title>
 
-            <para>Do the following to integrate the annotation processor with the
-                Eclipse IDE:
-            </para>
+            <section>
+                <title>Eclipse</title>
 
-            <itemizedlist>
-                <listitem>
-                    <para>Right-click your project, choose "Properties"</para>
-                </listitem>
+                <para>Do the following to use the annotation processor within the
+                    <ulink url="http://www.eclipse.org/">Eclipse</ulink>
+                    IDE:
+                </para>
 
-                <listitem>
-                    <para>Go to "Java Compiler" and make sure, that "Compiler compliance
-                        level" is set to "1.6", otherwise the processor won't be
-                        activated
-                    </para>
-                </listitem>
+                <itemizedlist>
+                    <listitem>
+                        <para>Right-click your project, choose "Properties"</para>
+                    </listitem>
 
-                <listitem>
-                    <para>Go to "Java Compiler - Annotation Processing" and choose
-                        "Enable annotation processing"
-                    </para>
-                </listitem>
+                    <listitem>
+                        <para>Go to "Java Compiler" and make sure, that "Compiler
+                            compliance level" is set to "1.6". Otherwise the processor won't
+                            be activated
+                        </para>
+                    </listitem>
 
-                <listitem>
-                    <para>Go to "Java Compiler - Annotation Processing - Factory Path"
-                        and add the following JARs:
-                    </para>
+                    <listitem>
+                        <para>Go to "Java Compiler - Annotation Processing" and choose
+                            "Enable annotation processing"
+                        </para>
+                    </listitem>
 
-                    <itemizedlist>
-                        <listitem>
-                            <para>validation-api-1.0.0.GA.jar</para>
-                        </listitem>
+                    <listitem>
+                        <para>Go to "Java Compiler - Annotation Processing - Factory Path"
+                            and add the following JARs:
+                        </para>
 
-                        <listitem>
-                            <para>hibernate-validator-annotation-processor-4.1.0.GA.jar</para>
-                        </listitem>
-                    </itemizedlist>
-                </listitem>
+                        <itemizedlist>
+                            <listitem>
+                                <para>validation-api-1.0.0.GA.jar</para>
+                            </listitem>
 
-                <listitem>
-                    <para>Confirm the workspace rebuild</para>
-                </listitem>
-            </itemizedlist>
+                            <listitem>
+                                <para>hibernate-validator-annotation-processor-4.1.0.GA.jar</para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
 
-            <para>You now should see any annotation problems as regular error
-                markers within the editor and in the "Problem" view:
-            </para>
+                    <listitem>
+                        <para>Confirm the workspace rebuild</para>
+                    </listitem>
+                </itemizedlist>
 
-            <mediaobject>
-                <imageobject>
-                    <imagedata align="center" arch="" contentwidth="150mm"
-                               fileref="annotation_processor_eclipse.png"/>
-                </imageobject>
-            </mediaobject>
-        </section>
+                <para>You now should see any annotation problems as regular error
+                    markers within the editor and in the "Problem" view:
+                </para>
 
-        <section>
-            <title>IntelliJ IDEA</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata align="center" arch="" contentwidth="150mm"
+                                   fileref="annotation_processor_eclipse.png"/>
+                    </imageobject>
+                </mediaobject>
+            </section>
 
-            <para>The following steps must be followed to use the annotation
-                processor within IntelliJ IDEA (version 9 and above):
-            </para>
+            <section>
+                <title>IntelliJ IDEA</title>
 
-            <itemizedlist>
-                <listitem>
-                    <para>Go to "File", then "Settings",</para>
-                </listitem>
+                <para>The following steps must be followed to use the annotation
+                    processor within
+                    <ulink url="http://www.jetbrains.com/idea/">IntelliJ
+                        IDEA
+                    </ulink>
+                    (version 9 and above):
+                </para>
 
-                <listitem>
-                    <para>Expand the node "Compiler", then "Annotation
-                        Processors"
-                    </para>
-                </listitem>
+                <itemizedlist>
+                    <listitem>
+                        <para>Go to "File", then "Settings",</para>
+                    </listitem>
 
-                <listitem>
-                    <para>Choose "Enable annotation processing" and enter the following
-                        as "Processor path":
-                        /path/to/validation-api-1.0.0.GA.jar:/path/to/hibernate-validator-annotation-processor-4.1.0.GA.jar
-                    </para>
-                </listitem>
+                    <listitem>
+                        <para>Expand the node "Compiler", then "Annotation
+                            Processors"
+                        </para>
+                    </listitem>
 
-                <listitem>
-                    <para>Add the processor's fully qualified name
-                        "org.hibernate.validator.ap.ConstraintValidationProcessor" to the
-                        "Annotation Processors" list
-                    </para>
-                </listitem>
+                    <listitem>
+                        <para>Choose "Enable annotation processing" and enter the
+                            following as "Processor path":
+                            /path/to/validation-api-1.0.0.GA.jar:/path/to/hibernate-validator-annotation-processor-4.1.0.GA.jar
+                        </para>
+                    </listitem>
 
-                <listitem>
-                    <para>Add you module to the "Processed Modules" list</para>
-                </listitem>
-            </itemizedlist>
+                    <listitem>
+                        <para>Add the processor's fully qualified name
+                            <classname>org.hibernate.validator.ap.ConstraintValidationProcessor</classname>
+                            to the "Annotation Processors" list
+                        </para>
+                    </listitem>
 
-            <para>Rebuilding your project then should show any erronous constraint
-                annotations:
-            </para>
+                    <listitem>
+                        <para>If applicable add you module to the "Processed Modules"
+                            list
+                        </para>
+                    </listitem>
+                </itemizedlist>
 
-            <para>TODO GM: ANNOTATION_PROCESSOR_INTELLIJ.PNG</para>
-        </section>
+                <para>Rebuilding your project then should show any erronous constraint
+                    annotations:
+                </para>
 
-        <section>
-            <title>NetBeans</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata align="center" arch="" contentwidth="150mm"
+                                   fileref="annotation_processor_intellij.png"/>
+                    </imageobject>
+                </mediaobject>
+            </section>
 
-            <para>Starting with version 6.9, also the NetBeans IDE supports plugging
-                in annotation processors into the IDE build. To do so, do the
-                following:
-            </para>
+            <section>
+                <title>NetBeans</title>
 
-            <itemizedlist>
-                <listitem>
-                    <para>Right-click your project, choose "Properties"</para>
-                </listitem>
+                <para>Starting with version 6.9, also the
+                    <ulink
+                            url="http://www.netbeans.org/">NetBeans
+                    </ulink>
+                    IDE supports using
+                    annotation processors within the IDE build. To do so, do the
+                    following:
+                </para>
 
-                <listitem>
-                    <para>Go to "Libraries", tab "Processor", and add the following two
-                        JARs:
-                    </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Right-click your project, choose "Properties"</para>
+                    </listitem>
 
-                    <itemizedlist>
-                        <listitem>
-                            <para>validation-api-1.0.0.GA.jar</para>
-                        </listitem>
+                    <listitem>
+                        <para>Go to "Libraries", tab "Processor", and add the following
+                            two JARs:
+                        </para>
 
-                        <listitem>
-                            <para>hibernate-validator-annotation-processor-4.1.0.GA.jar</para>
-                        </listitem>
-                    </itemizedlist>
-                </listitem>
+                        <itemizedlist>
+                            <listitem>
+                                <para>validation-api-1.0.0.GA.jar</para>
+                            </listitem>
 
-                <listitem>
-                    <para>Go to "Build - Compiling", select "Enable Annotation
-                        Processing" and "Enable Annotation Processing in Editor". Add the
-                        annotation processor by specifying its fully qualified name
-                        org.hibernate.validator.ap.ConstraintValidationProcessor
-                    </para>
-                </listitem>
-            </itemizedlist>
+                            <listitem>
+                                <para>hibernate-validator-annotation-processor-4.1.0.GA.jar</para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
 
-            <para>Any constraint annotation problems will then be marked directly
-                within the editor:
-            </para>
+                    <listitem>
+                        <para>Go to "Build - Compiling", select "Enable Annotation
+                            Processing" and "Enable Annotation Processing in Editor". Add the
+                            annotation processor by specifying its fully qualified name
+                            <classname>org.hibernate.validator.ap.ConstraintValidationProcessor</classname>
+                        </para>
+                    </listitem>
+                </itemizedlist>
 
-            <mediaobject>
-                <imageobject>
-                    <imagedata align="center" arch="" contentwidth="150mm"
-                               fileref="annotation_processor_eclipse.png"/>
-                </imageobject>
-            </mediaobject>
+                <para>Any constraint annotation problems will then be marked directly
+                    within the editor:
+                </para>
+
+                <mediaobject>
+                    <imageobject>
+                        <imagedata align="center" arch="" contentwidth="150mm"
+                                   fileref="annotation_processor_netbeans.png"/>
+                    </imageobject>
+                </mediaobject>
+            </section>
         </section>
     </section>
 
-    <section>
+    <section id="section-known-issues">
         <title>Known issues</title>
 
-        <para>TODO GM</para>
+        <para>The following known issues exist as of May 2010:</para>
+
+        <itemizedlist>
+            <listitem>
+                <para><ulink
+                        url="http://opensource.atlassian.com/projects/hibernate/browse/HV-308">HV-308</ulink>:
+                    Additional validators registered for a constraint
+                    <ulink
+                            url="http://docs.jboss.org/hibernate/stable/validator/reference/en/html_single/#d0e1957">
+                        using
+                        XML
+                    </ulink>
+                    are not evaluated by the annotation processor.
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>Sometimes custom constraints can't be
+                    <ulink
+                            url="http://opensource.atlassian.com/projects/hibernate/browse/HV-293">properly
+                        evaluated
+                    </ulink>
+                    when using the processor within Eclipse. This seems
+                    to be an issue with the Eclipse JSR 269 API implementation, but
+                    further investigation is required here.
+                </para>
+            </listitem>
+        </itemizedlist>
     </section>
 </chapter>
