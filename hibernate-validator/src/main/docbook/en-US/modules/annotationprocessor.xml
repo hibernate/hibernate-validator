@@ -174,7 +174,7 @@
 
         <itemizedlist>
           <listitem>
-            <para>validation-api-&jpaVersion;.jar</para>
+            <para>validation-api-&bvVersion;.jar</para>
           </listitem>
 
           <listitem>
@@ -190,8 +190,8 @@
           <title>Using the annotation processor with javac</title>
 
           <programlisting>javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
-   -cp /path/to/validation-api-&jpaVersion;.jar \ 
-   -processorpath /path/to/validation-api-&jpaVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar                  </programlisting>
+   -cp /path/to/validation-api-&bvVersion;.jar \ 
+   -processorpath /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar                  </programlisting>
         </example>
       </section>
 
@@ -209,9 +209,9 @@
 
           <programlisting>&lt;javac srcdir="src/main"
        destdir="build/classes"
-       classpath="/path/to/validation-api-&jpaVersion;.jar"&gt;
+       classpath="/path/to/validation-api-&bvVersion;.jar"&gt;
        &lt;compilerarg value="-processorpath" /&gt;
-       &lt;compilerarg value="/path/to/validation-api-&jpaVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar"/&gt;
+       &lt;compilerarg value="/path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar"/&gt;
 &lt;/javac&gt;</programlisting>
         </example>
       </section>
@@ -338,7 +338,7 @@
 
             <itemizedlist>
               <listitem>
-                <para>validation-api-&jpaVersion;.jar</para>
+                <para>validation-api-&bvVersion;.jar</para>
               </listitem>
 
               <listitem>
@@ -383,7 +383,7 @@
           <listitem>
             <para>Choose "Enable annotation processing" and enter the
             following as "Processor path":
-            /path/to/validation-api-&jpaVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar</para>
+            /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar</para>
           </listitem>
 
           <listitem>
@@ -428,7 +428,7 @@
 
             <itemizedlist>
               <listitem>
-                <para>validation-api-&jpaVersion;.jar</para>
+                <para>validation-api-&bvVersion;.jar</para>
               </listitem>
 
               <listitem>
