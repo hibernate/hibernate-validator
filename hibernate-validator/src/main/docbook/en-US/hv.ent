@@ -1,0 +1,5 @@
+<!ENTITY version "WORKING">
+<!ENTITY jpaVersion "1.0.0.GA">
+<!ENTITY today "TODAY">
+<!ENTITY copyrightYear "2009, 2010">
+<!ENTITY copyrightHolder "Red Hat, Inc. &amp; Gunnar Morling">
