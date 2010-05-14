@@ -16,8 +16,11 @@
 	~ See the License for the specific language governing permissions and
 	~ limitations under the License.
 -->
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
+%BOOK_ENTITIES;
+]>
 <chapter>
   <title id="chapter-further-reading">Further reading</title>
 

@@ -16,14 +16,12 @@
 	~ See the License for the specific language governing permissions and
 	~ limitations under the License.
 -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-        "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-        <!ENTITY version "WORKING">
-        <!ENTITY today "TODAY">
-        <!ENTITY copyrightYear "2009, 2010">
-        <!ENTITY copyrightHolder "Red Hat, Inc. &amp; Gunnar Morling">
-        ]>
-<book lang="en">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "hv.ent">
+%BOOK_ENTITIES;
+]>
+
+<book>
     <bookinfo>
         <title>Hibernate Validator</title>
         <subtitle>JSR 303 Reference Implementation</subtitle>
