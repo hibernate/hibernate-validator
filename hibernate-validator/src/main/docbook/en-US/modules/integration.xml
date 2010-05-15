@@ -59,7 +59,7 @@
     <para>You can also limit the DDL constraint generation to a subset of the
     defined constraints by setting the property
     <property>org.hibernate.validator.group.ddl</property>. The property
-    specifies the comma seperated, fully specified classnames of the groups a
+    specifies the comma-separated, fully specified class names of the groups a
     constraint has to be part of in order to be considered for DDL schema
     generation.</para>
   </section>
@@ -88,7 +88,7 @@
       <property>javax.persistence.validation.group.pre-persist</property>,
       <property>javax.persistence.validation.group.pre-update</property> and
       <property>javax.persistence.validation.group.pre-remove</property>. The
-      values of these properties are the comma seperated, fully specified
+      values of these properties are the comma-separated, fully specified
       class names of the groups to validate. <xref
       linkend="example-beanvalidationeventlistener-config" /> shows the
       default values for these properties. In this case they could also be
@@ -171,7 +171,7 @@
     <para>When working with JSF2 or <productname>JBoss Seam</productname> and
     Hibernate Validator (Bean Validation) is present in the runtime
     environment validation is triggered for every field in the application.
-    <xref linkend="example-jsf" /> shows an example of the f:validateBean tag
+    <xref linkend="example-jsf2" /> shows an example of the f:validateBean tag
     in a JSF page. For more information refer to the Seam documentation or the
     JSF 2 specification.</para>
 

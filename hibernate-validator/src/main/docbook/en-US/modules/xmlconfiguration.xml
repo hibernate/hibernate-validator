@@ -86,7 +86,7 @@
     <classname>javax.validation.ConstraintValidatorFactory</classname>. The
     same configuration options are also available programmatically through the
     <classname>javax.validation.Configuration</classname>. In fact XML
-    configuration will be overriden by values explicitly specified via the
+    configuration will be overridden by values explicitly specified via the
     API. It is even possible to ignore the XML configuration completely via
     <methodname> Configuration.ignoreXmlConfiguration()</methodname>. See also
     <xref linkend="validator-bootstrapping" />.</para>

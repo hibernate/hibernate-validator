@@ -79,8 +79,9 @@ public class Car {
       </example>
 
       <para>When using field level constraints field access strategy is used
-      to access the value to be validated. This means the instance variable
-      directly independed of the access type.</para>
+      to access the value to be validated. This means the bean validation
+      provider directly accesses the instance variable and does not invoke the
+      property accessor method also if such a method exists.</para>
 
       <note>
         <para>The access type (private, protected or public) does not
@@ -248,8 +249,7 @@ public class RentalCar extends Car {
 }</programlisting>
       </example>
 
-      <para>Our well-known class <classname>Car</classname> from <xref
-      linkend="example-class-car" /> is now extended by
+      <para>Our well-known class <classname>Car</classname> is now extended by
       <classname>RentalCar</classname> with the additional property
       <property>rentalStation</property>. If an instance of
       <classname>RentalCar</classname> is validated, not only the
@@ -337,11 +337,11 @@ public class Car {
       <code>null</code>.</para>
 
       <para>Object graph validation also works for collection-typed fields.
-      That means any attributes that are</para>
+      That means any attributes that</para>
 
       <itemizedlist>
         <listitem>
-          <para>arrays</para>
+          <para>are arrays</para>
         </listitem>
 
         <listitem>
@@ -545,7 +545,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
               <entry>Usage</entry>
 
-              <entry>Example (refering to <xref
+              <entry>Example (referring to <xref
               linkend="example-validator-validate" />)</entry>
             </row>
           </thead>
@@ -892,7 +892,7 @@ public interface CarChecks {
 
       <note>
         <para>If at least one constraints fails in a sequenced group none of
-        the constraints of the follwoing groups in the sequence get
+        the constraints of the following groups in the sequence get
         validated.</para>
       </note>
 
@@ -1354,10 +1354,10 @@ public void testOrderedChecksWithRedefinedDefault() {
             <entry>field/property. Any non-primitive types are
             supported.</entry>
 
-            <entry>Performs validation recursively on the associated object. If
-            the object is a collection or an array, the elements are validated
-            recursively. If the object is a map, the value elements are
-            validated recursively.</entry>
+            <entry>Performs validation recursively on the associated object.
+            If the object is a collection or an array, the elements are
+            validated recursively. If the object is a map, the value elements
+            are validated recursively.</entry>
 
             <entry>none</entry>
           </row>

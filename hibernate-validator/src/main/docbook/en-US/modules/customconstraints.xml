@@ -134,10 +134,10 @@ public @interface CheckCase {
 
         <listitem>
           <para>an attribute <classname>payload</classname> that can be used
-          by clients of the Bean Validation API to asign custom payload
+          by clients of the Bean Validation API to assign custom payload
           objects to a constraint. This attribute is not used by the API
           itself. <tip>
-              <para>An examle for a custom payload could be the definition of
+              <para>An example for a custom payload could be the definition of
               a severity.</para>
 
               <programlisting>public class Severity {
@@ -165,7 +165,7 @@ public class ContactDetails {
       </itemizedlist>
 
       <para>Besides those three mandatory attributes
-      (<property>messge</property>, <property>groups</property> and
+      (<property>message</property>, <property>groups</property> and
       <property>payload</property>) we add another one allowing for the
       required case mode to be specified. The name <property>value</property>
       is a special one, which can be omitted upon using the annotation, if it
@@ -267,7 +267,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       <classname>initialize()</classname>. As the Bean Validation
       specification recommends, we consider <code>null</code> values as being
       valid. If <code>null</code> is not a valid value for an element, it
-      should be annotated with <code>@NotNull</code> explicitely.</para>
+      should be annotated with <code>@NotNull</code> explicitly.</para>
 
       <section>
         <title>The ConstraintValidatorContext</title>
