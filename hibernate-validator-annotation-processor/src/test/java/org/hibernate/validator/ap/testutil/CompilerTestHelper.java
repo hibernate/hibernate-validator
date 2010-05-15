@@ -30,7 +30,7 @@ import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
-import org.hibernate.validator.ap.util.DiagnosticExpection;
+import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -148,28 +148,28 @@ public class CompilerTestHelper {
 	 *
 	 * @param diagnostics The actual diagnostics as populated by the executed
 	 * {@link CompilationTask}.
-	 * @param expections The expectations to compare against.
+	 * @param expectations The expectations to compare against.
 	 */
-	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpection... expections) {
+	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpectation... expectations) {
 
 		List<Diagnostic<? extends JavaFileObject>> diagnosticsList = diagnostics.getDiagnostics();
 
-		if ( expections == null ) {
+		if ( expectations == null ) {
 			assertTrue( diagnosticsList.isEmpty() );
 		}
 		else {
 
-			if ( diagnosticsList.size() != expections.length ) {
+			if ( diagnosticsList.size() != expectations.length ) {
 				System.out.println( diagnosticsList );
 			}
 
-			assertEquals( diagnosticsList.size(), expections.length, "Wrong number of diagnostics." );
+			assertEquals( diagnosticsList.size(), expectations.length, "Wrong number of diagnostics." );
 
 			int i = 0;
-			for ( DiagnosticExpection oneExpection : expections ) {
+			for ( DiagnosticExpectation oneExpectation : expectations ) {
 
-				assertEquals( diagnosticsList.get( i ).getKind(), oneExpection.getKind() );
-				assertEquals( diagnosticsList.get( i ).getLineNumber(), oneExpection.getLineNumber() );
+				assertEquals( diagnosticsList.get( i ).getKind(), oneExpectation.getKind() );
+				assertEquals( diagnosticsList.get( i ).getLineNumber(), oneExpectation.getLineNumber() );
 
 				i++;
 			}

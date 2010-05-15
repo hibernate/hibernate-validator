@@ -25,12 +25,13 @@ import javax.tools.Diagnostic.Kind;
  *
  * @author Gunnar Morling
  */
-public class DiagnosticExpection {
+public class DiagnosticExpectation {
+
 	private final Kind kind;
 
 	private final long lineNumber;
 
-	public DiagnosticExpection(Kind kind, long lineNumber) {
+	public DiagnosticExpectation(Kind kind, long lineNumber) {
 		this.kind = kind;
 		this.lineNumber = lineNumber;
 	}
@@ -45,6 +46,6 @@ public class DiagnosticExpection {
 
 	@Override
 	public String toString() {
-		return "DiagnosticExpection [kind=" + kind + ", lineNumber=" + lineNumber + "]";
+		return "DiagnosticExpectation [kind=" + kind + ", lineNumber=" + lineNumber + "]";
 	}
 }
