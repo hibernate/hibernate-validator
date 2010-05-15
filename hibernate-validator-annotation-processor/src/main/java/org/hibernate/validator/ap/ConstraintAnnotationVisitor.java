@@ -48,24 +48,23 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  */
 final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<AnnotationMirror>> {
 
-	private final ConstraintHelper constraintHelper;
-
 	private final MessagerAdapter messager;
 
-	private ConstraintCheckFactory constraintCheckFactory;
+	private final ConstraintCheckFactory constraintCheckFactory;
 
-	//TODO GM: establish processor option for this
-	private boolean verbose = true;
+	private final boolean verbose;
 
-	public ConstraintAnnotationVisitor(ProcessingEnvironment processingEnvironment, MessagerAdapter messager) {
+	public ConstraintAnnotationVisitor(
+			ProcessingEnvironment processingEnvironment, MessagerAdapter messager, boolean verbose) {
 
 		this.messager = messager;
+		this.verbose = verbose;
 
 		AnnotationApiHelper annotationApiHelper = new AnnotationApiHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
 		);
 
-		constraintHelper = new ConstraintHelper(
+		ConstraintHelper constraintHelper = new ConstraintHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils(), annotationApiHelper
 		);
 

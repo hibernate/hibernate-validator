@@ -46,10 +46,6 @@ public class CompilerTestHelper {
 
 	private final String sourceBaseDir;
 
-	/**
-	 * TODO GM: How can JavaCompiler access all dependencies of the project? This works within
-	 * Eclipse, but not on the command line.
-	 */
 	private final String pathToBeanValidationApiJar;
 
 	public CompilerTestHelper(JavaCompiler compiler, String sourceBaseDir, String pathToBeanValidationApiJar) {
@@ -75,20 +71,30 @@ public class CompilerTestHelper {
 	}
 
 	/**
-	 * Creates and executes a {@link CompilationTask} using the given input.
-	 *
-	 * @param annotationProcessor An annotation processor to be attached to the task.
-	 * @param diagnostics An diagnostics listener to be attached to the task.
-	 * @param sourceFiles The source files to be compiled.
-	 *
-	 * @return True, if the source files could be compiled successfully (meaning
-	 *         in especially, that the given annotation processor didn't raise
-	 *         any errors), false otherwise.
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, File...)
 	 */
 	public boolean compile(
 			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, File... sourceFiles) {
 
-		return compile( annotationProcessor, diagnostics, Kind.ERROR, sourceFiles );
+		return compile( annotationProcessor, diagnostics, null, null, sourceFiles );
+	}
+
+	/**
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, File...)
+	 */
+	public boolean compile(
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, File... sourceFiles) {
+
+		return compile( annotationProcessor, diagnostics, diagnosticKind, null, sourceFiles );
+	}
+
+	/**
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, File...)
+	 */
+	public boolean compile(
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, boolean verbose, File... sourceFiles) {
+
+		return compile( annotationProcessor, diagnostics, null, verbose, sourceFiles );
 	}
 
 	/**
@@ -97,6 +103,7 @@ public class CompilerTestHelper {
 	 * @param annotationProcessor An annotation processor to be attached to the task.
 	 * @param diagnostics An diagnostics listener to be attached to the task.
 	 * @param diagnosticKind A value for the "diagnosticKind" option.
+	 * @param verbose A value for the "verbose" option.
 	 * @param sourceFiles The source files to be compiled.
 	 *
 	 * @return True, if the source files could be compiled successfully (meaning
@@ -104,21 +111,26 @@ public class CompilerTestHelper {
 	 *         any errors), false otherwise.
 	 */
 	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, File... sourceFiles) {
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, Boolean verbose, File... sourceFiles) {
 
 		StandardJavaFileManager fileManager =
 				compiler.getStandardFileManager( null, null, null );
 
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( sourceFiles );
 
-		List<String> optionList = new ArrayList<String>();
-		optionList.addAll(
-				Arrays.asList(
-						"-classpath", pathToBeanValidationApiJar, "-AdiagnosticKind=" + diagnosticKind, "-d", "target"
-				)
-		);
+		List<String> options = new ArrayList<String>();
 
-		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, optionList, null, compilationUnits );
+		options.addAll( Arrays.asList( "-classpath", pathToBeanValidationApiJar, "-d", "target" ) );
+
+		if ( diagnosticKind != null ) {
+			options.add( "-AdiagnosticKind=" + diagnosticKind );
+		}
+
+		if ( verbose != null ) {
+			options.add( "-Averbose=" + verbose.toString() );
+		}
+
+		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, options, null, compilationUnits );
 		task.setProcessors( Arrays.asList( annotationProcessor ) );
 
 		return task.call();

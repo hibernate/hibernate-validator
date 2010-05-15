@@ -54,16 +54,22 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  */
 @SupportedAnnotationTypes("*")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-@SupportedOptions(ConstraintValidationProcessor.DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME)
+@SupportedOptions({
+		ConstraintValidationProcessor.DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME,
+		ConstraintValidationProcessor.VERBOSE_PROCESSOR_OPTION_NAME
+})
 public class ConstraintValidationProcessor extends AbstractProcessor {
 
 	/**
 	 * The name of the processor option for setting the diagnostic kind to be
-	 * used when reporting errors during annotation processing. Can be set on
-	 * the command line using the -A option, e.g.
-	 * <code>-AdiagnosticKind=ERROR</code>.
+	 * used when reporting errors during annotation processing.
 	 */
 	public final static String DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME = "diagnosticKind";
+
+	/**
+	 * The name of the processor option for activating verbose message reporting.
+	 */
+	public final static String VERBOSE_PROCESSOR_OPTION_NAME = "verbose";
 
 	/**
 	 * The diagnostic kind to be used if no or an invalid kind is given as processor option.
@@ -79,11 +85,17 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 	 */
 	private MessagerAdapter messager;
 
+	/**
+	 * Whether logging information shall be put out in a verbose way or not.
+	 */
+	private boolean verbose;
+
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 
 		super.init( processingEnv );
 
+		this.verbose = isVerbose();
 		messager = new MessagerAdapter( processingEnv.getMessager(), getDiagnosticKind() );
 	}
 
@@ -97,7 +109,7 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 		);
 
 		ElementVisitor<Void, List<AnnotationMirror>> visitor = new ConstraintAnnotationVisitor(
-				processingEnv, messager
+				processingEnv, messager, verbose
 		);
 
 		for ( TypeElement oneAnnotation : annotations ) {
@@ -144,6 +156,27 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 		}
 
 		return DEFAULT_DIAGNOSTIC_KIND;
+	}
+
+	/**
+	 * Retrieves the value for the "verbose" property from the options.
+	 *
+	 * @return The value for the "verbose" property.
+	 */
+	private boolean isVerbose() {
+
+		boolean theValue = Boolean.parseBoolean( processingEnv.getOptions().get( VERBOSE_PROCESSOR_OPTION_NAME ) );
+
+		if ( theValue ) {
+			super.processingEnv.getMessager().printMessage(
+					Kind.NOTE, MessageFormat.format(
+							"Verbose reporting is activated. Some processing information will be displayed using diagnostic kind {0}.",
+							Kind.NOTE
+					)
+			);
+		}
+
+		return theValue;
 	}
 
 }

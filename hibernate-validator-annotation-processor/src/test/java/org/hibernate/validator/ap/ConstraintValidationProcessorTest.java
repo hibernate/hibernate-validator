@@ -18,6 +18,7 @@
 package org.hibernate.validator.ap;
 
 import java.io.File;
+import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaFileObject;
@@ -125,16 +126,24 @@ public class ConstraintValidationProcessorTest {
 	}
 
 	@Test
-	public void compilationSucceedsDueToDiagnosticKindWarning() {
+	public void testThatProcessorOptionsAreEvaluated() {
 
 		File sourceFile = compilerHelper.getSourceFile( FieldLevelValidationUsingBuiltInConstraints.class );
 
+		// compile with -AdiagnosticKind=Kind.WARNING and -Averbose=true
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, Kind.WARNING, sourceFile );
+				compilerHelper.compile(
+						new ConstraintValidationProcessor(), diagnostics, Kind.WARNING, true, sourceFile
+				);
 
+		// compilation succeeds as there are problems, but Kind.WARNING won't stop compilation
 		assertTrue( compilationResult );
+
 		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpection( Kind.WARNING, 54 ), new DiagnosticExpection( Kind.WARNING, 60 )
+				diagnostics,
+				new DiagnosticExpection( Kind.NOTE, Diagnostic.NOPOS ), //says that verbose messaging is enabled
+				new DiagnosticExpection( Kind.WARNING, 54 ),
+				new DiagnosticExpection( Kind.WARNING, 60 )
 		);
 	}
 
