@@ -40,7 +40,7 @@ public class URLValidator implements ConstraintValidator<URL, String> {
 	}
 
 	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
-		if ( value == null ) {
+		if ( value == null || value.length() == 0 ) {
 			return true;
 		}
 

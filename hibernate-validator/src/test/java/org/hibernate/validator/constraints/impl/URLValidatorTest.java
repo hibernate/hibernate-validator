@@ -41,7 +41,6 @@ public class URLValidatorTest {
 		validator.initialize( url );
 
 		assertTrue( validator.isValid( null, null ) );
-		assertFalse( validator.isValid( "", null ) );
 		assertFalse( validator.isValid( "http", null ) );
 		assertFalse( validator.isValid( "ftp//abc.de", null ) );
 		assertTrue( validator.isValid( "ftp://abc.de", null ) );
@@ -62,7 +61,7 @@ public class URLValidatorTest {
 		descriptor = new AnnotationDescriptor<URL>( URL.class );
 		descriptor.setValue( "protocol", "file" );
 		url = AnnotationFactory.create( descriptor );
-		validator = new URLValidator();                             
+		validator = new URLValidator();
 		validator.initialize( url );
 		assertFalse( validator.isValid( "http://abc.de", null ) );
 		assertTrue( validator.isValid( "file://Users/foobar/tmp", null ) );
@@ -104,5 +103,19 @@ public class URLValidatorTest {
 
 		assertFalse( validator.isValid( "ftp://www#hibernate#org:80", null ) );
 		assertTrue( validator.isValid( "http://www.hibernate.org:80", null ) );
+	}
+
+	@Test
+	public void testIsValidEmptyString() {
+		// HV-323
+		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
+		descriptor.setValue( "protocol", "http" );
+		descriptor.setValue( "host", "www.hibernate.org" );
+		descriptor.setValue( "port", 80 );
+		URL url = AnnotationFactory.create( descriptor );
+		URLValidator validator = new URLValidator();
+		validator.initialize( url );
+
+		assertTrue( validator.isValid( "", null ) );
 	}
 }
