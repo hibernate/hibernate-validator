@@ -22,7 +22,7 @@ import java.security.PrivilegedAction;
 /**
  * @author Emmanuel Bernard
  */
-public class GetClassLoader implements PrivilegedAction<ClassLoader> {
+public final class GetClassLoader implements PrivilegedAction<ClassLoader> {
 	private final Class<?> clazz;
 
 	public static GetClassLoader fromContext() {
@@ -30,7 +30,9 @@ public class GetClassLoader implements PrivilegedAction<ClassLoader> {
 	}
 
 	public static GetClassLoader fromClass(Class<?> clazz) {
-		if ( clazz == null ) throw new IllegalArgumentException("Class is null");
+		if ( clazz == null ) {
+			throw new IllegalArgumentException( "Class is null" );
+		}
 		return new GetClassLoader( clazz );
 	}
 
@@ -39,7 +41,7 @@ public class GetClassLoader implements PrivilegedAction<ClassLoader> {
 	}
 
 	public ClassLoader run() {
-		if (clazz != null) {
+		if ( clazz != null ) {
 			return clazz.getClassLoader();
 		}
 		else {
