@@ -28,5 +28,10 @@ public class LoggerFactory {
 		StackTraceElement directCaller = t.getStackTrace()[1];
 		return org.slf4j.LoggerFactory.getLogger( directCaller.getClassName() );
 	}
+
+	// private constructor to avoid instantiation
+	private LoggerFactory(){
+
+	}
 }
 

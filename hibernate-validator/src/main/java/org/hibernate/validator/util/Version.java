@@ -58,4 +58,9 @@ public class Version {
 
 	public static void touch() {
 	}
+
+	// helper class should not have a public constructor
+	private Version() {
+
+	}
 }
