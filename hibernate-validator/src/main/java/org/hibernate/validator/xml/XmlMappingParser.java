@@ -111,7 +111,7 @@ public class XmlMappingParser {
 		}
 	}
 
-	public Set<Class<?>> getProcessedClasses() {
+	public Set<Class<?>> getXmlConfiguredClasses() {
 		return processedClasses;
 	}
 
