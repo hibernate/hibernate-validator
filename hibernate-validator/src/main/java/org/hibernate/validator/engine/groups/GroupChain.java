@@ -51,13 +51,13 @@ public class GroupChain {
 		return sequenceMap.values().iterator();
 	}
 
-	void insertGroup(Group group) {
+	public void insertGroup(Group group) {
 		if ( !groupList.contains( group ) ) {
 			groupList.add( group );
 		}
 	}
 
-	void insertSequence(List<Group> groups) {
+	public void insertSequence(List<Group> groups) {
 		if ( groups == null || groups.size() == 0 ) {
 			return;
 		}

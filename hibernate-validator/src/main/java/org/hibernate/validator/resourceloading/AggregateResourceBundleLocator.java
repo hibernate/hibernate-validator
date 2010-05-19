@@ -107,7 +107,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 *
 	 * @author Gunnar Morling
 	 */
-	static class AggregateBundle extends ResourceBundle {
+	public static class AggregateBundle extends ResourceBundle {
 		private Map<String, Object> contents = new HashMap<String, Object>();
 
 		/**
