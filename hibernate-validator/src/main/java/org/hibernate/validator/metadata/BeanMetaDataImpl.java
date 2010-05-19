@@ -252,8 +252,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void createMetaData(AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 		initDefaultGroupSequence();
-		List<Class<?>> classes = new ArrayList<Class<?>>();
-		ReflectionHelper.computeClassHierarchy( beanClass, classes );
+		List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 		for ( Class<?> current : classes ) {
 			initClass( current, annotationIgnores, beanMetaDataCache );
 		}
