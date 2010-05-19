@@ -1,4 +1,4 @@
-// $Id: ResourceBundleMessageInterpolator.java 19081 2010-03-22 20:19:52Z hardy.ferentschik $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
