@@ -43,7 +43,7 @@ import com.googlecode.jtype.TypeUtils;
  *
  * @author Hardy Ferentschik
  */
-public class ReflectionHelper {
+public final class ReflectionHelper {
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -52,10 +52,12 @@ public class ReflectionHelper {
 	}
 
 	//run client in privileged block
+
 	@SuppressWarnings("unchecked")
-	static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
+	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
 		try {
 			Method m = annotation.getClass().getMethod( parameterName );
+			m.setAccessible( true );
 			Object o = m.invoke( annotation );
 			if ( o.getClass().getName().equals( type.getName() ) ) {
 				return ( T ) o;
@@ -325,7 +327,7 @@ public class ReflectionHelper {
 	 * @return The mapped value or {@code null} if {@code value} is {@code null} or not implementing @{code Map}.
 	 */
 	public static Object getMappedValue(Object value, Object key) {
-		if ( value == null || !( value instanceof Map ) ) {
+		if ( !( value instanceof Map ) ) {
 			return null;
 		}
 
@@ -407,9 +409,22 @@ public class ReflectionHelper {
 	 * Get all superclasses and interfaces recursively.
 	 *
 	 * @param clazz The class to start the search with.
+	 *
+	 * @return List of all super classes and interfaces of {@code clazz}.
+	 */
+	public static List<Class<?>> computeClassHierarchy(Class<?> clazz) {
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		computeClassHierarchy( clazz, classes );
+		return classes;
+	}
+
+	/**
+	 * Get all superclasses and interfaces recursively.
+	 *
+	 * @param clazz The class to start the search with.
 	 * @param classes List of classes to which to add all found super classes and interfaces.
 	 */
-	public static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes) {
+	private static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes) {
 		for ( Class current = clazz; current != null; current = current.getSuperclass() ) {
 			if ( classes.contains( current ) ) {
 				return;
@@ -430,8 +445,7 @@ public class ReflectionHelper {
 	 * @return {@code true} if {@code clazz} extends or implements {@code superClassOrInterface}, {@code false} otherwise.
 	 */
 	private static boolean extendsOrImplements(Class<?> clazz, Class<?> superClassOrInterface) {
-		List<Class<?>> classes = new ArrayList<Class<?>>();
-		computeClassHierarchy( clazz, classes );
+		List<Class<?>> classes = computeClassHierarchy( clazz );
 		return classes.contains( superClassOrInterface );
 	}
 }
