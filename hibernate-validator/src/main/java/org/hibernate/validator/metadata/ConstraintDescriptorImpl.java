@@ -109,7 +109,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final ElementType elementType;
 
 	/**
-	 * The oririgin of the constraint. Defined on the actual root class or somehwere in the class hierarchy
+	 * The origin of the constraint. Defined on the actual root class or somehwere in the class hierarchy
 	 */
 	private final ConstraintOrigin definedOn;
 
