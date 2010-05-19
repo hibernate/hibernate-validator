@@ -28,7 +28,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.ValidatorFactoryImpl;
 
 /**
- * Default implementation of <code>ValidationProvider</code> within Hibernate validator.
+ * Default implementation of {@code ValidationProvider} within Hibernate Validator.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
