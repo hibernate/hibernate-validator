@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +38,13 @@ public class ConstraintMapping {
 
 	protected void addConstraintConfig(ConstraintDefinition<?> definition) {
 		Class<?> beanClass = definition.getBeanType();
-		if(configData.containsKey( beanClass )) {
+		if ( configData.containsKey( beanClass ) ) {
 			configData.get( beanClass ).add( definition );
-		} else {
+		}
+		else {
 			List<ConstraintDefinition<?>> definitionList = new ArrayList<ConstraintDefinition<?>>();
 			definitionList.add( definition );
-			configData.put(beanClass, definitionList);
+			configData.put( beanClass, definitionList );
 		}
 	}
 

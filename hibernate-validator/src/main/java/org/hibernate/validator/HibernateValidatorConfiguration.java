@@ -19,6 +19,7 @@ package org.hibernate.validator;
 
 import javax.validation.Configuration;
 
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
 /**
@@ -62,4 +63,5 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	ResourceBundleLocator getDefaultResourceBundleLocator();
 
+	HibernateValidatorConfiguration addMapping(ConstraintMapping mapping);
 }

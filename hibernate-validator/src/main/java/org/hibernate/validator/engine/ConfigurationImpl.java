@@ -36,6 +36,7 @@ import javax.validation.spi.ValidationProvider;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
@@ -46,7 +47,7 @@ import org.hibernate.validator.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.xml.ValidationXmlParser;
 
 /**
- * Hibernate specific <code>Configuration</code> implementation.
+ * Hibernate specific {@code Configuration} implementation.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -72,8 +73,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
-
 	private Set<InputStream> configurationStreams = new HashSet<InputStream>();
+	private ConstraintMapping mapping;
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -125,6 +126,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 		return this;
 	}
+
 
 	public ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
@@ -208,6 +210,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ResourceBundleLocator getDefaultResourceBundleLocator() {
 		return defaultResourceBundleLocator;
+	}
+
+	public HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
+		this.mapping = mapping;
+		return this;
+	}
+
+	public ConstraintMapping getMapping() {
+		return mapping;
 	}
 
 	private boolean isSpecificProvider() {
