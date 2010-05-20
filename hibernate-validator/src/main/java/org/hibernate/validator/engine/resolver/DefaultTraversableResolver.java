@@ -18,7 +18,6 @@
 package org.hibernate.validator.engine.resolver;
 
 import java.lang.annotation.ElementType;
-import java.security.AccessController;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
@@ -26,8 +25,7 @@ import javax.validation.ValidationException;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.privilegedactions.NewInstance;
-import org.hibernate.validator.util.privilegedactions.LoadClass;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * A JPA 2 aware <code>TraversableResolver</code>.
@@ -64,7 +62,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	 */
 	private void detectJPA() {
 		try {
-			loadClass( PERSISTENCE_UTIL_CLASS_NAME, this.getClass() );
+			ReflectionHelper.loadClass( PERSISTENCE_UTIL_CLASS_NAME, this.getClass() );
 			log.debug( "Found {} on classpath.", PERSISTENCE_UTIL_CLASS_NAME );
 		}
 		catch ( ValidationException e ) {
@@ -76,16 +74,10 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		}
 
 		try {
-			@SuppressWarnings( "unchecked" )
-			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
-					loadClass(JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
-			NewInstance<? extends TraversableResolver> newInstance = NewInstance.action( jpaAwareResolverClass, "" );
-			if ( System.getSecurityManager() != null ) {
-				jpaTraversableResolver = AccessController.doPrivileged( newInstance );
-			}
-			else {
-				jpaTraversableResolver = newInstance.run();
-			}
+			@SuppressWarnings("unchecked")
+			Class<? extends TraversableResolver> jpaAwareResolverClass = ( Class<? extends TraversableResolver> )
+					ReflectionHelper.loadClass( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
+			jpaTraversableResolver = ReflectionHelper.newInstance( jpaAwareResolverClass, "" );
 			log.info(
 					"Instantiated an instance of {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
@@ -95,16 +87,6 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					"Unable to load or instanciate JPA aware resolver {}. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
-		}
-	}
-
-	private Class<?> loadClass(String className, Class<?> caller) {
-		LoadClass action = LoadClass.action( className, caller );
-		if (System.getSecurityManager() != null) {
-			return AccessController.doPrivileged( action );
-		}
-		else {
-			return action.run();
 		}
 	}
 

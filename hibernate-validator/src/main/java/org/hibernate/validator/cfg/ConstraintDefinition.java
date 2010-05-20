@@ -19,12 +19,11 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.security.AccessController;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.util.privilegedactions.NewInstance;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -78,7 +77,15 @@ public class ConstraintDefinition<A extends Annotation> {
 	}
 
 	public <A extends Annotation, T extends ConstraintDefinition<A>> T constraint(Class<T> definition) {
-		T constraintDefinition = createConstraintDefinition( definition );
+
+		final Constructor<T> constructor = ReflectionHelper.getConstructor(
+				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
+		);
+
+		final T constraintDefinition = ReflectionHelper.newConstructorInstance(
+				constructor, beanType, property, elementType, mapping
+		);
+
 		mapping.addConstraintConfig( constraintDefinition );
 		return constraintDefinition;
 	}
@@ -113,19 +120,6 @@ public class ConstraintDefinition<A extends Annotation> {
 
 	public String getProperty() {
 		return property;
-	}
-
-	private <A extends Annotation, T extends ConstraintDefinition<A>> T createConstraintDefinition(Class<T> definition) {
-		T constraintDefinition;
-		NewInstance<T> newInstance = NewInstance.action( definition, "", beanType, property, elementType, mapping );
-
-		if ( System.getSecurityManager() != null ) {
-			constraintDefinition = AccessController.doPrivileged( newInstance );
-		}
-		else {
-			constraintDefinition = newInstance.run();
-		}
-		return constraintDefinition;
 	}
 
 	@Override

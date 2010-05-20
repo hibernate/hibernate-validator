@@ -18,12 +18,14 @@
 package org.hibernate.validator.util.privilegedactions;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
-
-import org.hibernate.validator.util.ReflectionHelper;
+import javax.validation.ValidationException;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 	private final Annotation annotation;
@@ -42,6 +44,29 @@ public class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 	}
 
 	public T run() {
-		return ReflectionHelper.getAnnotationParameter( annotation, parameterName, type );
+		try {
+			Method m = annotation.getClass().getMethod( parameterName );
+			m.setAccessible( true );
+			Object o = m.invoke( annotation );
+			if ( o.getClass().getName().equals( type.getName() ) ) {
+				return ( T ) o;
+			}
+			else {
+				String msg = "Wrong parameter type. Expected: " + type.getName() + " Actual: " + o.getClass().getName();
+				throw new ValidationException( msg );
+			}
+		}
+		catch ( NoSuchMethodException e ) {
+			String msg = "The specified annotation defines no parameter '" + parameterName + "'.";
+			throw new ValidationException( msg, e );
+		}
+		catch ( IllegalAccessException e ) {
+			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
+			throw new ValidationException( msg, e );
+		}
+		catch ( InvocationTargetException e ) {
+			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
+			throw new ValidationException( msg, e );
+		}
 	}
 }

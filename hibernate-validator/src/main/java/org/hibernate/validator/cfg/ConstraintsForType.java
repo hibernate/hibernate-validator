@@ -19,9 +19,9 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.security.AccessController;
+import java.lang.reflect.Constructor;
 
-import org.hibernate.validator.util.privilegedactions.NewInstance;
+import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.TYPE;
 
@@ -46,7 +46,13 @@ public class ConstraintsForType {
 	}
 
 	public <A extends Annotation, T extends ConstraintDefinition<A>> T constraint(Class<T> definition) {
-		T constraintDefinition = createConstraintDefinition( definition );
+		final Constructor<T> constructor = ReflectionHelper.getConstructor(
+				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
+		);
+
+		final T constraintDefinition = ReflectionHelper.newConstructorInstance(
+				constructor, beanClass, property, elementType, mapping
+		);
 		mapping.addConstraintConfig( constraintDefinition );
 		return constraintDefinition;
 	}
@@ -57,19 +63,6 @@ public class ConstraintsForType {
 
 	public ConstraintsForType valid(String property, ElementType type) {
 		return null;
-	}
-
-	private <A extends Annotation, T extends ConstraintDefinition<A>> T createConstraintDefinition(Class<T> definition) {
-		T constraintDefinition;
-		NewInstance<T> newInstance = NewInstance.action( definition, "", beanClass, property, elementType, mapping );
-
-		if ( System.getSecurityManager() != null ) {
-			constraintDefinition = AccessController.doPrivileged( newInstance );
-		}
-		else {
-			constraintDefinition = newInstance.run();
-		}
-		return constraintDefinition;
 	}
 }
 

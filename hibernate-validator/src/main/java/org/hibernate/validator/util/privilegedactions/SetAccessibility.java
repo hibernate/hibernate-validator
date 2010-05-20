@@ -17,13 +17,13 @@
 */
 package org.hibernate.validator.util.privilegedactions;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.util.ReflectionHelper;
-
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class SetAccessibility implements PrivilegedAction<Object> {
 	private final Member member;
@@ -37,7 +37,7 @@ public class SetAccessibility implements PrivilegedAction<Object> {
 	}
 
 	public Object run() {
-		ReflectionHelper.setAccessibility( member );
+		( ( AccessibleObject ) member ).setAccessible( true );
 		return member;
 	}
 }

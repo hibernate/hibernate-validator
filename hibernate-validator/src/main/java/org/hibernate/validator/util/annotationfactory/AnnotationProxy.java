@@ -21,13 +21,13 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.util.ReflectionHelper;
+
 
 /**
  * A concrete implementation of <code>Annotation</code> that pretends it is a
@@ -68,14 +68,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private Map<String, Object> getAnnotationValues(AnnotationDescriptor descriptor) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		int processedValuesFromDescriptor = 0;
-		GetDeclaredMethods action = GetDeclaredMethods.action( annotationType );
-		final Method[] declaredMethods;
-		if ( System.getSecurityManager() != null ) {
-			declaredMethods = AccessController.doPrivileged( action );
-		}
-		else {
-			declaredMethods = action.run();
-		}
+		final Method[] declaredMethods = ReflectionHelper.getMethods( annotationType );
 		for ( Method m : declaredMethods ) {
 			if ( descriptor.containsElement( m.getName() ) ) {
 				result.put( m.getName(), descriptor.valueOf( m.getName() ) );

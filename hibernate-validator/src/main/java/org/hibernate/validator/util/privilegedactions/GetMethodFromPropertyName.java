@@ -20,10 +20,9 @@ package org.hibernate.validator.util.privilegedactions;
 import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.util.ReflectionHelper;
-
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class GetMethodFromPropertyName implements PrivilegedAction<Method> {
 	private final Class<?> clazz;
@@ -39,6 +38,19 @@ public class GetMethodFromPropertyName implements PrivilegedAction<Method> {
 	}
 
 	public Method run() {
-			return ReflectionHelper.getMethod( clazz, property );
+		try {
+			char string[] = property.toCharArray();
+			string[0] = Character.toUpperCase( string[0] );
+			String fullMethodName = new String( string );
+			try {
+				return clazz.getMethod( "get" + fullMethodName );
+			}
+			catch ( NoSuchMethodException e ) {
+				return clazz.getMethod( "is" + fullMethodName );
+			}
+		}
+		catch ( NoSuchMethodException e ) {
+			return null;
+		}
 	}
 }

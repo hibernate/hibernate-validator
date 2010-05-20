@@ -19,18 +19,18 @@ package org.hibernate.validator.test.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.util.privilegedactions.SetAccessibility;
+import org.hibernate.validator.util.ReflectionHelper;
+
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -50,7 +50,7 @@ public class ConstraintHelperTest {
 		Field[] fields = engine.getClass().getDeclaredFields();
 		assertNotNull( fields );
 		assertTrue( fields.length == 1 );
-		setAccessibility( fields[0] );
+		ReflectionHelper.setAccessibility( fields[0] );
 
 		Annotation annotation = fields[0].getAnnotation( Pattern.List.class );
 		assertNotNull( annotation );
@@ -64,15 +64,11 @@ public class ConstraintHelperTest {
 		fields = order.getClass().getDeclaredFields();
 		assertNotNull( fields );
 		assertTrue( fields.length == 1 );
-		setAccessibility( fields[0] );
+		ReflectionHelper.setAccessibility( fields[0] );
 
 		annotation = fields[0].getAnnotation( NotNull.class );
 		assertNotNull( annotation );
 		multiValueConstraintAnnotations = constraintHelper.getMultiValueConstraints( annotation );
 		assertTrue( multiValueConstraintAnnotations.size() == 0, "There should be no constraint annotations" );
-	}
-
-	void setAccessibility(Member member) {
-		SetAccessibility.action( member ).run();
 	}
 }

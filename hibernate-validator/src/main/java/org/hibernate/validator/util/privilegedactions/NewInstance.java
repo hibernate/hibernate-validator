@@ -17,8 +17,6 @@
 */
 package org.hibernate.validator.util.privilegedactions;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.security.PrivilegedAction;
 import javax.validation.ValidationException;
 
@@ -31,38 +29,24 @@ import javax.validation.ValidationException;
 public class NewInstance<T> implements PrivilegedAction<T> {
 	private final Class<T> clazz;
 	private final String message;
-	private final Class<?>[] parameterTypes;
-	private final Object[] initArgs;
 
-	public static <T> NewInstance<T> action(Class<T> clazz, String message, Object... initArgs) {
-		return new NewInstance<T>( clazz, message, initArgs );
+	public static <T> NewInstance<T> action(Class<T> clazz, String message) {
+		return new NewInstance<T>( clazz, message );
 	}
 
-	private NewInstance(Class<T> clazz, String message, Object... initArgs) {
+	private NewInstance(Class<T> clazz, String message) {
 		this.clazz = clazz;
 		this.message = message;
-		this.initArgs = initArgs;
-		this.parameterTypes = new Class<?>[initArgs.length];
-		for ( int i = 0; i < initArgs.length; i++ ) {
-			this.parameterTypes[i] = initArgs[i].getClass();
-		}
 	}
 
 	public T run() {
 		try {
-			Constructor<T> constructor = clazz.getConstructor( parameterTypes );
-			return constructor.newInstance( initArgs );
+			return clazz.newInstance();
 		}
 		catch ( InstantiationException e ) {
 			throw new ValidationException( "Unable to instantiate " + message + ": " + clazz, e );
 		}
 		catch ( IllegalAccessException e ) {
-			throw new ValidationException( "Unable to instantiate " + clazz, e );
-		}
-		catch ( NoSuchMethodException e ) {
-			throw new ValidationException( "Unable to instantiate " + clazz, e );
-		}
-		catch ( InvocationTargetException e ) {
 			throw new ValidationException( "Unable to instantiate " + clazz, e );
 		}
 		catch ( RuntimeException e ) {

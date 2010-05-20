@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.security.AccessController;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintValidator;
@@ -72,9 +71,7 @@ import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validator.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validator.constraints.impl.SizeValidatorForMap;
 import org.hibernate.validator.constraints.impl.SizeValidatorForString;
-import org.hibernate.validator.util.privilegedactions.GetMethods;
-import org.hibernate.validator.util.privilegedactions.GetMethod;
-import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -196,15 +193,8 @@ public class ConstraintHelper {
 	public boolean isMultiValueConstraint(Annotation annotation) {
 		boolean isMultiValueConstraint = false;
 		try {
-			final GetMethod getMethod = GetMethod.action( annotation.getClass(), "value" );
-			final Method method;
-			if ( System.getSecurityManager() != null ) {
-				method = AccessController.doPrivileged( getMethod );
-			}
-			else {
-				method = getMethod.run();
-			}
-			if (method != null) {
+			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
+			if ( method != null ) {
 				Class returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
 					Annotation[] annotations = ( Annotation[] ) method.invoke( annotation );
@@ -241,15 +231,8 @@ public class ConstraintHelper {
 	public <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
 		List<Annotation> annotationList = new ArrayList<Annotation>();
 		try {
-			final GetMethod getMethod = GetMethod.action( annotation.getClass(), "value" );
-			final Method method;
-			if ( System.getSecurityManager() != null ) {
-				method = AccessController.doPrivileged( getMethod );
-			}
-			else {
-				method = getMethod.run();
-			}
-			if (method != null) {
+			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
+			if ( method != null ) {
 				Class returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
 					Annotation[] annotations = ( Annotation[] ) method.invoke( annotation );
@@ -302,14 +285,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertNoParameterStartsWithValid(Annotation annotation) {
-		final Method[] methods;
-		final GetMethods getMethods = GetMethods.action( annotation.annotationType() );
-		if ( System.getSecurityManager() != null ) {
-			methods = AccessController.doPrivileged( getMethods );
-		}
-		else {
-			methods = getMethods.run();
-		}
+		final Method[] methods = ReflectionHelper.getMethods( annotation.annotationType() );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) ) {
 				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
@@ -320,17 +296,10 @@ public class ConstraintHelper {
 
 	private void assertPayloadParameterExists(Annotation annotation) {
 		try {
-			final GetMethod getMethod = GetMethod.action( annotation.annotationType(), "payload" );
-			final Method method;
-			if ( System.getSecurityManager() != null ) {
-				method = AccessController.doPrivileged( getMethod );
-			}
-			else {
-				method = getMethod.run();
-			}
-			if (method == null) {
+			final Method method = ReflectionHelper.getMethod( annotation.annotationType(), "payload" );
+			if ( method == null ) {
 				String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a payload parameter.";
+						"not contain a payload parameter.";
 				throw new ConstraintDefinitionException( msg );
 			}
 			Class<?>[] defaultPayload = ( Class<?>[] ) method.getDefaultValue();
@@ -350,17 +319,10 @@ public class ConstraintHelper {
 
 	private void assertGroupsParameterExists(Annotation annotation) {
 		try {
-			final GetMethod getMethod = GetMethod.action( annotation.annotationType(), "groups" );
-			final Method method;
-			if ( System.getSecurityManager() != null ) {
-				method = AccessController.doPrivileged( getMethod );
-			}
-			else {
-				method = getMethod.run();
-			}
-			if (method == null) {
+			final Method method = ReflectionHelper.getMethod( annotation.annotationType(), "groups" );
+			if ( method == null ) {
 				String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a groups parameter.";
+						"not contain a groups parameter.";
 				throw new ConstraintDefinitionException( msg );
 			}
 			Class<?>[] defaultGroups = ( Class<?>[] ) method.getDefaultValue();
@@ -380,13 +342,7 @@ public class ConstraintHelper {
 
 	private void assertMessageParameterExists(Annotation annotation) {
 		try {
-			GetAnnotationParameter<?> action = GetAnnotationParameter.action( annotation, "message", String.class );
-			if (System.getSecurityManager() != null) {
-				AccessController.doPrivileged( action );
-			}
-			else {
-				action.run();
-			}
+			ReflectionHelper.getAnnotationParameter( annotation, "message", String.class );
 		}
 		catch ( Exception e ) {
 			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +

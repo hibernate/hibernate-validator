@@ -38,6 +38,6 @@ public class ContainsMethod implements PrivilegedAction<Boolean> {
 	}
 
 	public Boolean run() {
-		return ReflectionHelper.getMethod( clazz, property ) != null;
+		return ReflectionHelper.getMethodFromPropertyName( clazz, property ) != null;
 	}
 }

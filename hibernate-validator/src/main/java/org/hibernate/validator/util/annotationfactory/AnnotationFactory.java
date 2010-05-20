@@ -22,36 +22,31 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
-import java.security.AccessController;
 
-import org.hibernate.validator.util.privilegedactions.GetConstructor;
-import org.hibernate.validator.util.privilegedactions.GetClassLoader;
-
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Creates live annotations (actually <code>AnnotationProxies</code>) from <code>AnnotationDescriptors</code>.
  *
  * @author Paolo Perrotta
  * @author Davide Marchignoli
+ * @author Hardy Ferentschik
  * @see AnnotationProxy
  */
 public class AnnotationFactory {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
-		boolean isSecured = System.getSecurityManager() != null;
-		GetClassLoader action = GetClassLoader.fromContext();
-		ClassLoader classLoader = isSecured ? AccessController.doPrivileged( action ) : action.run();
-        //TODO round 34ms to generate the proxy, hug! is Javassist Faster?
-        Class<T> proxyClass = (Class<T>) Proxy.getProxyClass( classLoader, descriptor.type() );
+		ClassLoader classLoader = ReflectionHelper.getClassLoaderFromContext();
+		Class<T> proxyClass = ( Class<T> ) Proxy.getProxyClass( classLoader, descriptor.type() );
 		InvocationHandler handler = new AnnotationProxy( descriptor );
 		try {
 			return getProxyInstance( proxyClass, handler );
 		}
-		catch (RuntimeException e) {
+		catch ( RuntimeException e ) {
 			throw e;
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			throw new RuntimeException( e );
 		}
 	}
@@ -59,14 +54,7 @@ public class AnnotationFactory {
 	private static <T extends Annotation> T getProxyInstance(Class<T> proxyClass, InvocationHandler handler) throws
 			SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
 			IllegalAccessException, InvocationTargetException {
-		GetConstructor<T> action = GetConstructor.action( proxyClass, InvocationHandler.class );
-		final Constructor<T> constructor;
-		if ( System.getSecurityManager() != null ) {
-			constructor = AccessController.doPrivileged( action );
-		}
-		else {
-			constructor = action.run();
-		}
-		return constructor.newInstance( handler );
+		final Constructor<T> constructor = ReflectionHelper.getConstructor( proxyClass, InvocationHandler.class );
+		return ReflectionHelper.newConstructorInstance( constructor, handler );
 	}
 }

@@ -17,11 +17,10 @@
 */
 package org.hibernate.validator.engine;
 
-import java.security.AccessController;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
-import org.hibernate.validator.util.privilegedactions.NewInstance;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.
@@ -32,12 +31,6 @@ import org.hibernate.validator.util.privilegedactions.NewInstance;
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 
 	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		NewInstance<T> newInstance = NewInstance.action( key, "" );
-		if ( System.getSecurityManager() != null ) {
-			return AccessController.doPrivileged( newInstance );
-		}
-		else {
-			return newInstance.run();
-		}
+		return ReflectionHelper.newInstance( key, "" );
 	}
 }

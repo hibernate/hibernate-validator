@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,14 +53,8 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.util.privilegedactions.ContainsField;
-import org.hibernate.validator.util.privilegedactions.ContainsMethod;
-import org.hibernate.validator.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.util.privilegedactions.GetMethod;
-import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
-import org.hibernate.validator.util.privilegedactions.LoadClass;
 import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
@@ -170,7 +163,7 @@ public class XmlMappingParser {
 			}
 			for ( String validatorClassName : validatedByType.getValue() ) {
 				Class<? extends ConstraintValidator<?, ?>> validatorClass;
-				validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) loadClass(
+				validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) ReflectionHelper.loadClass(
 						validatorClassName,
 						this.getClass()
 				);
@@ -185,16 +178,6 @@ public class XmlMappingParser {
 			constraintHelper.addConstraintValidatorDefinition(
 					annotationClass, constraintValidatorClasses
 			);
-		}
-	}
-
-	private Class<?> loadClass(String className, Class<?> caller) {
-		LoadClass action = LoadClass.action( className, caller );
-		if ( System.getSecurityManager() != null ) {
-			return AccessController.doPrivileged( action );
-		}
-		else {
-			return action.run();
 		}
 	}
 
@@ -228,25 +211,11 @@ public class XmlMappingParser {
 			else {
 				fieldNames.add( fieldName );
 			}
-			final boolean containsField;
-			ContainsField containsAction = ContainsField.action( beanClass, fieldName );
-			if ( System.getSecurityManager() != null ) {
-				containsField = AccessController.doPrivileged( containsAction );
-			}
-			else {
-				containsField = containsAction.run();
-			}
+			final boolean containsField = ReflectionHelper.containsField( beanClass, fieldName );
 			if ( !containsField ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the fieldType  " + fieldName );
 			}
-			GetDeclaredField action = GetDeclaredField.action( beanClass, fieldName );
-			final Field field;
-			if ( System.getSecurityManager() != null ) {
-				field = AccessController.doPrivileged( action );
-			}
-			else {
-				field = action.run();
-			}
+			final Field field = ReflectionHelper.getField( beanClass, fieldName );
 
 			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.isIgnoreAnnotations() == null ? false : fieldType.isIgnoreAnnotations();
@@ -279,25 +248,11 @@ public class XmlMappingParser {
 			else {
 				getterNames.add( getterName );
 			}
-			ContainsMethod cmAction = ContainsMethod.action( beanClass, getterName );
-			boolean containsMethod;
-			if ( System.getSecurityManager() != null ) {
-				containsMethod = AccessController.doPrivileged( cmAction );
-			}
-			else {
-				containsMethod = cmAction.run();
-			}
+			boolean containsMethod = ReflectionHelper.containsMethod( beanClass, getterName );
 			if ( !containsMethod ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the property  " + getterName );
 			}
-			final Method method;
-			GetMethodFromPropertyName action = GetMethodFromPropertyName.action( beanClass, getterName );
-			if ( System.getSecurityManager() != null ) {
-				method = AccessController.doPrivileged( action );
-			}
-			else {
-				method = action.run();
-			}
+			final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
 
 			// ignore annotations
 			boolean ignoreGetterAnnotation = getterType.isIgnoreAnnotations() == null ? false : getterType.isIgnoreAnnotations();
@@ -423,15 +378,7 @@ public class XmlMappingParser {
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-		Method m;
-		GetMethod action = GetMethod.action( annotationClass, name );
-		if ( System.getSecurityManager() != null ) {
-			m = AccessController.doPrivileged( action );
-		}
-		else {
-			m = action.run();
-		}
-
+		Method m = ReflectionHelper.getMethod( annotationClass, name );
 		if ( m == null ) {
 			throw new ValidationException( "Annotation of type " + annotationClass.getName() + " does not contain a parameter " + name + "." );
 		}
@@ -574,7 +521,7 @@ public class XmlMappingParser {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = loadClass( value, this.getClass() );
+			returnValue = ReflectionHelper.loadClass( value, this.getClass() );
 		}
 		else {
 			try {
@@ -634,7 +581,7 @@ public class XmlMappingParser {
 		else {
 			fullyQualifiedClass = defaultPackage + PACKAGE_SEPARATOR + clazz;
 		}
-		return loadClass( fullyQualifiedClass, this.getClass() );
+		return ReflectionHelper.loadClass( fullyQualifiedClass, this.getClass() );
 	}
 
 	private boolean isQualifiedClass(String clazz) {
@@ -661,9 +608,7 @@ public class XmlMappingParser {
 	}
 
 	private Schema getMappingSchema() {
-		boolean isSecured = System.getSecurityManager() != null;
-		GetClassLoader action = GetClassLoader.fromClass( XmlMappingParser.class );
-		ClassLoader loader = isSecured ? AccessController.doPrivileged( action ) : action.run();
+		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlMappingParser.class );
 		URL schemaUrl = loader.getResource( VALIDATION_MAPPING_XSD );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;

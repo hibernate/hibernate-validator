@@ -24,7 +24,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,11 +41,8 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
-import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
-import org.hibernate.validator.util.privilegedactions.SetAccessibility;
 
 
 /**
@@ -128,7 +124,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		for ( Map.Entry<Class<?>, List<MetaConstraint<T, ?>>> entry : xmlConfiguredConstraints.entrySet() ) {
 			Class<?> clazz = entry.getKey();
-			for(MetaConstraint<T,?> constraint : entry.getValue()) {
+			for ( MetaConstraint<T, ?> constraint : entry.getValue() ) {
 				addMetaConstraint( clazz, constraint );
 			}
 		}
@@ -237,7 +233,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addCascadedMember(Member member) {
-		setAccessibility( member );
+		ReflectionHelper.setAccessibility( member );
 		cascadedMembers.add( member );
 		addPropertyDescriptorForMember( member, true );
 	}
@@ -282,14 +278,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		GetDeclaredFields action = GetDeclaredFields.action( clazz );
-		final Field[] fields;
-		if ( System.getSecurityManager() != null ) {
-			fields = AccessController.doPrivileged( action );
-		}
-		else {
-			fields = action.run();
-		}
+		final Field[] fields = ReflectionHelper.getFields( clazz );
 		for ( Field field : fields ) {
 			addToPropertyNameList( field );
 
@@ -322,7 +311,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetaData ) {
-				setAccessibility( field );
+				ReflectionHelper.setAccessibility( field );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
@@ -340,26 +329,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private void setAccessibility(Member member) {
-		SetAccessibility action = SetAccessibility.action( member );
-		if ( System.getSecurityManager() != null ) {
-			AccessController.doPrivileged( action );
-		}
-		else {
-			action.run();
-		}
-	}
-
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
-		final Method[] declaredMethods;
-		if ( System.getSecurityManager() != null ) {
-			declaredMethods = AccessController.doPrivileged( action );
-		}
-		else {
-			declaredMethods = action.run();
-		}
-
+		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
 		for ( Method method : declaredMethods ) {
 			addToPropertyNameList( method );
 
@@ -392,7 +363,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetaData ) {
-				setAccessibility( method );
+				ReflectionHelper.setAccessibility( method );
 				MetaConstraint<T, ?> metaConstraint = createMetaConstraint( method, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}

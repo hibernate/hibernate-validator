@@ -43,11 +43,8 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
-import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
-import org.hibernate.validator.util.privilegedactions.GetMethod;
-import org.hibernate.validator.util.privilegedactions.GetMethods;
 import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
@@ -147,15 +144,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Class<Payload>[] payloadFromAnnotation;
 		try {
 			//TODO be extra safe and make sure this is an array of Payload
-			GetAnnotationParameter<Class[]> action = GetAnnotationParameter.action(
-					annotation, PAYLOAD, Class[].class
-			);
-			if ( System.getSecurityManager() != null ) {
-				payloadFromAnnotation = AccessController.doPrivileged( action );
-			}
-			else {
-				payloadFromAnnotation = action.run();
-			}
+			payloadFromAnnotation = ReflectionHelper.getAnnotationParameter( annotation, PAYLOAD, Class[].class );
 		}
 		catch ( ValidationException e ) {
 			//ignore people not defining payloads
@@ -169,14 +158,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = new HashSet<Class<?>>();
-		final Class<?>[] groupsFromAnnotation;
-		GetAnnotationParameter<Class[]> action = GetAnnotationParameter.action( annotation, GROUPS, Class[].class );
-		if ( System.getSecurityManager() != null ) {
-			groupsFromAnnotation = AccessController.doPrivileged( action );
-		}
-		else {
-			groupsFromAnnotation = action.run();
-		}
+		final Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
+				annotation, GROUPS, Class[].class
+		);
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
 		}
@@ -277,20 +261,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		sb.append( ", elementType=" ).append( elementType );
 		sb.append( ", definedOn=" ).append( definedOn );
 		sb.append( ", groups=" ).append( groups );
-		sb.append( ", attributes=" ).append( attributes );		
+		sb.append( ", attributes=" ).append( attributes );
 		sb.append( '}' );
 		return sb.toString();
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
-		GetDeclaredMethods action = GetDeclaredMethods.action( annotation.annotationType() );
-		final Method[] declaredMethods;
-		if ( System.getSecurityManager() != null ) {
-			declaredMethods = AccessController.doPrivileged( action );
-		}
-		else {
-			declaredMethods = action.run();
-		}
+		final Method[] declaredMethods = ReflectionHelper.getMethods( annotation.annotationType() );
 		Map<String, Object> parameters = new HashMap<String, Object>( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
 			try {
@@ -323,15 +300,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
-		final Method[] methods;
-		final GetMethods getMethods = GetMethods.action( annotation.annotationType() );
-		if ( System.getSecurityManager() != null ) {
-			methods = AccessController.doPrivileged( getMethods );
-		}
-		else {
-			methods = getMethods.run();
-		}
-
+		final Method[] methods = ReflectionHelper.getMethods( annotation.annotationType() );
 		for ( Method m : methods ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
 				addOverrideAttributes(
@@ -368,14 +337,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
-		final GetMethod getMethod = GetMethod.action( overridesAttribute.constraint(), overridesAttribute.name() );
-		final Method method;
-		if ( System.getSecurityManager() != null ) {
-			method = AccessController.doPrivileged( getMethod );
-		}
-		else {
-			method = getMethod.run();
-		}
+		final Method method = ReflectionHelper.getMethod( overridesAttribute.constraint(), overridesAttribute.name() );
 		if ( method == null ) {
 			throw new ConstraintDefinitionException(
 					"Overridden constraint does not define an attribute with name " + overridesAttribute.name()

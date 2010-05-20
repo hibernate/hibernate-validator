@@ -17,15 +17,14 @@
 */
 package org.hibernate.validator.resourceloading;
 
-import java.security.AccessController;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * A resource bundle locator, that loads resource bundles by simply
@@ -53,11 +52,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	public ResourceBundle getResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
-		boolean isSecured = System.getSecurityManager() != null;
-		GetClassLoader action = GetClassLoader.fromContext();
-		ClassLoader classLoader = isSecured ? AccessController
-				.doPrivileged( action ) : action.run();
-
+		ClassLoader classLoader = ReflectionHelper.getClassLoaderFromContext();
 		if ( classLoader != null ) {
 			rb = loadBundle(
 					classLoader, locale, bundleName
@@ -65,10 +60,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			);
 		}
 		if ( rb == null ) {
-			action = GetClassLoader
-					.fromClass( PlatformResourceBundleLocator.class );
-			classLoader = isSecured ? AccessController.doPrivileged( action )
-					: action.run();
+			classLoader = ReflectionHelper.getClassLoaderFromClass( PlatformResourceBundleLocator.class );
 			rb = loadBundle(
 					classLoader, locale, bundleName
 							+ " not found by validator classloader"

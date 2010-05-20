@@ -20,12 +20,11 @@ package org.hibernate.validator.util;
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -40,11 +39,22 @@ import javax.validation.ValidationException;
 
 import com.googlecode.jtype.TypeUtils;
 
+import org.hibernate.validator.util.privilegedactions.ConstructorInstance;
+import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.GetConstructor;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.util.privilegedactions.GetMethod;
+import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
+import org.hibernate.validator.util.privilegedactions.SetAccessibility;
 
 /**
- * Some reflection utility methods.
+ * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
+ * for situations where a security manager is in place.
  *
  * @author Hardy Ferentschik
  */
@@ -56,32 +66,87 @@ public final class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
+	public static ClassLoader getClassLoaderFromContext() {
+		ClassLoader loader;
+		GetClassLoader action = GetClassLoader.fromContext();
+		if ( System.getSecurityManager() != null ) {
+			loader = AccessController.doPrivileged( action );
+		}
+		else {
+			loader = action.run();
+		}
+		return loader;
+	}
+
+	public static ClassLoader getClassLoaderFromClass(Class<?> clazz) {
+		ClassLoader loader;
+		GetClassLoader action = GetClassLoader.fromClass( clazz );
+		if ( System.getSecurityManager() != null ) {
+			loader = AccessController.doPrivileged( action );
+		}
+		else {
+			loader = action.run();
+		}
+		return loader;
+	}
+
+	public static Class<?> loadClass(String className, Class<?> caller) {
+		LoadClass action = LoadClass.action( className, caller );
+		if ( System.getSecurityManager() != null ) {
+			return AccessController.doPrivileged( action );
+		}
+		else {
+			return action.run();
+		}
+	}
+
+	public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... params) {
+		Constructor<T> constructor;
+		GetConstructor<T> action = GetConstructor.action( clazz, params );
+		if ( System.getSecurityManager() != null ) {
+			constructor = AccessController.doPrivileged( action );
+		}
+		else {
+			constructor = action.run();
+		}
+		return constructor;
+	}
+
+	public static <T> T newInstance(Class<T> clazz, String message) {
+		T instance;
+		NewInstance<T> newInstance = NewInstance.action( clazz, message );
+		if ( System.getSecurityManager() != null ) {
+			instance = AccessController.doPrivileged( newInstance );
+		}
+		else {
+			instance = newInstance.run();
+		}
+		return instance;
+	}
+
+	public static <T> T newConstructorInstance(Constructor<T> constructor, Object... initArgs) {
+		T instance;
+		ConstructorInstance<T> newInstance = ConstructorInstance.action( constructor, initArgs );
+		if ( System.getSecurityManager() != null ) {
+			instance = AccessController.doPrivileged( newInstance );
+		}
+		else {
+			instance = newInstance.run();
+		}
+		return instance;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
-		try {
-			Method m = annotation.getClass().getMethod( parameterName );
-			m.setAccessible( true );
-			Object o = m.invoke( annotation );
-			if ( o.getClass().getName().equals( type.getName() ) ) {
-				return ( T ) o;
-			}
-			else {
-				String msg = "Wrong parameter type. Expected: " + type.getName() + " Actual: " + o.getClass().getName();
-				throw new ValidationException( msg );
-			}
+		T result;
+		GetAnnotationParameter<T> action = GetAnnotationParameter.action( annotation, parameterName, type );
+		if ( System.getSecurityManager() != null ) {
+			result = AccessController.doPrivileged( action );
 		}
-		catch ( NoSuchMethodException e ) {
-			String msg = "The specified annotation defines no parameter '" + parameterName + "'.";
-			throw new ValidationException( msg, e );
+		else {
+			result = action.run();
 		}
-		catch ( IllegalAccessException e ) {
-			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
-			throw new ValidationException( msg, e );
-		}
-		catch ( InvocationTargetException e ) {
-			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
-			throw new ValidationException( msg, e );
-		}
+		return result;
 	}
 
 	/**
@@ -187,7 +252,6 @@ public final class ReflectionHelper {
 	 * @return Returns the type of the field of return type of a method.
 	 */
 	public static Class<?> getType(Member member) {
-
 		Class<?> type = null;
 		if ( member instanceof Field ) {
 			type = ( ( Field ) member ).getType();
@@ -252,14 +316,12 @@ public final class ReflectionHelper {
 	}
 
 	public static void setAccessibility(Member member) {
-		// HV-257
-		// Also set accessibility in case of public abstract members. If you proxy an interface using java.lang.reflect.Proxy
-		// per default you will get a IllegalAccessException since you are not allowed to access public abstract methods.
-		// Seems odd. One could argue that the proxy 'is' the implementation for the interface method and hence they
-		// should be accessible. Maybe this is a JVM bug !?
-		if ( !Modifier.isPublic( member.getModifiers() )
-				|| ( Modifier.isPublic( member.getModifiers() ) && Modifier.isAbstract( member.getModifiers() ) ) ) {
-			( ( AccessibleObject ) member ).setAccessible( true );
+		SetAccessibility action = SetAccessibility.action( member );
+		if ( System.getSecurityManager() != null ) {
+			AccessController.doPrivileged( action );
+		}
+		else {
+			action.run();
 		}
 	}
 
@@ -404,30 +466,140 @@ public final class ReflectionHelper {
 		return map.get( key );
 	}
 
+
 	/**
-	 * Returns the method with the specified name or <code>null</code> if it does not exist.
+	 * Returns the field with the specified name or <code>null</code> if it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param fieldName The field name.
+	 *
+	 * @return Returns the field with the specified name or <code>null</code> if it does not exist.
+	 */
+	public static Field getField(Class<?> clazz, String fieldName) {
+		GetDeclaredField action = GetDeclaredField.action( clazz, fieldName );
+		final Field field;
+		if ( System.getSecurityManager() != null ) {
+			field = AccessController.doPrivileged( action );
+		}
+		else {
+			field = action.run();
+		}
+		return field;
+	}
+
+	/**
+	 * Checks whether the specified class contains a field with the given name.
+	 *
+	 * @param clazz The class to check.
+	 * @param fieldName The field name.
+	 *
+	 * @return Returns {@code true} if the field exists, {@code false} otherwise.
+	 */
+	public static boolean containsField(Class<?> clazz, String fieldName) {
+		return getField( clazz, fieldName ) != null;
+	}
+
+	/**
+	 * Returns the fields of the specified class.
+	 *
+	 * @param clazz The class for which to retrieve the fields.
+	 *
+	 * @return Returns the fields for this class.
+	 */
+	public static Field[] getFields(Class<?> clazz) {
+		GetDeclaredFields action = GetDeclaredFields.action( clazz );
+		final Field[] fields;
+		if ( System.getSecurityManager() != null ) {
+			fields = AccessController.doPrivileged( action );
+		}
+		else {
+			fields = action.run();
+		}
+		return fields;
+	}
+
+	/**
+	 * Returns the method with the specified property name or {@code null} if it does not exist. This method will
+	 * prepend  'is' and 'get' to the property name and capitalize the first letter.
+	 *
+	 * @param clazz The class to check.
+	 * @param methodName The property name.
+	 *
+	 * @return Returns the method with the specified property or {@code null} if it does not exist.
+	 */
+	public static Method getMethodFromPropertyName(Class<?> clazz, String methodName) {
+		Method method;
+		GetMethodFromPropertyName action = GetMethodFromPropertyName.action( clazz, methodName );
+		if ( System.getSecurityManager() != null ) {
+			method = AccessController.doPrivileged( action );
+		}
+		else {
+			method = action.run();
+		}
+		return method;
+	}
+
+	/**
+	 * Checks whether the specified class contains a method for the specified property.
+	 *
+	 * @param clazz The class to check.
+	 * @param property The property name.
+	 *
+	 * @return Returns {@code true} if the method exists, {@code false} otherwise.
+	 */
+	public static boolean containsMethodWithPropertyName(Class<?> clazz, String property) {
+		return getMethodFromPropertyName( clazz, property ) != null;
+	}
+
+	/**
+	 * Returns the method with the specified name or {@code null} if it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param methodName The property name.
+	 *
+	 * @return Returns the method with the specified property or {@code null}if it does not exist.
+	 */
+	public static Method getMethod(Class<?> clazz, String methodName) {
+		Method method;
+		GetMethod action = GetMethod.action( clazz, methodName );
+		if ( System.getSecurityManager() != null ) {
+			method = AccessController.doPrivileged( action );
+		}
+		else {
+			method = action.run();
+		}
+		return method;
+	}
+
+	/**
+	 * Returns the methods of the specified class.
+	 *
+	 * @param clazz The class for which to retrieve the methods.
+	 *
+	 * @return Returns the methods for this class.
+	 */
+	public static Method[] getMethods(Class<?> clazz) {
+		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
+		final Method[] methods;
+		if ( System.getSecurityManager() != null ) {
+			methods = AccessController.doPrivileged( action );
+		}
+		else {
+			methods = action.run();
+		}
+		return methods;
+	}
+
+	/**
+	 * Checks whether the specified class contains a method with the given name.
 	 *
 	 * @param clazz The class to check.
 	 * @param methodName The method name.
 	 *
-	 * @return Returns the method with the specified name or <code>null</code> if it does not exist.
+	 * @return Returns {@code true} if the method exists, {@code false} otherwise.
 	 */
-	//run client in privileged block
-	public static Method getMethod(Class<?> clazz, String methodName) {
-		try {
-			char string[] = methodName.toCharArray();
-			string[0] = Character.toUpperCase( string[0] );
-			methodName = new String( string );
-			try {
-				return clazz.getMethod( "get" + methodName );
-			}
-			catch ( NoSuchMethodException e ) {
-				return clazz.getMethod( "is" + methodName );
-			}
-		}
-		catch ( NoSuchMethodException e ) {
-			return null;
-		}
+	public static boolean containsMethod(Class<?> clazz, String methodName) {
+		return getMethodFromPropertyName( clazz, methodName ) != null;
 	}
 
 	/**
