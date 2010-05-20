@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.validator.util.ReflectionHelper;
+
 /**
  * @author Hardy Ferentschik
  */
@@ -38,6 +40,7 @@ public class ConstraintMapping {
 
 	protected void addConstraintConfig(ConstraintDefinition<?> definition) {
 		Class<?> beanClass = definition.getBeanType();
+
 		if ( configData.containsKey( beanClass ) ) {
 			configData.get( beanClass ).add( definition );
 		}

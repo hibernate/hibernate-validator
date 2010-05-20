@@ -36,6 +36,9 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -172,9 +175,33 @@ public class ReflectionHelperTest {
 		}
 	}
 
+	@Test
+	public void testPropertyExists() {
+		assertTrue( ReflectionHelper.propertyExists( Foo.class, "foo", FIELD ) );
+		assertFalse( ReflectionHelper.propertyExists( Foo.class, "foo", METHOD ) );
+		assertFalse( ReflectionHelper.propertyExists( Foo.class, "bar", FIELD ) );
+		assertTrue( ReflectionHelper.propertyExists( Foo.class, "bar", METHOD ) );
+
+		try {
+			assertTrue( ReflectionHelper.propertyExists( Foo.class, "bar", TYPE ) );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			// success
+		}
+	}
+
 	public class TestTypes {
 		public List<String> stringList;
 		public Map<String, Object> objectMap;
 		public String[] stringArray;
+	}
+
+	public class Foo {
+		String foo;
+
+		public String getBar() {
+			return "bar";
+		}
 	}
 }

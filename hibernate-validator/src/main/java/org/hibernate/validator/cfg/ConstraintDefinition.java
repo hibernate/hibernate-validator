@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.util.NewInstance;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * @author Hardy Ferentschik
@@ -50,9 +51,17 @@ public class ConstraintDefinition<A extends Annotation> {
 			throw new ValidationException( "ConstraintMapping cannot be null" );
 		}
 
-		if ( ( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) )
-				&& ( property == null || property.length() == 0 ) ) {
-			throw new ValidationException( "A property level constraint cannot have a null or empty property name" );
+		if ( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) {
+			if ( property == null || property.length() == 0 ) {
+				throw new ValidationException( "A property level constraint cannot have a null or empty property name" );
+			}
+
+			if ( !ReflectionHelper.propertyExists( beanType, property, elementType ) ) {
+				throw new ValidationException(
+						"The class " + beanType + " does not have a property '"
+								+ property + "' with access " + elementType
+				);
+			}
 		}
 
 		this.beanType = beanType;

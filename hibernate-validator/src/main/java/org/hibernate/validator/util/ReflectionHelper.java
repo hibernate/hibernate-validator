@@ -19,6 +19,7 @@ package org.hibernate.validator.util;
 
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -50,8 +51,6 @@ public final class ReflectionHelper {
 	 */
 	private ReflectionHelper() {
 	}
-
-	//run client in privileged block
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
@@ -110,6 +109,56 @@ public final class ReflectionHelper {
 		}
 		return name;
 	}
+
+	/**
+	 * Checks whether the property with the specified name and type exists on the given class.
+	 *
+	 * @param clazz The class to check for the property. Cannot be {@code null}.
+	 * @param property The property name without 'is', 'get' or 'has'. Cannot be {@code null} or empty.
+	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
+	 *
+	 * @return {@code true} is the property and can be access via the specified type, {@code false} otherwise.
+	 */
+	public static boolean propertyExists(Class<?> clazz, String property, ElementType elementType) {
+		if ( clazz == null ) {
+			throw new IllegalArgumentException( "The class cannot be null" );
+		}
+
+		if ( property == null || property.length() == 0 ) {
+			throw new IllegalArgumentException( "Property name cannot be null or empty" );
+		}
+
+		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
+			throw new IllegalArgumentException( "Element type has to be FIELD or METHOD" );
+		}
+
+		boolean exists = false;
+		if ( ElementType.FIELD.equals( elementType ) ) {
+			try {
+				clazz.getDeclaredField( property );
+				exists = true;
+			}
+			catch ( NoSuchFieldException e ) {
+				exists = false;
+			}
+		}
+		else {
+			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
+			String[] prefixes = {"is", "get", "has"};
+			for(String prefix : prefixes) {
+				try {
+					clazz.getDeclaredMethod( prefix + methodName );
+					exists = true;
+					break;
+				} catch (NoSuchMethodException e) {
+
+				}
+			}
+
+		}
+		return exists;
+	}
+
 
 	/**
 	 * Returns the type of the field of return type of a method.
