@@ -26,8 +26,8 @@ import javax.validation.ValidationException;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.NewInstance;
-import org.hibernate.validator.util.LoadClass;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
 
 /**
  * A JPA 2 aware <code>TraversableResolver</code>.

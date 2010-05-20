@@ -30,6 +30,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -38,6 +39,9 @@ import java.util.Map;
 import javax.validation.ValidationException;
 
 import com.googlecode.jtype.TypeUtils;
+
+import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
+import org.hibernate.validator.util.privilegedactions.GetMethod;
 
 /**
  * Some reflection utility methods.
@@ -120,6 +124,19 @@ public final class ReflectionHelper {
 	 * @return {@code true} is the property and can be access via the specified type, {@code false} otherwise.
 	 */
 	public static boolean propertyExists(Class<?> clazz, String property, ElementType elementType) {
+		return getMember( clazz, property, elementType ) != null;
+	}
+
+	/**
+	 * Returns the member with the given name and type.
+	 *
+	 * @param clazz The class from which to retrieve the member. Cannot be {@code null}.
+	 * @param property The property name without 'is', 'get' or 'has'. Cannot be {@code null} or empty.
+	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
+	 *
+	 * @return the member which matching the name and type or {@code null} if no such member exists.
+	 */
+	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
 		if ( clazz == null ) {
 			throw new IllegalArgumentException( "The class cannot be null" );
 		}
@@ -132,31 +149,33 @@ public final class ReflectionHelper {
 			throw new IllegalArgumentException( "Element type has to be FIELD or METHOD" );
 		}
 
-		boolean exists = false;
+		Member member = null;
 		if ( ElementType.FIELD.equals( elementType ) ) {
-			try {
-				clazz.getDeclaredField( property );
-				exists = true;
+			GetDeclaredField action = GetDeclaredField.action( clazz, property );
+			if ( System.getSecurityManager() != null ) {
+				member = AccessController.doPrivileged( action );
 			}
-			catch ( NoSuchFieldException e ) {
-				exists = false;
+			else {
+				member = action.run();
 			}
 		}
 		else {
 			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
-			String[] prefixes = {"is", "get", "has"};
-			for(String prefix : prefixes) {
-				try {
-					clazz.getDeclaredMethod( prefix + methodName );
-					exists = true;
+			String[] prefixes = { "is", "get", "has" };
+			for ( String prefix : prefixes ) {
+				GetMethod action = GetMethod.action( clazz, prefix + methodName );
+				if ( System.getSecurityManager() != null ) {
+					member = AccessController.doPrivileged( action );
+				}
+				else {
+					member = action.run();
+				}
+				if ( member != null ) {
 					break;
-				} catch (NoSuchMethodException e) {
-
 				}
 			}
-
 		}
-		return exists;
+		return member;
 	}
 
 
@@ -232,7 +251,7 @@ public final class ReflectionHelper {
 		return value;
 	}
 
-	static void setAccessibility(Member member) {
+	public static void setAccessibility(Member member) {
 		// HV-257
 		// Also set accessibility in case of public abstract members. If you proxy an interface using java.lang.reflect.Proxy
 		// per default you will get a IllegalAccessException since you are not allowed to access public abstract methods.
@@ -394,7 +413,7 @@ public final class ReflectionHelper {
 	 * @return Returns the method with the specified name or <code>null</code> if it does not exist.
 	 */
 	//run client in privileged block
-	static Method getMethod(Class<?> clazz, String methodName) {
+	public static Method getMethod(Class<?> clazz, String methodName) {
 		try {
 			char string[] = methodName.toCharArray();
 			string[0] = Character.toUpperCase( string[0] );

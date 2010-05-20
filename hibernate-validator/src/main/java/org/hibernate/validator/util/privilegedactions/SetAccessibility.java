@@ -15,33 +15,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Member;
 import java.security.PrivilegedAction;
+
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * @author Emmanuel Bernard
  */
-public class GetConstructor<T> implements PrivilegedAction<Constructor<T>> {
-	private final Class<T> clazz;
-	private final Class<?>[] params;
+public class SetAccessibility implements PrivilegedAction<Object> {
+	private final Member member;
 
-	public static <T> GetConstructor<T> action(Class<T> clazz, Class<?>... params) {
-		return new GetConstructor<T>( clazz, params );
+	public static SetAccessibility action(Member member) {
+		return new SetAccessibility( member );
 	}
 
-	private GetConstructor(Class<T> clazz, Class<?>... params) {
-		this.clazz = clazz;
-		this.params = params;
+	private SetAccessibility(Member member) {
+		this.member = member;
 	}
 
-	public Constructor<T> run() {
-		try {
-			return clazz.getConstructor(params);
-		}
-		catch ( NoSuchMethodException e ) {
-			return null;
-		}
+	public Object run() {
+		ReflectionHelper.setAccessibility( member );
+		return member;
 	}
 }

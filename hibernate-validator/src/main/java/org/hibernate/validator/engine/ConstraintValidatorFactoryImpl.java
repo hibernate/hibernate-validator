@@ -21,7 +21,7 @@ import java.security.AccessController;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
-import org.hibernate.validator.util.NewInstance;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
 
 /**
  * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.

@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.util.LoggerFactory;
 
 /**

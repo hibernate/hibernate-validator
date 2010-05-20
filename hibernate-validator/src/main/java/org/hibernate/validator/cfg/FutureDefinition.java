@@ -15,35 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.cfg;
+package org.hibernate.validator.cfg;
 
-import java.util.Date;
+import java.lang.annotation.ElementType;
+import javax.validation.Payload;
+import javax.validation.constraints.Future;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Marathon implements Tournament {
-	private String name;
-
-	private long numberOfRunners;
-
-	private Date tournamentDate;
-
-	public String getName() {
-		return name;
+public class FutureDefinition extends ConstraintDefinition<Future> {
+	public FutureDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Future.class, property, elementType, mapping );
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public FutureDefinition message(String message) {
+		addParameter( "message", message );
+		return this;
 	}
 
-	public Date getTournamentDate() {
-		return tournamentDate;
+	public FutureDefinition groups(Class<?>... groups) {
+		addParameter( "groups", groups );
+		return this;
 	}
 
-	public void setTournamentDate(Date tournamentDate) {
-		this.tournamentDate = tournamentDate;
+	public FutureDefinition payload(Class<? extends Payload>... payload) {
+		addParameter( "payload", payload );
+		return this;
 	}
 }
-
-

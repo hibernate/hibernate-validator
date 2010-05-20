@@ -15,37 +15,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
+import java.lang.reflect.Field;
 import java.security.PrivilegedAction;
+
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * @author Emmanuel Bernard
  */
-public final class GetClassLoader implements PrivilegedAction<ClassLoader> {
+public class GetDeclaredField implements PrivilegedAction<Field> {
 	private final Class<?> clazz;
+	private final String fieldName;
 
-	public static GetClassLoader fromContext() {
-		return new GetClassLoader( null );
+	public static GetDeclaredField action(Class<?> clazz, String fieldName) {
+		return new GetDeclaredField( clazz, fieldName );
 	}
 
-	public static GetClassLoader fromClass(Class<?> clazz) {
-		if ( clazz == null ) {
-			throw new IllegalArgumentException( "Class is null" );
-		}
-		return new GetClassLoader( clazz );
-	}
-
-	private GetClassLoader(Class<?> clazz) {
+	private GetDeclaredField(Class<?> clazz, String fieldName) {
 		this.clazz = clazz;
+		this.fieldName = fieldName;
 	}
 
-	public ClassLoader run() {
-		if ( clazz != null ) {
-			return clazz.getClassLoader();
+	public Field run() {
+		try {
+			final Field field = clazz.getDeclaredField( fieldName );
+			ReflectionHelper.setAccessibility( field );
+			return field;
 		}
-		else {
-			return Thread.currentThread().getContextClassLoader();
+		catch ( NoSuchFieldException e ) {
+			return null;
 		}
 	}
 }

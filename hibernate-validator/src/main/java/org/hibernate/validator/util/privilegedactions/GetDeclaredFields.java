@@ -15,28 +15,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
-import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
+import java.lang.reflect.Field;
 
 /**
  * @author Emmanuel Bernard
  */
-public class GetMethodFromPropertyName implements PrivilegedAction<Method> {
+public class GetDeclaredFields implements PrivilegedAction<Field[]> {
 	private final Class<?> clazz;
-	private final String property;
 
-	public static GetMethodFromPropertyName action(Class<?> clazz, String property) {
-		return new GetMethodFromPropertyName( clazz, property );
+	public static GetDeclaredFields action(Class<?> clazz) {
+		return new GetDeclaredFields( clazz );
 	}
 
-	private GetMethodFromPropertyName(Class<?> clazz, String property) {
+	private GetDeclaredFields(Class<?> clazz) {
 		this.clazz = clazz;
-		this.property = property;
 	}
 
-	public Method run() {
-			return ReflectionHelper.getMethod( clazz, property );
+	public Field[] run() {
+		return clazz.getDeclaredFields();
 	}
 }

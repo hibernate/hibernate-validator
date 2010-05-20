@@ -15,31 +15,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
-import java.lang.annotation.Annotation;
 import java.security.PrivilegedAction;
+
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * @author Emmanuel Bernard
  */
-public class GetAnnotationParameter<T> implements PrivilegedAction<T> {
-	private final Annotation annotation;
-	private final String parameterName;
-	private final Class<T> type;
+public class ContainsMethod implements PrivilegedAction<Boolean> {
+	private final Class<?> clazz;
+	private final String property;
 
-
-	public static <T> GetAnnotationParameter<T> action(Annotation annotation, String parameterName, Class<T> type) {
-		return new GetAnnotationParameter<T>( annotation, parameterName, type );
+	public static ContainsMethod action(Class<?> clazz, String property) {
+		return new ContainsMethod( clazz, property );
 	}
 
-	private GetAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
-		this.annotation = annotation;
-		this.parameterName = parameterName;
-		this.type = type;
+	private ContainsMethod(Class<?> clazz, String property) {
+		this.clazz = clazz;
+		this.property = property;
 	}
 
-	public T run() {
-		return ReflectionHelper.getAnnotationParameter( annotation, parameterName, type );
+	public Boolean run() {
+		return ReflectionHelper.getMethod( clazz, property ) != null;
 	}
 }

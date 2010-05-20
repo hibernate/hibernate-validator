@@ -15,26 +15,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
 import java.security.PrivilegedAction;
-import java.lang.reflect.Method;
 
 /**
  * @author Emmanuel Bernard
  */
-public class GetDeclaredMethods implements PrivilegedAction<Method[]> {
+public final class GetClassLoader implements PrivilegedAction<ClassLoader> {
 	private final Class<?> clazz;
 
-	public static GetDeclaredMethods action(Class<?> clazz) {
-		return new GetDeclaredMethods( clazz );
+	public static GetClassLoader fromContext() {
+		return new GetClassLoader( null );
 	}
 
-	private GetDeclaredMethods(Class<?> clazz) {
+	public static GetClassLoader fromClass(Class<?> clazz) {
+		if ( clazz == null ) {
+			throw new IllegalArgumentException( "Class is null" );
+		}
+		return new GetClassLoader( clazz );
+	}
+
+	private GetClassLoader(Class<?> clazz) {
 		this.clazz = clazz;
 	}
 
-	public Method[] run() {
-		return clazz.getDeclaredMethods();
+	public ClassLoader run() {
+		if ( clazz != null ) {
+			return clazz.getClassLoader();
+		}
+		else {
+			return Thread.currentThread().getContextClassLoader();
+		}
 	}
 }

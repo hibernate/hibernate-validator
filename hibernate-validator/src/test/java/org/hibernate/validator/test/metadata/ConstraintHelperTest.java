@@ -30,7 +30,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.util.SetAccessibility;
+import org.hibernate.validator.util.privilegedactions.SetAccessibility;
 
 /**
  * @author Hardy Ferentschik

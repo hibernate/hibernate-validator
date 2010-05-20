@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -21,7 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.security.AccessController;
 
-import org.hibernate.validator.util.NewInstance;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
 
 import static java.lang.annotation.ElementType.TYPE;
 

@@ -17,6 +17,8 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
@@ -29,6 +31,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.FutureDefinition;
 import org.hibernate.validator.cfg.MinDefinition;
 import org.hibernate.validator.cfg.NotNullDefinition;
 import org.hibernate.validator.test.util.TestUtil;
@@ -89,10 +92,36 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "may not be null" );
 	}
 
-	@Test
-	public void testSingleConstraintWrongAccessType() {
+	@Test(enabled = false)
+	public void testInheritedConstraint() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.property( "name", METHOD )
+				.constraint( NotNullDefinition.class )
+				.type( Tournament.class )
+				.property( "tournamentDate", METHOD )
+				.constraint( FutureDefinition.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "New York Marathon" );
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.set( Calendar.YEAR, -1 );
+		marathon.setTournamentDate( cal.getTime() );
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+	}
+
+	@Test
+	public void testSingleConstraintWrongAccessType() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		try {
 			mapping.type( Marathon.class )

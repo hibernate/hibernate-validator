@@ -15,35 +15,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
-import java.lang.reflect.Field;
 import java.security.PrivilegedAction;
+import java.lang.reflect.Method;
 
 /**
  * @author Emmanuel Bernard
  */
-public class GetDeclaredField implements PrivilegedAction<Field> {
+public class GetDeclaredMethods implements PrivilegedAction<Method[]> {
 	private final Class<?> clazz;
-	private final String fieldName;
 
-	public static GetDeclaredField action(Class<?> clazz, String fieldName) {
-		return new GetDeclaredField( clazz, fieldName );
+	public static GetDeclaredMethods action(Class<?> clazz) {
+		return new GetDeclaredMethods( clazz );
 	}
 
-	private GetDeclaredField(Class<?> clazz, String fieldName) {
+	private GetDeclaredMethods(Class<?> clazz) {
 		this.clazz = clazz;
-		this.fieldName = fieldName;
 	}
 
-	public Field run() {
-		try {
-			final Field field = clazz.getDeclaredField( fieldName );
-			ReflectionHelper.setAccessibility( field );
-			return field;
-		}
-		catch ( NoSuchFieldException e ) {
-			return null;
-		}
+	public Method[] run() {
+		return clazz.getDeclaredMethods();
 	}
 }

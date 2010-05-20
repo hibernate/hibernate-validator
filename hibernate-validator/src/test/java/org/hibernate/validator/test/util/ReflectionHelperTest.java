@@ -46,7 +46,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
- * Tests for the <code>ReflectionHelper</code>.
+ * Tests for the {@code ReflectionHelper}.
  *
  * @author Hardy Ferentschik
  */

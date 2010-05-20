@@ -15,30 +15,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 import java.security.PrivilegedAction;
 
 /**
  * @author Emmanuel Bernard
  */
-public class GetMethod implements PrivilegedAction<Method> {
-	private final Class<?> clazz;
-	private final String methodName;
+public class GetConstructor<T> implements PrivilegedAction<Constructor<T>> {
+	private final Class<T> clazz;
+	private final Class<?>[] params;
 
-	public static GetMethod action(Class<?> clazz, String methodName) {
-		return new GetMethod( clazz, methodName );
+	public static <T> GetConstructor<T> action(Class<T> clazz, Class<?>... params) {
+		return new GetConstructor<T>( clazz, params );
 	}
 
-	private GetMethod(Class<?> clazz, String methodName) {
+	private GetConstructor(Class<T> clazz, Class<?>... params) {
 		this.clazz = clazz;
-		this.methodName = methodName;
+		this.params = params;
 	}
 
-	public Method run() {
+	public Constructor<T> run() {
 		try {
-			return clazz.getMethod(methodName);
+			return clazz.getConstructor(params);
 		}
 		catch ( NoSuchMethodException e ) {
 			return null;

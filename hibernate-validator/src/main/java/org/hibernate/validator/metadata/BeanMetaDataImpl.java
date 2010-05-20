@@ -42,11 +42,11 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.GetDeclaredFields;
-import org.hibernate.validator.util.GetDeclaredMethods;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
-import org.hibernate.validator.util.SetAccessibility;
+import org.hibernate.validator.util.privilegedactions.SetAccessibility;
 
 
 /**

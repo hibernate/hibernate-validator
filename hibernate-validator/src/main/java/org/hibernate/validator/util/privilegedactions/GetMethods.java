@@ -15,33 +15,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
 import java.security.PrivilegedAction;
+import java.lang.reflect.Method;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ContainsField implements PrivilegedAction<Boolean> {
+public class GetMethods implements PrivilegedAction<Method[]> {
 	private final Class<?> clazz;
-	private final String property;
 
-	public static ContainsField action(Class<?> clazz, String property) {
-		return new ContainsField( clazz, property );
+	public static GetMethods action(Class<?> clazz) {
+		return new GetMethods( clazz );
 	}
 
-	private ContainsField(Class<?> clazz, String property) {
+	private GetMethods(Class<?> clazz) {
 		this.clazz = clazz;
-		this.property = property;
 	}
 
-	public Boolean run() {
-		try {
-			clazz.getDeclaredField( property );
-			return true;
-		}
-		catch ( NoSuchFieldException e ) {
-			return false;
-		}
+	public Method[] run() {
+		return clazz.getMethods();
 	}
 }

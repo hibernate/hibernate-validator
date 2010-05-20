@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.util.NewInstance;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**

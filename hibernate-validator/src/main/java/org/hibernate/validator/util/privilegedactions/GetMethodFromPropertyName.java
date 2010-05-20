@@ -15,27 +15,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.util;
+package org.hibernate.validator.util.privilegedactions;
 
-import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
+
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * @author Emmanuel Bernard
  */
-public class SetAccessibility implements PrivilegedAction<Object> {
-	private final Member member;
+public class GetMethodFromPropertyName implements PrivilegedAction<Method> {
+	private final Class<?> clazz;
+	private final String property;
 
-	public static SetAccessibility action(Member member) {
-		return new SetAccessibility( member );
+	public static GetMethodFromPropertyName action(Class<?> clazz, String property) {
+		return new GetMethodFromPropertyName( clazz, property );
 	}
 
-	private SetAccessibility(Member member) {
-		this.member = member;
+	private GetMethodFromPropertyName(Class<?> clazz, String property) {
+		this.clazz = clazz;
+		this.property = property;
 	}
 
-	public Object run() {
-		ReflectionHelper.setAccessibility( member );
-		return member;
+	public Method run() {
+			return ReflectionHelper.getMethod( clazz, property );
 	}
 }

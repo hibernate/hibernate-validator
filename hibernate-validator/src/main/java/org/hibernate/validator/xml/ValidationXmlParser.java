@@ -37,10 +37,10 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.hibernate.validator.util.GetClassLoader;
-import org.hibernate.validator.util.LoadClass;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
 import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.NewInstance;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.

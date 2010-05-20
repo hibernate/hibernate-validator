@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.hibernate.validator.util.GetDeclaredMethods;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
 
 /**
  * A concrete implementation of <code>Annotation</code> that pretends it is a

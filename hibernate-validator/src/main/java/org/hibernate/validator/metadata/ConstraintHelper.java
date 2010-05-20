@@ -72,9 +72,9 @@ import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validator.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validator.constraints.impl.SizeValidatorForMap;
 import org.hibernate.validator.constraints.impl.SizeValidatorForString;
-import org.hibernate.validator.util.GetMethods;
-import org.hibernate.validator.util.GetMethod;
-import org.hibernate.validator.util.GetAnnotationParameter;
+import org.hibernate.validator.util.privilegedactions.GetMethods;
+import org.hibernate.validator.util.privilegedactions.GetMethod;
+import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.

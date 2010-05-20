@@ -24,8 +24,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 
-import org.hibernate.validator.util.GetConstructor;
-import org.hibernate.validator.util.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.GetConstructor;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 
 
 /**

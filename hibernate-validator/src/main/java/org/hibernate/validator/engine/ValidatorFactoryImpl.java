@@ -20,7 +20,6 @@ package org.hibernate.validator.engine;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,6 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.util.GetDeclaredField;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -120,6 +118,11 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		);
 	}
 
+	/**
+	 * Reads the configuration from {@code mapping} and creates the appropriate meta-data structures.
+	 *
+	 * @param mapping The constraint configuration created via the programmatic API.
+	 */
 	private <A extends Annotation, T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
 		Map<Class<?>, List<ConstraintDefinition<?>>> configData = mapping.getConfigData();
 		for ( Map.Entry<Class<?>, List<ConstraintDefinition<?>>> entry : configData.entrySet() ) {
@@ -146,14 +149,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 						annotation, constraintHelper, config.getElementType(), ConstraintOrigin.DEFINED_LOCALLY
 				);
 
-				final Member member;
-				GetDeclaredField action = GetDeclaredField.action( config.getBeanType(), config.getProperty() );
-				if ( System.getSecurityManager() != null ) {
-					member = AccessController.doPrivileged( action );
-				}
-				else {
-					member = action.run();
-				}
+				final Member member = ReflectionHelper.getMember(
+						config.getBeanType(), config.getProperty(), config.getElementType()
+				);
+
 				MetaConstraint<T, ?> metaConstraint = new MetaConstraint(
 						config.getBeanType(), member, constraintDescriptor
 				);

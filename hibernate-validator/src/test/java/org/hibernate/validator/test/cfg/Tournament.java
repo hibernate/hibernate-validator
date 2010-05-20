@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -22,28 +22,8 @@ import java.util.Date;
 /**
  * @author Hardy Ferentschik
  */
-public class Marathon implements Tournament {
-	private String name;
-
-	private long numberOfRunners;
-
-	private Date tournamentDate;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Date getTournamentDate() {
-		return tournamentDate;
-	}
-
-	public void setTournamentDate(Date tournamentDate) {
-		this.tournamentDate = tournamentDate;
-	}
+public interface Tournament {
+	Date getTournamentDate();
 }
 
 

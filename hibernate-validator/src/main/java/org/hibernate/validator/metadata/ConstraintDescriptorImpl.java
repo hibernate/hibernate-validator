@@ -43,10 +43,10 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.GetAnnotationParameter;
-import org.hibernate.validator.util.GetDeclaredMethods;
-import org.hibernate.validator.util.GetMethod;
-import org.hibernate.validator.util.GetMethods;
+import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.util.privilegedactions.GetMethod;
+import org.hibernate.validator.util.privilegedactions.GetMethods;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
