@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
@@ -59,7 +60,7 @@ public class TestUtil {
 
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
-			Configuration configuration = getConfiguration();
+			Configuration configuration = getConfiguration( Locale.ENGLISH );
 			configuration.traversableResolver( new DummyTraversableResolver() );
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
@@ -67,10 +68,19 @@ public class TestUtil {
 	}
 
 	public static Configuration<HibernateValidatorConfiguration> getConfiguration() {
-		return Validation.byProvider( HibernateValidator.class ).configure();
+		return getConfiguration( HibernateValidator.class, Locale.ENGLISH );
+	}
+
+	public static Configuration<HibernateValidatorConfiguration> getConfiguration(Locale locale) {
+		return getConfiguration( HibernateValidator.class, locale );
 	}
 
 	public static <T extends Configuration<T>, U extends ValidationProvider<T>> T getConfiguration(Class<U> type) {
+		return getConfiguration( type, Locale.ENGLISH );
+	}
+
+	public static <T extends Configuration<T>, U extends ValidationProvider<T>> T getConfiguration(Class<U> type, Locale locale) {
+		Locale.setDefault( locale );
 		return Validation.byProvider( type ).configure();
 	}
 
@@ -83,41 +93,12 @@ public class TestUtil {
 	 */
 	public static Validator getValidatorWithCustomConfiguration(String path) {
 		Thread.currentThread().setContextClassLoader( new CustomValidationXmlClassLoader( path ) );
-
-		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidator.class )
-				.configure();
-		return configuration.buildValidatorFactory().getValidator();
-	}
-
-	/**
-	 * @return A <code>Validator</code> instance which ignores <i>validation.xml</code>.
-	 */
-	public static Validator getValidatorIgnoringValidationXml() {
-		Thread.currentThread().setContextClassLoader( new IgnoringValidationXmlClassLoader() );
-
-		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidator.class )
-				.configure();
-		return configuration.buildValidatorFactory().getValidator();
-	}
-
-	public static ConstraintDescriptor<?> getSingleConstraintDescriptorFor(Class<?> clazz, String property) {
-		Set<ConstraintDescriptor<?>> constraintDescriptors = getConstraintDescriptorsFor( clazz, property );
-		assertTrue(
-				constraintDescriptors.size() == 1, "This method should only be used when there is a single constraint"
-		);
-		return constraintDescriptors.iterator().next();
+		return getConfiguration().buildValidatorFactory().getValidator();
 	}
 
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, String property) {
 		Validator validator = getValidator();
 		return validator.getConstraintsForClass( clazz ).getConstraintsForProperty( property );
-	}
-
-	public static Set<ConstraintDescriptor<?>> getConstraintDescriptorsFor(Class<?> clazz, String property) {
-		ElementDescriptor elementDescriptor = getPropertyDescriptor( clazz, property );
-		return elementDescriptor.getConstraintDescriptors();
 	}
 
 	public static <T> void assertCorrectConstraintViolationMessages(Set<ConstraintViolation<T>> violations, String... messages) {

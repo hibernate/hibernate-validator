@@ -15,51 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.cfg;
+package org.hibernate.validator.cfg;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.lang.annotation.ElementType;
+import javax.validation.Payload;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Marathon implements Tournament {
-	private String name;
-
-	private long numberOfRunners;
-
-	private Date tournamentDate;
-
-	private List<Runner> runners;
-
-	public Marathon() {
-		runners = new ArrayList<Runner>();
+public class AssertTrueDefinition extends ConstraintDefinition<AssertTrue> {
+	public AssertTrueDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, AssertTrue.class, property, elementType, mapping );
 	}
 
-	public String getName() {
-		return name;
+	public AssertTrueDefinition message(String message) {
+		addParameter( "message", message );
+		return this;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public AssertTrueDefinition groups(Class<?>... groups) {
+		addParameter( "groups", groups );
+		return this;
 	}
 
-	public Date getTournamentDate() {
-		return tournamentDate;
-	}
-
-	public void setTournamentDate(Date tournamentDate) {
-		this.tournamentDate = tournamentDate;
-	}
-
-	public List<Runner> getRunners() {
-		return runners;
-	}
-
-	public void addRunner(Runner runner) {
-		runners.add( runner );
+	public AssertTrueDefinition payload(Class<? extends Payload>... payload) {
+		addParameter( "payload", payload );
+		return this;
 	}
 }
-
-

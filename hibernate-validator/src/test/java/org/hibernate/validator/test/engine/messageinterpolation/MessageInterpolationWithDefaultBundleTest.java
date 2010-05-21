@@ -57,8 +57,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testEmailAndRangeMessageEnglishLocale() {
-		Locale.setDefault( Locale.ENGLISH );
-		Configuration<?> config = TestUtil.getConfiguration();
+		Configuration<?> config = TestUtil.getConfiguration( Locale.ENGLISH );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -76,8 +75,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testEmailAndRangeMessageGermanLocale() {
-		Locale.setDefault( Locale.GERMAN );
-		Configuration<?> config = TestUtil.getConfiguration();
+		Configuration<?> config = TestUtil.getConfiguration( Locale.GERMAN );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -95,8 +93,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testEmailAndRangeMessageFrenchLocale() {
-		Locale.setDefault( Locale.FRENCH );
-		Configuration<?> config = TestUtil.getConfiguration();
+		Configuration<?> config = TestUtil.getConfiguration( Locale.FRENCH );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -115,9 +112,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testThatExplicitlySetEnglishLocaleHasPrecedenceOverDefaultLocale() {
-
-		Locale.setDefault( Locale.FRENCH );
-		Configuration<?> config = TestUtil.getConfiguration();
+		Configuration<?> config = TestUtil.getConfiguration( Locale.FRENCH );
 		config.messageInterpolator( new LocalizedMessageInterpolator( Locale.ENGLISH ) );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();

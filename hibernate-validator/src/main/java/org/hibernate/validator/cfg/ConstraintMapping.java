@@ -18,20 +18,25 @@
 package org.hibernate.validator.cfg;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import org.hibernate.validator.util.ReflectionHelper;
+import java.util.Set;
 
 /**
  * @author Hardy Ferentschik
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConstraintDefinition<?>>> configData;
+	private final Map<Class<?>, List<ConstraintDefinition<?>>> constraintConfig;
+	private final Map<Class<?>, List<CascadeDefinition>> cascadeConfig;
+	private final Set<Class<?>> configuredClasses;
 
 	public ConstraintMapping() {
-		configData = new HashMap<Class<?>, List<ConstraintDefinition<?>>>();
+		constraintConfig = new HashMap<Class<?>, List<ConstraintDefinition<?>>>();
+		cascadeConfig = new HashMap<Class<?>, List<CascadeDefinition>>();
+		configuredClasses = new HashSet<Class<?>>();
 	}
 
 	public ConstraintsForType type(Class<?> beanClass) {
@@ -40,26 +45,48 @@ public class ConstraintMapping {
 
 	protected void addConstraintConfig(ConstraintDefinition<?> definition) {
 		Class<?> beanClass = definition.getBeanType();
-
-		if ( configData.containsKey( beanClass ) ) {
-			configData.get( beanClass ).add( definition );
+		configuredClasses.add( beanClass );
+		if ( constraintConfig.containsKey( beanClass ) ) {
+			constraintConfig.get( beanClass ).add( definition );
 		}
 		else {
 			List<ConstraintDefinition<?>> definitionList = new ArrayList<ConstraintDefinition<?>>();
 			definitionList.add( definition );
-			configData.put( beanClass, definitionList );
+			constraintConfig.put( beanClass, definitionList );
 		}
 	}
 
-	public Map<Class<?>, List<ConstraintDefinition<?>>> getConfigData() {
-		return configData;
+	protected void addCascadeConfig(CascadeDefinition cascade) {
+		Class<?> beanClass = cascade.getBeanType();
+		configuredClasses.add( beanClass );
+		if ( cascadeConfig.containsKey( beanClass ) ) {
+			cascadeConfig.get( beanClass ).add( cascade );
+		}
+		else {
+			List<CascadeDefinition> cascadeList = new ArrayList<CascadeDefinition>();
+			cascadeList.add( cascade );
+			cascadeConfig.put( beanClass, cascadeList );
+		}
+	}
+
+	public Map<Class<?>, List<ConstraintDefinition<?>>> getConstraintConfig() {
+		return constraintConfig;
+	}
+
+	public Map<Class<?>, List<CascadeDefinition>> getCascadeConfig() {
+		return cascadeConfig;
+	}
+
+	public Collection<Class<?>> getConfiguredClasses() {
+		return configuredClasses;
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ConstraintMapping" );
-		sb.append( "{configData=" ).append( configData );
+		sb.append( "{cascadeConfig=" ).append( cascadeConfig );
+		sb.append( ", constraintConfig=" ).append( constraintConfig );
 		sb.append( '}' );
 		return sb.toString();
 	}

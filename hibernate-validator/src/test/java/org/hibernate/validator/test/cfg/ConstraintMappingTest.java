@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.AssertTrueDefinition;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.FutureDefinition;
 import org.hibernate.validator.cfg.MinDefinition;
@@ -59,8 +60,8 @@ public class ConstraintMappingTest {
 				.property( "numberOfRunners", FIELD )
 				.constraint( MinDefinition.class ).value( 1 );
 
-		assertTrue( mapping.getConfigData().containsKey( Marathon.class ) );
-		assertTrue( mapping.getConfigData().get( Marathon.class ).size() == 2 );
+		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
+		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
 	}
 
 	@Test
@@ -118,6 +119,34 @@ public class ConstraintMappingTest {
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "must be in the future" );
+	}
+
+	@Test
+	public void testValid() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.valid( "runners", METHOD )
+				.type( Runner.class )
+				.property( "paidEntryFee", FIELD )
+				.constraint( AssertTrueDefinition.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "New York Marathon" );
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 0 );
+
+		marathon.addRunner( new Runner() );
+		violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "must be true" );
 	}
 
 	@Test

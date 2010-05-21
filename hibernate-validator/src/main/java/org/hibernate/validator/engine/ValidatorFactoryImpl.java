@@ -34,6 +34,7 @@ import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
+import org.hibernate.validator.cfg.CascadeDefinition;
 import org.hibernate.validator.cfg.ConstraintDefinition;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.metadata.AnnotationIgnores;
@@ -123,10 +124,8 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	 *
 	 * @param mapping The constraint configuration created via the programmatic API.
 	 */
-	private <A extends Annotation, T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
-		Map<Class<?>, List<ConstraintDefinition<?>>> configData = mapping.getConfigData();
-
-		for ( Class<?> clazz : mapping.getConfigData().keySet() ) {
+	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
+		for ( Class<?> clazz : mapping.getConfiguredClasses() ) {
 			@SuppressWarnings("unchecked")
 			Class<T> beanClass = ( Class<T> ) clazz;
 
@@ -139,19 +138,29 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 			for ( Class<?> classInHierarchy : classes ) {
 				// if the programmatic config contains constraints for the class in the hierarchy create a meta constraint
-				if ( mapping.getConfigData().keySet().contains( classInHierarchy ) ) {
+				if ( mapping.getConstraintConfig().keySet().contains( classInHierarchy ) ) {
 					addProgrammaticConfiguredConstraints(
-							mapping.getConfigData().get( classInHierarchy ), beanClass, classInHierarchy, constraints
+							mapping.getConstraintConfig().get( classInHierarchy ),
+							beanClass,
+							classInHierarchy,
+							constraints
+					);
+				}
+
+				if ( mapping.getCascadeConfig().keySet().contains( classInHierarchy ) ) {
+					addProgrammaticConfiguredCascade(
+							mapping.getCascadeConfig().get( classInHierarchy ), cascadedMembers
 					);
 				}
 			}
 
+			// TODO handle redefinition of default group
 			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
 					beanClass,
 					constraintHelper,
 					new ArrayList<Class<?>>(),
 					constraints,
-					new ArrayList<Member>(),
+					cascadedMembers,
 					new AnnotationIgnores(),
 					beanMetaDataCache
 			);
@@ -224,7 +233,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 																				Class<T> rootClass, Class<?> hierarchyClass,
 																				Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
 		for ( ConstraintDefinition<?> config : definitions ) {
-			A annotation = (A) createAnnotationProxy( config );
+			A annotation = ( A ) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 					annotation, constraintHelper, config.getElementType(), definedIn
@@ -261,6 +270,19 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
+	private void addProgrammaticConfiguredCascade(List<CascadeDefinition> cascades,
+												  List<Member> cascadedMembers) {
+		if ( cascades == null ) {
+			return;
+		}
+		for ( CascadeDefinition cascade : cascades ) {
+			Member m = ReflectionHelper.getMember(
+					cascade.getBeanType(), cascade.getProperty(), cascade.getElementType()
+			);
+			cascadedMembers.add( m );
+		}
+	}
+
 	/**
 	 * @param rootClass The root class. That is the class for which we currently create a  {@code BeanMetaData}
 	 * @param hierarchyClass The class on which the current constraint is defined on
@@ -279,7 +301,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 	@SuppressWarnings("unchecked")
 	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefinition<?> config) {
-		Class<A> constraintType = (Class<A>) config.getConstraintType();
+		Class<A> constraintType = ( Class<A> ) config.getConstraintType();
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
 		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {
 			annotationDescriptor.setValue( parameter.getKey(), parameter.getValue() );

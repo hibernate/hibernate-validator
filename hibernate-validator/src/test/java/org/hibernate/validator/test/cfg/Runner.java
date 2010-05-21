@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -17,48 +17,29 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 /**
  * @author Hardy Ferentschik
  */
-public class Marathon implements Tournament {
+public class Runner {
 	private String name;
 
-	private long numberOfRunners;
+	private boolean paidEntryFee;
 
-	private Date tournamentDate;
+	public boolean isPaidEntryFee() {
+		return paidEntryFee;
+	}
 
-	private List<Runner> runners;
-
-	public Marathon() {
-		runners = new ArrayList<Runner>();
+	public void setPaidEntryFee(boolean paidEntryFee) {
+		this.paidEntryFee = paidEntryFee;
 	}
 
 	public String getName() {
+
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Date getTournamentDate() {
-		return tournamentDate;
-	}
-
-	public void setTournamentDate(Date tournamentDate) {
-		this.tournamentDate = tournamentDate;
-	}
-
-	public List<Runner> getRunners() {
-		return runners;
-	}
-
-	public void addRunner(Runner runner) {
-		runners.add( runner );
 	}
 }
 

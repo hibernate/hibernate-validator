@@ -29,13 +29,15 @@ import static java.lang.annotation.ElementType.TYPE;
  * @author Hardy Ferentschik
  */
 public class ConstraintsForType {
+	private static final String EMPTY_PROPERTY = "";
+
 	private final ConstraintMapping mapping;
 	private final Class<?> beanClass;
 	private String property;
 	private ElementType elementType;
 
 	public ConstraintsForType(Class<?> beanClass, ConstraintMapping mapping) {
-		this( beanClass, "", TYPE, mapping );
+		this( beanClass, EMPTY_PROPERTY, TYPE, mapping );
 	}
 
 	public ConstraintsForType(Class<?> beanClass, String property, ElementType type, ConstraintMapping mapping) {
@@ -62,7 +64,12 @@ public class ConstraintsForType {
 	}
 
 	public ConstraintsForType valid(String property, ElementType type) {
-		return null;
+		mapping.addCascadeConfig(new CascadeDefinition( beanClass, property, type));
+		return this;
+	}
+
+	public ConstraintsForType type(Class<?> type) {
+		return new ConstraintsForType( type, mapping );
 	}
 }
 

@@ -99,7 +99,8 @@ public class ConstraintDefinition<A extends Annotation> {
 	}
 
 	public ConstraintsForType valid(String property, ElementType type) {
-		return null;
+		mapping.addCascadeConfig( new CascadeDefinition( beanType, property, type ) );
+		return new ConstraintsForType( beanType, mapping );
 	}
 
 	public Class<A> getConstraintType() {

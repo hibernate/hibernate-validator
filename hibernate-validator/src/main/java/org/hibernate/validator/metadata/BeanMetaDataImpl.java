@@ -112,8 +112,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public BeanMetaDataImpl(Class<T> beanClass,
 							ConstraintHelper constraintHelper,
 							List<Class<?>> defaultGroupSequence,
-							Map<Class<?>, List<MetaConstraint<T, ?>>> xmlConfiguredConstraints,
-							List<Member> xmlConfiguredMember,
+							Map<Class<?>, List<MetaConstraint<T, ?>>> constraints,
+							List<Member> cascadedMembers,
 							AnnotationIgnores annotationIgnores,
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
@@ -122,13 +122,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( !defaultGroupSequence.isEmpty() ) {
 			setDefaultGroupSequence( defaultGroupSequence );
 		}
-		for ( Map.Entry<Class<?>, List<MetaConstraint<T, ?>>> entry : xmlConfiguredConstraints.entrySet() ) {
+		for ( Map.Entry<Class<?>, List<MetaConstraint<T, ?>>> entry : constraints.entrySet() ) {
 			Class<?> clazz = entry.getKey();
 			for ( MetaConstraint<T, ?> constraint : entry.getValue() ) {
 				addMetaConstraint( clazz, constraint );
 			}
 		}
-		for ( Member member : xmlConfiguredMember ) {
+		for ( Member member : cascadedMembers ) {
 			addCascadedMember( member );
 		}
 	}
