@@ -650,7 +650,8 @@ public final class ReflectionHelper {
 	 *
 	 * @param clazz The class to start the search with.
 	 *
-	 * @return List of all super classes and interfaces of {@code clazz}.
+	 * @return List of all super classes and interfaces of {@code clazz}. The list contains the class itself! The empty
+	 *         list is returned if {@code clazz} is {@code null}.
 	 */
 	public static List<Class<?>> computeClassHierarchy(Class<?> clazz) {
 		List<Class<?>> classes = new ArrayList<Class<?>>();

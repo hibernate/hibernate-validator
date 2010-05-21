@@ -49,7 +49,7 @@ import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.xml.XmlMappingParser;
 
 /**
- * Factory returning initialized <code>Validator</code> instances. This is Hibernate Validator's default
+ * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
  * implementation of the {@code ValidatorFactory} interface.
  *
  * @author Emmanuel Bernard
@@ -125,54 +125,38 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	 */
 	private <A extends Annotation, T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
 		Map<Class<?>, List<ConstraintDefinition<?>>> configData = mapping.getConfigData();
-		for ( Map.Entry<Class<?>, List<ConstraintDefinition<?>>> entry : configData.entrySet() ) {
-			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = new HashMap<Class<?>, List<MetaConstraint<T, ?>>>();
-			for ( ConstraintDefinition<?> config : entry.getValue() ) {
-				AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>(
-						( Class<A> ) config.getConstraintType()
-				);
-				for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {
-					annotationDescriptor.setValue( parameter.getKey(), parameter.getValue() );
-				}
 
-				A annotation;
-				try {
-					annotation = AnnotationFactory.create( annotationDescriptor );
-				}
-				catch ( RuntimeException e ) {
-					throw new ValidationException(
-							"Unable to create annotation for configured constraint: " + e.getMessage(), e
+		for ( Class<?> clazz : mapping.getConfigData().keySet() ) {
+			@SuppressWarnings("unchecked")
+			Class<T> beanClass = ( Class<T> ) clazz;
+
+			// for each configured entity we have to check whether any of the interfaces or super classes is configured
+			// vua the programmatic api as well
+			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
+
+			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
+			List<Member> cascadedMembers = new ArrayList<Member>();
+
+			for ( Class<?> classInHierarchy : classes ) {
+				// if the programmatic config contains constraints for the class in the hierarchy create a meta constraint
+				if ( mapping.getConfigData().keySet().contains( classInHierarchy ) ) {
+					addProgrammaticConfiguredConstraints(
+							mapping.getConfigData().get( classInHierarchy ), beanClass, classInHierarchy, constraints
 					);
 				}
-
-				ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-						annotation, constraintHelper, config.getElementType(), ConstraintOrigin.DEFINED_LOCALLY
-				);
-
-				final Member member = ReflectionHelper.getMember(
-						config.getBeanType(), config.getProperty(), config.getElementType()
-				);
-
-				MetaConstraint<T, ?> metaConstraint = new MetaConstraint(
-						config.getBeanType(), member, constraintDescriptor
-				);
-				List<MetaConstraint<T, ?>> constraintList = new ArrayList<MetaConstraint<T, ?>>();
-				constraintList.add( metaConstraint );
-				constraints.put( config.getBeanType(), constraintList );
-
-
-				BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
-						( Class<T> ) config.getBeanType(),
-						constraintHelper,
-						new ArrayList<Class<?>>(),
-						constraints,
-						new ArrayList<Member>(),
-						new AnnotationIgnores(),
-						beanMetaDataCache
-				);
-
-				beanMetaDataCache.addBeanMetaData( ( Class<T> ) config.getBeanType(), metaData );
 			}
+
+			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
+					beanClass,
+					constraintHelper,
+					new ArrayList<Class<?>>(),
+					constraints,
+					new ArrayList<Member>(),
+					new AnnotationIgnores(),
+					beanMetaDataCache
+			);
+
+			beanMetaDataCache.addBeanMetaData( beanClass, metaData );
 		}
 	}
 
@@ -188,7 +172,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			Class<T> beanClass = ( Class<T> ) clazz;
 
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
-			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = new HashMap<Class<?>, List<MetaConstraint<T, ?>>>();
+			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
 			List<Member> cascadedMembers = new ArrayList<Member>();
 			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
 			// some constraints might be configured in super classes or interfaces. The xml configuration does not
@@ -216,7 +200,9 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser, Class<T> rootClass, Class<?> hierarchyClass, Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
+	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser,
+																	   Class<T> rootClass,
+																	   Class<?> hierarchyClass, Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
 		for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
@@ -228,21 +214,60 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			MetaConstraint<T, A> newMetaConstraint = new MetaConstraint<T, A>(
 					rootClass, constraint.getMember(), descriptor
 			);
-			List<MetaConstraint<T, ?>> constraintList = constraints.get( hierarchyClass );
-			if ( constraintList == null ) {
-				constraintList = new ArrayList<MetaConstraint<T, ?>>();
-				constraints.put( hierarchyClass, constraintList );
-			}
-			constraintList.add( newMetaConstraint );
+
+			addConstraintToMap( hierarchyClass, newMetaConstraint, constraints );
 		}
 	}
 
-	private void addXmlCascadedMember(XmlMappingParser mappingParser, Class<?> hierarchyClass, List<Member> cascadedMembers) {
+	@SuppressWarnings("unchecked")
+	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefinition<?>> definitions,
+																				Class<T> rootClass, Class<?> hierarchyClass,
+																				Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
+		for ( ConstraintDefinition<?> config : definitions ) {
+			A annotation = (A) createAnnotationProxy( config );
+			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
+			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
+					annotation, constraintHelper, config.getElementType(), definedIn
+			);
+
+			Member member = ReflectionHelper.getMember(
+					config.getBeanType(), config.getProperty(), config.getElementType()
+			);
+
+			MetaConstraint<T, ?> metaConstraint = new MetaConstraint(
+					config.getBeanType(), member, constraintDescriptor
+			);
+			addConstraintToMap( hierarchyClass, metaConstraint, constraints );
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T, A extends Annotation> void addConstraintToMap(Class<?> hierarchyClass,
+															  MetaConstraint<T, A> constraint,
+															  Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
+		List<MetaConstraint<T, ?>> constraintList = constraints.get( hierarchyClass );
+		if ( constraintList == null ) {
+			constraintList = new ArrayList<MetaConstraint<T, ?>>();
+			constraints.put( hierarchyClass, constraintList );
+		}
+		constraintList.add( constraint );
+	}
+
+	private void addXmlCascadedMember(XmlMappingParser mappingParser,
+									  Class<?> hierarchyClass,
+									  List<Member> cascadedMembers) {
 		for ( Member m : mappingParser.getCascadedMembersForClass( hierarchyClass ) ) {
 			cascadedMembers.add( m );
 		}
 	}
 
+	/**
+	 * @param rootClass The root class. That is the class for which we currently create a  {@code BeanMetaData}
+	 * @param hierarchyClass The class on which the current constraint is defined on
+	 *
+	 * @return Returns {@code ConstraintOrigin.DEFINED_LOCALLY} if the constraint was defined on the root bean,
+	 *         {@code ConstraintOrigin.DEFINED_IN_HIERARCHY} otherwise.
+	 */
 	private ConstraintOrigin definedIn(Class<?> rootClass, Class<?> hierarchyClass) {
 		if ( hierarchyClass.equals( rootClass ) ) {
 			return ConstraintOrigin.DEFINED_LOCALLY;
@@ -250,5 +275,29 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		else {
 			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefinition<?> config) {
+		Class<A> constraintType = (Class<A>) config.getConstraintType();
+		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
+		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {
+			annotationDescriptor.setValue( parameter.getKey(), parameter.getValue() );
+		}
+
+		A annotation;
+		try {
+			annotation = AnnotationFactory.create( annotationDescriptor );
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException(
+					"Unable to create annotation for configured constraint: " + e.getMessage(), e
+			);
+		}
+		return annotation;
+	}
+
+	private <T> Map<Class<?>, List<MetaConstraint<T, ?>>> createEmptyConstraintMap() {
+		return new HashMap<Class<?>, List<MetaConstraint<T, ?>>>();
 	}
 }

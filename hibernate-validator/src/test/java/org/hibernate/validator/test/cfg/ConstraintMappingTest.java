@@ -92,7 +92,7 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "may not be null" );
 	}
 
-	@Test(enabled = false)
+	@Test
 	public void testInheritedConstraint() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
@@ -117,7 +117,7 @@ public class ConstraintMappingTest {
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
-		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+		assertConstraintViolation( violations.iterator().next(), "must be in the future" );
 	}
 
 	@Test
