@@ -35,7 +35,7 @@
             <email>gunnar.morling@googlemail.com</email>
             <organization>Individual</organization>
             <url>http://musingsofaprogrammingaddict.blogspot.com/</url>
-        </developer>        
+        </developer>
     </developers>
 
     <mailingLists>
@@ -297,6 +297,11 @@
                     <artifactId>maven-archetype-plugin</artifactId>
                     <version>2.0-alpha-4</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -344,26 +349,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>2.0.1</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <id>html</id>
-                        <configuration>
-                            <tags>
-                                <tag>
-                                    <name>todo</name>
-                                    <placement>a</placement>
-                                    <head>ToDo:</head>
-                                </tag>
-                            </tags>
-                        </configuration>
-                        <reports>
-                            <report>javadoc</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
