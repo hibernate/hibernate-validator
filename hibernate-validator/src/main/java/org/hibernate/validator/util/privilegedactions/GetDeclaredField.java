@@ -20,8 +20,6 @@ package org.hibernate.validator.util.privilegedactions;
 import java.lang.reflect.Field;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.util.ReflectionHelper;
-
 /**
  * @author Emmanuel Bernard
  */
@@ -41,7 +39,7 @@ public class GetDeclaredField implements PrivilegedAction<Field> {
 	public Field run() {
 		try {
 			final Field field = clazz.getDeclaredField( fieldName );
-			ReflectionHelper.setAccessibility( field );
+			field.setAccessible( true );
 			return field;
 		}
 		catch ( NoSuchFieldException e ) {
