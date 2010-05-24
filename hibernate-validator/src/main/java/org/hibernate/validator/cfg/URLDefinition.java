@@ -1,6 +1,5 @@
 // $Id$
-/*
- * JBoss, Home of Professional Open Source
+/* JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -19,29 +18,45 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.AssertTrue;
+
+import org.hibernate.validator.constraints.URL;
 
 /**
  * @author Hardy Ferentschik
  */
-public class AssertFalseDefinition extends ConstraintDefinition<AssertFalse> {
-	public AssertFalseDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertFalse.class, property, elementType, mapping );
+public class URLDefinition extends ConstraintDefinition<URL> {
+
+	public URLDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, URL.class, property, elementType, mapping );
 	}
 
-	public AssertFalseDefinition message(String message) {
+	public URLDefinition message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public AssertFalseDefinition groups(Class<?>... groups) {
+	public URLDefinition groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public AssertFalseDefinition payload(Class<? extends Payload>... payload) {
+	public URLDefinition payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public URLDefinition protocol(String protocol) {
+		addParameter( "protocol", protocol );
+		return this;
+	}
+
+	public URLDefinition host(String host) {
+		addParameter( "host", host );
+		return this;
+	}
+
+	public URLDefinition port(int port) {
+		addParameter( "port", port );
 		return this;
 	}
 }

@@ -19,28 +19,28 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.AssertTrue;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * @author Hardy Ferentschik
  */
-public class AssertFalseDefinition extends ConstraintDefinition<AssertFalse> {
-	public AssertFalseDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertFalse.class, property, elementType, mapping );
+public class NotBlankDefinition extends ConstraintDefinition<NotBlank> {
+	public NotBlankDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, NotBlank.class, property, elementType, mapping );
 	}
 
-	public AssertFalseDefinition message(String message) {
+	public NotBlankDefinition message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public AssertFalseDefinition groups(Class<?>... groups) {
+	public NotBlankDefinition groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public AssertFalseDefinition payload(Class<? extends Payload>... payload) {
+	public NotBlankDefinition payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}

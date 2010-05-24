@@ -19,29 +19,34 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.DecimalMin;
 
 /**
  * @author Hardy Ferentschik
  */
-public class AssertFalseDefinition extends ConstraintDefinition<AssertFalse> {
-	public AssertFalseDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertFalse.class, property, elementType, mapping );
+public class DecimalMinDefinition extends ConstraintDefinition<DecimalMin> {
+
+	public DecimalMinDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, DecimalMin.class, property, elementType, mapping );
 	}
 
-	public AssertFalseDefinition message(String message) {
+	public DecimalMinDefinition message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public AssertFalseDefinition groups(Class<?>... groups) {
+	public DecimalMinDefinition groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public AssertFalseDefinition payload(Class<? extends Payload>... payload) {
+	public DecimalMinDefinition payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public DecimalMinDefinition value(String min) {
+		addParameter( "value", min );
 		return this;
 	}
 }

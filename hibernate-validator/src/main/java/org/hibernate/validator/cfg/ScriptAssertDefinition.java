@@ -19,29 +19,45 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.AssertTrue;
+
+import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
  * @author Hardy Ferentschik
  */
-public class AssertFalseDefinition extends ConstraintDefinition<AssertFalse> {
-	public AssertFalseDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertFalse.class, property, elementType, mapping );
+public class ScriptAssertDefinition extends ConstraintDefinition<ScriptAssert> {
+
+	public ScriptAssertDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, ScriptAssert.class, property, elementType, mapping );
 	}
 
-	public AssertFalseDefinition message(String message) {
+	public ScriptAssertDefinition message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public AssertFalseDefinition groups(Class<?>... groups) {
+	public ScriptAssertDefinition groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public AssertFalseDefinition payload(Class<? extends Payload>... payload) {
+	public ScriptAssertDefinition payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public ScriptAssertDefinition lang(String lang) {
+		addParameter( "lang", lang );
+		return this;
+	}
+
+	public ScriptAssertDefinition script(String script) {
+		addParameter( "script", script );
+		return this;
+	}
+
+	public ScriptAssertDefinition alias(String alias) {
+		addParameter( "alias", alias );
 		return this;
 	}
 }

@@ -15,33 +15,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.DecimalMax;
 
 /**
  * @author Hardy Ferentschik
  */
-public class AssertFalseDefinition extends ConstraintDefinition<AssertFalse> {
-	public AssertFalseDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertFalse.class, property, elementType, mapping );
+public class DecimalMaxDefinition extends ConstraintDefinition<DecimalMax> {
+
+	public DecimalMaxDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, DecimalMax.class, property, elementType, mapping );
 	}
 
-	public AssertFalseDefinition message(String message) {
+	public DecimalMaxDefinition message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public AssertFalseDefinition groups(Class<?>... groups) {
+	public DecimalMaxDefinition groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public AssertFalseDefinition payload(Class<? extends Payload>... payload) {
+	public DecimalMaxDefinition payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public DecimalMaxDefinition value(String max) {
+		addParameter( "value", max );
 		return this;
 	}
 }
