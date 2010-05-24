@@ -69,8 +69,8 @@
         Optional dependencies
         -->
         <dependency>
-            <groupId>org.hibernate.java-persistence</groupId>
-            <artifactId>jpa-api</artifactId>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -86,10 +86,24 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>3.5.0-Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <properties>
+        <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
+        <jdbc.driver>org.h2.Driver</jdbc.driver>
+        <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
+        <jdbc.user>sa</jdbc.user>
+        <jdbc.pass/>
+        <jdbc.isolation/>
+    </properties>
+
     <build>
         <defaultGoal>test</defaultGoal>
         <resources>
@@ -102,6 +116,16 @@
                 <targetPath>META-INF</targetPath>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -34,7 +34,6 @@ public class Runner {
 	}
 
 	public String getName() {
-
 		return name;
 	}
 
