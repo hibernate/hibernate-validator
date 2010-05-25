@@ -30,14 +30,18 @@ import org.hibernate.validator.util.ReflectionHelper;
  * @author Hardy Ferentschik
  */
 public class ConstraintDef<A extends Annotation> {
-	private final Class<A> constraintType;
-	private final Map<String, Object> parameters;
-	private final Class<?> beanType;
-	private final ElementType elementType;
-	private final String property;
-	private final ConstraintMapping mapping;
+	protected final Class<A> constraintType;
+	protected final Map<String, Object> parameters;
+	protected final Class<?> beanType;
+	protected final ElementType elementType;
+	protected final String property;
+	protected final ConstraintMapping mapping;
 
 	public ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
+		this( beanType, constraintType, property, elementType, new HashMap<String, Object>(), mapping );
+	}
+
+	protected ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
 		if ( beanType == null ) {
 			throw new ValidationException( "Null is not a valid bean type" );
 		}
@@ -65,7 +69,7 @@ public class ConstraintDef<A extends Annotation> {
 
 		this.beanType = beanType;
 		this.constraintType = constraintType;
-		this.parameters = new HashMap<String, Object>();
+		this.parameters = parameters;
 		this.property = property;
 		this.elementType = elementType;
 		this.mapping = mapping;
@@ -77,7 +81,6 @@ public class ConstraintDef<A extends Annotation> {
 	}
 
 	public <A extends Annotation, T extends ConstraintDef<A>> T constraint(Class<T> definition) {
-
 		final Constructor<T> constructor = ReflectionHelper.getConstructor(
 				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
 		);
@@ -103,30 +106,10 @@ public class ConstraintDef<A extends Annotation> {
 		return new ConstraintsForType( beanType, mapping );
 	}
 
-	public Class<A> getConstraintType() {
-		return constraintType;
-	}
-
-	public Map<String, Object> getParameters() {
-		return parameters;
-	}
-
-	public ElementType getElementType() {
-		return elementType;
-	}
-
-	public Class<?> getBeanType() {
-		return beanType;
-	}
-
-	public String getProperty() {
-		return property;
-	}
-
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "ConstraintDefinition" );
+		sb.append( this.getClass().getName() );
 		sb.append( "{beanType=" ).append( beanType );
 		sb.append( ", constraintType=" ).append( constraintType );
 		sb.append( ", parameters=" ).append( parameters );

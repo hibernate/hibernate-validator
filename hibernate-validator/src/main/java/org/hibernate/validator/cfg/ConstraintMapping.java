@@ -17,6 +17,7 @@
  */
 package org.hibernate.validator.cfg;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,13 +33,13 @@ import java.util.Set;
  * @author Hardy Ferentschik
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConstraintDef<?>>> constraintConfig;
+	private final Map<Class<?>, List<ConstraintDefAccessor<?>>> constraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 
 	public ConstraintMapping() {
-		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?>>>();
+		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDefAccessor<?>>>();
 		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
 		this.configuredClasses = new HashSet<Class<?>>();
 		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
@@ -48,15 +49,24 @@ public class ConstraintMapping {
 		return new ConstraintsForType( beanClass, this );
 	}
 
-	protected void addConstraintConfig(ConstraintDef<?> definition) {
-		Class<?> beanClass = definition.getBeanType();
+	protected <A extends Annotation> void addConstraintConfig(ConstraintDef<?> definition) {
+		Class<?> beanClass = definition.beanType;
+		ConstraintDefAccessor<A> defAccessor = new ConstraintDefAccessor<A>(
+				beanClass,
+				( Class<A> ) definition.constraintType,
+				definition.property,
+				definition.elementType,
+				definition.parameters,
+				this
+		);
+
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {
-			constraintConfig.get( beanClass ).add( definition );
+			constraintConfig.get( beanClass ).add( defAccessor );
 		}
 		else {
-			List<ConstraintDef<?>> definitionList = new ArrayList<ConstraintDef<?>>();
-			definitionList.add( definition );
+			List<ConstraintDefAccessor<?>> definitionList = new ArrayList<ConstraintDefAccessor<?>>();
+			definitionList.add( defAccessor );
 			constraintConfig.put( beanClass, definitionList );
 		}
 	}
@@ -78,7 +88,7 @@ public class ConstraintMapping {
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
 	}
 
-	public Map<Class<?>, List<ConstraintDef<?>>> getConstraintConfig() {
+	public Map<Class<?>, List<ConstraintDefAccessor<?>>> getConstraintConfig() {
 		return constraintConfig;
 	}
 

@@ -35,7 +35,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.cfg.CascadeDef;
-import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintDefAccessor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
@@ -228,10 +228,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDef<?>> definitions,
+	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefAccessor<?>> definitions,
 																				Class<T> rootClass, Class<?> hierarchyClass,
 																				Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
-		for ( ConstraintDef<?> config : definitions ) {
+		for ( ConstraintDefAccessor<?> config : definitions ) {
 			A annotation = ( A ) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
@@ -299,7 +299,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDef<?> config) {
+	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefAccessor<?> config) {
 		Class<A> constraintType = ( Class<A> ) config.getConstraintType();
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
 		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {
