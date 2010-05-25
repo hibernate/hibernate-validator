@@ -34,6 +34,7 @@ import org.hibernate.validator.cfg.AssertTrueDefinition;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.FutureDefinition;
 import org.hibernate.validator.cfg.MinDefinition;
+import org.hibernate.validator.cfg.NotEmptyDefinition;
 import org.hibernate.validator.cfg.NotNullDefinition;
 import org.hibernate.validator.test.util.TestUtil;
 import org.hibernate.validator.util.LoggerFactory;
@@ -161,6 +162,38 @@ public class ConstraintMappingTest {
 		catch ( ValidationException e ) {
 			log.debug( e.toString() );
 		}
+	}
+
+	@Test
+	public void testDefaultGroupSequence() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.defaultGroupSequence( Foo.class, Marathon.class )
+				.property( "name", METHOD )
+				.constraint( NotNullDefinition.class ).groups( Foo.class )
+				.property( "runners", METHOD )
+				.constraint( NotEmptyDefinition.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+
+		marathon.setName( "Stockholm Marathon" );
+		violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
+	}
+
+	public interface Foo {
 	}
 }
 

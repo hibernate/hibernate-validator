@@ -19,6 +19,7 @@ package org.hibernate.validator.cfg;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,17 +27,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Top level class for programmatically configured constraints.
+ *
  * @author Hardy Ferentschik
  */
 public class ConstraintMapping {
 	private final Map<Class<?>, List<ConstraintDefinition<?>>> constraintConfig;
 	private final Map<Class<?>, List<CascadeDefinition>> cascadeConfig;
 	private final Set<Class<?>> configuredClasses;
+	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 
 	public ConstraintMapping() {
-		constraintConfig = new HashMap<Class<?>, List<ConstraintDefinition<?>>>();
-		cascadeConfig = new HashMap<Class<?>, List<CascadeDefinition>>();
-		configuredClasses = new HashSet<Class<?>>();
+		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDefinition<?>>>();
+		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDefinition>>();
+		this.configuredClasses = new HashSet<Class<?>>();
+		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
 	}
 
 	public ConstraintsForType type(Class<?> beanClass) {
@@ -69,6 +74,10 @@ public class ConstraintMapping {
 		}
 	}
 
+	protected void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
+		defaultGroupSequences.put( beanClass, defaultGroupSequence );
+	}
+
 	public Map<Class<?>, List<ConstraintDefinition<?>>> getConstraintConfig() {
 		return constraintConfig;
 	}
@@ -81,12 +90,23 @@ public class ConstraintMapping {
 		return configuredClasses;
 	}
 
+	public List<Class<?>> getDefaultSequence(Class<?> beanType) {
+		if ( defaultGroupSequences.containsKey( beanType ) ) {
+			return defaultGroupSequences.get( beanType );
+		}
+		else {
+			return Collections.emptyList();
+		}
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ConstraintMapping" );
 		sb.append( "{cascadeConfig=" ).append( cascadeConfig );
 		sb.append( ", constraintConfig=" ).append( constraintConfig );
+		sb.append( ", configuredClasses=" ).append( configuredClasses );
+		sb.append( ", defaultGroupSequences=" ).append( defaultGroupSequences );
 		sb.append( '}' );
 		return sb.toString();
 	}

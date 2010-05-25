@@ -154,11 +154,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				}
 			}
 
-			// TODO handle redefinition of default group
 			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
 					beanClass,
 					constraintHelper,
-					new ArrayList<Class<?>>(),
+					mapping.getDefaultSequence( beanClass ),
 					constraints,
 					cascadedMembers,
 					new AnnotationIgnores(),

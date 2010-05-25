@@ -20,6 +20,7 @@ package org.hibernate.validator.cfg;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -64,11 +65,17 @@ public class ConstraintsForType {
 	}
 
 	public ConstraintsForType valid(String property, ElementType type) {
-		mapping.addCascadeConfig(new CascadeDefinition( beanClass, property, type));
+		mapping.addCascadeConfig( new CascadeDefinition( beanClass, property, type ) );
 		return this;
 	}
 
-	public ConstraintsForType type(Class<?> type) {
+	public ConstraintsForType defaultGroupSequence(Class<?>... defaultGroupSequence) {
+		mapping.addDefaultGroupSequence( beanClass, Arrays.asList( defaultGroupSequence ) );
+		return this;
+	}
+
+	public ConstraintsForType type(Class<?> type, Class<?>... defaultGroupSequence) {
+		mapping.addDefaultGroupSequence( type, Arrays.asList( defaultGroupSequence ) );
 		return new ConstraintsForType( type, mapping );
 	}
 }
