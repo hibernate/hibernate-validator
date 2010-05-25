@@ -57,9 +57,9 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-				.constraint( NotNullDefinition.class )
+					.constraint( NotNullDefinition.class )
 				.property( "numberOfRunners", FIELD )
-				.constraint( MinDefinition.class ).value( 1 );
+					.constraint( MinDefinition.class ).value( 1 );
 
 		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
@@ -82,7 +82,7 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-				.constraint( NotNullDefinition.class );
+					.constraint( NotNullDefinition.class );
 
 		config.addMapping( mapping );
 
@@ -99,12 +99,13 @@ public class ConstraintMappingTest {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping.type( Marathon.class )
+		mapping
+			.type( Marathon.class )
 				.property( "name", METHOD )
-				.constraint( NotNullDefinition.class )
-				.type( Tournament.class )
+					.constraint( NotNullDefinition.class )
+			.type( Tournament.class )
 				.property( "tournamentDate", METHOD )
-				.constraint( FutureDefinition.class );
+					.constraint( FutureDefinition.class );
 
 		config.addMapping( mapping );
 
@@ -128,10 +129,10 @@ public class ConstraintMappingTest {
 
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
-				.valid( "runners", METHOD )
+					.valid( "runners", METHOD )
 				.type( Runner.class )
-				.property( "paidEntryFee", FIELD )
-				.constraint( AssertTrueDefinition.class );
+					.property( "paidEntryFee", FIELD )
+						.constraint( AssertTrueDefinition.class );
 
 		config.addMapping( mapping );
 
@@ -154,9 +155,10 @@ public class ConstraintMappingTest {
 	public void testSingleConstraintWrongAccessType() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		try {
-			mapping.type( Marathon.class )
+			mapping
+				.type( Marathon.class )
 					.property( "numberOfRunners", METHOD )
-					.constraint( NotNullDefinition.class );
+						.constraint( NotNullDefinition.class );
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -169,12 +171,13 @@ public class ConstraintMappingTest {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping.type( Marathon.class )
+		mapping
+			.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
 				.property( "name", METHOD )
-				.constraint( NotNullDefinition.class ).groups( Foo.class )
+					.constraint( NotNullDefinition.class ).groups( Foo.class )
 				.property( "runners", METHOD )
-				.constraint( NotEmptyDefinition.class );
+					.constraint( NotEmptyDefinition.class );
 
 		config.addMapping( mapping );
 
