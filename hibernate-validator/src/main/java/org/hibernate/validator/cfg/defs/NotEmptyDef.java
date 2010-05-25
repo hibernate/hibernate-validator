@@ -15,33 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
 
-import org.hibernate.validator.constraints.CreditCardNumber;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @author Hardy Ferentschik
  */
-public class CreditCardNumberDefinition extends ConstraintDefinition<CreditCardNumber> {
-	public CreditCardNumberDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, CreditCardNumber.class, property, elementType, mapping );
+public class NotEmptyDef extends ConstraintDef<NotEmpty> {
+	public NotEmptyDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, NotEmpty.class, property, elementType, mapping );
 	}
 
-	public CreditCardNumberDefinition message(String message) {
+	public NotEmptyDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public CreditCardNumberDefinition groups(Class<?>... groups) {
+	public NotEmptyDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public CreditCardNumberDefinition payload(Class<? extends Payload>... payload) {
+	public NotEmptyDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}

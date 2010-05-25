@@ -15,38 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.DecimalMin;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.Email;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DecimalMinDefinition extends ConstraintDefinition<DecimalMin> {
-
-	public DecimalMinDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, DecimalMin.class, property, elementType, mapping );
+public class EmailDef extends ConstraintDef<Email> {
+	public EmailDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Email.class, property, elementType, mapping );
 	}
 
-	public DecimalMinDefinition message(String message) {
+	public EmailDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public DecimalMinDefinition groups(Class<?>... groups) {
+	public EmailDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public DecimalMinDefinition payload(Class<? extends Payload>... payload) {
+	public EmailDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return this;
-	}
-
-	public DecimalMinDefinition value(String min) {
-		addParameter( "value", min );
 		return this;
 	}
 }

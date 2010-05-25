@@ -15,32 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Past;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class AssertFalseDefinition extends ConstraintDefinition<AssertFalse> {
-	public AssertFalseDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertFalse.class, property, elementType, mapping );
+public class PastDef extends ConstraintDef<Past> {
+	public PastDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Past.class, property, elementType, mapping );
 	}
 
-	public AssertFalseDefinition message(String message) {
+	public PastDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public AssertFalseDefinition groups(Class<?>... groups) {
+	public PastDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public AssertFalseDefinition payload(Class<? extends Payload>... payload) {
+	public PastDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}

@@ -15,34 +15,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
+import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+
 
 /**
  * @author Hardy Ferentschik
  */
-public class EmailDefinition extends ConstraintDefinition<Email> {
-	public EmailDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Email.class, property, elementType, mapping );
+public class PatternDef extends ConstraintDef<Pattern> {
+
+	public PatternDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Pattern.class, property, elementType, mapping );
 	}
 
-	public EmailDefinition message(String message) {
+	public PatternDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public EmailDefinition groups(Class<?>... groups) {
+	public PatternDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public EmailDefinition payload(Class<? extends Payload>... payload) {
+	public PatternDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public PatternDef flags(Pattern.Flag[] flags) {
+		addParameter( "flags", flags );
+		return this;
+	}
+
+	public PatternDef regexp(String regexp) {
+		addParameter( "regexp", regexp );
 		return this;
 	}
 }

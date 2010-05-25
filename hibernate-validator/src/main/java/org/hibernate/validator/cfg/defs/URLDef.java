@@ -1,6 +1,5 @@
 // $Id$
-/*
- * JBoss, Home of Professional Open Source
+/* JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,49 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
 
-import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.URL;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ScriptAssertDefinition extends ConstraintDefinition<ScriptAssert> {
+public class URLDef extends ConstraintDef<URL> {
 
-	public ScriptAssertDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, ScriptAssert.class, property, elementType, mapping );
+	public URLDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, URL.class, property, elementType, mapping );
 	}
 
-	public ScriptAssertDefinition message(String message) {
+	public URLDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public ScriptAssertDefinition groups(Class<?>... groups) {
+	public URLDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public ScriptAssertDefinition payload(Class<? extends Payload>... payload) {
+	public URLDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}
 
-	public ScriptAssertDefinition lang(String lang) {
-		addParameter( "lang", lang );
+	public URLDef protocol(String protocol) {
+		addParameter( "protocol", protocol );
 		return this;
 	}
 
-	public ScriptAssertDefinition script(String script) {
-		addParameter( "script", script );
+	public URLDef host(String host) {
+		addParameter( "host", host );
 		return this;
 	}
 
-	public ScriptAssertDefinition alias(String alias) {
-		addParameter( "alias", alias );
+	public URLDef port(int port) {
+		addParameter( "port", port );
 		return this;
 	}
 }

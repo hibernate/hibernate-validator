@@ -15,33 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.Max;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class PastDefinition extends ConstraintDefinition<Past> {
-	public PastDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Past.class, property, elementType, mapping );
+public class MaxDef extends ConstraintDef<Max> {
+
+	public MaxDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Max.class, property, elementType, mapping );
 	}
 
-	public PastDefinition message(String message) {
+	public MaxDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public PastDefinition groups(Class<?>... groups) {
+	public MaxDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public PastDefinition payload(Class<? extends Payload>... payload) {
+	public MaxDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public MaxDef value(long max) {
+		addParameter( "value", max );
 		return this;
 	}
 }

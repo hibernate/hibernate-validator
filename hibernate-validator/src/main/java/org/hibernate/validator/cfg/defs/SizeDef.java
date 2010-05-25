@@ -1,4 +1,3 @@
-// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -15,44 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+
+// $Id$
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
+import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class RangeDefinition extends ConstraintDefinition<Range> {
+public class SizeDef extends ConstraintDef<Size> {
 
-	public RangeDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Range.class, property, elementType, mapping );
+	public SizeDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Size.class, property, elementType, mapping );
 	}
 
-	public RangeDefinition message(String message) {
+	public SizeDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public RangeDefinition groups(Class<?>... groups) {
+	public SizeDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public RangeDefinition payload(Class<? extends Payload>... payload) {
+	public SizeDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}
 
-	public RangeDefinition min(long min) {
-		addParameter( "value", min );
+	public SizeDef min(int min) {
+		addParameter( "min", min );
 		return this;
 	}
 
-	public RangeDefinition max(long max) {
-		addParameter( "value", max );
+	public SizeDef max(int max) {
+		addParameter( "max", max );
 		return this;
 	}
 }
+
+

@@ -32,14 +32,14 @@ import java.util.Set;
  * @author Hardy Ferentschik
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConstraintDefinition<?>>> constraintConfig;
-	private final Map<Class<?>, List<CascadeDefinition>> cascadeConfig;
+	private final Map<Class<?>, List<ConstraintDef<?>>> constraintConfig;
+	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 
 	public ConstraintMapping() {
-		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDefinition<?>>>();
-		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDefinition>>();
+		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?>>>();
+		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
 		this.configuredClasses = new HashSet<Class<?>>();
 		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
 	}
@@ -48,27 +48,27 @@ public class ConstraintMapping {
 		return new ConstraintsForType( beanClass, this );
 	}
 
-	protected void addConstraintConfig(ConstraintDefinition<?> definition) {
+	protected void addConstraintConfig(ConstraintDef<?> definition) {
 		Class<?> beanClass = definition.getBeanType();
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {
 			constraintConfig.get( beanClass ).add( definition );
 		}
 		else {
-			List<ConstraintDefinition<?>> definitionList = new ArrayList<ConstraintDefinition<?>>();
+			List<ConstraintDef<?>> definitionList = new ArrayList<ConstraintDef<?>>();
 			definitionList.add( definition );
 			constraintConfig.put( beanClass, definitionList );
 		}
 	}
 
-	protected void addCascadeConfig(CascadeDefinition cascade) {
+	protected void addCascadeConfig(CascadeDef cascade) {
 		Class<?> beanClass = cascade.getBeanType();
 		configuredClasses.add( beanClass );
 		if ( cascadeConfig.containsKey( beanClass ) ) {
 			cascadeConfig.get( beanClass ).add( cascade );
 		}
 		else {
-			List<CascadeDefinition> cascadeList = new ArrayList<CascadeDefinition>();
+			List<CascadeDef> cascadeList = new ArrayList<CascadeDef>();
 			cascadeList.add( cascade );
 			cascadeConfig.put( beanClass, cascadeList );
 		}
@@ -78,11 +78,11 @@ public class ConstraintMapping {
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
 	}
 
-	public Map<Class<?>, List<ConstraintDefinition<?>>> getConstraintConfig() {
+	public Map<Class<?>, List<ConstraintDef<?>>> getConstraintConfig() {
 		return constraintConfig;
 	}
 
-	public Map<Class<?>, List<CascadeDefinition>> getCascadeConfig() {
+	public Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
 		return cascadeConfig;
 	}
 

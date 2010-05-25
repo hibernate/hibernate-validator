@@ -15,32 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
+import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NotBlankDefinition extends ConstraintDefinition<NotBlank> {
-	public NotBlankDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, NotBlank.class, property, elementType, mapping );
+public class NotNullDef extends ConstraintDef<NotNull> {
+	public NotNullDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, NotNull.class, property, elementType, mapping );
 	}
 
-	public NotBlankDefinition message(String message) {
+	public NotNullDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public NotBlankDefinition groups(Class<?>... groups) {
+	public NotNullDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public NotBlankDefinition payload(Class<? extends Payload>... payload) {
+	public NotNullDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}

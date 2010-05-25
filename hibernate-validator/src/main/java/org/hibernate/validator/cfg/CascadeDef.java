@@ -25,12 +25,12 @@ import org.hibernate.validator.util.ReflectionHelper;
 /**
  * @author Hardy Ferentschik
  */
-public class CascadeDefinition {
+public class CascadeDef {
 	private final Class<?> beanType;
 	private final ElementType elementType;
 	private final String property;
 
-	public CascadeDefinition(Class<?> beanType, String property, ElementType elementType) {
+	public CascadeDef(Class<?> beanType, String property, ElementType elementType) {
 		if ( beanType == null ) {
 			throw new ValidationException( "Null is not a valid bean type" );
 		}

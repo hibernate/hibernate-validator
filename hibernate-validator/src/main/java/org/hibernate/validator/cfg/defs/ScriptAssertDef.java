@@ -15,33 +15,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NotEmptyDefinition extends ConstraintDefinition<NotEmpty> {
-	public NotEmptyDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, NotEmpty.class, property, elementType, mapping );
+public class ScriptAssertDef extends ConstraintDef<ScriptAssert> {
+
+	public ScriptAssertDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, ScriptAssert.class, property, elementType, mapping );
 	}
 
-	public NotEmptyDefinition message(String message) {
+	public ScriptAssertDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public NotEmptyDefinition groups(Class<?>... groups) {
+	public ScriptAssertDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public NotEmptyDefinition payload(Class<? extends Payload>... payload) {
+	public ScriptAssertDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public ScriptAssertDef lang(String lang) {
+		addParameter( "lang", lang );
+		return this;
+	}
+
+	public ScriptAssertDef script(String script) {
+		addParameter( "script", script );
+		return this;
+	}
+
+	public ScriptAssertDef alias(String alias) {
+		addParameter( "alias", alias );
 		return this;
 	}
 }

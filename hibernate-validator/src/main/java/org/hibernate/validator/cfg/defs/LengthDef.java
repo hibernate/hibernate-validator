@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -15,32 +15,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.Length;
+
 
 /**
  * @author Hardy Ferentschik
  */
-public class NotNullDefinition extends ConstraintDefinition<NotNull> {
-	public NotNullDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, NotNull.class, property, elementType, mapping );
+public class LengthDef extends ConstraintDef<Length> {
+
+	public LengthDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Length.class, property, elementType, mapping );
 	}
 
-	public NotNullDefinition message(String message) {
+	public LengthDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public NotNullDefinition groups(Class<?>... groups) {
+	public LengthDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public NotNullDefinition payload(Class<? extends Payload>... payload) {
+	public LengthDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public LengthDef min(int min) {
+		addParameter( "min", min );
+		return this;
+	}
+
+	public LengthDef max(int max) {
+		addParameter( "max", max );
 		return this;
 	}
 }

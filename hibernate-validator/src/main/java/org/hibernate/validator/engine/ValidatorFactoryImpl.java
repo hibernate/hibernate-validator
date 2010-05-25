@@ -34,8 +34,8 @@ import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
-import org.hibernate.validator.cfg.CascadeDefinition;
-import org.hibernate.validator.cfg.ConstraintDefinition;
+import org.hibernate.validator.cfg.CascadeDef;
+import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
@@ -228,10 +228,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefinition<?>> definitions,
+	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDef<?>> definitions,
 																				Class<T> rootClass, Class<?> hierarchyClass,
 																				Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
-		for ( ConstraintDefinition<?> config : definitions ) {
+		for ( ConstraintDef<?> config : definitions ) {
 			A annotation = ( A ) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
@@ -269,12 +269,12 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
-	private void addProgrammaticConfiguredCascade(List<CascadeDefinition> cascades,
+	private void addProgrammaticConfiguredCascade(List<CascadeDef> cascades,
 												  List<Member> cascadedMembers) {
 		if ( cascades == null ) {
 			return;
 		}
-		for ( CascadeDefinition cascade : cascades ) {
+		for ( CascadeDef cascade : cascades ) {
 			Member m = ReflectionHelper.getMember(
 					cascade.getBeanType(), cascade.getProperty(), cascade.getElementType()
 			);
@@ -299,7 +299,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefinition<?> config) {
+	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDef<?> config) {
 		Class<A> constraintType = ( Class<A> ) config.getConstraintType();
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
 		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {

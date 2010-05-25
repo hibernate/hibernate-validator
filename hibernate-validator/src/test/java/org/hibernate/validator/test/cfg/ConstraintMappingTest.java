@@ -30,12 +30,13 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.AssertTrueDefinition;
+import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.FutureDefinition;
-import org.hibernate.validator.cfg.MinDefinition;
-import org.hibernate.validator.cfg.NotEmptyDefinition;
-import org.hibernate.validator.cfg.NotNullDefinition;
+import org.hibernate.validator.cfg.defs.FutureDef;
+import org.hibernate.validator.cfg.defs.MinDef;
+import org.hibernate.validator.cfg.defs.NotEmptyDef;
+import org.hibernate.validator.cfg.defs.NotNullDef;
+import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.test.util.TestUtil;
 import org.hibernate.validator.util.LoggerFactory;
 
@@ -57,9 +58,9 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDefinition.class )
+					.constraint( NotNullDef.class )
 				.property( "numberOfRunners", FIELD )
-					.constraint( MinDefinition.class ).value( 1 );
+					.constraint( MinDef.class ).value( 1 );
 
 		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
@@ -82,7 +83,7 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDefinition.class );
+					.constraint( NotNullDef.class );
 
 		config.addMapping( mapping );
 
@@ -102,10 +103,10 @@ public class ConstraintMappingTest {
 		mapping
 			.type( Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDefinition.class )
+					.constraint( NotNullDef.class )
 			.type( Tournament.class )
 				.property( "tournamentDate", METHOD )
-					.constraint( FutureDefinition.class );
+					.constraint( FutureDef.class );
 
 		config.addMapping( mapping );
 
@@ -132,7 +133,7 @@ public class ConstraintMappingTest {
 					.valid( "runners", METHOD )
 				.type( Runner.class )
 					.property( "paidEntryFee", FIELD )
-						.constraint( AssertTrueDefinition.class );
+						.constraint( AssertTrueDef.class );
 
 		config.addMapping( mapping );
 
@@ -158,7 +159,7 @@ public class ConstraintMappingTest {
 			mapping
 				.type( Marathon.class )
 					.property( "numberOfRunners", METHOD )
-						.constraint( NotNullDefinition.class );
+						.constraint( NotNullDef.class );
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -175,9 +176,9 @@ public class ConstraintMappingTest {
 			.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDefinition.class ).groups( Foo.class )
+					.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
-					.constraint( NotEmptyDefinition.class );
+					.constraint( NotEmptyDef.class );
 
 		config.addMapping( mapping );
 
@@ -194,6 +195,36 @@ public class ConstraintMappingTest {
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
+	}
+
+		@Test
+	public void testMultipleConstraintOfTheSameType() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.property( "name", METHOD )
+					.constraint( SizeDef.class ).min( 5 )
+					.constraint( SizeDef.class ).min( 10 );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "Foo" );
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 2 );
+
+		marathon.setName( "Foobar" );
+		violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+
+		marathon.setName( "Stockholm Marathon" );
+		violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 0 );
 	}
 
 	public interface Foo {

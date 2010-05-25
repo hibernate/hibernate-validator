@@ -48,7 +48,7 @@ public class ConstraintsForType {
 		this.elementType = type;
 	}
 
-	public <A extends Annotation, T extends ConstraintDefinition<A>> T constraint(Class<T> definition) {
+	public <A extends Annotation, T extends ConstraintDef<A>> T constraint(Class<T> definition) {
 		final Constructor<T> constructor = ReflectionHelper.getConstructor(
 				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
 		);
@@ -65,7 +65,7 @@ public class ConstraintsForType {
 	}
 
 	public ConstraintsForType valid(String property, ElementType type) {
-		mapping.addCascadeConfig( new CascadeDefinition( beanClass, property, type ) );
+		mapping.addCascadeConfig( new CascadeDef( beanClass, property, type ) );
 		return this;
 	}
 

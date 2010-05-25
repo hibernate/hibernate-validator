@@ -1,3 +1,4 @@
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -14,47 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-// $Id:$
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Min;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class SizeDefinition extends ConstraintDefinition<Size> {
+public class MinDef extends ConstraintDef<Min> {
 
-	public SizeDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Size.class, property, elementType, mapping );
+	public MinDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Min.class, property, elementType, mapping );
 	}
 
-	public SizeDefinition message(String message) {
+	public MinDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public SizeDefinition groups(Class<?>... groups) {
+	public MinDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public SizeDefinition payload(Class<? extends Payload>... payload) {
+	public MinDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}
 
-	public SizeDefinition min(int min) {
-		addParameter( "min", min );
-		return this;
-	}
-
-	public SizeDefinition max(int max) {
-		addParameter( "max", max );
+	public MinDef value(long min) {
+		addParameter( "value", min );
 		return this;
 	}
 }
-
-

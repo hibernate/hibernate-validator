@@ -29,7 +29,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 /**
  * @author Hardy Ferentschik
  */
-public class ConstraintDefinition<A extends Annotation> {
+public class ConstraintDef<A extends Annotation> {
 	private final Class<A> constraintType;
 	private final Map<String, Object> parameters;
 	private final Class<?> beanType;
@@ -37,7 +37,7 @@ public class ConstraintDefinition<A extends Annotation> {
 	private final String property;
 	private final ConstraintMapping mapping;
 
-	public ConstraintDefinition(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
+	public ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
 		if ( beanType == null ) {
 			throw new ValidationException( "Null is not a valid bean type" );
 		}
@@ -71,12 +71,12 @@ public class ConstraintDefinition<A extends Annotation> {
 		this.mapping = mapping;
 	}
 
-	protected ConstraintDefinition addParameter(String key, Object value) {
+	protected ConstraintDef addParameter(String key, Object value) {
 		parameters.put( key, value );
 		return this;
 	}
 
-	public <A extends Annotation, T extends ConstraintDefinition<A>> T constraint(Class<T> definition) {
+	public <A extends Annotation, T extends ConstraintDef<A>> T constraint(Class<T> definition) {
 
 		final Constructor<T> constructor = ReflectionHelper.getConstructor(
 				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
@@ -99,7 +99,7 @@ public class ConstraintDefinition<A extends Annotation> {
 	}
 
 	public ConstraintsForType valid(String property, ElementType type) {
-		mapping.addCascadeConfig( new CascadeDefinition( beanType, property, type ) );
+		mapping.addCascadeConfig( new CascadeDef( beanType, property, type ) );
 		return new ConstraintsForType( beanType, mapping );
 	}
 

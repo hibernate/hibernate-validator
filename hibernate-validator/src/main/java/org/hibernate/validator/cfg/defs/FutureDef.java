@@ -15,44 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Digits;
+import javax.validation.constraints.Future;
 
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DigitsDefinition extends ConstraintDefinition<Digits> {
-
-	public DigitsDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Digits.class, property, elementType, mapping );
+public class FutureDef extends ConstraintDef<Future> {
+	public FutureDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Future.class, property, elementType, mapping );
 	}
 
-	public DigitsDefinition message(String message) {
+	public FutureDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public DigitsDefinition groups(Class<?>... groups) {
+	public FutureDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public DigitsDefinition payload(Class<? extends Payload>... payload) {
+	public FutureDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return this;
-	}
-
-	public DigitsDefinition integer(int integer) {
-		addParameter( "integer", integer );
-		return this;
-	}
-
-	public DigitsDefinition fraction(int fraction) {
-		addParameter( "fraction", fraction );
 		return this;
 	}
 }

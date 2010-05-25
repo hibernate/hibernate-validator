@@ -15,37 +15,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Max;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * @author Hardy Ferentschik
  */
-public class MaxDefinition extends ConstraintDefinition<Max> {
+public class RangeDef extends ConstraintDef<Range> {
 
-	public MaxDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Max.class, property, elementType, mapping );
+	public RangeDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Range.class, property, elementType, mapping );
 	}
 
-	public MaxDefinition message(String message) {
+	public RangeDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public MaxDefinition groups(Class<?>... groups) {
+	public RangeDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public MaxDefinition payload(Class<? extends Payload>... payload) {
+	public RangeDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}
 
-	public MaxDefinition value(long max) {
+	public RangeDef min(long min) {
+		addParameter( "value", min );
+		return this;
+	}
+
+	public RangeDef max(long max) {
 		addParameter( "value", max );
 		return this;
 	}

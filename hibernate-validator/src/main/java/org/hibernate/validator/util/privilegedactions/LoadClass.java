@@ -43,14 +43,17 @@ public class LoadClass implements PrivilegedAction<Class<?>> {
 				return contextClassLoader.loadClass( className );
 			}
 		}
-		catch ( Throwable e ) {
+		catch ( ClassNotFoundException e ) {
+			// ignore - try using the classloader of the caller first
+		}
+		catch ( RuntimeException e ) {
 			// ignore
 		}
 		try {
 			return Class.forName( className, true, caller.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new ValidationException("Unable to load class: " + className, e);
+			throw new ValidationException( "Unable to load class: " + className, e );
 		}
 	}
 }

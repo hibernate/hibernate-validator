@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -15,38 +15,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Digits;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+
 
 /**
  * @author Hardy Ferentschik
  */
-public class MinDefinition extends ConstraintDefinition<Min> {
+public class DigitsDef extends ConstraintDef<Digits> {
 
-	public MinDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Min.class, property, elementType, mapping );
+	public DigitsDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Digits.class, property, elementType, mapping );
 	}
 
-	public MinDefinition message(String message) {
+	public DigitsDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public MinDefinition groups(Class<?>... groups) {
+	public DigitsDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public MinDefinition payload(Class<? extends Payload>... payload) {
+	public DigitsDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}
 
-	public MinDefinition value(long min) {
-		addParameter( "value", min );
+	public DigitsDef integer(int integer) {
+		addParameter( "integer", integer );
+		return this;
+	}
+
+	public DigitsDef fraction(int fraction) {
+		addParameter( "fraction", fraction );
 		return this;
 	}
 }

@@ -15,32 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class AssertTrueDefinition extends ConstraintDefinition<AssertTrue> {
-	public AssertTrueDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertTrue.class, property, elementType, mapping );
+public class NullDef extends ConstraintDef<Null> {
+	public NullDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, Null.class, property, elementType, mapping );
 	}
 
-	public AssertTrueDefinition message(String message) {
+	public NullDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public AssertTrueDefinition groups(Class<?>... groups) {
+	public NullDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public AssertTrueDefinition payload(Class<? extends Payload>... payload) {
+	public NullDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}

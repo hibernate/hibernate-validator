@@ -1,5 +1,6 @@
 // $Id$
-/* JBoss, Home of Professional Open Source
+/*
+ * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,49 +15,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
+import javax.validation.constraints.DecimalMax;
 
-import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class URLDefinition extends ConstraintDefinition<URL> {
+public class DecimalMaxDef extends ConstraintDef<DecimalMax> {
 
-	public URLDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, URL.class, property, elementType, mapping );
+	public DecimalMaxDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, DecimalMax.class, property, elementType, mapping );
 	}
 
-	public URLDefinition message(String message) {
+	public DecimalMaxDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public URLDefinition groups(Class<?>... groups) {
+	public DecimalMaxDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public URLDefinition payload(Class<? extends Payload>... payload) {
+	public DecimalMaxDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}
 
-	public URLDefinition protocol(String protocol) {
-		addParameter( "protocol", protocol );
-		return this;
-	}
-
-	public URLDefinition host(String host) {
-		addParameter( "host", host );
-		return this;
-	}
-
-	public URLDefinition port(int port) {
-		addParameter( "port", port );
+	public DecimalMaxDef value(String max) {
+		addParameter( "value", max );
 		return this;
 	}
 }

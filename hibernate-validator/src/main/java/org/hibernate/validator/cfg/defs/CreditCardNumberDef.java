@@ -16,38 +16,35 @@
  * limitations under the License.
  */
 
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.DecimalMax;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.CreditCardNumber;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DecimalMaxDefinition extends ConstraintDefinition<DecimalMax> {
-
-	public DecimalMaxDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, DecimalMax.class, property, elementType, mapping );
+public class CreditCardNumberDef extends ConstraintDef<CreditCardNumber> {
+	public CreditCardNumberDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, CreditCardNumber.class, property, elementType, mapping );
 	}
 
-	public DecimalMaxDefinition message(String message) {
+	public CreditCardNumberDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public DecimalMaxDefinition groups(Class<?>... groups) {
+	public CreditCardNumberDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public DecimalMaxDefinition payload(Class<? extends Payload>... payload) {
+	public CreditCardNumberDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return this;
-	}
-
-	public DecimalMaxDefinition value(String max) {
-		addParameter( "value", max );
 		return this;
 	}
 }

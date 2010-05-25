@@ -15,46 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
+import javax.validation.constraints.AssertTrue;
 
-import org.hibernate.validator.constraints.Length;
-
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class LengthDefinition extends ConstraintDefinition<Length> {
-
-	public LengthDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Length.class, property, elementType, mapping );
+public class AssertTrueDef extends ConstraintDef<AssertTrue> {
+	public AssertTrueDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, AssertTrue.class, property, elementType, mapping );
 	}
 
-	public LengthDefinition message(String message) {
+	public AssertTrueDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public LengthDefinition groups(Class<?>... groups) {
+	public AssertTrueDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public LengthDefinition payload(Class<? extends Payload>... payload) {
+	public AssertTrueDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return this;
-	}
-
-	public LengthDefinition min(int min) {
-		addParameter( "min", min );
-		return this;
-	}
-
-	public LengthDefinition max(int max) {
-		addParameter( "max", max );
 		return this;
 	}
 }

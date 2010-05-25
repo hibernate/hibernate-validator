@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -15,44 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * @author Hardy Ferentschik
  */
-public class PatternDefinition extends ConstraintDefinition<Pattern> {
-
-	public PatternDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Pattern.class, property, elementType, mapping );
+public class NotBlankDef extends ConstraintDef<NotBlank> {
+	public NotBlankDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, NotBlank.class, property, elementType, mapping );
 	}
 
-	public PatternDefinition message(String message) {
+	public NotBlankDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public PatternDefinition groups(Class<?>... groups) {
+	public NotBlankDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public PatternDefinition payload(Class<? extends Payload>... payload) {
+	public NotBlankDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return this;
-	}
-
-	public PatternDefinition flags(Pattern.Flag[] flags) {
-		addParameter( "flags", flags );
-		return this;
-	}
-
-	public PatternDefinition regexp(String regexp) {
-		addParameter( "regexp", regexp );
 		return this;
 	}
 }

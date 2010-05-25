@@ -15,32 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.DecimalMin;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NullDefinition extends ConstraintDefinition<Null> {
-	public NullDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Null.class, property, elementType, mapping );
+public class DecimalMinDef extends ConstraintDef<DecimalMin> {
+
+	public DecimalMinDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, DecimalMin.class, property, elementType, mapping );
 	}
 
-	public NullDefinition message(String message) {
+	public DecimalMinDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public NullDefinition groups(Class<?>... groups) {
+	public DecimalMinDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public NullDefinition payload(Class<? extends Payload>... payload) {
+	public DecimalMinDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return this;
+	}
+
+	public DecimalMinDef value(String min) {
+		addParameter( "value", min );
 		return this;
 	}
 }

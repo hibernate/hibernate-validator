@@ -15,31 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
 import javax.validation.Payload;
-import javax.validation.constraints.Future;
+import javax.validation.constraints.AssertFalse;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
-public class FutureDefinition extends ConstraintDefinition<Future> {
-	public FutureDefinition(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Future.class, property, elementType, mapping );
+public class AssertFalseDef extends ConstraintDef<AssertFalse> {
+	public AssertFalseDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
+		super( beanType, AssertFalse.class, property, elementType, mapping );
 	}
 
-	public FutureDefinition message(String message) {
+	public AssertFalseDef message(String message) {
 		addParameter( "message", message );
 		return this;
 	}
 
-	public FutureDefinition groups(Class<?>... groups) {
+	public AssertFalseDef groups(Class<?>... groups) {
 		addParameter( "groups", groups );
 		return this;
 	}
 
-	public FutureDefinition payload(Class<? extends Payload>... payload) {
+	public AssertFalseDef payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return this;
 	}
