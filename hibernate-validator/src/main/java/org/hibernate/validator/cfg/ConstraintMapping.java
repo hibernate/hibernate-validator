@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Top level class for programmatically configured constraints.
+ * Top level class for constraints configured via the programmatic API.
  *
  * @author Hardy Ferentschik
  */
@@ -51,6 +51,7 @@ public class ConstraintMapping {
 
 	protected <A extends Annotation> void addConstraintConfig(ConstraintDef<?> definition) {
 		Class<?> beanClass = definition.beanType;
+		@SuppressWarnings( "unchecked")
 		ConstraintDefAccessor<A> defAccessor = new ConstraintDefAccessor<A>(
 				beanClass,
 				( Class<A> ) definition.constraintType,

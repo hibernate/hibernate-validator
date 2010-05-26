@@ -30,7 +30,7 @@ import javax.validation.groups.Default;
  *
  * @author Hardy Ferentschik
  */
-public class GroupChain {
+public final class GroupChain {
 
 	/**
 	 * The list of single groups to be used this validation.
@@ -78,11 +78,11 @@ public class GroupChain {
 	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) {
 		for ( Map.Entry<Class<?>, List<Group>> entry : sequenceMap.entrySet() ) {
 			Class<?> sequence = entry.getKey();
-			List<Group> groupList = entry.getValue();
+			List<Group> groups = entry.getValue();
 			List<Group> defaultGroupList = buildTempGroupList( defaultGroupSequence, sequence );
-			int defaultGroupIndex = containsDefaultGroupAtIndex( sequence, groupList );
+			int defaultGroupIndex = containsDefaultGroupAtIndex( sequence, groups );
 			if ( defaultGroupIndex != -1 ) {
-				ensureDefaultGroupSequenceIsExpandable( groupList, defaultGroupList, defaultGroupIndex );
+				ensureDefaultGroupSequenceIsExpandable( groups, defaultGroupList, defaultGroupIndex );
 			}
 		}
 	}
@@ -113,11 +113,11 @@ public class GroupChain {
 	}
 
 	private List<Group> buildTempGroupList(List<Class<?>> defaultGroupSequence, Class<?> sequence) {
-		List<Group> groupList = new ArrayList<Group>();
+		List<Group> groups = new ArrayList<Group>();
 		for ( Class<?> clazz : defaultGroupSequence ) {
 			Group g = new Group( clazz, sequence );
-			groupList.add( g );
+			groups.add( g );
 		}
-		return groupList;
+		return groups;
 	}
 }

@@ -94,7 +94,7 @@ public class SingleThreadCachedTraversableResolver implements TraversableResolve
 		return cachedLH.isCascadable;
 	}
 
-	private static class TraversableHolder {
+	private static final class TraversableHolder {
 		private final Object traversableObject;
 		private final Path.Node traversableProperty;
 		private final Class<?> rootBeanType;

@@ -99,10 +99,15 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		defaultLocale = Locale.getDefault();
 
 		if ( userResourceBundleLocator == null ) {
-			userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES );
+			this.userResourceBundleLocator = new CachingResourceBundleLocator(
+					new PlatformResourceBundleLocator(
+							USER_VALIDATION_MESSAGES
+					)
+			);
 		}
-
-		this.userResourceBundleLocator = new CachingResourceBundleLocator( userResourceBundleLocator );
+		else {
+			this.userResourceBundleLocator = new CachingResourceBundleLocator( userResourceBundleLocator );
+		}
 
 		this.defaultResourceBundleLocator =
 				new CachingResourceBundleLocator(
