@@ -27,9 +27,11 @@ import org.hibernate.validator.util.ReflectionHelper;
 import static java.lang.annotation.ElementType.TYPE;
 
 /**
+ * Via instances of this class constraints and cascading properties can be configured for a single bean class.
+ *
  * @author Hardy Ferentschik
  */
-public class ConstraintsForType {
+public final class ConstraintsForType {
 	private static final String EMPTY_PROPERTY = "";
 
 	private final ConstraintMapping mapping;
@@ -48,6 +50,13 @@ public class ConstraintsForType {
 		this.elementType = type;
 	}
 
+	/**
+	 * Add a new constraint.
+	 *
+	 * @param definition The constraint definition class
+	 *
+	 * @return A constraint definition class allowing to specify additional constraint parameters.
+	 */
 	public <A extends Annotation, T extends ConstraintDef<A>> T constraint(Class<T> definition) {
 		final Constructor<T> constructor = ReflectionHelper.getConstructor(
 				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
@@ -60,6 +69,15 @@ public class ConstraintsForType {
 		return constraintDefinition;
 	}
 
+	/**
+	 * Changes the property for which added constraints apply. Until this method is called constraints apply on
+	 * class level. After calling this method constraints apply on the specified property with the given access type.
+	 *
+	 * @param property The property on which to apply the following constraints (Java Bean notation)
+	 * @param type The access type (field/property)
+	 *
+	 * @return Returns itself for method chaining
+	 */
 	public ConstraintsForType property(String property, ElementType type) {
 		return new ConstraintsForType( beanClass, property, type, mapping );
 	}
@@ -69,13 +87,26 @@ public class ConstraintsForType {
 		return this;
 	}
 
+	/**
+	 * Defines the default groups sequence for the bean class of this instance.
+	 *
+	 * @param defaultGroupSequence the default group sequence.
+	 *
+	 * @return Returns itself for method chaining.
+	 */
 	public ConstraintsForType defaultGroupSequence(Class<?>... defaultGroupSequence) {
 		mapping.addDefaultGroupSequence( beanClass, Arrays.asList( defaultGroupSequence ) );
 		return this;
 	}
 
-	public ConstraintsForType type(Class<?> type, Class<?>... defaultGroupSequence) {
-		mapping.addDefaultGroupSequence( type, Arrays.asList( defaultGroupSequence ) );
+	/**
+	 * Creates a new {@code ConstraintsForType} in order to define constraints on a new bean type.
+	 *
+	 * @param type the bean type
+	 *
+	 * @return a new {@code ConstraintsForType} instance
+	 */
+	public ConstraintsForType type(Class<?> type) {
 		return new ConstraintsForType( type, mapping );
 	}
 }

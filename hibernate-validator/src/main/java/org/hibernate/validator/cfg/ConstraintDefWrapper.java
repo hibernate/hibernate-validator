@@ -15,52 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.cfg;
+package org.hibernate.validator.cfg;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.util.Map;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Marathon implements Tournament {
+public class ConstraintDefWrapper<A extends Annotation> extends ConstraintDef<A> {
 
-	private String name;
-
-	private long numberOfHelpers;
-
-	private Date tournamentDate;
-
-	private List<Runner> runners;
-
-	public Marathon() {
-		runners = new ArrayList<Runner>();
+	public ConstraintDefWrapper(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
+		super( beanType, constraintType, property, elementType, parameters, mapping );
 	}
 
-	public String getName() {
-		return name;
+	public Class<A> getConstraintType() {
+		return constraintType;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public Map<String, Object> getParameters() {
+		return this.parameters;
 	}
 
-	public Date getTournamentDate() {
-		return tournamentDate;
+	public ElementType getElementType() {
+		return elementType;
 	}
 
-	public void setTournamentDate(Date tournamentDate) {
-		this.tournamentDate = tournamentDate;
+	public Class<?> getBeanType() {
+		return beanType;
 	}
 
-	public List<Runner> getRunners() {
-		return runners;
-	}
-
-	public void addRunner(Runner runner) {
-		runners.add( runner );
+	public String getProperty() {
+		return property;
 	}
 }
-
-

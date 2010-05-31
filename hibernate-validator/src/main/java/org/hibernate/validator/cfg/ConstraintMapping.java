@@ -33,75 +33,62 @@ import java.util.Set;
  * @author Hardy Ferentschik
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConstraintDefAccessor<?>>> constraintConfig;
+	private final Map<Class<?>, List<ConstraintDef<?>>> constraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 
 	public ConstraintMapping() {
-		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDefAccessor<?>>>();
+		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?>>>();
 		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
 		this.configuredClasses = new HashSet<Class<?>>();
 		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
 	}
 
-	public ConstraintsForType type(Class<?> beanClass) {
+	/**
+	 * Starts defining constraints on the specified bean class.
+	 *
+	 * @param beanClass The bean class on which to define constraints. All constraints defined after calling this method
+	 * are added to the bean of the type {@code beanClass} until the next call of {@code type}.
+	 *
+	 * @return Instance allowing for defining constraints on the specified class.
+	 */
+	public final ConstraintsForType type(Class<?> beanClass) {
 		return new ConstraintsForType( beanClass, this );
 	}
 
-	protected <A extends Annotation> void addConstraintConfig(ConstraintDef<?> definition) {
-		Class<?> beanClass = definition.beanType;
-		@SuppressWarnings( "unchecked")
-		ConstraintDefAccessor<A> defAccessor = new ConstraintDefAccessor<A>(
-				beanClass,
-				( Class<A> ) definition.constraintType,
-				definition.property,
-				definition.elementType,
-				definition.parameters,
-				this
-		);
+	public final <A extends Annotation> Map<Class<?>, List<ConstraintDefWrapper<?>>> getConstraintConfig() {
+		Map<Class<?>, List<ConstraintDefWrapper<?>>> newDefinitions = new HashMap<Class<?>, List<ConstraintDefWrapper<?>>>();
+		for ( Map.Entry<Class<?>, List<ConstraintDef<?>>> entry : constraintConfig.entrySet() ) {
 
-		configuredClasses.add( beanClass );
-		if ( constraintConfig.containsKey( beanClass ) ) {
-			constraintConfig.get( beanClass ).add( defAccessor );
+			List<ConstraintDefWrapper<?>> newList = new ArrayList<ConstraintDefWrapper<?>>();
+			for ( ConstraintDef<?> definition : entry.getValue() ) {
+				Class<?> beanClass = definition.beanType;
+				@SuppressWarnings("unchecked")
+				ConstraintDefWrapper<A> defAccessor = new ConstraintDefWrapper<A>(
+						beanClass,
+						( Class<A> ) definition.constraintType,
+						definition.property,
+						definition.elementType,
+						definition.parameters,
+						this
+				);
+				newList.add( defAccessor );
+			}
+			newDefinitions.put( entry.getKey(), newList );
 		}
-		else {
-			List<ConstraintDefAccessor<?>> definitionList = new ArrayList<ConstraintDefAccessor<?>>();
-			definitionList.add( defAccessor );
-			constraintConfig.put( beanClass, definitionList );
-		}
+		return newDefinitions;
 	}
 
-	protected void addCascadeConfig(CascadeDef cascade) {
-		Class<?> beanClass = cascade.getBeanType();
-		configuredClasses.add( beanClass );
-		if ( cascadeConfig.containsKey( beanClass ) ) {
-			cascadeConfig.get( beanClass ).add( cascade );
-		}
-		else {
-			List<CascadeDef> cascadeList = new ArrayList<CascadeDef>();
-			cascadeList.add( cascade );
-			cascadeConfig.put( beanClass, cascadeList );
-		}
-	}
-
-	protected void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
-		defaultGroupSequences.put( beanClass, defaultGroupSequence );
-	}
-
-	public Map<Class<?>, List<ConstraintDefAccessor<?>>> getConstraintConfig() {
-		return constraintConfig;
-	}
-
-	public Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
+	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
 		return cascadeConfig;
 	}
 
-	public Collection<Class<?>> getConfiguredClasses() {
+	public final Collection<Class<?>> getConfiguredClasses() {
 		return configuredClasses;
 	}
 
-	public List<Class<?>> getDefaultSequence(Class<?> beanType) {
+	public final List<Class<?>> getDefaultSequence(Class<?> beanType) {
 		if ( defaultGroupSequences.containsKey( beanType ) ) {
 			return defaultGroupSequences.get( beanType );
 		}
@@ -120,6 +107,36 @@ public class ConstraintMapping {
 		sb.append( ", defaultGroupSequences=" ).append( defaultGroupSequences );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	protected final void addCascadeConfig(CascadeDef cascade) {
+		Class<?> beanClass = cascade.getBeanType();
+		configuredClasses.add( beanClass );
+		if ( cascadeConfig.containsKey( beanClass ) ) {
+			cascadeConfig.get( beanClass ).add( cascade );
+		}
+		else {
+			List<CascadeDef> cascadeList = new ArrayList<CascadeDef>();
+			cascadeList.add( cascade );
+			cascadeConfig.put( beanClass, cascadeList );
+		}
+	}
+
+	protected final void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
+		defaultGroupSequences.put( beanClass, defaultGroupSequence );
+	}
+
+	protected final void addConstraintConfig(ConstraintDef<?> definition) {
+		Class<?> beanClass = definition.beanType;
+		configuredClasses.add( beanClass );
+		if ( constraintConfig.containsKey( beanClass ) ) {
+			constraintConfig.get( beanClass ).add( definition );
+		}
+		else {
+			List<ConstraintDef<?>> definitionList = new ArrayList<ConstraintDef<?>>();
+			definitionList.add( definition );
+			constraintConfig.put( beanClass, definitionList );
+		}
 	}
 }
 

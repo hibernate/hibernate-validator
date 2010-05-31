@@ -35,7 +35,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.cfg.CascadeDef;
-import org.hibernate.validator.cfg.ConstraintDefAccessor;
+import org.hibernate.validator.cfg.ConstraintDefWrapper;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
@@ -228,19 +228,22 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefAccessor<?>> definitions,
+	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefWrapper<?>> definitions,
 																				Class<T> rootClass, Class<?> hierarchyClass,
 																				Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
-		for ( ConstraintDefAccessor<?> config : definitions ) {
+		for ( ConstraintDefWrapper<?> config : definitions ) {
 			A annotation = ( A ) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 					annotation, constraintHelper, config.getElementType(), definedIn
 			);
 
-			Member member = ReflectionHelper.getMember(
-					config.getBeanType(), config.getProperty(), config.getElementType()
-			);
+			Member member = null;
+			if ( !config.getProperty().isEmpty() ) {
+				member = ReflectionHelper.getMember(
+						config.getBeanType(), config.getProperty(), config.getElementType()
+				);
+			}
 
 			MetaConstraint<T, ?> metaConstraint = new MetaConstraint(
 					config.getBeanType(), member, constraintDescriptor
@@ -299,7 +302,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefAccessor<?> config) {
+	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefWrapper<?> config) {
 		Class<A> constraintType = ( Class<A> ) config.getConstraintType();
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
 		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {

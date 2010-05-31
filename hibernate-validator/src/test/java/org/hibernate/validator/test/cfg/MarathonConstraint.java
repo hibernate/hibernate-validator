@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -17,50 +17,28 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Marathon implements Tournament {
+@Target({ TYPE })
+@Retention(RUNTIME)
+@Constraint(validatedBy = { MarathonConstraintValidator.class })
+public @interface MarathonConstraint {
+	public String message() default "invalid name";
 
-	private String name;
+	public Class<?>[] groups() default { };
 
-	private long numberOfHelpers;
+	public Class<? extends Payload>[] payload() default { };
 
-	private Date tournamentDate;
-
-	private List<Runner> runners;
-
-	public Marathon() {
-		runners = new ArrayList<Runner>();
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Date getTournamentDate() {
-		return tournamentDate;
-	}
-
-	public void setTournamentDate(Date tournamentDate) {
-		this.tournamentDate = tournamentDate;
-	}
-
-	public List<Runner> getRunners() {
-		return runners;
-	}
-
-	public void addRunner(Runner runner) {
-		runners.add( runner );
-	}
+	public int minRunner();
 }
 
 

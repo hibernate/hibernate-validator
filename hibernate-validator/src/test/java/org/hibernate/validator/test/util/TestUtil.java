@@ -29,8 +29,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.spi.ValidationProvider;
 
@@ -162,16 +160,6 @@ public class TestUtil {
 		}
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath, Class leafBean) {
-		assertEquals(
-
-				violation.getLeafBean().getClass(),
-				leafBean,
-				"Wrong leaf bean type"
-		);
-		assertConstraintViolation( violation, errorMessage, rootBean, invalidValue, propertyPath );
-	}
-
 	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath) {
 		assertEquals(
 				violation.getPropertyPath(),
@@ -269,20 +257,6 @@ public class TestUtil {
 				finalPath = customValidationXmlPath;
 			}
 			return super.getResourceAsStream( finalPath );
-		}
-	}
-
-	private static class IgnoringValidationXmlClassLoader extends ClassLoader {
-		IgnoringValidationXmlClassLoader() {
-			super( IgnoringValidationXmlClassLoader.class.getClassLoader() );
-		}
-
-		public InputStream getResourceAsStream(String path) {
-			if ( "META-INF/validation.xml".equals( path ) ) {
-				log.info( "Ignoring call to load validation.xml" );
-				return null;
-			}
-			return super.getResourceAsStream( path );
 		}
 	}
 }

@@ -30,7 +30,7 @@ import org.hibernate.validator.util.ReflectionHelper;
  * @author Hardy Ferentschik
  */
 public class ConstraintDef<A extends Annotation> {
-	protected final Class<A> constraintType;
+	protected Class<A> constraintType;
 	protected final Map<String, Object> parameters;
 	protected final Class<?> beanType;
 	protected final ElementType elementType;
@@ -44,10 +44,6 @@ public class ConstraintDef<A extends Annotation> {
 	protected ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
 		if ( beanType == null ) {
 			throw new ValidationException( "Null is not a valid bean type" );
-		}
-
-		if ( constraintType == null ) {
-			throw new ValidationException( "Null is not a valid constraint type" );
 		}
 
 		if ( mapping == null ) {

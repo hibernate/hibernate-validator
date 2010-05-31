@@ -30,9 +30,10 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.defs.FutureDef;
+import org.hibernate.validator.cfg.defs.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotEmptyDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
@@ -43,6 +44,7 @@ import org.hibernate.validator.util.LoggerFactory;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.testng.Assert.assertTrue;
 import static org.testng.FileAssert.fail;
@@ -58,9 +60,9 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDef.class )
-				.property( "numberOfRunners", FIELD )
-					.constraint( MinDef.class ).value( 1 );
+				.constraint( NotNullDef.class )
+				.property( "numberOfHelpers", FIELD )
+				.constraint( MinDef.class ).value( 1 );
 
 		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
@@ -83,7 +85,7 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDef.class );
+				.constraint( NotNullDef.class );
 
 		config.addMapping( mapping );
 
@@ -101,12 +103,12 @@ public class ConstraintMappingTest {
 
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
-			.type( Marathon.class )
+				.type( Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDef.class )
-			.type( Tournament.class )
+				.constraint( NotNullDef.class )
+				.type( Tournament.class )
 				.property( "tournamentDate", METHOD )
-					.constraint( FutureDef.class );
+				.constraint( FutureDef.class );
 
 		config.addMapping( mapping );
 
@@ -130,10 +132,10 @@ public class ConstraintMappingTest {
 
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
-					.valid( "runners", METHOD )
+				.valid( "runners", METHOD )
 				.type( Runner.class )
-					.property( "paidEntryFee", FIELD )
-						.constraint( AssertTrueDef.class );
+				.property( "paidEntryFee", FIELD )
+				.constraint( AssertTrueDef.class );
 
 		config.addMapping( mapping );
 
@@ -157,9 +159,9 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		try {
 			mapping
-				.type( Marathon.class )
-					.property( "numberOfRunners", METHOD )
-						.constraint( NotNullDef.class );
+					.type( Marathon.class )
+					.property( "numberOfHelpers", METHOD )
+					.constraint( NotNullDef.class );
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -173,12 +175,12 @@ public class ConstraintMappingTest {
 
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
-			.type( Marathon.class )
+				.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
 				.property( "name", METHOD )
-					.constraint( NotNullDef.class ).groups( Foo.class )
+				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
-					.constraint( NotEmptyDef.class );
+				.constraint( NotEmptyDef.class );
 
 		config.addMapping( mapping );
 
@@ -197,15 +199,15 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
 	}
 
-		@Test
+	@Test
 	public void testMultipleConstraintOfTheSameType() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-					.constraint( SizeDef.class ).min( 5 )
-					.constraint( SizeDef.class ).min( 10 );
+				.constraint( SizeDef.class ).min( 5 )
+				.constraint( SizeDef.class ).min( 10 );
 
 		config.addMapping( mapping );
 
@@ -225,6 +227,65 @@ public class ConstraintMappingTest {
 		marathon.setName( "Stockholm Marathon" );
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 0 );
+	}
+
+	@Test
+	public void testCustomConstraintTypeMissingParameter() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.constraint( GenericConstraintDef.class )
+				.constraintType( MarathonConstraint.class );
+
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+		config.addMapping( mapping );
+		try {
+			config.buildValidatorFactory();
+			fail( "MarathonConstraints needs a parameter" );
+		}
+		catch ( ValidationException e ) {
+			assertTrue( e.getMessage().contains( "No value provided for minRunner" ) );
+		}
+	}
+
+	@Test
+	public void testCustomConstraintType() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.constraint( GenericConstraintDef.class )
+				.constraintType( MarathonConstraint.class )
+				.param( "minRunner", 100 )
+				.message( "Needs more runners" );
+
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "Stockholm Marathon" );
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "Needs more runners" );
+
+		for ( int i = 0; i < 100; i++ ) {
+			marathon.addRunner( new Runner() );
+		}
+		violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 0 );
+	}
+
+	@Test(expectedExceptions = ValidationException.class)
+	public void testNullBean() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( null )
+				.constraint( GenericConstraintDef.class )
+				.constraintType( MarathonConstraint.class );
+
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+		config.addMapping( mapping );
+		config.buildValidatorFactory();
 	}
 
 	public interface Foo {

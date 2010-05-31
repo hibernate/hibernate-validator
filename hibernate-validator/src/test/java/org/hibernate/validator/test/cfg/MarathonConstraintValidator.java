@@ -1,4 +1,4 @@
-// $Id$
+// $Id:$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -15,38 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.test.cfg;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.util.Map;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
 
 /**
  * @author Hardy Ferentschik
  */
-public class ConstraintDefAccessor<A extends Annotation> extends ConstraintDef<A> {
+public class MarathonConstraintValidator implements ConstraintValidator<MarathonConstraint, Marathon> {
+	private int minRunners;
 
-	public ConstraintDefAccessor(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
-		super( beanType, constraintType, property, elementType, parameters, mapping );
+	public void initialize(MarathonConstraint constraintAnnotation) {
+		minRunners = constraintAnnotation.minRunner();
 	}
 
-	public Class<A> getConstraintType() {
-		return constraintType;
-	}
-
-	public Map<String, Object> getParameters() {
-		return this.parameters;
-	}
-
-	public ElementType getElementType() {
-		return elementType;
-	}
-
-	public Class<?> getBeanType() {
-		return beanType;
-	}
-
-	public String getProperty() {
-		return property;
+	public boolean isValid(Marathon m, ConstraintValidatorContext context) {
+		return m.getRunners().size() >= minRunners;
 	}
 }
+
+
