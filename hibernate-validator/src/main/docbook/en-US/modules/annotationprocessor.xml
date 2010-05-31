@@ -21,8 +21,8 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter>
-  <title id="chapter-annotation-processor">Hibernate Validator Annotation
+<section>
+  <title id="annotation-processor">Hibernate Validator Annotation
   Processor (EXPERIMENTAL)</title>
 
   <para>Have you ever caught yourself by unintentionally doing things
@@ -482,4 +482,4 @@
       </listitem>
     </itemizedlist>
   </section>
-</chapter>
+</section>
