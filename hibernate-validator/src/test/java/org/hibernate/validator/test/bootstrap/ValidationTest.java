@@ -27,17 +27,18 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.impl.NotNullValidator;
 import org.hibernate.validator.engine.ConfigurationImpl;
 import org.hibernate.validator.engine.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.ValidatorFactoryImpl;
-import org.hibernate.validator.HibernateValidator;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests the Bean Validation bootstrapping.
@@ -94,6 +95,16 @@ public class ValidationTest {
 		validator = factory.getValidator();
 		constraintViolations = validator.validate( customer );
 		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
+	}
+
+	/**
+	 * HV-328
+	 */
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullInputStream() {
+		Configuration<?> configuration = Validation.byDefaultProvider().configure();
+		configuration.addMapping( null );
+		configuration.buildValidatorFactory();
 	}
 
 	private void assertDefaultBuilderAndFactory(Configuration configuration) {

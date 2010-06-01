@@ -116,6 +116,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public HibernateValidatorConfiguration addMapping(InputStream stream) {
+		if ( mapping == null ) {
+			throw new IllegalArgumentException( "The stream cannot be null." );
+		}
 		validationBootstrapParameters.mappings.add( stream );
 		return this;
 	}
