@@ -34,17 +34,17 @@ public class DecimalMinDef extends ConstraintDef<DecimalMin> {
 	}
 
 	public DecimalMinDef message(String message) {
-		addParameter( "message", message );
+		super.message( message );
 		return this;
 	}
 
 	public DecimalMinDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
+		super.groups( groups );
 		return this;
 	}
 
 	public DecimalMinDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
+		super.payload( payload );
 		return this;
 	}
 

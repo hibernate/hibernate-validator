@@ -34,17 +34,17 @@ public class RangeDef extends ConstraintDef<Range> {
 	}
 
 	public RangeDef message(String message) {
-		addParameter( "message", message );
+		super.message( message );
 		return this;
 	}
 
 	public RangeDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
+		super.groups( groups );
 		return this;
 	}
 
 	public RangeDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
+		super.payload( payload );
 		return this;
 	}
 

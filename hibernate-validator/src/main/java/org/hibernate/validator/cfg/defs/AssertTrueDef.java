@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 import javax.validation.constraints.AssertTrue;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -30,20 +29,5 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 public class AssertTrueDef extends ConstraintDef<AssertTrue> {
 	public AssertTrueDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, AssertTrue.class, property, elementType, mapping );
-	}
-
-	public AssertTrueDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public AssertTrueDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public AssertTrueDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

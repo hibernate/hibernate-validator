@@ -68,8 +68,11 @@
     <xi:include href="modules/integration.xml"
                 xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
-    <xi:include href="modules/extensions.xml"
+    <xi:include href="modules/programmaticapi.xml"
                 xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+	<xi:include href="modules/annotationprocessor.xml"
+			    xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
     <xi:include href="modules/furtherreading.xml"
                 xmlns:xi="http://www.w3.org/2001/XInclude"/>

@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -30,20 +29,5 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 public class NotNullDef extends ConstraintDef<NotNull> {
 	public NotNullDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, NotNull.class, property, elementType, mapping );
-	}
-
-	public NotNullDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public NotNullDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public NotNullDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

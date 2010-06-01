@@ -35,17 +35,17 @@ public class DecimalMaxDef extends ConstraintDef<DecimalMax> {
 	}
 
 	public DecimalMaxDef message(String message) {
-		addParameter( "message", message );
+		super.message( message );
 		return this;
 	}
 
 	public DecimalMaxDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
+		super.groups( groups );
 		return this;
 	}
 
 	public DecimalMaxDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
+		super.payload( payload );
 		return this;
 	}
 

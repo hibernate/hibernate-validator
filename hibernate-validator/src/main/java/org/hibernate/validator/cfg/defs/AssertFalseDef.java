@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 import javax.validation.constraints.AssertFalse;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -30,20 +29,5 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 public class AssertFalseDef extends ConstraintDef<AssertFalse> {
 	public AssertFalseDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, AssertFalse.class, property, elementType, mapping );
-	}
-
-	public AssertFalseDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public AssertFalseDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public AssertFalseDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

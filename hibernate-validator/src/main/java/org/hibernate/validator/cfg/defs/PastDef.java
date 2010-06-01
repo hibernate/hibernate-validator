@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 import javax.validation.constraints.Past;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -30,20 +29,5 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 public class PastDef extends ConstraintDef<Past> {
 	public PastDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Past.class, property, elementType, mapping );
-	}
-
-	public PastDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public PastDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public PastDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

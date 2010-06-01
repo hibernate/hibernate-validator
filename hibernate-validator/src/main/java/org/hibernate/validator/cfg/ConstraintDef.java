@@ -22,6 +22,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import javax.validation.Payload;
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.util.ReflectionHelper;
@@ -29,7 +30,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 /**
  * @author Hardy Ferentschik
  */
-public class ConstraintDef<A extends Annotation> {
+public abstract class ConstraintDef<A extends Annotation> {
 	protected Class<A> constraintType;
 	protected final Map<String, Object> parameters;
 	protected final Class<?> beanType;
@@ -73,6 +74,21 @@ public class ConstraintDef<A extends Annotation> {
 
 	protected ConstraintDef addParameter(String key, Object value) {
 		parameters.put( key, value );
+		return this;
+	}
+
+	public ConstraintDef message(String message) {
+		addParameter( "message", message );
+		return this;
+	}
+
+	public ConstraintDef groups(Class<?>... groups) {
+		addParameter( "groups", groups );
+		return this;
+	}
+
+	public ConstraintDef payload(Class<? extends Payload>... payload) {
+		addParameter( "payload", payload );
 		return this;
 	}
 

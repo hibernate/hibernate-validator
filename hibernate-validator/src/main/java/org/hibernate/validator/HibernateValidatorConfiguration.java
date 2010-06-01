@@ -63,5 +63,15 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	ResourceBundleLocator getDefaultResourceBundleLocator();
 
+	/**
+	 * Adds the specified {@link ConstraintMapping} instance to the configuration. Constraints configured in {@code mapping}
+	 * will be added to the constraints configured via annotations and/or xml.
+	 *
+	 * @param mapping {@code ConstraintMapping} instance containing programmatic configured constraints
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @throws IllegalArgumentException if {@code mapping} is {@code null}
+	 */
 	HibernateValidatorConfiguration addMapping(ConstraintMapping mapping);
 }

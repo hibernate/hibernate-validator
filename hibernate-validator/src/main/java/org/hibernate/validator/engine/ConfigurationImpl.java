@@ -120,6 +120,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	public HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
+		if ( mapping == null ) {
+			throw new IllegalArgumentException( "The mapping cannot be null." );
+		}
+		this.mapping = mapping;
+		return this;
+	}
+
 	public HibernateValidatorConfiguration addProperty(String name, String value) {
 		if ( value != null ) {
 			validationBootstrapParameters.configProperties.put( name, value );
@@ -210,11 +218,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ResourceBundleLocator getDefaultResourceBundleLocator() {
 		return defaultResourceBundleLocator;
-	}
-
-	public HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
-		this.mapping = mapping;
-		return this;
 	}
 
 	public ConstraintMapping getMapping() {

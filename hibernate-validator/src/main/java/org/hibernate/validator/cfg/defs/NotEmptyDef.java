@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -30,20 +29,5 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class NotEmptyDef extends ConstraintDef<NotEmpty> {
 	public NotEmptyDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, NotEmpty.class, property, elementType, mapping );
-	}
-
-	public NotEmptyDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public NotEmptyDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public NotEmptyDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

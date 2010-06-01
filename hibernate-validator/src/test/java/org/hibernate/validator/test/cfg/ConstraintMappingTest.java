@@ -55,6 +55,13 @@ import static org.testng.FileAssert.fail;
 public class ConstraintMappingTest {
 	private static final Logger log = LoggerFactory.make();
 
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullConstraintMapping() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+		config.addMapping( ( ConstraintMapping ) null );
+		config.buildValidatorFactory();
+	}
+
 	@Test
 	public void testConstraintMapping() {
 		ConstraintMapping mapping = new ConstraintMapping();

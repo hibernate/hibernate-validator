@@ -34,17 +34,17 @@ public class ScriptAssertDef extends ConstraintDef<ScriptAssert> {
 	}
 
 	public ScriptAssertDef message(String message) {
-		addParameter( "message", message );
+		super.message( message );
 		return this;
 	}
 
 	public ScriptAssertDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
+		super.groups( groups );
 		return this;
 	}
 
 	public ScriptAssertDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
+		super.payload( payload );
 		return this;
 	}
 

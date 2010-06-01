@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 import javax.validation.constraints.Null;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -30,20 +29,5 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 public class NullDef extends ConstraintDef<Null> {
 	public NullDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Null.class, property, elementType, mapping );
-	}
-
-	public NullDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public NullDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public NullDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

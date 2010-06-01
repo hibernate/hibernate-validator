@@ -27,7 +27,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * A {@code ConstraintDef} class which can be used to configure any constraint type. For this purpose the class defines
- * a {@code constraintType}  method to specify the constraint type and a generic {@code param(Stringkey,Objectvalue)}
+ * a {@code constraintType}  method to specify the constraint type and a generic {@code param(String key,Object value)}
  * to add arbitrary constraint parameters.
  *
  * @author Hardy Ferentschik
@@ -39,17 +39,17 @@ public class GenericConstraintDef extends ConstraintDef {
 	}
 
 	public GenericConstraintDef message(String message) {
-		addParameter( "message", message );
+		super.message( message );
 		return this;
 	}
 
 	public GenericConstraintDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
+		super.groups( groups );
 		return this;
 	}
 
 	public GenericConstraintDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
+		super.payload( payload );
 		return this;
 	}
 

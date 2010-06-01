@@ -19,7 +19,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -31,20 +30,5 @@ import org.hibernate.validator.constraints.Email;
 public class EmailDef extends ConstraintDef<Email> {
 	public EmailDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Email.class, property, elementType, mapping );
-	}
-
-	public EmailDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public EmailDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public EmailDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

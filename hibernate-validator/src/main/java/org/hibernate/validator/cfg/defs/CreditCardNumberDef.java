@@ -19,7 +19,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -31,20 +30,5 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 public class CreditCardNumberDef extends ConstraintDef<CreditCardNumber> {
 	public CreditCardNumberDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, CreditCardNumber.class, property, elementType, mapping );
-	}
-
-	public CreditCardNumberDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public CreditCardNumberDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public CreditCardNumberDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

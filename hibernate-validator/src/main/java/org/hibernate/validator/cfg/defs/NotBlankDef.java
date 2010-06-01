@@ -18,7 +18,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -30,20 +29,5 @@ import org.hibernate.validator.constraints.NotBlank;
 public class NotBlankDef extends ConstraintDef<NotBlank> {
 	public NotBlankDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, NotBlank.class, property, elementType, mapping );
-	}
-
-	public NotBlankDef message(String message) {
-		addParameter( "message", message );
-		return this;
-	}
-
-	public NotBlankDef groups(Class<?>... groups) {
-		addParameter( "groups", groups );
-		return this;
-	}
-
-	public NotBlankDef payload(Class<? extends Payload>... payload) {
-		addParameter( "payload", payload );
-		return this;
 	}
 }

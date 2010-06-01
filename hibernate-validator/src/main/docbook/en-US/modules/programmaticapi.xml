@@ -21,31 +21,101 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<section id="programmaticapi">
-  <title>Programmatic constraint definitions</title>
+<chapter id="programmaticapi">
+  <title>Programmatic constraint definition</title>
 
-  <para><example>
-      <title>Creating a Hibernate Validator specific configuration</title>
+  <note>
+    <para>Use of the features described in the following sections is not
+    portable between Bean Validation providers/implementations.</para>
+  </note>
 
-      <programlisting>HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();</programlisting>
-    </example></para>
+  <para>Hibernate Validator allows to configure constraints not only via
+  annotations and xml, but also via a programmatic API. This API can be used
+  exclusively or in combination with annotations and xml. If used in
+  combination programmatic constraints are additive to otherwise configured
+  constraints.</para>
 
-  <para><example>
+  <para>The programmatic API is centered around the
+  <classname>ConstraintMapping</classname> class which can be found together
+  with its supporting classes in the
+  <package>org.hibernate.validator.cfg</package> package.
+  <classname>ConstraintMapping</classname> is the entry point to a fluent API
+  allowing the definition of constraints. <xref lang=""
+  linkend="example-constraint-mapping" /> shows how the API can be
+  used.</para>
+
+  <para><example id="example-constraint-mapping">
       <title>Programmatic constraint definition</title>
 
       <programlisting>ConstraintMapping mapping = new ConstraintMapping();
-mapping.type( Marathon.class )
-    .property( "name", METHOD )
+mapping.type( Car.class )
+    .property( "manufacturer", FIELD )
         .constraint( NotNullDef.class )
-    .property( "numberOfHelpers", FIELD )
-        .constraint( MinDef.class ).value( 1 );
+    .property( "licensePlate", FIELD )
+        .constraint( NotNullDef.class )
+        .constraint( SizeDef.class )
+            .min( 2 )
+            .max( 14 )
+    .property( "seatCount", FIELD )
+        .constraint( MinDef.class )
+            .value ( 2 )
+.type( RentalCar.class )
+    .property( "rentalStation", METHOD)
+        .constraint( NotNullDef.class );      </programlisting>
+    </example></para>
 
+  <para>As you can see you can configure constraints on multiple classes and
+  properties using method chaining. The constraint definition classes
+  <classname>NotNullDef</classname>, <classname>SizeDef</classname> and
+  <classname>MinDef</classname> are helper classes which allow to configure
+  constraint parameters in a type-safe fashion. Definition classes exists for
+  all built-in constraints in the
+  <classname>org.hibernate.validator.cfg.defs</classname> package. For a
+  custom constraint you can either create your own definition class extending
+  <classname>ConstraintDef</classname> or you can use
+  <classname>GenericConstraintDef</classname> as seen in <xref
+  linkend="example-generic-constraint-mapping" />.</para>
+
+  <para><example id="example-generic-constraint-mapping">
+      <title>Programmatic constraint definition using
+      <classname>GenericConstraintDef</classname></title>
+
+      <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+mapping.type( Car.class )
+    .property( "licensePlate", FIELD )
+        .constraint( GenericConstraintDef.class )
+            .constraintType( CheckCase.class )
+            .param( "value", CaseMode.UPPER );   </programlisting>
+    </example></para>
+
+  <para>Last but not least, you can also define cascading constraints as well
+  as the default group sequence of an entity.</para>
+
+  <para><example>
+      <title>Cascading constraints and group redefinition</title>
+
+      <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+mapping.type( Car.class )
+    .valid( "driver", FIELD )
+.type( RentalCar.class)
+    .defaultGroupSequence( RentalCar.class, CarChecks.class ); </programlisting>
+    </example></para>
+
+  <para>Once you have your <classname>ConstraintMapping</classname> you will
+  have to pass it to the configuration. Since the programmatic configuration
+  is not part of the official Bean Validation specification you will have to
+  get hold of the Hibernate Validator specific configuration instance. See
+  <xref linkend="example-hibernate-specific-config" />.</para>
+
+  <para><example id="example-hibernate-specific-config">
+      <title>Creating a Hibernate Validator specific configuration</title>
+
+      <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+// configure mapping instance
 
 HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
+config.addMapping( mapping );
 ValidatorFactory factory = config.buildValidatorFactory();
-Validator validator = factory.getValidator();
-validator.validate( new Marathon() );</programlisting>
-
-      <para></para>
+Validator validator = factory.getValidator();</programlisting>
     </example></para>
-</section>
+</chapter>
