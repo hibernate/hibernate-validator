@@ -250,7 +250,6 @@
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                         <remoteTagging>true</remoteTagging>
-                        <goal>deploy</goal>
                     </configuration>
                 </plugin>
                 <plugin>
