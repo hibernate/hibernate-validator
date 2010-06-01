@@ -297,7 +297,7 @@
                 <executions>
                     <execution>
                         <id>make-doc</id>
-                        <phase>site</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>resources</goal>
                             <goal>generate</goal>
@@ -319,7 +319,7 @@
                 <executions>
                     <execution>
                         <id>make-assembly</id>
-                        <phase>site</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>assembly</goal>
                         </goals>
@@ -329,11 +329,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <goals>deploy javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:resources
-                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:generate assembly:assembly
-                    </goals>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.twdata.maven</groupId>
