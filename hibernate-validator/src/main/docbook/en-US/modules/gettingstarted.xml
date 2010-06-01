@@ -100,21 +100,15 @@
         <title>Using Maven's archetype plugin to create a sample project using
         Hibernate Validator</title>
 
-        <programlisting>mvn archetype:generate \
-  -DarchetypeCatalog=http://repository.jboss.com/maven2/archetype-catalog.xml \
-  -DgroupId=com.mycompany \
-  -DartifactId=beanvalidation-gettingstarted \
-  -Dversion=1.0-SNAPSHOT \
-  -Dpackage=com.mycompany</programlisting>
+        <programlisting>mvn archetype:create -DarchetypeGroupId=org.hibernate \
+                     -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \
+                     -DarchetypeVersion=&version; \
+                     -DgroupId=com.mycompany 
+                     -DartifactId=hv-quickstart</programlisting>
       </example></para>
 
-    <para>When presented with the list of available archetypes in the JBoss
-    Maven Repository select the
-    <emphasis>hibernate-validator-quickstart-archetype. </emphasis>After Maven
-    has downloaded all dependencies confirm the settings by just pressing
-    enter. Maven will create your project in the directory
-    <filename>beanvalidation-gettingstarted</filename>. Change into this
-    directory and run:</para>
+    <para>Maven will create your project in the directory hv-quickstart.
+    Change into this directory and run:</para>
 
     <para><programlisting>mvn test</programlisting>Maven will compile the
     example code and run the implemented unit tests. Let's have a look at the
