@@ -74,6 +74,11 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 */
 	private final Map<LocalisedMessage, String> resolvedMessages = new WeakHashMap<LocalisedMessage, String>();
 
+	/**
+	 * Flag indicating whether this interpolator should chance some of the interpolation steps.
+	 */
+	private final boolean cacheMessages;
+
 	public ResourceBundleMessageInterpolator() {
 		this( ( ResourceBundleLocator ) null );
 	}
@@ -95,6 +100,10 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
+		this( userResourceBundleLocator, true );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cacheMessages) {
 
 		defaultLocale = Locale.getDefault();
 
@@ -113,6 +122,8 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				new CachingResourceBundleLocator(
 						new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES )
 				);
+
+		this.cacheMessages = cacheMessages;
 	}
 
 	public String interpolate(String message, Context context) {
@@ -134,13 +145,17 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 *
 	 * @param message the message to interpolate
 	 * @param annotationParameters the parameters of the annotation for which to interpolate this message
-	 * @param locale the <code>Locale</code> to use for the resource bundle.
+	 * @param locale the {@code Locale} to use for the resource bundle.
 	 *
 	 * @return the interpolated message.
 	 */
 	private String interpolateMessage(String message, Map<String, Object> annotationParameters, Locale locale) {
 		LocalisedMessage localisedMessage = new LocalisedMessage( message, locale );
-		String resolvedMessage = resolvedMessages.get( localisedMessage );
+		String resolvedMessage = null;
+
+		if ( cacheMessages ) {
+			resolvedMessage = resolvedMessages.get( localisedMessage );
+		}
 
 		// if the message is not already in the cache we have to run step 1-3 of the message resolution 
 		if ( resolvedMessage == null ) {
@@ -168,7 +183,9 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				// search the default bundle non recursive (step2)
 				resolvedMessage = replaceVariables( userBundleResolvedMessage, defaultResourceBundle, locale, false );
 				evaluatedDefaultBundleOnce = true;
-				resolvedMessages.put( localisedMessage, resolvedMessage );
+				if ( cacheMessages ) {
+					resolvedMessages.put( localisedMessage, resolvedMessage );
+				}
 			} while ( true );
 		}
 

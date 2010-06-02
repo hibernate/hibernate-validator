@@ -34,10 +34,10 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.MessageInterpolatorContext;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
@@ -264,11 +264,66 @@ public class ResourceBundleMessageInterpolatorTest {
 	}
 
 	/**
+	 * HV-330
+	 */
+	@Test
+	public void testMessageCaching() {
+
+		// do the whole tests first with caching enabled
+		TestResourceBundle testBundle = new TestResourceBundle();
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator( testBundle )
+		);
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+
+		String expected = "{hv-330}";
+		String actual = interpolator.interpolate( "{hv-330}", context );
+		assertEquals( actual, expected, "The key should not not exist in the bundle." );
+
+		testBundle.addOrUpdateMessage( "hv-330", "success" );
+		expected = "{hv-330}";
+		actual = interpolator.interpolate( "{hv-330}", context );
+		assertEquals(
+				actual,
+				expected,
+				"The message has not changed since per default the ResourceBundleMessageInterpolator caches the messages"
+		);
+
+		// now without caching
+		testBundle = new TestResourceBundle();
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator( testBundle ), false
+		);
+		context = new MessageInterpolatorContext( notNullDescriptor, null );
+
+		expected = "{hv-330}";
+		actual = interpolator.interpolate( "{hv-330}", context );
+		assertEquals( actual, expected, "The key should not not exist in the bundle." );
+
+		testBundle.addOrUpdateMessage( "hv-330", "success" );
+		expected = "success";
+		actual = interpolator.interpolate( "{hv-330}", context );
+		assertEquals(
+				actual,
+				expected,
+				"The message should change since ResourceBundleMessageInterpolator does not cache"
+		);
+	}
+
+	/**
 	 * A dummy locator always returning a {@link TestResourceBundle}.
 	 */
 	private static class TestResourceBundleLocator implements ResourceBundleLocator {
 
-		private TestResourceBundle resourceBundle = new TestResourceBundle();
+		private final ResourceBundle resourceBundle;
+
+		public TestResourceBundleLocator() {
+			this( new TestResourceBundle() );
+		}
+
+		public TestResourceBundleLocator(ResourceBundle bundle) {
+			resourceBundle = bundle;
+		}
 
 		public ResourceBundle getResourceBundle(Locale locale) {
 			return resourceBundle;
@@ -314,6 +369,11 @@ public class ResourceBundleMessageInterpolatorTest {
 			else {
 				throw new NoSuchElementException();
 			}
+		}
+
+		public void addOrUpdateMessage(String key, String message) {
+			testResources.put( key, message );
+			iter = testResources.keySet().iterator();
 		}
 	}
 }
