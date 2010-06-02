@@ -77,7 +77,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>target/site/apidocs</directory>
+            <directory>target/apidocs</directory>
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>  
         <fileSet>
