@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.1.0.Beta2</version>
     </parent>
     <artifactId>hibernate-validator-tck-runner</artifactId>
     <name>Hibernate Validator TCK Runner</name>
@@ -65,7 +63,7 @@
     <properties>
         <jboss.home>/opt/java/jboss-5.1.0.GA</jboss.home>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug/>
+        <remote.debug />
     </properties>
 
     <build>
