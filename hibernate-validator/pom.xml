@@ -311,7 +311,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/assembly/dist.xml</descriptor>
+                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
