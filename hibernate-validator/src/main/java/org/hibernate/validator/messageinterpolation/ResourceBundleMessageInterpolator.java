@@ -26,7 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
-import org.hibernate.validator.resourceloading.CachingResourceBundleLocator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
@@ -52,7 +51,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * Regular expression used to do message interpolation.
 	 */
-	private static final Pattern messageParameterPattern = Pattern.compile( "(\\{[^\\}]+?\\})" );
+	private static final Pattern MESSAGE_PARAMETER_PATTERN = Pattern.compile( "(\\{[^\\}]+?\\})" );
 
 	/**
 	 * The default locale for the current user.
@@ -108,21 +107,13 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		defaultLocale = Locale.getDefault();
 
 		if ( userResourceBundleLocator == null ) {
-			this.userResourceBundleLocator = new CachingResourceBundleLocator(
-					new PlatformResourceBundleLocator(
-							USER_VALIDATION_MESSAGES
-					)
-			);
+			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES );
 		}
 		else {
-			this.userResourceBundleLocator = new CachingResourceBundleLocator( userResourceBundleLocator );
+			this.userResourceBundleLocator = userResourceBundleLocator;
 		}
 
-		this.defaultResourceBundleLocator =
-				new CachingResourceBundleLocator(
-						new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES )
-				);
-
+		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES );
 		this.cacheMessages = cacheMessages;
 	}
 
@@ -204,7 +195,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	}
 
 	private String replaceVariables(String message, ResourceBundle bundle, Locale locale, boolean recurse) {
-		Matcher matcher = messageParameterPattern.matcher( message );
+		Matcher matcher = MESSAGE_PARAMETER_PATTERN.matcher( message );
 		StringBuffer sb = new StringBuffer();
 		String resolvedParameterValue;
 		while ( matcher.find() ) {
@@ -220,7 +211,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	}
 
 	private String replaceAnnotationAttributes(String message, Map<String, Object> annotationParameters) {
-		Matcher matcher = messageParameterPattern.matcher( message );
+		Matcher matcher = MESSAGE_PARAMETER_PATTERN.matcher( message );
 		StringBuffer sb = new StringBuffer();
 		while ( matcher.find() ) {
 			String resolvedParameterValue;
