@@ -149,7 +149,7 @@ public class ValidationContext<T> {
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
-				new MessageInterpolatorContext( descriptor, localContext.getCurrentBean() )
+				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,

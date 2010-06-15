@@ -21,9 +21,10 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.MessageInterpolator;
 
 /**
- * Takes mandatory elements in the constructor
+ * Implementation of the context used during message interpolation.
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class MessageInterpolatorContext implements MessageInterpolator.Context {
 	private final ConstraintDescriptor<?> constraintDescriptor;
@@ -40,5 +41,43 @@ public class MessageInterpolatorContext implements MessageInterpolator.Context {
 
 	public Object getValidatedValue() {
 		return validatedValue;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		MessageInterpolatorContext that = ( MessageInterpolatorContext ) o;
+
+		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
+			return false;
+		}
+		if ( validatedValue != null ? !validatedValue.equals( that.validatedValue ) : that.validatedValue != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = constraintDescriptor != null ? constraintDescriptor.hashCode() : 0;
+		result = 31 * result + ( validatedValue != null ? validatedValue.hashCode() : 0 );
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "MessageInterpolatorContext" );
+		sb.append( "{constraintDescriptor=" ).append( constraintDescriptor );
+		sb.append( ", validatedValue=" ).append( validatedValue );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }

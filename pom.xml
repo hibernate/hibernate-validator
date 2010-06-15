@@ -105,6 +105,11 @@
                 <classifier>jdk15</classifier>
             </dependency>
             <dependency>
+              <groupId>org.easymock</groupId>
+              <artifactId>easymock</artifactId>
+              <version>3.0</version>
+            </dependency>            
+            <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>1.2.124</version>
