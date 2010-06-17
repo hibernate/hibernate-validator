@@ -4,7 +4,7 @@
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.1.0.CR1</version>
+    <version>4.1.0-SNAPSHOT</version>
     <name>Hibernate Validator Aggregator</name>
     <url>http://validator.hibernate.org</url>
 
@@ -329,8 +329,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/tags/hibernate-validator-parent-4.1.0.CR1</connection>
-        <url>http://fisheye.jboss.org/browse/Hibernate/validator/tags/hibernate-validator-parent-4.1.0.CR1</url>
+        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk</connection>
+        <url>http://fisheye.jboss.org/browse/Hibernate/validator/trunk</url>
     </scm>
 
     <distributionManagement>
