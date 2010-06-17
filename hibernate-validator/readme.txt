@@ -20,13 +20,13 @@
   -------------
 
   The documentation for this release is included in the docs directory of distribution package
-  or online under https://www.hibernate.org/5.html
+  or online under http://www.hibernate.org/subprojects/validator/docs.html
 
   Release Notes
   -------------
 
   The full list of changes can be found at
-  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=10960
+  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11090
 
   System Requirements
   -------------------
