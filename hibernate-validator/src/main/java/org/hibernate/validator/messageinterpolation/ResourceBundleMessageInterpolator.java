@@ -79,23 +79,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final boolean cacheMessages;
 
 	public ResourceBundleMessageInterpolator() {
-		this( ( ResourceBundleLocator ) null );
-	}
-
-	/**
-	 * @param resourceBundle the resource bundle to use
-	 *
-	 * @deprecated Use {@link ResourceBundleMessageInterpolator#ResourceBundleMessageInterpolator(ResourceBundleLocator)} instead.
-	 */
-	@Deprecated
-	public ResourceBundleMessageInterpolator(final ResourceBundle resourceBundle) {
-		this(
-				new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES ) {
-					public ResourceBundle getResourceBundle(Locale locale) {
-						return locale == Locale.getDefault() ? resourceBundle : super.getResourceBundle( locale );
-					}
-				}
-		);
+		this( null );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
