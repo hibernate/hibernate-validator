@@ -38,7 +38,9 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw new IllegalArgumentException( minValue.value() + " does not represent a valid BigDecimal format" );
+			throw new IllegalArgumentException(
+					minValue.value() + " does not represent a valid BigDecimal format", nfe
+			);
 		}
 	}
 
@@ -56,7 +58,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 			return ( new BigDecimal( ( BigInteger ) value ) ).compareTo( minValue ) != -1;
 		}
 		else {
-			return ( new BigDecimal( value.doubleValue() ).compareTo( minValue ) ) != -1;
+			return ( BigDecimal.valueOf( value.longValue() ).compareTo( minValue ) ) != -1;
 		}
 	}
 }

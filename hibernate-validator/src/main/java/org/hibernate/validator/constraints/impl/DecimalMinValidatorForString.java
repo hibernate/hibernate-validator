@@ -34,7 +34,9 @@ public class DecimalMinValidatorForString implements ConstraintValidator<Decimal
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw new IllegalArgumentException( minValue.value() + " does not represent a valid BigDecimal format" );
+			throw new IllegalArgumentException(
+					minValue.value() + " does not represent a valid BigDecimal format", nfe
+			);
 		}
 	}
 

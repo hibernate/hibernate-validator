@@ -38,12 +38,13 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 			this.maxValue = new BigDecimal( maxValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw new IllegalArgumentException( maxValue.value() + " does not represent a valid BigDecimal format" );
+			throw new IllegalArgumentException(
+					maxValue.value() + " does not represent a valid BigDecimal format", nfe
+			);
 		}
 	}
 
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
-
 		//null values are valid
 		if ( value == null ) {
 			return true;
@@ -56,7 +57,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 			return ( new BigDecimal( ( BigInteger ) value ) ).compareTo( maxValue ) != 1;
 		}
 		else {
-			return ( new BigDecimal( value.doubleValue() ).compareTo( maxValue ) ) != 1;
+			return ( BigDecimal.valueOf( value.longValue() ).compareTo( maxValue ) ) != 1;
 		}
 	}
 }

@@ -1,7 +1,7 @@
 // $Id$
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -28,6 +28,7 @@ import javax.validation.constraints.Max;
  * value specified.
  *
  * @author Alaa Nassef
+ * @author Hardy Ferentschik
  */
 public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
 
@@ -49,8 +50,8 @@ public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
 			return ( ( BigInteger ) value ).compareTo( BigInteger.valueOf( maxValue ) ) != 1;
 		}
 		else {
-			double doubleValue = value.doubleValue();
-			return doubleValue <= maxValue;
+			long longValue = value.longValue();
+			return longValue <= maxValue;
 		}
 	}
 }

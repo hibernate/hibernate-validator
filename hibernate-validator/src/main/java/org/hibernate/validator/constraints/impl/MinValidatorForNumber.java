@@ -28,6 +28,7 @@ import javax.validation.constraints.Min;
  * value specified.
  *
  * @author Alaa Nassef
+ * @author Hardy Ferentschik
  */
 public class MinValidatorForNumber implements ConstraintValidator<Min, Number> {
 
@@ -49,9 +50,8 @@ public class MinValidatorForNumber implements ConstraintValidator<Min, Number> {
 			return ( ( BigInteger ) value ).compareTo( BigInteger.valueOf( minValue ) ) != -1;
 		}
 		else {
-			double doubleValue = value.doubleValue();
-			return doubleValue >= minValue;
+			long longValue = value.longValue();
+			return longValue >= minValue;
 		}
-
 	}
 }
