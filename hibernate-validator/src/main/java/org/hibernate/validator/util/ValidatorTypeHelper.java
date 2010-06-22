@@ -48,17 +48,13 @@ public class ValidatorTypeHelper {
 	 */
 	public static <T extends Annotation> Map<Type, Class<? extends ConstraintValidator<?, ?>>> getValidatorsTypes(
 			List<Class<? extends ConstraintValidator<T, ?>>> validators) {
-		if ( validators == null || validators.size() == 0 ) {
-			throw new ValidationException( "No ConstraintValidators associated to @Constraint" );
+		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
+				new HashMap<Type, Class<? extends ConstraintValidator<?, ?>>>();
+		for ( Class<? extends ConstraintValidator<?, ?>> validator : validators ) {
+			validatorsTypes.put( extractType( validator ), validator );
 		}
-		else {
-			Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
-					new HashMap<Type, Class<? extends ConstraintValidator<?, ?>>>();
-			for ( Class<? extends ConstraintValidator<?, ?>> validator : validators ) {
-				validatorsTypes.put( extractType( validator ), validator );
-			}
-			return validatorsTypes;
-		}
+		return validatorsTypes;
+
 	}
 
 	private static Type extractType(Class<? extends ConstraintValidator<?, ?>> validator) {

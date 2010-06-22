@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id$
  *
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -57,6 +57,8 @@ public class ConstraintTree<A extends Annotation> {
 	private final List<ConstraintTree<?>> children;
 	private final ConstraintDescriptorImpl<A> descriptor;
 
+	private final Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes;
+
 	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
@@ -79,6 +81,8 @@ public class ConstraintTree<A extends Annotation> {
 			ConstraintTree<?> treeNode = createConstraintTree( composingDescriptor );
 			children.add( treeNode );
 		}
+
+		validatorTypes = ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
@@ -217,11 +221,7 @@ public class ConstraintTree<A extends Annotation> {
 	 * @return The class of a matching validator.
 	 */
 	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Type type) {
-		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes =
-				ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
-
-		List<Type> suitableTypes = new ArrayList<Type>();
-		findSuitableValidatorTypes( type, validatorTypes, suitableTypes );
+		List<Type> suitableTypes = findSuitableValidatorTypes( type );
 
 		resolveAssignableTypes( suitableTypes );
 		verifyResolveWasUnique( type, suitableTypes );
@@ -257,12 +257,14 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private void findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes, List<Type> suitableTypes) {
-		for ( Type validatorType : validatorsTypes.keySet() ) {
+	private List<Type> findSuitableValidatorTypes(Type type) {
+		List<Type> suitableTypes = new ArrayList<Type>();
+		for ( Type validatorType : validatorTypes.keySet() ) {
 			if ( TypeUtils.isAssignable( validatorType, type ) && !suitableTypes.contains( validatorType ) ) {
 				suitableTypes.add( validatorType );
 			}
 		}
+		return suitableTypes;
 	}
 
 	/**
