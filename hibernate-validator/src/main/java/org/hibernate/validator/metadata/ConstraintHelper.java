@@ -80,11 +80,10 @@ import org.hibernate.validator.util.ReflectionHelper;
  * @author Alaa Nassef
  */
 public class ConstraintHelper {
-
 	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
 
-	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitons =
+	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitions =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
 
 	public ConstraintHelper() {
@@ -171,8 +170,8 @@ public class ConstraintHelper {
 		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : builtInList ) {
 			//safe cause all CV for a given annotation A are CV<A, ?>
 			@SuppressWarnings("unchecked")
-			Class<ConstraintValidator<? extends Annotation, ?>> safeValdiatorClass = ( Class<ConstraintValidator<? extends Annotation, ?>> ) validatorClass;
-			constraints.add( safeValdiatorClass );
+			Class<ConstraintValidator<? extends Annotation, ?>> safeValidatorClass = ( Class<ConstraintValidator<? extends Annotation, ?>> ) validatorClass;
+			constraints.add( safeValidatorClass );
 		}
 
 		return constraints;
@@ -187,7 +186,7 @@ public class ConstraintHelper {
 	 *
 	 * @param annotation the annotation to check.
 	 *
-	 * @return <code>true</code> if the specified annotation is a multi value constraints, <code>false</code>
+	 * @return {@code true} if the specified annotation is a multi value constraints, {@code false}
 	 *         otherwise.
 	 */
 	public boolean isMultiValueConstraint(Annotation annotation) {
@@ -356,7 +355,7 @@ public class ConstraintHelper {
 			throw new IllegalArgumentException( "Class cannot be null" );
 		}
 
-		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitons.get(
+		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitions.get(
 				annotationClass
 		);
 
@@ -365,18 +364,18 @@ public class ConstraintHelper {
 		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : list ) {
 			//safe cause all CV for a given annotation A are CV<A, ?>
 			@SuppressWarnings("unchecked")
-			Class<ConstraintValidator<T, ?>> safeValdiatorClass = ( Class<ConstraintValidator<T, ?>> ) validatorClass;
-			constraintsValidators.add( safeValdiatorClass );
+			Class<ConstraintValidator<T, ?>> safeValidatorClass = ( Class<ConstraintValidator<T, ?>> ) validatorClass;
+			constraintsValidators.add( safeValidatorClass );
 		}
 
 		return constraintsValidators;
 	}
 
 	public <A extends Annotation> void addConstraintValidatorDefinition(Class<A> annotationClass, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> definitionClasses) {
-		constraintValidatorDefinitons.putIfAbsent( annotationClass, definitionClasses );
+		constraintValidatorDefinitions.putIfAbsent( annotationClass, definitionClasses );
 	}
 
 	public boolean containsConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
-		return constraintValidatorDefinitons.containsKey( annotationClass );
+		return constraintValidatorDefinitions.containsKey( annotationClass );
 	}
 }

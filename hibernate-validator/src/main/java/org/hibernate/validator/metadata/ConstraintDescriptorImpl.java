@@ -19,10 +19,12 @@ package org.hibernate.validator.metadata;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,6 +63,19 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 	private static final String GROUPS = "groups";
 	private static final String PAYLOAD = "payload";
+
+	/**
+	 * A list of annotations which can be ignored when investigating for composing constraints.
+	 */
+	private static final List<String> NON_COMPOSING_CONSTRAINT_ANNOTATIONS = new ArrayList<String>();
+
+	static {
+		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Documented.class.getName() );
+		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Retention.class.getName() );
+		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Target.class.getName() );
+		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Constraint.class.getName() );
+		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( ReportAsSingleViolation.class.getName() );
+	}
 
 	/**
 	 * The actual constraint annotation.
@@ -356,6 +371,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 
 		for ( Annotation declaredAnnotation : annotation.annotationType().getDeclaredAnnotations() ) {
+			if ( NON_COMPOSING_CONSTRAINT_ANNOTATIONS.contains( declaredAnnotation.annotationType().getName() ) ) {
+				// ignore the usual suspects which will be in almost any constraint, but are no composing constraint
+				continue;
+			}
+
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotation )
 					|| constraintHelper.isBuiltinConstraint( declaredAnnotation.annotationType() ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
