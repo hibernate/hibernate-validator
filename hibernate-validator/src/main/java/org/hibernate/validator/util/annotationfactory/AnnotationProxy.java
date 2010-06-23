@@ -100,7 +100,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		result.append( '@' ).append( annotationType().getName() ).append( '(' );
+		result.append( '@' ).append( annotationType.getName() ).append( '(' );
 		for ( String s : getRegisteredMethodsInAlphabeticalOrder() ) {
 			result.append( s ).append( '=' ).append( values.get( s ) ).append( ", " );
 		}

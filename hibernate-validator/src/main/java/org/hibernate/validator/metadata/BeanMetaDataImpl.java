@@ -440,8 +440,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
-		if ( constraintHelper.isConstraintAnnotation( annotation ) ||
-				constraintHelper.isBuiltinConstraint( annotation.annotationType() ) ) {
+		Class<? extends Annotation> annotationType = annotation.annotationType();
+		if ( constraintHelper.isConstraintAnnotation( annotationType )
+				|| constraintHelper.isBuiltinConstraint( annotationType ) ) {
 			constraints.add( annotation );
 		}
 

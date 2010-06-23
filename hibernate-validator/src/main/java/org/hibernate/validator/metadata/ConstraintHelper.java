@@ -198,7 +198,8 @@ public class ConstraintHelper {
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
 					Annotation[] annotations = ( Annotation[] ) method.invoke( annotation );
 					for ( Annotation a : annotations ) {
-						if ( isConstraintAnnotation( a ) || isBuiltinConstraint( a.annotationType() ) ) {
+						Class<? extends Annotation> annotationType = a.annotationType();
+						if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
 							isMultiValueConstraint = true;
 						}
 						else {
@@ -236,7 +237,8 @@ public class ConstraintHelper {
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
 					Annotation[] annotations = ( Annotation[] ) method.invoke( annotation );
 					for ( Annotation a : annotations ) {
-						if ( isConstraintAnnotation( a ) || isBuiltinConstraint( a.annotationType() ) ) {
+						Class<? extends Annotation> annotationType = a.annotationType();
+						if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
 							annotationList.add( a );
 						}
 					}
@@ -262,29 +264,26 @@ public class ConstraintHelper {
 	 * <li>Defines a payload parameter.</li>
 	 * </ul>
 	 *
-	 * @param annotation The annotation to test.
+	 * @param annotationType The annotation type to test.
 	 *
 	 * @return <code>true</code> if the annotation fulfills the above condtions, <code>false</code> otherwise.
 	 */
-	public boolean isConstraintAnnotation(Annotation annotation) {
-
-		Constraint constraint = annotation.annotationType()
-				.getAnnotation( Constraint.class );
+	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
+		Constraint constraint = annotationType.getAnnotation( Constraint.class );
 		if ( constraint == null ) {
 			return false;
 		}
 
-		assertMessageParameterExists( annotation );
-		assertGroupsParameterExists( annotation );
-		assertPayloadParameterExists( annotation );
-
-		assertNoParameterStartsWithValid( annotation );
+		assertMessageParameterExists( annotationType );
+		assertGroupsParameterExists( annotationType );
+		assertPayloadParameterExists( annotationType );
+		assertNoParameterStartsWithValid( annotationType );
 
 		return true;
 	}
 
-	private void assertNoParameterStartsWithValid(Annotation annotation) {
-		final Method[] methods = ReflectionHelper.getMethods( annotation.annotationType() );
+	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
+		final Method[] methods = ReflectionHelper.getMethods( annotationType );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) ) {
 				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
@@ -293,64 +292,75 @@ public class ConstraintHelper {
 		}
 	}
 
-	private void assertPayloadParameterExists(Annotation annotation) {
+	private void assertPayloadParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotation.annotationType(), "payload" );
+			final Method method = ReflectionHelper.getMethod( annotationType, "payload" );
 			if ( method == null ) {
-				String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
+				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
 						"not contain a payload parameter.";
 				throw new ConstraintDefinitionException( msg );
 			}
 			Class<?>[] defaultPayload = ( Class<?>[] ) method.getDefaultValue();
 			if ( defaultPayload.length != 0 ) {
-				String msg = annotation.annotationType()
+				String msg = annotationType
 						.getName() + " contains Constraint annotation, but the payload " +
-						"paramter default value is not the empty array.";
+						"parameter default value is not the empty array.";
 				throw new ConstraintDefinitionException( msg );
 			}
 		}
 		catch ( ClassCastException e ) {
-			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but the " +
+			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
 					"payload parameter is of wrong type.";
 			throw new ConstraintDefinitionException( msg );
 		}
 	}
 
-	private void assertGroupsParameterExists(Annotation annotation) {
+	private void assertGroupsParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotation.annotationType(), "groups" );
+			final Method method = ReflectionHelper.getMethod( annotationType, "groups" );
 			if ( method == null ) {
-				String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
+				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
 						"not contain a groups parameter.";
 				throw new ConstraintDefinitionException( msg );
 			}
 			Class<?>[] defaultGroups = ( Class<?>[] ) method.getDefaultValue();
 			if ( defaultGroups.length != 0 ) {
-				String msg = annotation.annotationType()
+				String msg = annotationType
 						.getName() + " contains Constraint annotation, but the groups " +
-						"paramter default value is not the empty array.";
+						"parameter default value is not the empty array.";
 				throw new ConstraintDefinitionException( msg );
 			}
 		}
 		catch ( ClassCastException e ) {
-			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but the " +
+			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
 					"groups parameter is of wrong type.";
 			throw new ConstraintDefinitionException( msg );
 		}
 	}
 
-	private void assertMessageParameterExists(Annotation annotation) {
+	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			ReflectionHelper.getAnnotationParameter( annotation, "message", String.class );
+			final Method method = ReflectionHelper.getMethod( annotationType, "message" );
+			if ( method == null ) {
+				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
+						"not contain a message parameter.";
+				throw new ConstraintDefinitionException( msg );
+			}
+			if ( method.getReturnType() != String.class ) {
+				String msg = annotationType.getName() + " contains Constraint annotation, but the message parameter " +
+						"is not of type java.lang.String.";
+				throw new ConstraintDefinitionException( msg );
+			}
 		}
-		catch ( Exception e ) {
-			String msg = annotation.annotationType().getName() + " contains Constraint annotation, but does " +
-					"not contain a message parameter.";
+		catch ( ClassCastException e ) {
+			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
+					"groups parameter is of wrong type.";
 			throw new ConstraintDefinitionException( msg );
 		}
 	}
 
-	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorDefinition(Class<T> annotationClass) {
+	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorDefinition
+			(Class<T> annotationClass) {
 		if ( annotationClass == null ) {
 			throw new IllegalArgumentException( "Class cannot be null" );
 		}
