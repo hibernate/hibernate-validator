@@ -184,38 +184,27 @@ public class ConstraintHelper {
 	/**
 	 * Checks whether a given annotation is a multi value constraint or not.
 	 *
-	 * @param annotation the annotation to check.
+	 * @param annotationType the annotation type to check.
 	 *
 	 * @return {@code true} if the specified annotation is a multi value constraints, {@code false}
 	 *         otherwise.
 	 */
-	public boolean isMultiValueConstraint(Annotation annotation) {
+	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
 		boolean isMultiValueConstraint = false;
-		try {
-			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
+			final Method method = ReflectionHelper.getMethod( annotationType, "value" );
 			if ( method != null ) {
 				Class returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-					Annotation[] annotations = ( Annotation[] ) method.invoke( annotation );
-					for ( Annotation a : annotations ) {
-						Class<? extends Annotation> annotationType = a.annotationType();
-						if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
-							isMultiValueConstraint = true;
-						}
-						else {
-							isMultiValueConstraint = false;
-							break;
-						}
+					@SuppressWarnings( "unchecked" )
+					Class<? extends Annotation> componentType = ( Class<? extends Annotation> ) returnType.getComponentType();
+					if ( isConstraintAnnotation( componentType ) || isBuiltinConstraint( componentType ) ) {
+						isMultiValueConstraint = true;
+					}
+					else {
+						isMultiValueConstraint = false;
 					}
 				}
 			}
-		}
-		catch ( IllegalAccessException iae ) {
-			// ignore
-		}
-		catch ( InvocationTargetException ite ) {
-			// ignore
-		}
 		return isMultiValueConstraint;
 	}
 

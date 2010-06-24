@@ -445,9 +445,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				|| constraintHelper.isBuiltinConstraint( annotationType ) ) {
 			constraints.add( annotation );
 		}
-
-		// check if we have a multi-valued constraint
-		constraints.addAll( constraintHelper.getMultiValueConstraints( annotation ) );
+		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
+			constraints.addAll( constraintHelper.getMultiValueConstraints( annotation ) );
+		}
 
 		for ( Annotation constraint : constraints ) {
 			final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( clazz, constraint, type );

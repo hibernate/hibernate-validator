@@ -387,7 +387,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 					log.debug( "Adding composing constraint: " + descriptor );
 				}
 			}
-			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotation ) ) {
+			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotationType ) ) {
 				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
 				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
