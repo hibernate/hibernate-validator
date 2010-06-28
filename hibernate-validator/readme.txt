@@ -25,8 +25,8 @@
   Release Notes
   -------------
 
-  The full list of changes can be found at
-  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11090
+  The full list of changes for this release can be found at
+  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11091
 
   System Requirements
   -------------------
