@@ -1,0 +1,133 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2010-07-06 14:46+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: application/x-xml2pot; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: programmaticapi.xml:25 programmaticapi.xml:48
+#, no-c-format
+msgid "Programmatic constraint definition"
+msgstr ""
+
+#. Tag: para
+#: programmaticapi.xml:28
+#, no-c-format
+msgid "Use of the features described in the following sections is not portable between Bean Validation providers/implementations."
+msgstr ""
+
+#. Tag: para
+#: programmaticapi.xml:32
+#, no-c-format
+msgid "Hibernate Validator allows to configure constraints not only via annotations and xml, but also via a programmatic API. This API can be used exclusively or in combination with annotations and xml. If used in combination programmatic constraints are additive to otherwise configured constraints."
+msgstr ""
+
+#. Tag: para
+#: programmaticapi.xml:38
+#, no-c-format
+msgid "The programmatic API is centered around the <classname>ConstraintMapping</classname> class which can be found together with its supporting classes in the <package>org.hibernate.validator.cfg</package> package. <classname>ConstraintMapping</classname> is the entry point to a fluent API allowing the definition of constraints. <xref lang=\"\" linkend=\"example-constraint-mapping\"/> shows how the API can be used."
+msgstr ""
+
+#. Tag: programlisting
+#: programmaticapi.xml:50
+#, no-c-format
+msgid ""
+      "ConstraintMapping mapping = new ConstraintMapping();\n"
+      "mapping.type( Car.class )\n"
+      "    .property( \"manufacturer\", FIELD )\n"
+      "        .constraint( NotNullDef.class )\n"
+      "    .property( \"licensePlate\", FIELD )\n"
+      "        .constraint( NotNullDef.class )\n"
+      "        .constraint( SizeDef.class )\n"
+      "            .min( 2 )\n"
+      "            .max( 14 )\n"
+      "    .property( \"seatCount\", FIELD )\n"
+      "        .constraint( MinDef.class )\n"
+      "            .value ( 2 )\n"
+      ".type( RentalCar.class )\n"
+      "    .property( \"rentalStation\", METHOD)\n"
+      "        .constraint( NotNullDef.class );"
+msgstr ""
+
+#. Tag: para
+#: programmaticapi.xml:53
+#, no-c-format
+msgid "As you can see you can configure constraints on multiple classes and properties using method chaining. The constraint definition classes <classname>NotNullDef</classname>, <classname>SizeDef</classname> and <classname>MinDef</classname> are helper classes which allow to configure constraint parameters in a type-safe fashion. Definition classes exists for all built-in constraints in the <classname>org.hibernate.validator.cfg.defs</classname> package. For a custom constraint you can either create your own definition class extending <classname>ConstraintDef</classname> or you can use <classname>GenericConstraintDef</classname> as seen in <xref linkend=\"example-generic-constraint-mapping\"/>."
+msgstr ""
+
+#. Tag: title
+#: programmaticapi.xml:66
+#, no-c-format
+msgid "Programmatic constraint definition using <classname>GenericConstraintDef</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: programmaticapi.xml:69
+#, no-c-format
+msgid ""
+      "ConstraintMapping mapping = new ConstraintMapping();\n"
+      "mapping.type( Car.class )\n"
+      "    .property( \"licensePlate\", FIELD )\n"
+      "        .constraint( GenericConstraintDef.class )\n"
+      "            .constraintType( CheckCase.class )\n"
+      "            .param( \"value\", CaseMode.UPPER );"
+msgstr ""
+
+#. Tag: para
+#: programmaticapi.xml:72
+#, no-c-format
+msgid "Last but not least, you can also define cascading constraints as well as the default group sequence of an entity."
+msgstr ""
+
+#. Tag: title
+#: programmaticapi.xml:76
+#, no-c-format
+msgid "Cascading constraints and group redefinition"
+msgstr ""
+
+#. Tag: programlisting
+#: programmaticapi.xml:78
+#, no-c-format
+msgid ""
+      "ConstraintMapping mapping = new ConstraintMapping();\n"
+      "mapping.type( Car.class )\n"
+      "    .valid( \"driver\", FIELD )\n"
+      ".type( RentalCar.class)\n"
+      "    .defaultGroupSequence( RentalCar.class, CarChecks.class );"
+msgstr ""
+
+#. Tag: para
+#: programmaticapi.xml:81
+#, no-c-format
+msgid "Once you have your <classname>ConstraintMapping</classname> you will have to pass it to the configuration. Since the programmatic configuration is not part of the official Bean Validation specification you will have to get hold of the Hibernate Validator specific configuration instance. See <xref linkend=\"example-hibernate-specific-config\"/>."
+msgstr ""
+
+#. Tag: title
+#: programmaticapi.xml:88
+#, no-c-format
+msgid "Creating a Hibernate Validator specific configuration"
+msgstr ""
+
+#. Tag: programlisting
+#: programmaticapi.xml:90
+#, no-c-format
+msgid ""
+      "ConstraintMapping mapping = new ConstraintMapping();\n"
+      "// configure mapping instance\n"
+      "\n"
+      "HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();\n"
+      "config.addMapping( mapping );\n"
+      "ValidatorFactory factory = config.buildValidatorFactory();\n"
+      "Validator validator = factory.getValidator();"
+msgstr ""
+

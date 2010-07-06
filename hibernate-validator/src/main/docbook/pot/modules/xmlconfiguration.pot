@@ -1,0 +1,190 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2010-07-06 14:46+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: application/x-xml2pot; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: xmlconfiguration.xml:25
+#, no-c-format
+msgid "XML configuration"
+msgstr ""
+
+#. Tag: filename
+#: xmlconfiguration.xml:28
+#, no-c-format
+msgid "<filename>validation.xml</filename>"
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:30
+#, no-c-format
+msgid "The key to enable XML configuration for Hibernate Validator is the file <filename>validation.xml</filename>. If this file exists in the classpath its configuration will be applied when the <classname>ValidationFactory</classname> gets created. <xref linkend=\"image-validation-configuration\"/> shows a model view of the xsd <filename>valiation.xml</filename> has to adhere to."
+msgstr ""
+
+#. Tag: title
+#: xmlconfiguration.xml:37
+#, no-c-format
+msgid "validation-configuration-1.0.xsd"
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:52
+#, no-c-format
+msgid "shows the several configuration options of <filename>validation.xml</filename>."
+msgstr ""
+
+#. Tag: title
+#: xmlconfiguration.xml:56
+#, no-c-format
+msgid "<title>validation.xml</title>"
+msgstr ""
+
+#. Tag: programlisting
+#: xmlconfiguration.xml:58
+#, no-c-format
+msgid ""
+      "&lt;validation-config xmlns=\"http://jboss.org/xml/ns/javax/validation/configuration\"\n"
+      " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+      " xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/validation/configuration\"&gt;\n"
+      "    &lt;default-provider&gt;org.hibernate.validator.HibernateValidator&lt;/default-provider&gt;\n"
+      "    &lt;message-interpolator&gt;org.hibernate.validator.engine.ResourceBundleMessageInterpolator&lt;/message-interpolator&gt;\n"
+      "    &lt;traversable-resolver&gt;org.hibernate.validator.engine.resolver.DefaultTraversableResolver&lt;/traversable-resolver&gt;\n"
+      "    &lt;constraint-validator-factory&gt;org.hibernate.validator.engine.ConstraintValidatorFactoryImpl&lt;/constraint-validator-factory&gt;\n"
+      "    &lt;constraint-mapping&gt;/constraints-car.xml&lt;/constraint-mapping&gt;\n"
+      "    &lt;property name=\"prop1\"&gt;value1&lt;/property&gt;\n"
+      "    &lt;property name=\"prop2\"&gt;value2&lt;/property&gt;\n"
+      "&lt;/validation-config&gt;"
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:62
+#, no-c-format
+msgid "There can only be one <filename>validation.xml</filename> in the classpath. If more than one is found an exception is thrown."
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:66
+#, no-c-format
+msgid "All settings shown in the <filename>validation.xml</filename> are optional and in the case of <xref linkend=\"example-validation-xml\"/> show the defaults used within Hibernate Validator. The node <property>default-provider</property> allows to choose the Bean Validation provider. This is useful if there is more than one provider in the classpath. <property>message-interpolator</property>, <property>traversable-resolver</property> and <property>constraint-validator-factory</property> allow to customize the <classname>javax.validation.MessageInterpolator</classname>, <classname>javax.validation.TraversableResolver</classname> resp. <classname>javax.validation.ConstraintValidatorFactory</classname>. The same configuration options are also available programmatically through the <classname>javax.validation.Configuration</classname>. In fact XML configuration will be overridden by values explicitly specified via the API. It is even possible to ignore the XML configuration completely via <methodname> Configuration.ignoreXmlConfiguration()</methodname>. See also <xref linkend=\"validator-bootstrapping\"/>."
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:84
+#, no-c-format
+msgid "Via the <property>constraint-mapping</property> you can list an arbitrary number of additional XML files containing the actual constraint configuration. See <xref linkend=\"section-mapping-constraints\"/>."
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:88
+#, no-c-format
+msgid "Last but not least, you can specify provider specific properties via the <property>property</property> nodes. Hibernate Validator does currently not make use of any custom properties."
+msgstr ""
+
+#. Tag: title
+#: xmlconfiguration.xml:94
+#, no-c-format
+msgid "Mapping constraints"
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:96
+#, no-c-format
+msgid "Expressing constraints in XML is possible via files adhering to the xsd seen in <xref linkend=\"image-mapping-configuration\"/>. Note that these mapping files are only processed if listed via <property>constraint-mapping</property> in your <filename>validation.xml</filename>."
+msgstr ""
+
+#. Tag: title
+#: xmlconfiguration.xml:103
+#, no-c-format
+msgid "validation-mapping-1.0.xsd"
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:118
+#, no-c-format
+msgid "shows how our classes Car and RentalCar from <xref linkend=\"example-car\"/> resp. <xref linkend=\"example-rental-car\"/> could be mapped in XML."
+msgstr ""
+
+#. Tag: title
+#: xmlconfiguration.xml:123
+#, no-c-format
+msgid "constraints-car.xml"
+msgstr ""
+
+#. Tag: programlisting
+#: xmlconfiguration.xml:125
+#, no-c-format
+msgid ""
+      "&lt;constraint-mappings xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+      "                     xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd\"\n"
+      "                     xmlns=\"http://jboss.org/xml/ns/javax/validation/mapping\"&gt;\n"
+      "    &lt;default-package&gt;org.hibernate.validator.quickstart&lt;/default-package&gt;\n"
+      "    &lt;bean class=\"Car\" ignore-annotations=\"true\"&gt;\n"
+      "        &lt;field name=\"manufacturer\"&gt;\n"
+      "            &lt;constraint annotation=\"javax.validation.constraints.NotNull\"/&gt;\n"
+      "        &lt;/field&gt;\n"
+      "        &lt;field name=\"licensePlate\"&gt;\n"
+      "            &lt;constraint annotation=\"javax.validation.constraints.NotNull\"/&gt;\n"
+      "        &lt;/field&gt;\n"
+      "        &lt;field name=\"seatCount\"&gt;\n"
+      "            &lt;constraint annotation=\"javax.validation.constraints.Min\"&gt;\n"
+      "                &lt;element name=\"value\"&gt;2&lt;/element&gt;\n"
+      "            &lt;/constraint&gt;\n"
+      "        &lt;/field&gt;\n"
+      "        &lt;field name=\"driver\"&gt;\n"
+      "            &lt;valid/&gt;\n"
+      "        &lt;/field&gt;\n"
+      "        &lt;getter name=\"passedVehicleInspection\" ignore-annotations=\"true\"&gt;\n"
+      "            &lt;constraint annotation=\"javax.validation.constraints.AssertTrue\"&gt;\n"
+      "                &lt;message&gt;The car has to pass the vehicle inspection first&lt;/message&gt;\n"
+      "                &lt;groups&gt;\n"
+      "                    &lt;value&gt;CarChecks&lt;/value&gt;\n"
+      "                &lt;/groups&gt;\n"
+      "                &lt;element name=\"max\"&gt;10&lt;/element&gt;\n"
+      "            &lt;/constraint&gt;\n"
+      "        &lt;/getter&gt;\n"
+      "    &lt;/bean&gt;\n"
+      "    &lt;bean class=\"RentalCar\" ignore-annotations=\"true\"&gt;\n"
+      "        &lt;class ignore-annotations=\"true\"&gt;\n"
+      "            &lt;group-sequence&gt;\n"
+      "                &lt;value&gt;RentalCar&lt;/value&gt;\n"
+      "                &lt;value&gt;CarChecks&lt;/value&gt;\n"
+      "            &lt;/group-sequence&gt;\n"
+      "        &lt;/class&gt;\n"
+      "    &lt;/bean&gt;\n"
+      "    &lt;constraint-definition annotation=\"org.mycompany.CheckCase\" include-existing-validator=\"false\"&gt;\n"
+      "        &lt;validated-by include-existing-validators=\"false\"&gt;\n"
+      "            &lt;value&gt;org.mycompany.CheckCaseValidator&lt;/value&gt;\n"
+      "        &lt;/validated-by&gt;\n"
+      "    &lt;/constraint-definition&gt;\n"
+      "&lt;/constraint-mappings&gt;"
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:128
+#, no-c-format
+msgid "The XML configuration is closely mirroring the programmatic API. For this reason it should suffice to just add some comments. <property>default-package</property> is used for all fields where a classname is expected. If the specified class is not fully qualified the configured default package will be used. Every mapping file can then have several <property>bean</property> nodes, each describing the constraints on the entity with the specified class name.<warning> <para>A given entity can only be configured once across all configuration files. If the same class is configured more than once an exception is thrown.</para> </warning>Settings <property>ignore-annotations</property> to true means that constraint annotations placed on the configured bean are ignored. The default for this value is <constant>true</constant>. ignore-annotations is also available for the nodes <property>class</property>, <property>fields</property> and <property>getter</property>. If not explicitly specified on these levels the configured <property>bean</property> value applies. Otherwise do the nodes <property>class</property>, <property>fields</property> and <property>getter</property> determine on which level the constraints are placed (see <xref linkend=\"validator-usingvalidator-annotate\"/>). The <property>constraint</property> node is then used to add a constraint on the corresponding level. Each constraint definition must define the class via the annotation attribute. The constraint attributes required by the Bean Validation specification (<property>message</property>, <property>groups</property> and <property>payload</property>) have dedicated nodes. All other constraint specific attributes are configured using the the <property>element</property> node."
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:156
+#, no-c-format
+msgid "The class node also allows to reconfigure the default group sequence (see <xref linkend=\"section-default-group-class\"/>) via the <property>group-sequence</property> node."
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:160
+#, no-c-format
+msgid "Last but not least, the list of <classname>ConstraintValidator</classname>s associated to a given constraint can be altered via the <property>constraint-definition</property> node. The <property>annotation</property> attribute represents the constraint annotation being altered. The <property>validated-by</property> elements represent the (ordered) list of <classname>ConstraintValidator</classname> implementations associated to the constraint. If <property>include-existing-validator</property> is set to <constant>false</constant>, validators defined on the constraint annotation are ignored. If set to <constant>true</constant>, the list of ConstraintValidators described in XML are concatenated to the list of validators described on the annotation."
+msgstr ""
+

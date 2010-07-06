@@ -1,0 +1,347 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2010-07-06 14:51+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: application/x-xml2pot; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: gettingstarted.xml:25
+#, no-c-format
+msgid "Getting started"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:27
+#, no-c-format
+msgid "This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quickstart you need:"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:33
+#, no-c-format
+msgid "A JDK &gt;= 5"
+msgstr ""
+
+#. Tag: ulink
+#: gettingstarted.xml:37
+#, no-c-format
+msgid "Apache Maven"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:41
+#, no-c-format
+msgid "An Internet connection (Maven has to download all required libraries)"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:46
+#, no-c-format
+msgid ""
+      "A properly configured remote repository. Add the following to your <filename>settings.xml</filename>: <example> <title>Configuring the JBoss Maven repository in <filename>settings.xml</filename></title> <programlisting>&lt;repositories&gt;\n"
+      "    &lt;repository&gt;\n"
+      "        &lt;id&gt;jboss&lt;/id&gt;\n"
+      "        &lt;url&gt;http://repository.jboss.com/maven2&lt;/url&gt;\n"
+      "        &lt;releases&gt;\n"
+      "            &lt;enabled&gt;true&lt;/enabled&gt;\n"
+      "        &lt;/releases&gt;\n"
+      "        &lt;snapshots&gt;\n"
+      "            &lt;enabled&gt;false&lt;/enabled&gt;\n"
+      "        &lt;/snapshots&gt;\n"
+      "    &lt;/repository&gt;\n"
+      "&lt;/repositories&gt;</programlisting> </example>More information about <filename>settings.xml</filename> can be found in the <ulink url=\"http://maven.apache.org/ref/2.0.8/maven-settings/settings.html\">Maven Local Settings Model</ulink>."
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:60
+#, no-c-format
+msgid ""
+      "Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java Class Library since Java 6 which means that if you run Hibernate Validator with Java 5 you will have to add additional JAXB dependencies. Using maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;\n"
+      "    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
+      "    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
+      "    &lt;version&gt;2.2&lt;/version&gt;\n"
+      "&lt;/dependency&gt;\n"
+      "&lt;dependency&gt;\n"
+      "    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;\n"
+      "    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;\n"
+      "    &lt;version&gt;2.1.12&lt;/version&gt;\n"
+      "&lt;/dependency&gt;\n"
+      "</programlisting> if you are using the SourceForge package you find the necessary libraries in the <filename>lib/jdk5</filename> directory. In case you are not using the XML configuration you can also disable it explicitly by calling <methodname>Configuration.ignoreXmlConfiguration()</methodname> during <classname>ValidationFactory</classname> creation. In this case the JAXB dependencies are not needed."
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:73
+#, no-c-format
+msgid "Setting up a new Maven project"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:75
+#, no-c-format
+msgid "Start by creating new Maven project using the Maven archetype plugin as follows:"
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:79
+#, no-c-format
+msgid "Using Maven's archetype plugin to create a sample project using Hibernate Validator"
+msgstr ""
+
+#. Tag: programlisting
+#: gettingstarted.xml:82
+#, no-c-format
+msgid ""
+      "mvn archetype:create -DarchetypeGroupId=org.hibernate \\\n"
+      "                     -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \\\n"
+      "                     -DarchetypeVersion=&version; \\\n"
+      "                     -DgroupId=com.mycompany \n"
+      "                     -DartifactId=hv-quickstart"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:85
+#, no-c-format
+msgid "Maven will create your project in the directory hv-quickstart. Change into this directory and run:"
+msgstr ""
+
+#. Tag: programlisting
+#: gettingstarted.xml:88
+#, no-c-format
+msgid "mvn test"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:88
+#, no-c-format
+msgid "Maven will compile the example code and run the implemented unit tests. Let's have a look at the actual code."
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:94
+#, no-c-format
+msgid "Applying constraints"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:96
+#, no-c-format
+msgid "Open the project in the IDE of your choice and have a look at the class <classname>Car</classname>:"
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:100
+#, no-c-format
+msgid "Class Car annotated with constraints"
+msgstr ""
+
+#. Tag: programlisting
+#: gettingstarted.xml:102
+#, no-c-format
+msgid ""
+      "package com.mycompany;\n"
+      "\n"
+      "import javax.validation.constraints.Min;\n"
+      "import javax.validation.constraints.NotNull;\n"
+      "import javax.validation.constraints.Size;\n"
+      "\n"
+      "public class Car {\n"
+      "\n"
+      "    @NotNull\n"
+      "    private String manufacturer;\n"
+      "\n"
+      "    @NotNull\n"
+      "    @Size(min = 2, max = 14)\n"
+      "    private String licensePlate;\n"
+      "\n"
+      "    @Min(2)\n"
+      "    private int seatCount;\n"
+      "    \n"
+      "    public Car(String manufacturer, String licencePlate, int seatCount) {\n"
+      "        this.manufacturer = manufacturer;\n"
+      "        this.licensePlate = licencePlate;\n"
+      "        this.seatCount = seatCount;\n"
+      "    }\n"
+      "\n"
+      "    //getters and setters ...\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:105
+#, no-c-format
+msgid "<classname>@NotNull</classname>, <classname>@Size</classname> and <classname>@Min</classname> are so-called constraint annotations, that we use to declare constraints, which shall be applied to the fields of a <classname>Car</classname> instance:"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:112
+#, no-c-format
+msgid "<property>manufacturer</property> shall never be null"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:116
+#, no-c-format
+msgid "<property>licensePlate</property> shall never be null and must be between 2 and 14 characters long"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:121
+#, no-c-format
+msgid "<property>seatCount</property> shall be at least 2."
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:127
+#, no-c-format
+msgid "Validating constraints"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:129
+#, no-c-format
+msgid "To perform a validation of these constraints, we use a <classname>Validator</classname> instance. Let's have a look at the <classname>CarTest</classname> class:"
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:134
+#, no-c-format
+msgid "Class CarTest showing validation examples"
+msgstr ""
+
+#. Tag: programlisting
+#: gettingstarted.xml:136
+#, no-c-format
+msgid ""
+      "package com.mycompany;\n"
+      "\n"
+      "import static org.junit.Assert.*;\n"
+      "\n"
+      "import java.util.Set;\n"
+      "\n"
+      "import javax.validation.ConstraintViolation;\n"
+      "import javax.validation.Validation;\n"
+      "import javax.validation.Validator;\n"
+      "import javax.validation.ValidatorFactory;\n"
+      "\n"
+      "import org.junit.BeforeClass;\n"
+      "import org.junit.Test;\n"
+      "\n"
+      "public class CarTest {\n"
+      "\n"
+      "    private static Validator validator;\n"
+      "\n"
+      "    @BeforeClass\n"
+      "    public static void setUp() {\n"
+      "        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+      "        validator = factory.getValidator();\n"
+      "    }\n"
+      "\n"
+      "    @Test\n"
+      "    public void manufacturerIsNull() {\n"
+      "        Car car = new Car(null, \"DD-AB-123\", 4);\n"
+      "\n"
+      "        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "            validator.validate(car);\n"
+      "\n"
+      "        assertEquals(1, constraintViolations.size());\n"
+      "        assertEquals(\"may not be null\", constraintViolations.iterator().next().getMessage());\n"
+      "    }\n"
+      "\n"
+      "    @Test\n"
+      "    public void licensePlateTooShort() {\n"
+      "        Car car = new Car(\"Morris\", \"D\", 4);\n"
+      "\n"
+      "        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = \n"
+      "            validator.validate(car);\n"
+      "\n"
+      "        assertEquals(1, constraintViolations.size());\n"
+      "        assertEquals(\"size must be between 2 and 14\", constraintViolations.iterator().next().getMessage());\n"
+      "    }\n"
+      "    \n"
+      "    @Test\n"
+      "    public void seatCountTooLow() {\n"
+      "        Car car = new Car(\"Morris\", \"DD-AB-123\", 1);\n"
+      "\n"
+      "        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "            validator.validate(car);\n"
+      "\n"
+      "        assertEquals(1, constraintViolations.size());\n"
+      "        assertEquals(\"must be greater than or equal to 2\", constraintViolations.iterator().next().getMessage());\n"
+      "    }\n"
+      "\n"
+      "    @Test\n"
+      "    public void carIsValid() {\n"
+      "        Car car = new Car(\"Morris\", \"DD-AB-123\", 2);\n"
+      "\n"
+      "        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "            validator.validate(car);\n"
+      "\n"
+      "        assertEquals(0, constraintViolations.size());\n"
+      "    }\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:139
+#, no-c-format
+msgid "In the <methodname>setUp()</methodname> method we get a <classname>Validator</classname> instance from the <classname>ValidatorFactory</classname>. A <classname>Validator</classname> instance is thread-safe and may be reused multiple times. For this reason we store it as field of our test class. We can use the <classname>Validator</classname> now to validate the different car instances in the test methods."
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:147
+#, no-c-format
+msgid "The <methodname>validate()</methodname> method returns a set of <classname>ConstraintViolation</classname> instances, which we can iterate in order to see which validation errors occurred. The first three test methods show some expected constraint violations:"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:154
+#, no-c-format
+msgid "The <classname>@NotNull</classname> constraint on manufacturer is violated in <methodname>manufacturerIsNull()</methodname>"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:159
+#, no-c-format
+msgid "The <classname>@Size</classname> constraint on licensePlate is violated in <methodname>licensePlateTooShort()</methodname>"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:164
+#, no-c-format
+msgid "The <classname>@Min</classname> constraint on seatCount is violated in <methodname>seatCountTooLow()</methodname>"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:169
+#, no-c-format
+msgid "If the object validates successfully, <methodname>validate()</methodname> returns an empty set."
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:172
+#, no-c-format
+msgid "Note that we only use classes from the package <package>javax.validation</package> from the Bean Validation API. As we don't reference any classes of the RI directly, it would be no problem to switch to another implementation of the API, should that need arise."
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:180
+#, no-c-format
+msgid "Where to go next?"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:182
+#, no-c-format
+msgid "That concludes our 5 minute tour through the world of Hibernate Validator. Continue exploring the code examples or look at further examples referenced in <xref linkend=\"chapter-further-reading\"/>. To deepen your understanding of Hibernate Validator just continue reading <xref linkend=\"validator-usingvalidator\"/>. In case your application has specific validation requirements have a look at <xref linkend=\"validator-customconstraints\"/>."
+msgstr ""
+

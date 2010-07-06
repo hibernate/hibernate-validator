@@ -110,9 +110,9 @@
     <para>Maven will create your project in the directory hv-quickstart.
     Change into this directory and run:</para>
 
-    <para><programlisting>mvn test</programlisting>Maven will compile the
-    example code and run the implemented unit tests. Let's have a look at the
-    actual code.</para>
+    <para><programlisting>mvn test</programlisting>
+	Maven will compile the example code and run the implemented unit tests. Let's have a look at the actual code.
+	</para>
   </section>
 
   <section id="validator-gettingstarted-createmodel">
