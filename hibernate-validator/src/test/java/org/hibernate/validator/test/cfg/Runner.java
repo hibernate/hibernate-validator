@@ -21,9 +21,12 @@ package org.hibernate.validator.test.cfg;
  * @author Hardy Ferentschik
  */
 public class Runner {
+
 	private String name;
 
 	private boolean paidEntryFee;
+
+	private int age;
 
 	public boolean isPaidEntryFee() {
 		return paidEntryFee;
@@ -40,6 +43,13 @@ public class Runner {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
 }
-
-

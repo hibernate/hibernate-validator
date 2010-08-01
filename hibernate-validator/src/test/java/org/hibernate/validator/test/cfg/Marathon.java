@@ -28,6 +28,10 @@ public class Marathon implements Tournament {
 
 	private String name;
 
+	/**
+	 * Intentionally without a getter/setter to test adding a constraint programmatically using field access type
+	 */
+	@SuppressWarnings("unused")
 	private long numberOfHelpers;
 
 	private Date tournamentDate;

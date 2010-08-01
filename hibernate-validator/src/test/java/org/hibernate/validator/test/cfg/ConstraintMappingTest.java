@@ -37,6 +37,7 @@ import org.hibernate.validator.cfg.defs.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotEmptyDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
+import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.test.util.TestUtil;
 import org.hibernate.validator.util.LoggerFactory;
@@ -293,6 +294,32 @@ public class ConstraintMappingTest {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		config.addMapping( mapping );
 		config.buildValidatorFactory();
+	}
+
+	/**
+	 * HV-355 (parameter names of RangeDef wrong)
+	 */
+	@Test
+	public void testRangeDef() {
+
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Runner.class )
+				.property( "age", METHOD )
+				.constraint( RangeDef.class )
+				.min( 12 )
+				.max( 99 );
+
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );
 	}
 
 	public interface Foo {

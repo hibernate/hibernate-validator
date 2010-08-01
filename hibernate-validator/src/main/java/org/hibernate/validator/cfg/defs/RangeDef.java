@@ -49,12 +49,12 @@ public class RangeDef extends ConstraintDef<Range> {
 	}
 
 	public RangeDef min(long min) {
-		addParameter( "value", min );
+		addParameter( "min", min );
 		return this;
 	}
 
 	public RangeDef max(long max) {
-		addParameter( "value", max );
+		addParameter( "max", max );
 		return this;
 	}
 }
