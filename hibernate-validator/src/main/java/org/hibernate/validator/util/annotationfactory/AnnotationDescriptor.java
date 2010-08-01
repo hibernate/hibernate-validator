@@ -32,6 +32,7 @@ import java.util.Map;
  * @author Paolo Perrotta
  * @author Davide Marchignoli
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class AnnotationDescriptor<T extends Annotation> {
 
@@ -41,36 +42,36 @@ public class AnnotationDescriptor<T extends Annotation> {
 
 	/**
 	 * Returns a new descriptor for the given annotation type.
-	 * 
+	 *
 	 * @param <S> The type of the annotation.
 	 * @param annotationType The annotation's class.
-	 * 
+	 *
 	 * @return A new descriptor for the given annotation type.
 	 */
 	public static <S extends Annotation> AnnotationDescriptor<S> getInstance(Class<S> annotationType) {
-		return new AnnotationDescriptor<S>(annotationType);
+		return new AnnotationDescriptor<S>( annotationType );
 	}
-	
+
 	/**
 	 * Returns a new descriptor for the given annotation type.
-	 * 
+	 *
 	 * @param <S> The type of the annotation.
 	 * @param annotationType The annotation's class.
 	 * @param elements A map with attribute values for the annotation to be created.
-	 * 
+	 *
 	 * @return A new descriptor for the given annotation type.
 	 */
 	public static <S extends Annotation> AnnotationDescriptor<S> getInstance(Class<S> annotationType, Map<String, Object> elements) {
-		return new AnnotationDescriptor<S>(annotationType, elements);
+		return new AnnotationDescriptor<S>( annotationType, elements );
 	}
-	
+
 	public AnnotationDescriptor(Class<T> annotationType) {
 		this.type = annotationType;
 	}
 
-    public AnnotationDescriptor(Class<T> annotationType, Map<String, Object> elements) {
+	public AnnotationDescriptor(Class<T> annotationType, Map<String, Object> elements) {
 		this.type = annotationType;
-		for (Map.Entry<String, Object> entry : elements.entrySet()) {
+		for ( Map.Entry<String, Object> entry : elements.entrySet() ) {
 			this.elements.put( entry.getKey(), entry.getValue() );
 		}
 	}
@@ -89,6 +90,16 @@ public class AnnotationDescriptor<T extends Annotation> {
 
 	public int numberOfElements() {
 		return elements.size();
+	}
+
+	/**
+	 * Returns a map with the elements contained in this descriptor keyed by name. This map is a copy
+	 * of the internally used map, so it can safely be modified without altering this descriptor.
+	 *
+	 * @return A map with this descriptor's elements.
+	 */
+	public Map<String, Object> getElements() {
+		return new HashMap<String, Object>( elements );
 	}
 
 	public Class<T> type() {

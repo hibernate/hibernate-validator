@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -60,12 +61,12 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private final Map<String, Object> values;
 
 
-	public AnnotationProxy(AnnotationDescriptor descriptor) {
+	public AnnotationProxy(AnnotationDescriptor<?> descriptor) {
 		this.annotationType = descriptor.type();
 		values = getAnnotationValues( descriptor );
 	}
 
-	private Map<String, Object> getAnnotationValues(AnnotationDescriptor descriptor) {
+	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		int processedValuesFromDescriptor = 0;
 		final Method[] declaredMethods = ReflectionHelper.getMethods( annotationType );
@@ -82,7 +83,11 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 			}
 		}
 		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
-			throw new RuntimeException( "Trying to instantiate " + annotationType + " with unknown parameters." );
+
+			Set<String> unknownParameters = descriptor.getElements().keySet();
+			unknownParameters.removeAll( result.keySet() );
+
+			throw new RuntimeException( "Trying to instantiate " + annotationType + " with unknown parameter(s): " + unknownParameters );
 		}
 		return result;
 	}
