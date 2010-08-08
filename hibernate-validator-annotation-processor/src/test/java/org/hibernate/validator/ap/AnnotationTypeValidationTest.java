@@ -61,7 +61,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
 
 		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 27 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 26 ) );
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
 
 		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 30 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 28 ) );
 	}
 
 }
