@@ -68,7 +68,9 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils(), annotationApiHelper
 		);
 
-		constraintCheckFactory = new ConstraintCheckFactory( constraintHelper );
+		constraintCheckFactory = new ConstraintCheckFactory(
+				processingEnvironment.getTypeUtils(), constraintHelper, annotationApiHelper
+		);
 	}
 
 	/**

@@ -20,7 +20,9 @@ package org.hibernate.validator.ap.checks;
 import java.util.Map;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
+import javax.lang.model.util.Types;
 
+import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper.AnnotationType;
@@ -57,7 +59,7 @@ public class ConstraintCheckFactory {
 
 	private final static SingleValuedChecks NULL_CHECKS = new SingleValuedChecks();
 
-	public ConstraintCheckFactory(ConstraintHelper constraintHelper) {
+	public ConstraintCheckFactory(Types typeUtils, ConstraintHelper constraintHelper, AnnotationApiHelper annotationApiHelper) {
 
 		this.constraintHelper = constraintHelper;
 
@@ -100,6 +102,12 @@ public class ConstraintCheckFactory {
 		annotationTypeChecks.put(
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
 				new MultiValuedChecks( constraintHelper, new AnnotationTypeCheck( constraintHelper ) )
+		);
+		annotationTypeChecks.put(
+				AnnotationType.CONSTRAINT_META_ANNOTATION,
+				new SingleValuedChecks(
+						new RetentionPolicyCheck( annotationApiHelper )
+				)
 		);
 		annotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
 

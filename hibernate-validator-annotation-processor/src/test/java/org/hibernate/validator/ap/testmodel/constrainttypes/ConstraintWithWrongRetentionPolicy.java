@@ -1,4 +1,4 @@
-// $Id$
+// $Id: ConstraintWithWrongRetentionPolicy.java 19033 Aug 1, 2010 5:44:13 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -15,22 +15,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.ap.testmodel.invalidcomposedconstraint;
+package org.hibernate.validator.ap.testmodel.constrainttypes;
 
-import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import javax.validation.Constraint;
 
 /**
- * Constraint annotations are not allowed here, as ValidCustomerNumber isn't a
- * proper constraint type definition.
+ * @author Gunnar Morling
  */
-@NotNull
-@Size(min = 10, max = 10)
-public @interface ValidCustomerNumber {
-	String message() default "";
+@Constraint(validatedBy = { })
+@Retention(RetentionPolicy.CLASS)
+public @interface ConstraintWithWrongRetentionPolicy {
 
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
 }

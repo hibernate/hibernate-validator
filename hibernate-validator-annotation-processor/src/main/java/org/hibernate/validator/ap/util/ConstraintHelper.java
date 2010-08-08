@@ -116,6 +116,11 @@ public class ConstraintHelper {
 		GRAPH_VALIDATION_ANNOTATION,
 
 		/**
+		 * Given annotation is the @Constraint meta-annotation.
+		 */
+		CONSTRAINT_META_ANNOTATION,
+
+		/**
 		 * Given annotation is not related to the BV API (e.g. @Resource).
 		 */
 		NO_CONSTRAINT_ANNOTATION
@@ -224,6 +229,9 @@ public class ConstraintHelper {
 		else if ( isGraphValidationAnnotation( annotationMirror ) ) {
 			return AnnotationType.GRAPH_VALIDATION_ANNOTATION;
 		}
+		else if ( isConstraintMetaAnnotation( annotationMirror ) ) {
+			return AnnotationType.CONSTRAINT_META_ANNOTATION;
+		}
 		else {
 			return AnnotationType.NO_CONSTRAINT_ANNOTATION;
 		}
@@ -319,6 +327,19 @@ public class ConstraintHelper {
 				annotationMirror.getAnnotationType()
 						.asElement()
 		);
+	}
+
+	/**
+	 * Checks, whether the given annotation mirror represents the {@link javax.validation.Constraint}
+	 * meta-annotation or not.
+	 *
+	 * @param annotationMirror The annotation mirror of interest.
+	 *
+	 * @return True, if the given mirror represents the @Constraint meta-annotation
+	 *         type, false otherwise.
+	 */
+	private boolean isConstraintMetaAnnotation(AnnotationMirror annotationMirror) {
+		return annotationMirror.getAnnotationType().asElement().getSimpleName().contentEquals( "Constraint" );
 	}
 
 	/**
@@ -596,14 +617,7 @@ public class ConstraintHelper {
 		Set<TypeMirror> mirrorsForAllowedTypes = CollectionHelper.newHashSet();
 
 		for ( Class<?> oneAllowedType : allowedTypes ) {
-
-			if ( oneAllowedType.isArray() ) {
-				mirrorsForAllowedTypes.add( typeUtils.getArrayType( annotationApiHelper.getMirrorForType( oneAllowedType.getComponentType() ) ) );
-			}
-			else {
-				mirrorsForAllowedTypes.add( annotationApiHelper.getMirrorForType( oneAllowedType ) );
-			}
-
+			mirrorsForAllowedTypes.add( annotationApiHelper.getMirrorForType( oneAllowedType ) );
 		}
 
 		builtInConstraints.put( elementUtils.getName( annotation.getSimpleName() ), mirrorsForAllowedTypes );

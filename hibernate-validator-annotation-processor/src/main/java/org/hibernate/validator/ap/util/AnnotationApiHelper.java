@@ -133,11 +133,21 @@ public class AnnotationApiHelper {
 	/**
 	 * Returns a TypeMirror for the given class.
 	 *
-	 * @param clazz The class of interest. May not be a an array type.
+	 * @param clazz The class of interest.
 	 *
 	 * @return A TypeMirror for the given class.
 	 */
 	public TypeMirror getMirrorForType(Class<?> clazz) {
+
+		if ( clazz.isArray() ) {
+			return typeUtils.getArrayType( getMirrorForNonArrayType( clazz.getComponentType() ) );
+		}
+		else {
+			return getMirrorForNonArrayType( clazz );
+		}
+	}
+
+	private TypeMirror getMirrorForNonArrayType(Class<?> clazz) {
 
 		if ( clazz.isPrimitive() ) {
 			return primitiveMirrors.get( clazz );
