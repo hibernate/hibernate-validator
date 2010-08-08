@@ -22,8 +22,7 @@ import javax.tools.Diagnostic.Kind;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintWithWrongRetentionPolicy;
-import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintWithoutRetentionPolicy;
+import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalRetentionPolicies;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalTargets;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ValidCustomerNumber;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
@@ -54,27 +53,18 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 	}
 
 	@Test
-	public void testThatConstraintAnnotationTypeWithoutRetentionPolicyCausesCompilationError() {
-
-		File sourceFile = compilerHelper.getSourceFile( ConstraintWithoutRetentionPolicy.class );
-
-		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
-
-		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 26 ) );
-	}
-
-	@Test
 	public void testThatConstraintAnnotationTypeWithWrongRetentionPolicyCausesCompilationError() {
 
-		File sourceFile = compilerHelper.getSourceFile( ConstraintWithWrongRetentionPolicy.class );
+		File sourceFile = compilerHelper.getSourceFile( ConstraintsWithIllegalRetentionPolicies.class );
 
 		boolean compilationResult =
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
 
 		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 28 ) );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 33 ), new DiagnosticExpectation( Kind.ERROR, 42 )
+		);
 	}
 
 	@Test
