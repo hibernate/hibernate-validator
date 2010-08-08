@@ -20,6 +20,7 @@ package org.hibernate.validator.ap.testmodel.constrainttypes;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import javax.validation.Constraint;
+import javax.validation.Payload;
 
 /**
  * @author Gunnar Morling
@@ -33,6 +34,12 @@ public interface ConstraintsWithIllegalRetentionPolicies {
 	@Retention(RetentionPolicy.CLASS)
 	public @interface ConstraintWithWrongRetentionPolicy {
 
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
 	}
 
 	/**
@@ -40,6 +47,12 @@ public interface ConstraintsWithIllegalRetentionPolicies {
 	 */
 	@Constraint(validatedBy = { DummyValidator.class })
 	public @interface ConstraintWithoutRetentionPolicy {
+
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
 
 	}
 
@@ -49,6 +62,12 @@ public interface ConstraintsWithIllegalRetentionPolicies {
 	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface ConstraintWithCorrectRetentionPolicy {
+
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
 
 	}
 

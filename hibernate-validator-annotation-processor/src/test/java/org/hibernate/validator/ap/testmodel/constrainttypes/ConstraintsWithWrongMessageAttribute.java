@@ -21,36 +21,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.constraints.Size;
 
 /**
  * @author Gunnar Morling
  */
-public interface ConstraintsWithoutValidator {
+public interface ConstraintsWithWrongMessageAttribute {
 
 	/**
-	 * Compilation error expected as no validator is given.
-	 */
-	@Retention(RetentionPolicy.RUNTIME)
-	@Constraint(validatedBy = { })
-	public @interface ConstraintWithoutValidator {
-
-		String message() default "";
-
-		Class<?>[] groups() default { };
-
-		Class<? extends Payload>[] payload() default { };
-
-	}
-
-	/**
-	 * No compilation error expected as a validator is given.
+	 * Compilation error expected as no message() attribute is specified.
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = { DummyValidator.class })
-	public @interface ConstraintWithValidator {
-
-		String message() default "";
+	public @interface ConstraintWithoutMessageAttribute {
 
 		Class<?>[] groups() default { };
 
@@ -59,12 +41,26 @@ public interface ConstraintsWithoutValidator {
 	}
 
 	/**
-	 * No compilation error as this is a composed constraint.
+	 * Compilation error expected as message() attribute doesn't have String as return type.
 	 */
-	@Size
 	@Retention(RetentionPolicy.RUNTIME)
-	@Constraint(validatedBy = { })
-	public @interface ComposedConstraintWithoutValidator {
+	@Constraint(validatedBy = { DummyValidator.class })
+	public @interface ConstraintWithMessageAttributeWithWrongReturnType {
+
+		public int message();
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
+	}
+
+	/**
+	 * No compilation error expected.
+	 */
+	@Retention(RetentionPolicy.RUNTIME)
+	@Constraint(validatedBy = { DummyValidator.class })
+	public @interface ConstraintWithMessageAttribute {
 
 		String message() default "";
 

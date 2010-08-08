@@ -21,6 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.Payload;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
@@ -42,6 +43,12 @@ public interface ConstraintsWithIllegalTargets {
 	@Target({ LOCAL_VARIABLE })
 	public @interface ConstraintWithWrongTarget {
 
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
 	}
 
 	/**
@@ -52,6 +59,12 @@ public interface ConstraintsWithIllegalTargets {
 	@Target({ })
 	public @interface ConstraintWithEmptyTarget {
 
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
 	}
 
 	/**
@@ -60,6 +73,12 @@ public interface ConstraintsWithIllegalTargets {
 	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface ConstraintWithDefaultTarget {
+
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
 
 	}
 
@@ -71,6 +90,12 @@ public interface ConstraintsWithIllegalTargets {
 	@Target({ FIELD })
 	public @interface ConstraintWithAllowedTargetField {
 
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
 	}
 
 	/**
@@ -80,6 +105,12 @@ public interface ConstraintsWithIllegalTargets {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ METHOD })
 	public @interface ConstraintWithAllowedTargetMethod {
+
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
 
 	}
 
@@ -91,6 +122,12 @@ public interface ConstraintsWithIllegalTargets {
 	@Target({ TYPE })
 	public @interface ConstraintWithAllowedTargetType {
 
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
 	}
 
 	/**
@@ -100,6 +137,12 @@ public interface ConstraintsWithIllegalTargets {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ANNOTATION_TYPE })
 	public @interface ConstraintWithAllowedTargetAnnotationType {
+
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
 
 	}
 

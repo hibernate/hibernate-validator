@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalRetentionPolicies;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalTargets;
+import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithWrongMessageAttribute;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithoutValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.DummyValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ValidCustomerNumber;
@@ -66,7 +67,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 33 ), new DiagnosticExpectation( Kind.ERROR, 42 )
+				new DiagnosticExpectation( Kind.ERROR, 34 ), new DiagnosticExpectation( Kind.ERROR, 49 )
 		);
 	}
 
@@ -82,7 +83,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 42 ), new DiagnosticExpectation( Kind.ERROR, 52 )
+				new DiagnosticExpectation( Kind.ERROR, 43 ), new DiagnosticExpectation( Kind.ERROR, 59 )
 		);
 	}
 
@@ -98,7 +99,23 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 34 )
+				new DiagnosticExpectation( Kind.ERROR, 35 )
+		);
+	}
+
+	@Test
+	public void testThatConstraintAnnotationTypeWithMissingOrWrongMessageAttributeCausesCompilationError() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( ConstraintsWithWrongMessageAttribute.class );
+		File sourceFile2 = compilerHelper.getSourceFile( DummyValidator.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 35 ), new DiagnosticExpectation( Kind.ERROR, 50 )
 		);
 	}
 }
