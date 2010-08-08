@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintWithWrongRetentionPolicy;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintWithoutRetentionPolicy;
+import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalTargets;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ValidCustomerNumber;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
@@ -75,5 +76,21 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 28 ) );
 	}
+
+	@Test
+	public void testThatConstraintAnnotationTypeWithWrongTargetCausesCompilationError() {
+
+		File sourceFile = compilerHelper.getSourceFile( ConstraintsWithIllegalTargets.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 42 ), new DiagnosticExpectation( Kind.ERROR, 52 )
+		);
+	}
+
 
 }

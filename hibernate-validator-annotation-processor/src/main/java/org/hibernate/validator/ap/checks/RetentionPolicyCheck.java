@@ -41,8 +41,7 @@ public class RetentionPolicyCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element,
-														 AnnotationMirror annotation) {
+	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
 		Retention retention = element.getAnnotation( Retention.class );
 
