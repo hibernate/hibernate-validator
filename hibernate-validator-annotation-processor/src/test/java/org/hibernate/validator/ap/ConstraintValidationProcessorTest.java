@@ -20,12 +20,7 @@ package org.hibernate.validator.ap;
 import java.io.File;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaFileObject;
-import javax.tools.ToolProvider;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
@@ -58,58 +53,24 @@ import org.hibernate.validator.ap.testmodel.inheritedvalidator.AbstractCustomCon
 import org.hibernate.validator.ap.testmodel.inheritedvalidator.CustomConstraint;
 import org.hibernate.validator.ap.testmodel.inheritedvalidator.CustomConstraintValidator;
 import org.hibernate.validator.ap.testmodel.inheritedvalidator.FieldLevelValidationUsingInheritedValidator;
-import org.hibernate.validator.ap.testmodel.invalidcomposedconstraint.ValidCustomerNumber;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.NoUniqueValidatorResolution;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SerializableCollection;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.Size;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForCollection;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSerializable;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
-import org.hibernate.validator.ap.testutil.CompilerTestHelper;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Test for {@link ConstraintValidationProcessor} using the Java compiler
- * API as defined by JSR 199.
+ * Miscellaneous tests for {@link ConstraintValidationProcessor}.
  *
  * @author Gunnar Morling.
  */
-public class ConstraintValidationProcessorTest {
-
-	private static CompilerTestHelper compilerHelper;
-
-	private DiagnosticCollector<JavaFileObject> diagnostics;
-
-	@BeforeClass
-	public static void setUpCompilerHelper() {
-
-		String testSourceBaseDir = System.getProperty( "testSourceBaseDir" );
-		String pathToBeanValidationApiJar = System.getProperty( "pathToBeanValidationApiJar" );
-
-		assertNotNull(
-				testSourceBaseDir,
-				"The system property testSourceBaseDir has to be set and point to the base directory of the test java sources."
-		);
-		assertNotNull(
-				pathToBeanValidationApiJar,
-				"The system property pathToBeanValidationApiJar has to be set and point to the BV API Jars."
-		);
-
-		compilerHelper =
-				new CompilerTestHelper(
-						ToolProvider.getSystemJavaCompiler(), testSourceBaseDir, pathToBeanValidationApiJar
-				);
-	}
-
-	@BeforeMethod
-	public void setUp() {
-		diagnostics = new DiagnosticCollector<JavaFileObject>();
-	}
+public class ConstraintValidationProcessorTest extends ConstraintValidationProcessorTestBase {
 
 	@Test
 	public void fieldLevelValidationUsingBuiltInConstraints() {
@@ -298,20 +259,6 @@ public class ConstraintValidationProcessorTest {
 				new DiagnosticExpectation( Kind.ERROR, 43 ),
 				new DiagnosticExpectation( Kind.ERROR, 59 ),
 				new DiagnosticExpectation( Kind.ERROR, 67 )
-		);
-	}
-
-	@Test
-	public void testThatSpecifyingConstraintAnnotationAtNonConstraintAnnotationTypeCausesCompilationError() {
-
-		File sourceFile = compilerHelper.getSourceFile( ValidCustomerNumber.class );
-
-		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
-
-		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpectation( Kind.ERROR, 28 ), new DiagnosticExpectation( Kind.ERROR, 29 )
 		);
 	}
 
