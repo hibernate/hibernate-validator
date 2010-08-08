@@ -48,10 +48,14 @@ public class ConstraintValidatorCheck extends AbstractConstraintCheck {
 	@Override
 	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
-		Constraint constraint = element.getAnnotation( Constraint.class );
+		AnnotationMirror constraintMirror = annotationApiHelper.getMirror(
+				element.getAnnotationMirrors(), Constraint.class
+		);
+		boolean atLeastOneValidatorGiven = !annotationApiHelper.getAnnotationArrayValue(
+				constraintMirror, "validatedBy"
+		).isEmpty();
 
-		//raise an error if neither a validator is given and this is not a composed constraint
-		if ( !( constraint.validatedBy().length > 0 || constraintHelper.isComposedConstraint( element ) ) ) {
+		if ( !( atLeastOneValidatorGiven || constraintHelper.isComposedConstraint( element ) ) ) {
 
 			return CollectionHelper.asSet(
 					new ConstraintCheckError(
