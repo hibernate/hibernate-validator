@@ -24,8 +24,32 @@ import javax.validation.Constraint;
 /**
  * @author Gunnar Morling
  */
-@Constraint(validatedBy = { })
-@Retention(RetentionPolicy.CLASS)
-public @interface ConstraintWithWrongRetentionPolicy {
+public interface ConstraintsWithIllegalRetentionPolicies {
+
+	/**
+	 * Compilation error expected as wrong retention policy is given.
+	 */
+	@Constraint(validatedBy = { })
+	@Retention(RetentionPolicy.CLASS)
+	public @interface ConstraintWithWrongRetentionPolicy {
+
+	}
+
+	/**
+	 * Compilation error expected as no retention policy is given.
+	 */
+	@Constraint(validatedBy = { })
+	public @interface ConstraintWithoutRetentionPolicy {
+
+	}
+
+	/**
+	 * No compilation error expected as correct retention policy is given.
+	 */
+	@Constraint(validatedBy = { })
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface ConstraintWithCorrectRetentionPolicy {
+
+	}
 
 }
