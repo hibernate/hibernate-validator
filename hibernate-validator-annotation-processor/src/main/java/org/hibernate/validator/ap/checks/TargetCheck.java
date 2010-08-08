@@ -1,4 +1,4 @@
-// $Id: TargetCheck.java 19310 2010-04-27 22:51:17Z gunnar.morling $
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2009, Red Hat Middleware LLC, and individual contributors

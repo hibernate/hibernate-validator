@@ -1,4 +1,4 @@
-// $Id: ConstraintValidationProcessorTestBase.java 19033 Aug 8, 2010 11:14:14 AM gunnar.morling $
+// $Id$
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2009, Red Hat Middleware LLC, and individual contributors

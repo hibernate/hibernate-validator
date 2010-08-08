@@ -29,6 +29,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -304,6 +305,29 @@ public class ConstraintHelper {
 				: checkCustomConstraint(
 				constraintAnnotationType,
 				typeOfAnnotatedElement
+		);
+	}
+
+	/**
+	 * Checks, whether the given type element represents a composed constraint or not.
+	 *
+	 * @param element The type element of interest. Must not be null.
+	 *
+	 * @return True if the given element represents a composed constraint, false otherwise.
+	 */
+	public boolean isComposedConstraint(TypeElement element) {
+
+		return Boolean.TRUE.equals(
+				element.asType().accept(
+						new TypeKindVisitor6<Boolean, Void>() {
+
+							@Override
+							public Boolean visitDeclared(DeclaredType constraintValidatorImplementation, Void p) {
+								return !getComposingConstraints( constraintValidatorImplementation ).isEmpty();
+							}
+
+						}, null
+				)
 		);
 	}
 

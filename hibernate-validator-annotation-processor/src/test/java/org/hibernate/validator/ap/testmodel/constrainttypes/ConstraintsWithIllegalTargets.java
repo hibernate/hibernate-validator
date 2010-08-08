@@ -1,4 +1,4 @@
-// $Id: ConstraintsWithIllegalTargets.java 19033 Aug 1, 2010 5:44:13 PM gunnar.morling $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -37,7 +37,7 @@ public interface ConstraintsWithIllegalTargets {
 	/**
 	 * Compilation error expected due to none supported target type being given.
 	 */
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ LOCAL_VARIABLE })
 	public @interface ConstraintWithWrongTarget {
@@ -47,7 +47,7 @@ public interface ConstraintsWithIllegalTargets {
 	/**
 	 * Compilation error expected as no supported target type is given.
 	 */
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ })
 	public @interface ConstraintWithEmptyTarget {
@@ -57,7 +57,7 @@ public interface ConstraintsWithIllegalTargets {
 	/**
 	 * No compilation error expected, as not specifying @Target allows this constraint for all element types.
 	 */
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface ConstraintWithDefaultTarget {
 
@@ -66,7 +66,7 @@ public interface ConstraintsWithIllegalTargets {
 	/**
 	 * No compilation error expected, as supported target type FIELD is given.
 	 */
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ FIELD })
 	public @interface ConstraintWithAllowedTargetField {
@@ -76,7 +76,7 @@ public interface ConstraintsWithIllegalTargets {
 	/**
 	 * No compilation error expected, as supported target type METHOD is given.
 	 */
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ METHOD })
 	public @interface ConstraintWithAllowedTargetMethod {
@@ -86,7 +86,7 @@ public interface ConstraintsWithIllegalTargets {
 	/**
 	 * No compilation error expected, as supported target type TYPE is given.
 	 */
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ TYPE })
 	public @interface ConstraintWithAllowedTargetType {
@@ -96,7 +96,7 @@ public interface ConstraintsWithIllegalTargets {
 	/**
 	 * No compilation error expected, as supported target type ANNOTATION_TYPE is given.
 	 */
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ANNOTATION_TYPE })
 	public @interface ConstraintWithAllowedTargetAnnotationType {

@@ -17,39 +17,21 @@
 */
 package org.hibernate.validator.ap.testmodel.constrainttypes;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import javax.validation.Constraint;
+import java.lang.annotation.Annotation;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Gunnar Morling
  */
-public interface ConstraintsWithIllegalRetentionPolicies {
+public class DummyValidator implements ConstraintValidator<Annotation, Object> {
 
-	/**
-	 * Compilation error expected as wrong retention policy is given.
-	 */
-	@Constraint(validatedBy = { DummyValidator.class })
-	@Retention(RetentionPolicy.CLASS)
-	public @interface ConstraintWithWrongRetentionPolicy {
-
+	public void initialize(Annotation constraintAnnotation) {
+		throw new UnsupportedOperationException( "Not implemented" );
 	}
 
-	/**
-	 * Compilation error expected as no retention policy is given.
-	 */
-	@Constraint(validatedBy = { DummyValidator.class })
-	public @interface ConstraintWithoutRetentionPolicy {
-
-	}
-
-	/**
-	 * No compilation error expected as correct retention policy is given.
-	 */
-	@Constraint(validatedBy = { DummyValidator.class })
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface ConstraintWithCorrectRetentionPolicy {
-
+	public boolean isValid(Object value, ConstraintValidatorContext context) {
+		throw new UnsupportedOperationException( "Not implemented" );
 	}
 
 }

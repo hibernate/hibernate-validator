@@ -1,4 +1,4 @@
-// $Id: AnnotationTypeValidationTest.java 19525 2010-05-15 16:05:09Z gunnar.morling $
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -24,6 +24,8 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalRetentionPolicies;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalTargets;
+import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithoutValidator;
+import org.hibernate.validator.ap.testmodel.constrainttypes.DummyValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ValidCustomerNumber;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
@@ -55,10 +57,11 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 	@Test
 	public void testThatConstraintAnnotationTypeWithWrongRetentionPolicyCausesCompilationError() {
 
-		File sourceFile = compilerHelper.getSourceFile( ConstraintsWithIllegalRetentionPolicies.class );
+		File sourceFile1 = compilerHelper.getSourceFile( ConstraintsWithIllegalRetentionPolicies.class );
+		File sourceFile2 = compilerHelper.getSourceFile( DummyValidator.class );
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -70,10 +73,11 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 	@Test
 	public void testThatConstraintAnnotationTypeWithWrongTargetCausesCompilationError() {
 
-		File sourceFile = compilerHelper.getSourceFile( ConstraintsWithIllegalTargets.class );
+		File sourceFile1 = compilerHelper.getSourceFile( ConstraintsWithIllegalTargets.class );
+		File sourceFile2 = compilerHelper.getSourceFile( DummyValidator.class );
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -82,5 +86,19 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		);
 	}
 
+	@Test
+	public void testThatConstraintAnnotationTypeWithoutValidatorCausesCompilationError() {
 
+		File sourceFile1 = compilerHelper.getSourceFile( ConstraintsWithoutValidator.class );
+		File sourceFile2 = compilerHelper.getSourceFile( DummyValidator.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 34 )
+		);
+	}
 }

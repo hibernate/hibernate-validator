@@ -20,35 +20,38 @@ package org.hibernate.validator.ap.testmodel.constrainttypes;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import javax.validation.Constraint;
+import javax.validation.constraints.Size;
 
 /**
  * @author Gunnar Morling
  */
-public interface ConstraintsWithIllegalRetentionPolicies {
+public interface ConstraintsWithoutValidator {
 
 	/**
-	 * Compilation error expected as wrong retention policy is given.
+	 * Compilation error expected as no validator is given.
 	 */
-	@Constraint(validatedBy = { DummyValidator.class })
-	@Retention(RetentionPolicy.CLASS)
-	public @interface ConstraintWithWrongRetentionPolicy {
-
-	}
-
-	/**
-	 * Compilation error expected as no retention policy is given.
-	 */
-	@Constraint(validatedBy = { DummyValidator.class })
-	public @interface ConstraintWithoutRetentionPolicy {
-
-	}
-
-	/**
-	 * No compilation error expected as correct retention policy is given.
-	 */
-	@Constraint(validatedBy = { DummyValidator.class })
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface ConstraintWithCorrectRetentionPolicy {
+	@Constraint(validatedBy = { })
+	public @interface ConstraintWithoutValidator {
+
+	}
+
+	/**
+	 * No compilation error expected as a validator is given.
+	 */
+	@Retention(RetentionPolicy.RUNTIME)
+	@Constraint(validatedBy = { DummyValidator.class })
+	public @interface ConstraintWithValidator {
+
+	}
+
+	/**
+	 * No compilation error as this is a composed constraint.
+	 */
+	@Size
+	@Retention(RetentionPolicy.RUNTIME)
+	@Constraint(validatedBy = { })
+	public @interface ComposedConstraintWithoutValidator {
 
 	}
 

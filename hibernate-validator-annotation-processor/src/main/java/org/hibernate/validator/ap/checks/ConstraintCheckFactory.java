@@ -106,7 +106,9 @@ public class ConstraintCheckFactory {
 		annotationTypeChecks.put(
 				AnnotationType.CONSTRAINT_META_ANNOTATION,
 				new SingleValuedChecks(
-						new RetentionPolicyCheck( annotationApiHelper ), new TargetCheck( annotationApiHelper )
+						new RetentionPolicyCheck( annotationApiHelper ),
+						new TargetCheck( annotationApiHelper ),
+						new ConstraintValidatorCheck( constraintHelper, annotationApiHelper )
 				)
 		);
 		annotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );

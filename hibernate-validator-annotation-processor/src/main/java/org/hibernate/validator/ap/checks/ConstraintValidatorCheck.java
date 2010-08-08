@@ -17,50 +17,50 @@
  */
 package org.hibernate.validator.ap.checks;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
 import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
+import javax.validation.Constraint;
 
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
- * Checks, that {@link RetentionPolicy#RUNTIME} is declared for constraint annotation types.
+ * Checks, that for each constraint annotation type, which is not a composed constraint,
+ * a validator implementation is specified using {@link Constraint#validatedBy()}.
  *
  * @author Gunnar Morling
  */
-public class RetentionPolicyCheck extends AbstractConstraintCheck {
+public class ConstraintValidatorCheck extends AbstractConstraintCheck {
+
+	private ConstraintHelper constraintHelper;
 
 	private final AnnotationApiHelper annotationApiHelper;
 
-	public RetentionPolicyCheck(AnnotationApiHelper annotationApiHelper) {
+	public ConstraintValidatorCheck(ConstraintHelper constraintHelper, AnnotationApiHelper annotationApiHelper) {
+
+		this.constraintHelper = constraintHelper;
 		this.annotationApiHelper = annotationApiHelper;
 	}
 
 	@Override
 	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
-		Retention retention = element.getAnnotation( Retention.class );
+		Constraint constraint = element.getAnnotation( Constraint.class );
 
-		if ( retention == null ) {
-			return CollectionHelper.asSet(
-					new ConstraintCheckError( element, null, "CONSTRAINT_TYPE_WITH_MISSING_OR_WRONG_RETENTION" )
-			);
-		}
+		//raise an error if neither a validator is given and this is not a composed constraint
+		if ( !( constraint.validatedBy().length > 0 || constraintHelper.isComposedConstraint( element ) ) ) {
 
-		if ( !retention.value().equals( RetentionPolicy.RUNTIME ) ) {
 			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element,
-							annotationApiHelper.getMirror( element.getAnnotationMirrors(), Retention.class ),
-							"CONSTRAINT_TYPE_WITH_MISSING_OR_WRONG_RETENTION"
+							annotationApiHelper.getMirror( element.getAnnotationMirrors(), Constraint.class ),
+							"CONSTRAINT_TYPE_WITHOUT_VALIDATOR"
 					)
 			);
 		}
-
 
 		return Collections.emptySet();
 	}
