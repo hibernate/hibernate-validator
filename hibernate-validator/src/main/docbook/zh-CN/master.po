@@ -6,8 +6,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2010-07-06 14:46+0000\n"
-"PO-Revision-Date: 2010-07-06 14:46+0000\n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2010-08-14 14:38+0830\n"
+"Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,34 +17,35 @@ msgstr ""
 #: master.xml:26
 #, no-c-format
 msgid "Hibernate Validator"
-msgstr ""
+msgstr "Hibernate Validator"
 
 #. Tag: subtitle
 #: master.xml:27
 #, no-c-format
 msgid "JSR 303 Reference Implementation"
-msgstr ""
+msgstr "JSR 303 的参考实现"
 
 #. Tag: subtitle
 #: master.xml:28
 #, no-c-format
 msgid "Reference Guide"
-msgstr ""
+msgstr "使用指南"
 
 #. Tag: holder
 #: master.xml:34
 #, no-c-format
 msgid "&copyrightHolder;"
-msgstr ""
+msgstr "&copyrightHolder;"
 
 #. Tag: author
 #: master.xml:37
 #, no-c-format
 msgid "<firstname>Hardy</firstname> <surname>Ferentschik</surname>"
-msgstr ""
+msgstr "<firstname>Hardy</firstname> <surname>Ferentschik</surname>"
 
 #. Tag: author
 #: master.xml:41
 #, no-c-format
 msgid "<firstname>Gunnar</firstname> <surname>Morling</surname>"
-msgstr ""
+msgstr "<firstname>Gunnar</firstname> <surname>Morling</surname>"
+
