@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2010-07-06 14:46+0000\n"
-"PO-Revision-Date: 2010-08-19 01:49+0830\n"
+"PO-Revision-Date: 2010-08-19 22:28+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1024,13 +1024,13 @@ msgstr "如果默认的消息解析器不能够满足你的需求,那么你也�
 #: usingvalidator.xml:498
 #, no-c-format
 msgid "Validating groups"
-msgstr "验证组"
+msgstr "校验组"
 
 #. Tag: para
 #: usingvalidator.xml:500
 #, no-c-format
 msgid "Groups allow you to restrict the set of constraints applied during validation. This makes for example wizard like validation possible where in each step only a specified subset of constraints get validated. The groups targeted are passed as var-args parameters to <methodname>validate</methodname>, <methodname>validateProperty</methodname> and <methodname>validateValue</methodname>. Let's have a look at an extended <classname>Car</classname> with <classname>Driver</classname> example. First we have the class <classname>Person</classname> (<xref linkend=\"example-person\"/>) which has a <classname>@NotNull </classname>constraint on <property>name</property>. Since no group is specified for this annotation its default group is <classname>javax.validation.groups.Default</classname>."
-msgstr "验证组能够让你在验证的时候选择应用哪些约束条件. 这样在某些情况下( 例如向导 ) 就可以对每一步进行校验的时候, 选取对应这步的那些约束条件进行验证了. 校验组是通过可变参数传递给<methodname>validate</methodname>, <methodname>validateProperty</methodname> 和 <methodname>validateValue</methodname>的. 让我们来看个例子, 这个实例扩展了上面的<classname>Car</classname>类,又为其添加了一个新的<classname>Driver</classname>. 首先, 类<classname>Person</classname> (<xref linkend=\"example-person\"/>) 的<property>name</property>属性上定义了一个<classname>@NotNull </classname>的约束条件. 因为没有明确指定这个约束条件属于哪个组,所以它被归类到默认组 (<classname>javax.validation.groups.Default</classname>)."
+msgstr "校验组能够让你在验证的时候选择应用哪些约束条件. 这样在某些情况下( 例如向导 ) 就可以对每一步进行校验的时候, 选取对应这步的那些约束条件进行验证了. 校验组是通过可变参数传递给<methodname>validate</methodname>, <methodname>validateProperty</methodname> 和 <methodname>validateValue</methodname>的. 让我们来看个例子, 这个实例扩展了上面的<classname>Car</classname>类,又为其添加了一个新的<classname>Driver</classname>. 首先, 类<classname>Person</classname> (<xref linkend=\"example-person\"/>) 的<property>name</property>属性上定义了一个<classname>@NotNull </classname>的约束条件. 因为没有明确指定这个约束条件属于哪个组,所以它被归类到默认组 (<classname>javax.validation.groups.Default</classname>)."
 
 #. Tag: para
 #: usingvalidator.xml:515
@@ -1342,25 +1342,25 @@ msgstr "最后, 让我们再来校验所有的组中定义的约束条件,可以
 #: usingvalidator.xml:605
 #, no-c-format
 msgid "Group sequences"
-msgstr ""
+msgstr "校验组序列"
 
 #. Tag: para
 #: usingvalidator.xml:607
 #, no-c-format
 msgid "By default, constraints are evaluated in no particular order and this regardless of which groups they belong to. In some situations, however, it is useful to control the order of the constraints evaluation. In our example from <xref linkend=\"validator-usingvalidator-validationgroups\"/> we could for example require that first all default car constraints are passing before we check the road worthiness of the car. Finally before we drive away we check the actual driver constraints. In order to implement such an order one would define a new interface and annotate it with <classname>@GroupSequence</classname> defining the order in which the groups have to be validated."
-msgstr ""
+msgstr "默认情况下, 如果一个实体类(或者属性)上定义了多个约束条件,那么在验证过程中,这些约束条件无序被校验的, 不管它们属于那个验证组. 但是在某些情况下, 控制这个顺序又是有必要的. 在<xref linkend=\"validator-usingvalidator-validationgroups\"/>中, 我们可以要求汽车先要通过检测, 没有问题了之后在进行上路测试, 最后, 在我们把车开走之前,还要让司机通过测试. 为了达到这个效果, 我们可以创建一个新的接口, 然后用<classname>@GroupSequence</classname>标注它, 在这个标注里面去定义要应用的验证组的顺序. "
 
 #. Tag: para
 #: usingvalidator.xml:620
 #, no-c-format
 msgid "If at least one constraints fails in a sequenced group none of the constraints of the following groups in the sequence get validated."
-msgstr ""
+msgstr "如果这个校验组序列中有一个约束条件没有通过验证的话, 那么此约束条件后面的都不会再继续被校验了. "
 
 #. Tag: title
 #: usingvalidator.xml:626
 #, no-c-format
 msgid "Interface with @GroupSequence"
-msgstr ""
+msgstr "标注了@GroupSequence的接口"
 
 #. Tag: programlisting
 #: usingvalidator.xml:628
@@ -1370,24 +1370,27 @@ msgid ""
 "public interface OrderedChecks {\n"
 "}"
 msgstr ""
+"@GroupSequence({Default.class, CarChecks.class, DriverChecks.class})\n"
+"public interface OrderedChecks {\n"
+"}"
 
 #. Tag: para
 #: usingvalidator.xml:632
 #, no-c-format
 msgid "Groups defining a sequence and groups composing a sequence must not be involved in a cyclic dependency either directly or indirectly, either through cascaded sequence definition or group inheritance. If a group containing such a circularity is evaluated, a <classname>GroupDefinitionException</classname> is raised."
-msgstr ""
+msgstr "一个校验组序列中包含的校验组和这个校验组序列不能造成直接或者间接的循环引用. 包括校验组继承. 如果造成了循环引用的话, 会导致<classname>GroupDefinitionException</classname>异常."
 
 #. Tag: para
 #: usingvalidator.xml:636
 #, no-c-format
 msgid "The usage of the new sequence could then look like in <xref linkend=\"example-group-sequence\"/>."
-msgstr ""
+msgstr "<xref linkend=\"example-group-sequence\"/>展示了校验组序列的用法."
 
 #. Tag: title
 #: usingvalidator.xml:641
 #, no-c-format
 msgid "Usage of a group sequence"
-msgstr ""
+msgstr "校验组序列的用法"
 
 #. Tag: programlisting
 #: usingvalidator.xml:643
@@ -1406,24 +1409,36 @@ msgid ""
 "    assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );\n"
 "}"
 msgstr ""
+"@Test\n"
+"public void testOrderedChecks() {\n"
+"    Car car = new Car( \"Morris\", \"DD-AB-123\", 2 );\n"
+"    car.setPassedVehicleInspection( true );\n"
+"\n"
+"    Driver john = new Driver( \"John Doe\" );\n"
+"    john.setAge( 18 );\n"
+"    john.passedDrivingTest( true );\n"
+"    car.setDriver( john );\n"
+"\n"
+"    assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );\n"
+"}"
 
 #. Tag: title
 #: usingvalidator.xml:648
 #, no-c-format
 msgid "Redefining the default group sequence of a class"
-msgstr ""
+msgstr "对一个类重定义其默认校验组"
 
 #. Tag: para
 #: usingvalidator.xml:650
 #, no-c-format
 msgid "The @GroupSequence annotation also fulfills a second purpose. It allows you to redefine what the Default group means for a given class. To redefine <classname>Default</classname> for a class, place a <classname>@GroupSequence</classname> annotation on the class. The defined groups in the annotation express the sequence of groups that substitute <classname>Default</classname> for this class. <xref linkend=\"example-rental-car\"/> introduces a new class RentalCar with a redfined default group. With this definition the check for all three groups can be rewritten as seen in <xref linkend=\"example-testOrderedChecksWithRedefinedDefault\"/>."
-msgstr ""
+msgstr "<classname>@GroupSequence</classname> annotation还有第二个用处, 通过把<classname>@GroupSequence</classname>标注于一个类, 你可以给这个类定义它的默认校验组(<classname>Default</classname>).  这样,定义在其中的校验组就表示对这个类进行默认组校验的时候要被应用的约束条件(和顺序). <xref linkend=\"example-rental-car\"/>中引入了一个新的类RentalCar, 它就被重定义了默认组. 这样, 在<xref linkend=\"example-testOrderedChecksWithRedefinedDefault\"/>中, RentalCar被校验的时候,实际上是被应用了三个校验组的约束条件."
 
 #. Tag: title
 #: usingvalidator.xml:662
 #, no-c-format
 msgid "RentalCar"
-msgstr ""
+msgstr "RentalCar"
 
 #. Tag: programlisting
 #: usingvalidator.xml:664
@@ -1436,12 +1451,18 @@ msgid ""
 "    }\n"
 "}"
 msgstr ""
+"@GroupSequence({ RentalCar.class, CarChecks.class })\n"
+"public class RentalCar extends Car {\n"
+"    public RentalCar(String manufacturer, String licencePlate, int seatCount) {\n"
+"        super( manufacturer, licencePlate, seatCount );\n"
+"    }\n"
+"}"
 
 #. Tag: title
 #: usingvalidator.xml:668
 #, no-c-format
 msgid "testOrderedChecksWithRedefinedDefault"
-msgstr ""
+msgstr "testOrderedChecksWithRedefinedDefault"
 
 #. Tag: programlisting
 #: usingvalidator.xml:670
@@ -1460,61 +1481,73 @@ msgid ""
 "    assertEquals( 0, validator.validate( rentalCar, Default.class, DriverChecks.class ).size() );\n"
 "}"
 msgstr ""
+"@Test\n"
+"public void testOrderedChecksWithRedefinedDefault() {\n"
+"    RentalCar rentalCar = new RentalCar( \"Morris\", \"DD-AB-123\", 2 );\n"
+"    rentalCar.setPassedVehicleInspection( true );\n"
+"\n"
+"    Driver john = new Driver( \"John Doe\" );\n"
+"    john.setAge( 18 );\n"
+"    john.passedDrivingTest( true );\n"
+"    rentalCar.setDriver( john );\n"
+"\n"
+"    assertEquals( 0, validator.validate( rentalCar, Default.class, DriverChecks.class ).size() );\n"
+"}"
 
 #. Tag: para
 #: usingvalidator.xml:674
 #, no-c-format
 msgid "Due to the fact that there cannot be a cyclic dependency in the group and group sequence definitions one cannot just add <classname>Default</classname> to the sequence redefining <classname>Default</classname> for a class. Instead the class itself should be added!"
-msgstr ""
+msgstr "因为不能在校验组和校验组序列中有循环依赖关系, 所以, 如果你想重定义一个类的默认组, 并且还想把<classname>Default</classname>组加入到这个重定义的序列当中的话, 则不能简单的加入<classname>Default</classname>, 而是需要把被重定义的类加入到其中."
 
 #. Tag: title
 #: usingvalidator.xml:684
 #: usingvalidator.xml:692
 #, no-c-format
 msgid "Built-in constraints"
-msgstr ""
+msgstr "内置的约束条件"
 
 #. Tag: para
 #: usingvalidator.xml:686
 #, no-c-format
 msgid "Hibernate Validator implements all of the default constraints specified in Bean Validation as well as some custom ones. <xref linkend=\"table-builtin-constraints\"/> list all constraints available in Hibernate Validator."
-msgstr ""
+msgstr "Hibernate Validator不仅实现了Bean Validation中规定的所有的默认约束条件, 还有附加有一些自定义的. <xref linkend=\"table-builtin-constraints\"/>列出了Hibernate Validator中已经提供的约束条件."
 
 #. Tag: entry
 #: usingvalidator.xml:699
 #, no-c-format
 msgid "Annotation"
-msgstr ""
+msgstr "Annotation"
 
 #. Tag: entry
 #: usingvalidator.xml:701
 #, no-c-format
 msgid "Part of Bean Validation Specification"
-msgstr ""
+msgstr "属于Bean Validation 规范"
 
 #. Tag: entry
 #: usingvalidator.xml:703
 #, no-c-format
 msgid "Apply on"
-msgstr ""
+msgstr "应用位置"
 
 #. Tag: entry
 #: usingvalidator.xml:705
 #, no-c-format
 msgid "<entry>Use</entry>"
-msgstr ""
+msgstr "<entry>作用</entry>"
 
 #. Tag: entry
 #: usingvalidator.xml:707
 #, no-c-format
 msgid "Hibernate Metadata impact"
-msgstr ""
+msgstr "对Hibernate Core中的元数据的影响"
 
 #. Tag: entry
 #: usingvalidator.xml:713
 #, no-c-format
 msgid "@AssertFalse"
-msgstr ""
+msgstr "@AssertFalse"
 
 #. Tag: entry
 #: usingvalidator.xml:715
@@ -1533,7 +1566,7 @@ msgstr ""
 #: usingvalidator.xml:1049
 #, no-c-format
 msgid "<entry>yes</entry>"
-msgstr ""
+msgstr "<entry>yes</entry>"
 
 #. Tag: entry
 #: usingvalidator.xml:717
@@ -1543,13 +1576,13 @@ msgstr ""
 #: usingvalidator.xml:938
 #, no-c-format
 msgid "field/property"
-msgstr ""
+msgstr "field/property"
 
 #. Tag: entry
 #: usingvalidator.xml:719
 #, no-c-format
 msgid "Check that the annotated element is <constant>false</constant>."
-msgstr ""
+msgstr "检查被标注的值是否为<constant>false</constant>."
 
 #. Tag: entry
 #: usingvalidator.xml:722
@@ -1570,25 +1603,25 @@ msgstr ""
 #: usingvalidator.xml:1059
 #, no-c-format
 msgid "none"
-msgstr ""
+msgstr "没有"
 
 #. Tag: entry
 #: usingvalidator.xml:726
 #, no-c-format
 msgid "@AssertTrue"
-msgstr ""
+msgstr "@AssertTrue"
 
 #. Tag: entry
 #: usingvalidator.xml:732
 #, no-c-format
 msgid "Check that the annotated element is <constant>true</constant>."
-msgstr ""
+msgstr "检查被标注的值是否为<constant>true</constant>."
 
 #. Tag: entry
 #: usingvalidator.xml:739
 #, no-c-format
 msgid "@CreditCardNumber"
-msgstr ""
+msgstr "@CreditCardNumber"
 
 #. Tag: entry
 #: usingvalidator.xml:741
@@ -1601,26 +1634,26 @@ msgstr ""
 #: usingvalidator.xml:1032
 #, no-c-format
 msgid "<entry>no</entry>"
-msgstr ""
+msgstr "<entry>no</entry>"
 
 #. Tag: entry
 #: usingvalidator.xml:743
 #: usingvalidator.xml:1034
 #, no-c-format
 msgid "field/property. The supported type is <classname>String</classname>."
-msgstr ""
+msgstr "字段或属性, 要求其类型为<classname>String</classname>."
 
 #. Tag: entry
 #: usingvalidator.xml:746
 #, no-c-format
 msgid "Check that the annotated string passes the Luhn checksum test. Note, this validation aims to check for user mistake, not credit card validity! See also <ulink url=\"http://www.merriampark.com/anatomycc.htm\">Anatomy of Credit Card Numbers</ulink>."
-msgstr ""
+msgstr "检查被标注的字符串能否通过Luhn Checksum test. 注意, 这个约束条件是为了防止用户手误, 并不对信用卡有效性进行检测.  请参考<ulink url=\"http://www.merriampark.com/anatomycc.htm\">Anatomy of Credit Card Numbers</ulink>."
 
 #. Tag: entry
 #: usingvalidator.xml:756
 #, no-c-format
 msgid "@DecimalMax"
-msgstr ""
+msgstr "@DecimalMax"
 
 #. Tag: entry
 #: usingvalidator.xml:760
@@ -1631,49 +1664,49 @@ msgstr ""
 #: usingvalidator.xml:979
 #, no-c-format
 msgid "field/property. Supported types are <classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>String</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types."
-msgstr ""
+msgstr "字段或属性. 支持类型包括<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>String</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname>和其各自对应的包装器类型."
 
 #. Tag: entry
 #: usingvalidator.xml:767
 #, no-c-format
 msgid "The annotated element must be a number whose value must be lower or equal to the specified maximum. The parameter value is the string representation of the max value according to the <classname>BigDecimal</classname> string representation."
-msgstr ""
+msgstr "被标注的值必须不大于约束中指定的最大值. 这个约束的参数是一个通过<classname>BigDecimal</classname>定义的最大值的字符串表示."
 
 #. Tag: entry
 #: usingvalidator.xml:776
 #, no-c-format
 msgid "@DecimalMin"
-msgstr ""
+msgstr "@DecimalMin"
 
 #. Tag: entry
 #: usingvalidator.xml:787
 #, no-c-format
 msgid "The annotated element must be a number whose value must be higher or equal to the specified minimum. The parameter value is the string representation of the min value according to the <classname>BigDecimal</classname> string representation."
-msgstr ""
+msgstr "被标注的值必须不小于约束中指定的最小值. 这个约束的参数是一个通过<classname>BigDecimal</classname>定义的最小值的字符串表示."
 
 #. Tag: entry
 #: usingvalidator.xml:796
 #, no-c-format
 msgid "@Digits(integer=, fraction=)"
-msgstr ""
+msgstr "@Digits(integer=, fraction=)"
 
 #. Tag: entry
 #: usingvalidator.xml:807
 #, no-c-format
 msgid "Check whether the property is a number having up to <literal>integer</literal> digits and <literal>fraction</literal> fractional digits."
-msgstr ""
+msgstr "检查此值是否是一个数字,并且这个数字的整数部分不超过<literal>integer</literal>定义的位数, 和小数部分不超过<literal>fraction</literal> 定义的位数."
 
 #. Tag: entry
 #: usingvalidator.xml:811
 #, no-c-format
 msgid "Define column precision and scale."
-msgstr ""
+msgstr "对应的数据库表字段会被设置精度(precision)和准度(scale)."
 
 #. Tag: entry
 #: usingvalidator.xml:815
 #, no-c-format
 msgid "@Email"
-msgstr ""
+msgstr "@Email"
 
 #. Tag: entry
 #: usingvalidator.xml:819
@@ -1681,254 +1714,254 @@ msgstr ""
 #: usingvalidator.xml:965
 #, no-c-format
 msgid "field/property. Needs to be a string."
-msgstr ""
+msgstr "字段或属性, 需要是String类型的."
 
 #. Tag: entry
 #: usingvalidator.xml:821
 #, no-c-format
 msgid "Check whether the specified string is a valid email address."
-msgstr ""
+msgstr "检查所给的字符串是否符合email地址的格式."
 
 #. Tag: entry
 #: usingvalidator.xml:828
 #, no-c-format
 msgid "@Future"
-msgstr ""
+msgstr "@Future"
 
 #. Tag: entry
 #: usingvalidator.xml:832
 #: usingvalidator.xml:951
 #, no-c-format
 msgid "field/property. Supported types are <classname>java.util.Date</classname> and <classname>java.util.Calendar</classname>."
-msgstr ""
+msgstr "字段或属性, 支持类型是<classname>java.util.Date</classname> 和 <classname>java.util.Calendar</classname>."
 
 #. Tag: entry
 #: usingvalidator.xml:836
 #, no-c-format
 msgid "Checks whether the annotated date is in the future."
-msgstr ""
+msgstr "检查给定的日期是否比现在晚."
 
 #. Tag: entry
 #: usingvalidator.xml:842
 #, no-c-format
 msgid "@Length(min=, max=)"
-msgstr ""
+msgstr "@Length(min=, max=)"
 
 #. Tag: entry
 #: usingvalidator.xml:848
 #, no-c-format
 msgid "Validate that the annotated string is between <parameter>min</parameter> and <parameter>max</parameter> included."
-msgstr ""
+msgstr "检查该字符串的长度是否在<parameter>min</parameter> 和 <parameter>max</parameter>规定的范围内."
 
 #. Tag: entry
 #: usingvalidator.xml:852
 #: usingvalidator.xml:1005
 #, no-c-format
 msgid "Column length will be set to max."
-msgstr ""
+msgstr "对应的数据库表字段的长度会被设置成约束中定义的最大值."
 
 #. Tag: entry
 #: usingvalidator.xml:856
 #, no-c-format
 msgid "@Max"
-msgstr ""
+msgstr "@Max"
 
 #. Tag: entry
 #: usingvalidator.xml:867
 #, no-c-format
 msgid "Checks whether the annotated value is less than or equal to the specified maximum."
-msgstr ""
+msgstr "检查该值是否小于或等于约束条件中指定的最大值."
 
 #. Tag: entry
 #: usingvalidator.xml:870
 #: usingvalidator.xml:888
 #, no-c-format
 msgid "Add a check constraint on the column."
-msgstr ""
+msgstr "会给对应的数据库表字段添加一个check的约束条件."
 
 #. Tag: entry
 #: usingvalidator.xml:874
 #, no-c-format
 msgid "@Min"
-msgstr ""
+msgstr "@Min"
 
 #. Tag: entry
 #: usingvalidator.xml:885
 #, no-c-format
 msgid "Checks whether the annotated value is higher than or equal to the specified minimum."
-msgstr ""
+msgstr "检查该值是否大于或等于约束条件中规定的最小值."
 
 #. Tag: entry
 #: usingvalidator.xml:892
 #, no-c-format
 msgid "@NotNull"
-msgstr ""
+msgstr "@NotNull"
 
 #. Tag: entry
 #: usingvalidator.xml:898
 #, no-c-format
 msgid "Check that the annotated value is not <constant>null.</constant>"
-msgstr ""
+msgstr "检查该值不为<constant>null.</constant>."
 
 #. Tag: entry
 #: usingvalidator.xml:901
 #, no-c-format
 msgid "Column(s) are not null."
-msgstr ""
+msgstr "对应的表字段不允许为null."
 
 #. Tag: entry
 #: usingvalidator.xml:905
 #, no-c-format
 msgid "@NotBlank"
-msgstr ""
+msgstr "@NotBlank"
 
 #. Tag: entry
 #: usingvalidator.xml:911
 #, no-c-format
 msgid "Check that the annotated string is not null and the trimmed length is greater than 0. The difference to @NotEmpty is that this constraint can only be applied on strings and that trailing whitespaces are ignored."
-msgstr ""
+msgstr "检查该字符串不为null,并且不是空字符串. 本约束和下面的@NotEmpty的不同之处在于,本约束只能被用在字符串类型上,并且会忽略字符串尾部的空白字符."
 
 #. Tag: entry
 #: usingvalidator.xml:920
 #, no-c-format
 msgid "@NotEmpty"
-msgstr ""
+msgstr "@NotEmpty"
 
 #. Tag: entry
 #: usingvalidator.xml:924
 #, no-c-format
 msgid "field/property. Supported types are String, Collection, Map and arrays."
-msgstr ""
+msgstr "字段或属性. 支持的类型包括String, Collection, Map 和数组."
 
 #. Tag: entry
 #: usingvalidator.xml:927
 #, no-c-format
 msgid "Check whether the annotated element is not <constant>null</constant> nor empty."
-msgstr ""
+msgstr "检查该值不为null同时也不为空."
 
 #. Tag: entry
 #: usingvalidator.xml:934
 #, no-c-format
 msgid "@Null"
-msgstr ""
+msgstr "@Null"
 
 #. Tag: entry
 #: usingvalidator.xml:940
 #, no-c-format
 msgid "Check that the annotated value is <constant>null.</constant>"
-msgstr ""
+msgstr "检查该值应该为null."
 
 #. Tag: entry
 #: usingvalidator.xml:947
 #, no-c-format
 msgid "@Past"
-msgstr ""
+msgstr "@Past"
 
 #. Tag: entry
 #: usingvalidator.xml:955
 #, no-c-format
 msgid "Checks whether the annotated date is in the past."
-msgstr ""
+msgstr "检查标注对象中的值表示的日期比当前早."
 
 #. Tag: entry
 #: usingvalidator.xml:961
 #, no-c-format
 msgid "@Pattern(regex=, flag=)"
-msgstr ""
+msgstr "@Pattern(regex=, flag=)"
 
 #. Tag: entry
 #: usingvalidator.xml:967
 #, no-c-format
 msgid "Checks if the annotated string matches the regular expression <parameter>regex</parameter> considering the given flag <parameter>match</parameter>."
-msgstr ""
+msgstr "检查该字符串是否能够在<parameter>match</parameter>指定的情况下被<parameter>regex</parameter>定义的正则表达式匹配."
 
 #. Tag: entry
 #: usingvalidator.xml:975
 #, no-c-format
 msgid "@Range(min=, max=)"
-msgstr ""
+msgstr "@Range(min=, max=)"
 
 #. Tag: entry
 #: usingvalidator.xml:986
 #, no-c-format
 msgid "Check whether the annotated value lies between (inclusive) the specified minimum and maximum."
-msgstr ""
+msgstr "检查该值是否在[min, max)之间"
 
 #. Tag: entry
 #: usingvalidator.xml:993
 #, no-c-format
 msgid "@Size(min=, max=)"
-msgstr ""
+msgstr "@Size(min=, max=)"
 
 #. Tag: entry
 #: usingvalidator.xml:997
 #, no-c-format
 msgid "field/property. Supported types are <classname>String</classname>, <classname>Collection</classname>, <classname>Map</classname> and <classname>arrays</classname>."
-msgstr ""
+msgstr "字段或属性. 支持的类型包括String, Collection, Map 和数组."
 
 #. Tag: entry
 #: usingvalidator.xml:1002
 #, no-c-format
 msgid "Check if the annotated element size is between min and max (inclusive)."
-msgstr ""
+msgstr "检查该值的size是否在[min, max)之间."
 
 #. Tag: entry
 #: usingvalidator.xml:1009
 #, no-c-format
 msgid "@ScriptAssert(lang=, script=, alias=)"
-msgstr ""
+msgstr "@ScriptAssert(lang=, script=, alias=)"
 
 #. Tag: entry
 #: usingvalidator.xml:1013
 #, no-c-format
 msgid "type"
-msgstr ""
+msgstr "类"
 
 #. Tag: entry
 #: usingvalidator.xml:1015
 #, no-c-format
 msgid "Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 (\"Scripting for the Java<superscript>TM</superscript> Platform\") must part of the class path. This is automatically the case when running on Java 6. For older Java versions, the JSR 223 RI can be added manually to the class path.The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path."
-msgstr ""
+msgstr "要使用这个约束条件,必须先要保证Java Scripting API 即JSR 223 (\"Scripting for the Java<superscript>TM</superscript> Platform\")的实现在类路径当中. 如果使用的时Java 6的话,则不是问题, 如果是老版本的话, 那么需要把 JSR 223的实现添加进类路径. 这个约束条件中的表达式可以使用任何兼容JSR 223的脚本来编写. (更多信息请参考javadoc)"
 
 #. Tag: entry
 #: usingvalidator.xml:1030
 #, no-c-format
 msgid "@URL(protocol=, host=, port=)"
-msgstr ""
+msgstr "@URL(protocol=, host=, port=)"
 
 #. Tag: entry
 #: usingvalidator.xml:1037
 #, no-c-format
 msgid "Check if the annotated string is a valid URL. If any of parameters <parameter>protocol</parameter>, <parameter>host</parameter> or <parameter>port</parameter> is specified the URL must match the specified values in the according part."
-msgstr ""
+msgstr "判断该值是否是一个有效的URL, 如果给出了约束中的<parameter>protocol</parameter>, <parameter>host</parameter> 或 <parameter>port</parameter> 参数的话,那个被校验的值需要和其匹配."
 
 #. Tag: entry
 #: usingvalidator.xml:1047
 #, no-c-format
 msgid "@Valid"
-msgstr ""
+msgstr "@Valid"
 
 #. Tag: entry
 #: usingvalidator.xml:1051
 #, no-c-format
 msgid "field/property. Any non-primitive types are supported."
-msgstr ""
+msgstr "字段或属性. 支持所有的非原始类型."
 
 #. Tag: entry
 #: usingvalidator.xml:1054
 #, no-c-format
 msgid "Performs validation recursively on the associated object. If the object is a collection or an array, the elements are validated recursively. If the object is a map, the value elements are validated recursively."
-msgstr ""
+msgstr "递归的对关联对象进行校验, 如果关联对象是个集合或者数组, 那么对其中的元素进行递归校验,如果是一个map,则对其中的值部分进行校验."
 
 #. Tag: para
 #: usingvalidator.xml:1066
 #, no-c-format
 msgid "On top of the parameters indicated in <xref linkend=\"table-builtin-constraints\"/> each constraint supports the parameters <parameter>message</parameter>, <parameter>groups</parameter> and <parameter>payload</parameter>. This is a requirement of the Bean Validation specification."
-msgstr ""
+msgstr "除了<xref linkend=\"table-builtin-constraints\"/>中列出的各个约束包含的参数外,所有的约束条件还都有<parameter>message</parameter>, <parameter>groups</parameter> 和 <parameter>payload</parameter>三个参数, 这个是Bean Validation 规范规定的."
 
 #. Tag: para
 #: usingvalidator.xml:1073
 #, no-c-format
 msgid "In some cases these built-in constraints will not fulfill your requirements. In this case you can literally in a minute write your own constraints. We will discuss this in"
-msgstr ""
+msgstr "如果这些内置的约束不能满足你的需求的话, 那么你可以创建你自己的约束条件, 我们接下来会详细介绍, 请继续阅读"
 
