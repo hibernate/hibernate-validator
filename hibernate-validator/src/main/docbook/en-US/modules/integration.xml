@@ -152,7 +152,7 @@
       linkend="validator-checkconstraints-orm-hibernateevent" /> can in this
       case be configured in <filename>persistence.xml</filename>.
       <filename>persistence.xml</filename> also defines a node validation-mode
-      while can be set to <constant>AUTO</constant>,
+      which can be set to <constant>AUTO</constant>,
       <constant>CALLBACK</constant>, <constant>NONE</constant>. The default is
       <constant>AUTO</constant>.</para>
 
