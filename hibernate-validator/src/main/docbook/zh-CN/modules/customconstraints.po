@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2010-07-06 14:46+0000\n"
-"PO-Revision-Date: 2010-08-20 00:04+0830\n"
+"PO-Revision-Date: 2010-08-21 02:16+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -101,13 +101,13 @@ msgstr ""
 #: customconstraints.xml:74
 #, no-c-format
 msgid "Now we can define the actual constraint annotation. If you've never designed an annotation before, this may look a bit scary, but actually it's not that hard:"
-msgstr ""
+msgstr "现在我们可以来定义真正的约束标注了. 如果你以前没有创建过标注(annotation)的话,那么这个可能看起来有点吓人, 可是其实没有那么难的 :)"
 
 #. Tag: title
 #: customconstraints.xml:79
 #, no-c-format
 msgid "Defining CheckCase constraint annotation"
-msgstr ""
+msgstr "定义一个CheckCase的约束标注"
 
 #. Tag: programlisting
 #: customconstraints.xml:81
@@ -141,36 +141,63 @@ msgid ""
 "\n"
 "}"
 msgstr ""
+"package com.mycompany;\n"
+"\n"
+"import static java.lang.annotation.ElementType.*;\n"
+"import static java.lang.annotation.RetentionPolicy.*;\n"
+"\n"
+"import java.lang.annotation.Documented;\n"
+"import java.lang.annotation.Retention;\n"
+"import java.lang.annotation.Target;\n"
+"\n"
+"import javax.validation.Constraint;\n"
+"import javax.validation.Payload;\n"
+"\n"
+"@Target( { METHOD, FIELD, ANNOTATION_TYPE })\n"
+"@Retention(RUNTIME)\n"
+"@Constraint(validatedBy = CheckCaseValidator.class)\n"
+"@Documented\n"
+"public @interface CheckCase {\n"
+"\n"
+"    String message() default \"{com.mycompany.constraints.checkcase}\";\n"
+"\n"
+"    Class&lt;?&gt;[] groups() default {};\n"
+"\n"
+"    Class&lt;? extends Payload&gt;[] payload() default {};\n"
+"    \n"
+"    CaseMode value();\n"
+"\n"
+"}"
 
 #. Tag: para
 #: customconstraints.xml:84
 #, no-c-format
 msgid "An annotation type is defined using the <code>@interface</code> keyword. All attributes of an annotation type are declared in a method-like manner. The specification of the Bean Validation API demands, that any constraint annotation defines"
-msgstr ""
+msgstr "一个标注(annotation) 是通过<code>@interface</code>关键字来定义的. 这个标注中的属性是声明成类似方法的样式的. 根据Bean Validation API 规范的要求"
 
 #. Tag: para
 #: customconstraints.xml:91
 #, no-c-format
 msgid "an attribute <property>message</property> that returns the default key for creating error messages in case the constraint is violated"
-msgstr ""
+msgstr "<property>message</property>属性, 这个属性被用来定义默认得消息模版, 当这个约束条件被验证失败的时候,通过此属性来输出错误信息."
 
 #. Tag: para
 #: customconstraints.xml:97
 #, no-c-format
 msgid "an attribute <property>groups</property> that allows the specification of validation groups, to which this constraint belongs (see <xref linkend=\"validator-usingvalidator-validationgroups\"/>). This must default to an empty array of type <classname>Class&lt;?&gt;</classname>."
-msgstr ""
+msgstr "<property>groups</property> 属性, 用于指定这个约束条件属于哪(些)个校验组(请参考<xref linkend=\"validator-usingvalidator-validationgroups\"/>). 这个的默认值必须是<classname>Class&lt;?&gt;</classname>类型到空到数组."
 
 #. Tag: para
 #: customconstraints.xml:105
 #, no-c-format
 msgid "an attribute <classname>payload</classname> that can be used by clients of the Bean Validation API to assign custom payload objects to a constraint. This attribute is not used by the API itself."
-msgstr ""
+msgstr "<classname>payload</classname> 属性, Bean Validation API 的使用者可以通过此属性来给约束条件指定严重级别. 这个属性并不被API自身所使用."
 
 #. Tag: para
 #: customconstraints.xml:109
 #, no-c-format
 msgid "An example for a custom payload could be the definition of a severity."
-msgstr ""
+msgstr "通过payload属性来指定默认错误严重级别的示例"
 
 #. Tag: programlisting
 #: customconstraints.xml:112
@@ -191,66 +218,80 @@ msgid ""
 "    // ...\n"
 "}"
 msgstr ""
+"public class Severity {\n"
+"    public static class Info extends Payload {};\n"
+"    public static class Error extends Payload {};\n"
+"}\n"
+"\n"
+"public class ContactDetails {\n"
+"    @NotNull(message=\"Name is mandatory\", payload=Severity.Error.class)\n"
+"    private String name;\n"
+"\n"
+"    @NotNull(message=\"Phone number not specified, but not mandatory\", payload=Severity.Info.class)\n"
+"    private String phoneNumber;\n"
+"\n"
+"    // ...\n"
+"}"
 
 #. Tag: para
 #: customconstraints.xml:114
 #, no-c-format
 msgid "Now a client can after the validation of a <classname>ContactDetails</classname> instance access the severity of a constraint using <methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname> and adjust its behaviour depending on the severity."
-msgstr ""
+msgstr "这样, 在校验完一个<classname>ContactDetails</classname> 的示例之后, 你就可以通过调用<methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname>来得到之前指定到错误级别了,并且可以根据这个信息来决定接下来到行为."
 
 #. Tag: para
 #: customconstraints.xml:123
 #, no-c-format
 msgid "Besides those three mandatory attributes (<property>message</property>, <property>groups</property> and <property>payload</property>) we add another one allowing for the required case mode to be specified. The name <property>value</property> is a special one, which can be omitted upon using the annotation, if it is the only attribute specified, as e.g. in <code>@CheckCase(CaseMode.UPPER)</code>."
-msgstr ""
+msgstr "除了这三个强制性要求的属性(<property>message</property>, <property>groups</property> 和 <property>payload</property>) 之外, 我们还添加了一个属性用来指定所要求到字符串模式. 此属性的名称<property>value</property>在annotation的定义中比较特殊, 如果只有这个属性被赋值了的话, 那么, 在使用此annotation到时候可以忽略此属性名称, 即<code>@CheckCase(CaseMode.UPPER)</code>."
 
 #. Tag: para
 #: customconstraints.xml:131
 #, no-c-format
 msgid "In addition we annotate the annotation type with a couple of so-called meta annotations:"
-msgstr ""
+msgstr "另外, 我们还给这个annotation标注了一些(所谓的) 元标注( 译注: 或\"元模型信息\"?, \"meta annotatioins\"): "
 
 #. Tag: para
 #: customconstraints.xml:136
 #, no-c-format
 msgid "<code>@Target({ METHOD, FIELD, ANNOTATION_TYPE })</code>: Says, that methods, fields and annotation declarations may be annotated with @CheckCase (but not type declarations e.g.)"
-msgstr ""
+msgstr "<code>@Target({ METHOD, FIELD, ANNOTATION_TYPE })</code>: 表示@CheckCase 可以被用在方法, 字段或者annotation声明上."
 
 #. Tag: para
 #: customconstraints.xml:142
 #, no-c-format
 msgid "<code>@Retention(RUNTIME)</code>: Specifies, that annotations of this type will be available at runtime by the means of reflection"
-msgstr ""
+msgstr "<code>@Retention(RUNTIME)</code>: 表示这个标注信息是在运行期通过反射被读取的."
 
 #. Tag: para
 #: customconstraints.xml:148
 #, no-c-format
 msgid "<code>@Constraint(validatedBy = CheckCaseValidator.class)</code>: Specifies the validator to be used to validate elements annotated with @CheckCase"
-msgstr ""
+msgstr "<code>@Constraint(validatedBy = CheckCaseValidator.class)</code>: 指明使用那个校验器(类) 去校验使用了此标注的元素."
 
 #. Tag: para
 #: customconstraints.xml:154
 #, no-c-format
 msgid "<code>@Documented</code>: Says, that the use of <code>@CheckCase</code> will be contained in the JavaDoc of elements annotated with it"
-msgstr ""
+msgstr "<code>@Documented</code>: 表示在对使用了<code>@CheckCase</code>的类进行javadoc操作到时候, 这个标注会被添加到javadoc当中."
 
 #. Tag: title
 #: customconstraints.xml:162
 #, no-c-format
 msgid "The constraint validator"
-msgstr ""
+msgstr "约束校验器"
 
 #. Tag: para
 #: customconstraints.xml:165
 #, no-c-format
 msgid "Next, we need to implement a constraint validator, that's able to validate elements with a <classname>@CheckCase</classname> annotation. To do so, we implement the interface ConstraintValidator as shown below:"
-msgstr ""
+msgstr "接下来, 我们需要实现一个约束验证器, 它是被用来校验应用了<classname>@CheckCase</classname>标注到元素到. 如下面例子所示, 这个验证器需要实现ConstraintValidator接口."
 
 #. Tag: title
 #: customconstraints.xml:171
 #, no-c-format
 msgid "Implementing a constraint validator for the constraint <classname>CheckCase</classname>"
-msgstr ""
+msgstr "约束条件<classname>CheckCase</classname>的验证器"
 
 #. Tag: programlisting
 #: customconstraints.xml:174
@@ -282,48 +323,73 @@ msgid ""
 "\n"
 "}"
 msgstr ""
+"package com.mycompany;\n"
+"\n"
+"import javax.validation.ConstraintValidator;\n"
+"import javax.validation.ConstraintValidatorContext;\n"
+"\n"
+"public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {\n"
+"\n"
+"    private CaseMode caseMode;\n"
+"\n"
+"    public void initialize(CheckCase constraintAnnotation) {\n"
+"        this.caseMode = constraintAnnotation.value();\n"
+"    }\n"
+"\n"
+"    public boolean isValid(String object, ConstraintValidatorContext constraintContext) {\n"
+"\n"
+"        if (object == null)\n"
+"            return true;\n"
+"\n"
+"        if (caseMode == CaseMode.UPPER)\n"
+"            return object.equals(object.toUpperCase());\n"
+"        else\n"
+"            return object.equals(object.toLowerCase());\n"
+"    }\n"
+"\n"
+"}"
 
 #. Tag: para
 #: customconstraints.xml:177
 #, no-c-format
 msgid "The <classname>ConstraintValidator</classname> interface defines two type parameters, which we set in our implementation. The first one specifies the annotation type to be validated (in our example <classname>CheckCase</classname>), the second one the type of elements, which the validator can handle (here <classname>String</classname>)."
-msgstr ""
+msgstr "<classname>ConstraintValidator</classname>定义了两个泛型参数, 第一个是这个校验器所服务到标注类型(在我们的例子中即<classname>CheckCase</classname>), 第二个这个校验器所支持到被校验元素到类型 (即<classname>String</classname>)."
 
 #. Tag: para
 #: customconstraints.xml:184
 #, no-c-format
 msgid "In case a constraint annotation is allowed at elements of different types, a <classname>ConstraintValidator</classname> for each allowed type has to be implemented and registered at the constraint annotation as shown above."
-msgstr ""
+msgstr "如果一个约束标注支持多种类型到被校验元素的话, 那么需要为每个所支持的类型定义一个<classname>ConstraintValidator</classname>,并且注册到约束标注中."
 
 #. Tag: para
 #: customconstraints.xml:189
 #, no-c-format
 msgid "The implementation of the validator is straightforward. The <methodname>initialize()</methodname> method gives us access to the attribute values of the annotation to be validated. In the example we store the <classname>CaseMode</classname> in a field of the validator for further usage."
-msgstr ""
+msgstr "这个验证器的实现就很平常了, <methodname>initialize()</methodname> 方法传进来一个所要验证的标注类型的实例, 在本例中, 我们通过此实例来获取其value属性的值,并将其保存为<classname>CaseMode</classname>类型的成员变量供下一步使用."
 
 #. Tag: para
 #: customconstraints.xml:195
 #, no-c-format
 msgid "In the <methodname>isValid()</methodname> method we implement the logic, that determines, whether a <classname>String</classname> is valid according to a given <classname>@CheckCase</classname> annotation or not. This decision depends on the case mode retrieved in <classname>initialize()</classname>. As the Bean Validation specification recommends, we consider <code>null</code> values as being valid. If <code>null</code> is not a valid value for an element, it should be annotated with <code>@NotNull</code> explicitly."
-msgstr ""
+msgstr "<methodname>isValid()</methodname>是实现真正的校验逻辑的地方, 判断一个给定的<classname>String</classname>对于<classname>@CheckCase</classname>这个约束条件来说是否是合法的, 同时这还要取决于在<classname>initialize()</classname>中获得的大小写模式. 根据Bean Validation中所推荐的做法, 我们认为<code>null</code>是合法的值. 如果<code>null</code>对于这个元素来说是不合法的话,那么它应该使用<code>@NotNull</code>来标注."
 
 #. Tag: title
 #: customconstraints.xml:205
 #, no-c-format
 msgid "The ConstraintValidatorContext"
-msgstr ""
+msgstr "ConstraintValidatorContext"
 
 #. Tag: para
 #: customconstraints.xml:207
 #, no-c-format
 msgid "relies on the default error message generation by just returning <constant>true</constant> or <constant>false</constant> from the <methodname>isValid</methodname> call. Using the passed <classname>ConstraintValidatorContext</classname> object it is possible to either add additional error messages or completely disable the default error message generation and solely define custom error messages. The <classname>ConstraintValidatorContext</classname> API is modeled as fluent interface and is best demonstrated with an example:"
-msgstr ""
+msgstr "中的<methodname>isValid</methodname>使用了约束条件中定义的错误消息模板, 然后返回一个<constant>true</constant> 或者 <constant>false</constant>. 通过使用传入的<classname>ConstraintValidatorContext</classname>对象, 我们还可以给约束条件中定义的错误信息模板来添加额外的信息或者完全创建一个新的错误信息模板. "
 
 #. Tag: title
 #: customconstraints.xml:219
 #, no-c-format
 msgid "Use of ConstraintValidatorContext to define custom error messages"
-msgstr ""
+msgstr "使用ConstraintValidatorContext来自定义错误信息"
 
 #. Tag: programlisting
 #: customconstraints.xml:222
@@ -364,18 +430,52 @@ msgid ""
 "\n"
 "}"
 msgstr ""
+"package com.mycompany;\n"
+"\n"
+"import javax.validation.ConstraintValidator;\n"
+"import javax.validation.ConstraintValidatorContext;\n"
+"\n"
+"public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {\n"
+"\n"
+"    private CaseMode caseMode;\n"
+"\n"
+"    public void initialize(CheckCase constraintAnnotation) {\n"
+"        this.caseMode = constraintAnnotation.value();\n"
+"    }\n"
+"\n"
+"    public boolean isValid(String object, ConstraintValidatorContext constraintContext) {\n"
+"\n"
+"        if (object == null)\n"
+"            return true;\n"
+"        \n"
+"        boolean isValid;\n"
+"        if (caseMode == CaseMode.UPPER) {\n"
+"            isValid = object.equals(object.toUpperCase());\n"
+"        }\n"
+"        else {\n"
+"            isValid = object.equals(object.toLowerCase());\n"
+"        }\n"
+"        \n"
+"        if(!isValid) {\n"
+"            constraintContext.disableDefaultConstraintViolation();\n"
+"            constraintContext.buildConstraintViolationWithTemplate( \"{com.mycompany.constraints.CheckCase.message}\"  ).addConstraintViolation();\n"
+"        }\n"
+"        return result;\n"
+"    }\n"
+"\n"
+"}"
 
 #. Tag: para
 #: customconstraints.xml:225
 #, no-c-format
 msgid "shows how you can disable the default error message generation and add a custom error message using a specified message template. In this example the use of the <classname>ConstraintValidatorContext</classname> results in the same error message as the default error message generation."
-msgstr ""
+msgstr "演示了如果创建一个新的错误信息模板来替换掉约束条件中定义的默认的. 在本例中, 实际上通过调用<classname>ConstraintValidatorContext</classname>达到了一个使用默认消息模板的效果."
 
 #. Tag: para
 #: customconstraints.xml:231
 #, no-c-format
 msgid "It is important to end each new constraint violation with <methodname>addConstraintViolation</methodname>. Only after that the new constraint violation will be created."
-msgstr ""
+msgstr "在创建新的constraint violation的时候一定要记得调用<methodname>addConstraintViolation</methodname>, 只有这样, 这个新的constraint violation才会被真正的创建."
 
 #. Tag: para
 #: customconstraints.xml:236
@@ -405,54 +505,65 @@ msgid ""
 "    return isValid;\n"
 "}"
 msgstr ""
+"public boolean isValid(Group group, ConstraintValidatorContext constraintValidatorContext) {\n"
+"    boolean isValid = false;\n"
+"    ...\n"
+"\n"
+"    if(!isValid) {\n"
+"        constraintValidatorContext\n"
+"            .buildConstraintViolationWithTemplate( \"{my.custom.template}\" )\n"
+"            .addNode( \"myProperty\" ).addConstraintViolation();\n"
+"    }\n"
+"    return isValid;\n"
+"}"
 
 #. Tag: title
 #: customconstraints.xml:254
 #, no-c-format
 msgid "The error message"
-msgstr ""
+msgstr "校验错误信息"
 
 #. Tag: para
 #: customconstraints.xml:256
 #, no-c-format
 msgid "Finally we need to specify the error message, that shall be used, in case a <classname>@CheckCase</classname> constraint is violated. To do so, we add the following to our custom <filename>ValidationMessages.properties</filename> (see also <xref linkend=\"section-message-interpolation\"/>)"
-msgstr ""
+msgstr "最后, 我们还需要指定如果<classname>@CheckCase</classname>这个约束条件验证的时候,没有通过的话的校验错误信息. 我们可以添加下面的内容到我们项目自定义的<filename>ValidationMessages.properties</filename> (参考 <xref linkend=\"section-message-interpolation\"/>)文件中."
 
 #. Tag: title
 #: customconstraints.xml:263
 #, no-c-format
 msgid "Defining a custom error message for the <classname>CheckCase</classname> constraint"
-msgstr ""
+msgstr "为<classname>CheckCase</classname>约束定义一个错误信息"
 
 #. Tag: programlisting
 #: customconstraints.xml:266
 #, no-c-format
 msgid "com.mycompany.constraints.CheckCase.message=Case mode must be {value}."
-msgstr ""
+msgstr "com.mycompany.constraints.CheckCase.message=Case mode must be {value}."
 
 #. Tag: para
 #: customconstraints.xml:269
 #, no-c-format
 msgid "If a validation error occurs, the validation runtime will use the default value, that we specified for the message attribute of the <classname>@CheckCase</classname> annotation to look up the error message in this file."
-msgstr ""
+msgstr "如果发现校验错误了的话, 你所使用的Bean Validation的实现会用我们定义在<classname>@CheckCase</classname>中message属性上的值作为键到这个文件中去查找对应的错误信息."
 
 #. Tag: title
 #: customconstraints.xml:276
 #, no-c-format
 msgid "Using the constraint"
-msgstr ""
+msgstr "应用约束条件"
 
 #. Tag: para
 #: customconstraints.xml:278
 #, no-c-format
 msgid "Now that our first custom constraint is completed, we can use it in the <classname>Car</classname> class from the <xref linkend=\"validator-gettingstarted\"/> chapter to specify that the <property>licensePlate</property> field shall only contain upper-case strings:"
-msgstr ""
+msgstr "现在我们已经有了一个自定义的约束条件了, 我们可以把它用在<xref linkend=\"validator-gettingstarted\"/>中的<classname>Car</classname>类上, 来校验此类的<property>licensePlate</property>属性的值是否全都是大写字母."
 
 #. Tag: title
 #: customconstraints.xml:285
 #, no-c-format
 msgid "Applying the <classname>CheckCase</classname> constraint"
-msgstr ""
+msgstr "应用<classname>CheckCase</classname>约束条件"
 
 #. Tag: programlisting
 #: customconstraints.xml:288
@@ -488,18 +599,47 @@ msgid ""
 "\n"
 "}"
 msgstr ""
+"package com.mycompany;\n"
+"\n"
+"import javax.validation.constraints.Min;\n"
+"import javax.validation.constraints.NotNull;\n"
+"import javax.validation.constraints.Size;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"    @NotNull\n"
+"    private String manufacturer;\n"
+"\n"
+"    @NotNull\n"
+"    @Size(min = 2, max = 14)\n"
+"    @CheckCase(CaseMode.UPPER)\n"
+"    private String licensePlate;\n"
+"\n"
+"    @Min(2)\n"
+"    private int seatCount;\n"
+"    \n"
+"    public Car(String manufacturer, String licencePlate, int seatCount) {\n"
+"\n"
+"        this.manufacturer = manufacturer;\n"
+"        this.licensePlate = licencePlate;\n"
+"        this.seatCount = seatCount;\n"
+"    }\n"
+"\n"
+"    //getters and setters ...\n"
+"\n"
+"}"
 
 #. Tag: para
 #: customconstraints.xml:291
 #, no-c-format
 msgid "Finally let's demonstrate in a little test that the <classname>@CheckCase</classname> constraint is properly validated:"
-msgstr ""
+msgstr "最后,让我们用一个简单的测试来检测<classname>@CheckCase</classname>约束已经被正确的校验了:"
 
 #. Tag: title
 #: customconstraints.xml:296
 #, no-c-format
 msgid "Testcase demonstrating the <classname>CheckCase</classname> validation"
-msgstr ""
+msgstr "演示<classname>CheckCase</classname>的验证过程"
 
 #. Tag: programlisting
 #: customconstraints.xml:299
@@ -554,30 +694,78 @@ msgid ""
 "    }\n"
 "}"
 msgstr ""
+"package com.mycompany;\n"
+"\n"
+"import static org.junit.Assert.*;\n"
+"\n"
+"import java.util.Set;\n"
+"\n"
+"import javax.validation.ConstraintViolation;\n"
+"import javax.validation.Validation;\n"
+"import javax.validation.Validator;\n"
+"import javax.validation.ValidatorFactory;\n"
+"\n"
+"import org.junit.BeforeClass;\n"
+"import org.junit.Test;\n"
+"\n"
+"public class CarTest {\n"
+"\n"
+"    private static Validator validator;\n"
+"\n"
+"    @BeforeClass\n"
+"    public static void setUp() {\n"
+"        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"        validator = factory.getValidator();\n"
+"    }\n"
+"\n"
+"    @Test\n"
+"    public void testLicensePlateNotUpperCase() {\n"
+"\n"
+"        Car car = new Car(\"Morris\", \"dd-ab-123\", 4);\n"
+"\n"
+"        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+"            validator.validate(car);\n"
+"        assertEquals(1, constraintViolations.size());\n"
+"        assertEquals(\n"
+"            \"Case mode must be UPPER.\", \n"
+"            constraintViolations.iterator().next().getMessage());\n"
+"    }\n"
+"\n"
+"    @Test\n"
+"    public void carIsValid() {\n"
+"\n"
+"        Car car = new Car(\"Morris\", \"DD-AB-123\", 4);\n"
+"\n"
+"        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+"            validator.validate(car);\n"
+"\n"
+"        assertEquals(0, constraintViolations.size());\n"
+"    }\n"
+"}"
 
 #. Tag: title
 #: customconstraints.xml:305
 #, no-c-format
 msgid "Constraint composition"
-msgstr ""
+msgstr "约束条件组合"
 
 #. Tag: para
 #: customconstraints.xml:307
 #, no-c-format
 msgid "Looking at the <property>licensePlate</property> field of the <classname>Car</classname> class in <xref linkend=\"example-car-with-checkcase\"/>, we see three constraint annotations already. In complexer scenarios, where even more constraints could be applied to one element, this might become a bit confusing easily. Furthermore, if we had a <property>licensePlate</property> field in another class, we would have to copy all constraint declarations to the other class as well, violating the DRY principle."
-msgstr ""
+msgstr "在<xref linkend=\"example-car-with-checkcase\"/>中我们可以看到, 类<classname>Car</classname>的<property>licensePlate</property>属性上定义了三个约束条件. 在某些复杂的场景中, 可能还会有更多的约束条件被定义到同一个元素上面, 这可能会让代码看起来有些复杂, 另外, 如果在另外的类里面还有一个<property>licensePlate</property>属性, 我们可能还要把这些约束条件再拷贝到这个属性上, 但是这样做又违反了 DRY 原则."
 
 #. Tag: para
 #: customconstraints.xml:316
 #, no-c-format
 msgid "This problem can be tackled using compound constraints. In the following we create a new constraint annotation <classname>@ValidLicensePlate</classname>, that comprises the constraints <classname>@NotNull</classname>, <classname>@Size</classname> and <classname>@CheckCase</classname>:"
-msgstr ""
+msgstr "这个问题可以通过使用组合约束条件来解决. 接下来让我们来创建一个新的约束标注<classname>@ValidLicensePlate</classname>, 它组合了<classname>@NotNull</classname>, <classname>@Size</classname> 和 <classname>@CheckCase</classname>:"
 
 #. Tag: title
 #: customconstraints.xml:323
 #, no-c-format
 msgid "Creating a composing constraint <classname>ValidLicensePlate</classname>"
-msgstr ""
+msgstr "创建一个约束条件组合<classname>ValidLicensePlate</classname>"
 
 #. Tag: programlisting
 #: customconstraints.xml:326
@@ -614,24 +802,54 @@ msgid ""
 "\n"
 "}"
 msgstr ""
+"package com.mycompany;\n"
+"\n"
+"import static java.lang.annotation.ElementType.*;\n"
+"import static java.lang.annotation.RetentionPolicy.*;\n"
+"\n"
+"import java.lang.annotation.Documented;\n"
+"import java.lang.annotation.Retention;\n"
+"import java.lang.annotation.Target;\n"
+"\n"
+"import javax.validation.Constraint;\n"
+"import javax.validation.Payload;\n"
+"import javax.validation.constraints.NotNull;\n"
+"import javax.validation.constraints.Size;\n"
+"\n"
+"@NotNull\n"
+"@Size(min = 2, max = 14)\n"
+"@CheckCase(CaseMode.UPPER)\n"
+"@Target( { METHOD, FIELD, ANNOTATION_TYPE })\n"
+"@Retention(RUNTIME)\n"
+"@Constraint(validatedBy = {})\n"
+"@Documented\n"
+"public @interface ValidLicensePlate {\n"
+"\n"
+"    String message() default \"{com.mycompany.constraints.validlicenseplate}\";\n"
+"\n"
+"    Class&lt;?&gt;[] groups() default {};\n"
+"\n"
+"    Class&lt;? extends Payload&gt;[] payload() default {};\n"
+"\n"
+"}"
 
 #. Tag: para
 #: customconstraints.xml:329
 #, no-c-format
 msgid "To do so, we just have to annotate the constraint declaration with its comprising constraints (btw. that's exactly why we allowed annotation types as target for the <classname>@CheckCase</classname> annotation). As no additional validation is required for the <classname>@ValidLicensePlate</classname> annotation itself, we don't declare a validator within the <classname>@Constraint </classname>meta annotation."
-msgstr ""
+msgstr "我们只需要把要组合的约束标注在这个新的类型上加以声明 (注: 这正是我们为什么把annotation types作为了<classname>@CheckCase</classname>的一个target). 因为这个组合不需要额外的校验器, 所以不需要声明validator属性."
 
 #. Tag: para
 #: customconstraints.xml:337
 #, no-c-format
 msgid "Using the new compound constraint at the <property>licensePlate</property> field now is fully equivalent to the previous version, where we declared the three constraints directly at the field itself:"
-msgstr ""
+msgstr "现在, 在<property>licensePlate</property>属性上使用这个新定义的\"约束条件\" (其实是个组合) 和之前在其上声明那三个约束条件是一样的效果了."
 
 #. Tag: title
 #: customconstraints.xml:343
 #, no-c-format
 msgid "Application of composing constraint <classname>ValidLicensePlate</classname>"
-msgstr ""
+msgstr "使用<classname>ValidLicensePlate</classname>组合约束"
 
 #. Tag: programlisting
 #: customconstraints.xml:346
@@ -648,6 +866,16 @@ msgid ""
 "\n"
 "}"
 msgstr ""
+"package com.mycompany;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"    @ValidLicensePlate\n"
+"    private String licensePlate;\n"
+"\n"
+"    //...\n"
+"\n"
+"}"
 
 #. Tag: para
 #: customconstraints.xml:349
@@ -659,7 +887,7 @@ msgstr ""
 #: customconstraints.xml:359
 #, no-c-format
 msgid "Usage of <classname>@ReportAsSingleViolation</classname>"
-msgstr ""
+msgstr "<classname>@ReportAsSingleViolation</classname>的用法"
 
 #. Tag: programlisting
 #: customconstraints.xml:361
@@ -677,4 +905,15 @@ msgid ""
 "\n"
 "}"
 msgstr ""
+"//...\n"
+"@ReportAsSingleViolation\n"
+"public @interface ValidLicensePlate {\n"
+"\n"
+"    String message() default \"{com.mycompany.constraints.validlicenseplate}\";\n"
+"\n"
+"    Class&lt;?&gt;[] groups() default {};\n"
+"\n"
+"    Class&lt;? extends Payload&gt;[] payload() default {};\n"
+"\n"
+"}"
 
