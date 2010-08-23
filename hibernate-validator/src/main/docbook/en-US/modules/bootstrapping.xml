@@ -310,7 +310,7 @@ public interface TraversableResolver {
     enabled automatically depending on your environment. The first is the
     <classname>DefaultTraversableResolver</classname> which will always return
     true for <methodname>isReachable()</methodname> and
-    i<methodname>sTraversable()</methodname>. The second is the
+    <methodname>isTraversable()</methodname>. The second is the
     <classname>JPATraversableResolver</classname> which gets enabled when
     Hibernate Validator gets used in combination with JPA 2. In case you have
     to provide your own resolver you can do so again using the
