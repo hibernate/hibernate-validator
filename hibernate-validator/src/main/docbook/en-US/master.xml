@@ -42,6 +42,11 @@
                 <firstname>Gunnar</firstname>
                 <surname>Morling</surname>
             </author>
+		    <othercredit class="translator" lang="zh-CN">
+		        <firstname>Shaozhuang</firstname>
+		        <surname>Liu</surname>
+		        <email>stliu@hibernate.org</email>
+		    </othercredit>
         </authorgroup>
     </bookinfo>
 
