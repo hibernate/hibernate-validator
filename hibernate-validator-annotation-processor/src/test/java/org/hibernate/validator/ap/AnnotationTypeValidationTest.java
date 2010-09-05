@@ -24,7 +24,9 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalRetentionPolicies;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalTargets;
+import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithWrongGroupsAttribute;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithWrongMessageAttribute;
+import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithWrongPayloadAttribute;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithoutValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.DummyValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ValidCustomerNumber;
@@ -118,4 +120,50 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 35 ), new DiagnosticExpectation( Kind.ERROR, 50 )
 		);
 	}
+
+	@Test
+	public void testThatConstraintAnnotationTypeWithMissingOrWrongGroupsAttributeCausesCompilationError() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( ConstraintsWithWrongGroupsAttribute.class );
+		File sourceFile2 = compilerHelper.getSourceFile( DummyValidator.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 35 ),
+				new DiagnosticExpectation( Kind.ERROR, 52 ),
+				new DiagnosticExpectation( Kind.ERROR, 67 ),
+				new DiagnosticExpectation( Kind.ERROR, 82 ),
+				new DiagnosticExpectation( Kind.ERROR, 97 ),
+				new DiagnosticExpectation( Kind.ERROR, 112 ),
+				new DiagnosticExpectation( Kind.ERROR, 127 )
+		);
+	}
+
+	@Test
+	public void testThatConstraintAnnotationTypeWithMissingOrPayloadGroupsAttributeCausesCompilationError() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( ConstraintsWithWrongPayloadAttribute.class );
+		File sourceFile2 = compilerHelper.getSourceFile( DummyValidator.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 35 ),
+				new DiagnosticExpectation( Kind.ERROR, 53 ),
+				new DiagnosticExpectation( Kind.ERROR, 68 ),
+				new DiagnosticExpectation( Kind.ERROR, 83 ),
+				new DiagnosticExpectation( Kind.ERROR, 98 ),
+				new DiagnosticExpectation( Kind.ERROR, 113 ),
+				new DiagnosticExpectation( Kind.ERROR, 128 ),
+				new DiagnosticExpectation( Kind.ERROR, 143 )
+		);
+	}
+
 }
