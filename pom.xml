@@ -96,7 +96,7 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
-                <version>3.5.0-Final</version>
+                <version>3.5.5-Final</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
@@ -117,12 +117,12 @@
             <dependency>
                 <groupId>org.hibernate.jsr303.tck</groupId>
                 <artifactId>jsr303-tck</artifactId>
-                <version>1.0.3.GA</version>
+                <version>1.0.4.GA</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.test-harness</groupId>
-                <artifactId>jboss-test-harness-jboss-as-51</artifactId>
-                <version>1.0.0</version>
+                <artifactId>jboss-test-harness-jboss-as-60</artifactId>
+                <version>1.1.0-CR6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -167,11 +167,11 @@
                     <configuration>
                         <archive>
                             <manifestEntries>
-                                <Implementation-Title>${pom.artifactId}</Implementation-Title>
-                                <Implementation-Version>${pom.version}</Implementation-Version>
-                                <Implementation-Vendor>${pom.groupId}</Implementation-Vendor>
-                                <Implementation-Vendor-Id>${pom.groupId}</Implementation-Vendor-Id>
-                                <Implementation-URL>${pom.url}</Implementation-URL>
+                                <Implementation-Title>${project.artifactId}</Implementation-Title>
+                                <Implementation-Version>${project.version}</Implementation-Version>
+                                <Implementation-Vendor>${project.groupId}</Implementation-Vendor>
+                                <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+                                <Implementation-URL>${project.url}</Implementation-URL>
                                 <Specification-Title>Bean Validation</Specification-Title>
                             </manifestEntries>
                         </archive>
