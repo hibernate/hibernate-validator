@@ -154,7 +154,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestFile>${pom.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>
@@ -172,10 +172,10 @@
                             org.slf4j.*;version="[1.5.6,2.0.0)"
                         </Import-Package>
                         <Export-Package>
-                            org.hibernate.validator;version="${pom.version}",
-                            org.hibernate.validator.constraints;version="${pom.version}",
-                            org.hibernate.validator.messageinterpolation;version="${pom.version}",
-                            org.hibernate.validator.resourceloading;version="${pom.version}",
+                            org.hibernate.validator;version="${project.version}",
+                            org.hibernate.validator.constraints;version="${project.version}",
+                            org.hibernate.validator.messageinterpolation;version="${project.version}",
+                            org.hibernate.validator.resourceloading;version="${project.version}",
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -244,7 +244,7 @@
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
                     <windowtitle>Hibernate Validator ${project.version}</windowtitle>
                     <bottom>
-                        <![CDATA[Copyright &copy; ${inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
+                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
                 </configuration>
             </plugin>
             <plugin>
@@ -342,12 +342,4 @@
             </plugin>
         </plugins>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>
