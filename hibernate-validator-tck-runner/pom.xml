@@ -10,7 +10,7 @@
     </parent>
     <artifactId>hibernate-validator-tck-runner</artifactId>
     <name>Hibernate Validator TCK Runner</name>
-    <description>Aggregates dependencies and run's the JSR-303 TCK</description>
+    <description>Aggregates dependencies and runs the JSR-303 TCK</description>
 
     <dependencies>
         <dependency>
