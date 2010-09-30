@@ -71,6 +71,11 @@
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <optional>true</optional>
         </dependency>
+         <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
