@@ -117,7 +117,7 @@ public class ValidatorImpl implements Validator {
 				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
-		List<ConstraintViolation<T>> list = validateInContext( object, context, groupChain, null );
+		List<? extends ConstraintViolation<T>> list = validateInContext( object, context, groupChain, null );
 		return new HashSet<ConstraintViolation<T>>( list );
 	}
 
@@ -189,7 +189,7 @@ public class ValidatorImpl implements Validator {
 	 *
 	 * @return List of constraint violations or the empty set if there were no violations.
 	 */
-	private <T, U, V> List<ConstraintViolation<T>> validateInContext(U value, ValidationContext<T> context, GroupChain groupChain, PathImpl path) {
+	private <T, U, V> List<? extends ConstraintViolation<T>> validateInContext(U value, ValidationContext<T> context, GroupChain groupChain, PathImpl path) {
 		if ( value == null ) {
 			return Collections.emptyList();
 		}
