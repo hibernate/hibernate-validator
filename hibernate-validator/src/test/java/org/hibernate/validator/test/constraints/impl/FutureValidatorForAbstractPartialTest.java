@@ -18,73 +18,70 @@
 package org.hibernate.validator.test.constraints.impl;
 
 import junit.framework.Assert;
-import org.hibernate.validator.constraints.impl.FutureValidatorForAbstractInstant;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
-import org.joda.time.MutableDateTime;
+import org.hibernate.validator.constraints.impl.FutureValidatorForAbstractPartial;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
+import org.joda.time.Partial;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * @author Kevin Pollet
  */
-public class FutureValidatorForAbstractInstantTest {
+public class FutureValidatorForAbstractPartialTest {
 
-     private static FutureValidatorForAbstractInstant validator;
+     private static FutureValidatorForAbstractPartial validator;
 
      @BeforeClass
      public static void init() {
-        validator = new FutureValidatorForAbstractInstant();         
+        validator = new FutureValidatorForAbstractPartial();         
      }
 
      @Test
-     public void testIsValidForInstant() {
-         Instant future = new Instant().plus(31557600000l);
-         Instant past = new Instant().minus(31557600000l);
+     public void testIsValidForPartial() {
+         Partial future = new Partial(new LocalDate().plusYears(1));
+         Partial past = new Partial(new LocalDate().minusYears(1));
 
          Assert.assertTrue(validator.isValid(null, null));
          Assert.assertTrue(validator.isValid(future, null));
-         Assert.assertFalse(validator.isValid(new DateTime(), null));
+         Assert.assertFalse(validator.isValid(new LocalDate(), null));
          Assert.assertFalse(validator.isValid(past, null));
 
      }
 
      @Test
-     public void testIsValidForDateTime() {
-         DateTime future = new DateTime().plusYears(1);
-         DateTime past = new DateTime().minusYears(1);
+     public void testIsValidForLocalDate() {
+         LocalDate future = new LocalDate().plusYears(1);
+         LocalDate past = new LocalDate().minusYears(1);
 
          Assert.assertTrue(validator.isValid(null, null));
          Assert.assertTrue(validator.isValid(future, null));
-         Assert.assertFalse(validator.isValid(new DateTime(), null));
+         Assert.assertFalse(validator.isValid(new LocalDate(), null));
          Assert.assertFalse(validator.isValid(past, null));
 
      }
 
      @Test
-     public void testIsValidForDateMidnight() {
-         DateMidnight future = new DateMidnight().plusYears(1);
-         DateMidnight past = new DateMidnight().minusYears(1);
+     public void testIsValidForLocalTime() {
+         LocalTime future = new LocalTime().plusHours(1);
+         LocalTime past = new LocalTime().minusHours(1);
 
          Assert.assertTrue(validator.isValid(null, null));
          Assert.assertTrue(validator.isValid(future, null));
-         Assert.assertFalse(validator.isValid(new DateMidnight(), null));
+         Assert.assertFalse(validator.isValid(new LocalTime(), null));
          Assert.assertFalse(validator.isValid(past, null));
 
      }
 
      @Test
-     public void testIsValidForMutableDateTime() {
-         MutableDateTime future = new MutableDateTime();
-         future.addYears(1);
-
-         MutableDateTime past = new MutableDateTime();
-         past.addYears(-1);
+     public void testIsValidForLocalDateTime() {
+         LocalDateTime future = new LocalDateTime().plusYears(1);
+         LocalDateTime past = new LocalDateTime().minusYears(1);
 
          Assert.assertTrue(validator.isValid(null, null));
          Assert.assertTrue(validator.isValid(future, null));
-         Assert.assertFalse(validator.isValid(new MutableDateTime(), null));
+         Assert.assertFalse(validator.isValid(new LocalDateTime(), null));
          Assert.assertFalse(validator.isValid(past, null));
 
      }

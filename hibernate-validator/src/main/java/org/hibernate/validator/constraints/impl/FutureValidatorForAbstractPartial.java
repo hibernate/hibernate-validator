@@ -17,31 +17,29 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import org.joda.time.base.AbstractInstant;
+import org.joda.time.base.AbstractPartial;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
-import javax.validation.constraints.Past;
 
 /**
  * Check if Joda Time type who inherit from
- * {@code org.joda.time.base.AbstractInstant}
- * is in the past.
+ * {@code org.joda.time.base.AbstractPartial}
+ * is in the future.
  *
  * @author Kevin Pollet
  */
-public class PastValidatorForAbstractInstant implements ConstraintValidator<Past, AbstractInstant> {
+public class FutureValidatorForAbstractPartial implements ConstraintValidator<Future, AbstractPartial> {
 
-
-    public void initialize(Past constraintAnnotation) {
+    public void initialize(Future constraintAnnotation) {
     }
 
-    public boolean isValid(AbstractInstant value, ConstraintValidatorContext context) {
+    public boolean isValid(AbstractPartial value, ConstraintValidatorContext context) {
         if (value == null) {
             return true;
         }
-        
-        return value.isBeforeNow();
+
+       return value.toDateTime(null).isAfterNow();
     }
 }

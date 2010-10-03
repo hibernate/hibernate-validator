@@ -87,6 +87,7 @@ public class ConstraintHelper {
 		constraintList.add( FutureValidatorForDate.class );
         if (isJodaTimeInClasspath()) {
             constraintList.add( FutureValidatorForAbstractInstant.class );
+            constraintList.add( FutureValidatorForAbstractPartial.class );
         }
 		builtinConstraints.put( Future.class, constraintList );
 
@@ -113,6 +114,7 @@ public class ConstraintHelper {
 		constraintList.add( PastValidatorForDate.class );
         if (isJodaTimeInClasspath()) {
             constraintList.add( PastValidatorForAbstractInstant.class );
+            constraintList.add( PastValidatorForAbstractPartial.class );
         }
 		builtinConstraints.put( Past.class, constraintList );
 
