@@ -41,36 +41,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.impl.AssertFalseValidator;
-import org.hibernate.validator.constraints.impl.AssertTrueValidator;
-import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForString;
-import org.hibernate.validator.constraints.impl.DecimalMinValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMinValidatorForString;
-import org.hibernate.validator.constraints.impl.DigitsValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DigitsValidatorForString;
-import org.hibernate.validator.constraints.impl.FutureValidatorForCalendar;
-import org.hibernate.validator.constraints.impl.FutureValidatorForDate;
-import org.hibernate.validator.constraints.impl.MaxValidatorForNumber;
-import org.hibernate.validator.constraints.impl.MaxValidatorForString;
-import org.hibernate.validator.constraints.impl.MinValidatorForNumber;
-import org.hibernate.validator.constraints.impl.MinValidatorForString;
-import org.hibernate.validator.constraints.impl.NotNullValidator;
-import org.hibernate.validator.constraints.impl.NullValidator;
-import org.hibernate.validator.constraints.impl.PastValidatorForCalendar;
-import org.hibernate.validator.constraints.impl.PastValidatorForDate;
-import org.hibernate.validator.constraints.impl.PatternValidator;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArray;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfBoolean;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfByte;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfChar;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfDouble;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfFloat;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfInt;
-import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfLong;
-import org.hibernate.validator.constraints.impl.SizeValidatorForCollection;
-import org.hibernate.validator.constraints.impl.SizeValidatorForMap;
-import org.hibernate.validator.constraints.impl.SizeValidatorForString;
+import org.hibernate.validator.constraints.impl.*;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -114,6 +85,9 @@ public class ConstraintHelper {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( FutureValidatorForCalendar.class );
 		constraintList.add( FutureValidatorForDate.class );
+        if (isJodaTimeInClasspath()) {
+            constraintList.add( FutureValidatorForAbstractInstant.class );
+        }
 		builtinConstraints.put( Future.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
@@ -137,6 +111,9 @@ public class ConstraintHelper {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( PastValidatorForCalendar.class );
 		constraintList.add( PastValidatorForDate.class );
+        if (isJodaTimeInClasspath()) {
+            constraintList.add( PastValidatorForAbstractInstant.class );
+        }
 		builtinConstraints.put( Past.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
@@ -377,4 +354,22 @@ public class ConstraintHelper {
 	public boolean containsConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
 		return constraintValidatorDefinitions.containsKey( annotationClass );
 	}
+
+    private boolean isJodaTimeInClasspath() {
+        boolean isInClasspath;
+
+        try {
+
+            Class.forName("org.joda.time.base.AbstractInstant");
+            isInClasspath = true;
+
+        } catch (ClassNotFoundException e) {
+            isInClasspath = false;
+        }
+
+        return isInClasspath;
+    }
+
+
+
 }
