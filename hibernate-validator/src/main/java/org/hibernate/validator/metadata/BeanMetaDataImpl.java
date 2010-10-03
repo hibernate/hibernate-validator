@@ -41,6 +41,7 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
+import org.hibernate.validator.metadata.site.BeanConstraintSite;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -221,11 +222,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			beanDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
 		}
 		else {
+			BeanConstraintSite<?> site = (BeanConstraintSite<?>)(metaConstraint.getSite());
 			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
-					metaConstraint.getPropertyName()
+					site.getPropertyName()
 			);
 			if ( propertyDescriptor == null ) {
-				Member member = metaConstraint.getMember();
+				Member member = site.getMember();
 				propertyDescriptor = addPropertyDescriptorForMember( member, isValidAnnotationPresent( member ) );
 			}
 			propertyDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
@@ -301,7 +303,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
 					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
 					if ( descriptor.getElementType() == ElementType.FIELD
-							&& metaConstraint.getPropertyName().equals( ReflectionHelper.getPropertyName( field ) ) ) {
+							&& ((BeanConstraintSite<?>)(metaConstraint.getSite())).getPropertyName().equals( ReflectionHelper.getPropertyName( field ) ) ) {
 						fieldMetaData.add( descriptor );
 					}
 				}
@@ -353,7 +355,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				for ( MetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
 					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
 					if ( descriptor.getElementType() == ElementType.METHOD
-							&& metaConstraint.getPropertyName().equals( ReflectionHelper.getPropertyName( method ) ) ) {
+							&& ((BeanConstraintSite<?>)(metaConstraint.getSite())).getPropertyName().equals( ReflectionHelper.getPropertyName( method ) ) ) {
 						methodMetaData.add( descriptor );
 					}
 				}
@@ -422,8 +424,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private <A extends Annotation> MetaConstraint<T, ?> createMetaConstraint(Member m, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<T, A>( beanClass, m, descriptor );
+	private <A extends Annotation> MetaConstraint<T, A> createMetaConstraint(Member m, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<T, A>( descriptor, new BeanConstraintSite<T>(beanClass, m) );
 	}
 
 	/**

@@ -51,6 +51,7 @@ import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.site.BeanConstraintSite;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -311,12 +312,12 @@ public class ValidatorImpl implements Validator {
 		PathImpl newPath;
 
 		if ( path == null ) {
-			newPath = PathImpl.createNewPath( metaConstraint.getPropertyName() );
+			newPath = PathImpl.createNewPath( ((BeanConstraintSite<?>)metaConstraint.getSite()) .getPropertyName() );
 		}
 		else {
 			newPath = PathImpl.createShallowCopy( path );
 			if ( metaConstraint.getElementType() != ElementType.TYPE ) {
-				newPath.addNode( new NodeImpl( metaConstraint.getPropertyName() ) );
+				newPath.addNode( new NodeImpl( ((BeanConstraintSite<?>)metaConstraint.getSite()).getPropertyName() ) );
 			}
 		}
 
@@ -528,7 +529,9 @@ public class ValidatorImpl implements Validator {
 			Group group,
 			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
-		BeanMetaData<T> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
+		
+		//TODO GM: is that right?
+		BeanMetaData<T> beanMetaData = getBeanMetaData( (Class<T>)object.getClass() );
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
@@ -624,7 +627,9 @@ public class ValidatorImpl implements Validator {
 			Group group,
 			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolations = failingConstraintViolations.size();
-		BeanMetaData<U> beanMetaData = getBeanMetaData( metaConstraints.iterator().next().getBeanClass() );
+		
+		//TODO GM: is that right?
+		BeanMetaData<U> beanMetaData = getBeanMetaData( beanType );
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
@@ -683,7 +688,7 @@ public class ValidatorImpl implements Validator {
 		if ( !propertyIter.hasNext() ) {
 			List<MetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.getMetaConstraintsAsList();
 			for ( MetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
-				if ( elem.getName() != null && elem.getName().equals( metaConstraint.getPropertyName() ) ) {
+				if ( elem.getName() != null && elem.getName().equals( ((BeanConstraintSite<?>)metaConstraint.getSite()).getPropertyName() ) ) {
 					metaConstraints.add( metaConstraint );
 				}
 			}

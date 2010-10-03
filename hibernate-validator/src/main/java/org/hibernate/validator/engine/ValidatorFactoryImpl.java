@@ -44,6 +44,7 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.site.BeanConstraintSite;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -220,7 +221,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 					definedIn
 			);
 			MetaConstraint<T, A> newMetaConstraint = new MetaConstraint<T, A>(
-					rootClass, constraint.getMember(), descriptor
+					descriptor, constraint.getSite()
 			);
 
 			addConstraintToMap( hierarchyClass, newMetaConstraint, constraints );
@@ -246,7 +247,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			}
 
 			MetaConstraint<T, ?> metaConstraint = new MetaConstraint(
-					config.getBeanType(), member, constraintDescriptor
+					constraintDescriptor, new BeanConstraintSite<T>((Class<T>) config.getBeanType(), member)
 			);
 			addConstraintToMap( hierarchyClass, metaConstraint, constraints );
 		}
