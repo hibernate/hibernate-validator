@@ -13,6 +13,7 @@
             <package name="org.hibernate.validator.test.engine.customerror"/>
             <package name="org.hibernate.validator.test.engine.groups"/>
             <package name="org.hibernate.validator.test.engine.messageinterpolation"/>
+            <package name="org.hibernate.validator.test.engine.methodlevel"/>
             <package name="org.hibernate.validator.test.engine.proxy"/>
             <package name="org.hibernate.validator.test.engine.serialization"/>
             <package name="org.hibernate.validator.test.engine.traversableresolver"/>
