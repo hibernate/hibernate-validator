@@ -19,7 +19,6 @@ package org.hibernate.validator.test.engine.methodlevel;
 
 import java.lang.reflect.Proxy;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 
@@ -42,13 +41,13 @@ import org.testng.annotations.Test;
 public class MethodLevelValidationTest {
 
 	private MethodValidator validator;
-	private CustomerRepository proxiedRepo;
+	private CustomerRepository customerRepository;
 	
 	@BeforeMethod
 	public void setUpValidator() {
 		validator = Validation.buildDefaultValidatorFactory().getValidator().unwrap(MethodValidator.class);
 
-		proxiedRepo = (CustomerRepository)Proxy.newProxyInstance(
+		customerRepository = (CustomerRepository)Proxy.newProxyInstance(
 				getClass().getClassLoader(), 
 				new Class<?>[]{CustomerRepository.class}, 
 				new ValidationInvocationHandler(new CustomerRepositoryImpl(), validator));
@@ -59,7 +58,7 @@ public class MethodLevelValidationTest {
 		
 		try {
 		
-			proxiedRepo.findCustomerByName(null);
+			customerRepository.findCustomerByName(null);
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -71,17 +70,15 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByName");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
 			assertEquals(constraintViolation.getRootBeanClass(), null);
-			System.out.println(constraintViolation);
-
 		}
 	}
 	
 	@Test
-	public void multipleParameters() {
+	public void validationOfMethodWithMultipleParameters() {
 		
 		try {
 		
-			proxiedRepo.findCustomerByAgeAndName(30, null);
+			customerRepository.findCustomerByAgeAndName(30, null);
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -93,18 +90,16 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByAgeAndName");
 			assertEquals(constraintViolation.getParameterIndex(), 1);
 			assertEquals(constraintViolation.getRootBeanClass(), null);
-			System.out.println(constraintViolation);
-
 		}
 	}
-	
 	
 	@Test
 	public void methodValidationWithCascadingParameter() {
 		
+		Customer customer = new Customer(null, null);
+
 		try {
-			
-			proxiedRepo.persistCustomer(new Customer(null, null));
+			customerRepository.persistCustomer(customer);
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -117,14 +112,9 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getParameterIndex(), 0);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "name");
 			assertEquals(constraintViolation.getRootBeanClass(), Customer.class);
-			
-//			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-//			assertEquals(constraintViolation.getMessage(), "may not be null");
-//			assertEquals(constraintViolation.getPropertyPath().toString(), "name");
-			
-			
-			System.out.println(constraintViolation);
-
+			assertEquals(constraintViolation.getRootBean(), customer);
+			assertEquals(constraintViolation.getLeafBean(), customer);
+			assertEquals(constraintViolation.getInvalidValue(), null);
 		}
 	}
 	
@@ -135,7 +125,7 @@ public class MethodLevelValidationTest {
 		Customer customer = new Customer("Bob", address);
 
 		try {
-			proxiedRepo.persistCustomer(customer);
+			customerRepository.persistCustomer(customer);
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -159,7 +149,7 @@ public class MethodLevelValidationTest {
 		
 		try {
 			
-			proxiedRepo.findById(null);
+			customerRepository.findById(null);
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -180,7 +170,7 @@ public class MethodLevelValidationTest {
 		
 		try {
 			
-			proxiedRepo.foo(null);
+			customerRepository.foo(null);
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -201,7 +191,7 @@ public class MethodLevelValidationTest {
 		
 		try {
 			
-			proxiedRepo.bar(new Customer(null, null));
+			customerRepository.bar(new Customer(null, null));
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -223,7 +213,7 @@ public class MethodLevelValidationTest {
 		
 		try {
 			
-			proxiedRepo.foo(Long.valueOf(0));
+			customerRepository.foo(Long.valueOf(0));
 			fail("Expected ConstraintViolationException wasn't thrown.");
 		}
 		catch(ConstraintViolationException e) {
@@ -238,10 +228,11 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getRootBeanClass(), null);
 		}
 	}
+	
 	@Test
 	public void methodValidationSucceeds() {
 		
-		proxiedRepo.findCustomerByName("Bob");
+		customerRepository.findCustomerByName("Bob");
 	}
 	
 }
