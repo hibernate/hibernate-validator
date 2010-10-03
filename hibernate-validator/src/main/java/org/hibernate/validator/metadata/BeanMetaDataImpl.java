@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
@@ -42,6 +43,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.metadata.site.BeanConstraintSite;
+import org.hibernate.validator.metadata.site.MethodParameterConstraintSite;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -51,6 +53,7 @@ import org.hibernate.validator.util.ReflectionHelper;
  * instantiate an instance of this class and delegate the metadata extraction to it.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
@@ -72,6 +75,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private Map<Class<?>, List<MetaConstraint<T, ? extends Annotation>>> metaConstraints = new HashMap<Class<?>, List<MetaConstraint<T, ? extends Annotation>>>();
 
+	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = new HashMap<Class<?>, Map<Method,MethodMetaData>>();
+	
 	/**
 	 * List of cascaded members.
 	 */
@@ -157,6 +162,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		return Collections.unmodifiableList( constraintList );
 	}
+	
+	public Map<Class<?>, MethodMetaData> getMetaDataForMethod(Method method) {
+
+		Map<Class<?>, MethodMetaData> theValue = new HashMap<Class<?>, MethodMetaData>();
+		
+		for (Entry<Class<?>, Map<Method, MethodMetaData>> methodsOfOneClass : methodMetaConstraints.entrySet()) {
+			for(Entry<Method, MethodMetaData> oneMethodEntry : methodsOfOneClass.getValue().entrySet()) {
+				
+				if(ReflectionHelper.haveSameSignature(method, oneMethodEntry.getKey())) {
+					theValue.put(methodsOfOneClass.getKey(), oneMethodEntry.getValue());
+				}
+			}
+		}
+		
+		return theValue;
+	}
 
 	public PropertyDescriptor getPropertyDescriptor(String property) {
 		return propertyDescriptors.get( property );
@@ -233,6 +254,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			propertyDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
 		}
 	}
+	
+	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
+
+		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get(clazz);
+		
+		if(constraintsOfClass == null) {
+			constraintsOfClass = new HashMap<Method, MethodMetaData>();
+			methodMetaConstraints.put(clazz, constraintsOfClass);
+		}
+		
+		constraintsOfClass.put(methodMetaData.getMethod(), methodMetaData);
+	}
 
 	private void addCascadedMember(Member member) {
 		ReflectionHelper.setAccessibility( member );
@@ -260,6 +293,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		initClassConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initFieldConstraints( clazz, annotationIgnores, beanMetaDataCache );
+		initMethodParameterConstraints (clazz, annotationIgnores, beanMetaDataCache );
 	}
 
 	/**
@@ -376,6 +410,55 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
+	private <S> void initMethodParameterConstraints(Class<S> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
+		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
+		for ( Method method : declaredMethods ) {
+
+			// HV-172
+			if ( Modifier.isStatic( method.getModifiers() ) ) {
+				continue;
+			}
+
+			if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
+				continue;
+			}
+
+			// HV-262
+			BeanMetaDataImpl<S> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
+			Map<Integer, ParameterMetaData> constraintsByParameter;
+			boolean cachedMethodIsCascaded = false;
+//			if ( cachedMetaData != null ) {
+////				cachedMethodIsCascaded = cachedMetaData.getCascadedMembers().contains( method );
+//				
+//				Map<Class<?>, Map<Integer, List<MetaConstraint<S, ? extends Annotation>>>> constraintsByMethod = cachedMetaData.getMetaConstraintsForMethod(method);
+//				
+//				if(constraintsByMethod != null) {
+//					methodMetaData = new HashMap<Integer, List<ConstraintDescriptorImpl<?>>>();
+//					for (Entry<Class<?>, Map<Integer, List<MetaConstraint<S, ? extends Annotation>>>> constraintsOfOneParameter : constraintsByMethod.entrySet()) {
+//						
+//						for(Entry<Integer, List<MetaConstraint<S, ? extends Annotation>>> o :constraintsOfOneParameter.getValue().entrySet()) {
+//							List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
+//							for(MetaConstraint<S, ? extends Annotation> oneMetaConstraint : o.getValue()) {
+//								constraintDescriptors.add(oneMetaConstraint.getDescriptor());
+//							}
+//							methodMetaData.put(o.getKey(), constraintDescriptors);
+//						}
+//						
+//					}
+//				}
+//				else {
+//					methodMetaData = findParameterConstraints( method );
+//				}
+//			}
+//			else {
+			constraintsByParameter = findParameterConstraints( method );
+//			}
+			
+			MethodMetaData methodMetaData = new MethodMetaData(method, constraintsByParameter);
+			addMethodMetaConstraint(clazz, methodMetaData );
+		}
+	}
+	
 	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member, boolean isCascaded) {
 		String name = ReflectionHelper.getPropertyName( member );
 		PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
@@ -428,6 +511,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new MetaConstraint<T, A>( descriptor, new BeanConstraintSite<T>(beanClass, m) );
 	}
 
+	private <A extends Annotation> MetaConstraint<T, A> createMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<T, A>( descriptor, new MethodParameterConstraintSite(method, parameterIndex) );
+	}
+	
 	/**
 	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
 	 *
@@ -509,6 +596,37 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		return metaData;
 	}
+	
+	private Map<Integer, ParameterMetaData> findParameterConstraints(Method method) {
+		
+		Map<Integer, ParameterMetaData> metaData = new HashMap<Integer, ParameterMetaData>();
+		
+		int i = 0;
+		for (Annotation[] annotationsOfOneParameter : method.getParameterAnnotations()) {
+			
+			boolean parameterIsCascading = false;
+			List<MetaConstraint<?, ? extends Annotation>> constraintsOfOneParameter = new ArrayList<MetaConstraint<?,? extends Annotation>>();
+			
+			for (Annotation oneAnnotation : annotationsOfOneParameter) {
+
+				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(method.getDeclaringClass(), oneAnnotation, ElementType.PARAMETER);
+				
+				for (ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints) {
+					ReflectionHelper.setAccessibility( method );
+					constraintsOfOneParameter.add( createMetaConstraint(method, i, constraintDescriptorImpl));
+				}
+				
+				if(oneAnnotation.annotationType().equals(Valid.class)) {
+					parameterIsCascading = true;
+				}
+			}
+			
+			metaData.put(i, new ParameterMetaData(i, constraintsOfOneParameter, parameterIsCascading));
+			i++;
+		}
+		
+		return metaData;
+	}
 
 	private ConstraintOrigin determineOrigin(Class<?> clazz) {
 		if ( clazz.equals( beanClass ) ) {
@@ -526,6 +644,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		sb.append( "{beanClass=" ).append( beanClass );
 		sb.append( ", beanDescriptor=" ).append( beanDescriptor );
 		sb.append( ", metaConstraints=" ).append( metaConstraints );
+		sb.append( ", methodMetaConstraints=" ).append( methodMetaConstraints );
 		sb.append( ", cascadedMembers=" ).append( cascadedMembers );
 		sb.append( ", propertyDescriptors=" ).append( propertyDescriptors );
 		sb.append( ", defaultGroupSequence=" ).append( defaultGroupSequence );
