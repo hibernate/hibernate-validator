@@ -144,6 +144,10 @@ public class ValidationContext<T> {
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
+	
+	public boolean hasFailures() {
+		return !failingConstraintViolations.isEmpty();
+	}
 
 	public <U, V> ConstraintViolationImpl<T> createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
 		String messageTemplate = messageAndPath.getMessage();

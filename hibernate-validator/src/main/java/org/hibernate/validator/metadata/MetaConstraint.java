@@ -79,16 +79,12 @@ public class MetaConstraint<T, A extends Annotation> {
 	}
 
 	public <T, U, V> boolean validateConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
-		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 		valueContext.setElementType( getElementType() );
 		constraintTree.validateConstraints(
-				typeOfAnnotatedElement(), executionContext, valueContext, constraintViolations
+				typeOfAnnotatedElement(), executionContext, valueContext
 		);
-		if ( constraintViolations.size() > 0 ) {
-			executionContext.addConstraintFailures( constraintViolations );
-			return false;
-		}
-		return true;
+
+		return !executionContext.hasFailures();
 	}
 
 	public ConstraintSite getSite() {

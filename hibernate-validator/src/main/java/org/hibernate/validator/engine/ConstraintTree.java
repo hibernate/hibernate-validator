@@ -17,8 +17,6 @@
  * limitations under the License.
  */
 
-// $Id$
-
 package org.hibernate.validator.engine;
 
 import java.lang.annotation.Annotation;
@@ -48,6 +46,7 @@ import org.hibernate.validator.util.ValidatorTypeHelper;
  * This class encapsulates such a tree.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ConstraintTree<A extends Annotation> {
 
@@ -96,12 +95,24 @@ public class ConstraintTree<A extends Annotation> {
 	public ConstraintDescriptorImpl<A> getDescriptor() {
 		return descriptor;
 	}
+	
+	public <T, U, V> void validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
+		
+		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 
-	public <T, U, V> void validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations) {
+		validateConstraintsInternal(
+			type, executionContext, valueContext, constraintViolations
+		);
+		if ( constraintViolations.size() > 0 ) {
+			executionContext.addConstraintFailures( constraintViolations );
+		}
+	}
+	
+	private <T, U, V> void validateConstraintsInternal(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations) {
 		// first validate composing constraints (recursively)
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			List<ConstraintViolation<T>> tmpViolations = new ArrayList<ConstraintViolation<T>>();
-			tree.validateConstraints( type, executionContext, valueContext, tmpViolations );
+			tree.validateConstraintsInternal( type, executionContext, valueContext, tmpViolations );
 			constraintViolations.addAll( tmpViolations );
 		}
 
