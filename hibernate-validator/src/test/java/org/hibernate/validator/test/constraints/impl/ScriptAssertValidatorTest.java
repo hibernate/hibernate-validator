@@ -1,4 +1,3 @@
-// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -36,12 +35,12 @@ import static org.testng.Assert.assertTrue;
  * Unit test for {@link org.hibernate.validator.constraints.impl.ScriptAssertValidator}.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class ScriptAssertValidatorTest {
 
 	@Test
 	public void scriptEvaluatesToTrue() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "true" );
 
 		assertTrue( validator.isValid( new Object(), null ) );
@@ -49,7 +48,6 @@ public class ScriptAssertValidatorTest {
 
 	@Test
 	public void scriptEvaluatesToFalse() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "false" );
 
 		assertFalse( validator.isValid( new Object(), null ) );
@@ -57,7 +55,6 @@ public class ScriptAssertValidatorTest {
 
 	@Test
 	public void scriptExpressionReferencingAnnotatedObject() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
 				"javascript", "_this.startDate.before(_this.endDate)"
 		);
@@ -71,7 +68,6 @@ public class ScriptAssertValidatorTest {
 
 	@Test
 	public void scriptExpressionUsingCustomizedAlias() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
 				"javascript", "_.startDate.before(_.endDate)", "_"
 		);
@@ -84,25 +80,21 @@ public class ScriptAssertValidatorTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void emptyLanguageNameRaisesException() throws Exception {
-
 		getInitializedValidator( "", "script" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void emptyScriptRaisesException() throws Exception {
-
 		getInitializedValidator( "lang", "" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void emptyAliasRaisesException() throws Exception {
-
 		getInitializedValidator( "lang", "script", "" );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void unknownLanguageNameRaisesException() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "foo", "script" );
 
 		validator.isValid( new Object(), null );
@@ -110,7 +102,6 @@ public class ScriptAssertValidatorTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void illegalScriptExpressionRaisesException() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "foo" );
 
 		validator.isValid( new Object(), null );
@@ -118,7 +109,6 @@ public class ScriptAssertValidatorTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNullRaisesException() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "null" );
 
 		validator.isValid( new Object(), null );
@@ -126,7 +116,6 @@ public class ScriptAssertValidatorTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNoBooleanRaisesException() throws Exception {
-
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
 				"javascript", "new java.util.Date()"
 		);
@@ -135,18 +124,25 @@ public class ScriptAssertValidatorTest {
 	}
 
 	/**
-	 * Returns a {@link org.hibernate.validator.constraints.impl.ScriptAssertValidator} initialized with a {@link ScriptAssert} with the given values.
+	 * @param lang the script type
+	 * @param script the actual script
+	 * @param alias the alias name of the this object
+	 *
+	 * @return a {@link org.hibernate.validator.constraints.impl.ScriptAssertValidator} initialized with a {@link ScriptAssert} with the given values.
 	 */
-	private ConstraintValidator<ScriptAssert, Object> getInitializedValidator(String lang, String script, String name) {
+	private ConstraintValidator<ScriptAssert, Object> getInitializedValidator(String lang, String script, String alias) {
 
 		ConstraintValidator<ScriptAssert, Object> validator = new ScriptAssertValidator();
-		validator.initialize( getScriptAssert( lang, script, name ) );
+		validator.initialize( getScriptAssert( lang, script, alias ) );
 
 		return validator;
 	}
 
 	/**
-	 * Returns a {@link ScriptAssertValidator} initialized with a {@link ScriptAssert} with the given values.
+	 * @param lang the script type
+	 * @param script the actual script
+	 *
+	 * @return a {@link ScriptAssertValidator} initialized with a {@link ScriptAssert} with the given values.
 	 */
 	private ConstraintValidator<ScriptAssert, Object> getInitializedValidator(String lang, String script) {
 
@@ -157,16 +153,20 @@ public class ScriptAssertValidatorTest {
 	}
 
 	/**
-	 * Returns a {@link ScriptAssert} initialized with the given values.
+	 * @param lang the script type
+	 * @param script the actual script
+	 * @param alias the alias name of the this object
+	 *
+	 * @return a {@link ScriptAssert} initialized with the given values.
 	 */
-	private ScriptAssert getScriptAssert(String lang, String script, String name) {
+	private ScriptAssert getScriptAssert(String lang, String script, String alias) {
 
 		AnnotationDescriptor<ScriptAssert> descriptor = AnnotationDescriptor.getInstance( ScriptAssert.class );
 
 		descriptor.setValue( "lang", lang );
 		descriptor.setValue( "script", script );
-		if ( name != null ) {
-			descriptor.setValue( "alias", name );
+		if ( alias != null ) {
+			descriptor.setValue( "alias", alias );
 		}
 
 		return AnnotationFactory.create( descriptor );
@@ -198,6 +198,5 @@ public class ScriptAssertValidatorTest {
 		public Date getEndDate() {
 			return endDate;
 		}
-
 	}
 }

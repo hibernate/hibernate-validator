@@ -1,4 +1,3 @@
-// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -28,17 +27,14 @@ import org.hibernate.validator.constraints.impl.scriptassert.ScriptEvaluatorFact
  * Validator for the {@link ScriptAssert} constraint annotation.
  *
  * @author Gunnar Morling.
+ * @author Hardy Ferentschik
  */
 public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, Object> {
-
 	private String script;
-
 	private String languageName;
-
 	private String alias;
 
 	public void initialize(ScriptAssert constraintAnnotation) {
-
 		validateParameters( constraintAnnotation );
 
 		this.script = constraintAnnotation.script();
@@ -47,7 +43,6 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 	}
 
 	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
-
 		ScriptEvaluator scriptEvaluator = ScriptEvaluatorFactory.getInstance()
 				.getScriptEvaluatorByLanguageName( languageName );
 
@@ -55,14 +50,13 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 	}
 
 	private void validateParameters(ScriptAssert constraintAnnotation) {
-
-		if ( constraintAnnotation.script().isEmpty() ) {
+		if ( constraintAnnotation.script().length() == 0 ) {
 			throw new IllegalArgumentException( "The parameter \"script\" must not be empty." );
 		}
-		if ( constraintAnnotation.lang().isEmpty() ) {
+		if ( constraintAnnotation.lang().length() == 0 ) {
 			throw new IllegalArgumentException( "The parameter \"lang\" must not be empty." );
 		}
-		if ( constraintAnnotation.alias().isEmpty() ) {
+		if ( constraintAnnotation.alias().length() == 0 ) {
 			throw new IllegalArgumentException( "The parameter \"alias\" must not be empty." );
 		}
 	}
