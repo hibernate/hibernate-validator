@@ -85,10 +85,10 @@ public class ConstraintHelper {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( FutureValidatorForCalendar.class );
 		constraintList.add( FutureValidatorForDate.class );
-        if (isJodaTimeInClasspath()) {
-            constraintList.add( FutureValidatorForAbstractInstant.class );
-            constraintList.add( FutureValidatorForAbstractPartial.class );
-        }
+		if ( isJodaTimeInClasspath() ) {
+			constraintList.add( FutureValidatorForAbstractInstant.class );
+			constraintList.add( FutureValidatorForAbstractPartial.class );
+		}
 		builtinConstraints.put( Future.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
@@ -112,10 +112,10 @@ public class ConstraintHelper {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( PastValidatorForCalendar.class );
 		constraintList.add( PastValidatorForDate.class );
-        if (isJodaTimeInClasspath()) {
-            constraintList.add( PastValidatorForAbstractInstant.class );
-            constraintList.add( PastValidatorForAbstractPartial.class );
-        }
+		if ( isJodaTimeInClasspath() ) {
+			constraintList.add( PastValidatorForAbstractInstant.class );
+			constraintList.add( PastValidatorForAbstractPartial.class );
+		}
 		builtinConstraints.put( Past.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
@@ -357,20 +357,21 @@ public class ConstraintHelper {
 		return constraintValidatorDefinitions.containsKey( annotationClass );
 	}
 
-    private boolean isJodaTimeInClasspath() {
-        boolean isInClasspath;
+	private boolean isJodaTimeInClasspath() {
+		boolean isInClasspath;
 
-        try {
+		try {
 
-            Class.forName("org.joda.time.base.AbstractInstant");
-            isInClasspath = true;
+			Class.forName( "org.joda.time.base.AbstractInstant" );
+			isInClasspath = true;
 
-        } catch (ClassNotFoundException e) {
-            isInClasspath = false;
-        }
+		}
+		catch ( ClassNotFoundException e ) {
+			isInClasspath = false;
+		}
 
-        return isInClasspath;
-    }
+		return isInClasspath;
+	}
 
 
 

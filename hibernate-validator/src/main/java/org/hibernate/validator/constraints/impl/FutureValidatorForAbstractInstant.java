@@ -1,7 +1,7 @@
 // $Id$
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -17,11 +17,11 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import org.joda.time.base.AbstractInstant;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
+
+import org.joda.time.base.AbstractInstant;
 
 /**
  * Check if Joda Time type who inherit from
@@ -33,14 +33,15 @@ import javax.validation.constraints.Future;
 public class FutureValidatorForAbstractInstant implements ConstraintValidator<Future, AbstractInstant> {
 
 
-    public void initialize(Future constraintAnnotation) {
-    }
+	public void initialize(Future constraintAnnotation) {
+	}
 
-    public boolean isValid(AbstractInstant value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true;
-        }
+	public boolean isValid(AbstractInstant value, ConstraintValidatorContext context) {
+		//null values are valid
+		if ( value == null ) {
+			return true;
+		}
 
-        return value.isAfterNow();
-    }
+		return value.isAfterNow();
+	}
 }

@@ -17,11 +17,11 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import org.joda.time.base.AbstractPartial;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
+
+import org.joda.time.base.AbstractPartial;
 
 /**
  * Check if Joda Time type who inherit from
@@ -32,14 +32,15 @@ import javax.validation.constraints.Past;
  */
 public class PastValidatorForAbstractPartial implements ConstraintValidator<Past, AbstractPartial> {
 
-    public void initialize(Past constraintAnnotation) {
-    }
+	public void initialize(Past constraintAnnotation) {
+	}
 
-    public boolean isValid(AbstractPartial value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true;
-        }
+	public boolean isValid(AbstractPartial value, ConstraintValidatorContext context) {
+		//null values are valid
+		if ( value == null ) {
+			return true;
+		}
 
-       return value.toDateTime(null).isBeforeNow();
-    }
+		return value.toDateTime( null ).isBeforeNow();
+	}
 }

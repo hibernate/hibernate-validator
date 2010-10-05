@@ -17,12 +17,11 @@
 */
 package org.hibernate.validator.constraints.impl;
 
-import org.joda.time.base.AbstractInstant;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.Past;
+
+import org.joda.time.base.AbstractInstant;
 
 /**
  * Check if Joda Time type who inherit from
@@ -34,14 +33,15 @@ import javax.validation.constraints.Past;
 public class PastValidatorForAbstractInstant implements ConstraintValidator<Past, AbstractInstant> {
 
 
-    public void initialize(Past constraintAnnotation) {
-    }
+	public void initialize(Past constraintAnnotation) {
+	}
 
-    public boolean isValid(AbstractInstant value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true;
-        }
-        
-        return value.isBeforeNow();
-    }
+	public boolean isValid(AbstractInstant value, ConstraintValidatorContext context) {
+		//null values are valid
+		if ( value == null ) {
+			return true;
+		}
+
+		return value.isBeforeNow();
+	}
 }
