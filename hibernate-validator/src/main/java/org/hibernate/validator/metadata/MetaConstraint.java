@@ -79,12 +79,12 @@ public class MetaConstraint<T, A extends Annotation> {
 	}
 
 	public <T, U, V> boolean validateConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
+
 		valueContext.setElementType( getElementType() );
-		constraintTree.validateConstraints(
+		
+		return constraintTree.validateConstraints(
 				typeOfAnnotatedElement(), executionContext, valueContext
 		);
-
-		return !executionContext.hasFailures();
 	}
 
 	public ConstraintSite getSite() {

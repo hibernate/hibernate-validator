@@ -96,16 +96,19 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 	
-	public <T, U, V> void validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
+	public <T, U, V> boolean validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
 		
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 
 		validateConstraintsInternal(
 			type, executionContext, valueContext, constraintViolations
 		);
-		if ( constraintViolations.size() > 0 ) {
+		if ( !constraintViolations.isEmpty() ) {
 			executionContext.addConstraintFailures( constraintViolations );
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private <T, U, V> void validateConstraintsInternal(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations) {
