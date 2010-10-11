@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator;
 
 import java.math.BigDecimal;

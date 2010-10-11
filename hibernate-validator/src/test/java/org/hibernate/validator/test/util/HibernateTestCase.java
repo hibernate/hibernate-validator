@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-// $Id:$
 package org.hibernate.validator.test.util;
 
 import java.io.InputStream;

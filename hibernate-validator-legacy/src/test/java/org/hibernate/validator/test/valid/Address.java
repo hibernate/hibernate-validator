@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.test.valid;
 
 import org.hibernate.validator.NotNull;

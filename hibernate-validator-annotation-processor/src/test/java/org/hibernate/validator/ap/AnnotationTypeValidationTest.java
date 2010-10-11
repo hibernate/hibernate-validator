@@ -1,4 +1,3 @@
-// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -53,7 +52,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpectation( Kind.ERROR, 28 ), new DiagnosticExpectation( Kind.ERROR, 29 )
+				diagnostics, new DiagnosticExpectation( Kind.ERROR, 27 ), new DiagnosticExpectation( Kind.ERROR, 28 )
 		);
 	}
 
@@ -69,7 +68,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 34 ), new DiagnosticExpectation( Kind.ERROR, 49 )
+				new DiagnosticExpectation( Kind.ERROR, 33 ), new DiagnosticExpectation( Kind.ERROR, 48 )
 		);
 	}
 
@@ -85,7 +84,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 43 ), new DiagnosticExpectation( Kind.ERROR, 59 )
+				new DiagnosticExpectation( Kind.ERROR, 42 ), new DiagnosticExpectation( Kind.ERROR, 58 )
 		);
 	}
 
@@ -101,7 +100,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 35 )
+				new DiagnosticExpectation( Kind.ERROR, 34 )
 		);
 	}
 
@@ -117,7 +116,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 35 ), new DiagnosticExpectation( Kind.ERROR, 50 )
+				new DiagnosticExpectation( Kind.ERROR, 34 ), new DiagnosticExpectation( Kind.ERROR, 49 )
 		);
 	}
 
@@ -133,13 +132,13 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 35 ),
-				new DiagnosticExpectation( Kind.ERROR, 52 ),
-				new DiagnosticExpectation( Kind.ERROR, 67 ),
-				new DiagnosticExpectation( Kind.ERROR, 82 ),
-				new DiagnosticExpectation( Kind.ERROR, 97 ),
-				new DiagnosticExpectation( Kind.ERROR, 112 ),
-				new DiagnosticExpectation( Kind.ERROR, 127 )
+				new DiagnosticExpectation( Kind.ERROR, 34 ),
+				new DiagnosticExpectation( Kind.ERROR, 51 ),
+				new DiagnosticExpectation( Kind.ERROR, 66 ),
+				new DiagnosticExpectation( Kind.ERROR, 81 ),
+				new DiagnosticExpectation( Kind.ERROR, 96 ),
+				new DiagnosticExpectation( Kind.ERROR, 111 ),
+				new DiagnosticExpectation( Kind.ERROR, 126 )
 		);
 	}
 
@@ -155,14 +154,14 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 35 ),
-				new DiagnosticExpectation( Kind.ERROR, 53 ),
-				new DiagnosticExpectation( Kind.ERROR, 68 ),
-				new DiagnosticExpectation( Kind.ERROR, 83 ),
-				new DiagnosticExpectation( Kind.ERROR, 98 ),
-				new DiagnosticExpectation( Kind.ERROR, 113 ),
-				new DiagnosticExpectation( Kind.ERROR, 128 ),
-				new DiagnosticExpectation( Kind.ERROR, 143 )
+				new DiagnosticExpectation( Kind.ERROR, 34 ),
+				new DiagnosticExpectation( Kind.ERROR, 52 ),
+				new DiagnosticExpectation( Kind.ERROR, 67 ),
+				new DiagnosticExpectation( Kind.ERROR, 82 ),
+				new DiagnosticExpectation( Kind.ERROR, 97 ),
+				new DiagnosticExpectation( Kind.ERROR, 112 ),
+				new DiagnosticExpectation( Kind.ERROR, 127 ),
+				new DiagnosticExpectation( Kind.ERROR, 142 )
 		);
 	}
 

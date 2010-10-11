@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.constraints.impl;
 
 import javax.validation.ConstraintValidator;

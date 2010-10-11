@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.test.jpa;
 
 import org.hibernate.event.PreInsertEventListener;

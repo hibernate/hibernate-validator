@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.constraints.impl;
 
 import java.util.regex.Matcher;

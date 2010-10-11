@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.test.inheritance;
 
 import org.hibernate.validator.Min;

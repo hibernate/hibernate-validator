@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.interpolator;
 
 import java.lang.annotation.Annotation;

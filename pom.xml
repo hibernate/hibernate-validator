@@ -329,7 +329,7 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.jboss.org/repos/hibernate/validator/trunk</connection>
+        <connection>scm:git:git://github.com/hibernate/hibernate-validator.git</connection>
         <url>http://fisheye.jboss.org/browse/Hibernate/validator/trunk</url>
     </scm>
 

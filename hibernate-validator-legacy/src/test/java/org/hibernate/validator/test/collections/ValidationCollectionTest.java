@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.test.collections;
 
 import junit.framework.TestCase;

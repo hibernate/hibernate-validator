@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator;
 
 import org.slf4j.Logger;

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-// $Id$
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;

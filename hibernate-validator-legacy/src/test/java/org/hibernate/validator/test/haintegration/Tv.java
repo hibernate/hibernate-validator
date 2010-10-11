@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.test.haintegration;
 
 import java.util.Date;

@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.test.validators;
 
 import org.hibernate.validator.EAN;

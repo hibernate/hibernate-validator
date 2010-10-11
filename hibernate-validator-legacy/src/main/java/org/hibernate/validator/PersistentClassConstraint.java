@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator;
 
 import org.hibernate.mapping.PersistentClass;

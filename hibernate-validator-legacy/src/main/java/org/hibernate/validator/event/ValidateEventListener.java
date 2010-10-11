@@ -1,4 +1,3 @@
-//$Id$
 package org.hibernate.validator.event;
 
 import java.io.Serializable;

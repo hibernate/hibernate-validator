@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-// $Id:$
 package org.hibernate.validator.test.engine.groups;
 
 import java.util.ArrayList;
