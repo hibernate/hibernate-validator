@@ -1,4 +1,3 @@
-// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -48,7 +47,6 @@ public class FutureValidatorForAbstractInstantTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new DateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
 
 	@Test
@@ -60,7 +58,6 @@ public class FutureValidatorForAbstractInstantTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new DateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
 
 	@Test
@@ -72,7 +69,6 @@ public class FutureValidatorForAbstractInstantTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new DateMidnight(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
 
 	@Test
@@ -87,7 +83,5 @@ public class FutureValidatorForAbstractInstantTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new MutableDateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
-
 }

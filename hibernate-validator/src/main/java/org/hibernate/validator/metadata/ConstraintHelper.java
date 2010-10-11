@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -181,7 +181,7 @@ public class ConstraintHelper {
 		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : builtInList ) {
 			//safe cause all CV for a given annotation A are CV<A, ?>
 			@SuppressWarnings("unchecked")
-			Class<ConstraintValidator<? extends Annotation, ?>> safeValidatorClass = ( Class<ConstraintValidator<? extends Annotation, ?>> ) validatorClass;
+			Class<ConstraintValidator<? extends Annotation, ?>> safeValidatorClass = (Class<ConstraintValidator<? extends Annotation, ?>>) validatorClass;
 			constraints.add( safeValidatorClass );
 		}
 
@@ -202,20 +202,20 @@ public class ConstraintHelper {
 	 */
 	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
 		boolean isMultiValueConstraint = false;
-			final Method method = ReflectionHelper.getMethod( annotationType, "value" );
-			if ( method != null ) {
-				Class returnType = method.getReturnType();
-				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-					@SuppressWarnings( "unchecked" )
-					Class<? extends Annotation> componentType = ( Class<? extends Annotation> ) returnType.getComponentType();
-					if ( isConstraintAnnotation( componentType ) || isBuiltinConstraint( componentType ) ) {
-						isMultiValueConstraint = true;
-					}
-					else {
-						isMultiValueConstraint = false;
-					}
+		final Method method = ReflectionHelper.getMethod( annotationType, "value" );
+		if ( method != null ) {
+			Class returnType = method.getReturnType();
+			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+				@SuppressWarnings("unchecked")
+				Class<? extends Annotation> componentType = (Class<? extends Annotation>) returnType.getComponentType();
+				if ( isConstraintAnnotation( componentType ) || isBuiltinConstraint( componentType ) ) {
+					isMultiValueConstraint = true;
+				}
+				else {
+					isMultiValueConstraint = false;
 				}
 			}
+		}
 		return isMultiValueConstraint;
 	}
 
@@ -235,7 +235,7 @@ public class ConstraintHelper {
 			if ( method != null ) {
 				Class returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-					Annotation[] annotations = ( Annotation[] ) method.invoke( annotation );
+					Annotation[] annotations = (Annotation[]) method.invoke( annotation );
 					for ( Annotation a : annotations ) {
 						Class<? extends Annotation> annotationType = a.annotationType();
 						if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
@@ -300,7 +300,7 @@ public class ConstraintHelper {
 						"not contain a payload parameter.";
 				throw new ConstraintDefinitionException( msg );
 			}
-			Class<?>[] defaultPayload = ( Class<?>[] ) method.getDefaultValue();
+			Class<?>[] defaultPayload = (Class<?>[]) method.getDefaultValue();
 			if ( defaultPayload.length != 0 ) {
 				String msg = annotationType
 						.getName() + " contains Constraint annotation, but the payload " +
@@ -323,7 +323,7 @@ public class ConstraintHelper {
 						"not contain a groups parameter.";
 				throw new ConstraintDefinitionException( msg );
 			}
-			Class<?>[] defaultGroups = ( Class<?>[] ) method.getDefaultValue();
+			Class<?>[] defaultGroups = (Class<?>[]) method.getDefaultValue();
 			if ( defaultGroups.length != 0 ) {
 				String msg = annotationType
 						.getName() + " contains Constraint annotation, but the groups " +
@@ -374,7 +374,7 @@ public class ConstraintHelper {
 		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : list ) {
 			//safe cause all CV for a given annotation A are CV<A, ?>
 			@SuppressWarnings("unchecked")
-			Class<ConstraintValidator<T, ?>> safeValidatorClass = ( Class<ConstraintValidator<T, ?>> ) validatorClass;
+			Class<ConstraintValidator<T, ?>> safeValidatorClass = (Class<ConstraintValidator<T, ?>>) validatorClass;
 			constraintsValidators.add( safeValidatorClass );
 		}
 
@@ -404,7 +404,4 @@ public class ConstraintHelper {
 
 		return isInClasspath;
 	}
-
-
-
 }

@@ -1,4 +1,3 @@
-// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -48,7 +47,6 @@ public class FutureValidatorForAbstractPartialTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new LocalDate(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
 
 	@Test
@@ -60,7 +58,6 @@ public class FutureValidatorForAbstractPartialTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new LocalDate(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
 
 	@Test
@@ -72,7 +69,6 @@ public class FutureValidatorForAbstractPartialTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new LocalTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
 
 	@Test
@@ -84,7 +80,5 @@ public class FutureValidatorForAbstractPartialTest {
 		Assert.assertTrue( validator.isValid( future, null ) );
 		Assert.assertFalse( validator.isValid( new LocalDateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
-
 	}
-
 }
