@@ -48,6 +48,8 @@ import org.hibernate.validator.constraints.impl.DecimalMinValidatorForNumber;
 import org.hibernate.validator.constraints.impl.DecimalMinValidatorForString;
 import org.hibernate.validator.constraints.impl.DigitsValidatorForNumber;
 import org.hibernate.validator.constraints.impl.DigitsValidatorForString;
+import org.hibernate.validator.constraints.impl.FutureValidatorForAbstractInstant;
+import org.hibernate.validator.constraints.impl.FutureValidatorForAbstractPartial;
 import org.hibernate.validator.constraints.impl.FutureValidatorForCalendar;
 import org.hibernate.validator.constraints.impl.FutureValidatorForDate;
 import org.hibernate.validator.constraints.impl.MaxValidatorForNumber;
@@ -56,6 +58,8 @@ import org.hibernate.validator.constraints.impl.MinValidatorForNumber;
 import org.hibernate.validator.constraints.impl.MinValidatorForString;
 import org.hibernate.validator.constraints.impl.NotNullValidator;
 import org.hibernate.validator.constraints.impl.NullValidator;
+import org.hibernate.validator.constraints.impl.PastValidatorForAbstractInstant;
+import org.hibernate.validator.constraints.impl.PastValidatorForAbstractPartial;
 import org.hibernate.validator.constraints.impl.PastValidatorForCalendar;
 import org.hibernate.validator.constraints.impl.PastValidatorForDate;
 import org.hibernate.validator.constraints.impl.PatternValidator;
@@ -113,6 +117,10 @@ public class ConstraintHelper {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( FutureValidatorForCalendar.class );
 		constraintList.add( FutureValidatorForDate.class );
+		if ( isJodaTimeInClasspath() ) {
+			constraintList.add( FutureValidatorForAbstractInstant.class );
+			constraintList.add( FutureValidatorForAbstractPartial.class );
+		}
 		builtinConstraints.put( Future.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
@@ -136,6 +144,10 @@ public class ConstraintHelper {
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( PastValidatorForCalendar.class );
 		constraintList.add( PastValidatorForDate.class );
+		if ( isJodaTimeInClasspath() ) {
+			constraintList.add( PastValidatorForAbstractInstant.class );
+			constraintList.add( PastValidatorForAbstractPartial.class );
+		}
 		builtinConstraints.put( Past.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
@@ -376,4 +388,23 @@ public class ConstraintHelper {
 	public boolean containsConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
 		return constraintValidatorDefinitions.containsKey( annotationClass );
 	}
+
+	private boolean isJodaTimeInClasspath() {
+		boolean isInClasspath;
+
+		try {
+
+			Class.forName( "org.joda.time.base.AbstractInstant" );
+			isInClasspath = true;
+
+		}
+		catch ( ClassNotFoundException e ) {
+			isInClasspath = false;
+		}
+
+		return isInClasspath;
+	}
+
+
+
 }
