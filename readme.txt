@@ -14,7 +14,7 @@
 
   Prior to version 4.x Hibernate Validators was based on a different source base which 
   is not based on JSR 303. This code can be accessed via 
-  http://anonsvn.jboss.org/repos/hibernate/validator/trunk/hibernate-validator-legacy
+  http://github.com/hibernate/hibernate-validator/tree/master/hibernate-validator-legacy
 
   Documentation
   -------------
@@ -54,7 +54,8 @@
         <version>${project.version}</version>
     </dependency>
 
-    Hibernate Validator can be found in the JBoss Maven repository: http://repository.jboss.com/maven2/
+    Hibernate Validator can be found in the JBoss Maven repository:
+    http://repository.jboss.org/nexus/content/groups/public-jboss/
 
   Licensing
   ---------
@@ -67,5 +68,5 @@
   Home Page:          http://validator.hibernate.org
   Downloads:          http://www.hibernate.org/subprojects/validator/download.html
   Mailing Lists:      http://www.hibernate.org/community/mailinglists.html
-  Source Code:        http://anonsvn.jboss.org/repos/hibernate/validator/trunk/
+  Source Code:        git://github.com/hibernate/hibernate-validator.git
   Issue Tracking:     http://opensource.atlassian.com/projects/hibernate/browse/HV

@@ -54,12 +54,12 @@
 
     <files>
       <file>
-        <source>readme.txt</source>
+        <source>../readme.txt</source>
         <outputDirectory>/</outputDirectory>
         <filtered>true</filtered>
       </file>
       <file>
-        <source>license.txt</source>
+        <source>../license.txt</source>
         <outputDirectory>/</outputDirectory>
       </file>
     </files>
