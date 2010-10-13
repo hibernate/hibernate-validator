@@ -311,6 +311,7 @@
                         <phase>deploy</phase>
                         <goals>
                             <goal>resources</goal>
+                            <goal>translate</goal>
                             <goal>generate</goal>
                         </goals>
                     </execution>
