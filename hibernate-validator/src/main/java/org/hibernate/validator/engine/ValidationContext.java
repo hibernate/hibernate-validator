@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.engine;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,7 +117,22 @@ public class ValidationContext<T> {
 		);
 	}
 
-	private ValidationContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> MethodValidationContext<T> getContextForValidateParameter( Method method, int parameterIndex, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory) {
+		return new MethodValidationContext<T>(
+				method, parameterIndex, null, null, messageInterpolator, constraintValidatorFactory, null
+		);
+	}
+	
+	public static <T> MethodValidationContext<T> getContextForValidateCascadingParameter( Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
+		return new MethodValidationContext<T>(
+				method, parameterIndex, rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver
+		);
+	}
+
+	protected ValidationContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.messageInterpolator = messageInterpolator;
@@ -143,8 +159,12 @@ public class ValidationContext<T> {
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
+	
+	public boolean hasFailures() {
+		return !failingConstraintViolations.isEmpty();
+	}
 
-	public <U, V> ConstraintViolationImpl<T> createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
+	public <U, V> ConstraintViolation<T> createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
@@ -163,10 +183,10 @@ public class ValidationContext<T> {
 		);
 	}
 
-	public <U, V> List<ConstraintViolationImpl<T>> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
-		List<ConstraintViolationImpl<T>> constraintViolations = new ArrayList<ConstraintViolationImpl<T>>();
+	public <U, V> List<ConstraintViolation<T>> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
+		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
-			ConstraintViolationImpl<T> violation = createConstraintViolation(
+			ConstraintViolation<T> violation = createConstraintViolation(
 					localContext, messageAndPath, constraintValidatorContext.getConstraintDescriptor()
 			);
 			constraintViolations.add( violation );
@@ -209,7 +229,7 @@ public class ValidationContext<T> {
 		}
 	}
 
-	public List<ConstraintViolation<T>> getFailingConstraints() {
+	public List<? extends ConstraintViolation<T>> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
 

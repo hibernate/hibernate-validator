@@ -56,6 +56,7 @@ import org.hibernate.validator.util.privilegedactions.SetAccessibility;
  * for situations where a security manager is in place.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public final class ReflectionHelper {
 
@@ -280,6 +281,24 @@ public final class ReflectionHelper {
 		else {
 			throw new IllegalArgumentException( "Member " + member + " is neither a field nor a method" );
 		}
+		if ( type instanceof TypeVariable ) {
+			type = TypeUtils.getErasedType( type );
+		}
+		return type;
+	}
+	
+	/**
+	 * Returns the type of the parameter of the given method with the given parameter index.
+	 * 
+	 * @param method The method of interest.
+	 * @param parameterIndex The index of the parameter for which the type should be returned.
+	 * 
+	 * @return The erased type.
+	 */
+	public static Type typeOf(Method method, int parameterIndex) {
+		
+		Type type = method.getGenericParameterTypes()[parameterIndex];
+		
 		if ( type instanceof TypeVariable ) {
 			type = TypeUtils.getErasedType( type );
 		}
@@ -601,6 +620,60 @@ public final class ReflectionHelper {
 		return getMethodFromPropertyName( clazz, methodName ) != null;
 	}
 
+	/**
+	 * Checks, whether the given class has a method with the same signature as
+	 * the given one. This is the case, if the method itself is member of the
+	 * given class or if another method with the same name, parameter count and
+	 * types exists.
+	 * 
+	 * @param clazz
+	 *            The class to check.
+	 * @param method
+	 *            The method, which's signature should be used as pattern.
+	 * 
+	 * @return True, if the given class has a method with the searched
+	 *         signature, false otherwise.
+	 */
+	public static boolean containsMethodWithSameSignature(Class<?> clazz, Method method) {
+		
+		if(clazz == null) {
+			throw new IllegalArgumentException("clazz must not be null");
+		}
+		if(method == null) {
+			throw new IllegalArgumentException("method must not be null");
+		}
+		
+		for(Method oneMethod : getMethods(clazz)) {
+			if(haveSameSignature(oneMethod, method)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Checks, whether the given methods have the same signature, which is the
+	 * case if they have the same name, parameter count and types.
+	 * 
+	 * @param method1
+	 *            A first method.
+	 * @param method2
+	 *            A second method.
+	 * 
+	 * @return True, if the methods have the same signature, false otherwise.
+	 */
+	public static boolean haveSameSignature(Method method1, Method method2) {
+		
+		if(method1 == null || method2 == null) {
+			throw new IllegalArgumentException("method1 and method2 must not be null");
+		}
+		
+		return 
+			method1.getName().equals(method2.getName()) && 
+			Arrays.equals( method1.getGenericParameterTypes(), method2.getGenericParameterTypes() );
+	}
+	
 	/**
 	 * Returns the autoboxed type of a primitive type.
 	 *

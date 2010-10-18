@@ -18,6 +18,7 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,6 +69,20 @@ public interface BeanMetaData<T> {
 	 */
 	List<MetaConstraint<T, ? extends Annotation>> getMetaConstraintsAsList();
 
+	/**
+	 * Returns the constraint-related meta data for the given method of the
+	 * class represented by this bean meta data.
+	 * 
+	 * @param method
+	 *            The method of interest.
+	 * @return A map with constraint-related meta data, keyed by the class
+	 *         defining it (will only contain more than one entry, if the given
+	 *         method is overwritten from an interface or base class. In this
+	 *         case an entry for each class/interface in the inheritance
+	 *         hierarchy is returned).
+	 */
+	Map<Class<?>, MethodMetaData> getMetaDataForMethod(Method method);
+	
 	/**
 	 * Return {@code PropertyDescriptor} for the given property.
 	 *

@@ -18,68 +18,47 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
 
 import org.hibernate.validator.engine.ConstraintTree;
 import org.hibernate.validator.engine.ValidationContext;
 import org.hibernate.validator.engine.ValueContext;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.metadata.site.ConstraintSite;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
  * meta data about the constraint. This allows a unified handling of constraints in the validator implementation.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
+//TODO GM: parametrize with type of constraint site
 public class MetaConstraint<T, A extends Annotation> {
-
-	/**
-	 * The member the constraint was defined on.
-	 */
-	private final Member member;
-
-	/**
-	 * The JavaBeans name of the field/property the constraint was placed on. {@code null} if this is a
-	 * class level constraint.
-	 */
-	private final String propertyName;
-
-	/**
-	 * The class of the bean hosting this constraint.
-	 */
-	private final Class<T> beanClass;
 
 	/**
 	 * The constraint tree created from the constraint annotation.
 	 */
 	private final ConstraintTree<A> constraintTree;
-
+	
+	/**
+	 * The site at which this constraint is defined.
+	 */
+	private final ConstraintSite site;
+	
 	/**
 	 * @param beanClass The class in which the constraint is defined on
 	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 */
-	public MetaConstraint(Class<T> beanClass, Member member, ConstraintDescriptorImpl<A> constraintDescriptor) {
-		this.member = member;
-		if ( this.member != null ) {
-			this.propertyName = ReflectionHelper.getPropertyName( member );
-			if ( member instanceof Method && propertyName == null ) { // can happen if member is a Method which does not follow the bean convention
-				throw new ValidationException(
-						"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
-				);
-			}
-		} else {
-			this.propertyName = null;
-		}
-		this.beanClass = beanClass;
+	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintSite site) {
+		
 		constraintTree = new ConstraintTree<A>( constraintDescriptor );
+		this.site = site;
 	}
 
 	/**
@@ -94,39 +73,23 @@ public class MetaConstraint<T, A extends Annotation> {
 		return constraintTree.getDescriptor();
 	}
 
-	public Class<T> getBeanClass() {
-		return beanClass;
-	}
-
-	public Member getMember() {
-		return member;
-	}
-
-	/**
-	 * @return The JavaBeans name of the field/property the constraint was placed on. {@code null} if this is a
-	 *         class level constraint.
-	 */
-	public String getPropertyName() {
-		return propertyName;
-	}
-
 	public ElementType getElementType() {
 		return constraintTree.getDescriptor().getElementType();
 	}
 
 	public <T, U, V> boolean validateConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
-		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
+
 		valueContext.setElementType( getElementType() );
-		constraintTree.validateConstraints(
-				typeOfAnnotatedElement(), executionContext, valueContext, constraintViolations
+		
+		return constraintTree.validateConstraints(
+				typeOfAnnotatedElement(), executionContext, valueContext
 		);
-		if ( constraintViolations.size() > 0 ) {
-			executionContext.addConstraintFailures( constraintViolations );
-			return false;
-		}
-		return true;
 	}
 
+	public ConstraintSite getSite() {
+		return site;
+	}
+	
 	/**
 	 * @param o the object from which to retrieve the value.
 	 *
@@ -134,41 +97,17 @@ public class MetaConstraint<T, A extends Annotation> {
 	 *         is returned of method or field access is used to access the value.
 	 */
 	public Object getValue(Object o) {
-		switch ( getElementType() ) {
-			case TYPE: {
-				return o;
-			}
-			default: {
-				return ReflectionHelper.getValue( member, o );
-			}
-		}
+		return site.getValue(o);
 	}
 
-	private Type typeOfAnnotatedElement() {
-		Type t;
-		switch ( getElementType() ) {
-			case TYPE: {
-				t = beanClass;
-				break;
-			}
-			default: {
-				t = ReflectionHelper.typeOf( member );
-				if ( t instanceof Class && ( ( Class ) t ).isPrimitive() ) {
-					t = ReflectionHelper.boxedType( t );
-				}
-			}
-		}
-		return t;
+	protected Type typeOfAnnotatedElement() {
+		return site.typeOfAnnotatedElement();
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "MetaConstraint" );
-		sb.append( "{beanClass=" ).append( beanClass );
-		sb.append( ", member=" ).append( member );
-		sb.append( ", propertyName='" ).append( propertyName ).append( '\'' );
-		sb.append( '}' );
-		return sb.toString();
+		return "MetaConstraint [constraintTree=" + constraintTree + ", site="
+				+ site + "]";
 	}
+
 }
