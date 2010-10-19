@@ -53,7 +53,6 @@ public class BeanConstraintSite <T> implements ConstraintSite {
 	/**
 	 * @param beanClass The class in which the constraint is defined on
 	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
-	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 */
 	public BeanConstraintSite(Class<T> beanClass, Member member) {
 		
