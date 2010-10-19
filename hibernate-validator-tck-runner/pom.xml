@@ -7,6 +7,7 @@
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
         <version>4.2.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>hibernate-validator-tck-runner</artifactId>
     <name>Hibernate Validator TCK Runner</name>
@@ -38,12 +39,6 @@
         <dependency>
             <groupId>org.jboss.test-harness</groupId>
             <artifactId>jboss-test-harness-jboss-as-60</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!--
