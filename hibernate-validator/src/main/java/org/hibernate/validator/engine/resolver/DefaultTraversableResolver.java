@@ -62,11 +62,14 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	private void detectJPA() {
 		try {
 			ReflectionHelper.loadClass( PERSISTENCE_UTIL_CLASS_NAME, this.getClass() );
-			log.debug( "Found {} on classpath.", PERSISTENCE_UTIL_CLASS_NAME );
+			log.debug(
+					"Found {} on classpath. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver",
+					PERSISTENCE_UTIL_CLASS_NAME
+			);
 		}
 		catch ( ValidationException e ) {
 			log.debug(
-					"Cannot find {} on classpath. All properties will per default be traversable.",
+					"Cannot find {} on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.",
 					PERSISTENCE_UTIL_CLASS_NAME
 			);
 			return;
@@ -74,16 +77,16 @@ public class DefaultTraversableResolver implements TraversableResolver {
 
 		try {
 			@SuppressWarnings("unchecked")
-			Class<? extends TraversableResolver> jpaAwareResolverClass = ( Class<? extends TraversableResolver> )
+			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
 					ReflectionHelper.loadClass( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
 			jpaTraversableResolver = ReflectionHelper.newInstance( jpaAwareResolverClass, "" );
 			log.info(
-					"Instantiated an instance of {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
+					"Instantiated JPA aware TraversableResolver of type {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
 		catch ( ValidationException e ) {
 			log.info(
-					"Unable to load or instanciate JPA aware resolver {}. All properties will per default be traversable.",
+					"Unable to load or instantiate JPA aware resolver {}. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
