@@ -61,17 +61,6 @@ public class PastValidatorForAbstractPartialTest {
 	}
 
 	@Test
-	public void testIsValidForLocalTime() {
-		LocalTime future = new LocalTime().plusHours( 1 );
-		LocalTime past = new LocalTime().minusHours( 1 );
-
-		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( new LocalTime(), null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
-	}
-
-	@Test
 	public void testIsValidForLocalDateTime() {
 		LocalDateTime future = new LocalDateTime().plusYears( 1 );
 		LocalDateTime past = new LocalDateTime().minusYears( 1 );
