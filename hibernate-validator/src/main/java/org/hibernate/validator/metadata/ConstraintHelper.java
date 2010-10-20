@@ -83,6 +83,9 @@ import org.hibernate.validator.util.ReflectionHelper;
  * @author Alaa Nassef
  */
 public class ConstraintHelper {
+	
+	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.base.AbstractInstant";
+
 	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
 
@@ -391,17 +394,13 @@ public class ConstraintHelper {
 
 	private boolean isJodaTimeInClasspath() {
 		boolean isInClasspath;
-
 		try {
-
-			Class.forName( "org.joda.time.base.AbstractInstant" );
+			ReflectionHelper.loadClass( JODA_TIME_CLASS_NAME, this.getClass() );
 			isInClasspath = true;
-
 		}
-		catch ( ClassNotFoundException e ) {
+		catch ( ValidationException e ) {
 			isInClasspath = false;
 		}
-
 		return isInClasspath;
 	}
 }
