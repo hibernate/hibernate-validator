@@ -43,12 +43,10 @@
 
     <listitem>
       <para>A properly configured remote repository. Add the following to your
-      <filename>settings.xml</filename>: <example>
-          <title>Configuring the JBoss Maven repository in
-          <filename>settings.xml</filename></title>
+      <filename>settings.xml</filename>: <example id="example-jboss-maven-url">
+          <title>Configuring the JBoss Maven repository</title>
 
-          <programlisting>
-&lt;repositories&gt;
+          <programlisting>&lt;repositories&gt;
     &lt;repository&gt;
         &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
         &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-jboss&lt;/url&gt;
@@ -59,8 +57,7 @@
           &lt;enabled&gt;true&lt;/enabled&gt;
         &lt;/snapshots&gt;
      &lt;/repository&gt;
-&lt;/repositories&gt;
-          </programlisting>
+&lt;/repositories&gt;        </programlisting>
         </example>More information about <filename>settings.xml</filename> can
       be found in the <ulink
       url="http://maven.apache.org/ref/2.0.8/maven-settings/settings.html">Maven
@@ -111,9 +108,9 @@
     <para>Maven will create your project in the directory hv-quickstart.
     Change into this directory and run:</para>
 
-    <para><programlisting>mvn test</programlisting>
-	Maven will compile the example code and run the implemented unit tests. Let's have a look at the actual code.
-	</para>
+    <para><programlisting>mvn test</programlisting> Maven will compile the
+    example code and run the implemented unit tests. Let's have a look at the
+    actual code.</para>
   </section>
 
   <section id="validator-gettingstarted-createmodel">

@@ -48,6 +48,15 @@
   process and raising compilation errors whenever constraint annotations are
   incorrectly used.</para>
 
+  <note>
+    <para>You can find the Hibernate Validator Annotation Processor as part of
+    the distribution bundle on <ulink
+    url="http://sourceforge.net/projects/hibernate/files/hibernate-validator">Sourceforge</ulink>
+    or in the JBoss Maven Repository (see <xref
+    linkend="example-jboss-maven-url" />) under the GAV
+    org.hibernate:hibernate-validator-annotation-processor.</para>
+  </note>
+
   <warning>
     <para>A first version of the Hibernate Validator Annotation Processor is
     part of Hibernate Validator since release 4.1. It is currently still under
