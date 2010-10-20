@@ -44,7 +44,6 @@ public class FutureValidatorForAbstractPartialTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new LocalDate(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 
@@ -55,7 +54,6 @@ public class FutureValidatorForAbstractPartialTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new LocalDate(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 
@@ -66,7 +64,6 @@ public class FutureValidatorForAbstractPartialTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new LocalDateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 }
