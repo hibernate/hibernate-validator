@@ -40,6 +40,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.impl.AssertFalseValidator;
 import org.hibernate.validator.constraints.impl.AssertTrueValidator;
 import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForNumber;
@@ -390,6 +391,10 @@ public class ConstraintHelper {
 
 	public boolean containsConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
 		return constraintValidatorDefinitions.containsKey( annotationClass );
+	}
+
+	public boolean isConstraintComposition(Class<? extends Annotation> annotationType) {
+		return annotationType == ConstraintComposition.class;
 	}
 
 	private boolean isJodaTimeInClasspath() {

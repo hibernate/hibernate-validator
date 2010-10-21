@@ -1,5 +1,4 @@
 /*
- *
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
@@ -15,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.hibernate.validator.engine;
 
 import java.lang.annotation.Annotation;
@@ -36,16 +34,22 @@ import javax.validation.metadata.ConstraintDescriptor;
 import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
+import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ValidatorTypeHelper;
+
+import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
+import static org.hibernate.validator.constraints.CompositionType.AND;
+import static org.hibernate.validator.constraints.CompositionType.OR;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
  * This class encapsulates such a tree.
  *
  * @author Hardy Ferentschik
- * @author Gunnar Morling
+ * @author Federico Mancini
+ * @author Dag Hovland
  */
 public class ConstraintTree<A extends Annotation> {
 
@@ -70,7 +74,7 @@ public class ConstraintTree<A extends Annotation> {
 
 		final Set<ConstraintDescriptorImpl<?>> composingConstraints = new HashSet<ConstraintDescriptorImpl<?>>();
 		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
-			composingConstraints.add( ( ConstraintDescriptorImpl<?> ) composingConstraint );
+			composingConstraints.add( (ConstraintDescriptorImpl<?>) composingConstraint );
 		}
 
 		children = new ArrayList<ConstraintTree<?>>( composingConstraints.size() );
@@ -94,41 +98,54 @@ public class ConstraintTree<A extends Annotation> {
 	public ConstraintDescriptorImpl<A> getDescriptor() {
 		return descriptor;
 	}
-	
+
 	public <T, U, V> boolean validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
-		
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 
-		validateConstraintsInternal(
-			type, executionContext, valueContext, constraintViolations
+		validateConstraints(
+				type, executionContext, valueContext, constraintViolations
 		);
 		if ( !constraintViolations.isEmpty() ) {
 			executionContext.addConstraintFailures( constraintViolations );
 			return false;
 		}
-		
 		return true;
 	}
-	
-	private <T, U, V> void validateConstraintsInternal(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations) {
-		// first validate composing constraints (recursively)
+
+	private <T, U, V> void validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations) {
+		boolean allTrue = true;
+		boolean atLeastOneTrue = false;
+
+		// validate composing constraints (recursively)
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			List<ConstraintViolation<T>> tmpViolations = new ArrayList<ConstraintViolation<T>>();
-			tree.validateConstraintsInternal( type, executionContext, valueContext, tmpViolations );
+			tree.validateConstraints( type, executionContext, valueContext, tmpViolations );
 			constraintViolations.addAll( tmpViolations );
+
+			if ( tmpViolations.isEmpty() ) {
+				atLeastOneTrue = true;
+				// no need to further validate constraints, because at least one validation passed
+				if ( descriptor.getCompositionType() == OR ) {
+					break;
+				}
+			}
+			else {
+				allTrue = false;
+			}
 		}
 
-		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-				valueContext.getPropertyPath(), descriptor
+		boolean passedValidation = passedCompositionTypeRequirement(
+				constraintViolations, allTrue, atLeastOneTrue
 		);
 
 		// check whether we have constraints violations, but we should only report the single message of the
 		// main constraint. We already have to generate the message here, since the composing constraints might
 		// not have its own ConstraintValidator.
 		// Also we want to leave it open to the final ConstraintValidator to generate a custom message. 
-		if ( constraintViolations.size() > 0 && reportAsSingleViolation() ) {
+		if ( !passedValidation && reportAsSingleViolation() ) {
+
 			constraintViolations.clear();
-			final String message = ( String ) getDescriptor().getAttributes().get( "message" );
+			final String message = (String) getDescriptor().getAttributes().get( "message" );
 			MessageAndPath messageAndPath = new MessageAndPath( message, valueContext.getPropertyPath() );
 			ConstraintViolation<T> violation = executionContext.createConstraintViolation(
 					valueContext, messageAndPath, descriptor
@@ -136,7 +153,8 @@ public class ConstraintTree<A extends Annotation> {
 			constraintViolations.add( violation );
 		}
 
-		// we could have a composing constraint which does not need its own validator.
+		// after all children are validated the actual ConstraintValidator of the constraint itself is executed (provided
+		// there is one
 		if ( !descriptor.getConstraintValidatorClasses().isEmpty() ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace(
@@ -150,6 +168,10 @@ public class ConstraintTree<A extends Annotation> {
 					executionContext.getConstraintValidatorFactory()
 			);
 
+			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
+					valueContext.getPropertyPath(), descriptor
+			);
+
 			validateSingleConstraint(
 					executionContext,
 					valueContext,
@@ -158,6 +180,28 @@ public class ConstraintTree<A extends Annotation> {
 					validator
 			);
 		}
+	}
+
+	private <T> boolean passedCompositionTypeRequirement(List<ConstraintViolation<T>> constraintViolations, boolean allTrue, boolean atLeastOneTrue) {
+		CompositionType compositionType = getDescriptor().getCompositionType();
+		assert ( allTrue == constraintViolations.isEmpty() );
+		boolean passedValidation = false;
+		switch ( compositionType ) {
+			case OR:
+				passedValidation = atLeastOneTrue;
+				break;
+			case AND:
+				passedValidation = allTrue;
+				break;
+			case ALL_FALSE:
+				passedValidation = !atLeastOneTrue;
+				break;
+		}
+		assert ( !passedValidation || !( compositionType == AND ) || constraintViolations.isEmpty() );
+		if ( passedValidation ) {
+			constraintViolations.clear();
+		}
+		return passedValidation;
 	}
 
 	private <T, U, V> void validateSingleConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations, ConstraintValidatorContextImpl constraintValidatorContext, ConstraintValidator<A, V> validator) {
@@ -177,8 +221,14 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
+	/**
+	 * @return {@code} true if the current constraint should be reportes as single violation, {@code false otherwise}.
+	 * When using disjunction or negation, we only report the single top-level violation, as
+	 * it is hard, especially for ALL_FALSE to give meaningful reports
+	 */
 	private boolean reportAsSingleViolation() {
-		return getDescriptor().isReportAsSingleViolation();
+		return getDescriptor().isReportAsSingleViolation()
+				|| getDescriptor().getCompositionType() == ALL_FALSE;
 	}
 
 	/**
@@ -206,7 +256,7 @@ public class ConstraintTree<A extends Annotation> {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "Constraint validator {} found in cache" );
 			}
-			constraintValidator = ( ConstraintValidator<A, V> ) constraintValidatorCache.get( key );
+			constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
 		}
 		return constraintValidator;
 	}
@@ -214,7 +264,7 @@ public class ConstraintTree<A extends Annotation> {
 	@SuppressWarnings("unchecked")
 	private <V> ConstraintValidator<A, V> createAndInitializeValidator(ConstraintValidatorFactory constraintFactory, Class<? extends ConstraintValidator<?, ?>> validatorClass) {
 		ConstraintValidator<A, V> constraintValidator;
-		constraintValidator = ( ConstraintValidator<A, V> ) constraintFactory.getInstance(
+		constraintValidator = (ConstraintValidator<A, V>) constraintFactory.getInstance(
 				validatorClass
 		);
 		if ( constraintValidator == null ) {
@@ -246,7 +296,7 @@ public class ConstraintTree<A extends Annotation> {
 		if ( assignableClasses.size() == 0 ) {
 			String className = valueClass.toString();
 			if ( valueClass instanceof Class ) {
-				Class<?> clazz = ( Class<?> ) valueClass;
+				Class<?> clazz = (Class<?>) valueClass;
 				if ( clazz.isArray() ) {
 					className = clazz.getComponentType().toString() + "[]";
 				}
@@ -348,7 +398,7 @@ public class ConstraintTree<A extends Annotation> {
 				return false;
 			}
 
-			ValidatorCacheKey that = ( ValidatorCacheKey ) o;
+			ValidatorCacheKey that = (ValidatorCacheKey) o;
 
 			if ( constraintValidatorFactory != null ? !constraintValidatorFactory.equals( that.constraintValidatorFactory ) : that.constraintValidatorFactory != null ) {
 				return false;

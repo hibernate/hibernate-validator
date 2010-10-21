@@ -1,3 +1,4 @@
+// $Id: ConstraintDescriptorImpl.java 19825 2010-06-24 21:29:29Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -44,6 +45,11 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.slf4j.Logger;
 
+import org.hibernate.validator.constraints.CompositionType;
+import org.hibernate.validator.constraints.ConstraintComposition;
+
+import static org.hibernate.validator.constraints.CompositionType.AND;
+
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
@@ -54,6 +60,8 @@ import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Federico Mancini
+ * @author Dag Hovland
  */
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
@@ -88,7 +96,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	/**
 	 * The set of classes implementing the validation for this constraint. See also
-	 * <code>ConstraintValidator</code> resolution algorithm.
+	 * {@code ConstraintValidator} resolution algorithm.
 	 */
 	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses;
 
@@ -129,12 +137,17 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final ConstraintOrigin definedOn;
 
+    /**
+     * Type indicating how composing constraints should be combined. By default this is set to {@Code ConstraintComposition.CompositionType.AND}.
+     */
+	private CompositionType compositionType = AND;
+
 
 	/**
 	 * Handle to the built-in constraint implementations.
 	 */
 	//TODO Can be made transient since it is only used during object construction. It would be better if we would not have to pass it at all
-	private transient final ConstraintHelper constraintHelper;
+	private final transient ConstraintHelper constraintHelper;
 
 	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup, ElementType type, ConstraintOrigin definedOn) {
 		this.annotation = annotation;
@@ -375,7 +388,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				// ignore the usual suspects which will be in almost any constraint, but are no composing constraint
 				continue;
 			}
-
+			
+			//If there is a @ConstraintCompositionType annotation, set its value as the local compositionType field
+			if (constraintHelper.isConstraintComposition(declaredAnnotationType)) {
+				this.setCompositionType(((ConstraintComposition) declaredAnnotation).value());
+				if ( log.isDebugEnabled()) {
+					log.debug( "Adding Bool" + declaredAnnotationType.getName() );
+				}
+				continue;
+			}
+			
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType )
 					|| constraintHelper.isBuiltinConstraint( declaredAnnotationType ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
@@ -443,6 +465,20 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return new ConstraintDescriptorImpl<U>(
 				annotationProxy, constraintHelper, elementType, definedOn
 		);
+	}
+
+	/**
+	 * @param compositionType the compositionType to set
+	 */
+	public void setCompositionType(CompositionType compositionType) {
+		this.compositionType = compositionType;
+	}
+
+	/**
+	 * @return the compositionType
+	 */
+	public CompositionType getCompositionType() {
+		return compositionType;
 	}
 
 	/**
