@@ -21,6 +21,8 @@ import javax.validation.ValidationException;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
+ * @author Kevin Pollet
  */
 public class LoadClass implements PrivilegedAction<Class<?>> {
 
@@ -41,47 +43,57 @@ public class LoadClass implements PrivilegedAction<Class<?>> {
 
 	public Class<?> run() {
 		if ( className.startsWith( HIBERNATE_VALIDATOR_CLASS_NAME ) ) {
-			try {
-				return Class.forName( className, true, caller.getClassLoader() );
-			}
-			catch ( ClassNotFoundException e ) {
-				//ignore -- try using the class loader of context first
-			}
-			catch ( RuntimeException e ) {
-				// ignore
-			}
-			try {
-				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-				if ( contextClassLoader != null ) {
-					return contextClassLoader.loadClass( className );
-				}
-				else {
-					throw new ValidationException( "Unable to load class: " + className );
-				}
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new ValidationException( "Unable to load class: " + className, e );
-			}
+			return loadClassInValidatorNameSpace();
 		}
 		else {
-			try {
-				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-				if ( contextClassLoader != null ) {
-					return contextClassLoader.loadClass( className );
-				}
+			return loadNonValidatorClass();
+		}
+	}
+
+	// HV-363 - library internal classes are loaded via Class.forName first
+
+	private Class<?> loadClassInValidatorNameSpace() {
+		try {
+			return Class.forName( className, true, caller.getClassLoader() );
+		}
+		catch ( ClassNotFoundException e ) {
+			//ignore -- try using the class loader of context first
+		}
+		catch ( RuntimeException e ) {
+			// ignore
+		}
+		try {
+			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+			if ( contextClassLoader != null ) {
+				return contextClassLoader.loadClass( className );
 			}
-			catch ( ClassNotFoundException e ) {
-				// ignore - try using the classloader of the caller first
+			else {
+				throw new ValidationException( "Unable to load class: " + className );
 			}
-			catch ( RuntimeException e ) {
-				// ignore
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new ValidationException( "Unable to load class: " + className, e );
+		}
+	}
+
+	private Class<?> loadNonValidatorClass() {
+		try {
+			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+			if ( contextClassLoader != null ) {
+				return contextClassLoader.loadClass( className );
 			}
-			try {
-				return Class.forName( className, true, caller.getClassLoader() );
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new ValidationException( "Unable to load class: " + className, e );
-			}
+		}
+		catch ( ClassNotFoundException e ) {
+			// ignore - try using the classloader of the caller first
+		}
+		catch ( RuntimeException e ) {
+			// ignore
+		}
+		try {
+			return Class.forName( className, true, caller.getClassLoader() );
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new ValidationException( "Unable to load class: " + className, e );
 		}
 	}
 }
