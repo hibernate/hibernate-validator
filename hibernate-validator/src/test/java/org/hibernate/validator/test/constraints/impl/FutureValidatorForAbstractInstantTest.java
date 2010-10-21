@@ -45,7 +45,6 @@ public class FutureValidatorForAbstractInstantTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new DateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 
@@ -56,7 +55,6 @@ public class FutureValidatorForAbstractInstantTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new DateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 
@@ -67,7 +65,6 @@ public class FutureValidatorForAbstractInstantTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new DateMidnight(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 
@@ -81,7 +78,6 @@ public class FutureValidatorForAbstractInstantTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new MutableDateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 }

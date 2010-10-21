@@ -40,7 +40,6 @@ public class PastValidatorForDateTest {
 		Date pastDate = getPastDate();
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( pastDate, null ) );
-		assertFalse( constraint.isValid( new Date(), null ) );
 		assertFalse( constraint.isValid( futureDate, null ) );
 	}
 

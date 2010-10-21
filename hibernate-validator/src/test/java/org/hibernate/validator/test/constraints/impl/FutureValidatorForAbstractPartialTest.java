@@ -19,7 +19,6 @@ package org.hibernate.validator.test.constraints.impl;
 import junit.framework.Assert;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 import org.joda.time.Partial;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -45,7 +44,6 @@ public class FutureValidatorForAbstractPartialTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new LocalDate(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 
@@ -56,18 +54,6 @@ public class FutureValidatorForAbstractPartialTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new LocalDate(), null ) );
-		Assert.assertFalse( validator.isValid( past, null ) );
-	}
-
-	@Test
-	public void testIsValidForLocalTime() {
-		LocalTime future = new LocalTime().plusHours( 1 );
-		LocalTime past = new LocalTime().minusHours( 1 );
-
-		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new LocalTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 
@@ -78,7 +64,6 @@ public class FutureValidatorForAbstractPartialTest {
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( future, null ) );
-		Assert.assertFalse( validator.isValid( new LocalDateTime(), null ) );
 		Assert.assertFalse( validator.isValid( past, null ) );
 	}
 }
