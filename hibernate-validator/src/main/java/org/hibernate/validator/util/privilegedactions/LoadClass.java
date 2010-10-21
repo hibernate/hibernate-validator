@@ -23,7 +23,11 @@ import javax.validation.ValidationException;
  * @author Emmanuel Bernard
  */
 public class LoadClass implements PrivilegedAction<Class<?>> {
+
+	private static final String HIBERNATE_VALIDATOR_CLASS_NAME = "org.hibernate.validator";
+
 	private final String className;
+
 	private final Class<?> caller;
 
 	public static LoadClass action(String className, Class<?> caller) {
@@ -36,23 +40,48 @@ public class LoadClass implements PrivilegedAction<Class<?>> {
 	}
 
 	public Class<?> run() {
-		try {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass( className );
+		if ( className.startsWith( HIBERNATE_VALIDATOR_CLASS_NAME ) ) {
+			try {
+				return Class.forName( className, true, caller.getClassLoader() );
+			}
+			catch ( ClassNotFoundException e ) {
+				//ignore -- try using the class loader of context first
+			}
+			catch ( RuntimeException e ) {
+				// ignore
+			}
+			try {
+				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+				if ( contextClassLoader != null ) {
+					return contextClassLoader.loadClass( className );
+				}
+				else {
+					throw new ValidationException( "Unable to load class: " + className );
+				}
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException( "Unable to load class: " + className, e );
 			}
 		}
-		catch ( ClassNotFoundException e ) {
-			// ignore - try using the classloader of the caller first
-		}
-		catch ( RuntimeException e ) {
-			// ignore
-		}
-		try {
-			return Class.forName( className, true, caller.getClassLoader() );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new ValidationException( "Unable to load class: " + className, e );
+		else {
+			try {
+				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+				if ( contextClassLoader != null ) {
+					return contextClassLoader.loadClass( className );
+				}
+			}
+			catch ( ClassNotFoundException e ) {
+				// ignore - try using the classloader of the caller first
+			}
+			catch ( RuntimeException e ) {
+				// ignore
+			}
+			try {
+				return Class.forName( className, true, caller.getClassLoader() );
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new ValidationException( "Unable to load class: " + className, e );
+			}
 		}
 	}
 }
