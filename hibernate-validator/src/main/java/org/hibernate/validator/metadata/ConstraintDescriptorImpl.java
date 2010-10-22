@@ -317,10 +317,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 		// should never happen
 		catch ( IllegalAccessException e ) {
-			throw new ValidationException( "Unable to retrieve annotation parameter value." );
+			throw new ValidationException( "Unable to retrieve annotation parameter value.", e );
 		}
 		catch ( InvocationTargetException e ) {
-			throw new ValidationException( "Unable to retrieve annotation parameter value." );
+			throw new ValidationException( "Unable to retrieve annotation parameter value.", e );
 		}
 		return value;
 	}

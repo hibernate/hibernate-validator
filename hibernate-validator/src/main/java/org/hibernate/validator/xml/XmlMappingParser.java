@@ -437,7 +437,7 @@ public class XmlMappingParser {
 				returnValue = createAnnotation( annotationType, annotationClass );
 			}
 			catch ( ClassCastException e ) {
-				throw new ValidationException( "Unexpected parameter value" );
+				throw new ValidationException( "Unexpected parameter value", e );
 			}
 		}
 		else {
@@ -530,7 +530,7 @@ public class XmlMappingParser {
 				returnValue = Enum.valueOf( enumClass, value );
 			}
 			catch ( ClassCastException e ) {
-				throw new ValidationException( "Invalid return type: " + returnType + ". Should be a enumeration type." );
+				throw new ValidationException( "Invalid return type: " + returnType + ". Should be a enumeration type.", e );
 			}
 		}
 		return returnValue;

@@ -315,7 +315,7 @@ public class ConstraintHelper {
 		catch ( ClassCastException e ) {
 			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
 					"payload parameter is of wrong type.";
-			throw new ConstraintDefinitionException( msg );
+			throw new ConstraintDefinitionException( msg, e );
 		}
 	}
 
@@ -338,7 +338,7 @@ public class ConstraintHelper {
 		catch ( ClassCastException e ) {
 			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
 					"groups parameter is of wrong type.";
-			throw new ConstraintDefinitionException( msg );
+			throw new ConstraintDefinitionException( msg, e );
 		}
 	}
 
@@ -359,7 +359,7 @@ public class ConstraintHelper {
 		catch ( ClassCastException e ) {
 			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
 					"groups parameter is of wrong type.";
-			throw new ConstraintDefinitionException( msg );
+			throw new ConstraintDefinitionException( msg, e );
 		}
 	}
 

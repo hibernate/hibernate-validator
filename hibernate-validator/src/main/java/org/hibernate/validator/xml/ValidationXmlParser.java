@@ -3,7 +3,7 @@
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ *       hibernate-validator/src/main/docbook/en-US/modules/integration.xml~
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -188,7 +188,7 @@ public class ValidationXmlParser {
 				log.info( "Using {} as validation provider.", providerClassName );
 			}
 			catch ( Exception e ) {
-				throw new ValidationException( "Unable to instantiate validation provider class " + providerClassName + "." );
+				throw new ValidationException( "Unable to instantiate validation provider class " + providerClassName + ".", e );
 			}
 		}
 	}
@@ -215,7 +215,7 @@ public class ValidationXmlParser {
 		}
 		catch ( JAXBException e ) {
 			log.error( "Error parsing {}: {}", VALIDATION_XML_FILE, e.getMessage() );
-			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE );
+			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE, e );
 		}
 		finally {
 			try {
