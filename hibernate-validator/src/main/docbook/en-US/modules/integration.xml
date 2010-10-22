@@ -67,7 +67,16 @@
     <title>ORM integration</title>
 
     <para>Hibernate Validator integrates with both Hibernate and all pure Java
-    Persistence providers.</para>
+    Persistence providers. </para>
+
+    <tip>
+      <para>When lazy loaded associations are supposed to be validated it is
+      recommended to place the constraint on the getter of the association.
+      Hibernate replaces lazy loaded associations with proxy instances which
+      get initialized/loaded when requested via the getter. If, in such a
+      case, the constraint is placed on field level the actual proxy instance
+      is used which will lead to validation errors.</para>
+    </tip>
 
     <section id="validator-checkconstraints-orm-hibernateevent">
       <title>Hibernate event-based validation</title>
