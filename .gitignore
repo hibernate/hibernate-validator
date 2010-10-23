@@ -2,3 +2,4 @@ hibernate-validator/target/*
 hibernate-validator/test-output/*
 hibernate-validator/.*
 hibernate-validator/maven-eclipse.xml
+*~
