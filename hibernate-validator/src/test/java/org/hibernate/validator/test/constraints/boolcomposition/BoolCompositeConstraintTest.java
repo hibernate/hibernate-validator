@@ -47,18 +47,18 @@ public class BoolCompositeConstraintTest {
 				new Person( "K", "G" )
 		);
 
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectConstraintTypes( constraintViolations, PatternOrSize.class, NotNullAndSize.class );
-		assertCorrectPropertyPaths(constraintViolations, "name", "name");
+		assertNumberOfViolations( constraintViolations, 4 );
+		assertCorrectConstraintTypes( constraintViolations, PatternOrSize.class, NotNullAndSize.class, TemporarySSN.class, SSN.class );
+		assertCorrectPropertyPaths(constraintViolations, "name", "name", "ssn", "ssn");
 
 		constraintViolations = currentValidator.validate(
 				new Person(
 						"G", "Gerhard"
 				)
 		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, PatternOrSize.class );
-		assertCorrectPropertyPaths(constraintViolations, "nickName");
+		assertNumberOfViolations( constraintViolations, 3 );
+		assertCorrectConstraintTypes( constraintViolations, PatternOrSize.class , TemporarySSN.class, SSN.class );
+		assertCorrectPropertyPaths(constraintViolations, "nickName", "ssn", "ssn");
 	}
 
 	/**
@@ -74,20 +74,78 @@ public class BoolCompositeConstraintTest {
 				)
 		);
 
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectConstraintTypes( constraintViolations, PatternOrSize.class, NotNullAndSize.class );
-		assertCorrectPropertyPaths(constraintViolations, "name", "nickName");
+		assertNumberOfViolations( constraintViolations, 4 );
+		assertCorrectConstraintTypes( constraintViolations, PatternOrSize.class, NotNullAndSize.class  , TemporarySSN.class, SSN.class);
+		assertCorrectPropertyPaths(constraintViolations, "name", "nickName", "ssn", "ssn");
 
 		constraintViolations = currentValidator.validate(
 				new Person(
 						"L", "G"
 				)
 		);
-		assertNumberOfViolations( constraintViolations, 3 );
+		assertNumberOfViolations( constraintViolations, 5 );
 		assertCorrectConstraintTypes(
-				constraintViolations, NotNullAndSize.class, PatternOrSize.class, PatternOrSize.class
+				constraintViolations, NotNullAndSize.class, PatternOrSize.class, PatternOrSize.class , TemporarySSN.class, SSN.class
 		);
-		assertCorrectPropertyPaths(constraintViolations, "name", "name", "nickName");
+		assertCorrectPropertyPaths(constraintViolations, "name", "name", "nickName", "ssn", "ssn");
+	}
+
+    /**
+	 * HV-390
+	 */
+	@Test
+	public void testCorrectAnnotationTypeWithBoolAllFalse() {
+		Validator currentValidator = TestUtil.getValidator();
+		// Uses ALL_FALSE, OR, and AND. Checks that SSN works
+		Set<ConstraintViolation<Person>> constraintViolations = currentValidator.validate(
+				new Person(
+					   "NickName", "Name", "33333333333"
+					   )
+												  );
+
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		// Uses ALL_FALSE, OR, and AND. Checks that TemporarySSN works
+		constraintViolations = currentValidator.validate(
+				new Person(
+					   "NickName", "Name", "333333"
+					   )
+												  );
+
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		// Checks that two negations work
+		constraintViolations = currentValidator.validate(
+								 new Person(
+									    "NickName", "Name", "333333","12345678901"
+									    )
+								 );
+
+		assertNumberOfViolations( constraintViolations, 2 );
+		assertCorrectConstraintTypes( constraintViolations, Blacklist.class, IsBlank.class );
+		assertCorrectPropertyPaths(constraintViolations, "anotherSsn", "anotherSsn");
+
+		// Checks that negation on a list works
+		constraintViolations = currentValidator.validate(
+				new Person(
+					   "NickName", "Name", "12345678901"
+					   )
+												  );
+
+		assertNumberOfViolations( constraintViolations, 1 );	
+		assertCorrectConstraintTypes( constraintViolations, Blacklist.class );
+		assertCorrectPropertyPaths(constraintViolations, "ssn");
+
+		// Checks that all parts of an "or" ar reported
+		constraintViolations = currentValidator.validate(
+				new Person(
+					   "NickName", "Name", "12345678"
+					   )
+												  );
+
+		assertNumberOfViolations( constraintViolations, 2 );	
+		assertCorrectConstraintTypes( constraintViolations, TemporarySSN.class, SSN.class );
+		assertCorrectPropertyPaths(constraintViolations, "ssn", "ssn");
 	}
 }
 
