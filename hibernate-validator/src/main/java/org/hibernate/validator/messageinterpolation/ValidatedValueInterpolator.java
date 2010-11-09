@@ -39,9 +39,9 @@ import org.hibernate.validator.util.LoggerFactory;
 //TODO let the user to specify the language script
 public class ValidatedValueInterpolator implements MessageInterpolator {
 
-	public static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
+	private static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
 
-	public static final Pattern VALIDATED_VALUE_PATTERN = Pattern.compile( "\\$\\{" + VALIDATED_VALUE_KEYWORD + "(:[^\\}]+)?\\}" );
+	private static final Pattern VALIDATED_VALUE_PATTERN = Pattern.compile( "\\$\\{" + VALIDATED_VALUE_KEYWORD + "(:[^\\}]+)?\\}" );
 
 	private static final String VALIDATED_VALUE_ALIAS = "_";
 
