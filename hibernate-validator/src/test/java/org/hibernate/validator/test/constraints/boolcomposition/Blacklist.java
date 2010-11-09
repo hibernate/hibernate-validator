@@ -21,16 +21,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Pattern.List;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
-import org.hibernate.validator.constraints.CompositionType;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 
@@ -42,10 +40,15 @@ import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
  */
 
 @ConstraintComposition(ALL_FALSE)
-    @Target({ METHOD, FIELD, ANNOTATION_TYPE })
+@Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = {})
-@List({@Pattern(regexp = "12345678901"),@Pattern(regexp = "98765678765"),@Pattern(regexp = "55555555555"),@Pattern(regexp = "123456")})
+@Constraint(validatedBy = { })
+@List({
+		@Pattern(regexp = "12345678901"),
+		@Pattern(regexp = "98765678765"),
+		@Pattern(regexp = "55555555555"),
+		@Pattern(regexp = "123456")
+})
 public @interface Blacklist {
 	public abstract String message() default "Blacklisted SSN";
 

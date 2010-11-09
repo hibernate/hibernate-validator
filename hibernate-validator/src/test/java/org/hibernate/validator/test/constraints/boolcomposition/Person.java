@@ -30,11 +30,11 @@ public class Person {
 	@PatternOrSize
 	private String name;
 
-    @AllowedSSN
-    private String ssn = "";
-    
+	@AllowedSSN
+	private String ssn = "";
 
-    @Blacklist
+
+	@Blacklist
 	@IsBlank
 	private String anotherSsn = "";
 
@@ -43,15 +43,15 @@ public class Person {
 		this.name = name;
 	}
 
-    public Person(String nickName, String name, String ssn){
-	this(nickName, name);
-	this.ssn = ssn;
-    }
+	public Person(String nickName, String name, String ssn) {
+		this( nickName, name );
+		this.ssn = ssn;
+	}
 
-    public Person(String nickName, String name, String ssn, String anotherSsn){
-      this(nickName, name, ssn);
-	this.anotherSsn = anotherSsn;
-    }
+	public Person(String nickName, String name, String ssn, String anotherSsn) {
+		this( nickName, name, ssn );
+		this.anotherSsn = anotherSsn;
+	}
 
 	public String getNickName() {
 		return nickName;
@@ -68,20 +68,21 @@ public class Person {
 	public void setName(String name) {
 		this.name = name;
 	}
-    
-    public String getSsn() {
+
+	public String getSsn() {
 		return ssn;
 	}
 
 	public void setSsn(String ssn) {
 		this.ssn = ssn;
 	}
-     public String getAnotherSsn() {
+
+	public String getAnotherSsn() {
 		return anotherSsn;
 	}
 
 	public void setAnotherSsn(String anotherSsn) {
 		this.anotherSsn = anotherSsn;
 	}
-    
+
 }
