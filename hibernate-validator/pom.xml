@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
@@ -71,7 +73,7 @@
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <optional>true</optional>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <optional>true</optional>
@@ -87,10 +89,10 @@
             <classifier>jdk15</classifier>
         </dependency>
         <dependency>
-          <groupId>org.easymock</groupId>
-          <artifactId>easymock</artifactId>
-          <scope>test</scope>
-        </dependency>        
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
@@ -108,8 +110,8 @@
         <jdbc.driver>org.h2.Driver</jdbc.driver>
         <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
         <jdbc.user>sa</jdbc.user>
-        <jdbc.pass />
-        <jdbc.isolation />
+        <jdbc.pass/>
+        <jdbc.isolation/>
     </properties>
 
     <build>
@@ -229,7 +231,7 @@
                                 </relocation>
                             </relocations>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
                             </transformers>
                         </configuration>
                     </execution>
@@ -268,14 +270,14 @@
                     <sourceDocumentName>master.xml</sourceDocumentName>
                     <sourceDirectory>${basedir}/src/main/docbook</sourceDirectory>
                     <masterTranslation>en-US</masterTranslation>
-			        <translations>
-			        	<translation>zh-CN</translation>
-			        </translations>
+                    <translations>
+                        <translation>zh-CN</translation>
+                    </translations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
                     <formats>
-                    	<format>
+                        <format>
                             <formatName>pdf</formatName>
                             <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl</stylesheetResource>
                             <finalName>hibernate_validator_reference.pdf</finalName>
@@ -324,6 +326,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-injection-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>bytecode</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <bytecodeInjections>
+                        <bytecodeInjection>
+                            <expression>${project.version}</expression>
+                            <targetMembers>
+                                <methodBodyReturn>
+                                    <className>org.hibernate.validator.util.Version</className>
+                                    <methodName>getVersionString</methodName>
+                                </methodBodyReturn>
+                            </targetMembers>
+                        </bytecodeInjection>
+                    </bytecodeInjections>
+                </configuration>
             </plugin>
         </plugins>
     </build>
