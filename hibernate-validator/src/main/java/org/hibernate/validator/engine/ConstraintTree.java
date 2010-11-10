@@ -35,7 +35,6 @@ import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
-import org.hibernate.validator.engine.ConstraintViolationImpl;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ValidatorTypeHelper;
@@ -92,20 +91,18 @@ public class ConstraintTree<A extends Annotation> {
 		return new ConstraintTree<U>( composingDescriptor, this );
 	}
 
-	public List<ConstraintTree<?>> getChildren() {
+	public final List<ConstraintTree<?>> getChildren() {
 		return children;
 	}
 
-	public ConstraintDescriptorImpl<A> getDescriptor() {
+	public final ConstraintDescriptorImpl<A> getDescriptor() {
 		return descriptor;
 	}
 
-	public <T, U, V> boolean validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
-		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
+	public <T, U, V> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
 
-		validateConstraints(
-				type, executionContext, valueContext, constraintViolations
-		);
+		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
+		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
 			executionContext.addConstraintFailures( constraintViolations );
 			return false;
@@ -113,32 +110,17 @@ public class ConstraintTree<A extends Annotation> {
 		return true;
 	}
 
-	private <T, U, V> void validateConstraints(Type type, ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations) {
-		boolean allTrue = true;
-		boolean atLeastOneTrue = false;
-		//New list of violation used to store the violations from the local constraintValidator, i.e.,
-		//the call to validateSingleConstraint()
-		List<ConstraintViolation<T>> localViolations=new ArrayList<ConstraintViolation<T>>();
-		// validate composing constraints (recursively)
-		for ( ConstraintTree<?> tree : getChildren() ) {
-			List<ConstraintViolation<T>> tmpViolations = new ArrayList<ConstraintViolation<T>>();
-			tree.validateConstraints( type, executionContext, valueContext, tmpViolations );
-			constraintViolations.addAll( tmpViolations );
+	private <T, U, V> void validateConstraints(ValidationContext<T> executionContext,
+											   ValueContext<U, V> valueContext,
+											   List<ConstraintViolation<T>> constraintViolations) {
+		CompositionResult compositionResult = validateComposingConstraints(
+				executionContext, valueContext, constraintViolations
+		);
 
-			if ( tmpViolations.isEmpty() ) {
-				atLeastOneTrue = true;
-				// no need to further validate constraints, because at least one validation passed
-				if ( descriptor.getCompositionType() == OR ) {
-					break;
-				}
-			}
-			else {
-				allTrue = false;
-			}
-		}
-				
+
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed (provided
 		// there is one)
+		List<ConstraintViolation<T>> localViolationList = new ArrayList<ConstraintViolation<T>>();
 		if ( !descriptor.getConstraintValidatorClasses().isEmpty() ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace(
@@ -148,81 +130,123 @@ public class ConstraintTree<A extends Annotation> {
 				);
 			}
 			ConstraintValidator<A, V> validator = getInitializedValidator(
-					type,
+					valueContext.getTypeOfAnnotatedElement(),
 					executionContext.getConstraintValidatorFactory()
 			);
 
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
 					valueContext.getPropertyPath(), descriptor
 			);
-            
-			//We add the violations to the local list we created at the beginning, if any
-			localViolations.addAll(validateSingleConstraint(
-					executionContext,
-					valueContext,
-					constraintViolations,
-					constraintValidatorContext,
-					validator)
+
+			localViolationList.addAll(
+					validateSingleConstraint(
+							executionContext,
+							valueContext,
+							constraintValidatorContext,
+							validator
+					)
 			);
-			//We re-evaluate the boolean composition 
-			//by taking into consideration also the violations
-			//from the local constraintValidator
-			if( localViolations.isEmpty()  ) {
-				atLeastOneTrue = true;
-			} else {
-				allTrue = false;
+
+			// We re-evaluate the boolean composition by taking into consideration also the violations
+			// from the local constraintValidator
+			if ( localViolationList.isEmpty() ) {
+				compositionResult.setAtLeastOneTrue( true );
+			}
+			else {
+				compositionResult.setAllTrue( false );
 			}
 		}
-		
-		//Final boolean evaluation that now includes all constraints involved, not only the composing ones
-		boolean passedValidation = passedCompositionTypeRequirement(
-				constraintViolations, allTrue, atLeastOneTrue
-		);
 
-		//If there are some violations, we check whether they should be reported as one
-		if ( !passedValidation ) {
-			if(reportAsSingleViolation()){
-				//We clear the current violations list anyway
-				constraintViolations.clear(); 
-				//But then we need to distinguish whether the local ConstraintValidator has reported
-				//violations or not (or if there is no local ConstraintValidator at all).
-				//If not we create a violation
-				//using the error message in the annotation declaration at top level.
-				if(localViolations.isEmpty() ){
-					final String message = (String) getDescriptor().getAttributes().get( "message" );
-					MessageAndPath messageAndPath = new MessageAndPath( message, valueContext.getPropertyPath() );
-					ConstraintViolation<T> violation = executionContext.createConstraintViolation(
-							valueContext, messageAndPath, descriptor
-					);
-					constraintViolations.add( violation );
-				}
-			}
-			//Now, if there were some violations reported by 
-			//the local ConstraintValidator, they need to be added to constraintViolations.
-			//Whether we need to report them as a single contraint or just add them to the other violations
-		    //from the composing constraints, has been taken care of in the previous conditional block.
-			//This takes also care of possible custom error messages created by the constraintValidator,
-			//as checked in test CustomErrorMessage.java
-			//If no violations have been reported from the local ConstraintValidator, or no such validator exists,
-			//then we just add an empty list.
-			constraintViolations.addAll( localViolations );
+		if ( !passesCompositionTypeRequirement( constraintViolations, compositionResult ) ) {
+			prepareFinalConstraintViolations(
+					executionContext, valueContext, constraintViolations, localViolationList
+			);
 		}
-
 	}
 
-	private <T> boolean passedCompositionTypeRequirement(List<ConstraintViolation<T>> constraintViolations, boolean allTrue, boolean atLeastOneTrue) {
+	/**
+	 * Before the final constraint violations can be reported back we need to check whether we have a composing
+	 * constraint whose result should be reported as single violation.
+	 *
+	 * @param executionContext Meta data about top level validation
+	 * @param valueContext Meta data for currently validated value
+	 * @param constraintViolations Used to accumulate constraint violations
+	 * @param localViolationList List of constraint violations of top level constraint
+	 */
+	private <T, U, V> void prepareFinalConstraintViolations(ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations, List<ConstraintViolation<T>> localViolationList) {
+		if ( reportAsSingleViolation() ) {
+			// We clear the current violations list anyway
+			constraintViolations.clear();
+
+			// But then we need to distinguish whether the local ConstraintValidator has reported
+			// violations or not (or if there is no local ConstraintValidator at all).
+			// If not we create a violation
+			// using the error message in the annotation declaration at top level.
+			if ( localViolationList.isEmpty() ) {
+				final String message = (String) getDescriptor().getAttributes().get( "message" );
+				MessageAndPath messageAndPath = new MessageAndPath( message, valueContext.getPropertyPath() );
+				ConstraintViolation<T> violation = executionContext.createConstraintViolation(
+						valueContext, messageAndPath, descriptor
+				);
+				constraintViolations.add( violation );
+			}
+		}
+
+		// Now, if there were some violations reported by
+		// the local ConstraintValidator, they need to be added to constraintViolations.
+		// Whether we need to report them as a single constraint or just add them to the other violations
+		// from the composing constraints, has been taken care of in the previous conditional block.
+		// This takes also care of possible custom error messages created by the constraintValidator,
+		// as checked in test CustomErrorMessage.java
+		// If no violations have been reported from the local ConstraintValidator, or no such validator exists,
+		// then we just add an empty list.
+		constraintViolations.addAll( localViolationList );
+	}
+
+	/**
+	 * Validates all composing constraints recursively.
+	 *
+	 * @param executionContext Meta data about top level validation
+	 * @param valueContext Meta data for currently validated value
+	 * @param constraintViolations Used to accumulate constraint violations
+	 *
+	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
+	 */
+	private <T, U, V> CompositionResult validateComposingConstraints(ValidationContext<T> executionContext,
+																	 ValueContext<U, V> valueContext,
+																	 List<ConstraintViolation<T>> constraintViolations) {
+		CompositionResult compositionResult = new CompositionResult( true, false );
+		for ( ConstraintTree<?> tree : getChildren() ) {
+			List<ConstraintViolation<T>> tmpViolationList = new ArrayList<ConstraintViolation<T>>();
+			tree.validateConstraints( executionContext, valueContext, tmpViolationList );
+			constraintViolations.addAll( tmpViolationList );
+
+			if ( tmpViolationList.isEmpty() ) {
+				compositionResult.setAtLeastOneTrue( true );
+				// no need to further validate constraints, because at least one validation passed
+				if ( descriptor.getCompositionType() == OR ) {
+					break;
+				}
+			}
+			else {
+				compositionResult.setAllTrue( false );
+			}
+		}
+		return compositionResult;
+	}
+
+	private <T> boolean passesCompositionTypeRequirement(List<ConstraintViolation<T>> constraintViolations, CompositionResult compositionResult) {
 		CompositionType compositionType = getDescriptor().getCompositionType();
-		//assert ( allTrue == constraintViolations.isEmpty() ); //not true anymore
 		boolean passedValidation = false;
 		switch ( compositionType ) {
 			case OR:
-				passedValidation = atLeastOneTrue;
+				passedValidation = compositionResult.isAtLeastOneTrue();
 				break;
 			case AND:
-				passedValidation = allTrue;
+				passedValidation = compositionResult.isAllTrue();
 				break;
 			case ALL_FALSE:
-				passedValidation = !atLeastOneTrue;
+				passedValidation = !compositionResult.isAtLeastOneTrue();
 				break;
 		}
 		assert ( !passedValidation || !( compositionType == AND ) || constraintViolations.isEmpty() );
@@ -231,11 +255,13 @@ public class ConstraintTree<A extends Annotation> {
 		}
 		return passedValidation;
 	}
-    
-	//Changed to return the violations without adding them to constraintViolations at this point, but keeping them for after the boolean evaluation.
-	private <T, U, V> List<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations, ConstraintValidatorContextImpl constraintValidatorContext, ConstraintValidator<A, V> validator) {
+
+	private <T, U, V> List<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
+																			ValueContext<U, V> valueContext,
+																			ConstraintValidatorContextImpl constraintValidatorContext,
+																			ConstraintValidator<A, V> validator) {
 		boolean isValid;
-		List<ConstraintViolation<T>> cv= new ArrayList<ConstraintViolation<T>>();
+		List<ConstraintViolation<T>> cv = new ArrayList<ConstraintViolation<T>>();
 		try {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
@@ -245,8 +271,10 @@ public class ConstraintTree<A extends Annotation> {
 		if ( !isValid ) {
 			//We do not add them these violations yet, since we don't know how they are
 			//going to influence the final boolean evaluation
-			cv.addAll(executionContext.createConstraintViolations(
-					valueContext, constraintValidatorContext)
+			cv.addAll(
+					executionContext.createConstraintViolations(
+							valueContext, constraintValidatorContext
+					)
 			);
 		}
 		return cv;
@@ -254,8 +282,8 @@ public class ConstraintTree<A extends Annotation> {
 
 	/**
 	 * @return {@code} true if the current constraint should be reportes as single violation, {@code false otherwise}.
-	 * When using negation, we only report the single top-level violation, as
-	 * it is hard, especially for ALL_FALSE to give meaningful reports
+	 *         When using negation, we only report the single top-level violation, as
+	 *         it is hard, especially for ALL_FALSE to give meaningful reports
 	 */
 	private boolean reportAsSingleViolation() {
 		return getDescriptor().isReportAsSingleViolation()
@@ -411,7 +439,7 @@ public class ConstraintTree<A extends Annotation> {
 		return sb.toString();
 	}
 
-	private static class ValidatorCacheKey {
+	private static final class ValidatorCacheKey {
 		private ConstraintValidatorFactory constraintValidatorFactory;
 		private Class<? extends ConstraintValidator<?, ?>> validatorType;
 
@@ -446,6 +474,32 @@ public class ConstraintTree<A extends Annotation> {
 			int result = constraintValidatorFactory != null ? constraintValidatorFactory.hashCode() : 0;
 			result = 31 * result + ( validatorType != null ? validatorType.hashCode() : 0 );
 			return result;
+		}
+	}
+
+	private static final class CompositionResult {
+		private boolean allTrue;
+		private boolean atLeastOneTrue;
+
+		CompositionResult(boolean allTrue, boolean atLeastOneTrue) {
+			this.allTrue = allTrue;
+			this.atLeastOneTrue = atLeastOneTrue;
+		}
+
+		public boolean isAllTrue() {
+			return allTrue;
+		}
+
+		public boolean isAtLeastOneTrue() {
+			return atLeastOneTrue;
+		}
+
+		public void setAllTrue(boolean allTrue) {
+			this.allTrue = allTrue;
+		}
+
+		public void setAtLeastOneTrue(boolean atLeastOneTrue) {
+			this.atLeastOneTrue = atLeastOneTrue;
 		}
 	}
 }

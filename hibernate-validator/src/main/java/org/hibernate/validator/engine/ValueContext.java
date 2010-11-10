@@ -17,6 +17,7 @@
 package org.hibernate.validator.engine;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
 /**
@@ -56,9 +57,14 @@ public class ValueContext<T, V> {
 	 */
 	private ElementType elementType;
 
+	/**
+	 * The type of annotated element.
+	 */
+	private Type typeOfAnnotatedElement;
+
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) value.getClass();
+		Class<T> rootBeanClass = (Class<T>) value.getClass();
 		return new ValueContext<T, V>( value, rootBeanClass );
 	}
 
@@ -71,52 +77,60 @@ public class ValueContext<T, V> {
 		this.currentBeanType = currentBeanType;
 	}
 
-	public PathImpl getPropertyPath() {
+	public final PathImpl getPropertyPath() {
 		return propertyPath;
 	}
 
-	public Class<?> getCurrentGroup() {
+	public final Class<?> getCurrentGroup() {
 		return currentGroup;
 	}
 
-	public T getCurrentBean() {
+	public final T getCurrentBean() {
 		return currentBean;
 	}
 
-	public Class<T> getCurrentBeanType() {
+	public final Class<T> getCurrentBeanType() {
 		return currentBeanType;
 	}
 
-	public V getCurrentValidatedValue() {
+	public final V getCurrentValidatedValue() {
 		return currentValue;
 	}
 
-	public void setPropertyPath(PathImpl propertyPath) {
+	public final void setPropertyPath(PathImpl propertyPath) {
 		this.propertyPath = propertyPath;
 	}
 
-	public void setCurrentGroup(Class<?> currentGroup) {
+	public final void setCurrentGroup(Class<?> currentGroup) {
 		this.currentGroup = currentGroup;
 	}
 
-	public void setCurrentValidatedValue(V currentValue) {
+	public final void setCurrentValidatedValue(V currentValue) {
 		this.currentValue = currentValue;
 	}
 
-	public void markCurrentPropertyAsIterable() {
+	public final void markCurrentPropertyAsIterable() {
 		propertyPath.getLeafNode().setInIterable( true );
 	}
 
-	public boolean validatingDefault() {
+	public final boolean validatingDefault() {
 		return getCurrentGroup() != null && getCurrentGroup().getName().equals( Default.class.getName() );
 	}
 
-	public ElementType getElementType() {
+	public final ElementType getElementType() {
 		return elementType;
 	}
 
-	public void setElementType(ElementType elementType) {
+	public final void setElementType(ElementType elementType) {
 		this.elementType = elementType;
+	}
+
+	public final Type getTypeOfAnnotatedElement() {
+		return typeOfAnnotatedElement;
+	}
+
+	public final void setTypeOfAnnotatedElement(Type typeOfAnnotatedElement) {
+		this.typeOfAnnotatedElement = typeOfAnnotatedElement;
 	}
 
 	@Override
@@ -129,6 +143,7 @@ public class ValueContext<T, V> {
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );
 		sb.append( ", elementType=" ).append( elementType );
+		sb.append( ", typeOfAnnotatedElement=" ).append( typeOfAnnotatedElement );
 		sb.append( '}' );
 		return sb.toString();
 	}
