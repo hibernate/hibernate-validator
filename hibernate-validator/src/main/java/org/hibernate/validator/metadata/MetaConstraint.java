@@ -19,11 +19,7 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-
-import javax.validation.ConstraintViolation;
 
 import org.hibernate.validator.engine.ConstraintTree;
 import org.hibernate.validator.engine.ValidationContext;
@@ -44,19 +40,18 @@ public class MetaConstraint<T, A extends Annotation> {
 	 * The constraint tree created from the constraint annotation.
 	 */
 	private final ConstraintTree<A> constraintTree;
-	
+
 	/**
 	 * The site at which this constraint is defined.
 	 */
 	private final ConstraintSite site;
-	
+
 	/**
-	 * @param beanClass The class in which the constraint is defined on
-	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
 	 * @param constraintDescriptor The constraint descriptor for this constraint
+	 * @param site meta data about constraint placement
 	 */
 	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintSite site) {
-		
+
 		constraintTree = new ConstraintTree<A>( constraintDescriptor );
 		this.site = site;
 	}
@@ -65,42 +60,41 @@ public class MetaConstraint<T, A extends Annotation> {
 	 * @return Returns the list of groups this constraint is part of. This might include the default group even when
 	 *         it is not explicitly specified, but part of the redefined default group list of the hosting bean.
 	 */
-	public Set<Class<?>> getGroupList() {
+	public final Set<Class<?>> getGroupList() {
 		return constraintTree.getDescriptor().getGroups();
 	}
 
-	public ConstraintDescriptorImpl<A> getDescriptor() {
+	public final ConstraintDescriptorImpl<A> getDescriptor() {
 		return constraintTree.getDescriptor();
 	}
 
-	public ElementType getElementType() {
+	public final ElementType getElementType() {
 		return constraintTree.getDescriptor().getElementType();
 	}
 
 	public <T, U, V> boolean validateConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
 
 		valueContext.setElementType( getElementType() );
-		
-		return constraintTree.validateConstraints(
-				typeOfAnnotatedElement(), executionContext, valueContext
-		);
+		valueContext.setTypeOfAnnotatedElement( typeOfAnnotatedElement() );
+
+		return constraintTree.validateConstraints( executionContext, valueContext );
 	}
 
-	public ConstraintSite getSite() {
+	public final ConstraintSite getSite() {
 		return site;
 	}
-	
+
 	/**
 	 * @param o the object from which to retrieve the value.
 	 *
 	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
 	 *         is returned of method or field access is used to access the value.
 	 */
-	public Object getValue(Object o) {
-		return site.getValue(o);
+	public final Object getValue(Object o) {
+		return site.getValue( o );
 	}
 
-	protected Type typeOfAnnotatedElement() {
+	protected final Type typeOfAnnotatedElement() {
 		return site.typeOfAnnotatedElement();
 	}
 
@@ -109,5 +103,4 @@ public class MetaConstraint<T, A extends Annotation> {
 		return "MetaConstraint [constraintTree=" + constraintTree + ", site="
 				+ site + "]";
 	}
-
 }
