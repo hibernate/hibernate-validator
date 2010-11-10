@@ -1,11 +1,13 @@
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.constraints.Size;
+
 import org.hibernate.validator.constraints.ConstraintComposition;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 
 /**
@@ -16,11 +18,8 @@ import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
  *
  * @author Federico Mancini
  * @author Dag Hovland
- * 
- * 
  */
-
-@Constraint(validatedBy=SmallStringValidator.class)//checks whether a string is at least 10 chars
+@Constraint(validatedBy = SmallStringValidator.class)
 @ConstraintComposition(ALL_FALSE)
 @Size(min = 10, max = 10)
 @Retention(RUNTIME)

@@ -16,28 +16,20 @@
 */
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
-
-
 /**
  * Test mode for HV-390.
-
  *
  * @author Federico Mancini
  * @author Dag Hovland
  */
-
-
-public class PersonConstrVal {
-
-	
+public class Person {
 	@SmallString
 	private String nickName;
-    
-	
+
 	@PatternOrLong
 	private String name;
 
-	public PersonConstrVal(String nickName, String name) {
+	public Person(String nickName, String name) {
 		this.nickName = nickName;
 		this.name = name;
 	}

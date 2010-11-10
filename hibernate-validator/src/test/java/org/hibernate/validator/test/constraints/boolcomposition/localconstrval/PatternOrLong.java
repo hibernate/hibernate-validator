@@ -21,9 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
 
@@ -44,10 +42,9 @@ import static org.hibernate.validator.constraints.CompositionType.OR;
 
 @ConstraintComposition(OR)
 @Pattern(regexp = "W{4}")
-//@ReportAsSingleViolation
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
-@Constraint(validatedBy = {LongStringValidator.class })
+@Constraint(validatedBy = { LongStringValidator.class })
 public @interface PatternOrLong {
 	public abstract String message() default "Both Pattern and LongString failed";
 
