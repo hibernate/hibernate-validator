@@ -144,23 +144,23 @@ public class ValidationContext<T> {
 		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
 	}
 
-	public T getRootBean() {
+	public final T getRootBean() {
 		return rootBean;
 	}
 
-	public Class<T> getRootBeanClass() {
+	public final Class<T> getRootBeanClass() {
 		return rootBeanClass;
 	}
 
-	public TraversableResolver getTraversableResolver() {
+	public final TraversableResolver getTraversableResolver() {
 		return traversableResolver;
 	}
 
-	public MessageInterpolator getMessageInterpolator() {
+	public final MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
 	
-	public boolean hasFailures() {
+	public final boolean hasFailures() {
 		return !failingConstraintViolations.isEmpty();
 	}
 
@@ -254,7 +254,7 @@ public class ValidationContext<T> {
 	}
 
 	private void markProcessedForCurrentPath(Object value, PathImpl path) {
-		// hmm - not sure if the current definiton of Path and Node are consistent. Shouldn't a simple property
+		// hmm - not sure if the current definition of Path and Node are consistent. Shouldn't a simple property
 		// of a entity have a parent node?
 		PathImpl parentPath = path.getPathWithoutLeafNode();
 		if ( parentPath == null ) {
