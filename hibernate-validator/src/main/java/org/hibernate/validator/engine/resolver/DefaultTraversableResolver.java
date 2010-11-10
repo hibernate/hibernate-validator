@@ -80,12 +80,12 @@ public class DefaultTraversableResolver implements TraversableResolver {
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
 					ReflectionHelper.loadClass( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
 			jpaTraversableResolver = ReflectionHelper.newInstance( jpaAwareResolverClass, "" );
-			log.info(
+			log.debug(
 					"Instantiated JPA aware TraversableResolver of type {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
 		catch ( ValidationException e ) {
-			log.info(
+			log.debug(
 					"Unable to load or instantiate JPA aware resolver {}. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
