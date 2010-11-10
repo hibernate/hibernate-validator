@@ -38,23 +38,23 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		this.constraintDescriptor = constraintDescriptor;
 	}
 
-	public void disableDefaultConstraintViolation() {
+	public final void disableDefaultConstraintViolation() {
 		defaultDisabled = true;
 	}
 
-	public String getDefaultConstraintMessageTemplate() {
+	public final String getDefaultConstraintMessageTemplate() {
 		return ( String ) constraintDescriptor.getAttributes().get( "message" );
 	}
 
-	public ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
+	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new ErrorBuilderImpl( messageTemplate, propertyPath );
 	}
 
-	public ConstraintDescriptor<?> getConstraintDescriptor() {
+	public final ConstraintDescriptor<?> getConstraintDescriptor() {
 		return constraintDescriptor;
 	}
 
-	public List<MessageAndPath> getMessageAndPathList() {
+	public final List<MessageAndPath> getMessageAndPathList() {
 		if ( defaultDisabled && messageAndPaths.size() == 0 ) {
 			throw new ValidationException(
 					"At least one custom message must be created if the default error message gets disabled."
@@ -71,8 +71,8 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	class ErrorBuilderImpl implements ConstraintViolationBuilder {
-		String messageTemplate;
-		PathImpl propertyPath;
+		private String messageTemplate;
+		private PathImpl propertyPath;
 
 		ErrorBuilderImpl(String template, PathImpl path) {
 			messageTemplate = template;
@@ -98,8 +98,8 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	class NodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderDefinedContext {
-		String messageTemplate;
-		PathImpl propertyPath;
+		private String messageTemplate;
+		private PathImpl propertyPath;
 
 		NodeBuilderImpl(String template, PathImpl path) {
 			messageTemplate = template;
@@ -118,9 +118,9 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	class InIterableNodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderCustomizableContext {
-		String messageTemplate;
-		PathImpl propertyPath;
-		String deferredNodeName;
+		private String messageTemplate;
+		private PathImpl propertyPath;
+		private String deferredNodeName;
 
 		InIterableNodeBuilderImpl(String template, PathImpl path, String deferredNodeName) {
 			this.messageTemplate = template;
@@ -154,9 +154,9 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	class InIterablePropertiesBuilderImpl implements ConstraintViolationBuilder.NodeContextBuilder {
-		String messageTemplate;
-		PathImpl propertyPath;
-		String deferredNodeName;
+		private String messageTemplate;
+		private PathImpl propertyPath;
+		private String deferredNodeName;
 
 		InIterablePropertiesBuilderImpl(String template, PathImpl path, String deferredNodeName) {
 			this.messageTemplate = template;
