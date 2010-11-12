@@ -37,7 +37,7 @@ import org.hibernate.validator.util.LoggerFactory;
 public class JPATraversableResolver implements TraversableResolver {
 	private static final Logger log = LoggerFactory.make();
 
-	public boolean isReachable(Object traversableObject,
+	public final boolean isReachable(Object traversableObject,
 							   Path.Node traversableProperty,
 							   Class<?> rootBeanType,
 							   Path pathToTraversableObject,
@@ -62,7 +62,7 @@ public class JPATraversableResolver implements TraversableResolver {
 		}
 	}
 
-	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
+	public final boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return true;
 	}
 }
