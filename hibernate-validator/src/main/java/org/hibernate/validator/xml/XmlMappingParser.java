@@ -85,7 +85,7 @@ public class XmlMappingParser {
 		this.defaultSequences = new HashMap<Class<?>, List<Class<?>>>();
 	}
 
-	public void parse(Set<InputStream> mappingStreams) {
+	public final void parse(Set<InputStream> mappingStreams) {
 		for ( InputStream in : mappingStreams ) {
 			ConstraintMappingsType mapping = getValidationConfig( in );
 			String defaultPackage = mapping.getDefaultPackage();
@@ -104,20 +104,20 @@ public class XmlMappingParser {
 		}
 	}
 
-	public Set<Class<?>> getXmlConfiguredClasses() {
+	public final Set<Class<?>> getXmlConfiguredClasses() {
 		return processedClasses;
 	}
 
-	public AnnotationIgnores getAnnotationIgnores() {
+	public final AnnotationIgnores getAnnotationIgnores() {
 		return annotationIgnores;
 	}
 
-	public <T> List<MetaConstraint<T, ? extends Annotation>> getConstraintsForClass(Class<T> beanClass) {
+	public final <T> List<MetaConstraint<T, ? extends Annotation>> getConstraintsForClass(Class<T> beanClass) {
 		List<MetaConstraint<T, ? extends Annotation>> list = new ArrayList<MetaConstraint<T, ? extends Annotation>>();
 		if ( constraintMap.containsKey( beanClass ) ) {
 			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
 				@SuppressWarnings("unchecked") // safe cast since the list of meta constraints is always specific to the bean type
-						MetaConstraint<T, ? extends Annotation> boundMetaConstraint = ( MetaConstraint<T, ? extends Annotation> ) metaConstraint;
+						MetaConstraint<T, ? extends Annotation> boundMetaConstraint = (MetaConstraint<T, ? extends Annotation>) metaConstraint;
 				list.add( boundMetaConstraint );
 			}
 			return list;
@@ -127,7 +127,7 @@ public class XmlMappingParser {
 		}
 	}
 
-	public List<Member> getCascadedMembersForClass(Class<?> beanClass) {
+	public final List<Member> getCascadedMembersForClass(Class<?> beanClass) {
 		if ( cascadedMembers.containsKey( beanClass ) ) {
 			return cascadedMembers.get( beanClass );
 		}
@@ -136,7 +136,7 @@ public class XmlMappingParser {
 		}
 	}
 
-	public List<Class<?>> getDefaultSequenceForClass(Class<?> beanClass) {
+	public final List<Class<?>> getDefaultSequenceForClass(Class<?> beanClass) {
 		if ( defaultSequences.containsKey( beanClass ) ) {
 			return defaultSequences.get( beanClass );
 		}
@@ -154,7 +154,7 @@ public class XmlMappingParser {
 			if ( !clazz.isAnnotation() ) {
 				throw new ValidationException( annotationClassName + " is not an annotation" );
 			}
-			Class<? extends Annotation> annotationClass = ( Class<? extends Annotation> ) clazz;
+			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
 			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
 			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
@@ -163,7 +163,7 @@ public class XmlMappingParser {
 			}
 			for ( String validatorClassName : validatedByType.getValue() ) {
 				Class<? extends ConstraintValidator<?, ?>> validatorClass;
-				validatorClass = ( Class<? extends ConstraintValidator<?, ?>> ) ReflectionHelper.loadClass(
+				validatorClass = (Class<? extends ConstraintValidator<?, ?>>) ReflectionHelper.loadClass(
 						validatorClassName,
 						this.getClass()
 				);
@@ -248,7 +248,7 @@ public class XmlMappingParser {
 			else {
 				getterNames.add( getterName );
 			}
-			boolean containsMethod = ReflectionHelper.containsMethod( beanClass, getterName );
+			boolean containsMethod = ReflectionHelper.containsMethodWithPropertyName( beanClass, getterName );
 			if ( !containsMethod ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the property  " + getterName );
 			}
@@ -333,7 +333,7 @@ public class XmlMappingParser {
 
 	private <A extends Annotation, T> MetaConstraint<?, ?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, Member member, String defaultPackage) {
 		@SuppressWarnings("unchecked")
-		Class<A> annotationClass = ( Class<A> ) getClass( constraint.getAnnotation(), defaultPackage );
+		Class<A> annotationClass = (Class<A>) getClass( constraint.getAnnotation(), defaultPackage );
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
 
 		if ( constraint.getMessage() != null ) {
@@ -374,7 +374,7 @@ public class XmlMappingParser {
 				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new MetaConstraint<T, A>( constraintDescriptor, new BeanConstraintSite<T>(beanClass, member) );
+		return new MetaConstraint<T, A>( constraintDescriptor, new BeanConstraintSite<T>( beanClass, member ) );
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
@@ -400,14 +400,14 @@ public class XmlMappingParser {
 			for ( Serializable s : elementType.getContent() ) {
 				values.add( getSingleValue( s, returnType.getComponentType() ) );
 			}
-			return values.toArray( ( Object[] ) Array.newInstance( returnType.getComponentType(), values.size() ) );
+			return values.toArray( (Object[]) Array.newInstance( returnType.getComponentType(), values.size() ) );
 		}
 	}
 
 	private void removeEmptyContentElements(ElementType elementType) {
 		List<Serializable> contentToDelete = new ArrayList<Serializable>();
 		for ( Serializable content : elementType.getContent() ) {
-			if ( content instanceof String && ( ( String ) content ).matches( "[\\n ].*" ) ) {
+			if ( content instanceof String && ( (String) content ).matches( "[\\n ].*" ) ) {
 				contentToDelete.add( content );
 			}
 		}
@@ -418,22 +418,22 @@ public class XmlMappingParser {
 
 		Object returnValue;
 		if ( serializable instanceof String ) {
-			String value = ( String ) serializable;
+			String value = (String) serializable;
 			returnValue = convertStringToReturnType( returnType, value );
 		}
-		else if ( serializable instanceof JAXBElement && ( ( JAXBElement ) serializable ).getDeclaredType()
+		else if ( serializable instanceof JAXBElement && ( (JAXBElement) serializable ).getDeclaredType()
 				.equals( String.class ) ) {
-			JAXBElement<?> elem = ( JAXBElement<?> ) serializable;
-			String value = ( String ) elem.getValue();
+			JAXBElement<?> elem = (JAXBElement<?>) serializable;
+			String value = (String) elem.getValue();
 			returnValue = convertStringToReturnType( returnType, value );
 		}
-		else if ( serializable instanceof JAXBElement && ( ( JAXBElement ) serializable ).getDeclaredType()
+		else if ( serializable instanceof JAXBElement && ( (JAXBElement) serializable ).getDeclaredType()
 				.equals( AnnotationType.class ) ) {
-			JAXBElement<?> elem = ( JAXBElement<?> ) serializable;
-			AnnotationType annotationType = ( AnnotationType ) elem.getValue();
+			JAXBElement<?> elem = (JAXBElement<?>) serializable;
+			AnnotationType annotationType = (AnnotationType) elem.getValue();
 			try {
 				@SuppressWarnings("unchecked")
-				Class<Annotation> annotationClass = ( Class<Annotation> ) returnType;
+				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
 				returnValue = createAnnotation( annotationType, annotationClass );
 			}
 			catch ( ClassCastException e ) {
@@ -526,11 +526,13 @@ public class XmlMappingParser {
 		else {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<Enum> enumClass = ( Class<Enum> ) returnType;
+				Class<Enum> enumClass = (Class<Enum>) returnType;
 				returnValue = Enum.valueOf( enumClass, value );
 			}
 			catch ( ClassCastException e ) {
-				throw new ValidationException( "Invalid return type: " + returnType + ". Should be a enumeration type.", e );
+				throw new ValidationException(
+						"Invalid return type: " + returnType + ". Should be a enumeration type.", e
+				);
 			}
 		}
 		return returnValue;
@@ -567,7 +569,7 @@ public class XmlMappingParser {
 				throw new ValidationException( "Specified payload class " + payload.getName() + " does not implement javax.validation.Payload" );
 			}
 			else {
-				payloadList.add( ( Class<? extends Payload> ) payload );
+				payloadList.add( (Class<? extends Payload>) payload );
 			}
 		}
 		return payloadList.toArray( new Class[payloadList.size()] );
