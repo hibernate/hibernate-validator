@@ -59,6 +59,7 @@ import org.hibernate.validator.util.privilegedactions.SetAccessibility;
  * @author Gunnar Morling
  */
 public final class ReflectionHelper {
+	private static String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -166,14 +167,10 @@ public final class ReflectionHelper {
 
 		if ( member instanceof Method ) {
 			String methodName = member.getName();
-			if ( methodName.startsWith( "is" ) ) {
-				name = Introspector.decapitalize( methodName.substring( 2 ) );
-			}
-			else if ( methodName.startsWith( "has" ) ) {
-				name = Introspector.decapitalize( methodName.substring( 3 ) );
-			}
-			else if ( methodName.startsWith( "get" ) ) {
-				name = Introspector.decapitalize( methodName.substring( 3 ) );
+			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
+				if ( methodName.startsWith( prefix ) ) {
+					name = Introspector.decapitalize( methodName.substring( prefix.length() ) );
+				}
 			}
 		}
 		return name;
@@ -226,8 +223,7 @@ public final class ReflectionHelper {
 		}
 		else {
 			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
-			String[] prefixes = { "is", "get", "has" };
-			for ( String prefix : prefixes ) {
+			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
 				GetMethod action = GetMethod.action( clazz, prefix + methodName );
 				if ( System.getSecurityManager() != null ) {
 					member = AccessController.doPrivileged( action );
@@ -254,11 +250,11 @@ public final class ReflectionHelper {
 	public static Class<?> getType(Member member) {
 		Class<?> type = null;
 		if ( member instanceof Field ) {
-			type = ( ( Field ) member ).getType();
+			type = ( (Field) member ).getType();
 		}
 
 		if ( member instanceof Method ) {
-			type = ( ( Method ) member ).getReturnType();
+			type = ( (Method) member ).getReturnType();
 		}
 		return type;
 	}
@@ -273,10 +269,10 @@ public final class ReflectionHelper {
 	public static Type typeOf(Member member) {
 		Type type;
 		if ( member instanceof Field ) {
-			type = ( ( Field ) member ).getGenericType();
+			type = ( (Field) member ).getGenericType();
 		}
 		else if ( member instanceof Method ) {
-			type = ( ( Method ) member ).getGenericReturnType();
+			type = ( (Method) member ).getGenericReturnType();
 		}
 		else {
 			throw new IllegalArgumentException( "Member " + member + " is neither a field nor a method" );
@@ -286,19 +282,19 @@ public final class ReflectionHelper {
 		}
 		return type;
 	}
-	
+
 	/**
 	 * Returns the type of the parameter of the given method with the given parameter index.
-	 * 
+	 *
 	 * @param method The method of interest.
 	 * @param parameterIndex The index of the parameter for which the type should be returned.
-	 * 
+	 *
 	 * @return The erased type.
 	 */
 	public static Type typeOf(Method method, int parameterIndex) {
-		
+
 		Type type = method.getGenericParameterTypes()[parameterIndex];
-		
+
 		if ( type instanceof TypeVariable ) {
 			type = TypeUtils.getErasedType( type );
 		}
@@ -310,7 +306,7 @@ public final class ReflectionHelper {
 		Object value = null;
 
 		if ( member instanceof Method ) {
-			Method method = ( Method ) member;
+			Method method = (Method) member;
 			try {
 				value = method.invoke( object );
 			}
@@ -322,7 +318,7 @@ public final class ReflectionHelper {
 			}
 		}
 		else if ( member instanceof Field ) {
-			Field field = ( Field ) member;
+			Field field = (Field) member;
 			try {
 				value = field.get( object );
 			}
@@ -354,11 +350,11 @@ public final class ReflectionHelper {
 	public static Type getIndexedType(Type type) {
 		Type indexedType = null;
 		if ( isIterable( type ) && type instanceof ParameterizedType ) {
-			ParameterizedType paramType = ( ParameterizedType ) type;
+			ParameterizedType paramType = (ParameterizedType) type;
 			indexedType = paramType.getActualTypeArguments()[0];
 		}
 		else if ( isMap( type ) && type instanceof ParameterizedType ) {
-			ParameterizedType paramType = ( ParameterizedType ) type;
+			ParameterizedType paramType = (ParameterizedType) type;
 			indexedType = paramType.getActualTypeArguments()[1];
 		}
 		else if ( TypeUtils.isArray( type ) ) {
@@ -373,14 +369,14 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is a iterable type, <code>false</code> otherwise.
 	 */
 	public static boolean isIterable(Type type) {
-		if ( type instanceof Class && extendsOrImplements( ( Class ) type, Iterable.class ) ) {
+		if ( type instanceof Class && extendsOrImplements( (Class) type, Iterable.class ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
-			return isIterable( ( ( ParameterizedType ) type ).getRawType() );
+			return isIterable( ( (ParameterizedType) type ).getRawType() );
 		}
 		if ( type instanceof WildcardType ) {
-			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
+			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
 			return upperBounds.length != 0 && isIterable( upperBounds[0] );
 		}
 		return false;
@@ -392,14 +388,14 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>Map</code>, <code>false</code> otherwise.
 	 */
 	public static boolean isMap(Type type) {
-		if ( type instanceof Class && extendsOrImplements( ( Class ) type, Map.class ) ) {
+		if ( type instanceof Class && extendsOrImplements( (Class) type, Map.class ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
-			return isMap( ( ( ParameterizedType ) type ).getRawType() );
+			return isMap( ( (ParameterizedType) type ).getRawType() );
 		}
 		if ( type instanceof WildcardType ) {
-			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
+			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
 			return upperBounds.length != 0 && isMap( upperBounds[0] );
 		}
 		return false;
@@ -411,14 +407,14 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>List</code>, <code>false</code> otherwise.
 	 */
 	public static boolean isList(Type type) {
-		if ( type instanceof Class && extendsOrImplements( ( Class ) type, List.class ) ) {
+		if ( type instanceof Class && extendsOrImplements( (Class) type, List.class ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
-			return isList( ( ( ParameterizedType ) type ).getRawType() );
+			return isList( ( (ParameterizedType) type ).getRawType() );
 		}
 		if ( type instanceof WildcardType ) {
-			Type[] upperBounds = ( ( WildcardType ) type ).getUpperBounds();
+			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
 			return upperBounds.length != 0 && isList( upperBounds[0] );
 		}
 		return false;
@@ -443,10 +439,10 @@ public final class ReflectionHelper {
 		Iterator<?> iter;
 		Type type = value.getClass();
 		if ( isIterable( type ) ) {
-			iter = ( ( Iterable<?> ) value ).iterator();
+			iter = ( (Iterable<?>) value ).iterator();
 		}
 		else if ( TypeUtils.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( ( Object ) value );
+			List<?> arrayList = Arrays.asList( (Object) value );
 			iter = arrayList.iterator();
 		}
 		else {
@@ -479,7 +475,7 @@ public final class ReflectionHelper {
 			return null;
 		}
 
-		Map<?, ?> map = ( Map<?, ?> ) value;
+		Map<?, ?> map = (Map<?, ?>) value;
 		//noinspection SuspiciousMethodCalls
 		return map.get( key );
 	}
@@ -617,63 +613,29 @@ public final class ReflectionHelper {
 	 * @return Returns {@code true} if the method exists, {@code false} otherwise.
 	 */
 	public static boolean containsMethod(Class<?> clazz, String methodName) {
-		return getMethodFromPropertyName( clazz, methodName ) != null;
+		return getMethod( clazz, methodName ) != null;
 	}
 
 	/**
-	 * Checks, whether the given class has a method with the same signature as
-	 * the given one. This is the case, if the method itself is member of the
-	 * given class or if another method with the same name, parameter count and
-	 * types exists.
-	 * 
-	 * @param clazz
-	 *            The class to check.
-	 * @param method
-	 *            The method, which's signature should be used as pattern.
-	 * 
-	 * @return True, if the given class has a method with the searched
-	 *         signature, false otherwise.
-	 */
-	public static boolean containsMethodWithSameSignature(Class<?> clazz, Method method) {
-		
-		if(clazz == null) {
-			throw new IllegalArgumentException("clazz must not be null");
-		}
-		if(method == null) {
-			throw new IllegalArgumentException("method must not be null");
-		}
-		
-		for(Method oneMethod : getMethods(clazz)) {
-			if(haveSameSignature(oneMethod, method)) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	/**
 	 * Checks, whether the given methods have the same signature, which is the
 	 * case if they have the same name, parameter count and types.
-	 * 
-	 * @param method1
-	 *            A first method.
-	 * @param method2
-	 *            A second method.
-	 * 
+	 *
+	 * @param method1 A first method.
+	 * @param method2 A second method.
+	 *
 	 * @return True, if the methods have the same signature, false otherwise.
 	 */
 	public static boolean haveSameSignature(Method method1, Method method2) {
-		
-		if(method1 == null || method2 == null) {
-			throw new IllegalArgumentException("method1 and method2 must not be null");
+
+		if ( method1 == null || method2 == null ) {
+			throw new IllegalArgumentException( "method1 and method2 must not be null" );
 		}
-		
-		return 
-			method1.getName().equals(method2.getName()) && 
-			Arrays.equals( method1.getGenericParameterTypes(), method2.getGenericParameterTypes() );
+
+		return
+				method1.getName().equals( method2.getName() ) &&
+						Arrays.equals( method1.getGenericParameterTypes(), method2.getGenericParameterTypes() );
 	}
-	
+
 	/**
 	 * Returns the autoboxed type of a primitive type.
 	 *
@@ -684,7 +646,7 @@ public final class ReflectionHelper {
 	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not represent a primitive type.
 	 */
 	public static Class<?> boxedType(Type primitiveType) {
-		if ( !( primitiveType instanceof Class ) && !( ( Class ) primitiveType ).isPrimitive() ) {
+		if ( !( primitiveType instanceof Class ) && !( (Class) primitiveType ).isPrimitive() ) {
 			throw new IllegalArgumentException( primitiveType.getClass() + "has to be a primitive type" );
 		}
 
