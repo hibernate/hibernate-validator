@@ -1,19 +1,19 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * JBoss, Home of Professional Open Source
+ * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.hibernate.validator.engine.resolver;
 
 import java.lang.annotation.ElementType;
@@ -27,7 +27,7 @@ import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
- * A JPA 2 aware <code>TraversableResolver</code>.
+ * A JPA 2 aware {@code TraversableResolver}.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -37,9 +37,14 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	private static final Logger log = LoggerFactory.make();
 
 	/**
-	 * Class to load to check whether JPA 2 is on the classpath.
+	 * Class to load to check whether JPA is on the classpath.
 	 */
-	private static final String PERSISTENCE_UTIL_CLASS_NAME = "javax.persistence.PersistenceUtil";
+	private static final String PERSISTENCE_CLASS_NAME = "javax.persistence.Persistence";
+
+	/**
+	 * Method to check whether the found {@code Persistence} class is of the version 2
+	 */
+	private static final String PERSISTENCE_UTIL_METHOD = "getPersistenceUtil";
 
 	/**
 	 * Class to instantiate in case JPA 2 is on the classpath.
@@ -60,20 +65,33 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	 * Tries to load detect and load JPA.
 	 */
 	private void detectJPA() {
+		// check whether we have Persistence on the classpath - 1 or 2
+		Class<?> persistenceClass;
 		try {
-			ReflectionHelper.loadClass( PERSISTENCE_UTIL_CLASS_NAME, this.getClass() );
-			log.debug(
-					"Found {} on classpath. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver",
-					PERSISTENCE_UTIL_CLASS_NAME
-			);
+			persistenceClass = ReflectionHelper.loadClass( PERSISTENCE_CLASS_NAME, this.getClass() );
 		}
 		catch ( ValidationException e ) {
 			log.debug(
 					"Cannot find {} on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.",
-					PERSISTENCE_UTIL_CLASS_NAME
+					PERSISTENCE_CLASS_NAME
 			);
 			return;
 		}
+
+		if ( !ReflectionHelper.containsMethod( persistenceClass, PERSISTENCE_UTIL_METHOD ) ) {
+			log.debug(
+					"Found {} on classpath, but no method '{}'. Assuming JPA 1 environment. All properties will per default be traversable.",
+					PERSISTENCE_CLASS_NAME,
+					PERSISTENCE_UTIL_METHOD
+			);
+			return;
+		}
+
+		log.debug(
+				"Found {} on classpath containing '{}'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver",
+				PERSISTENCE_CLASS_NAME,
+				PERSISTENCE_UTIL_METHOD
+		);
 
 		try {
 			@SuppressWarnings("unchecked")
