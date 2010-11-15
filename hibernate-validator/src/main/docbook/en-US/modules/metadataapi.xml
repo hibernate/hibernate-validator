@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	~ JBoss, Home of Professional Open Source
+	~ Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+	~ by the @authors tag. See the copyright.txt in the distribution for a
+	~ full listing of individual contributors.
+	~
+	~ Licensed under the Apache License, Version 2.0 (the "License");
+	~ you may not use this file except in compliance with the License.
+	~ You may obtain a copy of the License at
+	~ http://www.apache.org/licenses/LICENSE-2.0
+	~ Unless required by applicable law or agreed to in writing, software
+	~ distributed under the License is distributed on an "AS IS" BASIS,
+	~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	~ See the License for the specific language governing permissions and
+	~ limitations under the License.
+-->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="validator-metadata-api">
+  <title>Metadata API</title>
+
+  <para>The Bean Validation specification provides not only a validation
+  engine, but also a metadata repository for all defined constraints. The
+  following paragraphs are discussing this API. All the introduced classes can
+  be found in the <package>javax.validation.metadata</package> package.</para>
+
+  <section>
+    <title><classname
+    id="section-bean-descriptor">BeanDescriptor</classname></title>
+
+    <para>The entry into the metadata API is via
+    <code>Validator.getConstraintsForClass</code> which returns an instance of
+    the <ulink
+    url="http://docs.jboss.org/hibernate/stable/beanvalidation/api/javax/validation/metadata/BeanDescriptor.html"><classname>BeanDescriptor</classname></ulink>
+    interface. Using this bean descriptor you can determine whether the
+    specified class hosts any constraints at all via
+    <code>beanDescriptor.isBeanConstrained</code>. <tip>
+        <para>If a constraint declaration hosted by the requested class is
+        invalid, a <classname>ValidationException</classname> is
+        thrown.</para>
+      </tip></para>
+
+    <para>You can then call
+    <code>beanDescriptor.getConstraintDescriptors</code> to get a set of
+    <classname>ConstraintDescriptor</classname>s representing all class level
+    constraints.</para>
+
+    <para>If you are interested in property level constraints, you can call
+    <code>beanDescriptor.getConstraintsForProperty</code> or
+    <code>beanDescriptor.getConstrainedProperties</code> to get a single resp.
+    set of <classname>PropertyDescriptor</classname>s (see <xref
+    linkend="section-property-descriptor" />). </para>
+  </section>
+
+  <section id="section-property-descriptor">
+    <title><classname>PropertyDescriptor</classname></title>
+
+    <para>The <ulink
+    url="http://docs.jboss.org/hibernate/stable/beanvalidation/api/javax/validation/metadata/PropertyDescriptor.html"><classname>PropertyDescriptor</classname></ulink>
+    interface extends the <classname>ElementDescriptor</classname> interface
+    and represents constraints on properties of a class. The constraint can be
+    declared on the attribute itself or on the getter of the attribute -
+    provided Java Bean naming conventions are respected. A
+    <classname>PropertyDescriptor</classname> adds <code>isCascaded</code>
+    (returning <constant>true</constant> if the property is marked with
+    <classname>@Valid</classname>) and <code>getPropertyName</code> to the
+    <classname>ElementDescriptor</classname> functionality.</para>
+  </section>
+
+  <section>
+    <title><classname>ElementDescriptor</classname></title>
+
+    <para>The <ulink
+    url="http://docs.jboss.org/hibernate/stable/beanvalidation/api/javax/validation/metadata/ElementDescriptor.html"><classname>ElementDiscriptor</classname></ulink>
+    interface is the common base class for
+    <classname>BeanDescriptor</classname> and
+    <classname>PropertyDescriptor</classname>. Next to the
+    <code>hasConstraints </code>and <code>getConstraintDescriptors</code>
+    methods it also offers access to the
+    <classname>ConstraintFinder</classname> API which allows you to query the
+    metadata API in a more fine grained way. For example you can restrict your
+    search to constraints described on fields or on getters or a given set of
+    groups. Given an <classname>ElementDescriptor</classname> instance you
+    just call <code>findConstraints</code> to retrieve a
+    <classname>ConstraintFinder</classname> instance. </para>
+
+    <example id="example-constraint-finder">
+      <title>Usage of ConstraintFinder</title>
+
+      <programlisting>Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+BeanDescriptor beanDescriptor = validator.getConstraintsForClass(Person.class);
+PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty("name");
+Set&lt;ConstraintDescriptor&lt;?&gt;&gt; constraints = propertyDescriptor.findConstraints()
+                                           .declaredOn(ElementType.METHOD)
+                                           .unorderedAndMatchingGroups(Default.class)
+                                           .lookingAt(Scope.LOCAL_ELEMENT)
+                                           .getConstraintDescriptors();</programlisting>
+    </example>
+
+    <para><xref linkend="example-constraint-finder" /> shows an example on how
+    to use the <classname>ConstraintFinder</classname> API. Interesting are
+    especially the restrictions <code>unorderedAndMatchingGroups</code> and
+    <code>lookingAt(<ulink
+    url="http://docs.jboss.org/hibernate/stable/beanvalidation/api/javax/validation/metadata/Scope.html">Scope.LOCAL_ELEMENT</ulink>)</code>.
+    The former allows to only return
+    <classname>ConstraintDescriptors</classname> matching a specified set of
+    groups wheras the latter allows to distinguish between constraint directly
+    specified on the element (<constant>Scope.LOCAL_ELEMENT</constant>) or
+    constraints belonging to the element but hosted anywhere in the class
+    hierarchy (<constant>Scope.HIERARCHY</constant>).<warning>
+        <para>Order is not respected by unorderedAndMatchingGroups, but group
+        inheritance and inheritance via sequence are.</para>
+      </warning></para>
+  </section>
+
+  <section id="section-constraint-descriptor">
+    <title><classname>ConstraintDescriptor</classname></title>
+
+    <para>Last but not least, the <ulink
+    url="http://docs.jboss.org/hibernate/stable/beanvalidation/api/javax/validation/metadata/ConstraintDescriptor.html"><classname>ConstraintDescriptor</classname></ulink>
+    interface describes a single constraint together with its composing
+    constraints. Via an instance of this interface you get access to the
+    constraint annotation and its parameters, as well as the groups the
+    constraint is supposed to be applied on. It also also you to access the
+    pass-through constraint payload (see <xref
+    linkend="example-defining-custom-constraint" />).</para>
+  </section>
+</chapter>

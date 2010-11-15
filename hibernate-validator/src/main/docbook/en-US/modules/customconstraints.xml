@@ -79,7 +79,7 @@ public enum CaseMode {
       never designed an annotation before, this may look a bit scary, but
       actually it's not that hard:</para>
 
-      <example>
+      <example id="example-defining-custom-constraint">
         <title>Defining CheckCase constraint annotation</title>
 
         <programlisting language="JAVA" role="JAVA">package com.mycompany;

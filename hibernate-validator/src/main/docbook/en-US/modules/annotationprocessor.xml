@@ -21,7 +21,7 @@
 %BOOK_ENTITIES;
 ]>
 <chapter>
-  <title id="annotation-processor">Annotation Processor (EXPERIMENTAL)</title>
+  <title id="annotation-processor">Annotation Processor</title>
 
   <para>Have you ever caught yourself by unintentionally doing things
   like</para>
