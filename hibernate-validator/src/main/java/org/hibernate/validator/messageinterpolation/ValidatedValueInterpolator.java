@@ -33,17 +33,15 @@ import org.hibernate.validator.util.LoggerFactory;
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-//TODO use same system as the ScriptEvaluator used in @ScriptAssert
-//TODO bug do an escape of meta character in all string ResourceBundleMessageinterpolator use Matcher.quoteReplacement
-//TODO script with inner bracket
-//TODO let the user to specify the language script
 public class ValidatedValueInterpolator implements MessageInterpolator {
 
 	private static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
 
-	private static final Pattern VALIDATED_VALUE_PATTERN = Pattern.compile( "\\$\\{" + VALIDATED_VALUE_KEYWORD + "(:[^\\}]+)?\\}" );
-
 	private static final String VALIDATED_VALUE_ALIAS = "_";
+
+	private static final String VALIDATED_VALUE_SCRIPT_SEPARATOR = ":";
+
+	private static final Pattern VALIDATED_VALUE_START_PATTERN = Pattern.compile( "\\$\\{" + VALIDATED_VALUE_KEYWORD );
 
 	private final Logger logger = LoggerFactory.make();
 
@@ -106,26 +104,77 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 	 * @return the interpolated message
 	 */
 	private String interpolateMessage(String message, Object validatedValue) {
-
-		StringBuffer interpolatedMessage = new StringBuffer();
-		Matcher matcher = VALIDATED_VALUE_PATTERN.matcher( message );
+		String interpolatedMessage = message;
+		Matcher matcher = VALIDATED_VALUE_START_PATTERN.matcher( message );
 
 		while ( matcher.find() ) {
-			String interpolatedToString;
-			if ( matcher.groupCount() == 1 && matcher.group( 1 ) != null ) {
-				String toStringScript = matcher.group( 1 ).substring( 1 );
-				interpolatedToString = doToStringScriptEval(
-						toStringScript, validatedValue, scriptLang
+			int nbOpenCurlyBrace = 1;
+			boolean isDoubleQuoteBloc = false;
+			boolean isSimpleQuoteBloc = false;
+			int lastIndex = matcher.end();
+
+			do {
+
+				char current = message.charAt( lastIndex );
+
+				if ( current == '\'' ) {
+					if ( !isDoubleQuoteBloc && !isEscaped( message, lastIndex ) ) {
+						isSimpleQuoteBloc = !isSimpleQuoteBloc;
+					}
+				}
+				else if ( current == '"' ) {
+					if ( !isSimpleQuoteBloc && !isEscaped( message, lastIndex ) ) {
+						isDoubleQuoteBloc = !isDoubleQuoteBloc;
+					}
+				}
+				else if ( !isDoubleQuoteBloc && !isSimpleQuoteBloc ) {
+					if ( current == '{' ) {
+						nbOpenCurlyBrace++;
+					}
+					else if ( current == '}' ) {
+						nbOpenCurlyBrace--;
+					}
+				}
+
+				lastIndex++;
+
+			} while ( nbOpenCurlyBrace > 0 && lastIndex < message.length() );
+
+			//The validated value expression seems correct
+			if ( nbOpenCurlyBrace == 0 ) {
+				String expression = message.substring( matcher.start(), lastIndex );
+				String expressionValue = evaluateValidatedValueExpr( expression, validatedValue );
+
+				interpolatedMessage = interpolatedMessage.replaceFirst(
+						Pattern.quote( expression ), Matcher.quoteReplacement( expressionValue )
 				);
 			}
-			else {
-				interpolatedToString = String.valueOf( validatedValue );
-			}
-			matcher.appendReplacement( interpolatedMessage, Matcher.quoteReplacement( interpolatedToString ) );
 		}
-		matcher.appendTail( interpolatedMessage );
 
-		return interpolatedMessage.toString();
+		return interpolatedMessage;
+	}
+
+	/**
+	 * Returns the value of the validated value expression.
+	 *
+	 * @param expression the expression to interpolate
+	 * @param validatedValue the value of the object under validation
+	 *
+	 * @return the interpolated value
+	 */
+	private String evaluateValidatedValueExpr(String expression, Object validatedValue) {
+		String interpolatedValue;
+		int separatorIndex = expression.indexOf( VALIDATED_VALUE_SCRIPT_SEPARATOR );
+
+		if ( separatorIndex == -1 ) { //Use validated object toString method
+			interpolatedValue = String.valueOf( validatedValue );
+		}
+		else { //Use evaluation of toString script
+			String toStringScript = expression.substring( separatorIndex + 1, expression.length() - 1 );
+			interpolatedValue = doToStringScriptEval( toStringScript, validatedValue, scriptLang );
+		}
+
+		return interpolatedValue;
 	}
 
 	/**
@@ -158,6 +207,22 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 		}
 
 		return String.valueOf( validatedValue );
+	}
+
+	/**
+	 * Returns if the character at the given index in the String
+	 * is an escaped character preceded by a backslash character.
+	 *
+	 * @param enclosingString the string which contain the given character
+	 * @param charIndex the index of the character
+	 *
+	 * @return true if the given character is escaped false otherwise
+	 */
+	private boolean isEscaped(String enclosingString, int charIndex) {
+		if ( charIndex < 0 || charIndex > enclosingString.length() ) {
+			throw new IndexOutOfBoundsException( "The given index must be between 0 and enclosingString.length() - 1" );
+		}
+		return charIndex > 0 && enclosingString.charAt( charIndex - 1 ) == '\\';
 	}
 
 }
