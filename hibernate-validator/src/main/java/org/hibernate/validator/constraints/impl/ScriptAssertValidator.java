@@ -20,8 +20,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.constraints.impl.scriptassert.ScriptEvaluator;
-import org.hibernate.validator.constraints.impl.scriptassert.ScriptEvaluatorFactory;
+import org.hibernate.validator.util.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.util.scriptengine.ScriptEvaluatorFactory;
 
 /**
  * Validator for the {@link ScriptAssert} constraint annotation.

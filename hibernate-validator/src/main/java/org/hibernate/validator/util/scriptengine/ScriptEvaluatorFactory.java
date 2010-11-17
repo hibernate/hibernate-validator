@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.constraints.impl.scriptassert;
+package org.hibernate.validator.util.scriptengine;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
