@@ -17,6 +17,7 @@
 package org.hibernate.validator.engine.resolver;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Method;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
@@ -65,7 +66,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 	 * Tries to load detect and load JPA.
 	 */
 	private void detectJPA() {
-		// check whether we have Persistence on the classpath - 1 or 2
+		// check whether we have Persistence on the classpath
 		Class<?> persistenceClass;
 		try {
 			persistenceClass = ReflectionHelper.loadClass( PERSISTENCE_CLASS_NAME, this.getClass() );
@@ -78,13 +79,29 @@ public class DefaultTraversableResolver implements TraversableResolver {
 			return;
 		}
 
-		if ( !ReflectionHelper.containsMethod( persistenceClass, PERSISTENCE_UTIL_METHOD ) ) {
+		// check whether Persistence contains getPersistenceUtil
+		Method persistenceUtilGetter = ReflectionHelper.getMethod( persistenceClass, PERSISTENCE_UTIL_METHOD );
+		if ( persistenceUtilGetter == null ) {
 			log.debug(
 					"Found {} on classpath, but no method '{}'. Assuming JPA 1 environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME,
 					PERSISTENCE_UTIL_METHOD
 			);
 			return;
+		}
+
+		// try to invoke the method to make sure that we are dealing with a complete JPA2 implementation
+		// unfortunately there are several incomplete implementations out there (see HV-374)
+		try {
+			Object persistence = ReflectionHelper.newInstance( persistenceClass, "persistence provider" );
+			ReflectionHelper.getValue(persistenceUtilGetter, persistence );
+		}
+		catch ( Exception e ) {
+			log.debug(
+					"Unable to invoke {}.{}. Inconsistent JPA environment. All properties will per default be traversable.",
+					PERSISTENCE_CLASS_NAME,
+					PERSISTENCE_UTIL_METHOD
+			);
 		}
 
 		log.debug(
