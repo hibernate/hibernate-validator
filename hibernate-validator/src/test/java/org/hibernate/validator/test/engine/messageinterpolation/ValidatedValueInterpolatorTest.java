@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.test.engine.messageinterpolation;
 
-import java.util.Iterator;
 import java.util.ListResourceBundle;
 import java.util.Locale;
 import java.util.ResourceBundle;
