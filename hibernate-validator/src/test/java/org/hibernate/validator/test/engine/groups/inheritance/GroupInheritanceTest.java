@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.engine.groups;
+package org.hibernate.validator.test.engine.groups.inheritance;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -25,23 +25,38 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GroupsTest {
+public class GroupInheritanceTest {
 
 	/**
 	 * HV-288
 	 */
 	@Test
-	public void testGroupInheritance() {
+	public void testGroupInheritanceWithinGroupSequence() {
 		Validator validator = TestUtil.getValidator();
 		Try tryMe = new Try();
 		tryMe.field2 = "foo";
 		tryMe.field3 = "bar";
 
 		Set<ConstraintViolation<Try>> violations = validator.validate( tryMe, Try.GlobalCheck.class );
-		assertCorrectConstraintViolationMessages(violations, "field1");
+		assertCorrectConstraintViolationMessages( violations, "field1" );
+	}
+
+	/**
+	 * HV-353
+	 */
+	@Test
+	public void testGroupInheritance() {
+		Validator validator = TestUtil.getValidator();
+		Try tryMe = new Try();
+		tryMe.field3 = "foo";
+
+		Set<ConstraintViolation<Try>> violations = validator.validate( tryMe, Try.Component.class );
+		assertNumberOfViolations( violations, 2 );
+		assertCorrectConstraintViolationMessages( violations, "field1", "field2" );
 	}
 }
