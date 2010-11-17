@@ -14,13 +14,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.engine.groups;
+package org.hibernate.validator.test.engine.groups.evaluation;
 
 import javax.validation.GroupSequence;
 
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence(value = CyclicGroupSequence.class)
-public interface CyclicGroupSequence {
+@GroupSequence(value = CyclicGroupSequence1.class)
+public interface CyclicGroupSequence2 {
 }

@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.engine.groups;
+package org.hibernate.validator.test.engine.groups.evaluation;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,6 +31,9 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
+import org.hibernate.validator.test.engine.groups.First;
+import org.hibernate.validator.test.engine.groups.Last;
+import org.hibernate.validator.test.engine.groups.Second;
 
 import static org.testng.Assert.assertEquals;
 

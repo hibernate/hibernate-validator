@@ -14,13 +14,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.engine.groups;
+package org.hibernate.validator.test.engine.groups.evaluation;
 
-import javax.validation.GroupSequence;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence(value = CyclicGroupSequence1.class)
-public interface CyclicGroupSequence2 {
+public class ZipCodeCoherenceValidator implements ConstraintValidator<ZipCodeCoherenceChecker, Address> {
+
+	public void initialize(ZipCodeCoherenceChecker parameters) {
+	}
+
+	public boolean isValid(Address value, ConstraintValidatorContext constraintValidatorContext) {
+		return false;
+	}
 }

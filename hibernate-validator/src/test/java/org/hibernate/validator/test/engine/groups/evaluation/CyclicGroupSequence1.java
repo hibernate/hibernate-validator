@@ -14,25 +14,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.engine.groups;
+package org.hibernate.validator.test.engine.groups.evaluation;
 
-import java.lang.annotation.Documented;
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
+import javax.validation.GroupSequence;
 
 /**
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-@Target({ TYPE, ANNOTATION_TYPE })
-@Retention(RUNTIME)
-@Documented
-@Constraint(validatedBy = ZipCodeCoherenceValidator.class)
-public @interface ZipCodeCoherenceChecker {
-	public abstract String message() default "{validator.zipCodeCoherenceChecker}";
-
-	public abstract Class<?>[] groups() default { };
+@GroupSequence(value = CyclicGroupSequence2.class)
+public interface CyclicGroupSequence1 {
 }
