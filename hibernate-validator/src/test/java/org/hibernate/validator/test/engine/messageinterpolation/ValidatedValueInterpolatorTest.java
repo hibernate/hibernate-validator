@@ -16,14 +16,25 @@
  */
 package org.hibernate.validator.test.engine.messageinterpolation;
 
+import java.util.Iterator;
+import java.util.ListResourceBundle;
 import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+import javax.validation.Configuration;
+import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.MessageInterpolatorContext;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.messageinterpolation.ValidatedValueInterpolator;
+import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -38,9 +49,40 @@ public class ValidatedValueInterpolatorTest {
 
 	private static ValidatedValueInterpolator interpolator;
 
+	private static ValidatedValueResourceBundle validatedValueResourceBundle;
+
 	@BeforeClass
 	public static void init() {
 		interpolator = new ValidatedValueInterpolator( new MockDelegateInterpolator(), SCRIPT_LANG );
+		validatedValueResourceBundle = new ValidatedValueResourceBundle();
+	}
+
+	@Test
+	public void testSuccessfulInterpolationWithBootstrap() {
+		User user = new User();
+		user.setEmail( "hibernate.validator@" );
+		user.setAge( 19 );
+
+		//Bootstrap
+		Configuration<?> config = Validation.byDefaultProvider().configure();
+		MessageInterpolator resourceBundleInterpolator = new ResourceBundleMessageInterpolator(
+				new ResourceBundleLocator() {
+					public ResourceBundle getResourceBundle(Locale locale) {
+						return validatedValueResourceBundle;
+					}
+				}
+		);
+		config.messageInterpolator( new ValidatedValueInterpolator( resourceBundleInterpolator, SCRIPT_LANG ) );
+		ValidatorFactory factory = config.buildValidatorFactory();
+
+		//Validate the object
+		Validator validator = factory.getValidator();
+		Set<ConstraintViolation<User>> violations = validator.validate( user );
+		ConstraintViolation<User> emailViolation = violations.iterator().next();
+
+		assertNotNull( violations );
+		assertEquals( violations.size(), 1 );
+		assertEquals( emailViolation.getMessage(), "\"hibernate.validator@\" is not a well-formed email address" );
 	}
 
 	@Test
@@ -123,6 +165,28 @@ public class ValidatedValueInterpolatorTest {
 
 		public String interpolate(String message, Context context, Locale locale) {
 			return message;
+		}
+	}
+
+	/**
+	 * Create a resource bundle which provide
+	 * translation message with a validated value
+	 * interpolation. (Simulates a user resource bundle)
+	 */
+	private static class ValidatedValueResourceBundle extends ListResourceBundle {
+
+		public ValidatedValueResourceBundle() {
+			super();
+		}
+
+		@Override
+		protected Object[][] getContents() {
+			return new Object[][] {
+					{ //Custom message for @Email constraint
+							"org.hibernate.validator.constraints.Email.message",
+							"\"${validatedValue}\" is not a well-formed email address"
+					}
+			};
 		}
 	}
 
