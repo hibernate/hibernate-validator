@@ -291,7 +291,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>1.2.2</version>
+                    <version>1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jboss.maven.plugins</groupId>
