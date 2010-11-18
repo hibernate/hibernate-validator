@@ -30,6 +30,7 @@ import javax.validation.constraints.Size;
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class Car {
 
@@ -37,7 +38,7 @@ public class Car {
 	 * By annotating the field with @NotNull we specify, that null is not a valid
 	 * value.
 	 */
-	@NotNull
+	@NotNull(message = "may not be null")
 	private String manufacturer;
 
 	/**
@@ -45,13 +46,13 @@ public class Car {
 	 * 2 and 14 characters long.
 	 */
 	@NotNull
-	@Size(min = 2, max = 14)
+	@Size(min = 2, max = 14, message = "size must be between {min} and {max}")
 	private String licensePlate;
 
 	/**
 	 * This int field shall have a value of at least 2.
 	 */
-	@Min(2)
+	@Min(value = 2, message = "must be greater than or equal to {value}")
 	private int seatCount;
 
 	@AssertTrue(message = "The car has to pass the vehicle inspection first", groups = CarChecks.class)
