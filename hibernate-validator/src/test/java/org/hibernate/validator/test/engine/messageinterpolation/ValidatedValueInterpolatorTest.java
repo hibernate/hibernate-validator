@@ -24,6 +24,7 @@ import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
@@ -140,16 +141,12 @@ public class ValidatedValueInterpolatorTest {
 		assertEquals( interpolatedString, expectedValue );
 	}
 
-	@Test
+	@Test(expectedExceptions = { ValidationException.class })
 	public void testInvalidScriptToStringInterpolation() {
-		String expectedValue = "This is the interpolated value";
 		String stringToInterpolate = "This is the ${validatedValue:_.invalidMethod()}";
 
 		MessageInterpolatorContext context = new MessageInterpolatorContext( null, "interpolated value" );
-		String interpolatedString = interpolator.interpolate( stringToInterpolate, context );
-
-		assertNotNull( interpolatedString );
-		assertEquals( interpolatedString, expectedValue );
+		interpolator.interpolate( stringToInterpolate, context );
 	}
 
 	/**

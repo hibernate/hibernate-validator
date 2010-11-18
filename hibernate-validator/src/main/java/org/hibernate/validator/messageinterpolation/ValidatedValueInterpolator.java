@@ -19,14 +19,12 @@ package org.hibernate.validator.messageinterpolation;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.validation.MessageInterpolator;
+import javax.validation.ValidationException;
 
-import org.slf4j.Logger;
-
-import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.util.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.util.scriptengine.ScriptEvaluatorFactory;
 
 /**
  * Validated Value interpolator.
@@ -42,8 +40,6 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 	private static final String VALIDATED_VALUE_SCRIPT_SEPARATOR = ":";
 
 	private static final Pattern VALIDATED_VALUE_START_PATTERN = Pattern.compile( "\\$\\{" + VALIDATED_VALUE_KEYWORD );
-
-	private final Logger logger = LoggerFactory.make();
 
 	private final String scriptLang;
 
@@ -99,7 +95,7 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 	 * Interpolate the validated value in the given message
 	 *
 	 * @param message the message where validated value have to be interpolated
-	 * @param validatedValue the value under validation
+	 * @param validatedValue the value of the object being validated
 	 *
 	 * @return the interpolated message
 	 */
@@ -158,7 +154,7 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 	 * Returns the value of the validated value expression.
 	 *
 	 * @param expression the expression to interpolate
-	 * @param validatedValue the value of the object under validation
+	 * @param validatedValue the value of the object being validated
 	 *
 	 * @return the interpolated value
 	 */
@@ -184,29 +180,45 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 	 * method of the validated vaue is used.
 	 *
 	 * @param script the script to be evaluated
-	 * @param validatedValue the value under validation
+	 * @param validatedValue the value of the object being validated
 	 * @param scriptLang the script language
 	 *
 	 * @return the string result of the script evaluation
+	 *
+	 * @throws ValidationException If no JSR-223 engine exists for the given script language
+	 * or if any errors occur during the script execution
 	 */
 	private String doToStringScriptEval(String script, Object validatedValue, String scriptLang) {
+		Object evaluationResult;
+		ScriptEvaluator scriptEvaluator;
 
-		ScriptEngineManager manager = new ScriptEngineManager();
-		ScriptEngine engine = manager.getEngineByName( scriptLang );
-
-		if ( engine != null ) {
-			engine.put( VALIDATED_VALUE_ALIAS, validatedValue );
-			try {
-				Object result = engine.eval( script );
-				return String.valueOf( result );
-			}
-			catch ( ScriptException e ) {
-				//Ignore - by default return the toString method results of the validatedValue
-				logger.error( "Error during evaluation of script " + script, e );
-			}
+		try {
+			ScriptEvaluatorFactory scriptEvaluatorFactory = ScriptEvaluatorFactory.getInstance();
+			scriptEvaluator = scriptEvaluatorFactory.getScriptEvaluatorByLanguageName( scriptLang );
+		}
+		catch ( ScriptException e ) {
+			throw new ValidationException( e );
 		}
 
-		return String.valueOf( validatedValue );
+		try {
+			evaluationResult = scriptEvaluator.evaluate( script, validatedValue, VALIDATED_VALUE_ALIAS );
+		}
+		catch ( ScriptException e ) {
+			throw new ValidationException( "Error during execution of script \"" + script + "\" occured.", e );
+		}
+
+		if ( evaluationResult == null ) {
+			throw new ValidationException( "Script \"" + script + "\" returned null, but must return a string representation of the object being validated." );
+		}
+
+		if ( !( evaluationResult instanceof String ) ) {
+			throw new ValidationException(
+					"Script \"" + script + "\" returned a result of type " + evaluationResult.getClass()
+							.getCanonicalName() + " but must return a string representation of the object being validated."
+			);
+		}
+
+		return String.valueOf( evaluationResult );
 	}
 
 	/**
