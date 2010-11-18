@@ -45,38 +45,38 @@ public class NodeImpl implements Path.Node, Serializable {
 		this.key = node.getKey();
 	}
 
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
-	public boolean isInIterable() {
+	public final boolean isInIterable() {
 		return isInIterable;
 	}
 
-	public void setInIterable(boolean inIterable) {
+	public final void setInIterable(boolean inIterable) {
 		isInIterable = inIterable;
 	}
 
-	public Integer getIndex() {
+	public final Integer getIndex() {
 		return index;
 	}
 
-	public void setIndex(Integer index) {
+	public final void setIndex(Integer index) {
 		isInIterable = true;
 		this.index = index;
 	}
 
-	public Object getKey() {
+	public final Object getKey() {
 		return key;
 	}
 
-	public void setKey(Object key) {
+	public final void setKey(Object key) {
 		isInIterable = true;
 		this.key = key;
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		StringBuilder builder = new StringBuilder( name == null ? "" : name );
 		if ( isInIterable ) {
 			builder.append( INDEX_OPEN );
@@ -92,7 +92,7 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
 		}
@@ -119,7 +119,7 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		int result = name != null ? name.hashCode() : 0;
 		result = 31 * result + ( isInIterable ? 1 : 0 );
 		result = 31 * result + ( index != null ? index.hashCode() : 0 );

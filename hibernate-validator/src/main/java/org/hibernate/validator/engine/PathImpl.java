@@ -27,7 +27,7 @@ import javax.validation.Path;
 /**
  * @author Hardy Ferentschik
  */
-public class PathImpl implements Path, Serializable {
+public final class PathImpl implements Path, Serializable {
 
 	private static final long serialVersionUID = 7564511574909882392L;
 
@@ -37,8 +37,12 @@ public class PathImpl implements Path, Serializable {
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
 	private static final Pattern pathPattern = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
+	private static final int PROPERTY_NAME_GROUP = 1;
+	private static final int INDEXED_GROUP = 2;
+	private static final int INDEX_GROUP = 3;
+	private static final int REMAINING_STRING_GROUP = 5;
 
-	private static final String PROPERTY_PATH_SEPERATOR = ".";
+	private static final String PROPERTY_PATH_SEPARATOR = ".";
 
 	private final List<Node> nodeList;
 
@@ -77,7 +81,7 @@ public class PathImpl implements Path, Serializable {
 	private PathImpl(Path path) {
 		this.nodeList = new ArrayList<Node>();
 		for ( Object aPath : path ) {
-			nodeList.add( new NodeImpl( ( Node ) aPath ) );
+			nodeList.add( new NodeImpl( (Node) aPath ) );
 		}
 	}
 
@@ -108,16 +112,6 @@ public class PathImpl implements Path, Serializable {
 
 	public void addNode(Node node) {
 		nodeList.add( node );
-	}
-
-	public Node removeLeafNode() {
-		if ( nodeList.size() == 0 ) {
-			throw new IllegalStateException( "No nodes in path!" );
-		}
-		if ( nodeList.size() == 1 ) {
-			throw new IllegalStateException( "Root node cannot be removed!" );
-		}
-		return nodeList.remove( nodeList.size() - 1 );
 	}
 
 	public NodeImpl getLeafNode() {
@@ -153,10 +147,10 @@ public class PathImpl implements Path, Serializable {
 		Iterator<Path.Node> iter = iterator();
 		while ( iter.hasNext() ) {
 			Node node = iter.next();
-			builder.append( node.toString() );
-			if ( iter.hasNext() ) {
-				builder.append( PROPERTY_PATH_SEPERATOR );
+			if ( builder.length() > 0 && !node.isInIterable() ) {
+				builder.append( PROPERTY_PATH_SEPARATOR );
 			}
+			builder.append( node.toString() );
 		}
 		return builder.toString();
 	}
@@ -170,7 +164,7 @@ public class PathImpl implements Path, Serializable {
 			return false;
 		}
 
-		PathImpl path = ( PathImpl ) o;
+		PathImpl path = (PathImpl) o;
 		if ( nodeList != null && !nodeList.equals( path.nodeList ) ) {
 			return false;
 		}
@@ -192,24 +186,31 @@ public class PathImpl implements Path, Serializable {
 		do {
 			Matcher matcher = pathPattern.matcher( tmp );
 			if ( matcher.matches() ) {
-				String value = matcher.group( 1 );
-				String indexed = matcher.group( 2 );
-				String index = matcher.group( 3 );
+				String value = matcher.group( PROPERTY_NAME_GROUP );
+				String indexed = matcher.group( INDEXED_GROUP );
+				String index = matcher.group( INDEX_GROUP );
+
 				NodeImpl node = new NodeImpl( value );
-				if ( indexed != null ) {
-					node.setInIterable( true );
-				}
-				if ( index != null && index.length() > 0 ) {
-					try {
-						Integer i = Integer.parseInt( index );
-						node.setIndex( i );
-					}
-					catch ( NumberFormatException e ) {
-						node.setKey( index );
-					}
-				}
 				path.addNode( node );
-				tmp = matcher.group( 5 );
+
+				if ( indexed != null ) {
+					NodeImpl indexNode;
+					indexNode = new NodeImpl( (String) null );
+					indexNode.setInIterable( true );
+
+					if ( index != null && index.length() > 0 ) {
+						try {
+							Integer i = Integer.parseInt( index );
+							indexNode.setIndex( i );
+						}
+						catch ( NumberFormatException e ) {
+							indexNode.setKey( index );
+						}
+					}
+					path.addNode( indexNode );
+				}
+
+				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
 			else {
 				throw new IllegalArgumentException( "Unable to parse property path " + property );
@@ -217,5 +218,4 @@ public class PathImpl implements Path, Serializable {
 		} while ( tmp != null );
 		return path;
 	}
-
 }

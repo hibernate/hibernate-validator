@@ -110,7 +110,9 @@ public class ValueContext<T, V> {
 	}
 
 	public final void markCurrentPropertyAsIterable() {
-		propertyPath.getLeafNode().setInIterable( true );
+		NodeImpl node = new NodeImpl( (String) null);
+		node.setInIterable( true );
+		propertyPath.addNode( new NodeImpl(node) );
 	}
 
 	public final boolean validatingDefault() {

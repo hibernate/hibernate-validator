@@ -43,7 +43,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	public final String getDefaultConstraintMessageTemplate() {
-		return ( String ) constraintDescriptor.getAttributes().get( "message" );
+		return (String) constraintDescriptor.getAttributes().get( "message" );
 	}
 
 	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
@@ -129,7 +129,9 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintViolationBuilder.NodeContextBuilder inIterable() {
-			this.propertyPath.getLeafNode().setInIterable( true );
+			NodeImpl node = new NodeImpl( (String) null );
+			node.setInIterable( true );
+			this.propertyPath.addNode( node );
 			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath, deferredNodeName );
 		}
 
