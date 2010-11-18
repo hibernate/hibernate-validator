@@ -370,6 +370,7 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <!-- HV-396 to allow building with Maven 3 (final version) we have to add the repository configuration to the pom -->
     <repositories>
         <repository>
             <id>jboss-public-repository-group</id>
