@@ -22,13 +22,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.validation.ConstraintDeclarationException;
 
 /**
  * Factory responsible for the creation of {@link ScriptEvaluator}s. This
  * class is thread-safe.
- *
+ *                       
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ScriptEvaluatorFactory {
 
@@ -69,9 +71,9 @@ public class ScriptEvaluatorFactory {
 	 *
 	 * @return A script executor for the given language. Never null.
 	 *
-	 * @throws ConstraintDeclarationException In case no JSR 223 compatible engine for the given language could be found.
+	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.
 	 */
-	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) {
+	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) throws ScriptException {
 
 		if ( !scriptExecutorCache.containsKey( languageName ) ) {
 
@@ -88,15 +90,15 @@ public class ScriptEvaluatorFactory {
 	 * @param languageName A JSR 223 language name.
 	 *
 	 * @return A newly created script executor for the given language.
+	 * 
+	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.
 	 */
-	private ScriptEvaluator createNewScriptEvaluator(String languageName) {
+	private ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptException {
 
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {
-			throw new ConstraintDeclarationException(
-					"No JSR 223 script engine found for language \"" + languageName + "\"."
-			);
+			throw new ScriptException( "No JSR 223 script engine found for language \"" + languageName + "\"." );
 		}
 
 		return new ScriptEvaluator( engine );

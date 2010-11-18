@@ -24,6 +24,7 @@ import javax.validation.ConstraintDeclarationException;
  * A wrapper around JSR 223 {@link ScriptEngine}s. This class is thread-safe.
  *
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ScriptEvaluator {
 
@@ -49,11 +50,9 @@ public class ScriptEvaluator {
 	 *
 	 * @return The script's result.
 	 *
-	 * @throws ConstraintDeclarationException In case of any errors during script execution or if the script
-	 *                                        returned null or another type than Boolean.
+	 * @throws ScriptException In case of any errors during script execution.
 	 */
-	public boolean evaluate(String script, Object obj, String objectAlias) {
-
+	public Object evaluate(String script, Object obj, String objectAlias) throws ScriptException {
 		if ( engineAllowsParallelAccessFromMultipleThreads() ) {
 			return doEvaluate( script, obj, objectAlias );
 		}
@@ -64,33 +63,9 @@ public class ScriptEvaluator {
 		}
 	}
 
-	private boolean doEvaluate(String script, Object obj, String objectAlias) {
-
+	private Object doEvaluate(String script, Object obj, String objectAlias) throws ScriptException {
 		engine.put( objectAlias, obj );
-
-		Object evaluationResult;
-
-		try {
-			evaluationResult = engine.eval( script );
-		}
-		catch ( ScriptException e ) {
-			throw new ConstraintDeclarationException(
-					"Error during execution of script \"" + script + "\" occured.", e
-			);
-		}
-
-		if ( evaluationResult == null ) {
-			throw new ConstraintDeclarationException( "Script \"" + script + "\" returned null, but must return either true or false." );
-		}
-
-		if ( !( evaluationResult instanceof Boolean ) ) {
-			throw new ConstraintDeclarationException(
-					"Script \"" + script + "\" returned " + evaluationResult + " (of type " + evaluationResult.getClass()
-							.getCanonicalName() + "), but must return either true or false."
-			);
-		}
-
-		return Boolean.TRUE.equals( evaluationResult );
+		return engine.eval( script );
 	}
 
 	/**
