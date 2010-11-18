@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.MessageInterpolatorContext;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.messageinterpolation.ValidatedValueInterpolator;
+import org.hibernate.validator.messageinterpolation.ValueMessageInterpolator;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
 import static org.testng.Assert.assertEquals;
@@ -43,18 +43,18 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class ValidatedValueInterpolatorTest {
+public class ValueMessageInterpolatorTest {
 
 	private static final String SCRIPT_LANG = "javascript";
 
-	private static ValidatedValueInterpolator interpolator;
+	private static ValueMessageInterpolator interpolator;
 
-	private static ValidatedValueResourceBundle validatedValueResourceBundle;
+	private static ValueMessageResourceBundle valueMessageResourceBundle;
 
 	@BeforeClass
 	public static void init() {
-		interpolator = new ValidatedValueInterpolator( new MockDelegateInterpolator(), SCRIPT_LANG );
-		validatedValueResourceBundle = new ValidatedValueResourceBundle();
+		interpolator = new ValueMessageInterpolator( new MockDelegateInterpolator(), SCRIPT_LANG );
+		valueMessageResourceBundle = new ValueMessageResourceBundle();
 	}
 
 	@Test
@@ -68,11 +68,11 @@ public class ValidatedValueInterpolatorTest {
 		MessageInterpolator resourceBundleInterpolator = new ResourceBundleMessageInterpolator(
 				new ResourceBundleLocator() {
 					public ResourceBundle getResourceBundle(Locale locale) {
-						return validatedValueResourceBundle;
+						return valueMessageResourceBundle;
 					}
 				}
 		);
-		config.messageInterpolator( new ValidatedValueInterpolator( resourceBundleInterpolator, SCRIPT_LANG ) );
+		config.messageInterpolator( new ValueMessageInterpolator( resourceBundleInterpolator, SCRIPT_LANG ) );
 		ValidatorFactory factory = config.buildValidatorFactory();
 
 		//Validate the object
@@ -150,8 +150,7 @@ public class ValidatedValueInterpolatorTest {
 	}
 
 	/**
-	 * Mock delegate interpolator who simply return the
-	 * message to interpolate.
+	 * Mock interpolator who simply return the message to interpolate.
 	 */
 	private static class MockDelegateInterpolator implements MessageInterpolator {
 
@@ -165,13 +164,12 @@ public class ValidatedValueInterpolatorTest {
 	}
 
 	/**
-	 * Create a resource bundle which provide
-	 * translation message with a validated value
+	 * Create a resource bundle which provide translation message with a validated value
 	 * interpolation. (Simulates a user resource bundle)
 	 */
-	private static class ValidatedValueResourceBundle extends ListResourceBundle {
+	private static class ValueMessageResourceBundle extends ListResourceBundle {
 
-		public ValidatedValueResourceBundle() {
+		public ValueMessageResourceBundle() {
 			super();
 		}
 

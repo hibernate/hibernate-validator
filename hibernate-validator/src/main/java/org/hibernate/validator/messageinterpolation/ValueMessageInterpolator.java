@@ -27,11 +27,11 @@ import org.hibernate.validator.util.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.util.scriptengine.ScriptEvaluatorFactory;
 
 /**
- * Validated Value interpolator.
+ * Validated value message interpolator.
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class ValidatedValueInterpolator implements MessageInterpolator {
+public class ValueMessageInterpolator implements MessageInterpolator {
 
 	private static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
 
@@ -46,26 +46,26 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 	private final MessageInterpolator delegate;
 
 	/**
-	 * Construct a default ValidatedValueInterpolator
+	 * Construct a default ValueMessageInterpolator
 	 * who delegates initial interpolation to
 	 * default ResourceBundleMessageInterpolator and use
 	 * the given default script language.
 	 *
 	 * @param scriptLang the script language used in message interpolation
 	 */
-	public ValidatedValueInterpolator(String scriptLang) {
+	public ValueMessageInterpolator(String scriptLang) {
 		this( null, scriptLang );
 	}
 
 	/**
-	 * Construct a ValidatedValueInterpolator who delegates
+	 * Construct a ValueMessageInterpolator who delegates
 	 * the initial interpolation to the given MessageInterpolator and
 	 * use the default given script language used for toString interpolation.
 	 *
 	 * @param userMessageInterpolator the user specified message interpolator
 	 * @param scriptLang the script language used in message interpolation
 	 */
-	public ValidatedValueInterpolator(MessageInterpolator userMessageInterpolator, String scriptLang) {
+	public ValueMessageInterpolator(MessageInterpolator userMessageInterpolator, String scriptLang) {
 		if ( userMessageInterpolator == null ) {
 			//Use default ResourceBundleMessageInterpolator
 			this.delegate = new ResourceBundleMessageInterpolator();
@@ -175,9 +175,7 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 
 	/**
 	 * Evaluate the toString script with JSR 223 and returns
-	 * the string representation of the result. If
-	 * the script evaluation fails the default toString
-	 * method of the validated vaue is used.
+	 * the String representation of the result.
 	 *
 	 * @param script the script to be evaluated
 	 * @param validatedValue the value of the object being validated
@@ -223,7 +221,7 @@ public class ValidatedValueInterpolator implements MessageInterpolator {
 
 	/**
 	 * Returns if the character at the given index in the String
-	 * is an escaped character preceded by a backslash character.
+	 * is an escaped character (preceded by a backslash character).
 	 *
 	 * @param enclosingString the string which contain the given character
 	 * @param charIndex the index of the character
