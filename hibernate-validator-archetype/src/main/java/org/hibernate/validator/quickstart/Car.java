@@ -34,6 +34,9 @@ import javax.validation.constraints.Size;
  */
 public class Car {
 
+	//The definition of the message in the constraints is just for testing purpose.
+	//In a real world scenario you would place your messages into resource bundles.
+
 	/**
 	 * By annotating the field with @NotNull we specify, that null is not a valid
 	 * value.
