@@ -16,18 +16,21 @@
 */
 package org.hibernate.validator.constraints.impl;
 
+import javax.script.ScriptException;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.constraints.impl.scriptassert.ScriptEvaluator;
-import org.hibernate.validator.constraints.impl.scriptassert.ScriptEvaluatorFactory;
+import org.hibernate.validator.util.scriptengine.ScriptEvaluator;
+import org.hibernate.validator.util.scriptengine.ScriptEvaluatorFactory;
 
 /**
  * Validator for the {@link ScriptAssert} constraint annotation.
  *
  * @author Gunnar Morling.
  * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, Object> {
 	private String script;
@@ -43,10 +46,38 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 	}
 
 	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
-		ScriptEvaluator scriptEvaluator = ScriptEvaluatorFactory.getInstance()
-				.getScriptEvaluatorByLanguageName( languageName );
 
-		return scriptEvaluator.evaluate( script, value, alias );
+		Object evaluationResult;
+		ScriptEvaluator scriptEvaluator;
+
+		try {
+			ScriptEvaluatorFactory evaluatorFactory = ScriptEvaluatorFactory.getInstance();
+			scriptEvaluator = evaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
+		}
+		catch ( ScriptException e ) {
+			throw new ConstraintDeclarationException( e );
+		}
+
+		try {
+			evaluationResult = scriptEvaluator.evaluate( script, value, alias );
+		}
+		catch ( ScriptException e ) {
+			throw new ConstraintDeclarationException(
+					"Error during execution of script \"" + script + "\" occured.", e
+			);
+		}
+
+		if ( evaluationResult == null ) {
+			throw new ConstraintDeclarationException( "Script \"" + script + "\" returned null, but must return either true or false." );
+		}
+		if ( !( evaluationResult instanceof Boolean ) ) {
+			throw new ConstraintDeclarationException(
+					"Script \"" + script + "\" returned " + evaluationResult + " (of type " + evaluationResult.getClass()
+							.getCanonicalName() + "), but must return either true or false."
+			);
+		}
+
+		return Boolean.TRUE.equals( evaluationResult );
 	}
 
 	private void validateParameters(ScriptAssert constraintAnnotation) {

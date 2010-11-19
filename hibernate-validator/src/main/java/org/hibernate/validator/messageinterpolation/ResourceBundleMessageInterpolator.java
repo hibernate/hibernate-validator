@@ -34,6 +34,7 @@ import org.hibernate.validator.resourceloading.ResourceBundleLocator;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
@@ -187,7 +188,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 					parameter, bundle, locale, recurse
 			);
 
-			matcher.appendReplacement( sb, escapeMetaCharacters( resolvedParameterValue ) );
+			matcher.appendReplacement( sb, Matcher.quoteReplacement( resolvedParameterValue ) );
 		}
 		matcher.appendTail( sb );
 		return sb.toString();
@@ -201,11 +202,12 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			String parameter = matcher.group( 1 );
 			Object variable = annotationParameters.get( removeCurlyBrace( parameter ) );
 			if ( variable != null ) {
-				resolvedParameterValue = escapeMetaCharacters( variable.toString() );
+				resolvedParameterValue = variable.toString();
 			}
 			else {
 				resolvedParameterValue = parameter;
 			}
+			resolvedParameterValue = Matcher.quoteReplacement( resolvedParameterValue );
 			matcher.appendReplacement( sb, resolvedParameterValue );
 		}
 		matcher.appendTail( sb );
@@ -234,17 +236,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 	private String removeCurlyBrace(String parameter) {
 		return parameter.substring( 1, parameter.length() - 1 );
-	}
-
-	/**
-	 * @param s The string in which to replace the meta characters '$' and '\'.
-	 *
-	 * @return A string where meta characters relevant for {@link Matcher#appendReplacement} are escaped.
-	 */
-	private String escapeMetaCharacters(String s) {
-		String escapedString = s.replace( "\\", "\\\\" );
-		escapedString = escapedString.replace( "$", "\\$" );
-		return escapedString;
 	}
 
 	private static class LocalisedMessage {
