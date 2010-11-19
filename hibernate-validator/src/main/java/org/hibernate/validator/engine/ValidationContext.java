@@ -62,7 +62,7 @@ public class ValidationContext<T> {
 	/**
 	 * Maps an object to a list of paths in which it has been invalidated.
 	 */
-	private final Map<Object, Set<PathImpl>> processedPaths;
+	private final Map<Object, Set<String>> processedPaths;
 
 	/**
 	 * A list of all failing constraints so far.
@@ -93,7 +93,7 @@ public class ValidationContext<T> {
 
 	public static <T> ValidationContext<T> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
+		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new ValidationContext<T>(
 				rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
@@ -101,7 +101,7 @@ public class ValidationContext<T> {
 
 	public static <T> ValidationContext<T> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) rootBean.getClass();
+		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		return new ValidationContext<T>(
 				rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
@@ -117,22 +117,28 @@ public class ValidationContext<T> {
 		);
 	}
 
-	public static <T> MethodValidationContext<T> getContextForValidateParameter( Method method, int parameterIndex, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory) {
+	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory) {
 		return new MethodValidationContext<T>(
 				method, parameterIndex, null, null, messageInterpolator, constraintValidatorFactory, null
 		);
 	}
-	
-	public static <T> MethodValidationContext<T> getContextForValidateCascadingParameter( Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+
+	public static <T> MethodValidationContext<T> getContextForValidateCascadingParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
+		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
-				method, parameterIndex, rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver
+				method,
+				parameterIndex,
+				rootBeanClass,
+				object,
+				messageInterpolator,
+				constraintValidatorFactory,
+				traversableResolver
 		);
 	}
 
 	protected ValidationContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
-		
+
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.messageInterpolator = messageInterpolator;
@@ -140,7 +146,7 @@ public class ValidationContext<T> {
 		this.traversableResolver = traversableResolver;
 
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
-		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
+		processedPaths = new IdentityHashMap<Object, Set<String>>();
 		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
 	}
 
@@ -159,7 +165,7 @@ public class ValidationContext<T> {
 	public final MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
-	
+
 	public final boolean hasFailures() {
 		return !failingConstraintViolations.isEmpty();
 	}
@@ -198,7 +204,7 @@ public class ValidationContext<T> {
 		return constraintValidatorFactory;
 	}
 
-	public boolean isAlreadyValidated(Object value, Class<?> group, PathImpl path) {
+	public boolean isAlreadyValidated(Object value, Class<?> group, String path) {
 		boolean alreadyValidated;
 		alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
 
@@ -208,7 +214,7 @@ public class ValidationContext<T> {
 		return alreadyValidated;
 	}
 
-	public void markProcessed(Object value, Class<?> group, PathImpl path) {
+	public void markProcessed(Object value, Class<?> group, String path) {
 		markProcessForCurrentGroup( value, group );
 		if ( allowOneValidationPerPath ) {
 			markProcessedForCurrentPath( value, path );
@@ -233,14 +239,14 @@ public class ValidationContext<T> {
 		return failingConstraintViolations;
 	}
 
-	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
-		Set<PathImpl> pathSet = processedPaths.get( value );
+	private boolean isAlreadyValidatedForPath(Object value, String path) {
+		Set<String> pathSet = processedPaths.get( value );
 		if ( pathSet == null ) {
 			return false;
 		}
 
-		for ( PathImpl p : pathSet ) {
-			if ( p.isRootPath() || path.isRootPath() || p.isSubPathOf( path ) || path.isSubPathOf( p ) ) {
+		for ( String s : pathSet ) {
+			if ( s.length() == 0 || path.length() == 0 || s.startsWith( path ) || path.startsWith( s ) ) {
 				return true;
 			}
 		}
@@ -253,20 +259,20 @@ public class ValidationContext<T> {
 		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
 	}
 
-	private void markProcessedForCurrentPath(Object value, PathImpl path) {
-		// hmm - not sure if the current definition of Path and Node are consistent. Shouldn't a simple property
-		// of a entity have a parent node?
-		PathImpl parentPath = path.getPathWithoutLeafNode();
-		if ( parentPath == null ) {
-			parentPath = PathImpl.createNewPath( null );
+	private void markProcessedForCurrentPath(Object value, String path) {
+		if ( path.indexOf( '.' ) != -1 ) {
+			path = path.substring( 0, path.lastIndexOf( '.' ) );
+		}
+		else {
+			path = "";
 		}
 
 		if ( processedPaths.containsKey( value ) ) {
-			processedPaths.get( value ).add( parentPath );
+			processedPaths.get( value ).add( path );
 		}
 		else {
-			Set<PathImpl> set = new HashSet<PathImpl>();
-			set.add( parentPath );
+			Set<String> set = new HashSet<String>();
+			set.add( path );
 			processedPaths.put( value, set );
 		}
 	}
