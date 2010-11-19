@@ -43,6 +43,8 @@ public final class PathImpl implements Path, Serializable {
 	private static final int REMAINING_STRING_GROUP = 5;
 
 	private static final String PROPERTY_PATH_SEPARATOR = ".";
+	private static final String INDEX_OPEN = "[";
+	private static final String INDEX_CLOSE = "]";
 
 	private final List<Node> nodeList;
 
@@ -118,41 +120,47 @@ public final class PathImpl implements Path, Serializable {
 		if ( nodeList.size() == 0 ) {
 			throw new IllegalStateException( "No nodes in path!" );
 		}
-		return ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
+		return (NodeImpl) nodeList.get( nodeList.size() - 1 );
 	}
 
 	public Iterator<Path.Node> iterator() {
 		return nodeList.iterator();
 	}
 
-	public boolean isSubPathOf(Path path) {
-		Iterator<Node> pathIter = path.iterator();
-		Iterator<Node> thisIter = iterator();
-		while ( pathIter.hasNext() ) {
-			Node pathNode = pathIter.next();
-			if ( !thisIter.hasNext() ) {
-				return false;
+	public String asString() {
+		StringBuilder builder = new StringBuilder();
+		Iterator<Path.Node> iter = iterator();
+		boolean first = true;
+		while ( iter.hasNext() ) {
+			Node node = iter.next();
+			if ( node.isInIterable() ) {
+				appendIndex( builder, node );
 			}
-			Node thisNode = thisIter.next();
-			if ( !thisNode.equals( pathNode ) ) {
-				return false;
+			if ( node.getName() != null ) {
+				if ( !first ) {
+					builder.append( PROPERTY_PATH_SEPARATOR );
+				}
+				builder.append( node.getName() );
 			}
+			first = false;
 		}
-		return true;
+		return builder.toString();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		Iterator<Path.Node> iter = iterator();
-		while ( iter.hasNext() ) {
-			Node node = iter.next();
-			if ( builder.length() > 0 && !node.isInIterable() ) {
-				builder.append( PROPERTY_PATH_SEPARATOR );
-			}
-			builder.append( node.toString() );
+	   return asString();
+	}
+
+	private void appendIndex(StringBuilder builder, Node node) {
+		builder.append( INDEX_OPEN );
+		if ( node.getIndex() != null ) {
+			builder.append( node.getIndex() );
 		}
-		return builder.toString();
+		else if ( node.getKey() != null ) {
+			builder.append( node.getKey() );
+		}
+		builder.append( INDEX_CLOSE );
 	}
 
 	@Override
@@ -183,32 +191,23 @@ public final class PathImpl implements Path, Serializable {
 	private static PathImpl parseProperty(String property) {
 		PathImpl path = new PathImpl();
 		String tmp = property;
+		boolean indexed = false;
+		String indexOrKey = null;
 		do {
 			Matcher matcher = pathPattern.matcher( tmp );
 			if ( matcher.matches() ) {
 				String value = matcher.group( PROPERTY_NAME_GROUP );
-				String indexed = matcher.group( INDEXED_GROUP );
-				String index = matcher.group( INDEX_GROUP );
 
 				NodeImpl node = new NodeImpl( value );
 				path.addNode( node );
 
-				if ( indexed != null ) {
-					NodeImpl indexNode;
-					indexNode = new NodeImpl( (String) null );
-					indexNode.setInIterable( true );
-
-					if ( index != null && index.length() > 0 ) {
-						try {
-							Integer i = Integer.parseInt( index );
-							indexNode.setIndex( i );
-						}
-						catch ( NumberFormatException e ) {
-							indexNode.setKey( index );
-						}
-					}
-					path.addNode( indexNode );
+				// need to look backwards!!
+				if ( indexed ) {
+					setNodeIndexOrKey( indexOrKey, node );
 				}
+
+				indexed = matcher.group( INDEXED_GROUP ) != null;
+				indexOrKey = matcher.group( INDEX_GROUP );
 
 				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
@@ -216,6 +215,26 @@ public final class PathImpl implements Path, Serializable {
 				throw new IllegalArgumentException( "Unable to parse property path " + property );
 			}
 		} while ( tmp != null );
+
+		// check for a left over indexed node
+		if ( indexed ) {
+			NodeImpl node = new NodeImpl( (String) null );
+			setNodeIndexOrKey( indexOrKey, node );
+			path.addNode( node );
+		}
 		return path;
+	}
+
+	private static void setNodeIndexOrKey(String indexOrKey, NodeImpl node) {
+		node.setInIterable( true );
+		if ( indexOrKey != null && indexOrKey.length() > 0 ) {
+			try {
+				Integer i = Integer.parseInt( indexOrKey );
+				node.setIndex( i );
+			}
+			catch ( NumberFormatException e ) {
+				node.setKey( indexOrKey );
+			}
+		}
 	}
 }
