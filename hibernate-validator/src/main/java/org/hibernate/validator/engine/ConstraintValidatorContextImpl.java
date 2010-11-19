@@ -107,8 +107,8 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			// we need to defer the adding of the new node, since we don't know yet whether the new node  will be iterable
-			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
+			propertyPath.addNode( new NodeImpl( name ) );
+			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
@@ -120,80 +120,55 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	class InIterableNodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderCustomizableContext {
 		private String messageTemplate;
 		private PathImpl propertyPath;
-		private String deferredNodeName;
 
-		InIterableNodeBuilderImpl(String template, PathImpl path, String deferredNodeName) {
+		InIterableNodeBuilderImpl(String template, PathImpl path) {
 			this.messageTemplate = template;
 			this.propertyPath = path;
-			this.deferredNodeName = deferredNodeName;
 		}
 
 		public ConstraintViolationBuilder.NodeContextBuilder inIterable() {
-			NodeImpl node = new NodeImpl( (String) null );
-			node.setInIterable( true );
-			this.propertyPath.addNode( node );
-			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath, deferredNodeName );
+			this.propertyPath.getLeafNode().setInIterable( true );
+			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			addDeferredNode(); // now that we add another node we can add the deferred parent node
-			deferredNodeName = name;
+			propertyPath.addNode( new NodeImpl( name ) );
 			return this;
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
-			addDeferredNode();
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
-		}
-
-		private void addDeferredNode() {
-			if ( deferredNodeName != null ) {
-				NodeImpl node = new NodeImpl( deferredNodeName );
-				propertyPath.addNode( node );
-			}
 		}
 	}
 
 	class InIterablePropertiesBuilderImpl implements ConstraintViolationBuilder.NodeContextBuilder {
 		private String messageTemplate;
 		private PathImpl propertyPath;
-		private String deferredNodeName;
 
-		InIterablePropertiesBuilderImpl(String template, PathImpl path, String deferredNodeName) {
+		InIterablePropertiesBuilderImpl(String template, PathImpl path) {
 			this.messageTemplate = template;
 			this.propertyPath = path;
-			this.deferredNodeName = deferredNodeName;
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atKey(Object key) {
 			propertyPath.getLeafNode().setKey( key );
-			addDeferredNode();
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atIndex(Integer index) {
 			propertyPath.getLeafNode().setIndex( index );
-			addDeferredNode();
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			addDeferredNode();
-			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
+			propertyPath.addNode( new NodeImpl( name ) );
+			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
-			addDeferredNode();
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
-		}
-
-		private void addDeferredNode() {
-			if ( deferredNodeName != null ) {
-				NodeImpl node = new NodeImpl( deferredNodeName );
-				propertyPath.addNode( node );
-			}
 		}
 	}
 }
