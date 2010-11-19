@@ -17,6 +17,8 @@
 
 package org.hibernate.validator.test.engine.messageinterpolation;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.ListResourceBundle;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -140,6 +142,18 @@ public class ValueMessageInterpolatorTest {
 
 		assertNotNull( interpolatedString );
 		assertEquals( interpolatedString, expectedValue );
+	}
+
+	@Test
+	public void testScriptDateFormatting() {
+		Date date = new Date();
+		String stringToInterpolate = "${validatedValue:java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT).format(_)}";
+
+		MessageInterpolatorContext context = new MessageInterpolatorContext( null, date );
+		String interpolatedString = interpolator.interpolate( stringToInterpolate, context );
+
+		assertNotNull( interpolatedString );
+		assertEquals( interpolatedString, DateFormat.getTimeInstance( DateFormat.SHORT ).format( date ) );
 	}
 
 	@Test(expectedExceptions = { ValidationException.class })
