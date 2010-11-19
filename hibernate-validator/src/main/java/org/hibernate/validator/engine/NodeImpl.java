@@ -23,11 +23,7 @@ import javax.validation.Path;
  * @author Hardy Ferentschik
  */
 public class NodeImpl implements Path.Node, Serializable {
-
 	private static final long serialVersionUID = 2075466571633860499L;
-
-	private static final String INDEX_OPEN = "[";
-	private static final String INDEX_CLOSE = "]";
 
 	private final String name;
 	private boolean isInIterable;
@@ -76,19 +72,15 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	@Override
-	public final String toString() {
-		StringBuilder builder = new StringBuilder( name == null ? "" : name );
-		if ( isInIterable ) {
-			builder.append( INDEX_OPEN );
-			if ( getIndex() != null ) {
-				builder.append( getIndex() );
-			}
-			else if ( getKey() != null ) {
-				builder.append( getKey() );
-			}
-			builder.append( INDEX_CLOSE );
-		}
-		return builder.toString();
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "NodeImpl" );
+		sb.append( "{index=" ).append( index );
+		sb.append( ", name='" ).append( name ).append( '\'' );
+		sb.append( ", isInIterable=" ).append( isInIterable );
+		sb.append( ", key=" ).append( key );
+		sb.append( '}' );
+		return sb.toString();
 	}
 
 	@Override
@@ -100,7 +92,7 @@ public class NodeImpl implements Path.Node, Serializable {
 			return false;
 		}
 
-		NodeImpl node = ( NodeImpl ) o;
+		NodeImpl node = (NodeImpl) o;
 
 		if ( isInIterable != node.isInIterable ) {
 			return false;
