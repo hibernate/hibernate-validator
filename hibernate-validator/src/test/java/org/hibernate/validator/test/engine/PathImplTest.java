@@ -45,15 +45,9 @@ public class PathImplTest {
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
-		assertEquals( elem.getName(), null );
+		assertEquals( elem.getName(), "deliveryAddress" );
 		assertTrue( elem.isInIterable() );
 		assertEquals( elem.getIndex(), new Integer( 3 ) );
-
-		assertTrue( propIter.hasNext() );
-		elem = propIter.next();
-		assertEquals( elem.getName(), "deliveryAddress" );
-		assertFalse( elem.isInIterable() );
-		assertEquals( elem.getIndex(), null );
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
@@ -68,29 +62,28 @@ public class PathImplTest {
 
 		assertFalse( propIter.hasNext() );
 
-		assertEquals(path.toString(), property);
+		assertEquals( path.toString(), property );
 	}
 
-//	@Test
-//	public void testParseMapBasedProperty() {
-//		String property = "order[foo].deliveryAddress";
-//		Path path = PathImpl.createPathFromString( property );
-//		Iterator<Path.Node> propIter = path.iterator();
-//
-//		assertTrue( propIter.hasNext() );
-//		Path.Node elem = propIter.next();
-//		assertEquals( "order", elem.getName() );
-//		assertTrue( elem.isInIterable() );
-//		assertEquals( "foo", elem.getKey() );
-//
-//		assertTrue( propIter.hasNext() );
-//		elem = propIter.next();
-//		assertEquals( "deliveryAddress", elem.getName() );
-//		assertFalse( elem.isInIterable() );
-//		assertEquals( null, elem.getIndex() );
-//
-//		assertFalse( propIter.hasNext() );
-//	}
+	@Test
+	public void testParseMapBasedProperty() {
+		String property = "order[foo].deliveryAddress";
+		Path path = PathImpl.createPathFromString( property );
+		Iterator<Path.Node> propIter = path.iterator();
+
+		assertTrue( propIter.hasNext() );
+		Path.Node elem = propIter.next();
+		assertEquals( "order", elem.getName() );
+		assertFalse( elem.isInIterable() );
+
+		assertTrue( propIter.hasNext() );
+		elem = propIter.next();
+		assertEquals( "deliveryAddress", elem.getName() );
+		assertTrue( elem.isInIterable() );
+		assertEquals( "foo", elem.getKey() );
+
+		assertFalse( propIter.hasNext() );
+	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNull() {
