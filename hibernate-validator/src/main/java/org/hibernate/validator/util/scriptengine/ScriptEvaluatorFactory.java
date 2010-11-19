@@ -23,12 +23,11 @@ import java.util.concurrent.ConcurrentMap;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import javax.validation.ConstraintDeclarationException;
 
 /**
  * Factory responsible for the creation of {@link ScriptEvaluator}s. This
  * class is thread-safe.
- *                       
+ *
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
@@ -90,7 +89,7 @@ public class ScriptEvaluatorFactory {
 	 * @param languageName A JSR 223 language name.
 	 *
 	 * @return A newly created script executor for the given language.
-	 * 
+	 *
 	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.
 	 */
 	private ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptException {

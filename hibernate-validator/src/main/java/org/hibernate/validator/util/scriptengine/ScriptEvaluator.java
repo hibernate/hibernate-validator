@@ -18,7 +18,6 @@ package org.hibernate.validator.util.scriptengine;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import javax.validation.ConstraintDeclarationException;
 
 /**
  * A wrapper around JSR 223 {@link ScriptEngine}s. This class is thread-safe.
@@ -75,7 +74,7 @@ public class ScriptEvaluator {
 	 */
 	private boolean engineAllowsParallelAccessFromMultipleThreads() {
 
-		String threadingType = ( String ) engine.getFactory().getParameter( "THREADING" );
+		String threadingType = (String) engine.getFactory().getParameter( "THREADING" );
 
 		return "THREAD-ISOLATED".equals( threadingType ) || "STATELESS".equals( threadingType );
 	}
