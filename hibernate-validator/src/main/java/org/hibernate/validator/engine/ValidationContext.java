@@ -71,8 +71,6 @@ public class ValidationContext<T> {
 
 	/**
 	 * Flag indicating whether an object can only be validated once per group or once per group AND validation path.
-	 *
-	 * @todo Make this boolean a configurable item.
 	 */
 	private boolean allowOneValidationPerPath = true;
 
@@ -166,10 +164,6 @@ public class ValidationContext<T> {
 		return messageInterpolator;
 	}
 
-	public final boolean hasFailures() {
-		return !failingConstraintViolations.isEmpty();
-	}
-
 	public <U, V> ConstraintViolation<T> createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
@@ -183,13 +177,13 @@ public class ValidationContext<T> {
 				getRootBean(),
 				localContext.getCurrentBean(),
 				localContext.getCurrentValidatedValue(),
-				messageAndPath.getPath(),
+				PathImpl.createPathFromString( messageAndPath.getPath() ),
 				descriptor,
 				localContext.getElementType()
 		);
 	}
 
-	public <U, V> List<ConstraintViolation<T>> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
+	public final <U, V> List<ConstraintViolation<T>> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
 			ConstraintViolation<T> violation = createConstraintViolation(
@@ -200,7 +194,7 @@ public class ValidationContext<T> {
 		return constraintViolations;
 	}
 
-	public ConstraintValidatorFactory getConstraintValidatorFactory() {
+	public final ConstraintValidatorFactory getConstraintValidatorFactory() {
 		return constraintValidatorFactory;
 	}
 
@@ -229,7 +223,7 @@ public class ValidationContext<T> {
 		}
 	}
 
-	public void addConstraintFailures(List<ConstraintViolation<T>> failingConstraintViolations) {
+	public final void addConstraintFailures(List<ConstraintViolation<T>> failingConstraintViolations) {
 		for ( ConstraintViolation<T> violation : failingConstraintViolations ) {
 			addConstraintFailure( violation );
 		}
