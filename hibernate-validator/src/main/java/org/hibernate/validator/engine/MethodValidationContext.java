@@ -50,13 +50,14 @@ public class MethodValidationContext <T> extends ValidationContext<T> {
 		this.parameterIndex = parameterIndex;
 	}
 	
-	public Method getMethod() {
+	public final Method getMethod() {
 		return method;
 	}
 
-	public Integer getParameterIndex() {
+	public final Integer getParameterIndex() {
 		return parameterIndex;
 	}
+
 	public <U, V> MethodConstraintViolation<T> createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = getMessageInterpolator().interpolate(
@@ -73,7 +74,7 @@ public class MethodValidationContext <T> extends ValidationContext<T> {
 					getRootBean(),
 					localContext.getCurrentBean(),
 					localContext.getCurrentValidatedValue(),
-					messageAndPath.getPath(),
+					PathImpl.createPathFromString(messageAndPath.getPath()),
 					descriptor,
 					localContext.getElementType()
 			);
