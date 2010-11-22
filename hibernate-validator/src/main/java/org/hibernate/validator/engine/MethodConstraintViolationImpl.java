@@ -19,8 +19,6 @@ package org.hibernate.validator.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
-
-import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -29,35 +27,35 @@ import org.hibernate.validator.MethodConstraintViolation;
 /**
  * @author Gunnar Morling
  */
-public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T> implements MethodConstraintViolation<T> {
+public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
+		implements MethodConstraintViolation<T> {
 
 	private final Method method;
-	
 	private final int parameterIndex;
 
 	public MethodConstraintViolationImpl(
-		String messageTemplate,
-		String interpolatedMessage,
-		Method method, 
-		int parameterIndex,
-		Class<T> rootBeanClass, 
-		T rootBean, 
-		Object leafBeanInstance,
-		Object value,
-		Path propertyPath,
-		ConstraintDescriptor<?> constraintDescriptor, 
-		ElementType elementType) {
-		
+			String messageTemplate,
+			String interpolatedMessage,
+			Method method,
+			int parameterIndex,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			ElementType elementType) {
 		super(
-			messageTemplate, 
-			interpolatedMessage,
-			rootBeanClass, 
-			rootBean,
-			leafBeanInstance,
-			value, 
-			propertyPath, 
-			constraintDescriptor,
-			elementType);
+				messageTemplate,
+				interpolatedMessage,
+				rootBeanClass,
+				rootBean,
+				leafBeanInstance,
+				value,
+				propertyPath,
+				constraintDescriptor,
+				elementType
+		);
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;
@@ -75,27 +73,34 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((method == null) ? 0 : method.hashCode());
+		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
 		result = prime * result + parameterIndex;
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if ( this == obj ) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if ( !super.equals( obj ) ) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		MethodConstraintViolationImpl<?> other = (MethodConstraintViolationImpl<?>) obj;
-		if (method == null) {
-			if (other.method != null)
+		if ( method == null ) {
+			if ( other.method != null ) {
 				return false;
-		} else if (!method.equals(other.method))
+			}
+		}
+		else if ( !method.equals( other.method ) ) {
 			return false;
-		if (parameterIndex != other.parameterIndex)
+		}
+		if ( parameterIndex != other.parameterIndex ) {
 			return false;
+		}
 		return true;
 	}
 
@@ -111,5 +116,5 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 				+ getPropertyPath() + ", getConstraintDescriptor()="
 				+ getConstraintDescriptor() + "]";
 	}
-	
+
 }
