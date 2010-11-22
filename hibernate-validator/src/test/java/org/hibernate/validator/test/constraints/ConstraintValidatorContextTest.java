@@ -153,7 +153,7 @@ public class ConstraintValidatorContextTest {
 	}
 
 	private void assertMessageAndPath(MessageAndPath messageAndPath, String expectedMessage, String expectedPath) {
-		assertEquals( messageAndPath.getPath(), PathImpl.createPathFromString( expectedPath ), "Wrong path" );
+		assertEquals( messageAndPath.getPath(), expectedPath, "Wrong path" );
 		assertEquals( messageAndPath.getMessage(), expectedMessage, "Wrong message" );
 	}
 }
