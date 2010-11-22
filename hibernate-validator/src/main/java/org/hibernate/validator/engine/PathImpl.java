@@ -36,15 +36,16 @@ public final class PathImpl implements Path, Serializable {
 	 *
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
-	private static final Pattern pathPattern = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
+	private static final Pattern PATH_PATTERN = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
 	private static final int PROPERTY_NAME_GROUP = 1;
 	private static final int INDEXED_GROUP = 2;
 	private static final int INDEX_GROUP = 3;
 	private static final int REMAINING_STRING_GROUP = 5;
 
-	private static final String PROPERTY_PATH_SEPARATOR = ".";
-	private static final String INDEX_OPEN = "[";
-	private static final String INDEX_CLOSE = "]";
+	public static final String ROOT_PATH = "";
+	public static final String PROPERTY_PATH_SEPARATOR = ".";
+	public static final String INDEX_OPEN = "[";
+	public static final String INDEX_CLOSE = "]";
 
 	private final List<Node> nodeList;
 
@@ -149,7 +150,7 @@ public final class PathImpl implements Path, Serializable {
 
 	@Override
 	public String toString() {
-	   return asString();
+		return asString();
 	}
 
 	private void appendIndex(StringBuilder builder, Node node) {
@@ -194,7 +195,7 @@ public final class PathImpl implements Path, Serializable {
 		boolean indexed = false;
 		String indexOrKey = null;
 		do {
-			Matcher matcher = pathPattern.matcher( tmp );
+			Matcher matcher = PATH_PATTERN.matcher( tmp );
 			if ( matcher.matches() ) {
 				String value = matcher.group( PROPERTY_NAME_GROUP );
 
@@ -231,6 +232,7 @@ public final class PathImpl implements Path, Serializable {
 			try {
 				Integer i = Integer.parseInt( indexOrKey );
 				node.setIndex( i );
+				node.setKey( i );
 			}
 			catch ( NumberFormatException e ) {
 				node.setKey( indexOrKey );
