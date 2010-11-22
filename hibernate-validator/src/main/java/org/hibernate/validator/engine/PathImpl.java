@@ -77,17 +77,6 @@ public final class PathImpl implements Path, Serializable {
 		return path;
 	}
 
-	public static PathImpl createShallowCopy(Path path) {
-		return path == null ? null : new PathImpl( path );
-	}
-
-	private PathImpl(Path path) {
-		this.nodeList = new ArrayList<Node>();
-		for ( Object aPath : path ) {
-			nodeList.add( new NodeImpl( (Node) aPath ) );
-		}
-	}
-
 	private PathImpl() {
 		nodeList = new ArrayList<Node>();
 	}
@@ -99,13 +88,9 @@ public final class PathImpl implements Path, Serializable {
 		}
 	}
 
-	public boolean isRootPath() {
-		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
-	}
-
 	public PathImpl getPathWithoutLeafNode() {
 		List<Node> nodes = new ArrayList<Node>( nodeList );
-		PathImpl path = null;
+		PathImpl path = PathImpl.createNewPath( null );
 		if ( nodes.size() > 1 ) {
 			nodes.remove( nodes.size() - 1 );
 			path = new PathImpl( nodes );
