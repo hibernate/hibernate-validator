@@ -16,25 +16,23 @@
 */
 package org.hibernate.validator.engine;
 
-import javax.validation.Path;
-
 /**
  * @author Hardy Ferentschik
  */
 public class MessageAndPath {
 	private final String message;
-	private final Path propertyPath;
+	private final String propertyPath;
 
-	public MessageAndPath(String message, Path property) {
+	public MessageAndPath(String message, String property) {
 		this.message = message;
 		this.propertyPath = property;
 	}
 
-	public String getMessage() {
+	public final String getMessage() {
 		return message;
 	}
 
-	public Path getPath() {
+	public final String getPath() {
 		return propertyPath;
 	}
 }
