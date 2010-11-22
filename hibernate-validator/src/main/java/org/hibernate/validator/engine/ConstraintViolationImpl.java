@@ -51,40 +51,39 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 		this.elementType = elementType;
 	}
 
-	public String getMessage() {
+	public final String getMessage() {
 		return interpolatedMessage;
 	}
 
-	public String getMessageTemplate() {
+	public final String getMessageTemplate() {
 		return messageTemplate;
 	}
 
-	public T getRootBean() {
+	public final T getRootBean() {
 		return rootBean;
 	}
 
-	public Class<T> getRootBeanClass() {
+	public final Class<T> getRootBeanClass() {
 		return rootBeanClass;
 	}
 
-	public Object getLeafBean() {
+	public final Object getLeafBean() {
 		return leafBeanInstance;
 	}
 
-	public Object getInvalidValue() {
+	public final Object getInvalidValue() {
 		return value;
 	}
 
-	public Path getPropertyPath() {
+	public final Path getPropertyPath() {
 		return propertyPath;
 	}
 
-	public ConstraintDescriptor getConstraintDescriptor() {
+	public final ConstraintDescriptor getConstraintDescriptor() {
 		return this.constraintDescriptor;
 	}
 
 	@Override
-	@SuppressWarnings("SimplifiableIfStatement")
 	// IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method!
 	public boolean equals(Object o) {
 		if ( this == o ) {
@@ -94,7 +93,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 			return false;
 		}
 
-		ConstraintViolationImpl that = ( ConstraintViolationImpl ) o;
+		ConstraintViolationImpl that = (ConstraintViolationImpl) o;
 
 		if ( interpolatedMessage != null ? !interpolatedMessage.equals( that.interpolatedMessage ) : that.interpolatedMessage != null ) {
 			return false;
