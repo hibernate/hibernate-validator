@@ -27,7 +27,7 @@ import javax.validation.Path;
 /**
  * @author Hardy Ferentschik
  */
-public class PathImpl implements Path, Serializable {
+public final class PathImpl implements Path, Serializable {
 
 	private static final long serialVersionUID = 7564511574909882392L;
 
@@ -36,9 +36,16 @@ public class PathImpl implements Path, Serializable {
 	 *
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
-	private static final Pattern pathPattern = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
+	private static final Pattern PATH_PATTERN = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
+	private static final int PROPERTY_NAME_GROUP = 1;
+	private static final int INDEXED_GROUP = 2;
+	private static final int INDEX_GROUP = 3;
+	private static final int REMAINING_STRING_GROUP = 5;
 
-	private static final String PROPERTY_PATH_SEPERATOR = ".";
+	public static final String ROOT_PATH = "";
+	public static final String PROPERTY_PATH_SEPARATOR = ".";
+	public static final String INDEX_OPEN = "[";
+	public static final String INDEX_CLOSE = "]";
 
 	private final List<Node> nodeList;
 
@@ -70,17 +77,6 @@ public class PathImpl implements Path, Serializable {
 		return path;
 	}
 
-	public static PathImpl createShallowCopy(Path path) {
-		return path == null ? null : new PathImpl( path );
-	}
-
-	private PathImpl(Path path) {
-		this.nodeList = new ArrayList<Node>();
-		for ( Object aPath : path ) {
-			nodeList.add( new NodeImpl( ( Node ) aPath ) );
-		}
-	}
-
 	private PathImpl() {
 		nodeList = new ArrayList<Node>();
 	}
@@ -92,13 +88,9 @@ public class PathImpl implements Path, Serializable {
 		}
 	}
 
-	public boolean isRootPath() {
-		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
-	}
-
 	public PathImpl getPathWithoutLeafNode() {
 		List<Node> nodes = new ArrayList<Node>( nodeList );
-		PathImpl path = null;
+		PathImpl path = PathImpl.createNewPath( null );
 		if ( nodes.size() > 1 ) {
 			nodes.remove( nodes.size() - 1 );
 			path = new PathImpl( nodes );
@@ -110,55 +102,51 @@ public class PathImpl implements Path, Serializable {
 		nodeList.add( node );
 	}
 
-	public Node removeLeafNode() {
-		if ( nodeList.size() == 0 ) {
-			throw new IllegalStateException( "No nodes in path!" );
-		}
-		if ( nodeList.size() == 1 ) {
-			throw new IllegalStateException( "Root node cannot be removed!" );
-		}
-		return nodeList.remove( nodeList.size() - 1 );
-	}
-
 	public NodeImpl getLeafNode() {
 		if ( nodeList.size() == 0 ) {
 			throw new IllegalStateException( "No nodes in path!" );
 		}
-		return ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
+		return (NodeImpl) nodeList.get( nodeList.size() - 1 );
 	}
 
 	public Iterator<Path.Node> iterator() {
 		return nodeList.iterator();
 	}
 
-	public boolean isSubPathOf(Path path) {
-		Iterator<Node> pathIter = path.iterator();
-		Iterator<Node> thisIter = iterator();
-		while ( pathIter.hasNext() ) {
-			Node pathNode = pathIter.next();
-			if ( !thisIter.hasNext() ) {
-				return false;
+	public String asString() {
+		StringBuilder builder = new StringBuilder();
+		Iterator<Path.Node> iter = iterator();
+		boolean first = true;
+		while ( iter.hasNext() ) {
+			Node node = iter.next();
+			if ( node.isInIterable() ) {
+				appendIndex( builder, node );
 			}
-			Node thisNode = thisIter.next();
-			if ( !thisNode.equals( pathNode ) ) {
-				return false;
+			if ( node.getName() != null ) {
+				if ( !first ) {
+					builder.append( PROPERTY_PATH_SEPARATOR );
+				}
+				builder.append( node.getName() );
 			}
+			first = false;
 		}
-		return true;
+		return builder.toString();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		Iterator<Path.Node> iter = iterator();
-		while ( iter.hasNext() ) {
-			Node node = iter.next();
-			builder.append( node.toString() );
-			if ( iter.hasNext() ) {
-				builder.append( PROPERTY_PATH_SEPERATOR );
-			}
+		return asString();
+	}
+
+	private void appendIndex(StringBuilder builder, Node node) {
+		builder.append( INDEX_OPEN );
+		if ( node.getIndex() != null ) {
+			builder.append( node.getIndex() );
 		}
-		return builder.toString();
+		else if ( node.getKey() != null ) {
+			builder.append( node.getKey() );
+		}
+		builder.append( INDEX_CLOSE );
 	}
 
 	@Override
@@ -170,7 +158,7 @@ public class PathImpl implements Path, Serializable {
 			return false;
 		}
 
-		PathImpl path = ( PathImpl ) o;
+		PathImpl path = (PathImpl) o;
 		if ( nodeList != null && !nodeList.equals( path.nodeList ) ) {
 			return false;
 		}
@@ -189,33 +177,51 @@ public class PathImpl implements Path, Serializable {
 	private static PathImpl parseProperty(String property) {
 		PathImpl path = new PathImpl();
 		String tmp = property;
+		boolean indexed = false;
+		String indexOrKey = null;
 		do {
-			Matcher matcher = pathPattern.matcher( tmp );
+			Matcher matcher = PATH_PATTERN.matcher( tmp );
 			if ( matcher.matches() ) {
-				String value = matcher.group( 1 );
-				String indexed = matcher.group( 2 );
-				String index = matcher.group( 3 );
+				String value = matcher.group( PROPERTY_NAME_GROUP );
+
 				NodeImpl node = new NodeImpl( value );
-				if ( indexed != null ) {
-					node.setInIterable( true );
-				}
-				if ( index != null && index.length() > 0 ) {
-					try {
-						Integer i = Integer.parseInt( index );
-						node.setIndex( i );
-					}
-					catch ( NumberFormatException e ) {
-						node.setKey( index );
-					}
-				}
 				path.addNode( node );
-				tmp = matcher.group( 5 );
+
+				// need to look backwards!!
+				if ( indexed ) {
+					setNodeIndexOrKey( indexOrKey, node );
+				}
+
+				indexed = matcher.group( INDEXED_GROUP ) != null;
+				indexOrKey = matcher.group( INDEX_GROUP );
+
+				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
 			else {
 				throw new IllegalArgumentException( "Unable to parse property path " + property );
 			}
 		} while ( tmp != null );
+
+		// check for a left over indexed node
+		if ( indexed ) {
+			NodeImpl node = new NodeImpl( (String) null );
+			setNodeIndexOrKey( indexOrKey, node );
+			path.addNode( node );
+		}
 		return path;
 	}
 
+	private static void setNodeIndexOrKey(String indexOrKey, NodeImpl node) {
+		node.setInIterable( true );
+		if ( indexOrKey != null && indexOrKey.length() > 0 ) {
+			try {
+				Integer i = Integer.parseInt( indexOrKey );
+				node.setIndex( i );
+				node.setKey( i );
+			}
+			catch ( NumberFormatException e ) {
+				node.setKey( indexOrKey );
+			}
+		}
+	}
 }

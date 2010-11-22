@@ -23,11 +23,7 @@ import javax.validation.Path;
  * @author Hardy Ferentschik
  */
 public class NodeImpl implements Path.Node, Serializable {
-
 	private static final long serialVersionUID = 2075466571633860499L;
-
-	private static final String INDEX_OPEN = "[";
-	private static final String INDEX_CLOSE = "]";
 
 	private final String name;
 	private boolean isInIterable;
@@ -45,54 +41,50 @@ public class NodeImpl implements Path.Node, Serializable {
 		this.key = node.getKey();
 	}
 
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
-	public boolean isInIterable() {
+	public final boolean isInIterable() {
 		return isInIterable;
 	}
 
-	public void setInIterable(boolean inIterable) {
+	public final void setInIterable(boolean inIterable) {
 		isInIterable = inIterable;
 	}
 
-	public Integer getIndex() {
+	public final Integer getIndex() {
 		return index;
 	}
 
-	public void setIndex(Integer index) {
+	public final void setIndex(Integer index) {
 		isInIterable = true;
 		this.index = index;
 	}
 
-	public Object getKey() {
+	public final Object getKey() {
 		return key;
 	}
 
-	public void setKey(Object key) {
+	public final void setKey(Object key) {
 		isInIterable = true;
 		this.key = key;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder( name == null ? "" : name );
-		if ( isInIterable ) {
-			builder.append( INDEX_OPEN );
-			if ( getIndex() != null ) {
-				builder.append( getIndex() );
-			}
-			else if ( getKey() != null ) {
-				builder.append( getKey() );
-			}
-			builder.append( INDEX_CLOSE );
-		}
-		return builder.toString();
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "NodeImpl" );
+		sb.append( "{index=" ).append( index );
+		sb.append( ", name='" ).append( name ).append( '\'' );
+		sb.append( ", isInIterable=" ).append( isInIterable );
+		sb.append( ", key=" ).append( key );
+		sb.append( '}' );
+		return sb.toString();
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
 		}
@@ -100,7 +92,7 @@ public class NodeImpl implements Path.Node, Serializable {
 			return false;
 		}
 
-		NodeImpl node = ( NodeImpl ) o;
+		NodeImpl node = (NodeImpl) o;
 
 		if ( isInIterable != node.isInIterable ) {
 			return false;
@@ -119,7 +111,7 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		int result = name != null ? name.hashCode() : 0;
 		result = 31 * result + ( isInIterable ? 1 : 0 );
 		result = 31 * result + ( index != null ? index.hashCode() : 0 );

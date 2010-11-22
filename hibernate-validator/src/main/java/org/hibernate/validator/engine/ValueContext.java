@@ -40,7 +40,7 @@ public class ValueContext<T, V> {
 	/**
 	 * The current property path we are validating.
 	 */
-	private PathImpl propertyPath;
+	private String propertyPath;
 
 	/**
 	 * The current group we are validating.
@@ -75,9 +75,10 @@ public class ValueContext<T, V> {
 	public ValueContext(T currentBean, Class<T> currentBeanType) {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
+		this.propertyPath = PathImpl.ROOT_PATH;
 	}
 
-	public final PathImpl getPropertyPath() {
+	public final String getPropertyPath() {
 		return propertyPath;
 	}
 
@@ -97,8 +98,36 @@ public class ValueContext<T, V> {
 		return currentValue;
 	}
 
-	public final void setPropertyPath(PathImpl propertyPath) {
-		this.propertyPath = propertyPath;
+	public final void setPropertyPath(String propertyPath) {
+		if ( propertyPath == null ) {
+			this.propertyPath = PathImpl.ROOT_PATH;
+		}
+		else {
+			this.propertyPath = propertyPath;
+		}
+	}
+
+	public final void appendNode(String node) {
+		if ( node == null ) {
+			throw new IllegalArgumentException();
+		}
+		if ( propertyPath.length() != 0 ) {
+			propertyPath += PathImpl.PROPERTY_PATH_SEPARATOR;
+		}
+		propertyPath += node;
+	}
+
+	public final void markCurrentPropertyAsIterable() {
+		propertyPath = propertyPath + PathImpl.INDEX_OPEN + PathImpl.INDEX_CLOSE;
+	}
+
+	public final void setKeyOrIndex(String index) {
+		// sanity check
+		if ( !propertyPath.endsWith( PathImpl.INDEX_CLOSE ) ) {
+			throw new IllegalStateException( "Trying to set the map key or index of an non indexable property: " + propertyPath );
+		}
+		propertyPath = propertyPath.substring( 0, propertyPath.lastIndexOf( PathImpl.INDEX_OPEN ) + 1 )
+				+ index + PathImpl.INDEX_CLOSE;
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {
@@ -107,10 +136,6 @@ public class ValueContext<T, V> {
 
 	public final void setCurrentValidatedValue(V currentValue) {
 		this.currentValue = currentValue;
-	}
-
-	public final void markCurrentPropertyAsIterable() {
-		propertyPath.getLeafNode().setInIterable( true );
 	}
 
 	public final boolean validatingDefault() {
@@ -134,7 +159,7 @@ public class ValueContext<T, V> {
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ValueContext" );
 		sb.append( "{currentBean=" ).append( currentBean );

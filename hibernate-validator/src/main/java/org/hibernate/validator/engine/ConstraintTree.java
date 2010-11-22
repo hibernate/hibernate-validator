@@ -58,9 +58,7 @@ public class ConstraintTree<A extends Annotation> {
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
 	private final ConstraintDescriptorImpl<A> descriptor;
-
 	private final Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes;
-
 	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
@@ -99,8 +97,7 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public <T, U, V> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
-
+	public final <T, U, V> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
 		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
