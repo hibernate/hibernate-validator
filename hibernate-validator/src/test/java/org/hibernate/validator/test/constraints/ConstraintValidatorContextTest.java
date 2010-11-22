@@ -21,8 +21,6 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.ConstraintValidatorContextImpl;
@@ -32,6 +30,8 @@ import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -84,7 +84,6 @@ public class ConstraintValidatorContextTest {
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
 		assertMessageAndPath( messageAndPathList.get( 0 ), message, "foo[3].bar" );
-
 
 		context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
@@ -145,9 +144,7 @@ public class ConstraintValidatorContextTest {
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
-		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl(
-				PathImpl.createNewPath( null ), null
-		);
+		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( PathImpl.ROOT_PATH, null );
 		context.disableDefaultConstraintViolation();
 		return context;
 	}
