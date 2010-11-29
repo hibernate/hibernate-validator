@@ -16,14 +16,18 @@
 */
 package org.hibernate.validator.engine;
 
+import javax.validation.Path;
+
 /**
+ * Container class for a validation error message and its corresponding path.
+ *
  * @author Hardy Ferentschik
  */
 public class MessageAndPath {
 	private final String message;
-	private final String propertyPath;
+	private final Path propertyPath;
 
-	public MessageAndPath(String message, String property) {
+	public MessageAndPath(String message, Path property) {
 		this.message = message;
 		this.propertyPath = property;
 	}
@@ -32,7 +36,7 @@ public class MessageAndPath {
 		return message;
 	}
 
-	public final String getPath() {
+	public final Path getPath() {
 		return propertyPath;
 	}
 }
