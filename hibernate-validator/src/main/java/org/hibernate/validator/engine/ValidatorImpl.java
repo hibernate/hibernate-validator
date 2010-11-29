@@ -284,7 +284,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			List<Class<?>> defaultGroupSequence = getBeanMetaData( hostingBeanClass ).getDefaultGroupSequence();
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 				valueContext.setCurrentGroup( defaultSequenceMember );
-				Path currentPath = valueContext.getPropertyPath();
+				PathImpl currentPath = valueContext.getPropertyPath();
 				boolean validationSuccessful = true;
 				for ( MetaConstraint<U, ? extends Annotation> metaConstraint : constraints ) {
 					boolean tmp = validateConstraint(
@@ -306,7 +306,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 			valueContext.setCurrentGroup( defaultSequenceMember );
 			boolean validationSuccessful = true;
-			Path currentPath = valueContext.getPropertyPath();
+			PathImpl currentPath = valueContext.getPropertyPath();
 			for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
 				boolean tmp = validateConstraint( validationContext, valueContext, metaConstraint );
 				validationSuccessful = validationSuccessful && tmp;
@@ -321,7 +321,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	private <T, U, V> void validateConstraintsForNonDefaultGroup(ValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
-		Path currentPath = valueContext.getPropertyPath();
+		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( MetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
 			validateConstraint( validationContext, valueContext, metaConstraint );
 			// reset the path to the state before this call
@@ -345,7 +345,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		validationContext.markProcessed(
 				valueContext.getCurrentBean(),
 				valueContext.getCurrentGroup(),
-				valueContext.getPropertyPath().asString()
+				valueContext.getPropertyPath()
 		);
 
 		return validationSuccessful;
@@ -360,7 +360,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private <T, U, V> void validateCascadedConstraints(ValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
 		List<Member> cascadedMembers = getBeanMetaData( valueContext.getCurrentBeanType() ).getCascadedMembers();
-		Path currentPath = valueContext.getPropertyPath();
+		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
 			String newNode = ReflectionHelper.getPropertyName( member );
@@ -455,7 +455,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 
 			if ( !context.isAlreadyValidated(
-					value, valueContext.getCurrentGroup(), valueContext.getPropertyPath().asString()
+					value, valueContext.getCurrentGroup(), valueContext.getPropertyPath()
 			) ) {
 				GroupChain groupChain = groupChainGenerator.getGroupChainFor(
 						Arrays.<Class<?>>asList( valueContext.getCurrentGroup() )

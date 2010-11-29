@@ -18,7 +18,6 @@ package org.hibernate.validator.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-import javax.validation.Path;
 import javax.validation.groups.Default;
 
 /**
@@ -80,10 +79,10 @@ public class ValueContext<T, V> {
 	}
 
 	/**
-	 * @return returns the current path. A copy is made to avoid side effects.
+	 * @return returns the current path.
 	 */
 	public final PathImpl getPropertyPath() {
-		return PathImpl.createCopy( propertyPath );
+		return propertyPath;
 	}
 
 	public final Class<?> getCurrentGroup() {
@@ -108,8 +107,8 @@ public class ValueContext<T, V> {
 	 *
 	 * @param propertyPath Sets the new property path.
 	 */
-	public final void setPropertyPath(Path propertyPath) {
-		this.propertyPath = PathImpl.createCopy( (PathImpl) propertyPath );
+	public final void setPropertyPath(PathImpl propertyPath) {
+		this.propertyPath = propertyPath;
 	}
 
 	/**
@@ -122,6 +121,7 @@ public class ValueContext<T, V> {
 			throw new IllegalArgumentException();
 		}
 		else {
+			propertyPath = PathImpl.createCopy( propertyPath );
 			propertyPath.addNode( node );
 		}
 	}

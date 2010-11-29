@@ -109,7 +109,12 @@ public final class PathImpl implements Path, Serializable {
 		}
 	}
 
-	public PathImpl getPathWithoutLeafNode() {
+
+	public final boolean isRootPath() {
+		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
+	}
+
+	public final PathImpl getPathWithoutLeafNode() {
 		List<Node> nodes = new ArrayList<Node>( nodeList );
 		PathImpl path = PathImpl.createNewPath( null );
 		if ( nodes.size() > 1 ) {
@@ -119,21 +124,21 @@ public final class PathImpl implements Path, Serializable {
 		return path;
 	}
 
-	public NodeImpl addNode(String nodeName) {
+	public final NodeImpl addNode(String nodeName) {
 		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		NodeImpl newNode = new NodeImpl( nodeName, parent );
 		nodeList.add( newNode );
 		return newNode;
 	}
 
-	public NodeImpl getLeafNode() {
+	public final NodeImpl getLeafNode() {
 		if ( nodeList.size() == 0 ) {
 			throw new IllegalStateException( "No nodes in path!" );
 		}
 		return (NodeImpl) nodeList.get( nodeList.size() - 1 );
 	}
 
-	public Iterator<Path.Node> iterator() {
+	public final Iterator<Path.Node> iterator() {
 		if ( nodeList.size() == 0 ) {
 			return Collections.<Path.Node>emptyList().iterator();
 		}
@@ -143,7 +148,7 @@ public final class PathImpl implements Path, Serializable {
 		return nodeList.subList( 1, nodeList.size() ).iterator();
 	}
 
-	public String asString() {
+	public final String asString() {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 		for ( int i = 1; i < nodeList.size(); i++ ) {

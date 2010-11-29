@@ -21,12 +21,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -62,7 +64,7 @@ public class ValidationContext<T> {
 	/**
 	 * Maps an object to a list of paths in which it has been invalidated.
 	 */
-	private final Map<Object, Set<String>> processedPaths;
+	private final Map<Object, Set<PathImpl>> processedPaths;
 
 	/**
 	 * A list of all failing constraints so far.
@@ -144,7 +146,7 @@ public class ValidationContext<T> {
 		this.traversableResolver = traversableResolver;
 
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
-		processedPaths = new IdentityHashMap<Object, Set<String>>();
+		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
 		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
 	}
 
@@ -198,7 +200,7 @@ public class ValidationContext<T> {
 		return constraintValidatorFactory;
 	}
 
-	public boolean isAlreadyValidated(Object value, Class<?> group, String path) {
+	public boolean isAlreadyValidated(Object value, Class<?> group, PathImpl path) {
 		boolean alreadyValidated;
 		alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
 
@@ -208,7 +210,7 @@ public class ValidationContext<T> {
 		return alreadyValidated;
 	}
 
-	public void markProcessed(Object value, Class<?> group, String path) {
+	public void markProcessed(Object value, Class<?> group, PathImpl path) {
 		markProcessForCurrentGroup( value, group );
 		if ( allowOneValidationPerPath ) {
 			markProcessedForCurrentPath( value, path );
@@ -233,14 +235,14 @@ public class ValidationContext<T> {
 		return failingConstraintViolations;
 	}
 
-	private boolean isAlreadyValidatedForPath(Object value, String path) {
-		Set<String> pathSet = processedPaths.get( value );
+	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
+		Set<PathImpl> pathSet = processedPaths.get( value );
 		if ( pathSet == null ) {
 			return false;
 		}
 
-		for ( String s : pathSet ) {
-			if ( s.length() == 0 || path.length() == 0 || s.startsWith( path ) || path.startsWith( s ) ) {
+		for ( PathImpl p : pathSet ) {
+			if ( path.isRootPath() || p.isRootPath() || isSubPathOf( path, p ) || isSubPathOf( p, path ) ) {
 				return true;
 			}
 		}
@@ -248,25 +250,36 @@ public class ValidationContext<T> {
 		return false;
 	}
 
+	private boolean isSubPathOf(Path p1, Path p2) {
+		Iterator<Path.Node> p1Iter = p1.iterator();
+		Iterator<Path.Node> p2Iter = p2.iterator();
+		while ( p1Iter.hasNext() ) {
+			Path.Node p1Node = p1Iter.next();
+			if ( !p2Iter.hasNext() ) {
+				return false;
+			}
+			Path.Node p2Node = p2Iter.next();
+			if ( !p1Node.equals( p2Node ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private boolean isAlreadyValidatedForCurrentGroup(Object value, Class<?> group) {
 		final IdentitySet objectsProcessedInCurrentGroups = processedObjects.get( group );
 		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
 	}
 
-	private void markProcessedForCurrentPath(Object value, String path) {
-		if ( path.indexOf( '.' ) != -1 ) {
-			path = path.substring( 0, path.lastIndexOf( '.' ) );
-		}
-		else {
-			path = "";
-		}
+	private void markProcessedForCurrentPath(Object value, PathImpl path) {
+		PathImpl parentPath = path.getPathWithoutLeafNode();
 
 		if ( processedPaths.containsKey( value ) ) {
-			processedPaths.get( value ).add( path );
+			processedPaths.get( value ).add( parentPath );
 		}
 		else {
-			Set<String> set = new HashSet<String>();
-			set.add( path );
+			Set<PathImpl> set = new HashSet<PathImpl>();
+			set.add( parentPath );
 			processedPaths.put( value, set );
 		}
 	}
