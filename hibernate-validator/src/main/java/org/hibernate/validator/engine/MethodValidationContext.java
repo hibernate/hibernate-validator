@@ -74,7 +74,7 @@ public class MethodValidationContext <T> extends ValidationContext<T> {
 					getRootBean(),
 					localContext.getCurrentBean(),
 					localContext.getCurrentValidatedValue(),
-					PathImpl.createPathFromString(messageAndPath.getPath()),
+					messageAndPath.getPath(),
 					descriptor,
 					localContext.getElementType()
 			);
