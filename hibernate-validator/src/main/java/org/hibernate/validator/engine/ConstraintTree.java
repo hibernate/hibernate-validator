@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
+import org.hibernate.validator.util.LRUMap;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ValidatorTypeHelper;
 
@@ -60,6 +61,7 @@ public class ConstraintTree<A extends Annotation> {
 	private final ConstraintDescriptorImpl<A> descriptor;
 	private final Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes;
 	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
+	private final Map<Type, List<Type>> suitableTypes;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
@@ -83,6 +85,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 
 		validatorTypes = ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
+		suitableTypes = new LRUMap<Type, List<Type>>( 10 );
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
@@ -377,13 +380,17 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private List<Type> findSuitableValidatorTypes(Type type) {
-		List<Type> suitableTypes = new ArrayList<Type>();
+		if(suitableTypes.containsKey( type )) {
+			return suitableTypes.get( type );
+		}
+		List<Type> determinedSuitableTypes = new ArrayList<Type>();
 		for ( Type validatorType : validatorTypes.keySet() ) {
-			if ( TypeUtils.isAssignable( validatorType, type ) && !suitableTypes.contains( validatorType ) ) {
-				suitableTypes.add( validatorType );
+			if ( TypeUtils.isAssignable( validatorType, type ) && !determinedSuitableTypes.contains( validatorType ) ) {
+				determinedSuitableTypes.add( validatorType );
 			}
 		}
-		return suitableTypes;
+		suitableTypes.put( type, determinedSuitableTypes );
+		return determinedSuitableTypes;
 	}
 
 	/**
