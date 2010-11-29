@@ -29,6 +29,7 @@ import org.hibernate.validator.engine.PathImpl;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
+import static org.hibernate.validator.test.util.TestUtil.assertEqualPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -144,13 +145,15 @@ public class ConstraintValidatorContextTest {
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
-		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( PathImpl.ROOT_PATH, null );
+		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl(
+				PathImpl.createRootPath(), null
+		);
 		context.disableDefaultConstraintViolation();
 		return context;
 	}
 
 	private void assertMessageAndPath(MessageAndPath messageAndPath, String expectedMessage, String expectedPath) {
-		assertEquals( messageAndPath.getPath(), expectedPath, "Wrong path" );
+		assertEqualPaths( messageAndPath.getPath(), PathImpl.createPathFromString( expectedPath ) );
 		assertEquals( messageAndPath.getMessage(), expectedMessage, "Wrong message" );
 	}
 }

@@ -28,11 +28,12 @@ import javax.validation.metadata.ConstraintDescriptor;
 public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
 
 	private final List<MessageAndPath> messageAndPaths = new ArrayList<MessageAndPath>( 3 );
-	private final String propertyPath;
+	private final PathImpl propertyPath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
-	public ConstraintValidatorContextImpl(String propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
+
+	public ConstraintValidatorContextImpl(PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
 		this.propertyPath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -71,20 +72,16 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	class ErrorBuilderImpl implements ConstraintViolationBuilder {
 		private String messageTemplate;
-		private String propertyPath;
+		private PathImpl propertyPath;
 
-		ErrorBuilderImpl(String template, String path) {
+		ErrorBuilderImpl(String template, PathImpl path) {
 			messageTemplate = template;
 			propertyPath = path;
 		}
 
 		public NodeBuilderDefinedContext addNode(String name) {
-			String path = propertyPath;
-			if ( !PathImpl.ROOT_PATH.equals( propertyPath ) ) {
-				path += PathImpl.PROPERTY_PATH_SEPARATOR;
-			}
-			path += name;
-			return new NodeBuilderImpl( messageTemplate, path );
+			propertyPath.addNode( name );
+			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
@@ -95,17 +92,15 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	class NodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderDefinedContext {
 		private String messageTemplate;
-		private String propertyPath;
+		private PathImpl propertyPath;
 
-		NodeBuilderImpl(String template, String path) {
+		NodeBuilderImpl(String template, PathImpl path) {
 			messageTemplate = template;
 			propertyPath = path;
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			if ( name != null ) {
-				propertyPath += PathImpl.PROPERTY_PATH_SEPARATOR + name;
-			}
+			propertyPath.addNode( name );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
@@ -117,36 +112,20 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	class InIterableNodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderCustomizableContext {
 		private String messageTemplate;
-		private String propertyPath;
+		private PathImpl propertyPath;
 
-		InIterableNodeBuilderImpl(String template, String path) {
+		InIterableNodeBuilderImpl(String template, PathImpl path) {
 			this.messageTemplate = template;
 			this.propertyPath = path;
 		}
 
 		public ConstraintViolationBuilder.NodeContextBuilder inIterable() {
-			int lastPropertyIndex = propertyPath.lastIndexOf( PathImpl.PROPERTY_PATH_SEPARATOR );
-			StringBuilder builder = new StringBuilder();
-
-			if ( lastPropertyIndex != -1 ) {
-				builder = new StringBuilder();
-				builder.append( propertyPath.substring( 0, lastPropertyIndex ) );
-				builder.append( PathImpl.INDEX_OPEN );
-				builder.append( PathImpl.INDEX_CLOSE );
-				builder.append( PathImpl.PROPERTY_PATH_SEPARATOR );
-				builder.append( propertyPath.substring( lastPropertyIndex + 1 ) );
-			}
-			else {
-				builder.append( propertyPath );
-				builder.append( PathImpl.INDEX_OPEN );
-				builder.append( PathImpl.INDEX_CLOSE );
-			}
-
-			return new InIterablePropertiesBuilderImpl( messageTemplate, builder.toString() );
+			this.propertyPath.getLeafNode().getParent().setIterable( true );
+			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			propertyPath += PathImpl.PROPERTY_PATH_SEPARATOR + name;
+			propertyPath.addNode( name );
 			return this;
 		}
 
@@ -158,45 +137,31 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	class InIterablePropertiesBuilderImpl implements ConstraintViolationBuilder.NodeContextBuilder {
 		private String messageTemplate;
-		private String propertyPath;
+		private PathImpl propertyPath;
 
-		InIterablePropertiesBuilderImpl(String template, String path) {
+		InIterablePropertiesBuilderImpl(String template, PathImpl path) {
 			this.messageTemplate = template;
 			this.propertyPath = path;
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atKey(Object key) {
-			StringBuilder builder = addKeyOrIndex( key );
-			return new NodeBuilderImpl( messageTemplate, builder.toString() );
+			propertyPath.getLeafNode().getParent().setKey( key );
+			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atIndex(Integer index) {
-			StringBuilder builder = addKeyOrIndex( index );
-			return new NodeBuilderImpl( messageTemplate, builder.toString() );
+			propertyPath.getLeafNode().getParent().setIndex( index );
+			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			propertyPath += PathImpl.PROPERTY_PATH_SEPARATOR + name;
+			propertyPath.addNode( name );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
-		}
-
-		private StringBuilder addKeyOrIndex(Object key) {
-			int index = propertyPath.lastIndexOf( PathImpl.INDEX_OPEN );
-			StringBuilder builder = new StringBuilder();
-			builder.append( propertyPath.substring( 0, index ) );
-			builder.append( PathImpl.INDEX_OPEN );
-			builder.append( key );
-			builder.append( PathImpl.INDEX_CLOSE );
-			if ( propertyPath.lastIndexOf( PathImpl.PROPERTY_PATH_SEPARATOR ) != -1 ) {
-				builder.append( PathImpl.PROPERTY_PATH_SEPARATOR );
-				builder.append( propertyPath.substring( index + 3 ) );
-			}
-			return builder;
 		}
 	}
 }
