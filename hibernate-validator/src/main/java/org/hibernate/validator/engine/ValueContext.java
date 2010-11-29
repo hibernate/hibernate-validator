@@ -18,10 +18,11 @@ package org.hibernate.validator.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+import javax.validation.Path;
 import javax.validation.groups.Default;
 
 /**
- * An instance of this class is used to collect all the relevant information for validating a single entity/bean.
+ * An instance of this class is used to collect all the relevant information for validating a single class/property.
  *
  * @author Hardy Ferentschik
  */
@@ -40,7 +41,7 @@ public class ValueContext<T, V> {
 	/**
 	 * The current property path we are validating.
 	 */
-	private String propertyPath;
+	private PathImpl propertyPath;
 
 	/**
 	 * The current group we are validating.
@@ -62,24 +63,27 @@ public class ValueContext<T, V> {
 	 */
 	private Type typeOfAnnotatedElement;
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value) {
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) value.getClass();
-		return new ValueContext<T, V>( value, rootBeanClass );
+		return new ValueContext<T, V>( value, rootBeanClass, propertyPath );
 	}
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type) {
-		return new ValueContext<T, V>( null, type );
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type, PathImpl propertyPath) {
+		return new ValueContext<T, V>( null, type, propertyPath );
 	}
 
-	public ValueContext(T currentBean, Class<T> currentBeanType) {
+	public ValueContext(T currentBean, Class<T> currentBeanType, PathImpl propertyPath) {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
-		this.propertyPath = PathImpl.ROOT_PATH;
+		this.propertyPath = propertyPath == null ? null : PathImpl.createCopy( propertyPath );
 	}
 
-	public final String getPropertyPath() {
-		return propertyPath;
+	/**
+	 * @return returns the current path. A copy is made to avoid side effects.
+	 */
+	public final PathImpl getPropertyPath() {
+		return PathImpl.createCopy( propertyPath );
 	}
 
 	public final Class<?> getCurrentGroup() {
@@ -98,36 +102,40 @@ public class ValueContext<T, V> {
 		return currentValue;
 	}
 
-	public final void setPropertyPath(String propertyPath) {
-		if ( propertyPath == null ) {
-			this.propertyPath = PathImpl.ROOT_PATH;
-		}
-		else {
-			this.propertyPath = propertyPath;
-		}
+	/**
+	 * Sets the property path to the match the currently validated value. To avoid side effects a copy of the
+	 * provided path is stored.
+	 *
+	 * @param propertyPath Sets the new property path.
+	 */
+	public final void setPropertyPath(Path propertyPath) {
+		this.propertyPath = PathImpl.createCopy( (PathImpl) propertyPath );
 	}
 
+	/**
+	 * Adds a new node with the specified name to the current property path.
+	 *
+	 * @param node the name of the new node. Cannot be {@code null}.
+	 */
 	public final void appendNode(String node) {
 		if ( node == null ) {
 			throw new IllegalArgumentException();
 		}
-		if ( propertyPath.length() != 0 ) {
-			propertyPath += PathImpl.PROPERTY_PATH_SEPARATOR;
+		else {
+			propertyPath.addNode( node );
 		}
-		propertyPath += node;
 	}
 
 	public final void markCurrentPropertyAsIterable() {
-		propertyPath = propertyPath + PathImpl.INDEX_OPEN + PathImpl.INDEX_CLOSE;
+		propertyPath.getLeafNode().setIterable( true );
 	}
 
-	public final void setKeyOrIndex(String index) {
-		// sanity check
-		if ( !propertyPath.endsWith( PathImpl.INDEX_CLOSE ) ) {
-			throw new IllegalStateException( "Trying to set the map key or index of an non indexable property: " + propertyPath );
-		}
-		propertyPath = propertyPath.substring( 0, propertyPath.lastIndexOf( PathImpl.INDEX_OPEN ) + 1 )
-				+ index + PathImpl.INDEX_CLOSE;
+	public final void setKey(Object key) {
+		propertyPath.getLeafNode().setKey( key );
+	}
+
+	public final void setIndex(Integer index) {
+		propertyPath.getLeafNode().setIndex( index );
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {

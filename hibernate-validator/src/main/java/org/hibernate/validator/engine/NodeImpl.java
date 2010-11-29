@@ -25,20 +25,26 @@ import javax.validation.Path;
 public class NodeImpl implements Path.Node, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 
+	public static final String INDEX_OPEN = "[";
+	public static final String INDEX_CLOSE = "]";
+
 	private final String name;
-	private boolean isInIterable;
+	private final NodeImpl parent;
+	private boolean isIterable;
 	private Integer index;
 	private Object key;
 
-	public NodeImpl(String name) {
+	public NodeImpl(String name, NodeImpl parent) {
 		this.name = name;
+		this.parent = parent;
 	}
 
-	NodeImpl(Path.Node node) {
+	NodeImpl(NodeImpl node, NodeImpl parent) {
 		this.name = node.getName();
-		this.isInIterable = node.isInIterable();
-		this.index = node.getIndex();
-		this.key = node.getKey();
+		this.isIterable = node.isIterable;
+		this.index = node.index;
+		this.key = node.key;
+		this.parent = parent;
 	}
 
 	public final String getName() {
@@ -46,45 +52,75 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	public final boolean isInIterable() {
-		return isInIterable;
+		if ( parent == null ) {
+			return false;
+		}
+		else {
+			return parent.isIterable();
+		}
 	}
 
-	public final void setInIterable(boolean inIterable) {
-		isInIterable = inIterable;
+	public final void setIterable(boolean iterable) {
+		isIterable = iterable;
+	}
+
+	public final boolean isIterable() {
+		return isIterable;
 	}
 
 	public final Integer getIndex() {
-		return index;
+		if ( parent == null ) {
+			return null;
+		}
+		else {
+			return parent.index;
+		}
 	}
 
 	public final void setIndex(Integer index) {
-		isInIterable = true;
 		this.index = index;
 	}
 
 	public final Object getKey() {
-		return key;
+		if ( parent == null ) {
+			return null;
+		}
+		else {
+			return parent.key;
+		}
 	}
 
 	public final void setKey(Object key) {
-		isInIterable = true;
 		this.key = key;
+	}
+
+	public NodeImpl getParent() {
+		return parent;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "NodeImpl" );
-		sb.append( "{index=" ).append( index );
-		sb.append( ", name='" ).append( name ).append( '\'' );
-		sb.append( ", isInIterable=" ).append( isInIterable );
-		sb.append( ", key=" ).append( key );
-		sb.append( '}' );
-		return sb.toString();
+		return asString();
+	}
+
+	public final String asString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( getName() );
+		if ( isIterable() ) {
+			builder.append( INDEX_OPEN );
+			if ( index != null ) {
+				builder.append( index);
+			}
+			else if ( key != null ) {
+				builder.append( key );
+			}
+			builder.append( INDEX_CLOSE );
+		}
+		return builder.toString();
 	}
 
 	@Override
-	public final boolean equals(Object o) {
+	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
 		}
@@ -94,7 +130,7 @@ public class NodeImpl implements Path.Node, Serializable {
 
 		NodeImpl node = (NodeImpl) o;
 
-		if ( isInIterable != node.isInIterable ) {
+		if ( isIterable != node.isIterable ) {
 			return false;
 		}
 		if ( index != null ? !index.equals( node.index ) : node.index != null ) {
@@ -106,14 +142,18 @@ public class NodeImpl implements Path.Node, Serializable {
 		if ( name != null ? !name.equals( node.name ) : node.name != null ) {
 			return false;
 		}
+		if ( parent != null ? !parent.equals( node.parent ) : node.parent != null ) {
+			return false;
+		}
 
 		return true;
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		int result = name != null ? name.hashCode() : 0;
-		result = 31 * result + ( isInIterable ? 1 : 0 );
+		result = 31 * result + ( parent != null ? parent.hashCode() : 0 );
+		result = 31 * result + ( isIterable ? 1 : 0 );
 		result = 31 * result + ( index != null ? index.hashCode() : 0 );
 		result = 31 * result + ( key != null ? key.hashCode() : 0 );
 		return result;

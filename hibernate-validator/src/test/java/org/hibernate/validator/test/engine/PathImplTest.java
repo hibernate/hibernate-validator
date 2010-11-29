@@ -16,16 +16,27 @@
 */
 package org.hibernate.validator.test.engine;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
 import javax.validation.Path;
+import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.PathImpl;
+import org.hibernate.validator.test.util.TestUtil;
 
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
+import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * @author Hardy Ferentschik
@@ -114,5 +125,41 @@ public class PathImplTest {
 	public void testEmptyString() {
 		Path path = PathImpl.createPathFromString( "" );
 		assertTrue( path.iterator().hasNext() );
+	}
+
+	@Test
+	public void testNonStringMapKey() {
+		Validator validator = TestUtil.getValidator();
+		Container container = new Container();
+		Long id = 0l;
+		container.addItem( id, new Item( null) );
+		Set<ConstraintViolation<Container>> constraintViolations = validator.validate( container );
+		assertNumberOfViolations( constraintViolations, 1 );
+		ConstraintViolation<Container> violation = constraintViolations.iterator().next();
+		Path path = violation.getPropertyPath();
+		Iterator<Path.Node> iter = path.iterator();
+		iter.next();
+		Path.Node node = iter.next();
+		assertNotNull(node);
+		assertTrue( node.isInIterable() );
+		assertEquals( node.getKey(), id  );
+	}
+
+	class Container {
+		@Valid
+		Map<Long, Item> store = new HashMap<Long, Item>();
+
+		public void addItem(Long id, Item item) {
+			store.put( id, item );
+		}
+	}
+
+	class Item {
+		@NotNull
+		String id;
+
+		Item(String id) {
+			this.id = id;
+		}
 	}
 }
