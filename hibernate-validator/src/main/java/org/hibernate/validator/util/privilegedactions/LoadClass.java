@@ -24,7 +24,7 @@ import javax.validation.ValidationException;
  * @author Hardy Ferentschik
  * @author Kevin Pollet
  */
-public class LoadClass implements PrivilegedAction<Class<?>> {
+public final class LoadClass implements PrivilegedAction<Class<?>> {
 
 	private static final String HIBERNATE_VALIDATOR_CLASS_NAME = "org.hibernate.validator";
 

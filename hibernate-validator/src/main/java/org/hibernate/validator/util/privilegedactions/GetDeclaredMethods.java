@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 /**
  * @author Emmanuel Bernard
  */
-public class GetDeclaredMethods implements PrivilegedAction<Method[]> {
+public final class GetDeclaredMethods implements PrivilegedAction<Method[]> {
 	private final Class<?> clazz;
 
 	public static GetDeclaredMethods action(Class<?> clazz) {

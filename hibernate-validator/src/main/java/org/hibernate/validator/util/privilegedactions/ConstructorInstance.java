@@ -29,7 +29,7 @@ import javax.validation.ValidationException;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConstructorInstance<T> implements PrivilegedAction<T> {
+public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 	private final Constructor<T> constructor;
 	private final Object[] initArgs;
 

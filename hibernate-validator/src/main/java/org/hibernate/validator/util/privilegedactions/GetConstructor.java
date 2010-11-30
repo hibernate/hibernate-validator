@@ -22,7 +22,7 @@ import java.security.PrivilegedAction;
 /**
  * @author Emmanuel Bernard
  */
-public class GetConstructor<T> implements PrivilegedAction<Constructor<T>> {
+public final class GetConstructor<T> implements PrivilegedAction<Constructor<T>> {
 	private final Class<T> clazz;
 	private final Class<?>[] params;
 

@@ -24,7 +24,7 @@ import java.security.PrivilegedAction;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class SetAccessibility implements PrivilegedAction<Object> {
+public final class SetAccessibility implements PrivilegedAction<Object> {
 	private final Member member;
 
 	public static SetAccessibility action(Member member) {
@@ -36,7 +36,7 @@ public class SetAccessibility implements PrivilegedAction<Object> {
 	}
 
 	public Object run() {
-		( ( AccessibleObject ) member ).setAccessible( true );
+		( (AccessibleObject) member ).setAccessible( true );
 		return member;
 	}
 }
