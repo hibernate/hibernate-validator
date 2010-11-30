@@ -96,7 +96,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
-		buildHashCode();
+		hashCode = -1;
 		return currentLeafNode;
 	}
 
@@ -105,7 +105,7 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, null );
 		nodeList.remove( leafNode );
 		nodeList.add( currentLeafNode );
-		buildHashCode();
+		hashCode = -1;
 		return currentLeafNode;
 	}
 
@@ -114,7 +114,7 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, index, null );
 		nodeList.remove( leafNode );
 		nodeList.add( currentLeafNode );
-		buildHashCode();
+		hashCode = -1;
 		return currentLeafNode;
 	}
 
@@ -123,7 +123,7 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, key );
 		nodeList.remove( leafNode );
 		nodeList.add( currentLeafNode );
-		buildHashCode();
+		hashCode = -1;
 		return currentLeafNode;
 	}
 
@@ -185,7 +185,14 @@ public final class PathImpl implements Path, Serializable {
 
 	@Override
 	public int hashCode() {
+		if(hashCode == -1) {
+			buildHashCode();
+		}
 		return hashCode;
+	}
+
+	public void buildHashCode() {
+		hashCode = nodeList != null ? nodeList.hashCode() : 0;
 	}
 
 	/**
@@ -258,9 +265,5 @@ public final class PathImpl implements Path, Serializable {
 		}
 
 		return path;
-	}
-
-	public void buildHashCode() {
-		hashCode = nodeList != null ? nodeList.hashCode() : 0;
 	}
 }
