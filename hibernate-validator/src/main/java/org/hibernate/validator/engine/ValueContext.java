@@ -127,15 +127,15 @@ public class ValueContext<T, V> {
 	}
 
 	public final void markCurrentPropertyAsIterable() {
-		propertyPath.getLeafNode().setIterable( true );
+		propertyPath.makeLeafNodeIterable();
 	}
 
 	public final void setKey(Object key) {
-		propertyPath.getLeafNode().setKey( key );
+		propertyPath.setLeafNodeMapKey( key );
 	}
 
 	public final void setIndex(Integer index) {
-		propertyPath.getLeafNode().setIndex( index );
+		propertyPath.setLeafNodeIndex( index );
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {
