@@ -22,7 +22,7 @@ import java.security.PrivilegedAction;
 /**
  * @author Emmanuel Bernard
  */
-public class GetMethod implements PrivilegedAction<Method> {
+public final class GetMethod implements PrivilegedAction<Method> {
 	private final Class<?> clazz;
 	private final String methodName;
 

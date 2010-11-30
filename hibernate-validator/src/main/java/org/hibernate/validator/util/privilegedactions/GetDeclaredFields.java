@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
 /**
  * @author Emmanuel Bernard
  */
-public class GetDeclaredFields implements PrivilegedAction<Field[]> {
+public final class GetDeclaredFields implements PrivilegedAction<Field[]> {
 	private final Class<?> clazz;
 
 	public static GetDeclaredFields action(Class<?> clazz) {

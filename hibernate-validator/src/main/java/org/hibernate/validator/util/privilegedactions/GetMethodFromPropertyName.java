@@ -23,7 +23,7 @@ import java.security.PrivilegedAction;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class GetMethodFromPropertyName implements PrivilegedAction<Method> {
+public final class GetMethodFromPropertyName implements PrivilegedAction<Method> {
 	private final Class<?> clazz;
 	private final String property;
 

@@ -46,6 +46,8 @@ public final class PathImpl implements Path, Serializable {
 	private static final int REMAINING_STRING_GROUP = 5;
 
 	private final List<Node> nodeList;
+	private NodeImpl currentLeafNode;
+	private int hashCode;
 
 	/**
 	 * Returns a {@code Path} instance representing the path described by the given string. To create a root node the empty string should be passed.
@@ -87,51 +89,46 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public final PathImpl getPathWithoutLeafNode() {
-		List<Node> nodes = new ArrayList<Node>( nodeList );
-		PathImpl path = PathImpl.createNewPath( null );
-		if ( nodes.size() > 1 ) {
-			nodes.remove( nodes.size() - 1 );
-			path = new PathImpl( nodes );
-		}
-		return path;
+		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ) );
 	}
 
 	public final NodeImpl addNode(String nodeName) {
 		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		NodeImpl newNode = new NodeImpl( nodeName, parent, false, null, null );
-		nodeList.add( newNode );
-		return newNode;
+		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
+		nodeList.add( currentLeafNode );
+		buildHashCode();
+		return currentLeafNode;
 	}
 
 	public final NodeImpl makeLeafNodeIterable() {
 		NodeImpl leafNode = getLeafNode();
-		NodeImpl newNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, null );
+		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, null );
 		nodeList.remove( leafNode );
-		nodeList.add( newNode );
-		return newNode;
+		nodeList.add( currentLeafNode );
+		buildHashCode();
+		return currentLeafNode;
 	}
 
 	public final NodeImpl setLeafNodeIndex(Integer index) {
 		NodeImpl leafNode = getLeafNode();
-		NodeImpl newNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, index, null );
+		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, index, null );
 		nodeList.remove( leafNode );
-		nodeList.add( newNode );
-		return newNode;
+		nodeList.add( currentLeafNode );
+		buildHashCode();
+		return currentLeafNode;
 	}
 
 	public final NodeImpl setLeafNodeMapKey(Object key) {
 		NodeImpl leafNode = getLeafNode();
-		NodeImpl newNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, key );
+		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, key );
 		nodeList.remove( leafNode );
-		nodeList.add( newNode );
-		return newNode;
+		nodeList.add( currentLeafNode );
+		buildHashCode();
+		return currentLeafNode;
 	}
 
 	public final NodeImpl getLeafNode() {
-		if ( nodeList.size() == 0 ) {
-			throw new IllegalStateException( "No nodes in path!" );
-		}
-		return (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		return currentLeafNode;
 	}
 
 	public final Iterator<Path.Node> iterator() {
@@ -188,7 +185,7 @@ public final class PathImpl implements Path, Serializable {
 
 	@Override
 	public int hashCode() {
-		return nodeList != null ? nodeList.hashCode() : 0;
+		return hashCode;
 	}
 
 	/**
@@ -199,12 +196,14 @@ public final class PathImpl implements Path, Serializable {
 	private PathImpl(PathImpl path) {
 		this.nodeList = new ArrayList<Node>();
 		NodeImpl parent = null;
+		NodeImpl node = null;
 		for ( int i = 0; i < path.nodeList.size(); i++ ) {
-			NodeImpl node = (NodeImpl) path.nodeList.get( i );
+			node = (NodeImpl) path.nodeList.get( i );
 			NodeImpl newNode = new NodeImpl( node, parent );
 			this.nodeList.add( newNode );
 			parent = newNode;
 		}
+		currentLeafNode = node;
 	}
 
 	private PathImpl() {
@@ -221,14 +220,13 @@ public final class PathImpl implements Path, Serializable {
 	private static PathImpl parseProperty(String property) {
 		PathImpl path = createNewPath( null );
 		String tmp = property;
-		NodeImpl node;
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );
 			if ( matcher.matches() ) {
 
 				// create the node
 				String value = matcher.group( PROPERTY_NAME_GROUP );
-				node = path.addNode( value );
+				Node node = path.addNode( value );
 
 				// is the node indexable
 				if ( matcher.group( INDEXED_GROUP ) != null ) {
@@ -260,5 +258,9 @@ public final class PathImpl implements Path, Serializable {
 		}
 
 		return path;
+	}
+
+	public void buildHashCode() {
+		hashCode = nodeList != null ? nodeList.hashCode() : 0;
 	}
 }

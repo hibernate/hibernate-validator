@@ -55,13 +55,14 @@ import static org.hibernate.validator.constraints.CompositionType.OR;
 public class ConstraintTree<A extends Annotation> {
 
 	private static final Logger log = LoggerFactory.make();
+	private static final int MAX_TYPE_CACHE_SIZE = 20;
 
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
 	private final ConstraintDescriptorImpl<A> descriptor;
 	private final Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes;
 	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
-	private final Map<Type, List<Type>> suitableTypes;
+	private final Map<Type, Type> suitableTypeMap;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
@@ -85,7 +86,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 
 		validatorTypes = ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
-		suitableTypes = new LRUMap<Type, List<Type>>( 10 );
+		suitableTypeMap = new LRUMap<Type, Type>( MAX_TYPE_CACHE_SIZE );
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
@@ -343,12 +344,17 @@ public class ConstraintTree<A extends Annotation> {
 	 * @return The class of a matching validator.
 	 */
 	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Type type) {
-		List<Type> suitableTypes = findSuitableValidatorTypes( type );
+		if ( suitableTypeMap.containsKey( type ) ) {
+			return validatorTypes.get( suitableTypeMap.get( type ) );
+		}
 
-		resolveAssignableTypes( suitableTypes );
-		verifyResolveWasUnique( type, suitableTypes );
+		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( type );
+		resolveAssignableTypes( discoveredSuitableTypes );
+		verifyResolveWasUnique( type, discoveredSuitableTypes );
 
-		return validatorTypes.get( suitableTypes.get( 0 ) );
+		Type suitableType = discoveredSuitableTypes.get( 0 );
+		suitableTypeMap.put( type, suitableType );
+		return validatorTypes.get( suitableType );
 	}
 
 	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
@@ -380,16 +386,12 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private List<Type> findSuitableValidatorTypes(Type type) {
-		if(suitableTypes.containsKey( type )) {
-			return suitableTypes.get( type );
-		}
 		List<Type> determinedSuitableTypes = new ArrayList<Type>();
 		for ( Type validatorType : validatorTypes.keySet() ) {
 			if ( TypeUtils.isAssignable( validatorType, type ) && !determinedSuitableTypes.contains( validatorType ) ) {
 				determinedSuitableTypes.add( validatorType );
 			}
 		}
-		suitableTypes.put( type, determinedSuitableTypes );
 		return determinedSuitableTypes;
 	}
 

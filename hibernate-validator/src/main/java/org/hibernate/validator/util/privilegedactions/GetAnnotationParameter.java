@@ -26,7 +26,7 @@ import javax.validation.ValidationException;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class GetAnnotationParameter<T> implements PrivilegedAction<T> {
+public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 	private final Annotation annotation;
 	private final String parameterName;
 	private final Class<T> type;

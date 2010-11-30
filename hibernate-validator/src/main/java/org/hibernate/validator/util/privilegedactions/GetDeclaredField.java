@@ -22,7 +22,7 @@ import java.security.PrivilegedAction;
 /**
  * @author Emmanuel Bernard
  */
-public class GetDeclaredField implements PrivilegedAction<Field> {
+public final class GetDeclaredField implements PrivilegedAction<Field> {
 	private final Class<?> clazz;
 	private final String fieldName;
 

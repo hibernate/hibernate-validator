@@ -29,7 +29,7 @@ import org.hibernate.validator.util.ReflectionHelper;
  */
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 
-	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		return ReflectionHelper.newInstance( key, "" );
+	public final <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
+		return ReflectionHelper.newInstance( key, "ConstraintValidator" );
 	}
 }
