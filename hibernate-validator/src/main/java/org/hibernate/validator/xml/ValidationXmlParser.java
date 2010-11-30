@@ -55,7 +55,7 @@ public class ValidationXmlParser {
 	 *
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of <code>ConfigurationImpl.ValidationBootstrapParameters</code>.
 	 */
-	public ValidationBootstrapParameters parseValidationXml() {
+	public final ValidationBootstrapParameters parseValidationXml() {
 		ValidationConfigType config = getValidationConfig();
 		ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters();
 		if ( config != null ) {
@@ -75,11 +75,13 @@ public class ValidationXmlParser {
 		if ( constraintFactoryClass != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<ConstraintValidatorFactory> clazz = ( Class<ConstraintValidatorFactory> ) ReflectionHelper.loadClass(
+				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) ReflectionHelper.loadClass(
 						constraintFactoryClass, this.getClass()
 				);
-				xmlParameters.constraintValidatorFactory = ReflectionHelper.newInstance(
-						clazz, "constraint factory class"
+				xmlParameters.setConstraintValidatorFactory(
+						ReflectionHelper.newInstance(
+								clazz, "constraint factory class"
+						)
 				);
 				log.info( "Using {} as constraint factory.", constraintFactoryClass );
 			}
@@ -100,7 +102,7 @@ public class ValidationXmlParser {
 						property.getValue()
 				);
 			}
-			xmlParameters.configProperties.put( property.getName(), property.getValue() );
+			xmlParameters.addConfigProperty( property.getName(), property.getValue() );
 		}
 	}
 
@@ -115,7 +117,7 @@ public class ValidationXmlParser {
 			if ( in == null ) {
 				throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName + "." );
 			}
-			xmlParameters.mappings.add( in );
+			xmlParameters.addMapping( in );
 		}
 	}
 
@@ -124,10 +126,10 @@ public class ValidationXmlParser {
 		if ( messageInterpolatorClass != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<MessageInterpolator> clazz = ( Class<MessageInterpolator> ) ReflectionHelper.loadClass(
+				Class<MessageInterpolator> clazz = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
 						messageInterpolatorClass, this.getClass()
 				);
-				xmlParameters.messageInterpolator = clazz.newInstance();
+				xmlParameters.setMessageInterpolator( clazz.newInstance() );
 				log.info( "Using {} as message interpolator.", messageInterpolatorClass );
 			}
 			catch ( ValidationException e ) {
@@ -153,10 +155,10 @@ public class ValidationXmlParser {
 		if ( traversableResolverClass != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<TraversableResolver> clazz = ( Class<TraversableResolver> ) ReflectionHelper.loadClass(
+				Class<TraversableResolver> clazz = (Class<TraversableResolver>) ReflectionHelper.loadClass(
 						traversableResolverClass, this.getClass()
 				);
-				xmlParameters.traversableResolver = clazz.newInstance();
+				xmlParameters.setTraversableResolver( clazz.newInstance() );
 				log.info( "Using {} as traversable resolver.", traversableResolverClass );
 			}
 			catch ( ValidationException e ) {
@@ -182,13 +184,17 @@ public class ValidationXmlParser {
 		String providerClassName = config.getDefaultProvider();
 		if ( providerClassName != null ) {
 			try {
-				xmlParamters.providerClass = ( Class<? extends ValidationProvider<?>> ) ReflectionHelper.loadClass(
-						providerClassName, this.getClass()
+				xmlParamters.setProviderClass(
+						(Class<? extends ValidationProvider<?>>) ReflectionHelper.loadClass(
+								providerClassName, this.getClass()
+						)
 				);
 				log.info( "Using {} as validation provider.", providerClassName );
 			}
 			catch ( Exception e ) {
-				throw new ValidationException( "Unable to instantiate validation provider class " + providerClassName + ".", e );
+				throw new ValidationException(
+						"Unable to instantiate validation provider class " + providerClassName + ".", e
+				);
 			}
 		}
 	}
@@ -229,10 +235,10 @@ public class ValidationXmlParser {
 	}
 
 	private InputStream getInputStreamForPath(String path) {
-		//TODO not sure it's the right thing to do (ie removing '/'
-		//remove heading '/'
-		if ( path.startsWith( "/" ) ) {
-			path = path.substring( 1 );
+		//TODO not sure if it's the right thing to removing '/'
+		String inputPath = path;
+		if ( inputPath.startsWith( "/" ) ) {
+			inputPath = inputPath.substring( 1 );
 		}
 
 		boolean isContextCL = true;
@@ -244,12 +250,12 @@ public class ValidationXmlParser {
 			loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
 			isContextCL = false;
 		}
-		InputStream inputStream = loader.getResourceAsStream( path );
+		InputStream inputStream = loader.getResourceAsStream( inputPath );
 
 		// try the current class loader
 		if ( isContextCL && inputStream == null ) {
 			loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
-			inputStream = loader.getResourceAsStream( path );
+			inputStream = loader.getResourceAsStream( inputPath );
 		}
 		return inputStream;
 	}

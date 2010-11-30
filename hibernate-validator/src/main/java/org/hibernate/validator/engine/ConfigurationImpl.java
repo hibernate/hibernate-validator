@@ -91,38 +91,38 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 		this.providerResolver = null;
 		validationBootstrapParameters = new ValidationBootstrapParameters();
-		validationBootstrapParameters.provider = provider;
+		validationBootstrapParameters.setProvider( provider );
 	}
 
-	public HibernateValidatorConfiguration ignoreXmlConfiguration() {
+	public final HibernateValidatorConfiguration ignoreXmlConfiguration() {
 		ignoreXmlConfiguration = true;
 		return this;
 	}
 
-	public ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
-		this.validationBootstrapParameters.messageInterpolator = interpolator;
+	public final ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
+		this.validationBootstrapParameters.setMessageInterpolator( interpolator );
 		return this;
 	}
 
-	public ConfigurationImpl traversableResolver(TraversableResolver resolver) {
-		this.validationBootstrapParameters.traversableResolver = resolver;
+	public final ConfigurationImpl traversableResolver(TraversableResolver resolver) {
+		this.validationBootstrapParameters.setTraversableResolver( resolver );
 		return this;
 	}
 
-	public ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
-		this.validationBootstrapParameters.constraintValidatorFactory = constraintValidatorFactory;
+	public final ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
+		this.validationBootstrapParameters.setConstraintValidatorFactory( constraintValidatorFactory );
 		return this;
 	}
 
-	public HibernateValidatorConfiguration addMapping(InputStream stream) {
+	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
 		if ( stream == null ) {
 			throw new IllegalArgumentException( "The stream cannot be null." );
 		}
-		validationBootstrapParameters.mappings.add( stream );
+		validationBootstrapParameters.addMapping( stream );
 		return this;
 	}
 
-	public HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
+	public final HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
 		if ( mapping == null ) {
 			throw new IllegalArgumentException( "The mapping cannot be null." );
 		}
@@ -130,23 +130,22 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	public HibernateValidatorConfiguration addProperty(String name, String value) {
+	public final HibernateValidatorConfiguration addProperty(String name, String value) {
 		if ( value != null ) {
-			validationBootstrapParameters.configProperties.put( name, value );
+			validationBootstrapParameters.addConfigProperty( name, value );
 		}
 		return this;
 	}
 
-
-	public ValidatorFactory buildValidatorFactory() {
+	public final ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
 		ValidatorFactory factory = null;
 		try {
 			if ( isSpecificProvider() ) {
-				factory = validationBootstrapParameters.provider.buildValidatorFactory( this );
+				factory = validationBootstrapParameters.getProvider().buildValidatorFactory( this );
 			}
 			else {
-				final Class<? extends ValidationProvider<?>> providerClass = validationBootstrapParameters.providerClass;
+				final Class<? extends ValidationProvider<?>> providerClass = validationBootstrapParameters.getProviderClass();
 				if ( providerClass != null ) {
 					for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
 						if ( providerClass.isAssignableFrom( provider.getClass() ) ) {
@@ -182,52 +181,52 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return factory;
 	}
 
-	public boolean isIgnoreXmlConfiguration() {
+	public final boolean isIgnoreXmlConfiguration() {
 		return ignoreXmlConfiguration;
 	}
 
-	public MessageInterpolator getMessageInterpolator() {
-		return validationBootstrapParameters.messageInterpolator;
+	public final MessageInterpolator getMessageInterpolator() {
+		return validationBootstrapParameters.getMessageInterpolator();
 	}
 
-	public Set<InputStream> getMappingStreams() {
-		return validationBootstrapParameters.mappings;
+	public final Set<InputStream> getMappingStreams() {
+		return validationBootstrapParameters.getMappings();
 	}
 
-	public ConstraintValidatorFactory getConstraintValidatorFactory() {
-		return validationBootstrapParameters.constraintValidatorFactory;
+	public final ConstraintValidatorFactory getConstraintValidatorFactory() {
+		return validationBootstrapParameters.getConstraintValidatorFactory();
 	}
 
-	public TraversableResolver getTraversableResolver() {
-		return validationBootstrapParameters.traversableResolver;
+	public final TraversableResolver getTraversableResolver() {
+		return validationBootstrapParameters.getTraversableResolver();
 	}
 
-	public Map<String, String> getProperties() {
-		return validationBootstrapParameters.configProperties;
+	public final Map<String, String> getProperties() {
+		return validationBootstrapParameters.getConfigProperties();
 	}
 
-	public MessageInterpolator getDefaultMessageInterpolator() {
+	public final MessageInterpolator getDefaultMessageInterpolator() {
 		return defaultMessageInterpolator;
 	}
 
-	public TraversableResolver getDefaultTraversableResolver() {
+	public final TraversableResolver getDefaultTraversableResolver() {
 		return defaultTraversableResolver;
 	}
 
-	public ConstraintValidatorFactory getDefaultConstraintValidatorFactory() {
+	public final ConstraintValidatorFactory getDefaultConstraintValidatorFactory() {
 		return defaultConstraintValidatorFactory;
 	}
 
-	public ResourceBundleLocator getDefaultResourceBundleLocator() {
+	public final ResourceBundleLocator getDefaultResourceBundleLocator() {
 		return defaultResourceBundleLocator;
 	}
 
-	public ConstraintMapping getMapping() {
+	public final ConstraintMapping getMapping() {
 		return mapping;
 	}
 
 	private boolean isSpecificProvider() {
-		return validationBootstrapParameters.provider != null;
+		return validationBootstrapParameters.getProvider() != null;
 	}
 
 	/**
@@ -237,14 +236,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		if ( ignoreXmlConfiguration ) {
 			log.info( "Ignoring XML configuration." );
 			// make sure we use the defaults in case they haven't been provided yet
-			if ( validationBootstrapParameters.messageInterpolator == null ) {
-				validationBootstrapParameters.messageInterpolator = defaultMessageInterpolator;
+			if ( validationBootstrapParameters.getMessageInterpolator() == null ) {
+				validationBootstrapParameters.setMessageInterpolator( defaultMessageInterpolator );
 			}
-			if ( validationBootstrapParameters.traversableResolver == null ) {
-				validationBootstrapParameters.traversableResolver = defaultTraversableResolver;
+			if ( validationBootstrapParameters.getTraversableResolver() == null ) {
+				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );
 			}
-			if ( validationBootstrapParameters.constraintValidatorFactory == null ) {
-				validationBootstrapParameters.constraintValidatorFactory = defaultConstraintValidatorFactory;
+			if ( validationBootstrapParameters.getConstraintValidatorFactory() == null ) {
+				validationBootstrapParameters.setConstraintValidatorFactory( defaultConstraintValidatorFactory );
 			}
 		}
 		else {
@@ -254,41 +253,41 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private void applyXmlSettings(ValidationBootstrapParameters xmlParameters) {
-		validationBootstrapParameters.providerClass = xmlParameters.providerClass;
+		validationBootstrapParameters.setProviderClass( xmlParameters.getProviderClass() );
 
-		if ( validationBootstrapParameters.messageInterpolator == null ) {
-			if ( xmlParameters.messageInterpolator != null ) {
-				validationBootstrapParameters.messageInterpolator = xmlParameters.messageInterpolator;
+		if ( validationBootstrapParameters.getMessageInterpolator() == null ) {
+			if ( xmlParameters.getMessageInterpolator() != null ) {
+				validationBootstrapParameters.setMessageInterpolator( xmlParameters.getMessageInterpolator() );
 			}
 			else {
-				validationBootstrapParameters.messageInterpolator = defaultMessageInterpolator;
+				validationBootstrapParameters.setMessageInterpolator( defaultMessageInterpolator );
 			}
 		}
 
-		if ( validationBootstrapParameters.traversableResolver == null ) {
-			if ( xmlParameters.traversableResolver != null ) {
-				validationBootstrapParameters.traversableResolver = xmlParameters.traversableResolver;
+		if ( validationBootstrapParameters.getTraversableResolver() == null ) {
+			if ( xmlParameters.getTraversableResolver() != null ) {
+				validationBootstrapParameters.setTraversableResolver( xmlParameters.getTraversableResolver() );
 			}
 			else {
-				validationBootstrapParameters.traversableResolver = defaultTraversableResolver;
+				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );
 			}
 		}
 
-		if ( validationBootstrapParameters.constraintValidatorFactory == null ) {
-			if ( xmlParameters.constraintValidatorFactory != null ) {
-				validationBootstrapParameters.constraintValidatorFactory = xmlParameters.constraintValidatorFactory;
+		if ( validationBootstrapParameters.getConstraintValidatorFactory() == null ) {
+			if ( xmlParameters.getConstraintValidatorFactory() != null ) {
+				validationBootstrapParameters.setConstraintValidatorFactory( xmlParameters.getConstraintValidatorFactory() );
 			}
 			else {
-				validationBootstrapParameters.constraintValidatorFactory = defaultConstraintValidatorFactory;
+				validationBootstrapParameters.setConstraintValidatorFactory( defaultConstraintValidatorFactory );
 			}
 		}
 
-		validationBootstrapParameters.mappings.addAll( xmlParameters.mappings );
-		configurationStreams.addAll( xmlParameters.mappings );
+		validationBootstrapParameters.addAllMappings( xmlParameters.getMappings() );
+		configurationStreams.addAll( xmlParameters.getMappings() );
 
-		for ( Map.Entry<String, String> entry : xmlParameters.configProperties.entrySet() ) {
-			if ( validationBootstrapParameters.configProperties.get( entry.getKey() ) == null ) {
-				validationBootstrapParameters.configProperties.put( entry.getKey(), entry.getValue() );
+		for ( Map.Entry<String, String> entry : xmlParameters.getConfigProperties().entrySet() ) {
+			if ( validationBootstrapParameters.getConfigProperties().get( entry.getKey() ) == null ) {
+				validationBootstrapParameters.addConfigProperty( entry.getKey(), entry.getValue() );
 			}
 		}
 	}
