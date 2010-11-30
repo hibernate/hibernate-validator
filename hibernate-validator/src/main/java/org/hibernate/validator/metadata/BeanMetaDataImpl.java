@@ -97,7 +97,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final ConstraintHelper constraintHelper;
 
 	/**
-	 * A list of all property names in the class (constraint and un-constraint).
+	 * A list of all property names in the class (constrained and un-constrained).
 	 */
 	// Used to avoid ReflectionHelper#containsMember which is slow
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
