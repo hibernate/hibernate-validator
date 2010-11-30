@@ -131,7 +131,7 @@ public class PathImplTest {
 	public void testNonStringMapKey() {
 		Validator validator = TestUtil.getValidator();
 		Container container = new Container();
-		Long id = 0l;
+		Key id = new Key();
 		container.addItem( id, new Item( null) );
 		Set<ConstraintViolation<Container>> constraintViolations = validator.validate( container );
 		assertNumberOfViolations( constraintViolations, 1 );
@@ -147,11 +147,14 @@ public class PathImplTest {
 
 	class Container {
 		@Valid
-		Map<Long, Item> store = new HashMap<Long, Item>();
+		Map<Key, Item> store = new HashMap<Key, Item>();
 
-		public void addItem(Long id, Item item) {
+		public void addItem(Key id, Item item) {
 			store.put( id, item );
 		}
+	}
+
+	class Key {
 	}
 
 	class Item {

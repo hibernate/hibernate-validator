@@ -24,10 +24,10 @@ import javax.validation.constraints.Min;
  */
 public class Driver extends Person {
 	@Min(value = 18, message = "You have to be 18 to drive a car", groups = DriverChecks.class)
-	public int age;
+	private int age;
 
 	@AssertTrue(message = "You first have to pass the driving test", groups = DriverChecks.class)
-	public boolean hasDrivingLicense;
+	private boolean hasDrivingLicense;
 
 	public Driver(String name) {
 		super( name );

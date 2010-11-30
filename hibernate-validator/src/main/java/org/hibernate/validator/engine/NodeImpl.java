@@ -20,6 +20,8 @@ import java.io.Serializable;
 import javax.validation.Path;
 
 /**
+ * Immutable implementation of a {@code Path.Node}.
+ *
  * @author Hardy Ferentschik
  */
 public class NodeImpl implements Path.Node, Serializable {
@@ -30,21 +32,25 @@ public class NodeImpl implements Path.Node, Serializable {
 
 	private final String name;
 	private final NodeImpl parent;
-	private boolean isIterable;
-	private Integer index;
-	private Object key;
+	private final boolean isIterable;
+	private final Integer index;
+	private final Object key;
+	private final int hashCode;
+	private String asString;
 
-	public NodeImpl(String name, NodeImpl parent) {
+	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key) {
 		this.name = name;
 		this.parent = parent;
+		this.index = index;
+		this.key = key;
+		this.isIterable = indexable;
+
+		// implementation is immutable. pre-calculating toString and hashCode
+		this.hashCode = buildHashCode();
 	}
 
 	NodeImpl(NodeImpl node, NodeImpl parent) {
-		this.name = node.getName();
-		this.isIterable = node.isIterable;
-		this.index = node.index;
-		this.key = node.key;
-		this.parent = parent;
+		this( node.name, parent, node.isIterable, node.index, node.key );
 	}
 
 	public final String getName() {
@@ -60,10 +66,6 @@ public class NodeImpl implements Path.Node, Serializable {
 		}
 	}
 
-	public final void setIterable(boolean iterable) {
-		isIterable = iterable;
-	}
-
 	public final boolean isIterable() {
 		return isIterable;
 	}
@@ -77,10 +79,6 @@ public class NodeImpl implements Path.Node, Serializable {
 		}
 	}
 
-	public final void setIndex(Integer index) {
-		this.index = index;
-	}
-
 	public final Object getKey() {
 		if ( parent == null ) {
 			return null;
@@ -90,11 +88,7 @@ public class NodeImpl implements Path.Node, Serializable {
 		}
 	}
 
-	public final void setKey(Object key) {
-		this.key = key;
-	}
-
-	public NodeImpl getParent() {
+	public final NodeImpl getParent() {
 		return parent;
 	}
 
@@ -104,19 +98,10 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	public final String asString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append( getName() );
-		if ( isIterable() ) {
-			builder.append( INDEX_OPEN );
-			if ( index != null ) {
-				builder.append( index);
-			}
-			else if ( key != null ) {
-				builder.append( key );
-			}
-			builder.append( INDEX_CLOSE );
+		if ( asString == null ) {
+			asString = buildToString();
 		}
-		return builder.toString();
+		return asString;
 	}
 
 	@Override
@@ -151,11 +136,31 @@ public class NodeImpl implements Path.Node, Serializable {
 
 	@Override
 	public int hashCode() {
+		return hashCode;
+	}
+
+	private int buildHashCode() {
 		int result = name != null ? name.hashCode() : 0;
 		result = 31 * result + ( parent != null ? parent.hashCode() : 0 );
 		result = 31 * result + ( isIterable ? 1 : 0 );
 		result = 31 * result + ( index != null ? index.hashCode() : 0 );
 		result = 31 * result + ( key != null ? key.hashCode() : 0 );
 		return result;
+	}
+
+	private String buildToString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( getName() );
+		if ( isIterable() ) {
+			builder.append( INDEX_OPEN );
+			if ( index != null ) {
+				builder.append( index );
+			}
+			else if ( key != null ) {
+				builder.append( key );
+			}
+			builder.append( INDEX_CLOSE );
+		}
+		return builder.toString();
 	}
 }

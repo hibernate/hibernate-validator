@@ -82,34 +82,6 @@ public final class PathImpl implements Path, Serializable {
 		return new PathImpl( path );
 	}
 
-	/**
-	 * Copy constructor.
-	 *
-	 * @param path the path to make a copy of.
-	 */
-	private PathImpl(PathImpl path) {
-		this.nodeList = new ArrayList<Node>();
-		NodeImpl parent = null;
-		for ( int i = 0; i < path.nodeList.size(); i++ ) {
-			NodeImpl node = (NodeImpl) path.nodeList.get( i );
-			NodeImpl newNode = new NodeImpl( node, parent );
-			this.nodeList.add( newNode );
-			parent = newNode;
-		}
-	}
-
-	private PathImpl() {
-		nodeList = new ArrayList<Node>();
-	}
-
-	private PathImpl(List<Node> nodeList) {
-		this.nodeList = new ArrayList<Node>();
-		for ( Node node : nodeList ) {
-			this.nodeList.add( node );
-		}
-	}
-
-
 	public final boolean isRootPath() {
 		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
 	}
@@ -126,7 +98,31 @@ public final class PathImpl implements Path, Serializable {
 
 	public final NodeImpl addNode(String nodeName) {
 		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		NodeImpl newNode = new NodeImpl( nodeName, parent );
+		NodeImpl newNode = new NodeImpl( nodeName, parent, false, null, null );
+		nodeList.add( newNode );
+		return newNode;
+	}
+
+	public final NodeImpl makeLeafNodeIterable() {
+		NodeImpl leafNode = getLeafNode();
+		NodeImpl newNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, null );
+		nodeList.remove( leafNode );
+		nodeList.add( newNode );
+		return newNode;
+	}
+
+	public final NodeImpl setLeafNodeIndex(Integer index) {
+		NodeImpl leafNode = getLeafNode();
+		NodeImpl newNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, index, null );
+		nodeList.remove( leafNode );
+		nodeList.add( newNode );
+		return newNode;
+	}
+
+	public final NodeImpl setLeafNodeMapKey(Object key) {
+		NodeImpl leafNode = getLeafNode();
+		NodeImpl newNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, key );
+		nodeList.remove( leafNode );
 		nodeList.add( newNode );
 		return newNode;
 	}
@@ -195,6 +191,33 @@ public final class PathImpl implements Path, Serializable {
 		return nodeList != null ? nodeList.hashCode() : 0;
 	}
 
+	/**
+	 * Copy constructor.
+	 *
+	 * @param path the path to make a copy of.
+	 */
+	private PathImpl(PathImpl path) {
+		this.nodeList = new ArrayList<Node>();
+		NodeImpl parent = null;
+		for ( int i = 0; i < path.nodeList.size(); i++ ) {
+			NodeImpl node = (NodeImpl) path.nodeList.get( i );
+			NodeImpl newNode = new NodeImpl( node, parent );
+			this.nodeList.add( newNode );
+			parent = newNode;
+		}
+	}
+
+	private PathImpl() {
+		nodeList = new ArrayList<Node>();
+	}
+
+	private PathImpl(List<Node> nodeList) {
+		this.nodeList = new ArrayList<Node>();
+		for ( Node node : nodeList ) {
+			this.nodeList.add( node );
+		}
+	}
+
 	private static PathImpl parseProperty(String property) {
 		PathImpl path = createNewPath( null );
 		String tmp = property;
@@ -202,12 +225,29 @@ public final class PathImpl implements Path, Serializable {
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );
 			if ( matcher.matches() ) {
+
+				// create the node
 				String value = matcher.group( PROPERTY_NAME_GROUP );
 				node = path.addNode( value );
+
+				// is the node indexable
 				if ( matcher.group( INDEXED_GROUP ) != null ) {
-					node.setIterable( true );
+					path.makeLeafNodeIterable();
 				}
-				setNodeIndexOrKey( matcher.group( INDEX_GROUP ), node );
+
+				// take care of the index/key if one exists
+				String indexOrKey = matcher.group( INDEX_GROUP );
+				if ( indexOrKey != null && indexOrKey.length() > 0 ) {
+					try {
+						Integer i = Integer.parseInt( indexOrKey );
+						path.setLeafNodeIndex( i );
+					}
+					catch ( NumberFormatException e ) {
+						path.setLeafNodeMapKey( indexOrKey );
+					}
+				}
+
+				// match the remaining string
 				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
 			else {
@@ -215,23 +255,10 @@ public final class PathImpl implements Path, Serializable {
 			}
 		} while ( tmp != null );
 
-		if ( node.isIterable() ) {
+		if ( path.getLeafNode().isIterable() ) {
 			path.addNode( null );
 		}
 
 		return path;
-	}
-
-	private static void setNodeIndexOrKey(String indexOrKey, NodeImpl node) {
-		if ( indexOrKey != null && indexOrKey.length() > 0 ) {
-			try {
-				Integer i = Integer.parseInt( indexOrKey );
-				node.setIndex( i );
-				node.setKey( i );
-			}
-			catch ( NumberFormatException e ) {
-				node.setKey( indexOrKey );
-			}
-		}
 	}
 }
