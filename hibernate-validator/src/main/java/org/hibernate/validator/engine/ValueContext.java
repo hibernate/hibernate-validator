@@ -75,7 +75,7 @@ public class ValueContext<T, V> {
 	public ValueContext(T currentBean, Class<T> currentBeanType, PathImpl propertyPath) {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
-		this.propertyPath = propertyPath == null ? null : PathImpl.createCopy( propertyPath );
+		this.propertyPath = propertyPath;
 	}
 
 	/**
