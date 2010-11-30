@@ -88,7 +88,7 @@ public class ValidationBootstrapParameters {
 	}
 
 	public final void addAllMappings(Set<InputStream> mappings) {
-		mappings.addAll( mappings );
+		this.mappings.addAll( mappings );
 	}
 
 	public final Set<InputStream> getMappings() {
