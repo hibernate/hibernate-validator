@@ -40,7 +40,7 @@ import org.hibernate.validator.engine.groups.GroupChainGenerator;
  * @author Hardy Ferentschik
  */
 public class ElementDescriptorImpl implements ElementDescriptor {
-	protected final BeanMetaData<?> metaDataBean;
+	private final BeanMetaData<?> metaDataBean;
 	private final Class<?> type;
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors = new HashSet<ConstraintDescriptorImpl<?>>();
 
@@ -49,24 +49,28 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		this.type = type;
 	}
 
-	public void addConstraintDescriptor(ConstraintDescriptorImpl constraintDescriptor) {
+	public final  void addConstraintDescriptor(ConstraintDescriptorImpl constraintDescriptor) {
 		constraintDescriptors.add( constraintDescriptor );
 	}
 
-	public boolean hasConstraints() {
+	public final boolean hasConstraints() {
 		return constraintDescriptors.size() != 0;
 	}
 
-	public Class<?> getElementClass() {
+	public final Class<?> getElementClass() {
 		return type;
 	}
 
-	public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
+	public final Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
 		return findConstraints().getConstraintDescriptors();
 	}
 
-	public ConstraintFinder findConstraints() {
+	public final ConstraintFinder findConstraints() {
 		return new ConstraintFinderImpl();
+	}
+
+	public BeanMetaData<?> getMetaDataBean() {
+		return metaDataBean;
 	}
 
 	private class ConstraintFinderImpl implements ConstraintFinder {
