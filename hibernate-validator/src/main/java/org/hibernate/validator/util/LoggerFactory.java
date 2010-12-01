@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 /**
  * @author Hardy Ferentschik
  */
-public class LoggerFactory {
+public final class LoggerFactory {
 	public static Logger make() {
 		Throwable t = new Throwable();
 		StackTraceElement directCaller = t.getStackTrace()[1];

@@ -30,18 +30,18 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		super( beanMetaData.getBeanClass(), beanMetaData );
 	}
 
-	public boolean isBeanConstrained() {
-		return metaDataBean.getMetaConstraintsAsMap().size() > 0;
+	public final boolean isBeanConstrained() {
+		return getMetaDataBean().getMetaConstraintsAsMap().size() > 0;
 	}
 
-	public PropertyDescriptor getConstraintsForProperty(String propertyName) {
+	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
 		if ( propertyName == null ) {
 			throw new IllegalArgumentException( "The property name cannot be null" );
 		}
-		return metaDataBean.getPropertyDescriptor( propertyName );
+		return getMetaDataBean().getPropertyDescriptor( propertyName );
 	}
 
-	public Set<PropertyDescriptor> getConstrainedProperties() {
-		return metaDataBean.getConstrainedProperties();
+	public final Set<PropertyDescriptor> getConstrainedProperties() {
+		return getMetaDataBean().getConstrainedProperties();
 	}
 }

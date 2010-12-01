@@ -25,7 +25,7 @@ import javax.validation.ValidationException;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class NewInstance<T> implements PrivilegedAction<T> {
+public final class NewInstance<T> implements PrivilegedAction<T> {
 	private final Class<T> clazz;
 	private final String message;
 

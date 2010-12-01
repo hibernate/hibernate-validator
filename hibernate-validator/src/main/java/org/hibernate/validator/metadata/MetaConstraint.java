@@ -42,6 +42,11 @@ public class MetaConstraint<T, A extends Annotation> {
 	private final ConstraintTree<A> constraintTree;
 
 	/**
+	 * The constraint descriptor.
+	 */
+	private final ConstraintDescriptorImpl<A> constraintDescriptor;
+
+	/**
 	 * The site at which this constraint is defined.
 	 */
 	private final ConstraintSite site;
@@ -51,8 +56,8 @@ public class MetaConstraint<T, A extends Annotation> {
 	 * @param site meta data about constraint placement
 	 */
 	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintSite site) {
-
-		constraintTree = new ConstraintTree<A>( constraintDescriptor );
+		this.constraintTree = new ConstraintTree<A>( constraintDescriptor );
+		this.constraintDescriptor = constraintDescriptor;
 		this.site = site;
 	}
 
@@ -61,19 +66,18 @@ public class MetaConstraint<T, A extends Annotation> {
 	 *         it is not explicitly specified, but part of the redefined default group list of the hosting bean.
 	 */
 	public final Set<Class<?>> getGroupList() {
-		return constraintTree.getDescriptor().getGroups();
+		return constraintDescriptor.getGroups();
 	}
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {
-		return constraintTree.getDescriptor();
+		return constraintDescriptor;
 	}
 
 	public final ElementType getElementType() {
-		return constraintTree.getDescriptor().getElementType();
+		return constraintDescriptor.getElementType();
 	}
 
 	public <T, U, V> boolean validateConstraint(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
-
 		valueContext.setElementType( getElementType() );
 		valueContext.setTypeOfAnnotatedElement( typeOfAnnotatedElement() );
 
