@@ -233,7 +233,7 @@ public final class PathImpl implements Path, Serializable {
 
 				// create the node
 				String value = matcher.group( PROPERTY_NAME_GROUP );
-				Node node = path.addNode( value );
+				path.addNode( value );
 
 				// is the node indexable
 				if ( matcher.group( INDEXED_GROUP ) != null ) {
