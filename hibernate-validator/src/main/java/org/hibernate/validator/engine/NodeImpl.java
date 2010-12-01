@@ -127,9 +127,6 @@ public class NodeImpl implements Path.Node, Serializable {
 		if ( name != null ? !name.equals( node.name ) : node.name != null ) {
 			return false;
 		}
-		if ( parent != null ? !parent.equals( node.parent ) : node.parent != null ) {
-			return false;
-		}
 
 		return true;
 	}
@@ -141,7 +138,6 @@ public class NodeImpl implements Path.Node, Serializable {
 
 	private int buildHashCode() {
 		int result = name != null ? name.hashCode() : 0;
-		result = 31 * result + ( parent != null ? parent.hashCode() : 0 );
 		result = 31 * result + ( isIterable ? 1 : 0 );
 		result = 31 * result + ( index != null ? index.hashCode() : 0 );
 		result = 31 * result + ( key != null ? key.hashCode() : 0 );
