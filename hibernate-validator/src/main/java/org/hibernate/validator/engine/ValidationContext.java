@@ -272,14 +272,12 @@ public class ValidationContext<T> {
 	}
 
 	private void markProcessedForCurrentPath(Object value, PathImpl path) {
-		PathImpl parentPath = path.getPathWithoutLeafNode();
-
 		if ( processedPaths.containsKey( value ) ) {
-			processedPaths.get( value ).add( parentPath );
+			processedPaths.get( value ).add( path );
 		}
 		else {
 			Set<PathImpl> set = new HashSet<PathImpl>();
-			set.add( parentPath );
+			set.add( path );
 			processedPaths.put( value, set );
 		}
 	}
