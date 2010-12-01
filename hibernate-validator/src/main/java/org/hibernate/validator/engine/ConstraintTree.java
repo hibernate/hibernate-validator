@@ -19,6 +19,7 @@ package org.hibernate.validator.engine;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +60,18 @@ public class ConstraintTree<A extends Annotation> {
 
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
+
+	/**
+	 * The constraint descriptor for the constraint represented by this constraint tree.
+	 */
 	private final ConstraintDescriptorImpl<A> descriptor;
-	private final Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorTypes;
+
+	/**
+	 * A maps of all available constraint validator classes for this constraint mapped to their validator types.
+	 */
+	private final Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes;
+
+
 	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 	private final Map<Type, Type> suitableTypeMap;
 
@@ -85,8 +96,8 @@ public class ConstraintTree<A extends Annotation> {
 			children.add( treeNode );
 		}
 
-		validatorTypes = ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
-		suitableTypeMap = new LRUMap<Type, Type>( MAX_TYPE_CACHE_SIZE );
+		availableValidatorTypes = ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
+		suitableTypeMap = Collections.synchronizedMap(new LRUMap<Type, Type>( MAX_TYPE_CACHE_SIZE ));
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
@@ -292,14 +303,14 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	/**
-	 * @param type The type of the value to be validated (the type of the member/class the constraint was placed on).
+	 * @param validatedValueType The type of the value to be validated (the type of the member/class the constraint was placed on).
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator.
 	 *
 	 * @return A initialized constraint validator matching the type of the value to be validated.
 	 */
 	@SuppressWarnings("unchecked")
-	private <V> ConstraintValidator<A, V> getInitializedValidator(Type type, ConstraintValidatorFactory constraintFactory) {
-		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( type );
+	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ConstraintValidatorFactory constraintFactory) {
+		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
 
 		// check if we have the default validator factory. If not we don't use caching (see HV-242)
 		if ( !( constraintFactory instanceof ConstraintValidatorFactoryImpl ) ) {
@@ -339,22 +350,22 @@ public class ConstraintTree<A extends Annotation> {
 	/**
 	 * Runs the validator resolution algorithm.
 	 *
-	 * @param type The type of the value to be validated (the type of the member/class the constraint was placed on).
+	 * @param validatedValueType The type of the value to be validated (the type of the member/class the constraint was placed on).
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Type type) {
-		if ( suitableTypeMap.containsKey( type ) ) {
-			return validatorTypes.get( suitableTypeMap.get( type ) );
+	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Type validatedValueType) {
+		if ( suitableTypeMap.containsKey( validatedValueType ) ) {
+			return availableValidatorTypes.get( suitableTypeMap.get( validatedValueType ) );
 		}
 
-		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( type );
+		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType );
 		resolveAssignableTypes( discoveredSuitableTypes );
-		verifyResolveWasUnique( type, discoveredSuitableTypes );
+		verifyResolveWasUnique( validatedValueType, discoveredSuitableTypes );
 
 		Type suitableType = discoveredSuitableTypes.get( 0 );
-		suitableTypeMap.put( type, suitableType );
-		return validatorTypes.get( suitableType );
+		suitableTypeMap.put( validatedValueType, suitableType );
+		return availableValidatorTypes.get( suitableType );
 	}
 
 	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
@@ -387,7 +398,7 @@ public class ConstraintTree<A extends Annotation> {
 
 	private List<Type> findSuitableValidatorTypes(Type type) {
 		List<Type> determinedSuitableTypes = new ArrayList<Type>();
-		for ( Type validatorType : validatorTypes.keySet() ) {
+		for ( Type validatorType : availableValidatorTypes.keySet() ) {
 			if ( TypeUtils.isAssignable( validatorType, type ) && !determinedSuitableTypes.contains( validatorType ) ) {
 				determinedSuitableTypes.add( validatorType );
 			}
