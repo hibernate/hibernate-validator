@@ -17,6 +17,10 @@
 */
 package org.hibernate.validator.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
@@ -25,6 +29,9 @@ import javax.validation.Configuration;
 import javax.validation.Validation;
 import javax.validation.TraversableResolver;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.spi.ValidationProvider;
+
+import org.hibernate.validator.HibernateValidator;
 
 /**
  * This class lazily initialize the ValidatorFactory on the first usage
@@ -33,7 +40,12 @@ import javax.validation.ConstraintValidatorFactory;
  * Useful to avoid loading classes before JPA is initialized
  * and has enhanced its classes.
  *
+ * When no Configuration is passed, the provider is Hibernate Validator
+ *
+ * This class is used by JBoss AS 6.
+ *
  * Experimental, not considered a public API
+ *
  * @author Emmanuel Bernard
  */
 public class LazyValidatorFactory implements ValidatorFactory {
@@ -72,7 +84,11 @@ public class LazyValidatorFactory implements ValidatorFactory {
 	//we can initialize several times that's ok
 	private ValidatorFactory initFactory() {
 		if ( configuration == null ) {
-			return Validation.buildDefaultValidatorFactory();
+			return Validation
+					.byDefaultProvider()
+					.providerResolver( new HibernateProviderResolver() )
+					.configure()
+					.buildValidatorFactory();
 		}
 		else {
 			return configuration.buildValidatorFactory();
@@ -97,5 +113,19 @@ public class LazyValidatorFactory implements ValidatorFactory {
 
 	public <T> T unwrap(Class<T> clazz) {
 		return getDelegate().unwrap( clazz );
+	}
+
+	private static class HibernateProviderResolver implements ValidationProviderResolver {
+		private final List<ValidationProvider<?>> provider;
+
+		private HibernateProviderResolver() {
+			List<ValidationProvider<?>> provider = new ArrayList<ValidationProvider<?>>(1);
+			provider.add( new HibernateValidator() );
+			this.provider = Collections.unmodifiableList( provider );
+		}
+
+		public List<ValidationProvider<?>> getValidationProviders() {
+			return provider;
+		}
 	}
 }
