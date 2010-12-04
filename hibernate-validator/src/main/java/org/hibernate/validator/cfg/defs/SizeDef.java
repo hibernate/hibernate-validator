@@ -18,7 +18,7 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
+
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -27,25 +27,10 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class SizeDef extends ConstraintDef<Size> {
+public class SizeDef extends ConstraintDef<SizeDef, Size> {
 
 	public SizeDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Size.class, property, elementType, mapping );
-	}
-
-	public SizeDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public SizeDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public SizeDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public SizeDef min(int min) {

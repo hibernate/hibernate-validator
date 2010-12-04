@@ -56,7 +56,7 @@ public final class ConstraintsForType {
 	 *
 	 * @return A constraint definition class allowing to specify additional constraint parameters.
 	 */
-	public <A extends Annotation, T extends ConstraintDef<A>> T constraint(Class<T> definition) {
+	public <A extends Annotation, T extends ConstraintDef<T, A>> T constraint(Class<T> definition) {
 		final Constructor<T> constructor = ReflectionHelper.getConstructor(
 				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
 		);

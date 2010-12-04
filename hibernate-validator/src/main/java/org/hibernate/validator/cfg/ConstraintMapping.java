@@ -32,13 +32,13 @@ import java.util.Set;
  * @author Hardy Ferentschik
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConstraintDef<?>>> constraintConfig;
+	private final Map<Class<?>, List<ConstraintDef<?, ?>>> constraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 
 	public ConstraintMapping() {
-		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?>>>();
+		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?, ?>>>();
 		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
 		this.configuredClasses = new HashSet<Class<?>>();
 		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
@@ -58,10 +58,10 @@ public class ConstraintMapping {
 
 	public final <A extends Annotation> Map<Class<?>, List<ConstraintDefWrapper<?>>> getConstraintConfig() {
 		Map<Class<?>, List<ConstraintDefWrapper<?>>> newDefinitions = new HashMap<Class<?>, List<ConstraintDefWrapper<?>>>();
-		for ( Map.Entry<Class<?>, List<ConstraintDef<?>>> entry : constraintConfig.entrySet() ) {
+		for ( Map.Entry<Class<?>, List<ConstraintDef<?, ?>>> entry : constraintConfig.entrySet() ) {
 
 			List<ConstraintDefWrapper<?>> newList = new ArrayList<ConstraintDefWrapper<?>>();
-			for ( ConstraintDef<?> definition : entry.getValue() ) {
+			for ( ConstraintDef<?, ?> definition : entry.getValue() ) {
 				Class<?> beanClass = definition.beanType;
 				@SuppressWarnings("unchecked")
 				ConstraintDefWrapper<A> defAccessor = new ConstraintDefWrapper<A>(
@@ -125,14 +125,14 @@ public class ConstraintMapping {
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
 	}
 
-	protected final void addConstraintConfig(ConstraintDef<?> definition) {
+	protected final void addConstraintConfig(ConstraintDef<?, ?> definition) {
 		Class<?> beanClass = definition.beanType;
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {
 			constraintConfig.get( beanClass ).add( definition );
 		}
 		else {
-			List<ConstraintDef<?>> definitionList = new ArrayList<ConstraintDef<?>>();
+			List<ConstraintDef<?, ?>> definitionList = new ArrayList<ConstraintDef<?, ?>>();
 			definitionList.add( definition );
 			constraintConfig.put( beanClass, definitionList );
 		}

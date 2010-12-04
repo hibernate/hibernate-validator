@@ -25,7 +25,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class AssertTrueDef extends ConstraintDef<AssertTrue> {
+public class AssertTrueDef extends ConstraintDef<AssertTrueDef, AssertTrue> {
 	public AssertTrueDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, AssertTrue.class, property, elementType, mapping );
 	}

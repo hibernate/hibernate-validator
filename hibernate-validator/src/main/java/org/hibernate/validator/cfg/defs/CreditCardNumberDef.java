@@ -26,7 +26,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 /**
  * @author Hardy Ferentschik
  */
-public class CreditCardNumberDef extends ConstraintDef<CreditCardNumber> {
+public class CreditCardNumberDef extends ConstraintDef<CreditCardNumberDef, CreditCardNumber> {
 	public CreditCardNumberDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, CreditCardNumber.class, property, elementType, mapping );
 	}

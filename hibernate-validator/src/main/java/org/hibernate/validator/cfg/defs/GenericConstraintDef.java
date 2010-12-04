@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-
 package org.hibernate.validator.cfg.defs;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -31,33 +30,18 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  *
  * @author Hardy Ferentschik
  */
-public class GenericConstraintDef extends ConstraintDef {
+public class GenericConstraintDef<A extends Annotation> extends ConstraintDef<GenericConstraintDef<A>, A> {
 
 	public GenericConstraintDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, null, property, elementType, mapping );
 	}
 
-	public GenericConstraintDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public GenericConstraintDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public GenericConstraintDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
-	}
-
-	public GenericConstraintDef param(String key, Object value) {
+	public GenericConstraintDef<A> param(String key, Object value) {
 		addParameter( key, value );
 		return this;
 	}
 
-	public GenericConstraintDef constraintType(Class<?> constraintType) {
+	public GenericConstraintDef<A> constraintType(Class<A> constraintType) {
 		this.constraintType = constraintType;
 		return this;
 	}

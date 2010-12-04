@@ -17,7 +17,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 import javax.validation.constraints.Digits;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -27,25 +26,10 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class DigitsDef extends ConstraintDef<Digits> {
+public class DigitsDef extends ConstraintDef<DigitsDef, Digits> {
 
 	public DigitsDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Digits.class, property, elementType, mapping );
-	}
-
-	public DigitsDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public DigitsDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public DigitsDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public DigitsDef integer(int integer) {

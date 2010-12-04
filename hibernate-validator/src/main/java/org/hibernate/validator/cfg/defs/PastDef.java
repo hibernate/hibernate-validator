@@ -25,7 +25,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class PastDef extends ConstraintDef<Past> {
+public class PastDef extends ConstraintDef<PastDef, Past> {
 	public PastDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Past.class, property, elementType, mapping );
 	}

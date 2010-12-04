@@ -17,7 +17,7 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
+
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -27,25 +27,10 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class PatternDef extends ConstraintDef<Pattern> {
+public class PatternDef extends ConstraintDef<PatternDef, Pattern> {
 
 	public PatternDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Pattern.class, property, elementType, mapping );
-	}
-
-	public PatternDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public PatternDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public PatternDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public PatternDef flags(Pattern.Flag[] flags) {

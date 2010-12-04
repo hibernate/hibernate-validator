@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Hardy Ferentschik
  */
-public class ConstraintDefWrapper<A extends Annotation> extends ConstraintDef<A> {
+public class ConstraintDefWrapper<A extends Annotation> extends ConstraintDef<ConstraintDefWrapper<A>, A> {
 
 	public ConstraintDefWrapper(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
 		super( beanType, constraintType, property, elementType, parameters, mapping );

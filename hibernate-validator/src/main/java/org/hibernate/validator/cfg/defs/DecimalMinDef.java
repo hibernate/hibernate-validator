@@ -17,7 +17,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 import javax.validation.constraints.DecimalMin;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -26,25 +25,10 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class DecimalMinDef extends ConstraintDef<DecimalMin> {
+public class DecimalMinDef extends ConstraintDef<DecimalMinDef, DecimalMin> {
 
 	public DecimalMinDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, DecimalMin.class, property, elementType, mapping );
-	}
-
-	public DecimalMinDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public DecimalMinDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public DecimalMinDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public DecimalMinDef value(String min) {
