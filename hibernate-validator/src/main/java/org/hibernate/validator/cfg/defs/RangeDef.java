@@ -17,7 +17,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -26,25 +25,10 @@ import org.hibernate.validator.constraints.Range;
 /**
  * @author Hardy Ferentschik
  */
-public class RangeDef extends ConstraintDef<Range> {
+public class RangeDef extends ConstraintDef<RangeDef, Range> {
 
 	public RangeDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Range.class, property, elementType, mapping );
-	}
-
-	public RangeDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public RangeDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public RangeDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public RangeDef min(long min) {

@@ -17,7 +17,7 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
+
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -26,25 +26,10 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class MinDef extends ConstraintDef<Min> {
+public class MinDef extends ConstraintDef<MinDef, Min> {
 
 	public MinDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Min.class, property, elementType, mapping );
-	}
-
-	public MinDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public MinDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public MinDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public MinDef value(long min) {

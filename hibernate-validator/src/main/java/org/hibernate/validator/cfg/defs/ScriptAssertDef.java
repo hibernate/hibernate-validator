@@ -17,7 +17,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -26,25 +25,10 @@ import org.hibernate.validator.constraints.ScriptAssert;
 /**
  * @author Hardy Ferentschik
  */
-public class ScriptAssertDef extends ConstraintDef<ScriptAssert> {
+public class ScriptAssertDef extends ConstraintDef<ScriptAssertDef, ScriptAssert> {
 
 	public ScriptAssertDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, ScriptAssert.class, property, elementType, mapping );
-	}
-
-	public ScriptAssertDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public ScriptAssertDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public ScriptAssertDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public ScriptAssertDef lang(String lang) {

@@ -16,7 +16,6 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
-import javax.validation.Payload;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -25,25 +24,10 @@ import org.hibernate.validator.constraints.URL;
 /**
  * @author Hardy Ferentschik
  */
-public class URLDef extends ConstraintDef<URL> {
+public class URLDef extends ConstraintDef<URLDef, URL> {
 
 	public URLDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, URL.class, property, elementType, mapping );
-	}
-
-	public URLDef message(String message) {
-		super.message( message );
-		return this;
-	}
-
-	public URLDef groups(Class<?>... groups) {
-		super.groups( groups );
-		return this;
-	}
-
-	public URLDef payload(Class<? extends Payload>... payload) {
-		super.payload( payload );
-		return this;
 	}
 
 	public URLDef protocol(String protocol) {

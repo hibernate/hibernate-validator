@@ -29,7 +29,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 /**
  * @author Hardy Ferentschik
  */
-public abstract class ConstraintDef<A extends Annotation> {
+public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
 	protected Class<A> constraintType;
 	protected final Map<String, Object> parameters;
 	protected final Class<?> beanType;
@@ -71,32 +71,32 @@ public abstract class ConstraintDef<A extends Annotation> {
 		this.mapping = mapping;
 	}
 
-	protected ConstraintDef addParameter(String key, Object value) {
+	protected C addParameter(String key, Object value) {
 		parameters.put( key, value );
-		return this;
+		return (C) this;
 	}
 
-	public ConstraintDef message(String message) {
+	public C message(String message) {
 		addParameter( "message", message );
-		return this;
+		return (C) this;
 	}
 
-	public ConstraintDef groups(Class<?>... groups) {
+	public C groups(Class<?>... groups) {
 		addParameter( "groups", groups );
-		return this;
+		return (C) this;
 	}
 
-	public ConstraintDef payload(Class<? extends Payload>... payload) {
+	public C payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return this;
+		return (C) this;
 	}
 
-	public <A extends Annotation, T extends ConstraintDef<A>> T constraint(Class<T> definition) {
-		final Constructor<T> constructor = ReflectionHelper.getConstructor(
+	public <B extends Annotation, D extends ConstraintDef<D, B>> D constraint(Class<D> definition) {
+		final Constructor<D> constructor = ReflectionHelper.getConstructor(
 				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
 		);
 
-		final T constraintDefinition = ReflectionHelper.newConstructorInstance(
+		final D constraintDefinition = ReflectionHelper.newConstructorInstance(
 				constructor, beanType, property, elementType, mapping
 		);
 

@@ -26,7 +26,7 @@ import org.hibernate.validator.constraints.Email;
 /**
  * @author Hardy Ferentschik
  */
-public class EmailDef extends ConstraintDef<Email> {
+public class EmailDef extends ConstraintDef<EmailDef, Email> {
 	public EmailDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Email.class, property, elementType, mapping );
 	}

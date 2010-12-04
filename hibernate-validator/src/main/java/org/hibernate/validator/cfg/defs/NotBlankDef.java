@@ -25,7 +25,7 @@ import org.hibernate.validator.constraints.NotBlank;
 /**
  * @author Hardy Ferentschik
  */
-public class NotBlankDef extends ConstraintDef<NotBlank> {
+public class NotBlankDef extends ConstraintDef<NotBlankDef, NotBlank> {
 	public NotBlankDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, NotBlank.class, property, elementType, mapping );
 	}

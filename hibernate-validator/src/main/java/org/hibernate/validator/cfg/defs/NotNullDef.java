@@ -25,7 +25,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class NotNullDef extends ConstraintDef<NotNull> {
+public class NotNullDef extends ConstraintDef<NotNullDef, NotNull> {
 	public NotNullDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, NotNull.class, property, elementType, mapping );
 	}

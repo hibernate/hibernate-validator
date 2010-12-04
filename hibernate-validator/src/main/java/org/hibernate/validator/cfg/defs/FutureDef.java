@@ -25,7 +25,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 /**
  * @author Hardy Ferentschik
  */
-public class FutureDef extends ConstraintDef<Future> {
+public class FutureDef extends ConstraintDef<FutureDef, Future> {
 	public FutureDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Future.class, property, elementType, mapping );
 	}
