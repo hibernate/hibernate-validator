@@ -5,11 +5,13 @@
 .gradle
 buildSrc/.gradle
 
-# Build output directies
+# Build output directories
 /target
 */target
 /build
 */build
+/bin
+*/bin
 
 # IntelliJ specific files/directories
 /out
