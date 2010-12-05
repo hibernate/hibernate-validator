@@ -17,6 +17,7 @@
 package org.hibernate.validator.engine;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import javax.validation.Path;
 
 /**
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public final class PathImpl implements Path, Serializable {
 
@@ -50,13 +52,16 @@ public final class PathImpl implements Path, Serializable {
 	private int hashCode;
 
 	/**
-	 * Returns a {@code Path} instance representing the path described by the given string. To create a root node the empty string should be passed.
+	 * Returns a {@code Path} instance representing the path described by the
+	 * given string. To create a root node the empty string should be passed.
 	 *
 	 * @param propertyPath the path as string representation.
 	 *
-	 * @return a {@code Path} instance representing the path described by the given string.
+	 * @return a {@code Path} instance representing the path described by the
+	 *         given string.
 	 *
-	 * @throws IllegalArgumentException in case {@code property == null} or {@code property} cannot be parsed.
+	 * @throws IllegalArgumentException in case {@code property == null} or
+	 * 	       {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
 		if ( propertyPath == null ) {
@@ -69,6 +74,33 @@ public final class PathImpl implements Path, Serializable {
 
 		return parseProperty( propertyPath );
 	}
+
+	/**
+	 * Creates a path representing the specified method parameter.
+	 *
+	 * @param method The method hosting the parameter to represent.
+	 * @param parameterIndex The parameter's index starting with 0 for the method's first parameter.
+	 *
+	 * @return A path representing the specified method parameter.
+	 */
+	public static PathImpl createPathForMethodParameter(Method method, int parameterIndex) {
+
+		if ( method == null ) {
+			throw new IllegalArgumentException( "A method is required to create a method parameter path." );
+		}
+
+		if ( parameterIndex < 0 || parameterIndex > method.getParameterTypes().length - 1 ) {
+			throw new IllegalArgumentException(
+					"Given parameter index " + parameterIndex + " is not a valid index for the parameters of given method " + method + "."
+			);
+		}
+
+		PathImpl path = createRootPath();
+		path.addMethodParameterNode( method, parameterIndex );
+
+		return path;
+	}
+
 
 	public static PathImpl createNewPath(String name) {
 		PathImpl path = new PathImpl();
@@ -93,12 +125,21 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public final NodeImpl addNode(String nodeName) {
-		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = nodeList.size() == 0 ? null : ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
+
+	private NodeImpl addMethodParameterNode(Method method, int parameterIndex) {
+		NodeImpl parent = nodeList.size() == 0 ? null : ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = new MethodParameterNodeImpl( method, parameterIndex, parent );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
 
 	public final NodeImpl makeLeafNodeIterable() {
 		NodeImpl leafNode = getLeafNode();
@@ -145,7 +186,7 @@ public final class PathImpl implements Path, Serializable {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 		for ( int i = 1; i < nodeList.size(); i++ ) {
-			NodeImpl nodeImpl = (NodeImpl) nodeList.get( i );
+			NodeImpl nodeImpl = ( NodeImpl ) nodeList.get( i );
 			if ( nodeImpl.getName() != null ) {
 				if ( !first ) {
 					builder.append( PROPERTY_PATH_SEPARATOR );
@@ -172,7 +213,7 @@ public final class PathImpl implements Path, Serializable {
 			return false;
 		}
 
-		PathImpl path = (PathImpl) o;
+		PathImpl path = ( PathImpl ) o;
 		if ( nodeList != null && !nodeList.equals( path.nodeList ) ) {
 			return false;
 		}
@@ -185,7 +226,7 @@ public final class PathImpl implements Path, Serializable {
 
 	@Override
 	public int hashCode() {
-		if(hashCode == -1) {
+		if ( hashCode == -1 ) {
 			buildHashCode();
 		}
 		return hashCode;
@@ -205,7 +246,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = null;
 		NodeImpl node = null;
 		for ( int i = 0; i < path.nodeList.size(); i++ ) {
-			node = (NodeImpl) path.nodeList.get( i );
+			node = ( NodeImpl ) path.nodeList.get( i );
 			NodeImpl newNode = new NodeImpl( node, parent );
 			this.nodeList.add( newNode );
 			parent = newNode;

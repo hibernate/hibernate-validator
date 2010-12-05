@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.engine.PathImpl;
 import org.hibernate.validator.test.util.TestUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -40,6 +39,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 /**
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class PathImplTest {
 
@@ -132,7 +132,7 @@ public class PathImplTest {
 		Validator validator = TestUtil.getValidator();
 		Container container = new Container();
 		Key id = new Key();
-		container.addItem( id, new Item( null) );
+		container.addItem( id, new Item( null ) );
 		Set<ConstraintViolation<Container>> constraintViolations = validator.validate( container );
 		assertNumberOfViolations( constraintViolations, 1 );
 		ConstraintViolation<Container> violation = constraintViolations.iterator().next();
@@ -140,9 +140,27 @@ public class PathImplTest {
 		Iterator<Path.Node> iter = path.iterator();
 		iter.next();
 		Path.Node node = iter.next();
-		assertNotNull(node);
+		assertNotNull( node );
 		assertTrue( node.isInIterable() );
-		assertEquals( node.getKey(), id  );
+		assertEquals( node.getKey(), id );
+	}
+
+	@Test
+	public void testCreationOfMethodParameterPath() throws Exception {
+
+		PathImpl methodParameterPath = PathImpl.createPathForMethodParameter(
+				Container.class.getMethod( "addItem", Key.class, Item.class ), 0
+		);
+
+		assertEquals( methodParameterPath.toString(), "Container#addItem()[0]" );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testCreationOfMethodParameterPathFailsDueToInvalidParameterIndex() throws Exception {
+
+		PathImpl.createPathForMethodParameter(
+				Container.class.getMethod( "addItem", Key.class, Item.class ), 2
+		);
 	}
 
 	class Container {
