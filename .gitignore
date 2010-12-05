@@ -13,6 +13,10 @@ buildSrc/.gradle
 /bin
 */bin
 
+# Test output directories
+test-output
+*/test-output
+
 # IntelliJ specific files/directories
 /out
 .idea
