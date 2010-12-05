@@ -43,11 +43,14 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.FileAssert.fail;
 
 /**
- * Tests for the <code>ReflectionHelper</code>.
+ * A helper providing useful functions for testing Hibernate Validator, e.g. for the assertion of constraint
+ * violations.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class TestUtil {
+
 	private static final Logger log = LoggerFactory.make();
 
 	private static Validator hibernateValidator;
@@ -57,7 +60,7 @@ public class TestUtil {
 
 	public static Validator getValidator() {
 		if ( hibernateValidator == null ) {
-			Configuration configuration = getConfiguration( Locale.ENGLISH );
+			Configuration<HibernateValidatorConfiguration> configuration = getConfiguration( Locale.ENGLISH );
 			configuration.traversableResolver( new DummyTraversableResolver() );
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
@@ -138,7 +141,7 @@ public class TestUtil {
 		}
 	}
 
-	public static <T> void assertCorrectPropertyPaths(Set<ConstraintViolation<T>> violations, String... propertyPaths) {
+	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations, String... propertyPaths) {
 		List<Path> propertyPathsOfViolations = new ArrayList<Path>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			propertyPathsOfViolations.add( violation.getPropertyPath() );
@@ -159,38 +162,38 @@ public class TestUtil {
 		}
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue, String propertyPath) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage, Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
 		assertEquals(
 				violation.getPropertyPath(),
 				PathImpl.createPathFromString( propertyPath ),
 				"Wrong propertyPath"
 		);
-		assertConstraintViolation( violation, errorMessage, rootBean, invalidValue );
+		assertConstraintViolation( violation, errorMessage, rootBeanClass, invalidValue );
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean, Object invalidValue) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage, Class<?> rootBeanClass, Object invalidValue) {
 		assertEquals(
 				violation.getInvalidValue(),
 				invalidValue,
 				"Wrong invalid value"
 		);
-		assertConstraintViolation( violation, errorMessage, rootBean );
+		assertConstraintViolation( violation, errorMessage, rootBeanClass );
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String errorMessage, Class rootBean) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage, Class<?> rootBeanClass) {
 		assertEquals(
 				violation.getRootBean().getClass(),
-				rootBean,
+				rootBeanClass,
 				"Wrong root bean type"
 		);
 		assertConstraintViolation( violation, errorMessage );
 	}
 
-	public static void assertConstraintViolation(ConstraintViolation violation, String message) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, String message) {
 		assertEquals( violation.getMessage(), message, "Wrong message" );
 	}
 
-	public static void assertNumberOfViolations(Set violations, int expectedViolations) {
+	public static void assertNumberOfViolations(Set<? extends ConstraintViolation<?>> violations, int expectedViolations) {
 		assertEquals( violations.size(), expectedViolations, "Wrong number of constraint violations" );
 	}
 
