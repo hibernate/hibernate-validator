@@ -18,9 +18,12 @@
 package org.hibernate.validator.test.engine.methodlevel;
 
 import java.lang.reflect.Proxy;
+import java.util.Set;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
+import javax.validation.constraints.Min;
 
 import org.hibernate.validator.MethodValidator;
 import org.hibernate.validator.MethodConstraintViolation;
@@ -69,7 +72,8 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByName");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getRootBeanClass(), null);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
+			assertEquals(constraintViolation.getRootBean(), customerRepository);
 		}
 	}
 	
@@ -89,7 +93,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByAgeAndName");
 			assertEquals(constraintViolation.getParameterIndex(), 1);
-			assertEquals(constraintViolation.getRootBeanClass(), null);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
 	
@@ -111,8 +115,8 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "name");
-			assertEquals(constraintViolation.getRootBeanClass(), Customer.class);
-			assertEquals(constraintViolation.getRootBean(), customer);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
+			assertEquals(constraintViolation.getRootBean(), customerRepository);
 			assertEquals(constraintViolation.getLeafBean(), customer);
 			assertEquals(constraintViolation.getInvalidValue(), null);
 		}
@@ -137,8 +141,8 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "address.city");
-			assertEquals(constraintViolation.getRootBeanClass(), Customer.class);
-			assertEquals(constraintViolation.getRootBean(), customer);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
+			assertEquals(constraintViolation.getRootBean(), customerRepository);
 			assertEquals(constraintViolation.getLeafBean(), address);
 			assertEquals(constraintViolation.getInvalidValue(), null);
 		}
@@ -161,7 +165,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "findById");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), RepositoryBase.class);
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getRootBeanClass(), null);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
 	
@@ -182,7 +186,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "foo");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getRootBeanClass(), null);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
 	
@@ -203,7 +207,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "bar");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getRootBeanClass(), Customer.class);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "name");
 		}
 	}
@@ -225,7 +229,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "foo");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getRootBeanClass(), null);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
 	

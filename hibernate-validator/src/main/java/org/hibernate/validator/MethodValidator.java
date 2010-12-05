@@ -20,9 +20,6 @@ package org.hibernate.validator;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
 /**
  * Provides an API for method-level validation, based on JSR 303 Appendix C ("Proposal for method-level validation")
  * 
@@ -30,7 +27,7 @@ import javax.validation.Validator;
  */
 public interface MethodValidator {
 
-	Set<MethodConstraintViolation<?>> validateParameter(Method method, Object parameterValue, int parameterIndex, Class<?>... groups);
+	public <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups);
 
 	//getConstraintsForMethod()
 }

@@ -157,7 +157,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
 	}
 
-	public final Set<MethodConstraintViolation<?>> validateParameter(Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
+	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
 
 		if ( method == null ) {
 			throw new IllegalArgumentException( "The method cannot be null." );
@@ -165,7 +165,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
-		return validateParameter( method, parameterIndex, parameterValue, groupChain );
+		return validateParameter( object, method, parameterIndex, parameterValue, groupChain );
 	}
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
@@ -680,9 +680,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <V> Set<MethodConstraintViolation<?>> validateParameter(Method method, int parameterIndex, V value, GroupChain groupChain) {
+	private <V, T> Set<MethodConstraintViolation<T>> validateParameter(T bean, Method method, int parameterIndex, V value, GroupChain groupChain) {
 
-		Set<MethodConstraintViolation<?>> constraintViolations = new HashSet<MethodConstraintViolation<?>>();
+		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
 
 		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
 
@@ -690,8 +690,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
 		}
 
-		MethodValidationContext<?> context = ValidationContext.getContextForValidateParameter(
-				method, parameterIndex, messageInterpolator, constraintValidatorFactory
+		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
+				method, parameterIndex, bean, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
 		ValueContext<?, V> valueContext = ValueContext.getLocalExecutionContext( null, PathImpl.createRootPath() );
@@ -714,10 +714,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		if ( isCascadeRequired( method, parameterIndex ) && value != null ) {
 
 			//TODO GM: is it possible to use the existing context here?
-			context = ValidationContext.getContextForValidateCascadingParameter(
+			context = ValidationContext.getContextForValidateParameter(
 					method,
 					parameterIndex,
-					value,
+					bean,
 					messageInterpolator,
 					constraintValidatorFactory,
 					getCachingTraversableResolver()

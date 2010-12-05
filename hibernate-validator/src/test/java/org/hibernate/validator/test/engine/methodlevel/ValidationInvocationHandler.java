@@ -49,8 +49,9 @@ public class ValidationInvocationHandler implements InvocationHandler {
 		
 		for (int i = 0; i < args.length; i++) {
 			
-			Set<MethodConstraintViolation<?>> constraintViolations = validator.validateParameter(method, args[i], i);
-			
+			Set<MethodConstraintViolation<Object>> constraintViolations =  
+				validator.validateParameter(wrapped, method, args[i], i);
+
 			if(!constraintViolations.isEmpty()) {
 				throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
 			}

@@ -117,13 +117,7 @@ public class ValidationContext<T> {
 		);
 	}
 
-	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory) {
-		return new MethodValidationContext<T>(
-				method, parameterIndex, null, null, messageInterpolator, constraintValidatorFactory, null
-		);
-	}
-
-	public static <T> MethodValidationContext<T> getContextForValidateCascadingParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
