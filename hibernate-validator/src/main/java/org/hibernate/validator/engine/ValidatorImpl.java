@@ -694,9 +694,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				method, parameterIndex, bean, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
-		ValueContext<?, V> valueContext = ValueContext.getLocalExecutionContext( null, PathImpl.createRootPath() );
+		ValueContext<?, V> valueContext = ValueContext.getLocalExecutionContext( null, PathImpl.createPathForMethodParameter(method, parameterIndex) );
 		valueContext.setCurrentValidatedValue( value );
-
+		
 		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
 		// before traversing the object.
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
@@ -722,7 +722,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					constraintValidatorFactory,
 					getCachingTraversableResolver()
 			);
-			valueContext = ValueContext.getLocalExecutionContext( value, PathImpl.createRootPath() );
+			valueContext = ValueContext.getLocalExecutionContext( value, PathImpl.createPathForMethodParameter(method, parameterIndex) );
 
 			groupIterator = groupChain.getGroupIterator();
 			while ( groupIterator.hasNext() ) {

@@ -22,7 +22,9 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Path;
 import javax.validation.Validation;
+import javax.validation.Validator;
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.MethodValidator;
@@ -34,6 +36,7 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.RepositoryBase;
 
 import static org.testng.Assert.*;
+import static org.hibernate.validator.test.util.TestUtil.*;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -57,6 +60,15 @@ public class MethodLevelValidationTest {
 	}
 	
 	@Test
+	public void testPath() {
+		
+		Validator validator2 = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<Customer>> violations = validator2.validate(new Customer(null, null));
+		Path propertyPath = violations.iterator().next().getPropertyPath();
+		System.out.println(propertyPath);
+	}
+	
+	@Test
 	public void methodValidationYieldsConstraintViolation() {
 		
 		try {
@@ -66,14 +78,21 @@ public class MethodLevelValidationTest {
 		}
 		catch(ConstraintViolationException e) {
 			
-			assertEquals(e.getConstraintViolations().size(), 1);
+			Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
+			assertNumberOfViolations(constraintViolations, 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
-			assertEquals(constraintViolation.getMessage(), "may not be null");
+			
+			
+			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) constraintViolations.iterator().next();
+
+			
+			assertConstraintViolation(constraintViolation, "may not be null", CustomerRepositoryImpl.class, null);
+			
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByName");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
+			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#findCustomerByName()[0]");
+			
 		}
 	}
 	
@@ -114,7 +133,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getPropertyPath().toString(), "name");
+			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#persistCustomer()[0].name");
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
 			assertEquals(constraintViolation.getLeafBean(), customer);
@@ -140,7 +159,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
-			assertEquals(constraintViolation.getPropertyPath().toString(), "address.city");
+			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#persistCustomer()[0].address.city");
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
 			assertEquals(constraintViolation.getLeafBean(), address);
@@ -208,7 +227,7 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
 			assertEquals(constraintViolation.getParameterIndex(), 0);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
-			assertEquals(constraintViolation.getPropertyPath().toString(), "name");
+			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#bar()[0].name");
 		}
 	}
 	
