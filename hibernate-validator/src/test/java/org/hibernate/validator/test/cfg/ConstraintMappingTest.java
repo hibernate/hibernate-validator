@@ -43,13 +43,11 @@ import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.FileAssert.fail;
 
 /**
  * Unit test for {@link ConstraintMapping} et al.
- *  
+ *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
@@ -185,21 +183,21 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "must be true" );
 	}
 
-	@Test
-	public void testSingleConstraintWrongAccessType() {
+	@Test(
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = "The class class org.hibernate.validator.test.cfg.Marathon does not have a property 'numberOfHelpers' with access METHOD"
+	)
+	public void testSingleConstraintWrongAccessType() throws Throwable {
+
 		ConstraintMapping mapping = new ConstraintMapping();
 		try {
 			mapping
 					.type( Marathon.class )
 					.property( "numberOfHelpers", METHOD )
 					.constraint( NotNullDef.class );
-			fail( "Expected exception due to unknown property wasn't raised." );
 		}
 		catch ( ValidationException e ) {
-			assertEquals(
-					e.getCause().getCause().getMessage(),
-					"The class class org.hibernate.validator.test.cfg.Marathon does not have a property 'numberOfHelpers' with access METHOD"
-			);
+			throw ( e.getCause().getCause() );
 		}
 	}
 
@@ -263,7 +261,10 @@ public class ConstraintMappingTest {
 		assertNumberOfViolations( violations, 0 );
 	}
 
-	@Test
+	@Test(
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = ".*No value provided for minRunner.*"
+	)
 	public void testCustomConstraintTypeMissingParameter() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
@@ -271,13 +272,7 @@ public class ConstraintMappingTest {
 
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		config.addMapping( mapping );
-		try {
-			config.buildValidatorFactory();
-			fail( "MarathonConstraints needs a parameter" );
-		}
-		catch ( ValidationException e ) {
-			assertTrue( e.getMessage().contains( "No value provided for minRunner" ) );
-		}
+		config.buildValidatorFactory();
 	}
 
 	@Test
