@@ -27,7 +27,21 @@ import javax.validation.ValidationException;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
+ * Base class for all constraint definition types. Each sub type represents a
+ * single constraint annotation type and allows to add this constraint to a bean
+ * class in a programmatic type-safe way with help of the
+ * {@link ConstraintMapping} API.
+ * 
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
+ * 
+ * @param <C>
+ *            The type of a concrete sub type. Following to the
+ *            "self referencing generic type" pattern each sub type has to be
+ *            parametrized with itself.
+ * 
+ * @param <A>
+ *            The constraint annotation type represented by a concrete sub type.
  */
 public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
 	protected Class<A> constraintType;
@@ -71,24 +85,28 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		this.mapping = mapping;
 	}
 
+	@SuppressWarnings("unchecked")
+	private C getThis() {
+		return (C) this;
+	}
 	protected C addParameter(String key, Object value) {
 		parameters.put( key, value );
-		return (C) this;
+		return getThis();
 	}
 
 	public C message(String message) {
 		addParameter( "message", message );
-		return (C) this;
+		return getThis();
 	}
 
 	public C groups(Class<?>... groups) {
 		addParameter( "groups", groups );
-		return (C) this;
+		return getThis();
 	}
 
 	public C payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return (C) this;
+		return getThis();
 	}
 
 	public <B extends Annotation, D extends ConstraintDef<D, B>> D constraint(Class<D> definition) {
