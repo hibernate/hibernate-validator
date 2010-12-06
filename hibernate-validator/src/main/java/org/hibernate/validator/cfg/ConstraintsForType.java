@@ -21,6 +21,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
+import org.hibernate.validator.cfg.defs.GenericConstraintDef;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.TYPE;
@@ -29,6 +30,7 @@ import static java.lang.annotation.ElementType.TYPE;
  * Via instances of this class constraints and cascading properties can be configured for a single bean class.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public final class ConstraintsForType {
 	private static final String EMPTY_PROPERTY = "";
@@ -50,7 +52,7 @@ public final class ConstraintsForType {
 	}
 
 	/**
-	 * Add a new constraint.
+	 * Adds a new constraint.
 	 *
 	 * @param definition The constraint definition class
 	 *
@@ -64,6 +66,25 @@ public final class ConstraintsForType {
 		final T constraintDefinition = ReflectionHelper.newConstructorInstance(
 				constructor, beanClass, property, elementType, mapping
 		);
+		mapping.addConstraintConfig( constraintDefinition );
+		return constraintDefinition;
+	}
+
+	/**
+	 * Adds a new constraint in a generic way. The attributes of the constraint can later on be
+	 * set by invoking {@link GenericConstraintDef#addParameter(String, Object)}.
+	 *
+	 * @param <A> The annotation type of the constraint to add
+	 * @param definition The constraint to add
+	 *
+	 * @return A generic constraint definition class allowing to specify additional constraint parameters
+	 */
+	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
+
+		GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
+				beanClass, definition, property, elementType, mapping
+		);
+
 		mapping.addConstraintConfig( constraintDefinition );
 		return constraintDefinition;
 	}
