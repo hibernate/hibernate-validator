@@ -48,6 +48,7 @@ public class LazyValidatorFactoryTest {
 	}
 
 	public static class A {
-		@NotNull String b;
+		@NotNull
+		String b;
 	}
 }

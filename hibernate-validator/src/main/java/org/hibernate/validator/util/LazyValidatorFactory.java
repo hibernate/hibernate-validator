@@ -19,15 +19,15 @@ package org.hibernate.validator.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.validation.Configuration;
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.MessageInterpolator;
+import javax.validation.TraversableResolver;
+import javax.validation.Validation;
 import javax.validation.ValidationProviderResolver;
-import javax.validation.ValidatorFactory;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
-import javax.validation.MessageInterpolator;
-import javax.validation.Configuration;
-import javax.validation.Validation;
-import javax.validation.TraversableResolver;
-import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
@@ -56,7 +56,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 	 * Use the default ValidatorFactory creation routine
 	 */
 	public LazyValidatorFactory() {
-		this(null);
+		this( null );
 	}
 
 	public LazyValidatorFactory(Configuration<?> configuration) {
@@ -65,10 +65,10 @@ public class LazyValidatorFactory implements ValidatorFactory {
 
 	private ValidatorFactory getDelegate() {
 		ValidatorFactory result = delegate;
-		if (result == null) {
+		if ( result == null ) {
 			synchronized ( this ) {
 				result = delegate;
-				if (result == null) {
+				if ( result == null ) {
 					delegate = result = initFactory();
 				}
 			}
@@ -81,6 +81,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 	}
 
 	//we can initialize several times that's ok
+
 	private ValidatorFactory initFactory() {
 		if ( configuration == null ) {
 			return Validation
@@ -118,7 +119,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 		private final List<ValidationProvider<?>> provider;
 
 		private HibernateProviderResolver() {
-			List<ValidationProvider<?>> provider = new ArrayList<ValidationProvider<?>>(1);
+			List<ValidationProvider<?>> provider = new ArrayList<ValidationProvider<?>>( 1 );
 			provider.add( new HibernateValidator() );
 			this.provider = Collections.unmodifiableList( provider );
 		}
