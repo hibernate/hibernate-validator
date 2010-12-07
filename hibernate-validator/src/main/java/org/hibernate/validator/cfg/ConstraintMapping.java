@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +29,7 @@ import java.util.Set;
  * Top level class for constraints configured via the programmatic API.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ConstraintMapping {
 	private final Map<Class<?>, List<ConstraintDef<?, ?>>> constraintConfig;
@@ -56,27 +56,8 @@ public class ConstraintMapping {
 		return new ConstraintsForType( beanClass, this );
 	}
 
-	public final <A extends Annotation> Map<Class<?>, List<ConstraintDefWrapper<?>>> getConstraintConfig() {
-		Map<Class<?>, List<ConstraintDefWrapper<?>>> newDefinitions = new HashMap<Class<?>, List<ConstraintDefWrapper<?>>>();
-		for ( Map.Entry<Class<?>, List<ConstraintDef<?, ?>>> entry : constraintConfig.entrySet() ) {
-
-			List<ConstraintDefWrapper<?>> newList = new ArrayList<ConstraintDefWrapper<?>>();
-			for ( ConstraintDef<?, ?> definition : entry.getValue() ) {
-				Class<?> beanClass = definition.beanType;
-				@SuppressWarnings("unchecked")
-				ConstraintDefWrapper<A> defAccessor = new ConstraintDefWrapper<A>(
-						beanClass,
-						( Class<A> ) definition.constraintType,
-						definition.property,
-						definition.elementType,
-						definition.parameters,
-						this
-				);
-				newList.add( defAccessor );
-			}
-			newDefinitions.put( entry.getKey(), newList );
-		}
-		return newDefinitions;
+	public final Map<Class<?>, List<ConstraintDef<?, ?>>> getConstraintConfig() {
+		return constraintConfig;
 	}
 
 	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
@@ -126,7 +107,7 @@ public class ConstraintMapping {
 	}
 
 	protected final void addConstraintConfig(ConstraintDef<?, ?> definition) {
-		Class<?> beanClass = definition.beanType;
+		Class<?> beanClass = definition.getBeanType();
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {
 			constraintConfig.get( beanClass ).add( definition );
