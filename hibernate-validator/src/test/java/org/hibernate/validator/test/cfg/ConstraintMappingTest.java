@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.ConstraintsForType;
 import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.defs.FutureDef;
 import org.hibernate.validator.cfg.defs.MinDef;
@@ -124,6 +125,37 @@ public class ConstraintMappingTest {
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "too short" );
+	}
+
+	/**
+	 * HV-404: Introducing {@link ConstraintsForType#genericConstraint(Class)} allows to set
+	 * specific parameters on following specific constraints.
+	 */
+	@Test
+	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
+
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.genericConstraint( MarathonConstraint.class )
+				.param( "minRunner", 1 )
+				.property( "name", METHOD )
+				.constraint( SizeDef.class )
+				.message( "name too short" )
+				.min( 3 );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "NY" );
+		marathon.addRunner( new Runner() );
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "name too short" );
 	}
 
 	@Test
