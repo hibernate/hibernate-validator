@@ -34,23 +34,52 @@ import org.hibernate.validator.util.ReflectionHelper;
  * 
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * 
  * @param <C>
  *            The type of a concrete sub type. Following to the
  *            "self referencing generic type" pattern each sub type has to be
  *            parametrized with itself.
- * 
  * @param <A>
  *            The constraint annotation type represented by a concrete sub type.
  */
 public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
-	
-	private final Class<A> constraintType;
-	private final Map<String, Object> parameters;
-	private final Class<?> beanType;
-	private final ElementType elementType;
-	private final String property;
-	private final ConstraintMapping mapping;
+
+	// Note on visibility of members: In order to avoid the need for public
+	// getter methods for the fields of this class (which would pollute it's
+	// fluent API) they are protected instead of private. To get access to
+	// these fields outside of this class a ConstraintDefAccessor instance can
+	// be created from it, which offers public getter methods.
+
+	/**
+	 * The constraint annotation type of this definition.
+	 */
+	protected final Class<A> constraintType;
+
+	/**
+	 * A map with the annotation parameters of this definition. Keys are
+	 * property names of this definition's annotation type, values are
+	 * annotation parameter values of the appropriate types.
+	 */
+	protected final Map<String, Object> parameters;
+
+	/**
+	 * The bean type of this definition.
+	 */
+	protected final Class<?> beanType;
+
+	/**
+	 * The element type of this definition.
+	 */
+	protected final ElementType elementType;
+
+	/**
+	 * The property name of this definition, if it represents a property level constraint.
+	 */
+	protected final String property;
+
+	/**
+	 * The constraint mapping owning this constraint definition.
+	 */
+	protected final ConstraintMapping mapping;
 
 	public ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
 		this( beanType, constraintType, property, elementType, new HashMap<String, Object>(), mapping );
@@ -150,39 +179,4 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		return sb.toString();
 	}
 
-	/**
-	 * @return The constraint annotation type of this definition.
-	 */
-	public Class<A> getConstraintType() {
-		return constraintType;
-	}
-
-	/**
-	 * @return A map with the annotation parameters of this definition. Keys are property names of
-	 *         this definition's annotation type, values are annotation parameter values of the appropriate types.
-	 */
-	public Map<String, Object> getParameters() {
-		return parameters;
-	}
-
-	/**
-	 * @return The bean type of this definition.
-	 */
-	public Class<?> getBeanType() {
-		return beanType;
-	}
-
-	/**
-	 * @return The element type of this definition.
-	 */
-	public ElementType getElementType() {
-		return elementType;
-	}
-
-	/**
-	 * @return The property name of this definition, if it represents a property level constraint.
-	 */
-	public String getProperty() {
-		return property;
-	}
 }
