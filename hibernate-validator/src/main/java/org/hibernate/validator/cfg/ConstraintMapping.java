@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * Top level class for constraints configured via the programmatic API.
  *
@@ -56,8 +57,29 @@ public class ConstraintMapping {
 		return new ConstraintsForType( beanClass, this );
 	}
 
-	public final Map<Class<?>, List<ConstraintDef<?, ?>>> getConstraintConfig() {
-		return constraintConfig;
+	/**
+	 * Returns all constraint definitions registered with this mapping.
+	 *
+	 * @return A map with this mapping's constraint definitions. Each key in
+	 *         this map represents a bean type, for which the constraint
+	 *         definitions in the associated map value are configured.
+	 */
+	public final Map<Class<?>, List<ConstraintDefAccessor<?>>> getConstraintConfig() {
+
+		Map<Class<?>, List<ConstraintDefAccessor<?>>> newDefinitions = new HashMap<Class<?>, List<ConstraintDefAccessor<?>>>();
+
+		for ( Map.Entry<Class<?>, List<ConstraintDef<?, ?>>> entry : constraintConfig.entrySet() ) {
+
+			List<ConstraintDefAccessor<?>> newList = new ArrayList<ConstraintDefAccessor<?>>();
+
+			for ( ConstraintDef<?, ?> definition : entry.getValue() ) {
+				newList.add( ConstraintDefAccessor.getInstance( definition ) );
+			}
+
+			newDefinitions.put( entry.getKey(), newList );
+		}
+
+		return newDefinitions;
 	}
 
 	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
@@ -107,7 +129,7 @@ public class ConstraintMapping {
 	}
 
 	protected final void addConstraintConfig(ConstraintDef<?, ?> definition) {
-		Class<?> beanClass = definition.getBeanType();
+		Class<?> beanClass = definition.beanType;
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {
 			constraintConfig.get( beanClass ).add( definition );

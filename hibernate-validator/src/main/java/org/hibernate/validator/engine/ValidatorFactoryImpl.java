@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -34,7 +34,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.cfg.CascadeDef;
-import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.ConstraintDefAccessor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
@@ -229,10 +229,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDef<?, ?>> definitions,
+	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefAccessor<?>> definitions,
 																				Class<T> rootClass, Class<?> hierarchyClass,
 																				Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
-		for ( ConstraintDef<?, ?> config : definitions ) {
+		for ( ConstraintDefAccessor<?> config : definitions ) {
 			A annotation = ( A ) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
@@ -247,7 +247,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			}
 
 			MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
-					constraintDescriptor, new BeanConstraintSite<T>((Class<T>) config.getBeanType(), member)
+					constraintDescriptor, new BeanConstraintSite<T>( ( Class<T> ) config.getBeanType(), member )
 			);
 			addConstraintToMap( hierarchyClass, metaConstraint, constraints );
 		}
@@ -301,7 +301,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
-	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDef<?, A> config) {
+	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefAccessor<A> config) {
 		Class<A> constraintType = config.getConstraintType();
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
 		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {
