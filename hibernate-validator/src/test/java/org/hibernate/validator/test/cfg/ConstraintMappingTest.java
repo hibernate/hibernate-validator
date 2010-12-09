@@ -23,6 +23,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 
@@ -57,18 +59,43 @@ public class ConstraintMappingTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullConstraintMapping() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-		config.addMapping( ( ConstraintMapping ) null );
+		config.addMapping( (ConstraintMapping) null );
 		config.buildValidatorFactory();
 	}
 
 	@Test
-	public void testConstraintMapping() {
+	public void testConstraintMappingWithConstraintDefs() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( NotNullDef.class )
 				.property( "numberOfHelpers", FIELD )
 				.constraint( MinDef.class ).value( 1 );
+
+		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
+		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
+	}
+
+	@Test
+	public void testConstraintMappingWithGenericConstraints() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.property( "name", METHOD )
+				.genericConstraint( NotNull.class )
+				.property( "numberOfHelpers", FIELD )
+				.genericConstraint( Min.class ).param( "value", 1 );
+
+		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
+		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
+	}
+
+	@Test
+	public void testDefConstraintFollowedByGenericConstraint() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( Marathon.class )
+				.property( "numberOfHelpers", FIELD )
+				.constraint( MinDef.class ).value( 1 )
+				.genericConstraint( Min.class ).param( "value", 1 );
 
 		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
