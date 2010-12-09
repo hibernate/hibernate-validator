@@ -71,8 +71,8 @@ mapping.type( Car.class )
   all built-in constraints in the
   <classname>org.hibernate.validator.cfg.defs</classname> package. For a
   custom constraint you can either create your own definition class extending
-  <classname>ConstraintDef</classname> or you can use
-  <classname>GenericConstraintDef</classname> as seen in <xref
+  <classname>ConstraintDef</classname> or you can use the
+  <classname>genericConstraint</classname> method as seen in <xref
   linkend="example-generic-constraint-mapping" />.</para>
 
   <para><example id="example-generic-constraint-mapping">
@@ -82,8 +82,7 @@ mapping.type( Car.class )
       <programlisting>ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "licensePlate", FIELD )
-        .constraint( GenericConstraintDef.class )
-            .constraintType( CheckCase.class )
+        .genericConstraint( CheckCase.class )
             .param( "value", CaseMode.UPPER );   </programlisting>
     </example></para>
 
