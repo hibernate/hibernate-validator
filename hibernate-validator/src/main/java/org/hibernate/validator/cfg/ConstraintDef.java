@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.cfg.defs.GenericConstraintDef;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -31,15 +32,14 @@ import org.hibernate.validator.util.ReflectionHelper;
  * single constraint annotation type and allows to add this constraint to a bean
  * class in a programmatic type-safe way with help of the
  * {@link ConstraintMapping} API.
- * 
+ *
+ * @param <C> The type of a concrete sub type. Following to the
+ * "self referencing generic type" pattern each sub type has to be
+ * parametrized with itself.
+ * @param <A> The constraint annotation type represented by a concrete sub type.
+ *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @param <C>
- *            The type of a concrete sub type. Following to the
- *            "self referencing generic type" pattern each sub type has to be
- *            parametrized with itself.
- * @param <A>
- *            The constraint annotation type represented by a concrete sub type.
  */
 public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
 
@@ -117,7 +117,7 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 
 	@SuppressWarnings("unchecked")
 	private C getThis() {
-		return ( C ) this;
+		return (C) this;
 	}
 
 	protected C addParameter(String key, Object value) {
@@ -147,6 +147,16 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 
 		final D constraintDefinition = ReflectionHelper.newConstructorInstance(
 				constructor, beanType, property, elementType, mapping
+		);
+
+		mapping.addConstraintConfig( constraintDefinition );
+		return constraintDefinition;
+	}
+
+	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
+
+		GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
+				beanType, definition, property, elementType, mapping
 		);
 
 		mapping.addConstraintConfig( constraintDefinition );
