@@ -191,13 +191,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			throw new IllegalArgumentException( "null passed as group name" );
 		}
 
-		Class<?>[] groupCopy = Arrays.copyOf( groups, groups.length );
+		Class<?>[] tmpGroups = groups;
 		// if no groups is specified use the default
-		if ( groupCopy.length == 0 ) {
-			groupCopy = DEFAULT_GROUP_ARRAY;
+		if ( tmpGroups.length == 0 ) {
+			tmpGroups = DEFAULT_GROUP_ARRAY;
 		}
 
-		return groupChainGenerator.getGroupChainFor( Arrays.asList( groupCopy ) );
+		return groupChainGenerator.getGroupChainFor( Arrays.asList( tmpGroups ) );
 	}
 
 	/**
