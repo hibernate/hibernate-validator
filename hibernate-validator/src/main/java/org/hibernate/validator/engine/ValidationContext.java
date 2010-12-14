@@ -42,8 +42,9 @@ import org.hibernate.validator.util.IdentitySet;
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
+ * @author Gunnar Morling
  */
-public class ValidationContext<T> {
+public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	/**
 	 * The root bean of the validation.
@@ -54,7 +55,7 @@ public class ValidationContext<T> {
 	 * The root bean class of the validation.
 	 */
 	private final Class<T> rootBeanClass;
-
+	
 	/**
 	 * Maps a group to an identity set to keep track of already validated objects. We have to make sure
 	 * that each object gets only validated once per group and property path.
@@ -69,7 +70,7 @@ public class ValidationContext<T> {
 	/**
 	 * A list of all failing constraints so far.
 	 */
-	private final List<ConstraintViolation<T>> failingConstraintViolations;
+	private final List<C> failingConstraintViolations;
 
 	/**
 	 * Flag indicating whether an object can only be validated once per group or once per group AND validation path.
@@ -79,7 +80,7 @@ public class ValidationContext<T> {
 	/**
 	 * The message resolver which should be used in this context.
 	 */
-	private final MessageInterpolator messageInterpolator;
+	protected final MessageInterpolator messageInterpolator;
 
 	/**
 	 * The constraint factory which should be used in this context.
@@ -91,40 +92,39 @@ public class ValidationContext<T> {
 	 */
 	private final TraversableResolver traversableResolver;
 
-	public static <T> ValidationContext<T> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
-		return new ValidationContext<T>(
+		return new StandardValidationContext<T>(
 				rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
 	}
 
-	public static <T> ValidationContext<T> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
-		return new ValidationContext<T>(
+		return new StandardValidationContext<T>(
 				rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
 	}
 
-	public static <T> ValidationContext<T> getContextForValidateValue(Class<T> rootBeanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
-		return new ValidationContext<T>(
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateValue(Class<T> rootBeanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+		return new StandardValidationContext<T>(
 				rootBeanClass,
 				null,
-				messageInterpolator,
+				messageInterpolator, 
 				constraintValidatorFactory,
 				traversableResolver
 		);
 	}
 
-	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
-				method,
-				parameterIndex,
 				rootBeanClass,
 				object,
+				method,
 				messageInterpolator,
 				constraintValidatorFactory,
 				traversableResolver
@@ -141,7 +141,7 @@ public class ValidationContext<T> {
 
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
-		failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
+		failingConstraintViolations = new ArrayList<C>();
 	}
 
 	public final T getRootBean() {
@@ -151,6 +151,7 @@ public class ValidationContext<T> {
 	public final Class<T> getRootBeanClass() {
 		return rootBeanClass;
 	}
+	
 
 	public final TraversableResolver getTraversableResolver() {
 		return traversableResolver;
@@ -160,29 +161,12 @@ public class ValidationContext<T> {
 		return messageInterpolator;
 	}
 
-	public <U, V> ConstraintViolation<T> createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
-		String messageTemplate = messageAndPath.getMessage();
-		String interpolatedMessage = messageInterpolator.interpolate(
-				messageTemplate,
-				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
-		);
-		return new ConstraintViolationImpl<T>(
-				messageTemplate,
-				interpolatedMessage,
-				getRootBeanClass(),
-				getRootBean(),
-				localContext.getCurrentBean(),
-				localContext.getCurrentValidatedValue(),
-				messageAndPath.getPath(),
-				descriptor,
-				localContext.getElementType()
-		);
-	}
-
-	public final <U, V> List<ConstraintViolation<T>> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
-		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
+	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor);
+	
+	public final <U, V> List<C> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
+		List<C> constraintViolations = new ArrayList<C>();
 		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
-			ConstraintViolation<T> violation = createConstraintViolation(
+			C violation = createConstraintViolation(
 					localContext, messageAndPath, constraintValidatorContext.getConstraintDescriptor()
 			);
 			constraintViolations.add( violation );
@@ -211,7 +195,7 @@ public class ValidationContext<T> {
 		}
 	}
 
-	private void addConstraintFailure(ConstraintViolation<T> failingConstraintViolation) {
+	private void addConstraintFailure(C failingConstraintViolation) {
 		// NOTE: we are relying on the fact that ConstraintViolation.equals() is implemented correctly.
 		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
 		if ( i == -1 ) {
@@ -219,13 +203,13 @@ public class ValidationContext<T> {
 		}
 	}
 
-	public final void addConstraintFailures(List<ConstraintViolation<T>> failingConstraintViolations) {
-		for ( ConstraintViolation<T> violation : failingConstraintViolations ) {
+	public final void addConstraintFailures(List<C> failingConstraintViolations) {
+		for ( C violation : failingConstraintViolations ) {
 			addConstraintFailure( violation );
 		}
 	}
 
-	public List<? extends ConstraintViolation<T>> getFailingConstraints() {
+	public List<C> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
 

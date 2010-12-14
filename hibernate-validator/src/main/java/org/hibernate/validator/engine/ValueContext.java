@@ -37,6 +37,8 @@ public class ValueContext<T, V> {
 	 */
 	private final Class<T> currentBeanType;
 
+	private int parameterIndex;
+	
 	/**
 	 * The current property path we are validating.
 	 */
@@ -72,7 +74,7 @@ public class ValueContext<T, V> {
 		return new ValueContext<T, V>( null, type, propertyPath );
 	}
 
-	public ValueContext(T currentBean, Class<T> currentBeanType, PathImpl propertyPath) {
+	protected ValueContext(T currentBean, Class<T> currentBeanType, PathImpl propertyPath) {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
 		this.propertyPath = propertyPath;
@@ -96,7 +98,15 @@ public class ValueContext<T, V> {
 	public final Class<T> getCurrentBeanType() {
 		return currentBeanType;
 	}
+	
+	public int getParameterIndex() {
+		return parameterIndex;
+	}
 
+	public void setParameterIndex(int parameterIndex) {
+		this.parameterIndex = parameterIndex;
+	}
+	
 	public final V getCurrentValidatedValue() {
 		return currentValue;
 	}

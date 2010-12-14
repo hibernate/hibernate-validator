@@ -101,7 +101,7 @@ public class TestUtil {
 		return validator.getConstraintsForClass( clazz ).getConstraintsForProperty( property );
 	}
 
-	public static <T> void assertCorrectConstraintViolationMessages(Set<ConstraintViolation<T>> violations, String... messages) {
+	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations, String... messages) {
 		List<String> actualMessages = new ArrayList<String>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualMessages.add( violation.getMessage() );

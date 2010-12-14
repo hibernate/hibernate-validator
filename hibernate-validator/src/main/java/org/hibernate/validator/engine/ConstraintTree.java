@@ -112,8 +112,8 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public final <T, U, V> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
-		List<ConstraintViolation<T>> constraintViolations = new ArrayList<ConstraintViolation<T>>();
+	public final <T, U, V, E extends ConstraintViolation<T>> boolean validateConstraints(ValidationContext<T, E> executionContext, ValueContext<U, V> valueContext) {
+		List<E> constraintViolations = new ArrayList<E>();
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
 			executionContext.addConstraintFailures( constraintViolations );
@@ -122,9 +122,9 @@ public class ConstraintTree<A extends Annotation> {
 		return true;
 	}
 
-	private <T, U, V> void validateConstraints(ValidationContext<T> executionContext,
+	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraints(ValidationContext<T, E> executionContext,
 											   ValueContext<U, V> valueContext,
-											   List<ConstraintViolation<T>> constraintViolations) {
+											   List<E> constraintViolations) {
 		CompositionResult compositionResult = validateComposingConstraints(
 				executionContext, valueContext, constraintViolations
 		);
@@ -132,7 +132,7 @@ public class ConstraintTree<A extends Annotation> {
 
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed (provided
 		// there is one)
-		List<ConstraintViolation<T>> localViolationList = new ArrayList<ConstraintViolation<T>>();
+		List<E> localViolationList = new ArrayList<E>();
 		if ( !descriptor.getConstraintValidatorClasses().isEmpty() ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace(
@@ -185,7 +185,7 @@ public class ConstraintTree<A extends Annotation> {
 	 * @param constraintViolations Used to accumulate constraint violations
 	 * @param localViolationList List of constraint violations of top level constraint
 	 */
-	private <T, U, V> void prepareFinalConstraintViolations(ValidationContext<T> executionContext, ValueContext<U, V> valueContext, List<ConstraintViolation<T>> constraintViolations, List<ConstraintViolation<T>> localViolationList) {
+	private <T, U, V, E extends ConstraintViolation<T>> void prepareFinalConstraintViolations(ValidationContext<T, E> executionContext, ValueContext<U, V> valueContext, List<E> constraintViolations, List<E> localViolationList) {
 		if ( reportAsSingleViolation() ) {
 			// We clear the current violations list anyway
 			constraintViolations.clear();
@@ -197,7 +197,7 @@ public class ConstraintTree<A extends Annotation> {
 			if ( localViolationList.isEmpty() ) {
 				final String message = (String) getDescriptor().getAttributes().get( "message" );
 				MessageAndPath messageAndPath = new MessageAndPath( message, valueContext.getPropertyPath() );
-				ConstraintViolation<T> violation = executionContext.createConstraintViolation(
+				E violation = executionContext.createConstraintViolation(
 						valueContext, messageAndPath, descriptor
 				);
 				constraintViolations.add( violation );
@@ -224,12 +224,12 @@ public class ConstraintTree<A extends Annotation> {
 	 *
 	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
 	 */
-	private <T, U, V> CompositionResult validateComposingConstraints(ValidationContext<T> executionContext,
+	private <T, U, V, E extends ConstraintViolation<T>> CompositionResult validateComposingConstraints(ValidationContext<T, E> executionContext,
 																	 ValueContext<U, V> valueContext,
-																	 List<ConstraintViolation<T>> constraintViolations) {
+																	 List<E> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
 		for ( ConstraintTree<?> tree : getChildren() ) {
-			List<ConstraintViolation<T>> tmpViolationList = new ArrayList<ConstraintViolation<T>>();
+			List<E> tmpViolationList = new ArrayList<E>();
 			tree.validateConstraints( executionContext, valueContext, tmpViolationList );
 			constraintViolations.addAll( tmpViolationList );
 
@@ -247,7 +247,7 @@ public class ConstraintTree<A extends Annotation> {
 		return compositionResult;
 	}
 
-	private <T> boolean passesCompositionTypeRequirement(List<ConstraintViolation<T>> constraintViolations, CompositionResult compositionResult) {
+	private boolean passesCompositionTypeRequirement(List<?> constraintViolations, CompositionResult compositionResult) {
 		CompositionType compositionType = getDescriptor().getCompositionType();
 		boolean passedValidation = false;
 		switch ( compositionType ) {
@@ -268,12 +268,12 @@ public class ConstraintTree<A extends Annotation> {
 		return passedValidation;
 	}
 
-	private <T, U, V> List<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
+	private <T, U, V, E extends ConstraintViolation<T>> List<E> validateSingleConstraint(ValidationContext<T, E> executionContext,
 																			ValueContext<U, V> valueContext,
 																			ConstraintValidatorContextImpl constraintValidatorContext,
 																			ConstraintValidator<A, V> validator) {
 		boolean isValid;
-		List<ConstraintViolation<T>> cv = new ArrayList<ConstraintViolation<T>>();
+		List<E> cv = new ArrayList<E>();
 		try {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}

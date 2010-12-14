@@ -1,7 +1,6 @@
-// $Id: ValidationInvocationHandler.java 19033 Sep 19, 2010 9:54:48 AM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -46,17 +45,13 @@ public class ValidationInvocationHandler implements InvocationHandler {
 	}
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		
-		for (int i = 0; i < args.length; i++) {
-			
-			Set<MethodConstraintViolation<Object>> constraintViolations =  
-				validator.validateParameter(wrapped, method, args[i], i);
 
-			if(!constraintViolations.isEmpty()) {
-				throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
-			}
-		}
+		Set<MethodConstraintViolation<Object>> constraintViolations = validator.validateParameters(wrapped, method, args);
 		
+		if(!constraintViolations.isEmpty()) {
+			throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
+		}
+	
 		return method.invoke(wrapped, args);
 	}
 

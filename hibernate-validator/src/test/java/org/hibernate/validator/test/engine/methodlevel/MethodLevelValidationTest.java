@@ -88,11 +88,14 @@ public class MethodLevelValidationTest {
 			
 			assertConstraintViolation(constraintViolation, "may not be null", CustomerRepositoryImpl.class, null);
 			
+			System.out.println("Deskriptor: " + constraintViolation.getConstraintDescriptor());
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByName");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#findCustomerByName()[0]");
-			
+			assertEquals(constraintViolation.getLeafBean(), customerRepository);
+			assertEquals(constraintViolation.getInvalidValue(), null);
 		}
 	}
 	
@@ -113,6 +116,20 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByAgeAndName");
 			assertEquals(constraintViolation.getParameterIndex(), 1);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
+		}
+	}
+
+	@Test
+	public void constraintViolationsAtMultipleParameters() {
+		
+		try {
+			customerRepository.findCustomerByAgeAndName(1, null);
+			fail("Expected ConstraintViolationException wasn't thrown.");
+		}
+		catch(ConstraintViolationException e) {
+			
+			assertEquals(e.getConstraintViolations().size(), 2);
+			assertCorrectConstraintViolationMessages(e.getConstraintViolations(), "may not be null", "must be greater than or equal to 5");
 		}
 	}
 	

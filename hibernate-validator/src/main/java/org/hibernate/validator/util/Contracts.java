@@ -1,7 +1,6 @@
-// $Id: MethodAwareValidator.java 19033 Sep 18, 2010 7:07:16 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -15,21 +14,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator;
-
-import java.lang.reflect.Method;
-import java.util.Set;
+package org.hibernate.validator.util;
 
 /**
- * Provides an API for method-level validation, based on JSR 303 Appendix C ("Proposal for method-level validation")
- * 
  * @author Gunnar Morling
+ *
  */
-public interface MethodValidator {
+public class Contracts {
 
-	public <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups);
+	public static void assertNotNull(Object o) {
+		assertNotNull(o, "must not be null");
+	}
 
-	public <T> Set<MethodConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups);
-	
-	//getConstraintsForMethod()
+	public static void assertNotNull(Object o, String message) {
+		
+		if ( o == null ) {
+			throw new IllegalArgumentException( message );
+		}
+	}
 }

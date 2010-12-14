@@ -32,9 +32,10 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	void persistCustomer(@NotNull @Valid Customer customer);
 
-	void findCustomerByAgeAndName(Integer age, @NotNull String name);
+	void findCustomerByAgeAndName(@Min(5) Integer age, @NotNull String name);
 
 	void foo(@Min(1) Long id);
 
 	void bar(Customer customer);
+	
 }

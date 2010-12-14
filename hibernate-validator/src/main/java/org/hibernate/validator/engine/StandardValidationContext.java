@@ -16,48 +16,31 @@
 */
 package org.hibernate.validator.engine;
 
-import java.lang.reflect.Method;
-
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.MethodConstraintViolation;
-
 /**
- * A {@link ValidationContext} implementation which creates and manages
- * violations of type {@link MethodConstraintViolation}.
+ * A {@link ValidationContext} implementation which creates and manages violations of type {@link ConstraintViolation}.
  * 
  * @author Gunnar Morling
- * 
- * @param <T>
- *            The type of the root bean for which this context is created.
+ *
+ * @param <T> The type of the root bean for which this context is created.
  */
-public class MethodValidationContext <T> extends ValidationContext<T, MethodConstraintViolation<T>> {
+public class StandardValidationContext <T> extends ValidationContext<T, ConstraintViolation<T>> {
 
-	/**
-	 * The method of the current validation call.
-	 */
-	private final Method method;
-
-	protected MethodValidationContext(Class<T> rootBeanClass, T rootBean,
-			Method method,
+	protected StandardValidationContext(Class<T> rootBeanClass, T rootBean,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver) {
 		
 		super(rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver);
-
-		this.method = method;
 	}
 	
-	public Method getMethod() {
-		return method;
-	}
-
 	@Override
-	public <U, V> MethodConstraintViolation<T> createConstraintViolation(
+	public <U, V> ConstraintViolation<T> createConstraintViolation(
 			ValueContext<U, V> localContext, MessageAndPath messageAndPath,
 			ConstraintDescriptor<?> descriptor) {
 
@@ -66,11 +49,10 @@ public class MethodValidationContext <T> extends ValidationContext<T, MethodCons
 				messageTemplate,
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
-		return new MethodConstraintViolationImpl<T>(
+		
+		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
-				method, 
-				localContext.getParameterIndex(), 
 				getRootBeanClass(),
 				getRootBean(),
 				localContext.getCurrentBean(),
