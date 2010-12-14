@@ -126,32 +126,38 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	 * @param mapping The constraint configuration created via the programmatic API.
 	 */
 	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
+		
+		final Map<Class<?>, List<ConstraintDefAccessor<?>>> constraintsByType = mapping.getConstraintConfig();
+		final Map<Class<?>, List<CascadeDef>> cascadeConfigByType = mapping.getCascadeConfig();
+
 		for ( Class<?> clazz : mapping.getConfiguredClasses() ) {
 			@SuppressWarnings("unchecked")
 			Class<T> beanClass = ( Class<T> ) clazz;
 
 			// for each configured entity we have to check whether any of the interfaces or super classes is configured
-			// vua the programmatic api as well
+			// via the programmatic api as well
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 
 			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
 			List<Member> cascadedMembers = new ArrayList<Member>();
 
 			for ( Class<?> classInHierarchy : classes ) {
-				// if the programmatic config contains constraints for the class in the hierarchy create a meta constraint
-				if ( mapping.getConstraintConfig().keySet().contains( classInHierarchy ) ) {
+				
+				// if the programmatic config contains constraints for the class in the hierarchy create equivalent meta constraints
+				List<ConstraintDefAccessor<?>> constraintsOfType = constraintsByType.get( classInHierarchy );
+				if ( constraintsOfType != null ) {
 					addProgrammaticConfiguredConstraints(
-							mapping.getConstraintConfig().get( classInHierarchy ),
+							constraintsOfType,
 							beanClass,
 							classInHierarchy,
 							constraints
 					);
 				}
 
-				if ( mapping.getCascadeConfig().keySet().contains( classInHierarchy ) ) {
-					addProgrammaticConfiguredCascade(
-							mapping.getCascadeConfig().get( classInHierarchy ), cascadedMembers
-					);
+				// retrieve the cascading members of the current class if applicable
+				List<CascadeDef> cascadesOfType = cascadeConfigByType.get( classInHierarchy );
+				if ( cascadesOfType != null ) {
+					addProgrammaticConfiguredCascade( cascadesOfType, cascadedMembers );
 				}
 			}
 
@@ -274,9 +280,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 	private void addProgrammaticConfiguredCascade(List<CascadeDef> cascades,
 												  List<Member> cascadedMembers) {
-		if ( cascades == null ) {
-			return;
-		}
+
 		for ( CascadeDef cascade : cascades ) {
 			Member m = ReflectionHelper.getMember(
 					cascade.getBeanType(), cascade.getProperty(), cascade.getElementType()
