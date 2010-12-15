@@ -36,9 +36,11 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.MessageInterpolatorContext;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.messageinterpolation.ValueMessageInterpolator;
+import org.hibernate.validator.messageinterpolation.ValueScriptingMessageInterpolator;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -46,17 +48,17 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class ValueMessageInterpolatorTest {
+public class ValueScriptingMessageInterpolatorTest {
 
 	private static final String SCRIPT_LANG = "javascript";
 
-	private static ValueMessageInterpolator interpolator;
+	private static ValueScriptingMessageInterpolator interpolator;
 
 	private static ValueMessageResourceBundle valueMessageResourceBundle;
 
 	@BeforeClass
 	public static void init() {
-		interpolator = new ValueMessageInterpolator( new MockDelegateInterpolator(), SCRIPT_LANG );
+		interpolator = new ValueScriptingMessageInterpolator( new MockDelegateInterpolator(), SCRIPT_LANG );
 		valueMessageResourceBundle = new ValueMessageResourceBundle();
 	}
 
@@ -75,7 +77,7 @@ public class ValueMessageInterpolatorTest {
 					}
 				}
 		);
-		config.messageInterpolator( new ValueMessageInterpolator( resourceBundleInterpolator, SCRIPT_LANG ) );
+		config.messageInterpolator( new ValueScriptingMessageInterpolator( resourceBundleInterpolator, SCRIPT_LANG ) );
 		ValidatorFactory factory = config.buildValidatorFactory();
 
 		//Validate the object
@@ -83,9 +85,11 @@ public class ValueMessageInterpolatorTest {
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
 		ConstraintViolation<User> emailViolation = violations.iterator().next();
 
-		assertNotNull( violations );
-		assertEquals( violations.size(), 1 );
-		assertEquals( emailViolation.getMessage(), "\"hibernate.validator@\" is not a well-formed email address" );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages(
+				violations, "\"hibernate.validator@\" is not a well-formed email address"
+		);
 	}
 
 	@Test

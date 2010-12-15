@@ -186,7 +186,7 @@ Validator validator = factory.getValidator();
 
       <programlisting language="JAVA" role="JAVA">Configuration&lt;?&gt; configuration = Validation.byDefaultProvider().configure();
 ValidatorFactory factory = configuration
-    .messageInterpolator(new ValueMessageInterpolator(configuration.getDefaultMessageInterpolator(), "javascript"))
+    .messageInterpolator(new ValueScriptingMessageInterpolator(configuration.getDefaultMessageInterpolator(), "javascript"))
     .buildValidatorFactory();
 
 Validator validator = factory.getValidator();
