@@ -55,7 +55,7 @@ public class ValueFormatterMessageInterpolator extends AbstractFormattingMessage
 		super( userMessageInterpolator );
 	}
 
-	String interpolateValidatedValue(String expression, Object validatedValue, Locale locale) {
+	protected String interpolateValidatedValue(String expression, Object validatedValue, Locale locale) {
 		String interpolatedValue;
 		int separatorIndex = expression.indexOf( VALIDATED_VALUE_FORMAT_SEPARATOR );
 

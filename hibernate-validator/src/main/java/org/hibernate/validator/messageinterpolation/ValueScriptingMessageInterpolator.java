@@ -72,7 +72,7 @@ public class ValueScriptingMessageInterpolator extends AbstractFormattingMessage
 		this.scriptLang = scriptLang;
 	}
 
-	String interpolateValidatedValue(String expression, Object validatedValue, Locale locale) {
+	protected String interpolateValidatedValue(String expression, Object validatedValue, Locale locale) {
 		String interpolatedValue;
 		int separatorIndex = expression.indexOf( VALIDATED_VALUE_FORMAT_SEPARATOR );
 

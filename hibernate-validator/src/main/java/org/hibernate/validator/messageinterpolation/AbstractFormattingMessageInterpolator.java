@@ -144,5 +144,5 @@ public abstract class AbstractFormattingMessageInterpolator implements MessageIn
 	 *
 	 * @return the interpolated value
 	 */
-	abstract String interpolateValidatedValue(String expression, Object validatedValue, Locale locale);
+	protected abstract String interpolateValidatedValue(String expression, Object validatedValue, Locale locale);
 }
