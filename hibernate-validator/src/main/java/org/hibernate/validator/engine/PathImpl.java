@@ -26,6 +26,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.Path;
 
+import org.hibernate.validator.util.Contracts;
+
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -85,9 +87,7 @@ public final class PathImpl implements Path, Serializable {
 	 */
 	public static PathImpl createPathForMethodParameter(Method method, int parameterIndex) {
 
-		if ( method == null ) {
-			throw new IllegalArgumentException( "A method is required to create a method parameter path." );
-		}
+		Contracts.assertNotNull( method, "A method is required to create a method parameter path." );
 
 		if ( parameterIndex < 0 || parameterIndex > method.getParameterTypes().length - 1 ) {
 			throw new IllegalArgumentException(
@@ -97,6 +97,16 @@ public final class PathImpl implements Path, Serializable {
 
 		PathImpl path = createRootPath();
 		path.addMethodParameterNode( method, parameterIndex );
+
+		return path;
+	}
+
+	public static PathImpl createPathForMethodReturnValue(Method method) {
+
+		Contracts.assertNotNull( method, "A method is required to create a method return value path." );
+
+		PathImpl path = createRootPath();
+		path.addMethodReturnValueNode( method );
 
 		return path;
 	}
@@ -140,6 +150,13 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
+	private NodeImpl addMethodReturnValueNode(Method method) {
+		NodeImpl parent = nodeList.size() == 0 ? null : ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = new MethodReturnValueNodeImpl( method, parent );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
 
 	public final NodeImpl makeLeafNodeIterable() {
 		NodeImpl leafNode = getLeafNode();

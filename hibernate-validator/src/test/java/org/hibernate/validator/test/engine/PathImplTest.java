@@ -163,6 +163,25 @@ public class PathImplTest {
 		);
 	}
 
+	@Test
+	public void testCreationOfReturnValuePath() throws Exception {
+
+		PathImpl methodParameterPath = PathImpl.createPathForMethodReturnValue(
+				Container.class.getMethod( "addItem", Key.class, Item.class )
+		);
+
+		assertEquals( methodParameterPath.toString(), "Container#addItem()" );
+	}
+
+	@Test(
+		expectedExceptions=IllegalArgumentException.class,
+		expectedExceptionsMessageRegExp="A method is required to create a method return value path."
+	)
+	public void creationOfReturnValuePathFailsDueToNullMethod() throws Exception {
+
+		PathImpl.createPathForMethodReturnValue(null);
+	}
+	
 	class Container {
 		@Valid
 		Map<Key, Item> store = new HashMap<Key, Item>();
