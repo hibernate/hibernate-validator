@@ -28,7 +28,7 @@ import org.hibernate.validator.test.engine.methodlevel.model.Customer;
  */
 public interface CustomerRepository extends RepositoryBase<Customer> {
 
-	void findCustomerByName(@NotNull String name);
+	@Valid Customer findCustomerByName(@NotNull String name);
 
 	void persistCustomer(@NotNull @Valid Customer customer);
 
@@ -37,5 +37,7 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	void foo(@Min(1) Long id);
 
 	void bar(Customer customer);
+	
+	@Min(10) int baz();
 	
 }

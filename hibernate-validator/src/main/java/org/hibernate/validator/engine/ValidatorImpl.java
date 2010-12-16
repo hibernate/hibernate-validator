@@ -782,7 +782,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					continue;
 				}
 				metaConstraint.validateConstraint( validationContext, valueContext );
-				constraintViolations.addAll( (Collection<? extends MethodConstraintViolation<T>>) validationContext.getFailingConstraints() );
+				constraintViolations.addAll( validationContext.getFailingConstraints() );
 			}
 		}
 

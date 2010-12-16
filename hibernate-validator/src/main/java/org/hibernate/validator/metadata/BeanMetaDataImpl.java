@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.metadata.site.BeanConstraintSite;
 import org.hibernate.validator.metadata.site.MethodParameterConstraintSite;
+import org.hibernate.validator.metadata.site.ReturnValueConstraintSite;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -367,6 +368,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
 		for ( Method method : declaredMethods ) {
+			
+			if(!ReflectionHelper.isGetterMethod(method)) {
+				continue;
+			}
+			
 			addToPropertyNameList( method );
 
 			// HV-172
@@ -453,7 +459,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			constraintsByParameter = findParameterConstraints( method );
 //			}
 			
-			MethodMetaData methodMetaData = new MethodMetaData(method, constraintsByParameter);
+			ReturnValueMetaData returnValueConstraints = findReturnValueConstraints(method);
+			MethodMetaData methodMetaData = new MethodMetaData(method, constraintsByParameter, returnValueConstraints );
 			addMethodMetaConstraint(clazz, methodMetaData );
 		}
 	}
@@ -510,6 +517,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new MetaConstraint<T, A>( descriptor, new BeanConstraintSite<T>(beanClass, m) );
 	}
 
+	private <A extends Annotation> MetaConstraint<T, A> createMetaConstraint(Method m, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<T, A>( descriptor, new ReturnValueConstraintSite( m ) );
+	}
+	
 	private <A extends Annotation> MetaConstraint<T, A> createMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<T, A>( descriptor, new MethodParameterConstraintSite(method, parameterIndex) );
 	}
@@ -538,23 +549,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		for ( Annotation constraint : constraints ) {
-			final ConstraintDescriptorImpl constraintDescriptor = buildConstraintDescriptor( clazz, constraint, type );
+			final ConstraintDescriptorImpl<?> constraintDescriptor = buildConstraintDescriptor( clazz, constraint, type );
 			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <A extends Annotation> ConstraintDescriptorImpl buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
-		ConstraintDescriptorImpl constraintDescriptor;
+	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
+		ConstraintDescriptorImpl<A> constraintDescriptor;
 		ConstraintOrigin definedIn = determineOrigin( clazz );
 		if ( clazz.isInterface() && !clazz.equals( beanClass ) ) {
-			constraintDescriptor = new ConstraintDescriptorImpl(
+			constraintDescriptor = new ConstraintDescriptorImpl<A>(
 					annotation, constraintHelper, clazz, type, definedIn
 			);
 		}
 		else {
-			constraintDescriptor = new ConstraintDescriptorImpl( annotation, constraintHelper, type, definedIn );
+			constraintDescriptor = new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, definedIn );
 		}
 		return constraintDescriptor;
 	}
@@ -627,6 +637,21 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return metaData;
 	}
 
+	private ReturnValueMetaData findReturnValueConstraints(Method method) {
+	
+		List<ConstraintDescriptorImpl<?>> constraintsDescriptors = findConstraints(method, ElementType.METHOD);
+		List<MetaConstraint<?, ? extends Annotation>> constraints = new ArrayList<MetaConstraint<?,? extends Annotation>>();
+		
+		for (ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors) {
+			constraints.add(createMetaConstraint(method, oneDescriptor));
+		}
+		
+		boolean isCascading = isValidAnnotationPresent(method);
+		
+		return new ReturnValueMetaData(constraints, isCascading);
+	}
+	
+	
 	private ConstraintOrigin determineOrigin(Class<?> clazz) {
 		if ( clazz.equals( beanClass ) ) {
 			return ConstraintOrigin.DEFINED_LOCALLY;

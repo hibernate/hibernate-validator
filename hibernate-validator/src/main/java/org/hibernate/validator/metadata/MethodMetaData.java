@@ -21,8 +21,12 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
+ * Represents a method of a Java type and all its associated meta-data relevant
+ * in the context of bean validation, for instance the constraints at it's
+ * parameters or return value.
+ * 
  * @author Gunnar Morling
- *
+ * 
  */
 public class MethodMetaData {
 
@@ -30,10 +34,13 @@ public class MethodMetaData {
 	
 	private final Map<Integer, ParameterMetaData> parameterMetaData;
 
-	public MethodMetaData(Method method, Map<Integer, ParameterMetaData> parameterMetaData) {
+	private final ReturnValueMetaData returnValueMetaData;
+	
+	public MethodMetaData(Method method, Map<Integer, ParameterMetaData> parameterMetaData, ReturnValueMetaData returnValueMetaData) {
 
 		this.method = method;
 		this.parameterMetaData = parameterMetaData;
+		this.returnValueMetaData = returnValueMetaData;
 	}
 
 	public Method getMethod() {
@@ -45,6 +52,10 @@ public class MethodMetaData {
 		ParameterMetaData theValue = parameterMetaData.get(parameterIndex);
 		
 		return  theValue != null ? theValue : ParameterMetaData.NULL;
+	}
+	
+	public ReturnValueMetaData getReturnValueMetaData() {
+		return returnValueMetaData;
 	}
 	
 }

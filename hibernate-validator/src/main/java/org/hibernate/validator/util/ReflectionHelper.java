@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -174,6 +174,19 @@ public final class ReflectionHelper {
 			}
 		}
 		return name;
+	}
+	
+	/**
+	 * Checks whether the given method's name is a valid JavaBeans getter name,
+	 * meaning it starts with "is" or "has".
+	 * 
+	 * @param member
+	 *            The method of interest.
+	 * @return True, if the given method is a JavaBeans getter method, false
+	 *         otherwise.
+	 */
+	public static boolean isGetterMethod(Method member) {
+		return getPropertyName(member) != null;
 	}
 
 	/**
