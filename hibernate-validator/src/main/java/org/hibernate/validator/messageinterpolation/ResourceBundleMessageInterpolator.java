@@ -54,7 +54,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private static final Pattern MESSAGE_PARAMETER_PATTERN = Pattern.compile( "(\\{[^\\}]+?\\})" );
 
 	/**
-	 * The default locale for the current user.
+	 * The default locale in the current JVM.
 	 */
 	private final Locale defaultLocale;
 
