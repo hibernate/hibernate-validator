@@ -517,7 +517,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new MetaConstraint<T, A>( descriptor, new BeanConstraintSite<T>(beanClass, m) );
 	}
 
-	private <A extends Annotation> MetaConstraint<T, A> createMetaConstraint(Method m, ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> MetaConstraint<T, A> createReturnValueMetaConstraint(Method m, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<T, A>( descriptor, new ReturnValueConstraintSite( m ) );
 	}
 	
@@ -643,7 +643,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		List<MetaConstraint<?, ? extends Annotation>> constraints = new ArrayList<MetaConstraint<?,? extends Annotation>>();
 		
 		for (ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors) {
-			constraints.add(createMetaConstraint(method, oneDescriptor));
+			constraints.add(createReturnValueMetaConstraint(method, oneDescriptor));
 		}
 		
 		boolean isCascading = isValidAnnotationPresent(method);

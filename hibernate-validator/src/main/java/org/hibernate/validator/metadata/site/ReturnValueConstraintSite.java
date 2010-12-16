@@ -19,6 +19,7 @@ package org.hibernate.validator.metadata.site;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -31,6 +32,7 @@ public class ReturnValueConstraintSite implements ConstraintSite {
 	
 	public ReturnValueConstraintSite(Method method) {
 
+		Contracts.assertNotNull(method, "Method must not be null");
 		this.method = method;
 	}
 

@@ -1,7 +1,6 @@
-// $Id: CustomerRepositoryImpl.java 19033 Sep 19, 2010 10:06:02 AM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -25,8 +24,8 @@ import org.hibernate.validator.test.engine.methodlevel.model.Customer;
  */
 public class CustomerRepositoryImpl implements CustomerRepository {
 
-	public void findCustomerByName(String name) {
-		
+	public Customer findCustomerByName(String name) {
+		return null;
 	}
 
 	public void persistCustomer(Customer customer) {
