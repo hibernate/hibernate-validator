@@ -64,6 +64,9 @@ public class ValueFormatterMessageInterpolator extends AbstractFormattingMessage
 		}
 		else {
 			String format = expression.substring( separatorIndex + 1, expression.length() - 1 );
+			if ( format.length() == 0 ) {
+				throw new ValidationException( "Missing format string in template: " + expression );
+			}
 			try {
 				interpolatedValue = String.format( locale, format, validatedValue );
 			}

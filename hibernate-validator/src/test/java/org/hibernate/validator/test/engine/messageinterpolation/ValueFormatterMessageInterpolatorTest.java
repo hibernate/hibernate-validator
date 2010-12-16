@@ -48,7 +48,7 @@ import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolation
  */
 public class ValueFormatterMessageInterpolatorTest {
 	@Test
-	public void testSimpleToStringInterpolation() {
+	public void testSimpleValidatedValueInterpolation() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
@@ -60,8 +60,39 @@ public class ValueFormatterMessageInterpolatorTest {
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
 
 		assertNumberOfViolations( violations, 1 );
-		// date formatting occurs with the default Locale
 		assertCorrectConstraintViolationMessages( violations, past.toString() );
+	}
+
+	@Test
+	public void testMultipleValidatedValuesInMessageTemplate() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( TestClass.class )
+				.property( "date", FIELD )
+				.constraint( FutureDef.class ).message( "${validatedValue} ${validatedValue}" );
+
+		Validator validator = getValidatorUsingConstraintMapping( mapping );
+
+		Date past = new Date( System.currentTimeMillis() - 60000 ); // current date minus one minute
+		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, past.toString() + " " + past.toString() );
+	}
+
+	@Test
+	public void testEscapedCurlyBraces() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( TestClass.class )
+				.property( "date", FIELD )
+				.constraint( FutureDef.class ).message( "\\{${validatedValue}\\}" );
+
+		Validator validator = getValidatorUsingConstraintMapping( mapping );
+
+		Date past = new Date( System.currentTimeMillis() - 60000 ); // current date minus one minute
+		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "{" + past.toString() + "}" );
 	}
 
 	@Test
@@ -77,7 +108,6 @@ public class ValueFormatterMessageInterpolatorTest {
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
 
 		assertNumberOfViolations( violations, 1 );
-		// date formatting occurs with the default Locale
 		assertCorrectConstraintViolationMessages( violations, String.format( "%1$ty", past ) );
 	}
 
@@ -109,6 +139,80 @@ public class ValueFormatterMessageInterpolatorTest {
 
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, " '0.100000' " );
+	}
+
+	@Test
+	public void testCurlyBraceInFormat() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( TestClass.class )
+				.property( "doubleValue", FIELD )
+				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: {%1$5f} }" );
+
+		Validator validator = getValidatorUsingConstraintMapping( mapping );
+
+		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, " {0.100000} " );
+	}
+
+	@Test
+	public void testColonInFormat() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( TestClass.class )
+				.property( "doubleValue", FIELD )
+				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue::%1$5f:}" );
+
+		Validator validator = getValidatorUsingConstraintMapping( mapping );
+
+		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, ":0.100000:" );
+	}
+
+	@Test
+	public void testValidatedValueAndAdditionalUnknownParameter() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( TestClass.class )
+				.property( "doubleValue", FIELD )
+				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: '%1$5f' } ${foo}" );
+
+		Validator validator = getValidatorUsingConstraintMapping( mapping );
+
+		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, " '0.100000'  ${foo}" );
+	}
+
+	@Test
+	public void testNoClosingBrace() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( TestClass.class )
+				.property( "doubleValue", FIELD )
+				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue{" );
+
+		Validator validator = getValidatorUsingConstraintMapping( mapping );
+
+		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "${validatedValue{" );
+	}
+
+	@Test(
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = "Missing format string in template:.*"
+	)
+	public void testMissingFormatString() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( TestClass.class )
+				.property( "doubleValue", FIELD )
+				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue:}" );
+
+		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		validator.validate( new TestClass( 0.1 ) );
 	}
 
 	@Test
