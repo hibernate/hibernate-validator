@@ -63,7 +63,7 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 		}
 		catch ( ScriptException e ) {
 			throw new ConstraintDeclarationException(
-					"Error during execution of script \"" + script + "\" occured.", e
+					"Error during execution of script \"" + script + "\" occurred.", e
 			);
 		}
 
