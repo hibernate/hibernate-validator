@@ -25,11 +25,11 @@ import javax.validation.ValidationException;
 
 /**
  * A message interpolator which can interpolate the validated value and format this value using the syntax from
- * {@link java.util.Formatter}. Check the {@code Formatter} documentation for formatting syntax and options. If no
- * formatting string is specified {@code String.valueOf(validatedValue)} is called.
- * <p>
- * To interpolate the validated Value add {@code $&#123;validatedValue&#125;} into the message. To specify a format pattern use
- * {@code $&#123;validatedValue:[format string]&#125;}, eg {@code $&#123;validatedValue:%1$ty&#125;}.
+ * {@link java.util.Formatter}. Check the <code>Formatter</code> documentation for formatting syntax and options. If no
+ * formatting string is specified <code>String.valueOf(validatedValue)}</code> is called.
+ * <p/>
+ * To interpolate the validated value add <code>&#123;validatedValue&#125;</code> into the message. To specify a format
+ * pattern use <code>$&#123;validatedValue:[format string]&#125;</code>, e.g. <code>$&#123;validatedValue:%1$ty&#125;</code>.
  *
  * @author Hardy Ferentschik
  */

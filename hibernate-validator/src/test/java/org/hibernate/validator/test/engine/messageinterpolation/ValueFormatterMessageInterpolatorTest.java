@@ -257,6 +257,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		return factory.getValidator();
 	}
 
+	@SuppressWarnings("unused")
 	class TestClass {
 		private Date date;
 		private Double doubleValue;
