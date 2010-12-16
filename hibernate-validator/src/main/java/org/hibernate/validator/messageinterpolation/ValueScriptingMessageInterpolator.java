@@ -17,6 +17,7 @@
 
 package org.hibernate.validator.messageinterpolation;
 
+import java.util.Locale;
 import javax.script.ScriptException;
 import javax.validation.MessageInterpolator;
 import javax.validation.ValidationException;
@@ -25,7 +26,19 @@ import org.hibernate.validator.util.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.util.scriptengine.ScriptEvaluatorFactory;
 
 /**
- * Validated value message interpolator.
+ * A message interpolator which can interpolate the validated value and format this value using the Java Scripting
+ * API as defined by <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a>
+ * ("Scripting for the Java<sup>TM</sup> Platform"). Therefore an
+ * implementation of that API must part of the class path. This is automatically
+ * the case when running on Java 6. For older Java versions, the JSR 223 RI can
+ * be added manually to the class path.
+ * <p>
+ *  If no formatting script is specified {@code String.valueOf(validatedValue)} is called.
+ * </p>
+ * <p>
+ * To interpolate the validated Value add {@code $&#123;validatedValue&#125;} into the message template. To specify
+ * a format script use {@code $&#123;validatedValue:[script]&#125;}, eg {@code $&#123;validatedValue:_.toString()&#125;}.
+ * The {@code _} is used to reference the validated value.
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
@@ -59,15 +72,7 @@ public class ValueScriptingMessageInterpolator extends AbstractFormattingMessage
 		this.scriptLang = scriptLang;
 	}
 
-	/**
-	 * Returns the value of the validated value expression.
-	 *
-	 * @param expression the expression to interpolate
-	 * @param validatedValue the value of the object being validated
-	 *
-	 * @return the interpolated value
-	 */
-	String interpolateValidatedValue(String expression, Object validatedValue) {
+	String interpolateValidatedValue(String expression, Object validatedValue, Locale locale) {
 		String interpolatedValue;
 		int separatorIndex = expression.indexOf( VALIDATED_VALUE_FORMAT_SEPARATOR );
 

@@ -18,6 +18,7 @@
 package org.hibernate.validator.messageinterpolation;
 
 import java.util.IllegalFormatException;
+import java.util.Locale;
 import javax.validation.MessageInterpolator;
 import javax.validation.ValidationException;
 
@@ -27,8 +28,8 @@ import javax.validation.ValidationException;
  * {@link java.util.Formatter}. Check the {@code Formatter} documentation for formatting syntax and options. If no
  * formatting string is specified {@code String.valueOf(validatedValue)} is called.
  * <p>
- * To interpolate the validated Value add ${validatedValue} into the message. To specify a format pattern use
- * ${validatedValue:[formatString]}.
+ * To interpolate the validated Value add {@code $&#123;validatedValue&#125;} into the message. To specify a format pattern use
+ * {@code $&#123;validatedValue:[format string]&#125;}, eg {@code $&#123;validatedValue:%1$ty&#125;}.
  *
  * @author Hardy Ferentschik
  */
@@ -54,15 +55,7 @@ public class ValueFormatterMessageInterpolator extends AbstractFormattingMessage
 		super( userMessageInterpolator );
 	}
 
-	/**
-	 * Returns the value of the validated value expression.
-	 *
-	 * @param expression the expression to interpolate
-	 * @param validatedValue the value of the object being validated
-	 *
-	 * @return the interpolated value
-	 */
-	String interpolateValidatedValue(String expression, Object validatedValue) {
+	String interpolateValidatedValue(String expression, Object validatedValue, Locale locale) {
 		String interpolatedValue;
 		int separatorIndex = expression.indexOf( VALIDATED_VALUE_FORMAT_SEPARATOR );
 
@@ -72,7 +65,7 @@ public class ValueFormatterMessageInterpolator extends AbstractFormattingMessage
 		else {
 			String format = expression.substring( separatorIndex + 1, expression.length() - 1 );
 			try {
-				interpolatedValue = String.format( format, validatedValue );
+				interpolatedValue = String.format( locale, format, validatedValue );
 			}
 			catch ( IllegalFormatException e ) {
 				throw new ValidationException( "Invalid format: " + e.getMessage(), e );

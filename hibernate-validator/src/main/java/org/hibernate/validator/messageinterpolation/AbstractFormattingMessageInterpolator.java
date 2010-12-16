@@ -23,18 +23,26 @@ import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
 
+/**
+ * A base class for message interpolators which interpolate the validated value.
+ *
+ * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ */
 public abstract class AbstractFormattingMessageInterpolator implements MessageInterpolator {
 	public static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
 	public static final String VALIDATED_VALUE_FORMAT_SEPARATOR = ":";
 
 	private static final Pattern VALIDATED_VALUE_START_PATTERN = Pattern.compile( "\\$\\{" + VALIDATED_VALUE_KEYWORD );
 	private final MessageInterpolator delegate;
+	private final Locale defaultLocale;
 
 	public AbstractFormattingMessageInterpolator() {
 		this( null );
 	}
 
 	public AbstractFormattingMessageInterpolator(MessageInterpolator userMessageInterpolator) {
+		defaultLocale = Locale.getDefault();
 		if ( userMessageInterpolator == null ) {
 			this.delegate = new ResourceBundleMessageInterpolator();
 		}
@@ -44,22 +52,24 @@ public abstract class AbstractFormattingMessageInterpolator implements MessageIn
 	}
 
 	public String interpolate(String message, Context context) {
-		return interpolateMessage( delegate.interpolate( message, context ), context.getValidatedValue() );
+		return interpolate( message, context, defaultLocale );
 	}
 
 	public String interpolate(String message, Context context, Locale locale) {
-		return interpolateMessage( delegate.interpolate( message, context, locale ), context.getValidatedValue() );
+		String tmp = delegate.interpolate( message, context, locale );
+		return interpolateMessage( tmp, context.getValidatedValue(), locale );
 	}
 
 	/**
-	 * Interpolate the validated value in the given message
+	 * Interpolate the validated value in the given message.
 	 *
 	 * @param message the message where validated value have to be interpolated
 	 * @param validatedValue the value of the object being validated
+	 * @param locale the {@code Locale} to use for message interpolation
 	 *
 	 * @return the interpolated message
 	 */
-	private String interpolateMessage(String message, Object validatedValue) {
+	private String interpolateMessage(String message, Object validatedValue, Locale locale) {
 		String interpolatedMessage = message;
 		Matcher matcher = VALIDATED_VALUE_START_PATTERN.matcher( message );
 
@@ -96,10 +106,10 @@ public abstract class AbstractFormattingMessageInterpolator implements MessageIn
 
 			} while ( nbOpenCurlyBrace > 0 && lastIndex < message.length() );
 
-			//The validated value expression seems correct
+			// The validated value expression seems correct
 			if ( nbOpenCurlyBrace == 0 ) {
 				String expression = message.substring( matcher.start(), lastIndex );
-				String expressionValue = interpolateValidatedValue( expression, validatedValue );
+				String expressionValue = interpolateValidatedValue( expression, validatedValue, locale );
 				interpolatedMessage = interpolatedMessage.replaceFirst(
 						Pattern.quote( expression ), Matcher.quoteReplacement( expressionValue )
 				);
@@ -130,9 +140,9 @@ public abstract class AbstractFormattingMessageInterpolator implements MessageIn
 	 *
 	 * @param expression the expression to interpolate
 	 * @param validatedValue the value of the object being validated
+	 * @param locale the {@code Locale} to be used
 	 *
 	 * @return the interpolated value
 	 */
-	abstract String interpolateValidatedValue(String expression, Object validatedValue);
-
+	abstract String interpolateValidatedValue(String expression, Object validatedValue, Locale locale);
 }
