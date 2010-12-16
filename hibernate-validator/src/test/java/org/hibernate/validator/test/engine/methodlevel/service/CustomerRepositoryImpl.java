@@ -48,8 +48,13 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		
 	}
 
-	public int baz() {
-		return 0;
+	public void boz() {
+		
 	}
+
+	public int baz() {
+		return 9;
+	}
+
 
 }

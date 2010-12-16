@@ -28,7 +28,7 @@ import java.util.List;
  * @author Gunnar Morling
  * 
  */
-public class ReturnValueMetaData {
+public class ReturnValueMetaData implements Iterable<MetaConstraint<?, ? extends Annotation>> {
 
 	private final List<MetaConstraint<?, ? extends Annotation>> constraints;
 

@@ -38,6 +38,8 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	void bar(Customer customer);
 	
+	void boz();
+	
 	@Min(10) int baz();
 	
 }

@@ -57,6 +57,7 @@ import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.ReturnValueMetaData;
 import org.hibernate.validator.metadata.site.BeanConstraintSite;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -161,9 +162,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
 
-		if ( method == null ) {
-			throw new IllegalArgumentException( "The method cannot be null." );
-		}
+		Contracts.assertNotNull(object, "The object to be validated must not be null");
+		Contracts.assertNotNull(method, "The method to be validated must not be null");
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -176,8 +176,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	
 	public final <T> Set<MethodConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 		
-		Contracts.assertNotNull(object, "The object to be validated mus not be null");
-		Contracts.assertNotNull(method, "The method to be validated mus not be null");
+		Contracts.assertNotNull(object, "The object to be validated must not be null");
+		Contracts.assertNotNull(method, "The method to be validated must not be null");
+		
+		//this might the case for parameterless methods
+		if( parameterValues == null ) {
+			return Collections.emptySet();
+		}
 		
 		Set<MethodConstraintViolation<T>> violations = new HashSet<MethodConstraintViolation<T>>();
 		
@@ -194,6 +199,20 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return violations;
 		
 	};
+	
+	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
+
+		Contracts.assertNotNull(method, "The method to be validated must not be null");
+
+		GroupChain groupChain = determineGroupExecutionOrder( groups );
+
+		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
+				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
+		);
+		
+		return validateReturnValueInContext( context, object, method, returnValue, groupChain );
+	}
+	
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return getBeanMetaData( clazz ).getBeanDescriptor();
@@ -789,6 +808,87 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return constraintViolations;
 	}
 
+	private <V, T> Set<MethodConstraintViolation<T>> validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
+
+		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
+
+		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
+
+		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
+		}
+
+		ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext( bean, PathImpl.createPathForMethodReturnValue(method) );
+		valueContext.setCurrentValidatedValue( value );
+//		valueContext.setParameterIndex(parameterIndex);
+		
+		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
+		// before traversing the object.
+		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+
+		// validate constraints at the parameters themselves
+		while ( groupIterator.hasNext() ) {
+
+			Group group = groupIterator.next();
+			valueContext.setCurrentGroup( group.getGroup() );
+			validateReturnValueForGroup( context, valueContext );
+		}
+		constraintViolations.addAll( (Collection<? extends MethodConstraintViolation<T>>) context.getFailingConstraints() );
+
+//		// validate parameter beans annotated with @Valid
+//		if ( isCascadeRequired( method, parameterIndex ) && value != null ) {
+//
+//			ValueContext<V, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext( value, PathImpl.createPathForMethodParameter(method, parameterIndex) );
+//
+//			groupIterator = groupChain.getGroupIterator();
+//			while ( groupIterator.hasNext() ) {
+//
+//				Group group = groupIterator.next();
+//				cascadingvalueContext.setCurrentGroup( group.getGroup() );
+//				cascadingvalueContext.setParameterIndex(parameterIndex);
+//				validateConstraintsForCurrentGroup( context, cascadingvalueContext );
+//			}
+//
+//			// validate cascaded constraints of parameter bean
+//			groupIterator = groupChain.getGroupIterator();
+//			while ( groupIterator.hasNext() ) {
+//				Group group = groupIterator.next();
+//				cascadingvalueContext.setCurrentGroup( group.getGroup() );
+//				cascadingvalueContext.setParameterIndex(parameterIndex);
+//				validateCascadedConstraints( context, cascadingvalueContext );
+//			}
+//			constraintViolations.addAll( (Collection<? extends MethodConstraintViolation<T>>) context.getFailingConstraints() );
+//		}
+
+		//TODO GM: evaluate group sequences
+
+		return constraintViolations;
+	}
+	
+	private <T, U, V> Set<MethodConstraintViolation<T>> validateReturnValueForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
+
+		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
+
+		BeanMetaData<?> beanMetaData = getBeanMetaData( validationContext.getMethod().getDeclaringClass() );
+		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( validationContext.getMethod() );
+
+		for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaData.entrySet() ) {
+
+			ReturnValueMetaData constraintsOfOneParameter = constraintsOfOneClass.getValue().getReturnValueMetaData( );
+
+			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintsOfOneParameter ) {
+
+				if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
+					continue;
+				}
+				metaConstraint.validateConstraint( validationContext, valueContext );
+				constraintViolations.addAll( validationContext.getFailingConstraints() );
+			}
+		}
+
+		return constraintViolations;
+	}	
+	
 	/**
 	 * Collects all <code>MetaConstraint</code>s which match the given path relative to the specified root class.
 	 * <p>

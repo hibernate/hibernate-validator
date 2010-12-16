@@ -270,6 +270,36 @@ public class MethodLevelValidationTest {
 	}
 	
 	@Test
+	public void parameterValidationOfParameterlessMethod() {
+		customerRepository.boz();
+	}
+	
+	@Test
+	public void returnValueValidationYieldsConstraintViolation() {
+	
+		try {
+			customerRepository.baz();
+			fail("Expected ConstraintViolationException wasn't thrown.");
+		}
+		catch(ConstraintViolationException e) {
+			
+			assertNumberOfViolations(e.getConstraintViolations(), 1);
+			
+			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+
+			assertEquals(constraintViolation.getMessage(), "must be greater than or equal to 10");
+			assertEquals(constraintViolation.getMethod().getName(), "baz");
+			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getRootBean(), customerRepository);
+			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
+			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#baz()");
+			assertEquals(constraintViolation.getLeafBean(), customerRepository);
+			assertEquals(constraintViolation.getInvalidValue(), 9);
+		}
+	
+	}
+	
+	@Test
 	public void methodValidationSucceeds() {
 		
 		customerRepository.findCustomerByName("Bob");

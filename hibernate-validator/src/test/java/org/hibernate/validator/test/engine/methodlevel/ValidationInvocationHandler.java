@@ -52,7 +52,15 @@ public class ValidationInvocationHandler implements InvocationHandler {
 			throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
 		}
 	
-		return method.invoke(wrapped, args);
+		Object result = method.invoke(wrapped, args);
+		
+		constraintViolations = validator.validateReturnValue(wrapped, method, result);
+		
+		if(!constraintViolations.isEmpty()) {
+			throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
+		}
+		
+		return result;
 	}
 
 }

@@ -1,7 +1,6 @@
-// $Id: MethodAwareValidator.java 19033 Sep 18, 2010 7:07:16 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -30,6 +29,8 @@ public interface MethodValidator {
 	public <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups);
 
 	public <T> Set<MethodConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups);
+	
+	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups);
 	
 	//getConstraintsForMethod()
 }
