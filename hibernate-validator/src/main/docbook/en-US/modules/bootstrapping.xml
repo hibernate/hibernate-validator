@@ -169,15 +169,16 @@ Validator validator = factory.getValidator();
     the constraint message. To refer to this value in the constraint message
     you can use: <itemizedlist>
         <listitem>
-          <para>${validatedValue}: this will call <methodname>toString
+          <para>${validatedValue}: this will call <methodname>String.valueOf
           </methodname>on the validated value.</para>
         </listitem>
 
         <listitem>
-          <para>${validatedValue:yourScript}: provide your own script to
-          generate the string to display. You refer to the validated value via
-          "_", eg in case od a date instance:
-          <code>${validatedValue:java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT).format(_)}</code></para>
+          <para>${validatedValue:&lt;format&gt;}: provide your own format
+          string which will be passed to <code>String.format</code> together
+          with the validated value. Refer to the javadoc of
+          <code>String.format</code> for more information about the format
+          options.</para>
         </listitem>
       </itemizedlist></para>
 
@@ -186,7 +187,7 @@ Validator validator = factory.getValidator();
 
       <programlisting language="JAVA" role="JAVA">Configuration&lt;?&gt; configuration = Validation.byDefaultProvider().configure();
 ValidatorFactory factory = configuration
-    .messageInterpolator(new ValueScriptingMessageInterpolator(configuration.getDefaultMessageInterpolator(), "javascript"))
+    .messageInterpolator(new ValueFormatterMessageInterpolator(configuration.getDefaultMessageInterpolator()))
     .buildValidatorFactory();
 
 Validator validator = factory.getValidator();
