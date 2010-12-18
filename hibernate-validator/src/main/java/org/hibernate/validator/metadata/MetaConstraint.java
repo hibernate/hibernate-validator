@@ -33,9 +33,8 @@ import org.hibernate.validator.metadata.site.ConstraintSite;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-//TODO GM: parametrize with type of constraint site
-public class MetaConstraint<T, A extends Annotation> {
-
+public abstract class MetaConstraint<T, A extends Annotation> {
+	
 	/**
 	 * The constraint tree created from the constraint annotation.
 	 */
@@ -49,13 +48,14 @@ public class MetaConstraint<T, A extends Annotation> {
 	/**
 	 * The site at which this constraint is defined.
 	 */
-	private final ConstraintSite site;
+	protected final ConstraintSite site;
 
 	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 * @param site meta data about constraint placement
 	 */
 	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintSite site) {
+		
 		this.constraintTree = new ConstraintTree<A>( constraintDescriptor );
 		this.constraintDescriptor = constraintDescriptor;
 		this.site = site;
@@ -83,19 +83,9 @@ public class MetaConstraint<T, A extends Annotation> {
 
 		return constraintTree.validateConstraints( executionContext, valueContext );
 	}
-
-	public final ConstraintSite getSite() {
+	
+	public ConstraintSite getSite() {
 		return site;
-	}
-
-	/**
-	 * @param o the object from which to retrieve the value.
-	 *
-	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
-	 *         is returned of method or field access is used to access the value.
-	 */
-	public final Object getValue(Object o) {
-		return site.getValue( o );
 	}
 
 	protected final Type typeOfAnnotatedElement() {

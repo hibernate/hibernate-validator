@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
+import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
@@ -374,7 +375,7 @@ public class XmlMappingParser {
 				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new MetaConstraint<T, A>( constraintDescriptor, new BeanConstraintSite<T>( beanClass, member ) );
+		return new BeanMetaConstraint<T, A>( constraintDescriptor, beanClass, member );
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {

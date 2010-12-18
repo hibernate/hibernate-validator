@@ -37,13 +37,13 @@ import org.hibernate.validator.cfg.CascadeDef;
 import org.hibernate.validator.cfg.ConstraintDefAccessor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.metadata.AnnotationIgnores;
+import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.site.BeanConstraintSite;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -138,7 +138,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			// via the programmatic api as well
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 
-			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
+			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
 			List<Member> cascadedMembers = new ArrayList<Member>();
 
 			for ( Class<?> classInHierarchy : classes ) {
@@ -187,7 +187,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			Class<T> beanClass = ( Class<T> ) clazz;
 
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
-			Map<Class<?>, List<MetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
+			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
 			List<Member> cascadedMembers = new ArrayList<Member>();
 			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
 			// some constraints might be configured in super classes or interfaces. The xml configuration does not
@@ -217,8 +217,9 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	@SuppressWarnings("unchecked")
 	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser,
 																	   Class<T> rootClass,
-																	   Class<?> hierarchyClass, Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
+																	   Class<?> hierarchyClass, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints) {
 		for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
+
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
 					( A ) constraint.getDescriptor().getAnnotation(),
@@ -226,8 +227,13 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 					constraint.getElementType(),
 					definedIn
 			);
-			MetaConstraint<T, A> newMetaConstraint = new MetaConstraint<T, A>(
-					descriptor, constraint.getSite()
+
+			//TODO GM: avoid this cast
+			BeanMetaConstraint<?, ? extends Annotation> asBeanMetaConstraint = ( BeanMetaConstraint<?, ? extends Annotation> ) constraint;
+			BeanMetaConstraint<T, A> newMetaConstraint = new BeanMetaConstraint<T, A>(
+					descriptor,
+					asBeanMetaConstraint.getSite().getBeanClass(),
+					asBeanMetaConstraint.getSite().getMember()
 			);
 
 			addConstraintToMap( hierarchyClass, newMetaConstraint, constraints );
@@ -237,7 +243,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	@SuppressWarnings("unchecked")
 	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefAccessor<?>> definitions,
 																				Class<T> rootClass, Class<?> hierarchyClass,
-																				Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
+																				Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints) {
 		for ( ConstraintDefAccessor<?> config : definitions ) {
 			A annotation = ( A ) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
@@ -252,21 +258,22 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				);
 			}
 
-			MetaConstraint<T, A> metaConstraint = new MetaConstraint<T, A>(
-					constraintDescriptor, new BeanConstraintSite<T>( ( Class<T> ) config.getBeanType(), member )
+			BeanMetaConstraint<T, A> metaConstraint = new BeanMetaConstraint<T, A>(
+					constraintDescriptor, ( Class<T> ) config.getBeanType(), member
 			);
 			addConstraintToMap( hierarchyClass, metaConstraint, constraints );
 		}
 	}
 
-	private <T, A extends Annotation> void addConstraintToMap(Class<?> hierarchyClass,
-															  MetaConstraint<T, A> constraint,
-															  Map<Class<?>, List<MetaConstraint<T, ?>>> constraints) {
-		List<MetaConstraint<T, ?>> constraintList = constraints.get( hierarchyClass );
+	private <M extends MetaConstraint<?, ? extends Annotation>> void addConstraintToMap(Class<?> hierarchyClass, M constraint, Map<Class<?>, List<M>> constraints) {
+
+		List<M> constraintList = constraints.get( hierarchyClass );
+
 		if ( constraintList == null ) {
-			constraintList = new ArrayList<MetaConstraint<T, ?>>();
+			constraintList = new ArrayList<M>();
 			constraints.put( hierarchyClass, constraintList );
 		}
+
 		constraintList.add( constraint );
 	}
 
@@ -305,7 +312,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 	}
 
-	private <A extends Annotation> Annotation createAnnotationProxy(ConstraintDefAccessor<A> config) {
+	private <A extends Annotation> A createAnnotationProxy(ConstraintDefAccessor<A> config) {
 		Class<A> constraintType = config.getConstraintType();
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
 		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {
@@ -324,7 +331,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		return annotation;
 	}
 
-	private <T> Map<Class<?>, List<MetaConstraint<T, ?>>> createEmptyConstraintMap() {
-		return new HashMap<Class<?>, List<MetaConstraint<T, ?>>>();
+	private <T> Map<Class<?>, List<BeanMetaConstraint<T, ?>>> createEmptyConstraintMap() {
+		return new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>();
 	}
 }
