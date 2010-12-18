@@ -1,4 +1,3 @@
-// $Id: ConstraintSite.java 19033 Sep 26, 2010 9:15:08 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -26,12 +25,6 @@ import java.lang.reflect.Type;
  * @author Gunnar Morling
  */
 public interface ConstraintSite {
-
-	/**
-	 * @param o
-	 * @return
-	 */
-	Object getValue(Object o);
 
 	/**
 	 * @return

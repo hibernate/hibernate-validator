@@ -38,18 +38,6 @@ public class MethodParameterConstraintSite implements ConstraintSite {
 		this.parameterIndex = parameterIndex;
 	}
 
-	public Method getMethod() {
-		return method;
-	}
-
-	public int getParameterIndex() {
-		return parameterIndex;
-	}
-
-	public Object getValue(Object o) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
 	public Type typeOfAnnotatedElement() {
 		Type t = null;
 		
