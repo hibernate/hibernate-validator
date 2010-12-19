@@ -68,9 +68,9 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	private final Map<Object, Set<PathImpl>> processedPaths;
 
 	/**
-	 * A list of all failing constraints so far.
+	 * Contains all failing constraints so far.
 	 */
-	private final List<C> failingConstraintViolations;
+	private final Set<C> failingConstraintViolations;
 
 	/**
 	 * Flag indicating whether an object can only be validated once per group or once per group AND validation path.
@@ -141,7 +141,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
-		failingConstraintViolations = new ArrayList<C>();
+		failingConstraintViolations = new HashSet<C>();
 	}
 
 	public final T getRootBean() {
@@ -195,21 +195,11 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		}
 	}
 
-	private void addConstraintFailure(C failingConstraintViolation) {
-		// NOTE: we are relying on the fact that ConstraintViolation.equals() is implemented correctly.
-		int i = failingConstraintViolations.indexOf( failingConstraintViolation );
-		if ( i == -1 ) {
-			failingConstraintViolations.add( failingConstraintViolation );
-		}
+	public final void addConstraintFailures(Set<C> failingConstraintViolations) {
+		this.failingConstraintViolations.addAll(failingConstraintViolations);
 	}
 
-	public final void addConstraintFailures(List<C> failingConstraintViolations) {
-		for ( C violation : failingConstraintViolations ) {
-			addConstraintFailure( violation );
-		}
-	}
-
-	public List<C> getFailingConstraints() {
+	public Set<C> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
 

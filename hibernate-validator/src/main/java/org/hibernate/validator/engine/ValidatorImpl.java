@@ -133,8 +133,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 
 		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext( object, PathImpl.createRootPath() );
-		List<? extends ConstraintViolation<T>> list = validateInContext( valueContext, validationContext, groupChain );
-		return new HashSet<ConstraintViolation<T>>( list );
+
+		return validateInContext( valueContext, validationContext, groupChain );
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
@@ -144,11 +144,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		sanityCheckPropertyPath( propertyName );
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
-		List<ConstraintViolation<T>> failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
+		Set<ConstraintViolation<T>> failingConstraintViolations = new HashSet<ConstraintViolation<T>>();
 		validateProperty(
 				object, PathImpl.createPathFromString( propertyName ), failingConstraintViolations, groupChain
 		);
-		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
+		return failingConstraintViolations;
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
@@ -159,11 +159,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		sanityCheckPropertyPath( propertyName );
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
-		List<ConstraintViolation<T>> failingConstraintViolations = new ArrayList<ConstraintViolation<T>>();
+		Set<ConstraintViolation<T>> failingConstraintViolations = new HashSet<ConstraintViolation<T>>();
 		validateValue(
 				beanType, value, PathImpl.createPathFromString( propertyName ), failingConstraintViolations, groupChain
 		);
-		return new HashSet<ConstraintViolation<T>>( failingConstraintViolations );
+		return failingConstraintViolations;
 	}
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
@@ -185,7 +185,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Contracts.assertNotNull(object, "The object to be validated must not be null");
 		Contracts.assertNotNull(method, "The method to be validated must not be null");
 		
-		//this might the case for parameterless methods
+		//this might be the case for parameterless methods
 		if( parameterValues == null ) {
 			return Collections.emptySet();
 		}
@@ -261,11 +261,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @param <T> The root bean type
 	 * @param <V> The type of the current object on the validation stack
 	 *
-	 * @return List of constraint violations or the empty set if there were no violations.
+	 * @return Set of constraint violations or the empty set if there were no violations.
 	 */
-	private <T, U, V, E extends ConstraintViolation<T>> List<E> validateInContext(ValueContext<U, V> valueContext, ValidationContext<T, E> context, GroupChain groupChain) {
+	private <T, U, V, E extends ConstraintViolation<T>> Set<E> validateInContext(ValueContext<U, V> valueContext, ValidationContext<T, E> context, GroupChain groupChain) {
 		if ( valueContext.getCurrentBean() == null ) {
-			return Collections.emptyList();
+			return Collections.emptySet();
 		}
 
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
@@ -537,7 +537,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T> void validateProperty(T object, PathImpl propertyPath, List<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T> void validateProperty(T object, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 
 		@SuppressWarnings("unchecked")
 		final Class<T> beanType = (Class<T>) object.getClass();
@@ -598,7 +598,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V> void validatePropertyForGroup(
 			T object,
 			PathImpl path,
-			List<ConstraintViolation<T>> failingConstraintViolations,
+			Set<ConstraintViolation<T>> failingConstraintViolations,
 			Set<BeanMetaConstraint<T, ?>> metaConstraints,
 			U hostingBeanInstance,
 			Group group,
@@ -642,7 +642,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T> void validateValue(Class<T> beanType, Object value, PathImpl propertyPath, List<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T> void validateValue(Class<T> beanType, Object value, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 		Set<BeanMetaConstraint<T, ?>> metaConstraints = new HashSet<BeanMetaConstraint<T, ?>>();
 		collectMetaConstraintsForPath( beanType, null, propertyPath.iterator(), metaConstraints );
 
@@ -695,7 +695,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			Class<U> beanType,
 			V value,
 			PathImpl path,
-			List<ConstraintViolation<U>> failingConstraintViolations,
+			Set<ConstraintViolation<U>> failingConstraintViolations,
 			Set<BeanMetaConstraint<U, ?>> metaConstraints,
 			Group group,
 			TraversableResolver cachedTraversableResolver) {
