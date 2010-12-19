@@ -19,8 +19,8 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.metadata.site.MethodParameterConstraintSite;
-import org.hibernate.validator.metadata.site.ReturnValueConstraintSite;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodParameterConstraintLocation;
 
 /**
  * A {@link MetaConstraint} implementation that represents a method parameter or
@@ -41,7 +41,7 @@ public class MethodMetaConstraint<T, A extends Annotation> extends
 	public MethodMetaConstraint(
 			ConstraintDescriptorImpl<A> constraintDescriptor, Method method) {
 
-		super( constraintDescriptor, new ReturnValueConstraintSite( method ) );
+		super( constraintDescriptor, new MethodConstraintLocation( method ) );
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class MethodMetaConstraint<T, A extends Annotation> extends
 			int parameterIndex) {
 
 		super(
-				constraintDescriptor, new MethodParameterConstraintSite(
+				constraintDescriptor, new MethodParameterConstraintLocation(
 						method,
 						parameterIndex
 				)

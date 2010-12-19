@@ -24,7 +24,7 @@ import java.util.Set;
 import org.hibernate.validator.engine.ConstraintTree;
 import org.hibernate.validator.engine.ValidationContext;
 import org.hibernate.validator.engine.ValueContext;
-import org.hibernate.validator.metadata.site.ConstraintSite;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
@@ -34,7 +34,7 @@ import org.hibernate.validator.metadata.site.ConstraintSite;
  * @author Gunnar Morling
  */
 public abstract class MetaConstraint<T, A extends Annotation> {
-	
+
 	/**
 	 * The constraint tree created from the constraint annotation.
 	 */
@@ -46,19 +46,19 @@ public abstract class MetaConstraint<T, A extends Annotation> {
 	private final ConstraintDescriptorImpl<A> constraintDescriptor;
 
 	/**
-	 * The site at which this constraint is defined.
+	 * The location at which this constraint is defined.
 	 */
-	protected final ConstraintSite site;
+	protected final ConstraintLocation location;
 
 	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
-	 * @param site meta data about constraint placement
+	 * @param location meta data about constraint placement
 	 */
-	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintSite site) {
-		
+	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
+
 		this.constraintTree = new ConstraintTree<A>( constraintDescriptor );
 		this.constraintDescriptor = constraintDescriptor;
-		this.site = site;
+		this.location = location;
 	}
 
 	/**
@@ -83,18 +83,18 @@ public abstract class MetaConstraint<T, A extends Annotation> {
 
 		return constraintTree.validateConstraints( executionContext, valueContext );
 	}
-	
-	public ConstraintSite getSite() {
-		return site;
+
+	public ConstraintLocation getLocation() {
+		return location;
 	}
 
 	protected final Type typeOfAnnotatedElement() {
-		return site.typeOfAnnotatedElement();
+		return location.typeOfAnnotatedElement();
 	}
 
 	@Override
 	public String toString() {
-		return "MetaConstraint [constraintTree=" + constraintTree + ", site="
-				+ site + "]";
+		return "MetaConstraint [constraintTree=" + constraintTree + ", location="
+				+ location + "]";
 	}
 }

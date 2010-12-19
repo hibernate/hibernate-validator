@@ -126,7 +126,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	 * @param mapping The constraint configuration created via the programmatic API.
 	 */
 	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
-		
+
 		final Map<Class<?>, List<ConstraintDefAccessor<?>>> constraintsByType = mapping.getConstraintConfig();
 		final Map<Class<?>, List<CascadeDef>> cascadeConfigByType = mapping.getCascadeConfig();
 
@@ -142,7 +142,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			List<Member> cascadedMembers = new ArrayList<Member>();
 
 			for ( Class<?> classInHierarchy : classes ) {
-				
+
 				// if the programmatic config contains constraints for the class in the hierarchy create equivalent meta constraints
 				List<ConstraintDefAccessor<?>> constraintsOfType = constraintsByType.get( classInHierarchy );
 				if ( constraintsOfType != null ) {
@@ -232,8 +232,8 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			BeanMetaConstraint<?, ? extends Annotation> asBeanMetaConstraint = ( BeanMetaConstraint<?, ? extends Annotation> ) constraint;
 			BeanMetaConstraint<T, A> newMetaConstraint = new BeanMetaConstraint<T, A>(
 					descriptor,
-					asBeanMetaConstraint.getSite().getBeanClass(),
-					asBeanMetaConstraint.getSite().getMember()
+					asBeanMetaConstraint.getLocation().getBeanClass(),
+					asBeanMetaConstraint.getLocation().getMember()
 			);
 
 			addConstraintToMap( hierarchyClass, newMetaConstraint, constraints );

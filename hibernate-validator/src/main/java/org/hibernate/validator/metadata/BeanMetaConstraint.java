@@ -19,7 +19,7 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 
-import org.hibernate.validator.metadata.site.BeanConstraintSite;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -40,14 +40,14 @@ public class BeanMetaConstraint<T, A extends Annotation> extends MetaConstraint<
 	 * not a class-level constraint, otherwise null.
 	 */
 	public BeanMetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, Class<?> beanClass, Member member) {
-		super( constraintDescriptor, new BeanConstraintSite( beanClass, member ) );
+		super( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
 	}
 
 	/**
 	 * Returns the location of this constraint.
 	 */
-	public BeanConstraintSite getSite() {
-		return ( BeanConstraintSite ) site;
+	public BeanConstraintLocation getLocation() {
+		return ( BeanConstraintLocation ) location;
 	}
 
 	/**
@@ -58,11 +58,11 @@ public class BeanMetaConstraint<T, A extends Annotation> extends MetaConstraint<
 	 */
 	public Object getValue(Object o) {
 
-		if ( ( ( BeanConstraintSite ) site ).getMember() == null ) {
+		if ( getLocation().getMember() == null ) {
 			return o;
 		}
 		else {
-			return ReflectionHelper.getValue( ( ( BeanConstraintSite ) site ).getMember(), o );
+			return ReflectionHelper.getValue( getLocation().getMember(), o );
 		}
 	}
 

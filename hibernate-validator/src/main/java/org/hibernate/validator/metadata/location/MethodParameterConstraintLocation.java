@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.metadata.site;
+package org.hibernate.validator.metadata.location;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -23,27 +23,45 @@ import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
- * @author Gunnar Morling
+ * A {@link ConstraintLocation} implementation that represents a method parameter.
  *
+ * @author Gunnar Morling
  */
-public class ReturnValueConstraintSite implements ConstraintSite {
+public class MethodParameterConstraintLocation implements ConstraintLocation {
 
 	private final Method method;
-	
-	public ReturnValueConstraintSite(Method method) {
 
-		Contracts.assertNotNull(method, "Method must not be null");
+	private final int parameterIndex;
+
+	/**
+	 * Creates a new {@link MethodParameterConstraintLocation}.
+	 *
+	 * @param method The method of the location to be created.
+	 * @param parameterIndex The parameter index of the location to be created.
+	 */
+	public MethodParameterConstraintLocation(Method method, int parameterIndex) {
+
+		Contracts.assertNotNull( method, "Method must not be null" );
+
 		this.method = method;
+		this.parameterIndex = parameterIndex;
 	}
 
 	public Type typeOfAnnotatedElement() {
-		Type t = ReflectionHelper.typeOf( method );
-		
-		if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
+		Type t = null;
+
+		t = ReflectionHelper.typeOf( method, parameterIndex );
+		if ( t instanceof Class && ( ( Class<?> ) t ).isPrimitive() ) {
 			t = ReflectionHelper.boxedType( t );
 		}
-		
+
 		return t;
+	}
+
+	@Override
+	public String toString() {
+		return "MethodConstraintLocation [method=" + method + ", parameterIndex="
+				+ parameterIndex + "]";
 	}
 
 }

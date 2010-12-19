@@ -59,7 +59,7 @@ import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.metadata.ReturnValueMetaData;
-import org.hibernate.validator.metadata.site.BeanConstraintSite;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -395,7 +395,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		boolean validationSuccessful = true;
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
-			valueContext.appendNode( metaConstraint.getSite().getPropertyName() );
+			valueContext.appendNode( metaConstraint.getLocation().getPropertyName() );
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
@@ -920,7 +920,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			List<BeanMetaConstraint<T, ? extends Annotation>> metaConstraintList = metaData.getMetaConstraintsAsList();
 			for ( BeanMetaConstraint<T, ?> metaConstraint : metaConstraintList ) {
 				if ( elem.getName() != null && elem.getName()
-						.equals( metaConstraint.getSite().getPropertyName() ) ) {
+						.equals( metaConstraint.getLocation().getPropertyName() ) ) {
 					metaConstraints.add( metaConstraint );
 				}
 			}

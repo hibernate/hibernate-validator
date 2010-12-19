@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,20 +14,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.metadata.site;
+package org.hibernate.validator.metadata.location;
 
 import java.lang.reflect.Type;
 
 /**
  * Implementations describe the location at which a constraint is specified (a
  * bean, a method parameter etc.).
- * 
+ *
  * @author Gunnar Morling
  */
-public interface ConstraintSite {
+public interface ConstraintLocation {
 
 	/**
-	 * @return
+	 * Returns the type of the element at this constraint location. Depending
+	 * on the concrete implementation this might be the type of an annotated bean, method parameter etc.
+	 *
+	 * @return The type of the element at this constraint location.
 	 */
 	Type typeOfAnnotatedElement();
 

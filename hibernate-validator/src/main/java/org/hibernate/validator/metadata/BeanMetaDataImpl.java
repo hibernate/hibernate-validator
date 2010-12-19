@@ -240,10 +240,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		else {
 			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
-					metaConstraint.getSite().getPropertyName()
+					metaConstraint.getLocation().getPropertyName()
 			);
 			if ( propertyDescriptor == null ) {
-				Member member = metaConstraint.getSite().getMember();
+				Member member = metaConstraint.getLocation().getMember();
 				propertyDescriptor = addPropertyDescriptorForMember( member, isValidAnnotationPresent( member ) );
 			}
 			propertyDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
@@ -333,7 +333,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						.get( clazz ) ) {
 					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
 					if ( descriptor.getElementType() == ElementType.FIELD
-							&& metaConstraint.getSite()
+							&& metaConstraint.getLocation()
 							.getPropertyName()
 							.equals( ReflectionHelper.getPropertyName( field ) ) ) {
 						fieldMetaData.add( descriptor );
@@ -393,7 +393,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						.get( clazz ) ) {
 					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
 					if ( descriptor.getElementType() == ElementType.METHOD
-							&& metaConstraint.getSite()
+							&& metaConstraint.getLocation()
 							.getPropertyName()
 							.equals( ReflectionHelper.getPropertyName( method ) ) ) {
 						methodMetaData.add( descriptor );
