@@ -36,10 +36,12 @@ import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.slf4j.Logger;
@@ -99,7 +101,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	// Used to avoid ReflectionHelper#containsMember which is slow
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
-	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
+	/**
+	 * Whether constraints defined at non-getter methods are supported or not.
+	 * If not and we are finding some, a {@link ValidationException} will be
+	 * thrown by {@link BeanConstraintLocation}.
+	 */
+	private final boolean methodLevelConstraintsAllowed;
+
+	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, boolean methodLevelConstraintsAllowed, BeanMetaDataCache beanMetaDataCache) {
 		this(
 				beanClass,
 				constraintHelper,
@@ -107,6 +116,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>(),
 				new ArrayList<Member>(),
 				new AnnotationIgnores(),
+				methodLevelConstraintsAllowed,
 				beanMetaDataCache
 		);
 	}
@@ -117,9 +127,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints,
 							List<Member> cascadedMembers,
 							AnnotationIgnores annotationIgnores,
+							boolean methodLevelConstraintsAllowed,
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
+		this.methodLevelConstraintsAllowed = methodLevelConstraintsAllowed;
+		
 		createMetaData( annotationIgnores, beanMetaDataCache );
 		if ( !defaultGroupSequence.isEmpty() ) {
 			setDefaultGroupSequence( defaultGroupSequence );
@@ -288,7 +301,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		initClassConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initFieldConstraints( clazz, annotationIgnores, beanMetaDataCache );
-		initMethodParameterConstraints( clazz, annotationIgnores, beanMetaDataCache );
+		initMethodLevelConstraints( clazz, annotationIgnores, beanMetaDataCache );
 	}
 
 	/**
@@ -366,8 +379,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
 		for ( Method method : declaredMethods ) {
-			
-			if(!ReflectionHelper.isGetterMethod(method)) {
+
+			//if this is not a getter and method-level constraints are enabled, skip this method, as it will be
+			//processed in initMethodLevelConstraints(). If this is not a getter, but method-level constraints are
+			//not allowed, we'll continue in order to throw an exception, when the BeanConstraintLocation is
+			//created
+			//TODO GM: find a more explicit solution, when implementing the caching in initMethodLevelConstraints() 
+			if(!ReflectionHelper.isGetterMethod(method) && methodLevelConstraintsAllowed) {
 				continue;
 			}
 
@@ -416,7 +434,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private <S> void initMethodParameterConstraints(Class<S> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
+	//TODO GM: Implement caching similar to initMethodConstraints(). Maybe the two methods could also be unified to avoid
+	//the second loop over all methods.
+	private <S> void initMethodLevelConstraints(Class<S> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
 		for ( Method method : declaredMethods ) {
 

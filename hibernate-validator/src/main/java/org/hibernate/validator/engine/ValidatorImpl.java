@@ -59,7 +59,6 @@ import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.metadata.ReturnValueMetaData;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -106,12 +105,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private final BeanMetaDataCache beanMetaDataCache;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
+	/**
+	 * Whether this validator allows constraints to be defined at non-getter methods or not.
+	 */
+	private final boolean methodLevelConstraintsAllowed;
+
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache, boolean methodLevelConstraintsAllowed) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.constraintHelper = constraintHelper;
 		this.beanMetaDataCache = beanMetaDataCache;
+		this.methodLevelConstraintsAllowed = methodLevelConstraintsAllowed;
 
 		groupChainGenerator = new GroupChainGenerator();
 	}
@@ -962,7 +967,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <U> BeanMetaData<U> getBeanMetaData(Class<U> beanClass) {
 		BeanMetaDataImpl<U> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
 		if ( beanMetaData == null ) {
-			beanMetaData = new BeanMetaDataImpl<U>( beanClass, constraintHelper, beanMetaDataCache );
+			beanMetaData = new BeanMetaDataImpl<U>( beanClass, constraintHelper, methodLevelConstraintsAllowed, beanMetaDataCache );
 			beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
 		}
 		return beanMetaData;

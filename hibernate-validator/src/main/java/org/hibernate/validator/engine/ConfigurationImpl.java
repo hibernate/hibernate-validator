@@ -74,6 +74,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean ignoreXmlConfiguration = false;
 	private Set<InputStream> configurationStreams = new HashSet<InputStream>();
 	private ConstraintMapping mapping;
+	private boolean methodLevelConstraintsAllowed = false;
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -85,7 +86,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		validationBootstrapParameters = new ValidationBootstrapParameters();
 	}
 
-	public ConfigurationImpl(ValidationProvider provider) {
+	public ConfigurationImpl(ValidationProvider<?> provider) {
 		if ( provider == null ) {
 			throw new ValidationException( "Assertion error: inconsistent ConfigurationImpl construction" );
 		}
@@ -130,6 +131,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	public final HibernateValidatorConfiguration allowMethodLevelConstraints() {
+		this.methodLevelConstraintsAllowed = true;
+		return this;
+	}
+
 	public final HibernateValidatorConfiguration addProperty(String name, String value) {
 		if ( value != null ) {
 			validationBootstrapParameters.addConfigProperty( name, value );
@@ -147,7 +153,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			else {
 				final Class<? extends ValidationProvider<?>> providerClass = validationBootstrapParameters.getProviderClass();
 				if ( providerClass != null ) {
-					for ( ValidationProvider provider : providerResolver.getValidationProviders() ) {
+					for ( ValidationProvider<?> provider : providerResolver.getValidationProviders() ) {
 						if ( providerClass.isAssignableFrom( provider.getClass() ) ) {
 							factory = provider.buildValidatorFactory( this );
 							break;
@@ -223,6 +229,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public final ConstraintMapping getMapping() {
 		return mapping;
+	}
+
+	public final boolean isMethodLevelConstraintsAllowed() {
+		return methodLevelConstraintsAllowed;
 	}
 
 	private boolean isSpecificProvider() {

@@ -17,6 +17,7 @@
 package org.hibernate.validator;
 
 import javax.validation.Configuration;
+import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
@@ -73,4 +74,14 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @throws IllegalArgumentException if {@code mapping} is {@code null}
 	 */
 	HibernateValidatorConfiguration addMapping(ConstraintMapping mapping);
+
+	/**
+	 * Enables method-level validation, i.e. non-getter methods may be annotated with constraint annotations in order
+	 * to validate their return values. If this option is not activated during configuration time and a bean with constraints
+	 * at non-getter methods is validated a {@link ValidationException} upon this validation.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	HibernateValidatorConfiguration allowMethodLevelConstraints();
+
 }

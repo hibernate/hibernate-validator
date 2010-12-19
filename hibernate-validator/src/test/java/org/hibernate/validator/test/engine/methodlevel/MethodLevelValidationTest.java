@@ -1,7 +1,6 @@
-// $Id: MethodLevelValidationTest.java 19033 Sep 19, 2010 9:51:37 AM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -17,6 +16,12 @@
 */
 package org.hibernate.validator.test.engine.methodlevel;
 
+import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
+
 import java.lang.reflect.Proxy;
 import java.util.Set;
 
@@ -25,22 +30,22 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.constraints.Min;
 
-import org.hibernate.validator.MethodValidator;
+import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.MethodConstraintViolation;
+import org.hibernate.validator.MethodValidator;
+import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.test.engine.methodlevel.model.Address;
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.engine.methodlevel.service.RepositoryBase;
-
-import static org.testng.Assert.*;
-import static org.hibernate.validator.test.util.TestUtil.*;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
+ * Integration test for the method-level validation related features of {@link ValidatorImpl}.
+ * 
  * @author Gunnar Morling
  *
  */
@@ -51,7 +56,12 @@ public class MethodLevelValidationTest {
 	
 	@BeforeMethod
 	public void setUpValidator() {
-		validator = Validation.buildDefaultValidatorFactory().getValidator().unwrap(MethodValidator.class);
+		validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.allowMethodLevelConstraints()
+				.buildValidatorFactory()
+				.getValidator()
+				.unwrap( MethodValidator.class );
 
 		customerRepository = (CustomerRepository)Proxy.newProxyInstance(
 				getClass().getClassLoader(), 

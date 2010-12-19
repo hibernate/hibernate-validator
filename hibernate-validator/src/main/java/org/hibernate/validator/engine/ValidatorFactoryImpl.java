@@ -63,7 +63,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final ConstraintHelper constraintHelper;
-
+	private final boolean methodLevelConstraintsAllowed;
 	/**
 	 * Used to cache the constraint meta data for validated entities
 	 */
@@ -87,6 +87,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			if ( hibernateSpecificConfig.getMapping() != null ) {
 				initProgrammaticConfiguration( hibernateSpecificConfig.getMapping() );
 			}
+			methodLevelConstraintsAllowed = hibernateSpecificConfig.isMethodLevelConstraintsAllowed();
+		}
+		else {
+			methodLevelConstraintsAllowed = false;
 		}
 	}
 
@@ -116,7 +120,8 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				messageInterpolator,
 				traversableResolver,
 				constraintHelper,
-				beanMetaDataCache
+				beanMetaDataCache,
+				methodLevelConstraintsAllowed
 		);
 	}
 
@@ -168,6 +173,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 					constraints,
 					cascadedMembers,
 					new AnnotationIgnores(),
+					methodLevelConstraintsAllowed,
 					beanMetaDataCache
 			);
 
@@ -207,6 +213,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 					constraints,
 					cascadedMembers,
 					annotationIgnores,
+					methodLevelConstraintsAllowed,
 					beanMetaDataCache
 			);
 
