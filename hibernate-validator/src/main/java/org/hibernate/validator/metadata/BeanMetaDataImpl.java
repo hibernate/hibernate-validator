@@ -301,7 +301,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		initClassConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initFieldConstraints( clazz, annotationIgnores, beanMetaDataCache );
-		initMethodLevelConstraints( clazz, annotationIgnores, beanMetaDataCache );
 	}
 
 	/**
@@ -380,15 +379,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
 		for ( Method method : declaredMethods ) {
 
-			//if this is not a getter and method-level constraints are enabled, skip this method, as it will be
-			//processed in initMethodLevelConstraints(). If this is not a getter, but method-level constraints are
-			//not allowed, we'll continue in order to throw an exception, when the BeanConstraintLocation is
-			//created
-			//TODO GM: find a more explicit solution, when implementing the caching in initMethodLevelConstraints() 
-			if(!ReflectionHelper.isGetterMethod(method) && methodLevelConstraintsAllowed) {
-				continue;
-			}
-
 			addToPropertyNameList( method );
 
 			// HV-172
@@ -402,11 +392,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			// HV-262
 			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
-			List<ConstraintDescriptorImpl<?>> methodMetaData;
+			List<ConstraintDescriptorImpl<?>> methodConstraints;
 			boolean cachedMethodIsCascaded = false;
 			if ( cachedMetaData != null && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
 				cachedMethodIsCascaded = cachedMetaData.getCascadedMembers().contains( method );
-				methodMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
+				methodConstraints = new ArrayList<ConstraintDescriptorImpl<?>>();
 				for ( BeanMetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap()
 						.get( clazz ) ) {
 					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
@@ -414,77 +404,40 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							&& metaConstraint.getLocation()
 							.getPropertyName()
 							.equals( ReflectionHelper.getPropertyName( method ) ) ) {
-						methodMetaData.add( descriptor );
+						methodConstraints.add( descriptor );
 					}
 				}
 			}
 			else {
-				methodMetaData = findConstraints( method, ElementType.METHOD );
+				methodConstraints = findConstraints( method, ElementType.METHOD );
 			}
 
-			for ( ConstraintDescriptorImpl<?> constraintDescription : methodMetaData ) {
-				ReflectionHelper.setAccessibility( method );
-				BeanMetaConstraint<T, ?> metaConstraint = createBeanMetaConstraint( method, constraintDescription );
-				addMetaConstraint( clazz, metaConstraint );
-			}
-
-			if ( cachedMethodIsCascaded || method.isAnnotationPresent( Valid.class ) ) {
-				addCascadedMember( method );
-			}
-		}
-	}
-
-	//TODO GM: Implement caching similar to initMethodConstraints(). Maybe the two methods could also be unified to avoid
-	//the second loop over all methods.
-	private <S> void initMethodLevelConstraints(Class<S> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
-		for ( Method method : declaredMethods ) {
-
-			// HV-172
-			if ( Modifier.isStatic( method.getModifiers() ) ) {
-				continue;
-			}
-
-			if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
-				continue;
-			}
-
-			// HV-262
-			BeanMetaDataImpl<S> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
-			Map<Integer, ParameterMetaData> constraintsByParameter;
-			boolean cachedMethodIsCascaded = false;
-//			if ( cachedMetaData != null ) {
-////				cachedMethodIsCascaded = cachedMetaData.getCascadedMembers().contains( method );
-//				
-//				Map<Class<?>, Map<Integer, List<MetaConstraint<S, ? extends Annotation>>>> constraintsByMethod = cachedMetaData.getMetaConstraintsForMethod(method);
-//				
-//				if(constraintsByMethod != null) {
-//					methodMetaData = new HashMap<Integer, List<ConstraintDescriptorImpl<?>>>();
-//					for (Entry<Class<?>, Map<Integer, List<MetaConstraint<S, ? extends Annotation>>>> constraintsOfOneParameter : constraintsByMethod.entrySet()) {
-//						
-//						for(Entry<Integer, List<MetaConstraint<S, ? extends Annotation>>> o :constraintsOfOneParameter.getValue().entrySet()) {
-//							List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
-//							for(MetaConstraint<S, ? extends Annotation> oneMetaConstraint : o.getValue()) {
-//								constraintDescriptors.add(oneMetaConstraint.getDescriptor());
-//							}
-//							methodMetaData.put(o.getKey(), constraintDescriptors);
-//						}
-//						
-//					}
-//				}
-//				else {
-//					methodMetaData = findParameterConstraints( method );
-//				}
-//			}
-//			else {
-			constraintsByParameter = findParameterConstraints( method );
-//			}
-
+			//TODO GM: try to retrieve from cache
+			Map<Integer, ParameterMetaData> parameterConstraints = findParameterConstraints( method );
 			ReturnValueMetaData returnValueConstraints = findReturnValueConstraints( method );
+			
+			if(!ReflectionHelper.isGetterMethod(method) && !methodLevelConstraintsAllowed && !methodConstraints.isEmpty()) {
+				throw new ValidationException(
+						"Annotated methods must follow the JavaBeans naming convention. " + method.getName() + "() does not."
+				);
+			}
 			MethodMetaData methodMetaData = new MethodMetaData(
-					method, constraintsByParameter, returnValueConstraints
+					method, parameterConstraints, returnValueConstraints
 			);
+			
 			addMethodMetaConstraint( clazz, methodMetaData );
+
+			if(ReflectionHelper.isGetterMethod(method)) {
+				for ( ConstraintDescriptorImpl<?> constraintDescription : methodConstraints ) {
+					ReflectionHelper.setAccessibility( method );
+					BeanMetaConstraint<T, ?> metaConstraint = createBeanMetaConstraint( method, constraintDescription );
+					addMetaConstraint( clazz, metaConstraint );
+				}
+		
+				if ( cachedMethodIsCascaded || method.isAnnotationPresent( Valid.class ) ) {
+					addCascadedMember( method );
+				}
+			}
 		}
 	}
 
