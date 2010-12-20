@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -58,7 +59,6 @@ import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
-import org.hibernate.validator.metadata.ReturnValueMetaData;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -880,9 +880,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaData.entrySet() ) {
 
-			ReturnValueMetaData constraintsOfOneParameter = constraintsOfOneClass.getValue().getReturnValueMetaData( );
-
-			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintsOfOneParameter ) {
+			MethodMetaData metaData = constraintsOfOneClass.getValue();
+			
+			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : metaData ) {
 
 				if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 					continue;

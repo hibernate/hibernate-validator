@@ -17,9 +17,7 @@
 package org.hibernate.validator.metadata.location;
 
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import javax.validation.ValidationException;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -58,11 +56,6 @@ public class BeanConstraintLocation implements ConstraintLocation {
 
 		if ( this.member != null ) {
 			this.propertyName = ReflectionHelper.getPropertyName( member );
-			if ( member instanceof Method && propertyName == null ) { // can happen if member is a Method which does not follow the bean convention
-				throw new ValidationException(
-						"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
-				);
-			}
 		}
 		else {
 			this.propertyName = null;

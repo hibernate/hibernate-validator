@@ -1,7 +1,6 @@
-// $Id: MethodMetaData.java 19033 Sep 29, 2010 10:56:53 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -17,45 +16,65 @@
 */
 package org.hibernate.validator.metadata;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
  * in the context of bean validation, for instance the constraints at it's
  * parameters or return value.
- * 
+ *
  * @author Gunnar Morling
- * 
  */
-public class MethodMetaData {
+public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends Annotation>> {
 
 	private final Method method;
-	
+
 	private final Map<Integer, ParameterMetaData> parameterMetaData;
 
-	private final ReturnValueMetaData returnValueMetaData;
-	
-	public MethodMetaData(Method method, Map<Integer, ParameterMetaData> parameterMetaData, ReturnValueMetaData returnValueMetaData) {
+	private final List<BeanMetaConstraint<?, ? extends Annotation>> constraints;
+
+	private final boolean isCascading;
+
+	public MethodMetaData(
+			Method method,
+			Map<Integer, ParameterMetaData> parameterMetaData,
+			List<BeanMetaConstraint<?, ? extends Annotation>> constraints,
+			boolean isCascading) {
 
 		this.method = method;
 		this.parameterMetaData = parameterMetaData;
-		this.returnValueMetaData = returnValueMetaData;
+		this.constraints = constraints;
+		this.isCascading = isCascading;
 	}
 
 	public Method getMethod() {
 		return method;
 	}
-	
+
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
-		
-		ParameterMetaData theValue = parameterMetaData.get(parameterIndex);
-		
-		return  theValue != null ? theValue : ParameterMetaData.NULL;
+
+		ParameterMetaData theValue = parameterMetaData.get( parameterIndex );
+
+		return theValue != null ? theValue : ParameterMetaData.NULL;
 	}
-	
-	public ReturnValueMetaData getReturnValueMetaData() {
-		return returnValueMetaData;
+
+	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {
+		return constraints.iterator();
 	}
-	
+
+	public boolean isCascading() {
+		return isCascading;
+	}
+
+	@Override
+	public String toString() {
+		return "MethodMetaData [method=" + method + ", parameterMetaData="
+				+ parameterMetaData + ", constraints=" + constraints
+				+ ", isCascading=" + isCascading + "]";
+	}
+
 }

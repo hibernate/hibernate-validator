@@ -1,7 +1,6 @@
-// $Id: ParameterMetaData.java 19033 Sep 29, 2010 10:57:34 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -54,6 +53,21 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 
 	public Iterator<MetaConstraint<?, ? extends Annotation>> iterator() {
 		return constraints.iterator();
+	}
+
+	@Override
+	public String toString() {
+		
+		//display short annotation type names
+		StringBuilder sb = new StringBuilder();
+		
+		for (MetaConstraint<?, ? extends Annotation> oneConstraint : constraints) {
+			sb.append(oneConstraint.getDescriptor().getAnnotation().annotationType().getSimpleName());
+			sb.append(", ");
+		}
+		
+		return "ParameterMetaData [index=" + index + ", constraints=["
+				+ sb.substring(0, sb.length()-2) + "], isCascading=" + isCascading + "]";
 	}
 	
 }

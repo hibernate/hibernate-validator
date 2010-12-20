@@ -16,6 +16,9 @@
 */
 package org.hibernate.validator.metadata;
 
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
@@ -139,12 +142,57 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<T, ?>>> entry : constraints.entrySet() ) {
 			Class<?> clazz = entry.getKey();
+
+			//will hold the method constraints (getter and non-getter) of the given class keyed by method
+			Map<Method, List<BeanMetaConstraint<?, ? extends Annotation>>> constraintsByMethod = newHashMap();
+
 			for ( BeanMetaConstraint<T, ?> constraint : entry.getValue() ) {
-				addMetaConstraint( clazz, constraint );
+
+				if ( constraint.getDescriptor().getElementType() == ElementType.METHOD ) {
+
+					List<BeanMetaConstraint<?, ?>> constraintsForMethod = constraintsByMethod.get( constraint.getLocation().getMember() );
+					if ( constraintsForMethod == null ) {
+						constraintsForMethod = newArrayList();
+						constraintsByMethod.put(
+								( Method ) constraint.getLocation().getMember(), constraintsForMethod
+						);
+					}
+					constraintsForMethod.add( constraint );
+				}
+				//register non-method constraints
+				else {
+					addMetaConstraint( clazz, constraint );
+				}
 			}
+
+			//register the constraints for each method in methodMetaConstraints. Constraints at getters will also registered in metaConstraints
+			for ( Entry<Method, List<BeanMetaConstraint<?, ? extends Annotation>>> methodAndConstraints : constraintsByMethod
+					.entrySet() ) {
+
+				MethodMetaData methodMetaData = new MethodMetaData(
+						methodAndConstraints.getKey(),
+						Collections.<Integer, ParameterMetaData>emptyMap(),
+						methodAndConstraints.getValue(),
+						cascadedMembers.contains( methodAndConstraints.getKey() )
+				);
+				addMethodMetaConstraint( clazz, methodMetaData );
+			}
+
 		}
 		for ( Member member : cascadedMembers ) {
-			addCascadedMember( member );
+			// in case a method was specified as cascaded but did not have any constraints we have to register it here
+			if ( member instanceof Method && getMetaDataForMethod( ( Method ) member ) == null ) {
+				MethodMetaData methodMetaData = new MethodMetaData(
+						( Method ) member,
+						Collections.<Integer, ParameterMetaData>emptyMap(),
+						Collections.<BeanMetaConstraint<?, ? extends Annotation>>emptyList(),
+						true
+				);
+				addMethodMetaConstraint( member.getDeclaringClass(), methodMetaData );
+			}
+			else {
+				addCascadedMember( member );
+			}
 		}
 	}
 
@@ -265,14 +313,39 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
 
-		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get(clazz);
-		
-		if(constraintsOfClass == null) {
-			constraintsOfClass = new HashMap<Method, MethodMetaData>();
-			methodMetaConstraints.put(clazz, constraintsOfClass);
+		addToPropertyNameList( methodMetaData.getMethod() );
+
+		//reject constraints at non-getters if not explicitly allowed
+		if ( !ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) && !methodLevelConstraintsAllowed && methodMetaData
+				.iterator()
+				.hasNext() ) {
+			throw new ValidationException(
+					"Annotated methods must follow the JavaBeans naming convention. " + methodMetaData.getMethod()
+							.getName() + "() does not."
+			);
 		}
 		
-		constraintsOfClass.put(methodMetaData.getMethod(), methodMetaData);
+		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get(clazz);
+
+		if ( constraintsOfClass == null ) {
+			constraintsOfClass = new HashMap<Method, MethodMetaData>();
+			methodMetaConstraints.put( clazz, constraintsOfClass );
+		}
+
+		constraintsOfClass.put( methodMetaData.getMethod(), methodMetaData );
+
+		if ( ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) ) {
+
+			ReflectionHelper.setAccessibility( methodMetaData.getMethod() );
+
+			for ( BeanMetaConstraint<?, ? extends Annotation> metaConstraint : methodMetaData ) {
+				addMetaConstraint( clazz, ( BeanMetaConstraint<T, ? extends Annotation> ) metaConstraint );
+			}
+
+			if ( methodMetaData.isCascading() ) {
+				addCascadedMember( methodMetaData.getMethod() );
+			}
+		}
 	}
 
 	private void addCascadedMember(Member member) {
@@ -376,69 +449,36 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
+
 		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
+
 		for ( Method method : declaredMethods ) {
 
-			addToPropertyNameList( method );
-
 			// HV-172
-			if ( Modifier.isStatic( method.getModifiers() ) ) {
+			if ( Modifier.isStatic( method.getModifiers() ) || annotationIgnores.isIgnoreAnnotations( method ) ) {
 				continue;
 			}
 
-			if ( annotationIgnores.isIgnoreAnnotations( method ) ) {
-				continue;
+			// try to get meta data from cache, otherwise retrieve it from the class
+			MethodMetaData methodMetaData = getFromCache( clazz, method, beanMetaDataCache );
+
+			if ( methodMetaData == null ) {
+				methodMetaData = getMethodMetaData( method );
 			}
 
-			// HV-262
-			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
-			List<ConstraintDescriptorImpl<?>> methodConstraints;
-			boolean cachedMethodIsCascaded = false;
-			if ( cachedMetaData != null && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
-				cachedMethodIsCascaded = cachedMetaData.getCascadedMembers().contains( method );
-				methodConstraints = new ArrayList<ConstraintDescriptorImpl<?>>();
-				for ( BeanMetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap()
-						.get( clazz ) ) {
-					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
-					if ( descriptor.getElementType() == ElementType.METHOD
-							&& metaConstraint.getLocation()
-							.getPropertyName()
-							.equals( ReflectionHelper.getPropertyName( method ) ) ) {
-						methodConstraints.add( descriptor );
-					}
-				}
-			}
-			else {
-				methodConstraints = findConstraints( method, ElementType.METHOD );
-			}
-
-			//TODO GM: try to retrieve from cache
-			Map<Integer, ParameterMetaData> parameterConstraints = findParameterConstraints( method );
-			ReturnValueMetaData returnValueConstraints = findReturnValueConstraints( method );
-			
-			if(!ReflectionHelper.isGetterMethod(method) && !methodLevelConstraintsAllowed && !methodConstraints.isEmpty()) {
-				throw new ValidationException(
-						"Annotated methods must follow the JavaBeans naming convention. " + method.getName() + "() does not."
-				);
-			}
-			MethodMetaData methodMetaData = new MethodMetaData(
-					method, parameterConstraints, returnValueConstraints
-			);
-			
 			addMethodMetaConstraint( clazz, methodMetaData );
-
-			if(ReflectionHelper.isGetterMethod(method)) {
-				for ( ConstraintDescriptorImpl<?> constraintDescription : methodConstraints ) {
-					ReflectionHelper.setAccessibility( method );
-					BeanMetaConstraint<T, ?> metaConstraint = createBeanMetaConstraint( method, constraintDescription );
-					addMetaConstraint( clazz, metaConstraint );
-				}
-		
-				if ( cachedMethodIsCascaded || method.isAnnotationPresent( Valid.class ) ) {
-					addCascadedMember( method );
-				}
-			}
 		}
+	}
+	
+	private MethodMetaData getFromCache(Class<?> clazz, Method method, BeanMetaDataCache beanMetaDataCache) {
+		
+		BeanMetaDataImpl<?> cachedBeanMetaData = beanMetaDataCache.getBeanMetaData( clazz );
+
+		if ( cachedBeanMetaData != null ) {
+			return cachedBeanMetaData.getMetaDataForMethod( method ).get( clazz );
+		}
+		
+		return null;
 	}
 
 	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member, boolean isCascaded) {
@@ -491,10 +531,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private <A extends Annotation> BeanMetaConstraint<T, ?> createBeanMetaConstraint(Member m, ConstraintDescriptorImpl<A> descriptor) {
 		return new BeanMetaConstraint<T, A>( descriptor, beanClass, m );
-	}
-
-	private <A extends Annotation> MethodMetaConstraint<T, A> createReturnValueMetaConstraint(Method m, ConstraintDescriptorImpl<A> descriptor) {
-		return new MethodMetaConstraint<T, A>( descriptor, m );
 	}
 
 	private <A extends Annotation> MethodMetaConstraint<T, A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
@@ -584,6 +620,34 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return metaData;
 	}
 
+	/**
+	 * Finds all constraint annotations defined for the given method.
+	 *
+	 * @param method The method to check for constraints annotations.
+	 *
+	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
+	 */
+	private MethodMetaData getMethodMetaData(Method method) {
+
+		Map<Integer, ParameterMetaData> parameterConstraints = findParameterConstraints( method );
+		boolean isCascading = isValidAnnotationPresent( method );
+		List<BeanMetaConstraint<?, ? extends Annotation>> constraints =
+				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
+
+		return new MethodMetaData( method, parameterConstraints, constraints, isCascading );
+	}
+
+	private List<BeanMetaConstraint<?, ? extends Annotation>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
+
+		List<BeanMetaConstraint<?, ? extends Annotation>> constraints = new ArrayList<BeanMetaConstraint<?, ? extends Annotation>>();
+
+		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
+			constraints.add( createBeanMetaConstraint( method, oneDescriptor ) );
+		}
+
+		return constraints;
+	}
+
 	private Map<Integer, ParameterMetaData> findParameterConstraints(Method method) {
 
 		Map<Integer, ParameterMetaData> metaData = new HashMap<Integer, ParameterMetaData>();
@@ -615,19 +679,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return metaData;
 	}
 
-	private ReturnValueMetaData findReturnValueConstraints(Method method) {
-	
-		List<ConstraintDescriptorImpl<?>> constraintsDescriptors = findConstraints(method, ElementType.METHOD);
-		List<MetaConstraint<?, ? extends Annotation>> constraints = new ArrayList<MetaConstraint<?,? extends Annotation>>();
-		
-		for (ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors) {
-			constraints.add(createReturnValueMetaConstraint(method, oneDescriptor));
-		}
-		
-		boolean isCascading = isValidAnnotationPresent(method);
-		
-		return new ReturnValueMetaData(constraints, isCascading);
-	}
 
 	private ConstraintOrigin determineOrigin(Class<?> clazz) {
 		if ( clazz.equals( beanClass ) ) {

@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Min;
 
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -31,8 +30,8 @@ import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MethodMetaData;
-import org.hibernate.validator.metadata.ReturnValueMetaData;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
+import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -45,41 +44,53 @@ import static org.testng.Assert.assertTrue;
  */
 public class BeanMetaDataImplTest {
 
-	private BeanMetaData<CustomerRepository> metaData;
-
-	@BeforeMethod
-	public void setUpMetaData() {
-		metaData = new BeanMetaDataImpl<CustomerRepository>(
-				CustomerRepository.class, new ConstraintHelper(), true, new BeanMetaDataCache()
-		);
-	}
-
 	@Test
 	public void nonCascadingConstraintAtMethodReturnValue() throws Exception {
 
+		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
+
 		Method method = CustomerRepository.class.getMethod( "baz" );
 		MethodMetaData methodMetaData = metaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
-		ReturnValueMetaData returnValueMetaData = methodMetaData.getReturnValueMetaData();
-		ConstraintDescriptorImpl<? extends Annotation> descriptor = returnValueMetaData.iterator()
-				.next()
-				.getDescriptor();
 
 		assertEquals( methodMetaData.getMethod(), method );
+		assertFalse( methodMetaData.isCascading() );
+		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
+				.next()
+				.getDescriptor();
 		assertEquals( descriptor.getAnnotation().annotationType(), Min.class );
-		assertEquals( returnValueMetaData.iterator().next().getDescriptor().getAttributes().get( "value" ), 10L );
-		assertFalse( returnValueMetaData.isCascading() );
+		assertEquals( descriptor.getAttributes().get( "value" ), 10L );
+	}
+
+	@Test
+	public void constraintFromBaseClass() throws Exception {
+
+		BeanMetaData<CustomerRepositoryImpl> metaData = setupBeanMetaData( CustomerRepositoryImpl.class );
+
+		Method method = CustomerRepository.class.getMethod( "baz" );
+		MethodMetaData methodMetaData = metaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+
+		assertSize( methodMetaData, 1 );
+		assertEquals( methodMetaData.getMethod(), method );
+		assertFalse( methodMetaData.isCascading() );
+
+		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
+				.next()
+				.getDescriptor();
+		assertEquals( descriptor.getAnnotation().annotationType(), Min.class );
+		assertEquals( descriptor.getAttributes().get( "value" ), 10L );
 	}
 
 	@Test
 	public void cascadingConstraintAtMethodReturnValue() throws Exception {
 
+		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
+
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
 		MethodMetaData methodMetaData = metaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
-		ReturnValueMetaData returnValueMetaData = methodMetaData.getReturnValueMetaData();
 
 		assertEquals( methodMetaData.getMethod(), method );
-		assertFalse( returnValueMetaData.iterator().hasNext() );
-		assertTrue( returnValueMetaData.isCascading() );
+		assertTrue( methodMetaData.isCascading() );
+		assertSize( methodMetaData, 0 );
 	}
 
 	/**
@@ -90,8 +101,26 @@ public class BeanMetaDataImplTest {
 			expectedExceptionsMessageRegExp = "Annotated methods must follow the JavaBeans naming convention.*")
 	public void constraintAtMethodReturnValueCausesExceptionDueToMethodValidationNotBeingEnabled() {
 
-		metaData = new BeanMetaDataImpl<CustomerRepository>(
+		new BeanMetaDataImpl<CustomerRepository>(
 				CustomerRepository.class, new ConstraintHelper(), false, new BeanMetaDataCache()
 		);
+	}
+
+	private <T> BeanMetaDataImpl<T> setupBeanMetaData(Class<T> clazz) {
+		BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
+				clazz, new ConstraintHelper(), true, new BeanMetaDataCache()
+		);
+		return metaData;
+	}
+
+	private void assertSize(Iterable<?> iterable, int expectedCount) {
+
+		int i = 0;
+
+		for ( @SuppressWarnings("unused") Object o : iterable ) {
+			i++;
+		}
+
+		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
 	}
 }
