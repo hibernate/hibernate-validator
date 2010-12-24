@@ -454,7 +454,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @return An iterator over the value of a cascaded property.
 	 */
-	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext valueContext) {
+	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
 			iter = ( (Iterable<?>) value ).iterator();
@@ -500,16 +500,16 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return isIndexable;
 	}
 
-	private <T> void validateCascadedConstraint(ValidationContext<T, ?> context, Iterator<?> iter, boolean isIndexable, ValueContext valueContext) {
+	private <T> void validateCascadedConstraint(ValidationContext<T, ?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?, ?> valueContext) {
 		Object value;
 		Object mapKey;
 		int i = 0;
 		while ( iter.hasNext() ) {
 			value = iter.next();
 			if ( value instanceof Map.Entry ) {
-				mapKey = ( (Map.Entry) value ).getKey();
+				mapKey = ( (Map.Entry<?, ?>) value ).getKey();
 				valueContext.setKey( mapKey );
-				value = ( (Map.Entry) value ).getValue();
+				value = ( (Map.Entry<?, ?>) value ).getValue();
 			}
 			else if ( isIndexable ) {
 				valueContext.setIndex( i );
@@ -983,7 +983,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return new SingleThreadCachedTraversableResolver( traversableResolver );
 	}
 
-	private boolean isValidationRequired(ValidationContext validationContext, ValueContext valueContext, MetaConstraint metaConstraint) {
+	private boolean isValidationRequired(ValidationContext<?, ?> validationContext, ValueContext<?, ?> valueContext, MetaConstraint<?, ?> metaConstraint) {
 		if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 			return false;
 		}
@@ -1008,7 +1008,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return isReachable;
 	}
 
-	private boolean isCascadeRequired(ValidationContext validationContext, ValueContext valueContext, Member member) {
+	private boolean isCascadeRequired(ValidationContext<?, ?> validationContext, ValueContext<?, ?> valueContext, Member member) {
 		final ElementType type = member instanceof Field ? ElementType.FIELD : ElementType.METHOD;
 		boolean isReachable;
 		boolean isCascadable;
