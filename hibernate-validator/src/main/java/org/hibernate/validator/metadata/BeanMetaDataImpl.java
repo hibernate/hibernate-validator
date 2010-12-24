@@ -171,7 +171,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 				MethodMetaData methodMetaData = new MethodMetaData(
 						methodAndConstraints.getKey(),
-						Collections.<Integer, ParameterMetaData>emptyMap(),
 						methodAndConstraints.getValue(),
 						cascadedMembers.contains( methodAndConstraints.getKey() )
 				);
@@ -184,7 +183,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( member instanceof Method && getMetaDataForMethod( ( Method ) member ) == null ) {
 				MethodMetaData methodMetaData = new MethodMetaData(
 						( Method ) member,
-						Collections.<Integer, ParameterMetaData>emptyMap(),
 						Collections.<BeanMetaConstraint<?, ? extends Annotation>>emptyList(),
 						true
 				);
@@ -195,7 +193,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 	}
-
+	
 	public Class<T> getBeanClass() {
 		return beanClass;
 	}

@@ -18,6 +18,7 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,14 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 
 	public MethodMetaData(
 			Method method,
+			List<BeanMetaConstraint<?, ? extends Annotation>> constraints,
+			boolean isCascading) {
+
+		this( method, Collections.<Integer, ParameterMetaData>emptyMap(), constraints, isCascading );
+	}
+
+	public MethodMetaData(
+			Method method,
 			Map<Integer, ParameterMetaData> parameterMetaData,
 			List<BeanMetaConstraint<?, ? extends Annotation>> constraints,
 			boolean isCascading) {
@@ -51,10 +60,22 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		this.isCascading = isCascading;
 	}
 
+	/**
+	 * The method represented by this meta data object.
+	 *
+	 * @return The method represented by this meta data object.
+	 */
 	public Method getMethod() {
 		return method;
 	}
 
+	/**
+	 * Constraint meta data for the specified parameter.
+	 *
+	 * @param parameterIndex The index in this method's parameter array of the parameter of interest.
+	 *
+	 * @return Meta data for the specified parameter. May be {@link ParameterMetaData#NULL} but will never be <code>null</code.>
+	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
 		ParameterMetaData theValue = parameterMetaData.get( parameterIndex );
@@ -62,10 +83,18 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		return theValue != null ? theValue : ParameterMetaData.NULL;
 	}
 
+	/**
+	 * An iterator with the return value constraints of the represented method.
+	 */
 	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {
 		return constraints.iterator();
 	}
 
+	/**
+	 * Whether cascading validation for the represented method shall be performed or not.
+	 *
+	 * @return <code>True</code>, if cascading validation for the represented method shall be performed, <code>false</code> otherwise.
+	 */
 	public boolean isCascading() {
 		return isCascading;
 	}
