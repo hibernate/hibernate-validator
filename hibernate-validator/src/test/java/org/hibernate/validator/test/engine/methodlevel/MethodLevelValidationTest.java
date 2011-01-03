@@ -26,13 +26,14 @@ import java.lang.reflect.Proxy;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.MethodConstraintViolation;
+import org.hibernate.validator.MethodConstraintViolationException;
 import org.hibernate.validator.MethodValidator;
 import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.test.engine.methodlevel.model.Address;
@@ -87,23 +88,18 @@ public class MethodLevelValidationTest {
 	public void methodValidationYieldsConstraintViolation() {
 		
 		try {
-		
 			customerRepository.findCustomerByName(null);
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
-			Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
+			Set<MethodConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
 			assertNumberOfViolations(constraintViolations, 1);
 			
-			
-			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) constraintViolations.iterator().next();
+			MethodConstraintViolation<?> constraintViolation = constraintViolations.iterator().next();
 
-			
 			assertConstraintViolation(constraintViolation, "may not be null", CustomerRepositoryImpl.class, null);
-			
-			System.out.println("Deskriptor: " + constraintViolation.getConstraintDescriptor());
+			assertEquals(constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), NotNull.class);
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByName");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
@@ -118,15 +114,14 @@ public class MethodLevelValidationTest {
 	public void validationOfMethodWithMultipleParameters() {
 		
 		try {
-		
 			customerRepository.findCustomerByAgeAndName(30, null);
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByAgeAndName");
 			assertEquals(constraintViolation.getParameterIndex(), 1);
@@ -139,9 +134,9 @@ public class MethodLevelValidationTest {
 		
 		try {
 			customerRepository.findCustomerByAgeAndName(1, null);
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 2);
 			assertCorrectConstraintViolationMessages(e.getConstraintViolations(), "may not be null", "must be greater than or equal to 5");
@@ -155,13 +150,13 @@ public class MethodLevelValidationTest {
 
 		try {
 			customerRepository.persistCustomer(customer);
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
@@ -181,13 +176,13 @@ public class MethodLevelValidationTest {
 
 		try {
 			customerRepository.persistCustomer(customer);
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
 			assertEquals(constraintViolation.getParameterIndex(), 0);
@@ -205,13 +200,13 @@ public class MethodLevelValidationTest {
 		try {
 			
 			customerRepository.findById(null);
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "findById");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), RepositoryBase.class);
@@ -226,13 +221,13 @@ public class MethodLevelValidationTest {
 		try {
 			
 			customerRepository.foo(null);
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "foo");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
@@ -247,13 +242,13 @@ public class MethodLevelValidationTest {
 		try {
 			
 			customerRepository.bar(new Customer(null, null));
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "bar");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
@@ -269,13 +264,13 @@ public class MethodLevelValidationTest {
 		try {
 			
 			customerRepository.foo(Long.valueOf(0));
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertEquals(e.getConstraintViolations().size(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "must be greater than or equal to 1");
 			assertEquals(constraintViolation.getMethod().getName(), "foo");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
@@ -294,13 +289,13 @@ public class MethodLevelValidationTest {
 	
 		try {
 			customerRepository.baz();
-			fail("Expected ConstraintViolationException wasn't thrown.");
+			fail("Expected MethodConstraintViolationException wasn't thrown.");
 		}
-		catch(ConstraintViolationException e) {
+		catch(MethodConstraintViolationException e) {
 			
 			assertNumberOfViolations(e.getConstraintViolations(), 1);
 			
-			MethodConstraintViolation<?> constraintViolation = (MethodConstraintViolation<?>) e.getConstraintViolations().iterator().next();
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 
 			assertEquals(constraintViolation.getMessage(), "must be greater than or equal to 10");
 			assertEquals(constraintViolation.getMethod().getName(), "baz");
@@ -318,7 +313,7 @@ public class MethodLevelValidationTest {
 		customerRepository.parameterConstraintInGroup(null);
 	}
 	
-	@Test(expectedExceptions=ConstraintViolationException.class)
+	@Test(expectedExceptions=MethodConstraintViolationException.class)
 	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
 		setUpValidatorForGroups(CustomerRepository.ValidationGroup.class);
 		customerRepository.parameterConstraintInGroup(null);

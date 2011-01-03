@@ -18,30 +18,27 @@ package org.hibernate.validator.test.engine.methodlevel;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
-import org.hibernate.validator.MethodValidator;
 import org.hibernate.validator.MethodConstraintViolation;
+import org.hibernate.validator.MethodConstraintViolationException;
+import org.hibernate.validator.MethodValidator;
 
 /**
  * An invocation handler used to test method-level validation.
- * 
+ *
  * @author Gunnar Morling
  */
 public class ValidationInvocationHandler implements InvocationHandler {
 
 	private final Object wrapped;
-	
+
 	private final MethodValidator validator;
 
 	private final Class<?>[] groups;
-	
+
 	public ValidationInvocationHandler(Object wrapped, MethodValidator validator, Class<?>... groups) {
-		
+
 		this.wrapped = wrapped;
 		this.validator = validator;
 		this.groups = groups;
@@ -49,21 +46,21 @@ public class ValidationInvocationHandler implements InvocationHandler {
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-		Set<MethodConstraintViolation<Object>> constraintViolations = 
-			validator.validateParameters(wrapped, method, args, groups);
-		
-		if(!constraintViolations.isEmpty()) {
-			throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
+		Set<MethodConstraintViolation<Object>> constraintViolations =
+				validator.validateParameters( wrapped, method, args, groups );
+
+		if ( !constraintViolations.isEmpty() ) {
+			throw new MethodConstraintViolationException( constraintViolations );
 		}
-	
-		Object result = method.invoke(wrapped, args);
-		
-		constraintViolations = validator.validateReturnValue(wrapped, method, result, groups);
-		
-		if(!constraintViolations.isEmpty()) {
-			throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
+
+		Object result = method.invoke( wrapped, args );
+
+		constraintViolations = validator.validateReturnValue( wrapped, method, result, groups );
+
+		if ( !constraintViolations.isEmpty() ) {
+			throw new MethodConstraintViolationException( constraintViolations );
 		}
-		
+
 		return result;
 	}
 
