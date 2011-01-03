@@ -37,8 +37,12 @@ public class ValueContext<T, V> {
 	 */
 	private final Class<T> currentBeanType;
 
-	private int parameterIndex;
-	
+	/**
+	 * The index of the validated method parameter if this context is used for a method parameter validation, null
+	 * in all other cases (standard bean validation, return value validation).
+	 */
+	private Integer parameterIndex;
+
 	/**
 	 * The current property path we are validating.
 	 */
@@ -66,7 +70,7 @@ public class ValueContext<T, V> {
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = (Class<T>) value.getClass();
+		Class<T> rootBeanClass = ( Class<T> ) value.getClass();
 		return new ValueContext<T, V>( value, rootBeanClass, propertyPath );
 	}
 
@@ -98,15 +102,15 @@ public class ValueContext<T, V> {
 	public final Class<T> getCurrentBeanType() {
 		return currentBeanType;
 	}
-	
-	public int getParameterIndex() {
+
+	public Integer getParameterIndex() {
 		return parameterIndex;
 	}
 
 	public void setParameterIndex(int parameterIndex) {
 		this.parameterIndex = parameterIndex;
 	}
-	
+
 	public final V getCurrentValidatedValue() {
 		return currentValue;
 	}

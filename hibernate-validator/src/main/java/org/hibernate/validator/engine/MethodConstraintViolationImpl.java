@@ -1,4 +1,3 @@
-// $Id: ConstraintViolationImpl.java 19021 2010-03-18 18:17:05Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -30,14 +29,17 @@ import org.hibernate.validator.MethodConstraintViolation;
 public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 		implements MethodConstraintViolation<T> {
 
+	private static final long serialVersionUID = 7907489574577836537L;
+
 	private final Method method;
-	private final int parameterIndex;
+	private final Integer parameterIndex;
+	private final Kind kind;
 
 	public MethodConstraintViolationImpl(
 			String messageTemplate,
 			String interpolatedMessage,
 			Method method,
-			int parameterIndex,
+			Integer parameterIndex,
 			Class<T> rootBeanClass,
 			T rootBean,
 			Object leafBeanInstance,
@@ -59,22 +61,29 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;
+		this.kind = parameterIndex != null ? Kind.PARAMETER : Kind.RETURN_VALUE;
 	}
 
 	public Method getMethod() {
 		return method;
 	}
 
-	public int getParameterIndex() {
+	public Integer getParameterIndex() {
 		return parameterIndex;
+	}
+
+	public Kind getKind() {
+		return kind;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
 		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
-		result = prime * result + parameterIndex;
+		result = prime * result
+				+ ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 		return result;
 	}
 
@@ -89,7 +98,10 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		MethodConstraintViolationImpl<?> other = (MethodConstraintViolationImpl<?>) obj;
+		MethodConstraintViolationImpl<?> other = ( MethodConstraintViolationImpl<?> ) obj;
+		if ( kind != other.kind ) {
+			return false;
+		}
 		if ( method == null ) {
 			if ( other.method != null ) {
 				return false;
@@ -98,7 +110,12 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 		else if ( !method.equals( other.method ) ) {
 			return false;
 		}
-		if ( parameterIndex != other.parameterIndex ) {
+		if ( parameterIndex == null ) {
+			if ( other.parameterIndex != null ) {
+				return false;
+			}
+		}
+		else if ( !parameterIndex.equals( other.parameterIndex ) ) {
 			return false;
 		}
 		return true;
@@ -107,13 +124,13 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 	@Override
 	public String toString() {
 		return "MethodConstraintViolationImpl [method=" + method
-				+ ", parameterIndex=" + parameterIndex + ", getMessage()="
-				+ getMessage() + ", getMessageTemplate()="
-				+ getMessageTemplate() + ", getRootBean()=" + getRootBean()
-				+ ", getRootBeanClass()=" + getRootBeanClass()
-				+ ", getLeafBean()=" + getLeafBean() + ", getInvalidValue()="
-				+ getInvalidValue() + ", getPropertyPath()="
-				+ getPropertyPath() + ", getConstraintDescriptor()="
+				+ ", parameterIndex=" + parameterIndex + ", kind=" + kind
+				+ ", message=" + getMessage() + ", messageTemplate="
+				+ getMessageTemplate() + ", rootBean=" + getRootBean()
+				+ ", rootBeanClass=" + getRootBeanClass()
+				+ ", leafBean=" + getLeafBean() + ", invalidValue="
+				+ getInvalidValue() + ", propertyPath="
+				+ getPropertyPath() + ", constraintDescriptor="
 				+ getConstraintDescriptor() + "]";
 	}
 

@@ -33,6 +33,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.MethodConstraintViolation;
+import org.hibernate.validator.MethodConstraintViolation.Kind;
 import org.hibernate.validator.MethodConstraintViolationException;
 import org.hibernate.validator.MethodValidator;
 import org.hibernate.validator.engine.ValidatorImpl;
@@ -101,7 +102,8 @@ public class MethodLevelValidationTest {
 			assertConstraintViolation(constraintViolation, "may not be null", CustomerRepositoryImpl.class, null);
 			assertEquals(constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), NotNull.class);
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByName");
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(0));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#findCustomerByName()[0]");
@@ -124,7 +126,8 @@ public class MethodLevelValidationTest {
 			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "findCustomerByAgeAndName");
-			assertEquals(constraintViolation.getParameterIndex(), 1);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(1));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
@@ -159,7 +162,8 @@ public class MethodLevelValidationTest {
 			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(0));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#persistCustomer()[0].name");
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
@@ -185,7 +189,8 @@ public class MethodLevelValidationTest {
 			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "persistCustomer");
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(0));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#persistCustomer()[0].address.city");
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
@@ -210,7 +215,8 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "findById");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), RepositoryBase.class);
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(0));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
@@ -231,7 +237,8 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "foo");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(0));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
@@ -252,7 +259,8 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "may not be null");
 			assertEquals(constraintViolation.getMethod().getName(), "bar");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(0));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#bar()[0].name");
 		}
@@ -274,7 +282,8 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getMessage(), "must be greater than or equal to 1");
 			assertEquals(constraintViolation.getMethod().getName(), "foo");
 			assertEquals(constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class);
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), Integer.valueOf(0));
+			assertEquals(constraintViolation.getKind(), Kind.PARAMETER);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 		}
 	}
@@ -299,7 +308,8 @@ public class MethodLevelValidationTest {
 
 			assertEquals(constraintViolation.getMessage(), "must be greater than or equal to 10");
 			assertEquals(constraintViolation.getMethod().getName(), "baz");
-			assertEquals(constraintViolation.getParameterIndex(), 0);
+			assertEquals(constraintViolation.getParameterIndex(), null);
+			assertEquals(constraintViolation.getKind(), Kind.RETURN_VALUE);
 			assertEquals(constraintViolation.getRootBean(), customerRepository);
 			assertEquals(constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class);
 			assertEquals(constraintViolation.getPropertyPath().toString(), "CustomerRepository#baz()");

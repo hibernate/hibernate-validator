@@ -531,6 +531,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 							valueContext.getCurrentBeanType(), valueContext.getPropertyPath()
 					);
 				}
+
+				//propagate parameter index if required
+				if ( valueContext.getParameterIndex() != null ) {
+					newValueContext.setParameterIndex( valueContext.getParameterIndex() );
+				}
+				
 				validateInContext( newValueContext, context, groupChain );
 			}
 			i++;

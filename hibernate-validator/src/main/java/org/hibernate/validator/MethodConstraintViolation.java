@@ -1,4 +1,3 @@
-// $Id: MethodConstraintViolation.java 19033 Sep 24, 2010 4:28:20 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -24,14 +23,51 @@ import javax.validation.ConstraintViolation;
 /**
  * Extends {@link ConstraintViolation} by adding attributes specific for
  * method-level validation.
- * 
+ *
  * @author Gunnar Morling
  * @see MethodValidator
  */
-public interface MethodConstraintViolation <T> extends ConstraintViolation<T> {
-	
+public interface MethodConstraintViolation<T> extends ConstraintViolation<T> {
+
+	/**
+	 * The kind of a {@link MethodConstraintViolation}.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public static enum Kind {
+
+		/**
+		 * Identifies constraint violations occurred during the validation of a method's parameter.
+		 */
+		PARAMETER,
+
+		/**
+		 * Identifies constraint violations occurred during the validation of a method's return value.
+		 */
+		RETURN_VALUE;
+
+	}
+
+	/**
+	 * Returns the method during which's validation this constraint violation occurred.
+	 *
+	 * @return The method during which's validation this constraint violation occurred.
+	 */
 	Method getMethod();
-	
-	int getParameterIndex();
+
+	/**
+	 * Returns the index of the parameter holding the constraint which caused this constraint violation.
+	 *
+	 * @return The index of the parameter holding the constraint which caused this constraint violation or null if this
+	 *         constraint violation occurred during validation of a method's return value.
+	 */
+	Integer getParameterIndex();
+
+	/**
+	 * Returns the kind of this method constraint violation.
+	 *
+	 * @return The kind of this method constraint violation.
+	 */
+	Kind getKind();
 
 }
