@@ -26,20 +26,22 @@ import javax.validation.metadata.ConstraintDescriptor;
  * @author Hardy Ferentschik
  */
 public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.io.Serializable {
+
+	private static final long serialVersionUID = -4970067626703103139L;
+
 	private final String interpolatedMessage;
 	private final T rootBean;
 	private final Object value;
 	private final Path propertyPath;
 	private final Object leafBeanInstance;
-	private final ConstraintDescriptor constraintDescriptor;
+	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final String messageTemplate;
 	private final Class<T> rootBeanClass;
 	private final ElementType elementType;
 
-
 	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass,
 								   T rootBean, Object leafBeanInstance, Object value,
-								   Path propertyPath, ConstraintDescriptor constraintDescriptor, ElementType elementType) {
+								   Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType) {
 		this.messageTemplate = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
@@ -79,7 +81,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 		return propertyPath;
 	}
 
-	public final ConstraintDescriptor getConstraintDescriptor() {
+	public final ConstraintDescriptor<?> getConstraintDescriptor() {
 		return this.constraintDescriptor;
 	}
 
@@ -93,7 +95,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 			return false;
 		}
 
-		ConstraintViolationImpl that = (ConstraintViolationImpl) o;
+		ConstraintViolationImpl<?> that = ( ConstraintViolationImpl<?> ) o;
 
 		if ( interpolatedMessage != null ? !interpolatedMessage.equals( that.interpolatedMessage ) : that.interpolatedMessage != null ) {
 			return false;
