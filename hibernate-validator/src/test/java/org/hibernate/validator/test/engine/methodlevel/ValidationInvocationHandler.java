@@ -34,19 +34,23 @@ import org.hibernate.validator.MethodConstraintViolation;
  */
 public class ValidationInvocationHandler implements InvocationHandler {
 
-	private Object wrapped;
+	private final Object wrapped;
 	
-	private MethodValidator validator;
+	private final MethodValidator validator;
+
+	private final Class<?>[] groups;
 	
-	public ValidationInvocationHandler(Object wrapped, MethodValidator validator) {
+	public ValidationInvocationHandler(Object wrapped, MethodValidator validator, Class<?>... groups) {
 		
 		this.wrapped = wrapped;
 		this.validator = validator;
+		this.groups = groups;
 	}
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-		Set<MethodConstraintViolation<Object>> constraintViolations = validator.validateParameters(wrapped, method, args);
+		Set<MethodConstraintViolation<Object>> constraintViolations = 
+			validator.validateParameters(wrapped, method, args, groups);
 		
 		if(!constraintViolations.isEmpty()) {
 			throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));
@@ -54,7 +58,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 	
 		Object result = method.invoke(wrapped, args);
 		
-		constraintViolations = validator.validateReturnValue(wrapped, method, result);
+		constraintViolations = validator.validateReturnValue(wrapped, method, result, groups);
 		
 		if(!constraintViolations.isEmpty()) {
 			throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(constraintViolations));

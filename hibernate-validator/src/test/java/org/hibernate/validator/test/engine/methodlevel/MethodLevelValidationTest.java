@@ -55,7 +55,12 @@ public class MethodLevelValidationTest {
 	private CustomerRepository customerRepository;
 	
 	@BeforeMethod
-	public void setUpValidator() {
+	public void setUpDefaultMethodValidator() {
+		setUpValidatorForGroups();
+	}
+	
+	private void setUpValidatorForGroups(Class<?>... groups) {
+		
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.allowMethodLevelConstraints()
@@ -66,7 +71,7 @@ public class MethodLevelValidationTest {
 		customerRepository = (CustomerRepository)Proxy.newProxyInstance(
 				getClass().getClassLoader(), 
 				new Class<?>[]{CustomerRepository.class}, 
-				new ValidationInvocationHandler(new CustomerRepositoryImpl(), validator));
+				new ValidationInvocationHandler(new CustomerRepositoryImpl(), validator, groups));
 	}
 	
 	@Test
@@ -306,12 +311,21 @@ public class MethodLevelValidationTest {
 			assertEquals(constraintViolation.getLeafBean(), customerRepository);
 			assertEquals(constraintViolation.getInvalidValue(), 9);
 		}
+	}
 	
+	@Test
+	public void methodValidationSucceedsAsNoConstraintOfValidatedGroupAreViolated() {
+		customerRepository.parameterConstraintInGroup(null);
+	}
+	
+	@Test(expectedExceptions=ConstraintViolationException.class)
+	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
+		setUpValidatorForGroups(CustomerRepository.ValidationGroup.class);
+		customerRepository.parameterConstraintInGroup(null);
 	}
 	
 	@Test
 	public void methodValidationSucceeds() {
-		
 		customerRepository.findCustomerByName("Bob");
 	}
 	

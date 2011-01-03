@@ -757,7 +757,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			valueContext.setCurrentGroup( group.getGroup() );
 			validateParameterForGroup( context, valueContext );
 		}
-		constraintViolations.addAll( (Collection<? extends MethodConstraintViolation<T>>) context.getFailingConstraints() );
+		constraintViolations.addAll( context.getFailingConstraints() );
 
 		// validate parameter beans annotated with @Valid
 		if ( isCascadeRequired( method, parameterIndex ) && value != null ) {
@@ -781,7 +781,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				cascadingvalueContext.setParameterIndex(parameterIndex);
 				validateCascadedConstraints( context, cascadingvalueContext );
 			}
-			constraintViolations.addAll( (Collection<? extends MethodConstraintViolation<T>>) context.getFailingConstraints() );
+			constraintViolations.addAll( context.getFailingConstraints() );
 		}
 
 		//TODO GM: evaluate group sequences

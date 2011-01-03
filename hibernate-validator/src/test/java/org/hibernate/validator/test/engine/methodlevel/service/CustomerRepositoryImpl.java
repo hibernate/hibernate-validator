@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 
 /**
@@ -56,5 +58,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return 9;
 	}
 
+	public void parameterConstraintInGroup(String name) {
+		
+	}
 
 }

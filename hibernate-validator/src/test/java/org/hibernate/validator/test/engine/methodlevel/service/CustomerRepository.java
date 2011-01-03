@@ -1,4 +1,3 @@
-// $Id: CustomerRepository.java 19033 Sep 19, 2010 9:50:04 AM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -41,5 +40,9 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	void boz();
 	
 	@Min(10) int baz();
+	
+	void parameterConstraintInGroup(@NotNull(groups={ValidationGroup.class}) String name);
+	
+	public static interface ValidationGroup {}
 	
 }
