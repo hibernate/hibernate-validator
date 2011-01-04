@@ -16,15 +16,10 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
-import javax.inject.Named;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 
 /**
  * @author Gunnar Morling
- *
  */
 public class CustomerRepositoryImpl implements CustomerRepository {
 
@@ -33,11 +28,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	public void persistCustomer(Customer customer) {
-		
+
 	}
 
 	public void findCustomerByAgeAndName(Integer age, String name) {
-		
+
 	}
 
 	public Customer findById(Long id) {
@@ -45,15 +40,15 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	public void foo(Long id) {
-		
+
 	}
 
 	public void bar(Customer customer) {
-		
+
 	}
 
 	public void boz() {
-		
+
 	}
 
 	public int baz() {
@@ -61,10 +56,10 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	public void parameterConstraintInGroup(String name) {
-		
+
 	}
 
 	public void namedParameters(String param1, Customer customer) {
-		
+
 	}
 }
