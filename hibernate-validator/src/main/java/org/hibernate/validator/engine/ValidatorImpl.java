@@ -43,8 +43,6 @@ import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
-import com.googlecode.jtype.TypeUtils;
-
 import org.hibernate.validator.MethodConstraintViolation;
 import org.hibernate.validator.MethodValidator;
 import org.hibernate.validator.engine.groups.Group;
@@ -61,6 +59,8 @@ import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
+
+import com.googlecode.jtype.TypeUtils;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -177,7 +177,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
-		return validateParameterInContext( context, object, method, parameterIndex, parameterValue, groupChain );
+		validateParameterInContext( context, object, method, parameterIndex, parameterValue, groupChain );
+		
+		return context.getFailingConstraints();
 	}
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
@@ -190,8 +192,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return Collections.emptySet();
 		}
 
-		Set<MethodConstraintViolation<T>> violations = new HashSet<MethodConstraintViolation<T>>();
-
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
@@ -199,11 +199,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 
 		for(int i = 0; i < parameterValues.length; i++) {
-			violations.addAll(validateParameterInContext(context, object, method, i, parameterValues[i], groupChain));
+			validateParameterInContext(context, object, method, i, parameterValues[i], groupChain);
 		}
 
-		return violations;
-
+		return context.getFailingConstraints();
 	};
 
 	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
@@ -761,9 +760,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <V, T> Set<MethodConstraintViolation<T>> validateParameterInContext(MethodValidationContext<T> context, T bean, Method method, int parameterIndex, V value, GroupChain groupChain) {
-
-		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
+	private <V, T> void validateParameterInContext(MethodValidationContext<T> context, T bean, Method method, int parameterIndex, V value, GroupChain groupChain) {
 
 		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
 
@@ -791,10 +788,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		while ( groupIterator.hasNext() ) {
 
 			Group group = groupIterator.next();
-			valueContext.setCurrentGroup( group.getGroup() );
-			validateParameterForGroup( context, valueContext );
+			validateParameterForGroup( context, valueContext, group );
 		}
-		constraintViolations.addAll( context.getFailingConstraints() );
 
 		// validate parameter beans annotated with @Valid
 		if ( isCascadeRequired( method, parameterIndex ) && 
@@ -814,37 +809,57 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				validateCascadedParameter( context, cascadingvalueContext );
 			}
 	
-			constraintViolations.addAll( context.getFailingConstraints() );
 		}
 
 		//TODO GM: evaluate group sequences
-
-		return constraintViolations;
 	}
 
-	private <T, U, V> Set<MethodConstraintViolation<T>> validateParameterForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
-
-		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
+	private <T, U, V> void validateParameterForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext, Group group) {
 
 		BeanMetaData<?> beanMetaData = getBeanMetaData( validationContext.getMethod().getDeclaringClass() );
 		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( validationContext.getMethod() );
 
 		for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaData.entrySet() ) {
 
-			ParameterMetaData constraintsOfOneParameter = constraintsOfOneClass.getValue()
-					.getParameterMetaData( valueContext.getParameterIndex() );
+			// TODO GM: this should be pulled out so that a group is processed over all evaluated
+			// parameters before going to the next group. In the current form the group order seems
+			// pretty counter-intuitive
+			List<Class<?>> groupList;
+			if ( group.isDefaultGroup() ) {
+				groupList = getBeanMetaData( constraintsOfOneClass.getKey() ).getDefaultGroupSequence();
+			}
+			else {
+				groupList = new ArrayList<Class<?>>();
+				groupList.add( group.getGroup() );
+			}
 
-			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintsOfOneParameter ) {
+			boolean currentGroupCausedConstraintViolations = false;
 
-				if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
-					continue;
+			//the only case where we can have multiple groups here is a redefined default group sequence
+			for ( Class<?> oneGroup : groupList ) {
+
+				valueContext.setCurrentGroup( oneGroup );
+
+				ParameterMetaData constraintsOfOneParameter = constraintsOfOneClass.getValue()
+						.getParameterMetaData( valueContext.getParameterIndex() );
+
+				for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintsOfOneParameter ) {
+
+					if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
+						continue;
+					}
+					boolean result = metaConstraint.validateConstraint( validationContext, valueContext );
+					if ( !result ) {
+						currentGroupCausedConstraintViolations = true;
+					}
 				}
-				metaConstraint.validateConstraint( validationContext, valueContext );
-				constraintViolations.addAll( validationContext.getFailingConstraints() );
+
+				//stop processing after first group with errors occurred
+				if ( currentGroupCausedConstraintViolations ) {
+					break;
+				}
 			}
 		}
-
-		return constraintViolations;
 	}
 
 	private <V, T> Set<MethodConstraintViolation<T>> validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
