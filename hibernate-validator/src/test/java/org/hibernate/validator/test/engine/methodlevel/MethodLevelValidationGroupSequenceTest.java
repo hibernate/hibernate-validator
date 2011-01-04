@@ -16,13 +16,11 @@
  */
 package org.hibernate.validator.test.engine.methodlevel;
 
-import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
-
 import java.lang.reflect.Proxy;
-
 import javax.validation.Validation;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.MethodConstraintViolation;
@@ -30,9 +28,13 @@ import org.hibernate.validator.MethodConstraintViolationException;
 import org.hibernate.validator.MethodValidator;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
+import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
+import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+
+import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * Integration test for the group sequence processing during method-level validation.
@@ -44,7 +46,11 @@ public class MethodLevelValidationGroupSequenceTest {
 	private CustomerRepositoryWithRedefinedDefaultGroup customerRepository;
 
 	@BeforeMethod
-	public void setUpMethodValidator() {
+	public void setUpDefaultMethodValidator() {
+		setUpValidatorForGroups();
+	}
+
+	private void setUpValidatorForGroups(Class<?>... groups) {
 
 		MethodValidator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -56,7 +62,9 @@ public class MethodLevelValidationGroupSequenceTest {
 		customerRepository = ( CustomerRepositoryWithRedefinedDefaultGroup ) Proxy.newProxyInstance(
 				getClass().getClassLoader(),
 				new Class<?>[] { CustomerRepositoryWithRedefinedDefaultGroup.class },
-				new ValidationInvocationHandler( new CustomerRepositoryWithRedefinedDefaultGroupImpl(), validator )
+				new ValidationInvocationHandler(
+						new CustomerRepositoryWithRedefinedDefaultGroupImpl(), validator, groups
+				)
 		);
 	}
 
@@ -110,6 +118,36 @@ public class MethodLevelValidationGroupSequenceTest {
 			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
+			);
+		}
+	}
+
+	/**
+	 * Only one constraint violation is expected, as processing should stop after the
+	 * first erroneous group of the validated sequence.
+	 */
+	@Test
+	public void processingOfGroupSequenceStopsAfterFirstErroneousGroup() {
+
+		setUpValidatorForGroups( ValidationSequence.class );
+
+		try {
+			customerRepository.constraintInLaterPartOfGroupSequence( 1 );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertConstraintViolation(
+					constraintViolation,
+					"must be greater than or equal to 5",
+					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
+					1
+			);
+			assertEquals(
+					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
 			);
 		}
 	}

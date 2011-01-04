@@ -35,4 +35,7 @@ public class CustomerRepositoryWithRedefinedDefaultGroupImpl implements Customer
 	public void constraintInLaterPartOfDefaultSequence(int param) {
 	}
 
+	public void constraintInLaterPartOfGroupSequence(int param) {
+	}
+
 }

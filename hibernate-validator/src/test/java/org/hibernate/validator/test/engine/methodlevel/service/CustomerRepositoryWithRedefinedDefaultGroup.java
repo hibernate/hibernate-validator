@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2011, Red Hat Middleware LLC, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -38,6 +38,11 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
 	}) int param);
 
+	void constraintInLaterPartOfGroupSequence(@List( {
+			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
+	}) int param);
+
+
 	public static interface ValidationGroup1 {
 	}
 
@@ -45,6 +50,10 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 	}
 
 	public static interface ValidationGroup3 {
+	}
+
+	@GroupSequence( { ValidationGroup2.class, ValidationGroup3.class })
+	public static interface ValidationSequence {
 	}
 
 }

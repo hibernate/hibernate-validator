@@ -18,6 +18,7 @@ package org.hibernate.validator.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+
 import javax.validation.groups.Default;
 
 /**
@@ -82,6 +83,12 @@ public class ValueContext<T, V> {
 		return new ValueContext<T, V>( value, rootBeanClass, propertyPath );
 	}
 
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath, int parameterIndex, String parameterName) {
+		@SuppressWarnings("unchecked")
+		Class<T> rootBeanClass = ( Class<T> ) value.getClass();
+		return new ValueContext<T, V>( value, rootBeanClass, propertyPath, parameterIndex, parameterName );
+	}
+
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type, PathImpl propertyPath) {
 		return new ValueContext<T, V>( null, type, propertyPath );
 	}
@@ -90,6 +97,14 @@ public class ValueContext<T, V> {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
 		this.propertyPath = propertyPath;
+	}
+
+	private ValueContext(T currentBean, Class<T> currentBeanType, PathImpl propertyPath, int parameterIndex, String parameterName) {
+		this.currentBean = currentBean;
+		this.currentBeanType = currentBeanType;
+		this.propertyPath = propertyPath;
+		this.parameterIndex = parameterIndex;
+		this.parameterName = parameterName;
 	}
 
 	/**
