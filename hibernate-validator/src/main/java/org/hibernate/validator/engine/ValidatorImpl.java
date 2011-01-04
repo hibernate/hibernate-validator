@@ -446,6 +446,28 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	/**
+	 * Validates the cascading parameter specified with the given value context.
+	 * Any further cascading references are followed if applicable.
+	 *
+	 * @param validationContext The global context for the current validateParameter(s) call.
+	 * @param valueContext The local context for validating the given parameter.
+	 */
+	private <T, U, V> void validateCascadedParameter(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
+
+		Object value = valueContext.getCurrentBean();
+		Type type = valueContext.getCurrentBeanType();
+		Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
+		boolean isIndexable = isIndexable( type );
+
+		validateCascadedConstraint(
+				validationContext,
+				iter,
+				isIndexable,
+				valueContext
+		);
+	}
+
+	/**
 	 * Called when processing cascaded constraints. This methods inspects the type of the cascaded constraints and in case
 	 * of a list or array creates an iterator in order to validate each element.
 	 *
@@ -775,31 +797,23 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		constraintViolations.addAll( context.getFailingConstraints() );
 
 		// validate parameter beans annotated with @Valid
-		if ( isCascadeRequired( method, parameterIndex ) && value != null ) {
-
+		if ( isCascadeRequired( method, parameterIndex ) && 
+				value != null ) {
+			
 			ValueContext<V, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext(
 					value, PathImpl.createPathForMethodParameter( method, parameterName )
 			);
-
+			cascadingvalueContext.setParameterIndex( parameterIndex );
+			cascadingvalueContext.setParameterName( parameterName );
+	
 			groupIterator = groupChain.getGroupIterator();
 			while ( groupIterator.hasNext() ) {
-
+	
 				Group group = groupIterator.next();
 				cascadingvalueContext.setCurrentGroup( group.getGroup() );
-				cascadingvalueContext.setParameterIndex( parameterIndex );
-				cascadingvalueContext.setParameterName( parameterName );
-				validateConstraintsForCurrentGroup( context, cascadingvalueContext );
+				validateCascadedParameter( context, cascadingvalueContext );
 			}
-
-			// validate cascaded constraints of parameter bean
-			groupIterator = groupChain.getGroupIterator();
-			while ( groupIterator.hasNext() ) {
-				Group group = groupIterator.next();
-				cascadingvalueContext.setCurrentGroup( group.getGroup() );
-				cascadingvalueContext.setParameterIndex( parameterIndex );
-				cascadingvalueContext.setParameterName( parameterName );
-				validateCascadedConstraints( context, cascadingvalueContext );
-			}
+	
 			constraintViolations.addAll( context.getFailingConstraints() );
 		}
 

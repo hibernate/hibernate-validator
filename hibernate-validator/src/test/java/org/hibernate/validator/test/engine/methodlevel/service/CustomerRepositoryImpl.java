@@ -16,6 +16,9 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 
 /**
@@ -28,6 +31,18 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	public void persistCustomer(Customer customer) {
+
+	}
+
+	public void cascadingMapParameter(Map<String, Customer> customer) {
+
+	}
+
+	public void cascadingIterableParameter(List<Customer> customer) {
+
+	}
+
+	public void cascadingArrayParameter(Customer... customer) {
 
 	}
 
@@ -62,4 +77,5 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	public void namedParameters(String param1, Customer customer) {
 
 	}
+
 }

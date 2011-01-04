@@ -16,6 +16,9 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -28,24 +31,33 @@ import org.hibernate.validator.test.engine.methodlevel.model.Customer;
  */
 public interface CustomerRepository extends RepositoryBase<Customer> {
 
-	@Valid Customer findCustomerByName(@NotNull String name);
+	@Valid
+	Customer findCustomerByName(@NotNull String name);
 
 	void persistCustomer(@NotNull @Valid Customer customer);
+
+	void cascadingMapParameter(@Valid Map<String, Customer> customer);
+
+	void cascadingIterableParameter(@Valid List<Customer> customer);
+
+	void cascadingArrayParameter(@Valid Customer... customer);
 
 	void findCustomerByAgeAndName(@Min(5) Integer age, @NotNull String name);
 
 	void foo(@Min(1) Long id);
 
 	void bar(Customer customer);
-	
+
 	void boz();
-	
-	@Min(10) int baz();
-	
-	void parameterConstraintInGroup(@NotNull(groups={ValidationGroup.class}) String name);
-	
+
+	@Min(10)
+	int baz();
+
+	void parameterConstraintInGroup(@NotNull(groups = { ValidationGroup.class }) String name);
+
 	void namedParameters(@Named("param1") @NotNull String param1, @Named("customer") @NotNull @Valid Customer customer);
-	
-	public static interface ValidationGroup {}
-	
+
+	public static interface ValidationGroup {
+	}
+
 }

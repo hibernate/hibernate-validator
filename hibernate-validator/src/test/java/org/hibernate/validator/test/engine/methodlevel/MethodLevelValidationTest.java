@@ -19,10 +19,13 @@ package org.hibernate.validator.test.engine.methodlevel;
 import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -200,6 +203,95 @@ public class MethodLevelValidationTest {
 		}
 	}
 
+	@Test
+	public void cascadingMapParameter() {
+
+		Map<String, Customer> customers = newHashMap();
+		Customer bob = new Customer( null );
+		customers.put( "Bob", bob );
+
+		try {
+			customerRepository.cascadingMapParameter( customers );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMethod().getName(), "cascadingMapParameter" );
+			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 0 ) );
+			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
+			assertEquals(
+					constraintViolation.getPropertyPath().toString(),
+					"CustomerRepository#cascadingMapParameter(arg0)[Bob].name"
+			);
+			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getLeafBean(), bob );
+			assertEquals( constraintViolation.getInvalidValue(), null );
+		}
+	}
+
+	@Test
+	public void cascadingIterableParameter() {
+
+		Customer customer = new Customer( null );
+
+		try {
+			customerRepository.cascadingIterableParameter( Arrays.asList( null, customer ) );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMethod().getName(), "cascadingIterableParameter" );
+			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 0 ) );
+			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
+			assertEquals(
+					constraintViolation.getPropertyPath().toString(),
+					"CustomerRepository#cascadingIterableParameter(arg0)[1].name"
+			);
+			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getLeafBean(), customer );
+			assertEquals( constraintViolation.getInvalidValue(), null );
+		}
+	}
+
+	@Test
+	public void cascadingArrayParameter() {
+
+		Customer customer = new Customer( null );
+
+		try {
+			customerRepository.cascadingArrayParameter( null, customer );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMethod().getName(), "cascadingArrayParameter" );
+			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 0 ) );
+			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
+			assertEquals(
+					constraintViolation.getPropertyPath().toString(),
+					"CustomerRepository#cascadingArrayParameter(arg0)[1].name"
+			);
+			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertEquals( constraintViolation.getLeafBean(), customer );
+			assertEquals( constraintViolation.getInvalidValue(), null );
+		}
+	}
+	
 	@Test
 	public void constraintsAtMethodFromBaseClassAreEvaluated() {
 
