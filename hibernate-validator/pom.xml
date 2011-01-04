@@ -78,6 +78,11 @@
             <artifactId>joda-time</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <optional>true</optional>
+        </dependency> 
 
         <!--
         Test dependencies
