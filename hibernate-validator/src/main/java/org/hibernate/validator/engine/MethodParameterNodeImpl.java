@@ -28,21 +28,22 @@ public class MethodParameterNodeImpl extends NodeImpl {
 
 	private static final long serialVersionUID = -1964614171714243780L;
 
-	private final static String NAME_TEMPLATE = "%s#%s()";
+	private final static String NAME_TEMPLATE = "%s#%s(%s)";
 
 	/**
 	 * Creates a new {@link MethodParameterNodeImpl}.
 	 *
 	 * @param method The method hosting the parameter to represent.
-	 * @param parameterIndex The index of the parameter to represent, starting at 0 for the
-	 * first parameter.
+	 * @param parameterName The name of the parameter to represent.
 	 * @param parent The parent node, representing the bean hosting the given
 	 * method.
 	 */
-	MethodParameterNodeImpl(Method method, int parameterIndex, NodeImpl parent) {
+	MethodParameterNodeImpl(Method method, String parameterName, NodeImpl parent) {
 		super(
-				String.format( NAME_TEMPLATE, method.getDeclaringClass().getSimpleName(), method.getName() ),
-				parent, true, parameterIndex, null
+				String.format(
+						NAME_TEMPLATE, method.getDeclaringClass().getSimpleName(), method.getName(), parameterName
+				),
+				parent, false, null, null
 		);
 	}
 

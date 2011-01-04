@@ -149,17 +149,17 @@ public class PathImplTest {
 	public void testCreationOfMethodParameterPath() throws Exception {
 
 		PathImpl methodParameterPath = PathImpl.createPathForMethodParameter(
-				Container.class.getMethod( "addItem", Key.class, Item.class ), 0
+				Container.class.getMethod( "addItem", Key.class, Item.class ), "arg0"
 		);
 
-		assertEquals( methodParameterPath.toString(), "Container#addItem()[0]" );
+		assertEquals( methodParameterPath.toString(), "Container#addItem(arg0)" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testCreationOfMethodParameterPathFailsDueToInvalidParameterIndex() throws Exception {
+	public void testCreationOfMethodParameterPathFailsDueToMissingParameterIndex() throws Exception {
 
 		PathImpl.createPathForMethodParameter(
-				Container.class.getMethod( "addItem", Key.class, Item.class ), 2
+				Container.class.getMethod( "addItem", Key.class, Item.class ), null
 		);
 	}
 
@@ -174,14 +174,14 @@ public class PathImplTest {
 	}
 
 	@Test(
-		expectedExceptions=IllegalArgumentException.class,
-		expectedExceptionsMessageRegExp="A method is required to create a method return value path."
+			expectedExceptions = IllegalArgumentException.class,
+			expectedExceptionsMessageRegExp = "A method is required to create a method return value path."
 	)
 	public void creationOfReturnValuePathFailsDueToNullMethod() throws Exception {
 
-		PathImpl.createPathForMethodReturnValue(null);
+		PathImpl.createPathForMethodReturnValue( null );
 	}
-	
+
 	class Container {
 		@Valid
 		Map<Key, Item> store = new HashMap<Key, Item>();

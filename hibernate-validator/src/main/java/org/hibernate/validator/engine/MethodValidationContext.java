@@ -71,6 +71,7 @@ public class MethodValidationContext <T> extends ValidationContext<T, MethodCons
 				interpolatedMessage,
 				method, 
 				localContext.getParameterIndex(), 
+				localContext.getParameterName(),
 				getRootBeanClass(),
 				getRootBean(),
 				localContext.getCurrentBean(),

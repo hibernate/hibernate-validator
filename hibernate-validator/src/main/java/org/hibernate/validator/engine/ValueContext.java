@@ -21,9 +21,11 @@ import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
 /**
- * An instance of this class is used to collect all the relevant information for validating a single class/property.
+ * An instance of this class is used to collect all the relevant information for validating a single class, property or
+ * method invocation.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ValueContext<T, V> {
 
@@ -38,10 +40,16 @@ public class ValueContext<T, V> {
 	private final Class<T> currentBeanType;
 
 	/**
-	 * The index of the validated method parameter if this context is used for a method parameter validation, null
+	 * The index of the currently validated parameter if this context is used for a method parameter validation, null
 	 * in all other cases (standard bean validation, return value validation).
 	 */
 	private Integer parameterIndex;
+
+	/**
+	 * The name of the currently validated parameter if this context is used for a method parameter validation, null
+	 * in all other cases (standard bean validation, return value validation).
+	 */
+	private String parameterName;
 
 	/**
 	 * The current property path we are validating.
@@ -109,6 +117,14 @@ public class ValueContext<T, V> {
 
 	public void setParameterIndex(int parameterIndex) {
 		this.parameterIndex = parameterIndex;
+	}
+
+	public String getParameterName() {
+		return parameterName;
+	}
+
+	public void setParameterName(String parameterName) {
+		this.parameterName = parameterName;
 	}
 
 	public final V getCurrentValidatedValue() {
@@ -181,17 +197,14 @@ public class ValueContext<T, V> {
 	}
 
 	@Override
-	public final String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "ValueContext" );
-		sb.append( "{currentBean=" ).append( currentBean );
-		sb.append( ", currentBeanType=" ).append( currentBeanType );
-		sb.append( ", propertyPath=" ).append( propertyPath );
-		sb.append( ", currentGroup=" ).append( currentGroup );
-		sb.append( ", currentValue=" ).append( currentValue );
-		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", typeOfAnnotatedElement=" ).append( typeOfAnnotatedElement );
-		sb.append( '}' );
-		return sb.toString();
+	public String toString() {
+		return "ValueContext [currentBean=" + currentBean
+				+ ", currentBeanType=" + currentBeanType + ", parameterIndex="
+				+ parameterIndex + ", parameterName=" + parameterName
+				+ ", propertyPath=" + propertyPath + ", currentGroup="
+				+ currentGroup + ", currentValue=" + currentValue
+				+ ", elementType=" + elementType + ", typeOfAnnotatedElement="
+				+ typeOfAnnotatedElement + "]";
 	}
+
 }

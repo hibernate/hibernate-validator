@@ -1,4 +1,3 @@
-// $Id: Customer.java 19033 Sep 24, 2010 7:09:42 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -30,6 +29,11 @@ public class Customer {
 	
 	private final Address address;
 
+	public Customer(String name) {
+
+		this(name, null);
+	}
+	
 	public Customer(String name, Address address) {
 
 		this.name = name;

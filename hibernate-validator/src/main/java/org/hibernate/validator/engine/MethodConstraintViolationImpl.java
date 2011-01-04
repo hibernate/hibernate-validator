@@ -33,6 +33,7 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 
 	private final Method method;
 	private final Integer parameterIndex;
+	private final String parameterName;
 	private final Kind kind;
 
 	public MethodConstraintViolationImpl(
@@ -40,6 +41,7 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 			String interpolatedMessage,
 			Method method,
 			Integer parameterIndex,
+			String parameterName,
 			Class<T> rootBeanClass,
 			T rootBean,
 			Object leafBeanInstance,
@@ -61,6 +63,7 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;
+		this.parameterName = parameterName;
 		this.kind = parameterIndex != null ? Kind.PARAMETER : Kind.RETURN_VALUE;
 	}
 
@@ -70,6 +73,10 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 
 	public Integer getParameterIndex() {
 		return parameterIndex;
+	}
+
+	public String getParameterName() {
+		return parameterName;
 	}
 
 	public Kind getKind() {
@@ -84,6 +91,8 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
 		result = prime * result
 				+ ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
+		result = prime * result
+				+ ( ( parameterName == null ) ? 0 : parameterName.hashCode() );
 		return result;
 	}
 
@@ -118,18 +127,26 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 		else if ( !parameterIndex.equals( other.parameterIndex ) ) {
 			return false;
 		}
+		if ( parameterName == null ) {
+			if ( other.parameterName != null ) {
+				return false;
+			}
+		}
+		else if ( !parameterName.equals( other.parameterName ) ) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "MethodConstraintViolationImpl [method=" + method
-				+ ", parameterIndex=" + parameterIndex + ", kind=" + kind
-				+ ", message=" + getMessage() + ", messageTemplate="
-				+ getMessageTemplate() + ", rootBean=" + getRootBean()
-				+ ", rootBeanClass=" + getRootBeanClass()
-				+ ", leafBean=" + getLeafBean() + ", invalidValue="
-				+ getInvalidValue() + ", propertyPath="
+				+ ", parameterIndex=" + parameterIndex + ", parameterName="
+				+ parameterName + ", kind=" + kind + ", message="
+				+ getMessage() + ", messageTemplate=" + getMessageTemplate()
+				+ ", rootBean=" + getRootBean() + ", rootBeanClass="
+				+ getRootBeanClass() + ", leafBean=" + getLeafBean()
+				+ ", invalidValue=" + getInvalidValue() + ", propertyPath="
 				+ getPropertyPath() + ", constraintDescriptor="
 				+ getConstraintDescriptor() + "]";
 	}

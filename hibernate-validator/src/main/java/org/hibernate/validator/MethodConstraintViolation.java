@@ -1,23 +1,22 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * JBoss, Home of Professional Open Source
+ * Copyright 2009, Red Hat Middleware LLC, and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.hibernate.validator;
 
 import java.lang.reflect.Method;
-
 import javax.validation.ConstraintViolation;
 
 /**
@@ -37,31 +36,55 @@ public interface MethodConstraintViolation<T> extends ConstraintViolation<T> {
 	public static enum Kind {
 
 		/**
-		 * Identifies constraint violations occurred during the validation of a method's parameter.
+		 * Identifies constraint violations occurred during the validation of a
+		 * method's parameter.
 		 */
 		PARAMETER,
 
 		/**
-		 * Identifies constraint violations occurred during the validation of a method's return value.
+		 * Identifies constraint violations occurred during the validation of a
+		 * method's return value.
 		 */
 		RETURN_VALUE;
 
 	}
 
 	/**
-	 * Returns the method during which's validation this constraint violation occurred.
+	 * Returns the method during which's validation this constraint violation
+	 * occurred.
 	 *
-	 * @return The method during which's validation this constraint violation occurred.
+	 * @return The method during which's validation this constraint violation
+	 *         occurred.
 	 */
 	Method getMethod();
 
 	/**
-	 * Returns the index of the parameter holding the constraint which caused this constraint violation.
+	 * Returns the index of the parameter holding the constraint which caused
+	 * this constraint violation.
 	 *
-	 * @return The index of the parameter holding the constraint which caused this constraint violation or null if this
-	 *         constraint violation occurred during validation of a method's return value.
+	 * @return The index of the parameter holding the constraint which caused
+	 *         this constraint violation or null if this constraint violation is
+	 *         not of {@link Kind#PARAMETER}.
 	 */
 	Integer getParameterIndex();
+
+	/**
+	 * <p>
+	 * Returns the name of the parameter holding the constraint which caused
+	 * this constraint violation.
+	 * </p>
+	 * <p>
+	 * If this parameter is annotated with <code>@javax.inject.Named</code>, the
+	 * value given in this annotation will be used as parameter name, otherwise
+	 * a default name in the form <code>"arg" + index</code> will be used, e.g.
+	 * <code>"arg0"</code>.
+	 * </p>
+	 *
+	 * @return The name of the parameter holding the constraint which caused
+	 *         this constraint violation or null if this constraint violation is
+	 *         not of {@link Kind#PARAMETER}.
+	 */
+	String getParameterName();
 
 	/**
 	 * Returns the kind of this method constraint violation.

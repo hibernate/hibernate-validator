@@ -176,36 +176,36 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
-		
+
 		return validateParameterInContext( context, object, method, parameterIndex, parameterValue, groupChain );
 	}
-	
+
 	public final <T> Set<MethodConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
-		
+
 		Contracts.assertNotNull(object, "The object to be validated must not be null");
 		Contracts.assertNotNull(method, "The method to be validated must not be null");
-		
+
 		//this might be the case for parameterless methods
 		if( parameterValues == null ) {
 			return Collections.emptySet();
 		}
-		
+
 		Set<MethodConstraintViolation<T>> violations = new HashSet<MethodConstraintViolation<T>>();
-		
+
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
-		
+
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
-		
+
 		for(int i = 0; i < parameterValues.length; i++) {
 			violations.addAll(validateParameterInContext(context, object, method, i, parameterValues[i], groupChain));
 		}
-		
+
 		return violations;
-		
+
 	};
-	
+
 	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
 
 		Contracts.assertNotNull(method, "The method to be validated must not be null");
@@ -215,10 +215,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
-		
+
 		return validateReturnValueInContext( context, object, method, returnValue, groupChain );
 	}
-	
+
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return getBeanMetaData( clazz ).getBeanDescriptor();
@@ -532,11 +532,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					);
 				}
 
-				//propagate parameter index if required
+				//propagate parameter index/name if required
 				if ( valueContext.getParameterIndex() != null ) {
 					newValueContext.setParameterIndex( valueContext.getParameterIndex() );
+					newValueContext.setParameterName( valueContext.getParameterName() );
 				}
-				
+
 				validateInContext( newValueContext, context, groupChain );
 			}
 			i++;
@@ -748,10 +749,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
 		}
 
-		ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext( bean, PathImpl.createPathForMethodParameter(method, parameterIndex) );
+		String parameterName = beanMetaData.getMetaDataForMethod( method )
+				.get( method.getDeclaringClass() )
+				.getParameterMetaData( parameterIndex )
+				.getParameterName();
+
+		ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
+				bean, PathImpl.createPathForMethodParameter( method, parameterName )
+		);
 		valueContext.setCurrentValidatedValue( value );
-		valueContext.setParameterIndex(parameterIndex);
-		
+		valueContext.setParameterIndex( parameterIndex );
+		valueContext.setParameterName( parameterName );
+
 		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
 		// before traversing the object.
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
@@ -768,14 +777,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		// validate parameter beans annotated with @Valid
 		if ( isCascadeRequired( method, parameterIndex ) && value != null ) {
 
-			ValueContext<V, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext( value, PathImpl.createPathForMethodParameter(method, parameterIndex) );
+			ValueContext<V, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext(
+					value, PathImpl.createPathForMethodParameter( method, parameterName )
+			);
 
 			groupIterator = groupChain.getGroupIterator();
 			while ( groupIterator.hasNext() ) {
 
 				Group group = groupIterator.next();
 				cascadingvalueContext.setCurrentGroup( group.getGroup() );
-				cascadingvalueContext.setParameterIndex(parameterIndex);
+				cascadingvalueContext.setParameterIndex( parameterIndex );
+				cascadingvalueContext.setParameterName( parameterName );
 				validateConstraintsForCurrentGroup( context, cascadingvalueContext );
 			}
 
@@ -784,7 +796,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			while ( groupIterator.hasNext() ) {
 				Group group = groupIterator.next();
 				cascadingvalueContext.setCurrentGroup( group.getGroup() );
-				cascadingvalueContext.setParameterIndex(parameterIndex);
+				cascadingvalueContext.setParameterIndex( parameterIndex );
+				cascadingvalueContext.setParameterName( parameterName );
 				validateCascadedConstraints( context, cascadingvalueContext );
 			}
 			constraintViolations.addAll( context.getFailingConstraints() );
@@ -833,7 +846,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext( bean, PathImpl.createPathForMethodReturnValue(method) );
 		valueContext.setCurrentValidatedValue( value );
 //		valueContext.setParameterIndex(parameterIndex);
-		
+
 		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
 		// before traversing the object.
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
@@ -876,7 +889,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		return constraintViolations;
 	}
-	
+
 	private <T, U, V> Set<MethodConstraintViolation<T>> validateReturnValueForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
 
 		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
@@ -887,7 +900,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaData.entrySet() ) {
 
 			MethodMetaData metaData = constraintsOfOneClass.getValue();
-			
+
 			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : metaData ) {
 
 				if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
@@ -899,8 +912,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		return constraintViolations;
-	}	
-	
+	}
+
 	/**
 	 * Collects all <code>MetaConstraint</code>s which match the given path relative to the specified root class.
 	 * <p>

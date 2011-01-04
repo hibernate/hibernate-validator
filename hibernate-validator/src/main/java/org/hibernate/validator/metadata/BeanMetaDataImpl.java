@@ -58,6 +58,18 @@ import org.slf4j.Logger;
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
+	/**
+	 * The name of the <code>&#064;Named</code> annotation. In order to avoid a
+	 * strict runtime dependency to the JSR 330 API this type is not imported
+	 * statically.
+	 */
+	private static final String NAMED_ANNOTATION_NAME = "javax.inject.Named";
+
+	/**
+	 * Used as prefix for parameter names, if no explicite names are given.
+	 */
+	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
+
 	private static final Logger log = LoggerFactory.make();
 
 	/**
@@ -150,7 +162,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 				if ( constraint.getDescriptor().getElementType() == ElementType.METHOD ) {
 
-					List<BeanMetaConstraint<?, ?>> constraintsForMethod = constraintsByMethod.get( constraint.getLocation().getMember() );
+					List<BeanMetaConstraint<?, ? extends Annotation>> constraintsForMethod = constraintsByMethod.get(
+							constraint.getLocation().getMember()
+					);
 					if ( constraintsForMethod == null ) {
 						constraintsForMethod = newArrayList();
 						constraintsByMethod.put(
@@ -627,7 +641,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private MethodMetaData getMethodMetaData(Method method) {
 
-		Map<Integer, ParameterMetaData> parameterConstraints = findParameterConstraints( method );
+		Map<Integer, ParameterMetaData> parameterConstraints = getParameterMetaData( method );
 		boolean isCascading = isValidAnnotationPresent( method );
 		List<BeanMetaConstraint<?, ? extends Annotation>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
@@ -646,31 +660,60 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return constraints;
 	}
 
-	private Map<Integer, ParameterMetaData> findParameterConstraints(Method method) {
+	/**
+	 * Retrieves constraint related meta data for the parameters of the given
+	 * method.
+	 *
+	 * @param method The method of interest.
+	 *
+	 * @return A map with parameter meta data for the given method, keyed by
+	 *         parameter index.
+	 */
+	private Map<Integer, ParameterMetaData> getParameterMetaData(Method method) {
 
-		Map<Integer, ParameterMetaData> metaData = new HashMap<Integer, ParameterMetaData>();
+		Map<Integer, ParameterMetaData> metaData = newHashMap();
 
 		int i = 0;
-		for (Annotation[] annotationsOfOneParameter : method.getParameterAnnotations()) {
-			
-			boolean parameterIsCascading = false;
-			List<MetaConstraint<?, ? extends Annotation>> constraintsOfOneParameter = new ArrayList<MetaConstraint<?,? extends Annotation>>();
-			
-			for (Annotation oneAnnotation : annotationsOfOneParameter) {
+		for ( Annotation[] annotationsOfOneParameter : method.getParameterAnnotations() ) {
 
-				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(method.getDeclaringClass(), oneAnnotation, ElementType.PARAMETER);
-				
-				for (ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints) {
-					ReflectionHelper.setAccessibility( method );
-					constraintsOfOneParameter.add( createParameterMetaConstraint( method, i, constraintDescriptorImpl ) );
+			boolean parameterIsCascading = false;
+			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
+			List<MetaConstraint<?, ? extends Annotation>> constraintsOfOneParameter = newArrayList();
+
+			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
+
+				//1. collect constraints if this annotation is a constraint annotation
+				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
+						method.getDeclaringClass(), oneAnnotation, ElementType.PARAMETER
+				);
+				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
+					constraintsOfOneParameter.add(
+							createParameterMetaConstraint(
+									method, i, constraintDescriptorImpl
+							)
+					);
 				}
-				
-				if(oneAnnotation.annotationType().equals(Valid.class)) {
+
+				//2. mark parameter as cascading if this annotation is the @Valid annotation
+				if ( oneAnnotation.annotationType().equals( Valid.class ) ) {
 					parameterIsCascading = true;
 				}
+
+				//3. retrieve parameter name if this annotation is the @Named annotation
+				if ( oneAnnotation.annotationType().getName().equals( NAMED_ANNOTATION_NAME ) ) {
+					final Method valueMethod = ReflectionHelper.getMethod( oneAnnotation.annotationType(), "value" );
+					try {
+						parameterName = ( String ) valueMethod.invoke( oneAnnotation );
+					}
+					catch ( Exception e ) {
+						// ignore
+					}
+				}
 			}
-			
-			metaData.put(i, new ParameterMetaData(i, constraintsOfOneParameter, parameterIsCascading));
+
+			metaData.put(
+					i, new ParameterMetaData( i, parameterName, constraintsOfOneParameter, parameterIsCascading )
+			);
 			i++;
 		}
 

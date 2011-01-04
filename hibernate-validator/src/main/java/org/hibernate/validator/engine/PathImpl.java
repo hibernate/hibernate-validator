@@ -63,7 +63,7 @@ public final class PathImpl implements Path, Serializable {
 	 *         given string.
 	 *
 	 * @throws IllegalArgumentException in case {@code property == null} or
-	 * 	       {@code property} cannot be parsed.
+	 *                                  {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
 		if ( propertyPath == null ) {
@@ -81,22 +81,17 @@ public final class PathImpl implements Path, Serializable {
 	 * Creates a path representing the specified method parameter.
 	 *
 	 * @param method The method hosting the parameter to represent.
-	 * @param parameterIndex The parameter's index starting with 0 for the method's first parameter.
+	 * @param parameterName The parameter's name, e.g. "arg0" or "param1".
 	 *
 	 * @return A path representing the specified method parameter.
 	 */
-	public static PathImpl createPathForMethodParameter(Method method, int parameterIndex) {
+	public static PathImpl createPathForMethodParameter(Method method, String parameterName) {
 
 		Contracts.assertNotNull( method, "A method is required to create a method parameter path." );
-
-		if ( parameterIndex < 0 || parameterIndex > method.getParameterTypes().length - 1 ) {
-			throw new IllegalArgumentException(
-					"Given parameter index " + parameterIndex + " is not a valid index for the parameters of given method " + method + "."
-			);
-		}
+		Contracts.assertNotNull( parameterName, "A parameter name is required to create a method parameter path." );
 
 		PathImpl path = createRootPath();
-		path.addMethodParameterNode( method, parameterIndex );
+		path.addMethodParameterNode( method, parameterName );
 
 		return path;
 	}
@@ -142,9 +137,9 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	private NodeImpl addMethodParameterNode(Method method, int parameterIndex) {
+	private NodeImpl addMethodParameterNode(Method method, String parameterName) {
 		NodeImpl parent = nodeList.size() == 0 ? null : ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = new MethodParameterNodeImpl( method, parameterIndex, parent );
+		currentLeafNode = new MethodParameterNodeImpl( method, parameterName, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;

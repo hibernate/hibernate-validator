@@ -23,28 +23,37 @@ import java.util.List;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
- * 
+ *
  * @author Gunnar Morling
  */
 public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends Annotation>> {
 
-	public final static ParameterMetaData NULL = new ParameterMetaData(0, Collections.<MetaConstraint<?, ? extends Annotation>>emptyList(), false);
-	
+	public final static ParameterMetaData NULL = new ParameterMetaData(
+			0, null, Collections.<MetaConstraint<?, ? extends Annotation>>emptyList(), false
+	);
+
 	private final int index;
-	
+
+	private final String name;
+
 	private final List<MetaConstraint<?, ? extends Annotation>> constraints;
 
 	private final boolean isCascading;
-	
-	public ParameterMetaData(int index, List<MetaConstraint<?, ? extends Annotation>> constraints, boolean isCascading) {
-		
+
+	public ParameterMetaData(int index, String name, List<MetaConstraint<?, ? extends Annotation>> constraints, boolean isCascading) {
+
 		this.index = index;
+		this.name = name;
 		this.constraints = constraints;
 		this.isCascading = isCascading;
 	}
 
 	public int getIndex() {
 		return index;
+	}
+
+	public String getParameterName() {
+		return name;
 	}
 
 	public boolean isCascading() {
@@ -57,17 +66,17 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 
 	@Override
 	public String toString() {
-		
+
 		//display short annotation type names
 		StringBuilder sb = new StringBuilder();
-		
-		for (MetaConstraint<?, ? extends Annotation> oneConstraint : constraints) {
-			sb.append(oneConstraint.getDescriptor().getAnnotation().annotationType().getSimpleName());
-			sb.append(", ");
+
+		for ( MetaConstraint<?, ? extends Annotation> oneConstraint : constraints ) {
+			sb.append( oneConstraint.getDescriptor().getAnnotation().annotationType().getSimpleName() );
+			sb.append( ", " );
 		}
-		
-		return "ParameterMetaData [index=" + index + ", constraints=["
-				+ sb.substring(0, sb.length()-2) + "], isCascading=" + isCascading + "]";
+
+		return "ParameterMetaData [index=" + index + "], name=" + name + "], constraints=["
+				+ sb.substring( 0, sb.length() - 2 ) + "], isCascading=" + isCascading + "]";
 	}
-	
+
 }

@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
+import javax.inject.Named;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
@@ -62,4 +64,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		
 	}
 
+	public void namedParameters(String param1, Customer customer) {
+		
+	}
 }
