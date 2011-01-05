@@ -16,11 +16,14 @@
  */
 package org.hibernate.validator.test.engine.methodlevel;
 
-import java.lang.reflect.Proxy;
-import javax.validation.Validation;
+import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import java.lang.reflect.Proxy;
+
+import javax.validation.Validation;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.MethodConstraintViolation;
@@ -32,9 +35,8 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
 
-import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Integration test for the group sequence processing during method-level validation.
@@ -123,6 +125,27 @@ public class MethodLevelValidationGroupSequenceTest {
 	}
 
 	/**
+	 * Two constraint violations (originating from different parameters) from ValidationGroup1 expected.
+	 * Third violation from ValidationGroup2 is not expected, as sequence processing stopped after first group.
+	 */
+	@Test
+	public void processingOfDefaultSequenceStopsAfterFirstErroneousGroupWithSeveralParameters() {
+
+		try {
+			customerRepository.constraintInLaterPartOfDefaultSequenceAtDifferentParameters( 1, 2 );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e.getConstraintViolations(),
+					"must be greater than or equal to 5",
+					"must be greater than or equal to 7"
+			);
+		}
+	}
+
+	/**
 	 * Only one constraint violation is expected, as processing should stop after the
 	 * first erroneous group of the validated sequence.
 	 */
@@ -148,6 +171,29 @@ public class MethodLevelValidationGroupSequenceTest {
 			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
+			);
+		}
+	}
+
+	/**
+	 * Two constraint violations (originating from different parameters) from ValidationGroup2 expected.
+	 * Third violation from ValidationGroup3 is not expected, as sequence processing stopped after first group.
+	 */
+	@Test
+	public void processingOfGroupSequenceStopsAfterFirstErroneousGroupWithSeveralParameters() {
+
+		setUpValidatorForGroups( ValidationSequence.class );
+
+		try {
+			customerRepository.constraintInLaterPartOfGroupSequenceAtDifferentParameters( 1, 2 );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e.getConstraintViolations(),
+					"must be greater than or equal to 5",
+					"must be greater than or equal to 7"
 			);
 		}
 	}

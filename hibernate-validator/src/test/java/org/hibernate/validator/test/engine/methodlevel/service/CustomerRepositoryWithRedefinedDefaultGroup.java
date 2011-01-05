@@ -38,10 +38,18 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
 	}) int param);
 
+	void constraintInLaterPartOfDefaultSequenceAtDifferentParameters(@List( {
+			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
+	}) int param1, @Min(groups = ValidationGroup1.class, value = 7) int param2);
+
+
 	void constraintInLaterPartOfGroupSequence(@List( {
 			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
 	}) int param);
 
+	void constraintInLaterPartOfGroupSequenceAtDifferentParameters(@List( {
+			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
+	}) int param1, @Min(groups = ValidationGroup2.class, value = 7) int param2);
 
 	public static interface ValidationGroup1 {
 	}
