@@ -797,25 +797,30 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
 
 		//used for retrieval of parameter names; we'll take the names from the lowest method in the hierarchy
+		//This could cause default names ("arg0" etc.) to be used instead of explicit names defined add super
+		//types, so an alternative strategy might be to use the "nearest" explicitly given name
 		MethodMetaData methodMetaDataOfDeclaringType = methodMetaDataByType.get( method.getDeclaringClass() );
 
-		for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaDataByType.entrySet() ) {
+		// TODO GM: define behavior with respect to redefined default sequences. Should only the
+		// sequence from the validated bean be honored or also default sequence definitions up in
+		// the inheritance tree?
+		// For now a redefined default sequence will only be considered if specified at the bean
+		// hosting the validated itself, but no other default sequence from parent types
 
-			// TODO GM: define behavior with respect to redefined default sequences. Should only the
-			// sequence from the validated bean be honored or also default sequence definitions up in
-			// the inheritance tree?
-			List<Class<?>> groupList;
-			if ( group.isDefaultGroup() ) {
-				groupList = getBeanMetaData( constraintsOfOneClass.getKey() ).getDefaultGroupSequence();
-			}
-			else {
-				groupList = Arrays.<Class<?>>asList( group.getGroup() );
-			}
+		List<Class<?>> groupList;
+		if ( group.isDefaultGroup() ) {
+			groupList = beanMetaData.getDefaultGroupSequence();
+		}
+		else {
+			groupList = Arrays.<Class<?>>asList( group.getGroup() );
+		}
 
-			//the only case where we can have multiple groups here is a redefined default group sequence
-			for ( Class<?> oneGroup : groupList ) {
+		//the only case where we can have multiple groups here is a redefined default group sequence
+		for ( Class<?> oneGroup : groupList ) {
 
-				int numberOfViolationsOfCurrentGroup = 0;
+			int numberOfViolationsOfCurrentGroup = 0;
+
+			for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaDataByType.entrySet() ) {
 
 				for ( int i = 0; i < parameterValues.length; i++ ) {
 
@@ -835,24 +840,30 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					numberOfViolationsOfCurrentGroup += validateParameterForGroup(
 							validationContext, valueContext, parameterMetaData
 					);
-
-					// validate parameter beans annotated with @Valid if required
-					if ( isCascadeRequired( method, i ) && value != null ) {
-
-						ValueContext<Object, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext(
-								value, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
-						);
-						cascadingvalueContext.setCurrentGroup( group.getGroup() );
-
-						//TODO GM: consider violations from cascaded validation
-						validateCascadedParameter( validationContext, cascadingvalueContext );
-					}
 				}
+			}
 
-				//stop processing after first group with errors occurred
-				if ( numberOfViolationsOfCurrentGroup > 0 ) {
-					break;
-				}
+			//stop processing after first group with errors occurred
+			if ( numberOfViolationsOfCurrentGroup > 0 ) {
+				break;
+			}
+		}
+
+		// validate parameter beans annotated with @Valid if required
+		for ( int i = 0; i < parameterValues.length; i++ ) {
+
+			Object value = parameterValues[i];
+			String parameterName = methodMetaDataOfDeclaringType.getParameterMetaData( i ).getParameterName();
+
+			if ( isCascadeRequired( method, i ) && value != null ) {
+
+				ValueContext<Object, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext(
+						value, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
+				);
+				cascadingvalueContext.setCurrentGroup( group.getGroup() );
+
+				//TODO GM: consider violations from cascaded validation
+				validateCascadedParameter( validationContext, cascadingvalueContext );
 			}
 		}
 

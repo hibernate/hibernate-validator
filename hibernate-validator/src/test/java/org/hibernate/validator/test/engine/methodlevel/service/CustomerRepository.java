@@ -57,6 +57,10 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	void namedParameters(@Named("param1") @NotNull String param1, @Named("customer") @NotNull @Valid Customer customer);
 
+	void methodWithNamedParameter(@Named("nameInSubType") String param);
+	
+	void anotherMethodWithNamedParameter(@Min(6) int param);
+	
 	public static interface ValidationGroup {
 	}
 

@@ -477,6 +477,43 @@ public class MethodLevelValidationTest {
 	}
 
 	@Test
+	public void parameterNamesAreRetrievedFromTypeHostingTheValidatedMethod() {
+
+		try {
+			customerRepository.methodWithNamedParameter( null );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages( e.getConstraintViolations(), "may not be null" );
+
+			MethodConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+
+			assertEquals( violation.getParameterName(), "nameInSubType" );
+			assertEquals(
+					violation.getPropertyPath().toString(), "CustomerRepository#methodWithNamedParameter(nameInSubType)"
+			);
+		}
+	}
+
+	@Test
+	public void constraintsOnOverriddenMethodAddUpInHierarchy() {
+
+		try {
+			customerRepository.anotherMethodWithNamedParameter( 1 );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e.getConstraintViolations(),
+					"must be greater than or equal to 5",
+					"must be greater than or equal to 6"
+			);
+		}
+	}
+	
+	@Test
 	public void methodValidationSucceedsAsNoConstraintOfValidatedGroupAreViolated() {
 		customerRepository.parameterConstraintInGroup(null);
 	}

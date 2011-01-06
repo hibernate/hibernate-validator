@@ -78,4 +78,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	}
 
+	public void methodWithNamedParameter(String param) {
+
+	}
+
+	public void anotherMethodWithNamedParameter(int param) {
+
+	}
 }

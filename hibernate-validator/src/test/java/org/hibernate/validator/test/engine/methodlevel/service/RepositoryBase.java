@@ -17,14 +17,15 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
+import javax.inject.Named;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 
 /**
  * @author Gunnar Morling
- *
  */
 public interface RepositoryBase<T> {
 
@@ -32,12 +33,22 @@ public interface RepositoryBase<T> {
 	 * Used to test, that constraints at methods from base interfaces/classes are evaluated.
 	 */
 	T findById(@NotNull Long id);
-	
+
 	/**
 	 * Used to test, that constraints at overridden methods from base interfaces/classes are evaluated.
 	 */
 	void foo(@NotNull Long id);
-	
+
 	void bar(@NotNull @Valid Customer customer);
-	
+
+	/**
+	 * Used to test, that parameter names are retrieved from the lowest type in hierarchy.
+	 */
+	void methodWithNamedParameter(@Named("nameInBase") @NotNull String param);
+
+
+	/**
+	 * Used to test, that multiple constraints on overridden methods add up.
+	 */
+	void anotherMethodWithNamedParameter(@Min(5) int param);
 }

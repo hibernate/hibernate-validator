@@ -40,7 +40,7 @@ public class MethodConstraintViolationException extends ValidationException {
 	public MethodConstraintViolationException(
 			Set<? extends MethodConstraintViolation<?>> constraintViolations) {
 
-		super();
+		super( "The following constraint violations occurred: " + constraintViolations );
 		this.constraintViolations = new HashSet<MethodConstraintViolation<?>>( constraintViolations );
 	}
 
