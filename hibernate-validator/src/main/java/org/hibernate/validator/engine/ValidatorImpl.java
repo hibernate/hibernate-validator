@@ -168,8 +168,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
 
-		Contracts.assertNotNull(object, "The object to be validated must not be null");
-		Contracts.assertNotNull(method, "The method to be validated must not be null");
+		Contracts.assertNotNull( object, "The object to be validated must not be null" );
+		Contracts.assertNotNull( method, "The method to be validated must not be null" );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -178,17 +178,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 
 		validateParametersInContext( context, object, new Object[] { parameterValue }, groupChain );
-		
+
 		return context.getFailingConstraints();
 	}
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 
-		Contracts.assertNotNull(object, "The object to be validated must not be null");
-		Contracts.assertNotNull(method, "The method to be validated must not be null");
+		Contracts.assertNotNull( object, "The object to be validated must not be null" );
+		Contracts.assertNotNull( method, "The method to be validated must not be null" );
 
 		//this might be the case for parameterless methods
-		if( parameterValues == null ) {
+		if ( parameterValues == null ) {
 			return Collections.emptySet();
 		}
 
@@ -198,14 +198,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
-		validateParametersInContext(context, object, parameterValues, groupChain);
+		validateParametersInContext( context, object, parameterValues, groupChain );
 
 		return context.getFailingConstraints();
 	}
 
 	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
 
-		Contracts.assertNotNull(method, "The method to be validated must not be null");
+		Contracts.assertNotNull( method, "The method to be validated must not be null" );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -402,7 +402,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 			Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-			valueContext.setCurrentValidatedValue( (V) valueToValidate );
+			valueContext.setCurrentValidatedValue( ( V ) valueToValidate );
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
 
@@ -476,16 +476,16 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
-			iter = ( (Iterable<?>) value ).iterator();
+			iter = ( ( Iterable<?> ) value ).iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( ReflectionHelper.isMap( type ) ) {
-			Map<?, ?> map = (Map<?, ?>) value;
+			Map<?, ?> map = ( Map<?, ?> ) value;
 			iter = map.entrySet().iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( TypeUtils.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( (Object[]) value );
+			List<?> arrayList = Arrays.asList( ( Object[] ) value );
 			iter = arrayList.iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
@@ -526,9 +526,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		while ( iter.hasNext() ) {
 			value = iter.next();
 			if ( value instanceof Map.Entry ) {
-				mapKey = ( (Map.Entry<?, ?>) value ).getKey();
+				mapKey = ( ( Map.Entry<?, ?> ) value ).getKey();
 				valueContext.setKey( mapKey );
-				value = ( (Map.Entry<?, ?>) value ).getValue();
+				value = ( ( Map.Entry<?, ?> ) value ).getValue();
 			}
 			else if ( isIndexable ) {
 				valueContext.setIndex( i );
@@ -566,7 +566,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T> void validateProperty(T object, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 
 		@SuppressWarnings("unchecked")
-		final Class<T> beanType = (Class<T>) object.getClass();
+		final Class<T> beanType = ( Class<T> ) object.getClass();
 
 		Set<BeanMetaConstraint<T, ?>> metaConstraints = new HashSet<BeanMetaConstraint<T, ?>>();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
@@ -657,7 +657,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				valueContext.setCurrentGroup( groupClass );
 				if ( isValidationRequired( context, valueContext, metaConstraint ) ) {
 					Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-					valueContext.setCurrentValidatedValue( (V) valueToValidate );
+					valueContext.setCurrentValidatedValue( ( V ) valueToValidate );
 					metaConstraint.validateConstraint( context, valueContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
@@ -909,7 +909,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
 		}
 
-		ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext( bean, PathImpl.createPathForMethodReturnValue(method) );
+		ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
+				bean, PathImpl.createPathForMethodReturnValue( method )
+		);
 		valueContext.setCurrentValidatedValue( value );
 //		valueContext.setParameterIndex(parameterIndex);
 
@@ -924,7 +926,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			valueContext.setCurrentGroup( group.getGroup() );
 			validateReturnValueForGroup( context, valueContext );
 		}
-		constraintViolations.addAll( (Collection<? extends MethodConstraintViolation<T>>) context.getFailingConstraints() );
+		constraintViolations.addAll( ( Collection<? extends MethodConstraintViolation<T>> ) context.getFailingConstraints() );
 
 //		// validate parameter beans annotated with @Valid
 //		if ( isCascadeRequired( method, parameterIndex ) && value != null ) {
@@ -1035,7 +1037,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					}
 
 					@SuppressWarnings("unchecked")
-					Class<T> valueClass = (Class<T>) ( newValue == null ? type : newValue.getClass() );
+					Class<T> valueClass = ( Class<T> ) ( newValue == null ? type : newValue.getClass() );
 
 					return collectMetaConstraintsForPath(
 							valueClass,
@@ -1052,7 +1054,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <U> BeanMetaData<U> getBeanMetaData(Class<U> beanClass) {
 		BeanMetaDataImpl<U> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
 		if ( beanMetaData == null ) {
-			beanMetaData = new BeanMetaDataImpl<U>( beanClass, constraintHelper, methodLevelConstraintsAllowed, beanMetaDataCache );
+			beanMetaData = new BeanMetaDataImpl<U>(
+					beanClass, constraintHelper, methodLevelConstraintsAllowed, beanMetaDataCache
+			);
 			beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
 		}
 		return beanMetaData;
