@@ -56,7 +56,7 @@ import javax.validation.groups.Default;
  * <pre>
  * &#064;NotNull
  * &#064;Valid
- * Customer findCustomerByName(@NotNull @Size(min = 5) String name) {
+ * Customer findCustomerByName(&#064;NotNull &#064;Size(min = 5) String name) {
  * 	// ...
  * }
  * </pre>
@@ -74,11 +74,11 @@ import javax.validation.groups.Default;
  * checks manually.</li>
  * </ul>
  * <p>
- * This service only copes with the actual validation of method
- * parameters/return values itself, but not with the invocation of such a
- * validation. This invocation would typically be triggered using appropriate
- * integration layers providing AOP or similar method interception facilities
- * such as JDK's {@link Proxy} API or <a
+ * This service only copes with the actual <em>validation</em> of method
+ * parameters/return values itself, but not with the <em>invocation</em> of such
+ * a validation. It is expected that this invocation is triggered by an
+ * integration layer using AOP or similar method interception facilities such as
+ * JDK's {@link Proxy} API or <a
  * href="http://jcp.org/en/jsr/detail?id=299">CDI</a> (
  * "JSR 299: Contexts and Dependency Injection for the Java<sup>TM</sup> EE platform"
  * ).
@@ -119,8 +119,8 @@ import javax.validation.groups.Default;
  * </pre>
  * <p/>
  * <p>
- * If not stated otherwise, none of this interface's methods parameters allow
- * null as value.
+ * If not stated otherwise, none of this interface's methods allow
+ * <code>null</code> as parameter value.
  * </p>
  * 
  * @author Gunnar Morling
