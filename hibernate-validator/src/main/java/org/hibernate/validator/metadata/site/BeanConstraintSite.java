@@ -18,9 +18,7 @@
 package org.hibernate.validator.metadata.site;
 
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import javax.validation.ValidationException;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -54,16 +52,9 @@ public class BeanConstraintSite<T> implements ConstraintSite {
 	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
 	 */
 	public BeanConstraintSite(Class<T> beanClass, Member member) {
-
 		this.member = member;
-
 		if ( this.member != null ) {
 			this.propertyName = ReflectionHelper.getPropertyName( member );
-			if ( member instanceof Method && propertyName == null ) { // can happen if member is a Method which does not follow the bean convention
-				throw new ValidationException(
-						"Annotated methods must follow the JavaBeans naming convention. " + member.getName() + "() does not."
-				);
-			}
 		}
 		else {
 			this.propertyName = null;
