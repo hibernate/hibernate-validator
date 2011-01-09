@@ -18,12 +18,10 @@ package org.hibernate.validator.test.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import javax.validation.ValidationException;
 import javax.validation.constraints.Min;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
@@ -93,24 +91,8 @@ public class BeanMetaDataImplTest {
 		assertSize( methodMetaData, 0 );
 	}
 
-	/**
-	 * The JSR 303 TCK mandates that a compliant implementation must throw an exception in case a non-getter method
-	 * is annotated with a constraint annotation. To be compliant and support method validation we have a switch ({@link HibernateValidatorConfiguration#allowMethodLevelConstraints()} which controls this behavior.
-	 */
-	@Test(expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "Annotated methods must follow the JavaBeans naming convention.*")
-	public void constraintAtMethodReturnValueCausesExceptionDueToMethodValidationNotBeingEnabled() {
-
-		new BeanMetaDataImpl<CustomerRepository>(
-				CustomerRepository.class, new ConstraintHelper(), false, new BeanMetaDataCache()
-		);
-	}
-
 	private <T> BeanMetaDataImpl<T> setupBeanMetaData(Class<T> clazz) {
-		BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
-				clazz, new ConstraintHelper(), true, new BeanMetaDataCache()
-		);
-		return metaData;
+		return new BeanMetaDataImpl<T>( clazz, new ConstraintHelper(), new BeanMetaDataCache() );
 	}
 
 	private void assertSize(Iterable<?> iterable, int expectedCount) {

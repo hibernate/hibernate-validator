@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -31,8 +32,6 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
-
-import org.slf4j.Logger;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -44,6 +43,8 @@ import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.Version;
 import org.hibernate.validator.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.xml.ValidationXmlParser;
+
+import org.slf4j.Logger;
 
 /**
  * Hibernate specific {@code Configuration} implementation.
@@ -74,7 +75,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean ignoreXmlConfiguration = false;
 	private Set<InputStream> configurationStreams = new HashSet<InputStream>();
 	private ConstraintMapping mapping;
-	private boolean methodLevelConstraintsAllowed = false;
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -128,11 +128,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			throw new IllegalArgumentException( "The mapping cannot be null." );
 		}
 		this.mapping = mapping;
-		return this;
-	}
-
-	public final HibernateValidatorConfiguration allowMethodLevelConstraints() {
-		this.methodLevelConstraintsAllowed = true;
 		return this;
 	}
 
@@ -229,10 +224,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public final ConstraintMapping getMapping() {
 		return mapping;
-	}
-
-	public final boolean isMethodLevelConstraintsAllowed() {
-		return methodLevelConstraintsAllowed;
 	}
 
 	private boolean isSpecificProvider() {

@@ -66,7 +66,6 @@ public class MethodLevelValidationTest {
 
 		MethodValidator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.allowMethodLevelConstraints()
 				.buildValidatorFactory()
 				.getValidator()
 				.unwrap( MethodValidator.class );

@@ -39,12 +39,10 @@ import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.slf4j.Logger;
@@ -109,14 +107,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	// Used to avoid ReflectionHelper#containsMember which is slow
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
-	/**
-	 * Whether constraints defined at non-getter methods are supported or not.
-	 * If not and we are finding some, a {@link ValidationException} will be
-	 * thrown by {@link BeanConstraintLocation}.
-	 */
-	private final boolean methodLevelConstraintsAllowed;
-
-	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, boolean methodLevelConstraintsAllowed, BeanMetaDataCache beanMetaDataCache) {
+	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this(
 				beanClass,
 				constraintHelper,
@@ -124,7 +115,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>(),
 				new ArrayList<Member>(),
 				new AnnotationIgnores(),
-				methodLevelConstraintsAllowed,
 				beanMetaDataCache
 		);
 	}
@@ -135,11 +125,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints,
 							List<Member> cascadedMembers,
 							AnnotationIgnores annotationIgnores,
-							boolean methodLevelConstraintsAllowed,
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
-		this.methodLevelConstraintsAllowed = methodLevelConstraintsAllowed;
 		
 		createMetaData( annotationIgnores, beanMetaDataCache );
 		if ( !defaultGroupSequence.isEmpty() ) {
@@ -318,18 +306,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
 
-		addToPropertyNameList( methodMetaData.getMethod() );
-
-		//reject constraints at non-getters if not explicitly allowed
-		if ( !ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) && !methodLevelConstraintsAllowed && methodMetaData
-				.iterator()
-				.hasNext() ) {
-			throw new ValidationException(
-					"Annotated methods must follow the JavaBeans naming convention. " + methodMetaData.getMethod()
-							.getName() + "() does not."
-			);
-		}
-		
 		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get(clazz);
 
 		if ( constraintsOfClass == null ) {
@@ -341,6 +317,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		if ( ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) ) {
 
+			addToPropertyNameList( methodMetaData.getMethod() );
 			ReflectionHelper.setAccessibility( methodMetaData.getMethod() );
 
 			for ( BeanMetaConstraint<?, ? extends Annotation> metaConstraint : methodMetaData ) {

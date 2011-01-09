@@ -34,7 +34,6 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,7 +55,6 @@ public class MethodLevelValidationGroupSequenceTest {
 
 		MethodValidator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.allowMethodLevelConstraints()
 				.buildValidatorFactory()
 				.getValidator()
 				.unwrap( MethodValidator.class );

@@ -16,14 +16,16 @@
 */
 package org.hibernate.validator.engine;
 
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -63,7 +65,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final ConstraintHelper constraintHelper;
-	private final boolean methodLevelConstraintsAllowed;
+
 	/**
 	 * Used to cache the constraint meta data for validated entities
 	 */
@@ -87,10 +89,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			if ( hibernateSpecificConfig.getMapping() != null ) {
 				initProgrammaticConfiguration( hibernateSpecificConfig.getMapping() );
 			}
-			methodLevelConstraintsAllowed = hibernateSpecificConfig.isMethodLevelConstraintsAllowed();
-		}
-		else {
-			methodLevelConstraintsAllowed = false;
 		}
 	}
 
@@ -120,8 +118,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				messageInterpolator,
 				traversableResolver,
 				constraintHelper,
-				beanMetaDataCache,
-				methodLevelConstraintsAllowed
+				beanMetaDataCache
 		);
 	}
 
@@ -143,7 +140,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			// via the programmatic api as well
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 
-			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
+			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = newHashMap();
 			List<Member> cascadedMembers = new ArrayList<Member>();
 
 			for ( Class<?> classInHierarchy : classes ) {
@@ -173,7 +170,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 					constraints,
 					cascadedMembers,
 					new AnnotationIgnores(),
-					methodLevelConstraintsAllowed,
 					beanMetaDataCache
 			);
 
@@ -193,7 +189,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			Class<T> beanClass = ( Class<T> ) clazz;
 
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
-			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = createEmptyConstraintMap();
+			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = newHashMap();
 			List<Member> cascadedMembers = new ArrayList<Member>();
 			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
 			// some constraints might be configured in super classes or interfaces. The xml configuration does not
@@ -213,7 +209,6 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 					constraints,
 					cascadedMembers,
 					annotationIgnores,
-					methodLevelConstraintsAllowed,
 					beanMetaDataCache
 			);
 
@@ -338,7 +333,4 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		return annotation;
 	}
 
-	private <T> Map<Class<?>, List<BeanMetaConstraint<T, ?>>> createEmptyConstraintMap() {
-		return new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>();
-	}
 }

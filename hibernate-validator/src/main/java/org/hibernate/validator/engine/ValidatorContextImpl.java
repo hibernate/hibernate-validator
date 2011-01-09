@@ -38,21 +38,18 @@ public class ValidatorContextImpl implements ValidatorContext {
 	private final ConstraintValidatorFactory factoryConstraintValidatorFactory;
 	private final ConstraintHelper constraintHelper;
 	private final BeanMetaDataCache beanMetaDataCache;
-	private final boolean methodLevelConstraintsAllowed;
 
 	public ValidatorContextImpl(ConstraintValidatorFactory constraintValidatorFactory,
 								MessageInterpolator factoryMessageInterpolator,
 								TraversableResolver factoryTraversableResolver,
 								ConstraintHelper constraintHelper,
-								BeanMetaDataCache beanMetaDataCache,
-								boolean methodLevelConstraintsAllowed) {
+								BeanMetaDataCache beanMetaDataCache) {
 
 		this.factoryConstraintValidatorFactory = constraintValidatorFactory;
 		this.factoryMessageInterpolator = factoryMessageInterpolator;
 		this.factoryTraversableResolver = factoryTraversableResolver;
 		this.constraintHelper = constraintHelper;
 		this.beanMetaDataCache = beanMetaDataCache;
-		this.methodLevelConstraintsAllowed = methodLevelConstraintsAllowed;
 
 		messageInterpolator( factoryMessageInterpolator );
 		traversableResolver( factoryTraversableResolver );
@@ -95,8 +92,7 @@ public class ValidatorContextImpl implements ValidatorContext {
 				messageInterpolator,
 				traversableResolver,
 				constraintHelper,
-				beanMetaDataCache,
-				methodLevelConstraintsAllowed
+				beanMetaDataCache
 		);
 	}
 }

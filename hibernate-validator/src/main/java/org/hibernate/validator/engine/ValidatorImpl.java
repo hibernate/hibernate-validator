@@ -105,18 +105,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private final BeanMetaDataCache beanMetaDataCache;
 
-	/**
-	 * Whether this validator allows constraints to be defined at non-getter methods or not.
-	 */
-	private final boolean methodLevelConstraintsAllowed;
-
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache, boolean methodLevelConstraintsAllowed) {
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.constraintHelper = constraintHelper;
 		this.beanMetaDataCache = beanMetaDataCache;
-		this.methodLevelConstraintsAllowed = methodLevelConstraintsAllowed;
 
 		groupChainGenerator = new GroupChainGenerator();
 	}
@@ -1053,7 +1047,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		BeanMetaDataImpl<U> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
 		if ( beanMetaData == null ) {
 			beanMetaData = new BeanMetaDataImpl<U>(
-					beanClass, constraintHelper, methodLevelConstraintsAllowed, beanMetaDataCache
+					beanClass, constraintHelper, beanMetaDataCache
 			);
 			beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
 		}
