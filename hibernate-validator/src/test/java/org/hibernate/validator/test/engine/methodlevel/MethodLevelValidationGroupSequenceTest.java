@@ -253,4 +253,34 @@ public class MethodLevelValidationGroupSequenceTest {
 			);
 		}
 	}
+
+	/**
+	 * Only one constraint violation is expected, as processing should stop after the
+	 * first erroneous group of the validated sequence.
+	 */
+	@Test
+	public void processingOfGroupSequenceForReturnValueStopsAfterFirstErroneousGroup() {
+
+		setUpValidatorForGroups( ValidationSequence.class );
+
+		try {
+			customerRepository.constraintsInAllPartsOfGroupSequence();
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertConstraintViolation(
+					constraintViolation,
+					"must be greater than or equal to 5",
+					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
+					1
+			);
+			assertEquals(
+					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
+			);
+		}
+	}
 }

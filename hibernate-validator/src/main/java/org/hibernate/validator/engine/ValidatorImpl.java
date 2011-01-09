@@ -9,7 +9,7 @@
 * You may obtain a copy of the License at
 * http://www.apache.org/licenses/LICENSE-2.0
 * Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,  
+* distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
@@ -911,8 +911,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			validateReturnValueForGroup( context, bean, value, groupIterator.next() );
 		}
 
-		//TODO GM: evaluate group sequences
-
+		// now process sequences, stop after the first erroneous group
+		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		while ( sequenceIterator.hasNext() ) {
+			List<Group> sequence = sequenceIterator.next();
+			for ( Group group : sequence ) {
+				int numberOfFailingConstraint = validateReturnValueForGroup(
+						context, bean, value, group
+				);
+				if ( numberOfFailingConstraint > 0 ) {
+					break;
+				}
+			}
+		}
 	}
 
 	//TODO GM: if possible integrate with validateParameterForGroup()

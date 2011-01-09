@@ -64,6 +64,12 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 	})
 	int constraintsInAllPartOfDefaultSequence();
 
+	@List( {
+			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
+	})
+	int constraintsInAllPartsOfGroupSequence();
+
+
 	public static interface ValidationGroup1 {
 	}
 

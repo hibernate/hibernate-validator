@@ -57,4 +57,8 @@ public class CustomerRepositoryWithRedefinedDefaultGroupImpl implements Customer
 	public int constraintsInAllPartOfDefaultSequence() {
 		return 1;
 	}
+
+	public int constraintsInAllPartsOfGroupSequence() {
+		return 1;
+	}
 }
