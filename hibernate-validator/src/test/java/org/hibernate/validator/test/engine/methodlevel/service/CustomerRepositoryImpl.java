@@ -74,15 +74,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	}
 
-	public void namedParameters(String param1, Customer customer) {
-
-	}
-
-	public void methodWithNamedParameter(String param) {
-
-	}
-
-	public void anotherMethodWithNamedParameter(int param) {
+	public void overriddenMethodWithConstraint(int param) {
 
 	}
 }

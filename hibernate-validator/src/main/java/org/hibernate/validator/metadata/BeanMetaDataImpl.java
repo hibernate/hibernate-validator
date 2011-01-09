@@ -59,13 +59,6 @@ import org.slf4j.Logger;
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	/**
-	 * The name of the <code>&#064;Named</code> annotation. In order to avoid a
-	 * strict runtime dependency to the JSR 330 API this type is not imported
-	 * statically.
-	 */
-	private static final String NAMED_ANNOTATION_NAME = "javax.inject.Named";
-
-	/**
 	 * Used as prefix for parameter names, if no explicite names are given.
 	 */
 	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
@@ -697,17 +690,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				//2. mark parameter as cascading if this annotation is the @Valid annotation
 				if ( oneAnnotation.annotationType().equals( Valid.class ) ) {
 					parameterIsCascading = true;
-				}
-
-				//3. retrieve parameter name if this annotation is the @Named annotation
-				if ( oneAnnotation.annotationType().getName().equals( NAMED_ANNOTATION_NAME ) ) {
-					final Method valueMethod = ReflectionHelper.getMethod( oneAnnotation.annotationType(), "value" );
-					try {
-						parameterName = ( String ) valueMethod.invoke( oneAnnotation );
-					}
-					catch ( Exception e ) {
-						// ignore
-					}
 				}
 			}
 

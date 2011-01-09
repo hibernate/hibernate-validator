@@ -1,4 +1,3 @@
-// $Id: RepositoryBase.java 19033 Sep 28, 2010 9:01:57 AM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors
@@ -17,7 +16,6 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
-import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -42,13 +40,7 @@ public interface RepositoryBase<T> {
 	void bar(@NotNull @Valid Customer customer);
 
 	/**
-	 * Used to test, that parameter names are retrieved from the lowest type in hierarchy.
-	 */
-	void methodWithNamedParameter(@Named("nameInBase") @NotNull String param);
-
-
-	/**
 	 * Used to test, that multiple constraints on overridden methods add up.
 	 */
-	void anotherMethodWithNamedParameter(@Min(5) int param);
+	void overriddenMethodWithConstraint(@Min(5) int param);
 }

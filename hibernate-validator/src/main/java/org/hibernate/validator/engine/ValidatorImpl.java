@@ -797,8 +797,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
 
 		//used for retrieval of parameter names; we'll take the names from the lowest method in the hierarchy
-		//This could cause default names ("arg0" etc.) to be used instead of explicit names defined add super
-		//types, so an alternative strategy might be to use the "nearest" explicitly given name
 		MethodMetaData methodMetaDataOfDeclaringType = methodMetaDataByType.get( method.getDeclaringClass() );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the

@@ -45,7 +45,6 @@ import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.engine.methodlevel.service.RepositoryBase;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -426,95 +425,10 @@ public class MethodLevelValidationTest {
 	}
 
 	@Test
-	public void namedParameters() {
-
-		//param 1
-		try {
-			customerRepository.namedParameters( null, new Customer( "Bob" ) );
-			fail( "Expected MethodConstraintViolationException wasn't thrown." );
-		}
-		catch ( MethodConstraintViolationException e ) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
-			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 0 ) );
-			assertEquals( constraintViolation.getParameterName(), "param1" );
-			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(), "CustomerRepository#namedParameters(param1)"
-			);
-		}
-
-		//param 2
-		try {
-			customerRepository.namedParameters( "foo", null );
-			fail( "Expected MethodConstraintViolationException wasn't thrown." );
-		}
-		catch ( MethodConstraintViolationException e ) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
-			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 1 ) );
-			assertEquals( constraintViolation.getParameterName(), "customer" );
-			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(), "CustomerRepository#namedParameters(customer)"
-			);
-		}
-	}
-
-	@Test
-	public void cascadingNamedParameter() {
-
-		try {
-			customerRepository.namedParameters( "foo", new Customer( null ) );
-			fail( "Expected MethodConstraintViolationException wasn't thrown." );
-		}
-		catch ( MethodConstraintViolationException e ) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
-			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 1 ) );
-			assertEquals( constraintViolation.getParameterName(), "customer" );
-			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#namedParameters(customer).name"
-			);
-		}
-	}
-
-	@Test
-	public void parameterNamesAreRetrievedFromTypeHostingTheValidatedMethod() {
-
-		try {
-			customerRepository.methodWithNamedParameter( null );
-			fail( "Expected MethodConstraintViolationException wasn't thrown." );
-		}
-		catch ( MethodConstraintViolationException e ) {
-
-			assertCorrectConstraintViolationMessages( e.getConstraintViolations(), "may not be null" );
-
-			MethodConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-
-			assertEquals( violation.getParameterName(), "nameInSubType" );
-			assertEquals(
-					violation.getPropertyPath().toString(), "CustomerRepository#methodWithNamedParameter(nameInSubType)"
-			);
-		}
-	}
-
-	@Test
 	public void constraintsOnOverriddenMethodAddUpInHierarchy() {
 
 		try {
-			customerRepository.anotherMethodWithNamedParameter( 1 );
+			customerRepository.overriddenMethodWithConstraint( 1 );
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch ( MethodConstraintViolationException e ) {

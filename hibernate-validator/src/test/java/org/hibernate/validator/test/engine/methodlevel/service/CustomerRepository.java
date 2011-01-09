@@ -19,7 +19,6 @@ package org.hibernate.validator.test.engine.methodlevel.service;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -55,11 +54,7 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	void parameterConstraintInGroup(@NotNull(groups = { ValidationGroup.class }) String name);
 
-	void namedParameters(@Named("param1") @NotNull String param1, @Named("customer") @NotNull @Valid Customer customer);
-
-	void methodWithNamedParameter(@Named("nameInSubType") String param);
-	
-	void anotherMethodWithNamedParameter(@Min(6) int param);
+	void overriddenMethodWithConstraint(@Min(6) int param);
 	
 	public static interface ValidationGroup {
 	}

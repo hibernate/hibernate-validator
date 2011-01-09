@@ -17,6 +17,7 @@
 package org.hibernate.validator;
 
 import java.lang.reflect.Method;
+
 import javax.validation.ConstraintViolation;
 
 /**
@@ -74,12 +75,12 @@ public interface MethodConstraintViolation<T> extends ConstraintViolation<T> {
 	 * this constraint violation.
 	 * </p>
 	 * <p>
-	 * If this parameter is annotated with <code>@javax.inject.Named</code>, the
-	 * value given in this annotation will be used as parameter name, otherwise
-	 * a default name in the form <code>"arg" + index</code> will be used, e.g.
-	 * <code>"arg0"</code>.
+	 * Currently a synthetic name following the form <code>"arg" + index</code>
+	 * will be returned, e.g. <code>"arg0"</code>. In future versions it might
+	 * be possible to specify real parameter names, e.g. using an
+	 * annotation-based approach around <code>javax.inject.Named</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return The name of the parameter holding the constraint which caused
 	 *         this constraint violation or null if this constraint violation is
 	 *         not of {@link Kind#PARAMETER}.
