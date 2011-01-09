@@ -52,10 +52,24 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	@Min(10)
 	int baz();
 
+	@Valid
+	Customer cascadingReturnValue();
+
+	@Valid
+	List<Customer> cascadingIterableReturnValue();
+
+	@Valid
+	Map<String, Customer> cascadingMapReturnValue();
+
+	@Valid
+	Customer[] cascadingArrayReturnValue();
+
+	Customer overriddenMethodWithCascadingReturnValue();
+	
 	void parameterConstraintInGroup(@NotNull(groups = { ValidationGroup.class }) String name);
 
 	void overriddenMethodWithConstraint(@Min(6) int param);
-	
+
 	public static interface ValidationGroup {
 	}
 

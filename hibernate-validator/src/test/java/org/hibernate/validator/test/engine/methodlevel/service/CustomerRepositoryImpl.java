@@ -16,6 +16,9 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +73,32 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return 9;
 	}
 
+	public Customer cascadingReturnValue() {
+		return new Customer( null );
+	}
+
+	@Override
+	public List<Customer> cascadingIterableReturnValue() {
+		return Arrays.asList( null, new Customer( null ) );
+	}
+
+	@Override
+	public Map<String, Customer> cascadingMapReturnValue() {
+
+		Map<String, Customer> theValue = newHashMap();
+		theValue.put( "Bob", new Customer( null ) );
+		return theValue;
+	}
+
+	@Override
+	public Customer[] cascadingArrayReturnValue() {
+		return new Customer[] { null, new Customer( null ) };
+	}
+
+	public Customer overriddenMethodWithCascadingReturnValue() {
+		return new Customer( null );
+	}
+
 	public void parameterConstraintInGroup(String name) {
 
 	}
@@ -77,4 +106,5 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	public void overriddenMethodWithConstraint(int param) {
 
 	}
+
 }

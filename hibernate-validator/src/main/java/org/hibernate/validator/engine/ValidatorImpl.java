@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -171,6 +170,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
+		//TODO GM: This does not work. The parameter index is lost that way.
 		validateParametersInContext( context, object, new Object[] { parameterValue }, groupChain );
 
 		return context.getFailingConstraints();
@@ -207,7 +207,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
-		return validateReturnValueInContext( context, object, method, returnValue, groupChain );
+		validateReturnValueInContext( context, object, method, returnValue, groupChain );
+
+		return context.getFailingConstraints();
 	}
 
 
@@ -437,13 +439,16 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	/**
-	 * Validates the cascading parameter specified with the given value context.
-	 * Any further cascading references are followed if applicable.
+	 * Validates the cascading parameter or return value specified with the
+	 * given value context. Any further cascading references are followed if
+	 * applicable.
 	 *
-	 * @param validationContext The global context for the current validateParameter(s) call.
-	 * @param valueContext The local context for validating the given parameter.
+	 * @param validationContext The global context for the current validateParameter(s) or
+	 * validateReturnValue() call.
+	 * @param valueContext The local context for validating the given parameter/return
+	 * value.
 	 */
-	private <T, U, V> void validateCascadedParameter(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
+	private <T, U, V> void validateCascadedMethodConstraints(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
 
 		Object value = valueContext.getCurrentBean();
 		Type type = valueContext.getCurrentBeanType();
@@ -855,7 +860,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				cascadingvalueContext.setCurrentGroup( group.getGroup() );
 
 				//TODO GM: consider violations from cascaded validation
-				validateCascadedParameter( validationContext, cascadingvalueContext );
+				validateCascadedMethodConstraints( validationContext, cascadingvalueContext );
 			}
 		}
 
@@ -891,9 +896,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <V, T> Set<MethodConstraintViolation<T>> validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
-
-		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
+	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
 
 		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
 
@@ -901,77 +904,84 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
 		}
 
-		ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
-				bean, PathImpl.createPathForMethodReturnValue( method )
-		);
-		valueContext.setCurrentValidatedValue( value );
-//		valueContext.setParameterIndex(parameterIndex);
-
-		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
-		// before traversing the object.
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 
-		// validate constraints at the parameters themselves
+		// process first single groups
 		while ( groupIterator.hasNext() ) {
-
-			Group group = groupIterator.next();
-			valueContext.setCurrentGroup( group.getGroup() );
-			validateReturnValueForGroup( context, valueContext );
+			validateReturnValueForGroup( context, bean, value, groupIterator.next() );
 		}
-		constraintViolations.addAll( ( Collection<? extends MethodConstraintViolation<T>> ) context.getFailingConstraints() );
-
-//		// validate parameter beans annotated with @Valid
-//		if ( isCascadeRequired( method, parameterIndex ) && value != null ) {
-//
-//			ValueContext<V, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext( value, PathImpl.createPathForMethodParameter(method, parameterIndex) );
-//
-//			groupIterator = groupChain.getGroupIterator();
-//			while ( groupIterator.hasNext() ) {
-//
-//				Group group = groupIterator.next();
-//				cascadingvalueContext.setCurrentGroup( group.getGroup() );
-//				cascadingvalueContext.setParameterIndex(parameterIndex);
-//				validateConstraintsForCurrentGroup( context, cascadingvalueContext );
-//			}
-//
-//			// validate cascaded constraints of parameter bean
-//			groupIterator = groupChain.getGroupIterator();
-//			while ( groupIterator.hasNext() ) {
-//				Group group = groupIterator.next();
-//				cascadingvalueContext.setCurrentGroup( group.getGroup() );
-//				cascadingvalueContext.setParameterIndex(parameterIndex);
-//				validateCascadedConstraints( context, cascadingvalueContext );
-//			}
-//			constraintViolations.addAll( (Collection<? extends MethodConstraintViolation<T>>) context.getFailingConstraints() );
-//		}
 
 		//TODO GM: evaluate group sequences
 
-		return constraintViolations;
 	}
 
-	private <T, U, V> Set<MethodConstraintViolation<T>> validateReturnValueForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
+	//TODO GM: if possible integrate with validateParameterForGroup()
+	private <T, U, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext, T bean, V value, Group group) {
 
-		Set<MethodConstraintViolation<T>> constraintViolations = new HashSet<MethodConstraintViolation<T>>();
+		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		BeanMetaData<?> beanMetaData = getBeanMetaData( validationContext.getMethod().getDeclaringClass() );
-		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( validationContext.getMethod() );
+		Method method = validationContext.getMethod();
 
-		for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaData.entrySet() ) {
+		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
+		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
 
-			MethodMetaData metaData = constraintsOfOneClass.getValue();
+		// TODO GM: define behavior with respect to redefined default sequences. Should only the
+		// sequence from the validated bean be honored or also default sequence definitions up in
+		// the inheritance tree?
+		// For now a redefined default sequence will only be considered if specified at the bean
+		// hosting the validated itself, but no other default sequence from parent types
 
-			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : metaData ) {
+		List<Class<?>> groupList;
+		if ( group.isDefaultGroup() ) {
+			groupList = beanMetaData.getDefaultGroupSequence();
+		}
+		else {
+			groupList = Arrays.<Class<?>>asList( group.getGroup() );
+		}
 
-				if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
-					continue;
+		//the only case where we can have multiple groups here is a redefined default group sequence
+		for ( Class<?> oneGroup : groupList ) {
+
+			int numberOfViolationsOfCurrentGroup = 0;
+
+			for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaDataByType.entrySet() ) {
+
+				// validate constraints at return value itself
+				ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
+						bean, PathImpl.createPathForMethodReturnValue( method )
+				);
+				valueContext.setCurrentValidatedValue( value );
+				valueContext.setCurrentGroup( oneGroup );
+
+				MethodMetaData metaData = constraintsOfOneClass.getValue();
+
+				for ( MetaConstraint<?, ? extends Annotation> metaConstraint : metaData ) {
+
+					if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
+						continue;
+					}
+					metaConstraint.validateConstraint( validationContext, valueContext );
 				}
-				metaConstraint.validateConstraint( validationContext, valueContext );
-				constraintViolations.addAll( validationContext.getFailingConstraints() );
+			}
+
+			//stop processing after first group with errors occurred
+			if ( numberOfViolationsOfCurrentGroup > 0 ) {
+				break;
 			}
 		}
 
-		return constraintViolations;
+		// cascaded validation if required
+		if ( isCascadeRequired( method ) && value != null ) {
+
+			ValueContext<V, Object> cascadingvalueContext = ValueContext.getLocalExecutionContext(
+					value, PathImpl.createPathForMethodReturnValue( method )
+			);
+			cascadingvalueContext.setCurrentGroup( group.getGroup() );
+
+			validateCascadedMethodConstraints( validationContext, cascadingvalueContext );
+		}
+
+		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
 	/**
@@ -1126,12 +1136,45 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return isReachable && isCascadable;
 	}
 
+	/**
+	 * Checks whether a cascaded validation is required for the given parameter
+	 * of the given method or not.
+	 *
+	 * @param method The method of interest.
+	 * @param parameterIndex The parameter of interest's index within the method's
+	 * parameter list.
+	 *
+	 * @return True, if a cascaded validation is required, false otherwise.
+	 */
 	private boolean isCascadeRequired(Method method, int parameterIndex) {
+
 		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
 		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method );
 
 		for ( MethodMetaData oneMethodMetaData : methodMetaData.values() ) {
 			if ( oneMethodMetaData.getParameterMetaData( parameterIndex ).isCascading() ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks whether a cascaded validation is required when validating the
+	 * return value of of the given method or not.
+	 *
+	 * @param method The method of interest. parameter list.
+	 *
+	 * @return True, if a cascaded validation is required, false otherwise.
+	 */
+	private boolean isCascadeRequired(Method method) {
+
+		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
+		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method );
+
+		for ( MethodMetaData oneMethodMetaData : methodMetaData.values() ) {
+			if ( oneMethodMetaData.isCascading() ) {
 				return true;
 			}
 		}

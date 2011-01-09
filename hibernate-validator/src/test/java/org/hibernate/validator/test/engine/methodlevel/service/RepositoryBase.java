@@ -43,4 +43,7 @@ public interface RepositoryBase<T> {
 	 * Used to test, that multiple constraints on overridden methods add up.
 	 */
 	void overriddenMethodWithConstraint(@Min(5) int param);
+	
+	@Valid
+	Customer overriddenMethodWithCascadingReturnValue();
 }
