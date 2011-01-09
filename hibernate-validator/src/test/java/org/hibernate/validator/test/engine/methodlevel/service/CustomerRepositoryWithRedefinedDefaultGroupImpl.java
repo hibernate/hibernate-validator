@@ -44,4 +44,17 @@ public class CustomerRepositoryWithRedefinedDefaultGroupImpl implements Customer
 	public void constraintInLaterPartOfGroupSequenceAtDifferentParameters(int param1, int param2) {
 	}
 
+	// methods used for return value validation tests
+
+	public String noConstraintInDefaultGroupAtReturnValue() {
+		return null;
+	}
+
+	public String constraintInDefaultGroupAtReturnValue() {
+		return null;
+	}
+
+	public int constraintsInAllPartOfDefaultSequence() {
+		return 1;
+	}
 }

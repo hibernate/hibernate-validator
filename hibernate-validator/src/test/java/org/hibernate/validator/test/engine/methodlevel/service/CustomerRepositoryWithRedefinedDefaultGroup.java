@@ -51,6 +51,19 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
 	}) int param1, @Min(groups = ValidationGroup2.class, value = 7) int param2);
 
+	// methods used for return value validation tests
+
+	@NotNull(groups = ValidationGroup3.class)
+	String noConstraintInDefaultGroupAtReturnValue();
+
+	@NotNull(groups = ValidationGroup1.class)
+	String constraintInDefaultGroupAtReturnValue();
+
+	@List( {
+			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
+	})
+	int constraintsInAllPartOfDefaultSequence();
+
 	public static interface ValidationGroup1 {
 	}
 

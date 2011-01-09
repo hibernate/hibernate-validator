@@ -944,24 +944,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 			int numberOfViolationsOfCurrentGroup = 0;
 
+			// validate constraints at return value itself
+			ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
+					bean, PathImpl.createPathForMethodReturnValue( method )
+			);
+			valueContext.setCurrentValidatedValue( value );
+			valueContext.setCurrentGroup( oneGroup );
+
 			for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaDataByType.entrySet() ) {
 
-				// validate constraints at return value itself
-				ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
-						bean, PathImpl.createPathForMethodReturnValue( method )
-				);
-				valueContext.setCurrentValidatedValue( value );
-				valueContext.setCurrentGroup( oneGroup );
-
-				MethodMetaData metaData = constraintsOfOneClass.getValue();
-
-				for ( MetaConstraint<?, ? extends Annotation> metaConstraint : metaData ) {
-
-					if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
-						continue;
-					}
-					metaConstraint.validateConstraint( validationContext, valueContext );
-				}
+				numberOfViolationsOfCurrentGroup +=
+						validateReturnValueForGroup(
+								validationContext, valueContext, constraintsOfOneClass.getValue()
+						);
 			}
 
 			//stop processing after first group with errors occurred
@@ -979,6 +974,22 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			cascadingvalueContext.setCurrentGroup( group.getGroup() );
 
 			validateCascadedMethodConstraints( validationContext, cascadingvalueContext );
+		}
+
+		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
+	}
+
+	private <T, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext,
+												   ValueContext<T, V> valueContext, MethodMetaData constraintsOfOneClass) {
+
+		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
+
+		for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintsOfOneClass ) {
+
+			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
+				continue;
+			}
+			metaConstraint.validateConstraint( validationContext, valueContext );
 		}
 
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;

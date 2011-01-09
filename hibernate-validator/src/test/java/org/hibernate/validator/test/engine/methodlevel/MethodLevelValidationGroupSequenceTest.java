@@ -34,6 +34,7 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -192,6 +193,63 @@ public class MethodLevelValidationGroupSequenceTest {
 					e.getConstraintViolations(),
 					"must be greater than or equal to 5",
 					"must be greater than or equal to 7"
+			);
+		}
+	}
+
+	// Tests for return value validation below
+	// TODO GM: extract to separate test
+
+	@Test
+	public void validationSucceedsAsNoConstraintInDefaultSequenceAtReturnValueIsViolated() {
+		customerRepository.noConstraintInDefaultGroupAtReturnValue();
+	}
+
+	@Test
+	public void validationFailsAsConstraintInDefaultSequenceAtReturnValueIsViolated() {
+
+		try {
+			customerRepository.constraintInDefaultGroupAtReturnValue();
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertConstraintViolation(
+					constraintViolation, "may not be null", CustomerRepositoryWithRedefinedDefaultGroupImpl.class, null
+			);
+			assertEquals(
+					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
+			);
+		}
+	}
+
+	/**
+	 * Only one constraint violation is expected, as processing should stop after the
+	 * first erroneous group of the default sequence.
+	 */
+	@Test
+	public void processingOfDefaultSequenceForReturnValueStopsAfterFirstErroneousGroup() {
+
+		try {
+			customerRepository.constraintsInAllPartOfDefaultSequence();
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertConstraintViolation(
+					constraintViolation,
+					"must be greater than or equal to 5",
+					CustomerRepositoryWithRedefinedDefaultGroupImpl.class,
+					1
+			);
+			assertEquals(
+					constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
 			);
 		}
 	}
