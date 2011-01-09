@@ -45,6 +45,7 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
+
 import org.slf4j.Logger;
 
 /**
@@ -77,9 +78,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
 	 * (eg super class or interface) in which they are defined.
 	 */
-	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = new HashMap<Class<?>, List<BeanMetaConstraint<T,? extends Annotation>>>();
+	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = new HashMap<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>>();
 
-	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = new HashMap<Class<?>, Map<Method,MethodMetaData>>();
+	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = new HashMap<Class<?>, Map<Method, MethodMetaData>>();
 
 	/**
 	 * List of cascaded members.
@@ -206,7 +207,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public List<BeanMetaConstraint<T, ? extends Annotation>> getMetaConstraintsAsList() {
-		List<BeanMetaConstraint<T, ? extends Annotation>> constraintList = new ArrayList<BeanMetaConstraint<T,? extends Annotation>>();
+		List<BeanMetaConstraint<T, ? extends Annotation>> constraintList = new ArrayList<BeanMetaConstraint<T, ? extends Annotation>>();
 		for ( List<BeanMetaConstraint<T, ? extends Annotation>> list : metaConstraints.values() ) {
 			constraintList.addAll( list );
 		}
@@ -217,11 +218,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Map<Class<?>, MethodMetaData> theValue = new HashMap<Class<?>, MethodMetaData>();
 
-		for (Entry<Class<?>, Map<Method, MethodMetaData>> methodsOfOneClass : methodMetaConstraints.entrySet()) {
-			for(Entry<Method, MethodMetaData> oneMethodEntry : methodsOfOneClass.getValue().entrySet()) {
+		for ( Entry<Class<?>, Map<Method, MethodMetaData>> methodsOfOneClass : methodMetaConstraints.entrySet() ) {
+			for ( Entry<Method, MethodMetaData> oneMethodEntry : methodsOfOneClass.getValue().entrySet() ) {
 
-				if(ReflectionHelper.haveSameSignature(method, oneMethodEntry.getKey())) {
-					theValue.put(methodsOfOneClass.getKey(), oneMethodEntry.getValue());
+				if ( ReflectionHelper.haveSameSignature( method, oneMethodEntry.getKey() ) ) {
+					theValue.put( methodsOfOneClass.getKey(), oneMethodEntry.getValue() );
 				}
 			}
 		}
@@ -280,7 +281,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		// first we add the meta constraint to our meta constraint map
 		List<BeanMetaConstraint<T, ? extends Annotation>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
-			constraintList = new ArrayList<BeanMetaConstraint<T,? extends Annotation>>();
+			constraintList = new ArrayList<BeanMetaConstraint<T, ? extends Annotation>>();
 			metaConstraints.put( clazz, constraintList );
 		}
 		else {
@@ -306,7 +307,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
 
-		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get(clazz);
+		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get( clazz );
 
 		if ( constraintsOfClass == null ) {
 			constraintsOfClass = new HashMap<Method, MethodMetaData>();
