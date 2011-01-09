@@ -19,49 +19,29 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodParameterConstraintLocation;
 
 /**
- * A {@link MetaConstraint} implementation that represents a method parameter or
- * return value constraint.
+ * A {@link MetaConstraint} implementation that represents a method parameter constraint.
  *
  * @author Gunnar Morling
  */
-public class MethodMetaConstraint<T, A extends Annotation> extends
+public class ParameterMetaConstraint<T, A extends Annotation> extends
 		MetaConstraint<T, A> {
 
 	/**
-	 * Creates a new {@link MethodMetaConstraint} representing a return value
-	 * constraint.
-	 *
-	 * @param constraintDescriptor The descriptor for this constraint.
-	 * @param method The method hosting this constraint.
-	 */
-	public MethodMetaConstraint(
-			ConstraintDescriptorImpl<A> constraintDescriptor, Method method) {
-
-		super( constraintDescriptor, new MethodConstraintLocation( method ) );
-	}
-
-	/**
-	 * Creates a new {@link MethodMetaConstraint} representing a method
+	 * Creates a new {@link ParameterMetaConstraint} representing a method
 	 * parameter constraint.
 	 *
 	 * @param constraintDescriptor The descriptor for this constraint.
 	 * @param method The method hosting this constraint.
 	 * @param parameterIndex The index of the parameter hosting this constraint.
 	 */
-	public MethodMetaConstraint(
+	public ParameterMetaConstraint(
 			ConstraintDescriptorImpl<A> constraintDescriptor, Method method,
 			int parameterIndex) {
 
-		super(
-				constraintDescriptor, new MethodParameterConstraintLocation(
-						method,
-						parameterIndex
-				)
-		);
+		super( constraintDescriptor, new MethodParameterConstraintLocation( method, parameterIndex ) );
 	}
 
 }

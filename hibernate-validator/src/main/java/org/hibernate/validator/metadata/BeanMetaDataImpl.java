@@ -128,7 +128,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
-		
+
 		createMetaData( annotationIgnores, beanMetaDataCache );
 		if ( !defaultGroupSequence.isEmpty() ) {
 			setDefaultGroupSequence( defaultGroupSequence );
@@ -188,7 +188,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 	}
-	
+
 	public Class<T> getBeanClass() {
 		return beanClass;
 	}
@@ -216,10 +216,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public Map<Class<?>, MethodMetaData> getMetaDataForMethod(Method method) {
 
 		Map<Class<?>, MethodMetaData> theValue = new HashMap<Class<?>, MethodMetaData>();
-		
+
 		for (Entry<Class<?>, Map<Method, MethodMetaData>> methodsOfOneClass : methodMetaConstraints.entrySet()) {
 			for(Entry<Method, MethodMetaData> oneMethodEntry : methodsOfOneClass.getValue().entrySet()) {
-				
+
 				if(ReflectionHelper.haveSameSignature(method, oneMethodEntry.getKey())) {
 					theValue.put(methodsOfOneClass.getKey(), oneMethodEntry.getValue());
 				}
@@ -451,15 +451,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			addMethodMetaConstraint( clazz, methodMetaData );
 		}
 	}
-	
+
 	private MethodMetaData getFromCache(Class<?> clazz, Method method, BeanMetaDataCache beanMetaDataCache) {
-		
+
 		BeanMetaDataImpl<?> cachedBeanMetaData = beanMetaDataCache.getBeanMetaData( clazz );
 
 		if ( cachedBeanMetaData != null ) {
 			return cachedBeanMetaData.getMetaDataForMethod( method ).get( clazz );
 		}
-		
+
 		return null;
 	}
 
@@ -515,8 +515,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new BeanMetaConstraint<T, A>( descriptor, beanClass, m );
 	}
 
-	private <A extends Annotation> MethodMetaConstraint<T, A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MethodMetaConstraint<T, A>( descriptor, method, parameterIndex );
+	private <A extends Annotation> ParameterMetaConstraint<T, A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new ParameterMetaConstraint<T, A>( descriptor, method, parameterIndex );
 	}
 
 	/**
