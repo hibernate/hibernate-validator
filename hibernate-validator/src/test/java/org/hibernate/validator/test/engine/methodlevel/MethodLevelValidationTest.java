@@ -60,10 +60,10 @@ public class MethodLevelValidationTest {
 
 	@BeforeMethod
 	public void setUpDefaultMethodValidator() {
-		setUpValidatorForGroups();
+		setUpValidator();
 	}
 
-	private void setUpValidatorForGroups(Class<?>... groups) {
+	private void setUpValidator(Integer parameterIndex, Class<?>... groups) {
 
 		MethodValidator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -71,11 +71,18 @@ public class MethodLevelValidationTest {
 				.getValidator()
 				.unwrap( MethodValidator.class );
 
+		ValidationInvocationHandler handler = new ValidationInvocationHandler(
+				new CustomerRepositoryImpl(), validator, parameterIndex, groups
+		);
 		customerRepository = ( CustomerRepository ) Proxy.newProxyInstance(
 				getClass().getClassLoader(),
 				new Class<?>[] { CustomerRepository.class },
-				new ValidationInvocationHandler( new CustomerRepositoryImpl(), validator, groups )
+				handler
 		);
+	}
+
+	private void setUpValidator(Class<?>... groups) {
+		setUpValidator( null, groups );
 	}
 
 	@Test
@@ -399,6 +406,63 @@ public class MethodLevelValidationTest {
 		customerRepository.boz();
 	}
 
+	/**
+	 * The constraints at both parameters are violated, but as only the 2nd
+	 * parameter is validated, only one constraint violation is expected.
+	 */
+	@Test
+	public void singleParameterValidation() {
+
+		setUpValidator( 1 );
+
+		try {
+			customerRepository.findCustomerByAgeAndName( 1, null );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMethod().getName(), "findCustomerByAgeAndName" );
+			assertEquals( constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class );
+			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 1 ) );
+			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
+			assertEquals(
+					constraintViolation.getPropertyPath().toString(),
+					"CustomerRepository#findCustomerByAgeAndName(arg1)"
+			);
+			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+		}
+	}
+
+	@Test
+	public void cascadingSingleParameterValidation() {
+
+		setUpValidator( 1 );
+
+		try {
+			customerRepository.cascadingParameter( null, new Customer( null ) );
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMethod().getName(), "cascadingParameter" );
+			assertEquals( constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class );
+			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 1 ) );
+			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
+			assertEquals(
+					constraintViolation.getPropertyPath().toString(), "CustomerRepository#cascadingParameter(arg1).name"
+			);
+			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+		}
+	}
+
 	@Test
 	public void returnValueValidationYieldsConstraintViolation() {
 
@@ -583,7 +647,7 @@ public class MethodLevelValidationTest {
 
 	@Test(expectedExceptions = MethodConstraintViolationException.class)
 	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
-		setUpValidatorForGroups( CustomerRepository.ValidationGroup.class );
+		setUpValidator( CustomerRepository.ValidationGroup.class );
 		customerRepository.parameterConstraintInGroup( null );
 	}
 

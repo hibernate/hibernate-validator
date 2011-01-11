@@ -53,6 +53,10 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	}
 
+	public void cascadingParameter(Customer param1, Customer param2) {
+
+	}
+
 	public Customer findById(Long id) {
 		return null;
 	}

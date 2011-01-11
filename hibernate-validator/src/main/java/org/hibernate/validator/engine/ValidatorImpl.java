@@ -167,11 +167,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
-				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
+				method,
+				parameterIndex,
+				object,
+				messageInterpolator,
+				constraintValidatorFactory,
+				getCachingTraversableResolver()
 		);
 
-		//TODO GM: This does not work. The parameter index is lost that way.
-		validateParametersInContext( context, object, new Object[] { parameterValue }, groupChain );
+		Object[] parameterValues = new Object[method.getParameterTypes().length];
+		parameterValues[parameterIndex] = parameterValue;
+
+		validateParametersInContext( context, object, parameterValues, groupChain );
 
 		return context.getFailingConstraints();
 	}
@@ -188,7 +195,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
-		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
+		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
@@ -203,7 +210,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
-		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
+		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
 		);
 
@@ -821,6 +828,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 				for ( int i = 0; i < parameterValues.length; i++ ) {
 
+					//ignore this parameter if this validation is for a single parameter and this is not the right one
+					if ( validationContext.getParameterIndex() != null && !validationContext.getParameterIndex()
+							.equals( i ) ) {
+						continue;
+					}
+
 					Object value = parameterValues[i];
 					String parameterName = methodMetaDataOfDeclaringType.getParameterMetaData( i ).getParameterName();
 
@@ -848,6 +861,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		// validate parameter beans annotated with @Valid if required
 		for ( int i = 0; i < parameterValues.length; i++ ) {
+
+			//ignore this parameter if this validation is for a single parameter and this is not the right one
+			if ( validationContext.getParameterIndex() != null && !validationContext.getParameterIndex().equals( i ) ) {
+				continue;
+			}
 
 			Object value = parameterValues[i];
 			String parameterName = methodMetaDataOfDeclaringType.getParameterMetaData( i ).getParameterName();

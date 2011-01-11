@@ -35,19 +35,35 @@ public class ValidationInvocationHandler implements InvocationHandler {
 
 	private final MethodValidator validator;
 
+	private final Integer parameterIndex;
+
 	private final Class<?>[] groups;
 
 	public ValidationInvocationHandler(Object wrapped, MethodValidator validator, Class<?>... groups) {
 
+		this( wrapped, validator, null, groups );
+	}
+
+	public ValidationInvocationHandler(Object wrapped, MethodValidator validator, Integer parameterIndex, Class<?>... groups) {
+
 		this.wrapped = wrapped;
 		this.validator = validator;
+		this.parameterIndex = parameterIndex;
 		this.groups = groups;
 	}
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-		Set<MethodConstraintViolation<Object>> constraintViolations =
-				validator.validateParameters( wrapped, method, args, groups );
+		Set<MethodConstraintViolation<Object>> constraintViolations = null;
+
+		if ( parameterIndex != null ) {
+			constraintViolations = validator.validateParameter(
+					wrapped, method, args[parameterIndex], parameterIndex, groups
+			);
+		}
+		else {
+			constraintViolations = validator.validateParameters( wrapped, method, args, groups );
+		}
 
 		if ( !constraintViolations.isEmpty() ) {
 			throw new MethodConstraintViolationException( constraintViolations );

@@ -28,32 +28,60 @@ import org.hibernate.validator.MethodConstraintViolation;
 /**
  * A {@link ValidationContext} implementation which creates and manages
  * violations of type {@link MethodConstraintViolation}.
- * 
+ *
+ * @param <T> The type of the root bean for which this context is created.
+ *
  * @author Gunnar Morling
- * 
- * @param <T>
- *            The type of the root bean for which this context is created.
  */
-public class MethodValidationContext <T> extends ValidationContext<T, MethodConstraintViolation<T>> {
+public class MethodValidationContext<T> extends ValidationContext<T, MethodConstraintViolation<T>> {
 
 	/**
 	 * The method of the current validation call.
 	 */
 	private final Method method;
 
+	/**
+	 * The index of the parameter to validate if this context is used for validation of a single parameter, null otherwise.
+	 */
+	private final Integer parameterIndex;
+
 	protected MethodValidationContext(Class<T> rootBeanClass, T rootBean,
-			Method method,
-			MessageInterpolator messageInterpolator,
-			ConstraintValidatorFactory constraintValidatorFactory,
-			TraversableResolver traversableResolver) {
-		
-		super(rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver);
+									  Method method,
+									  MessageInterpolator messageInterpolator,
+									  ConstraintValidatorFactory constraintValidatorFactory,
+									  TraversableResolver traversableResolver) {
+
+		this(
+				rootBeanClass,
+				rootBean,
+				method,
+				null,
+				messageInterpolator,
+				constraintValidatorFactory,
+				traversableResolver
+		);
+
+	}
+
+	protected MethodValidationContext(Class<T> rootBeanClass, T rootBean,
+									  Method method,
+									  Integer parameterIndex,
+									  MessageInterpolator messageInterpolator,
+									  ConstraintValidatorFactory constraintValidatorFactory,
+									  TraversableResolver traversableResolver) {
+
+		super( rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver );
 
 		this.method = method;
+		this.parameterIndex = parameterIndex;
 	}
-	
+
 	public Method getMethod() {
 		return method;
+	}
+
+	public Integer getParameterIndex() {
+		return parameterIndex;
 	}
 
 	@Override
@@ -69,8 +97,8 @@ public class MethodValidationContext <T> extends ValidationContext<T, MethodCons
 		return new MethodConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
-				method, 
-				localContext.getParameterIndex(), 
+				method,
+				localContext.getParameterIndex(),
 				localContext.getParameterName(),
 				getRootBeanClass(),
 				getRootBean(),
