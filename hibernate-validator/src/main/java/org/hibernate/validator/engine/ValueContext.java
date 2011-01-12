@@ -18,7 +18,6 @@ package org.hibernate.validator.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-
 import javax.validation.groups.Default;
 
 /**
@@ -79,13 +78,13 @@ public class ValueContext<T, V> {
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) value.getClass();
+		Class<T> rootBeanClass = (Class<T>) value.getClass();
 		return new ValueContext<T, V>( value, rootBeanClass, propertyPath );
 	}
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath, int parameterIndex, String parameterName) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) value.getClass();
+		Class<T> rootBeanClass = (Class<T>) value.getClass();
 		return new ValueContext<T, V>( value, rootBeanClass, propertyPath, parameterIndex, parameterName );
 	}
 

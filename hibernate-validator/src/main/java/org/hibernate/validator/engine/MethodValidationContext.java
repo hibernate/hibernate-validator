@@ -17,7 +17,6 @@
 package org.hibernate.validator.engine;
 
 import java.lang.reflect.Method;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;

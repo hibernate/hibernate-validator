@@ -16,9 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
@@ -35,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -43,10 +39,13 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.slf4j.Logger;
+
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
-import org.slf4j.Logger;
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -150,7 +149,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					if ( constraintsForMethod == null ) {
 						constraintsForMethod = newArrayList();
 						constraintsByMethod.put(
-								( Method ) constraint.getLocation().getMember(), constraintsForMethod
+								(Method) constraint.getLocation().getMember(), constraintsForMethod
 						);
 					}
 					constraintsForMethod.add( constraint );
@@ -176,9 +175,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		for ( Member member : cascadedMembers ) {
 			// in case a method was specified as cascaded but did not have any constraints we have to register it here
-			if ( member instanceof Method && getMetaDataForMethod( ( Method ) member ) == null ) {
+			if ( member instanceof Method && getMetaDataForMethod( (Method) member ) == null ) {
 				MethodMetaData methodMetaData = new MethodMetaData(
-						( Method ) member,
+						(Method) member,
 						Collections.<BeanMetaConstraint<?, ? extends Annotation>>emptyList(),
 						true
 				);
@@ -294,7 +293,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			beanDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
 		}
 		else {
-			PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
+			PropertyDescriptorImpl propertyDescriptor = (PropertyDescriptorImpl) propertyDescriptors.get(
 					metaConstraint.getLocation().getPropertyName()
 			);
 			if ( propertyDescriptor == null ) {
@@ -322,7 +321,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			ReflectionHelper.setAccessibility( methodMetaData.getMethod() );
 
 			for ( BeanMetaConstraint<?, ? extends Annotation> metaConstraint : methodMetaData ) {
-				addMetaConstraint( clazz, ( BeanMetaConstraint<T, ? extends Annotation> ) metaConstraint );
+				addMetaConstraint( clazz, (BeanMetaConstraint<T, ? extends Annotation>) metaConstraint );
 			}
 
 			if ( methodMetaData.isCascading() ) {
@@ -466,7 +465,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member, boolean isCascaded) {
 		String name = ReflectionHelper.getPropertyName( member );
-		PropertyDescriptorImpl propertyDescriptor = ( PropertyDescriptorImpl ) propertyDescriptors.get(
+		PropertyDescriptorImpl propertyDescriptor = (PropertyDescriptorImpl) propertyDescriptors.get(
 				name
 		);
 		if ( propertyDescriptor == null ) {
@@ -482,7 +481,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private boolean isValidAnnotationPresent(Member member) {
-		return ( ( AnnotatedElement ) member ).isAnnotationPresent( Valid.class );
+		return ( (AnnotatedElement) member ).isAnnotationPresent( Valid.class );
 	}
 
 	private void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
@@ -596,7 +595,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		assert member instanceof Field || member instanceof Method;
 
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-		for ( Annotation annotation : ( ( AnnotatedElement ) member ).getAnnotations() ) {
+		for ( Annotation annotation : ( (AnnotatedElement) member ).getAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation, type ) );
 		}
 

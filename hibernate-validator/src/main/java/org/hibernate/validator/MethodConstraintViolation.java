@@ -17,7 +17,6 @@
 package org.hibernate.validator;
 
 import java.lang.reflect.Method;
-
 import javax.validation.ConstraintViolation;
 
 /**
@@ -46,8 +45,7 @@ public interface MethodConstraintViolation<T> extends ConstraintViolation<T> {
 		 * Identifies constraint violations occurred during the validation of a
 		 * method's return value.
 		 */
-		RETURN_VALUE;
-
+		RETURN_VALUE
 	}
 
 	/**
@@ -80,7 +78,7 @@ public interface MethodConstraintViolation<T> extends ConstraintViolation<T> {
 	 * be possible to specify real parameter names, e.g. using an
 	 * annotation-based approach around <code>javax.inject.Named</code>.
 	 * </p>
-	 * 
+	 *
 	 * @return The name of the parameter holding the constraint which caused
 	 *         this constraint violation or null if this constraint violation is
 	 *         not of {@link Kind#PARAMETER}.
@@ -93,5 +91,4 @@ public interface MethodConstraintViolation<T> extends ConstraintViolation<T> {
 	 * @return The kind of this method constraint violation.
 	 */
 	Kind getKind();
-
 }

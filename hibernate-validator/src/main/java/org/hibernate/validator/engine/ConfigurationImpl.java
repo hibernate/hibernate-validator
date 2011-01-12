@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -32,6 +31,8 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
+
+import org.slf4j.Logger;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -43,8 +44,6 @@ import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.Version;
 import org.hibernate.validator.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.xml.ValidationXmlParser;
-
-import org.slf4j.Logger;
 
 /**
  * Hibernate specific {@code Configuration} implementation.

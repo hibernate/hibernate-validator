@@ -16,14 +16,11 @@
  */
 package org.hibernate.validator.test.engine.methodlevel;
 
-import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
-
 import java.lang.reflect.Proxy;
-
 import javax.validation.Validation;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.MethodConstraintViolation;
@@ -35,8 +32,10 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * Integration test for the group sequence processing during method-level validation.
@@ -60,7 +59,7 @@ public class MethodLevelValidationGroupSequenceTest {
 				.getValidator()
 				.unwrap( MethodValidator.class );
 
-		customerRepository = ( CustomerRepositoryWithRedefinedDefaultGroup ) Proxy.newProxyInstance(
+		customerRepository = (CustomerRepositoryWithRedefinedDefaultGroup) Proxy.newProxyInstance(
 				getClass().getClassLoader(),
 				new Class<?>[] { CustomerRepositoryWithRedefinedDefaultGroup.class },
 				new ValidationInvocationHandler(

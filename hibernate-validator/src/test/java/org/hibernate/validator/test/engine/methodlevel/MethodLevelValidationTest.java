@@ -16,23 +16,18 @@
 */
 package org.hibernate.validator.test.engine.methodlevel;
 
-import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
-
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.MethodConstraintViolation;
@@ -46,8 +41,12 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.engine.methodlevel.service.RepositoryBase;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * Integration test for the method-level validation related features of {@link ValidatorImpl}.
@@ -74,7 +73,7 @@ public class MethodLevelValidationTest {
 		ValidationInvocationHandler handler = new ValidationInvocationHandler(
 				new CustomerRepositoryImpl(), validator, parameterIndex, groups
 		);
-		customerRepository = ( CustomerRepository ) Proxy.newProxyInstance(
+		customerRepository = (CustomerRepository) Proxy.newProxyInstance(
 				getClass().getClassLoader(),
 				new Class<?>[] { CustomerRepository.class },
 				handler
@@ -655,5 +654,4 @@ public class MethodLevelValidationTest {
 	public void methodValidationSucceeds() {
 		customerRepository.findCustomerByName( "Bob" );
 	}
-
 }

@@ -97,7 +97,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 
 		availableValidatorTypes = ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
-		suitableTypeMap = Collections.synchronizedMap(new LRUMap<Type, Type>( MAX_TYPE_CACHE_SIZE ));
+		suitableTypeMap = Collections.synchronizedMap( new LRUMap<Type, Type>( MAX_TYPE_CACHE_SIZE ) );
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
@@ -123,8 +123,8 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraints(ValidationContext<T, E> executionContext,
-											   ValueContext<U, V> valueContext,
-											   Set<E> constraintViolations) {
+																				 ValueContext<U, V> valueContext,
+																				 Set<E> constraintViolations) {
 		CompositionResult compositionResult = validateComposingConstraints(
 				executionContext, valueContext, constraintViolations
 		);
@@ -225,8 +225,8 @@ public class ConstraintTree<A extends Annotation> {
 	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
 	 */
 	private <T, U, V, E extends ConstraintViolation<T>> CompositionResult validateComposingConstraints(ValidationContext<T, E> executionContext,
-																	 ValueContext<U, V> valueContext,
-																	 Set<E> constraintViolations) {
+																									   ValueContext<U, V> valueContext,
+																									   Set<E> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			Set<E> tmpViolationList = new HashSet<E>();
@@ -269,9 +269,9 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> Set<E> validateSingleConstraint(ValidationContext<T, E> executionContext,
-																			ValueContext<U, V> valueContext,
-																			ConstraintValidatorContextImpl constraintValidatorContext,
-																			ConstraintValidator<A, V> validator) {
+																						ValueContext<U, V> valueContext,
+																						ConstraintValidatorContextImpl constraintValidatorContext,
+																						ConstraintValidator<A, V> validator) {
 		boolean isValid;
 		Set<E> cv = new HashSet<E>();
 		try {
@@ -435,7 +435,7 @@ public class ConstraintTree<A extends Annotation> {
 
 	private <V> void initializeConstraint
 			(ConstraintDescriptor<A>
-					descriptor, ConstraintValidator<A, V>
+					 descriptor, ConstraintValidator<A, V>
 					constraintValidator) {
 		try {
 			constraintValidator.initialize( descriptor.getAnnotation() );

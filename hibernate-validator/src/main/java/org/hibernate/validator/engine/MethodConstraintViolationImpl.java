@@ -107,7 +107,7 @@ public class MethodConstraintViolationImpl<T> extends ConstraintViolationImpl<T>
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		MethodConstraintViolationImpl<?> other = ( MethodConstraintViolationImpl<?> ) obj;
+		MethodConstraintViolationImpl<?> other = (MethodConstraintViolationImpl<?>) obj;
 		if ( kind != other.kind ) {
 			return false;
 		}

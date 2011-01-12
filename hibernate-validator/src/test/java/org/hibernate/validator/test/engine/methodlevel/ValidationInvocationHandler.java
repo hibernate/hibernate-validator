@@ -54,7 +54,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-		Set<MethodConstraintViolation<Object>> constraintViolations = null;
+		Set<MethodConstraintViolation<Object>> constraintViolations;
 
 		if ( parameterIndex != null ) {
 			constraintViolations = validator.validateParameter(
@@ -79,5 +79,4 @@ public class ValidationInvocationHandler implements InvocationHandler {
 
 		return result;
 	}
-
 }

@@ -63,7 +63,7 @@ public final class PathImpl implements Path, Serializable {
 	 *         given string.
 	 *
 	 * @throws IllegalArgumentException in case {@code property == null} or
-	 *                                  {@code property} cannot be parsed.
+	 * {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
 		if ( propertyPath == null ) {
@@ -130,7 +130,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public final NodeImpl addNode(String nodeName) {
-		NodeImpl parent = nodeList.size() == 0 ? null : ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -138,7 +138,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private NodeImpl addMethodParameterNode(Method method, String parameterName) {
-		NodeImpl parent = nodeList.size() == 0 ? null : ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new MethodParameterNodeImpl( method, parameterName, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -146,7 +146,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private NodeImpl addMethodReturnValueNode(Method method) {
-		NodeImpl parent = nodeList.size() == 0 ? null : ( NodeImpl ) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new MethodReturnValueNodeImpl( method, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -198,7 +198,7 @@ public final class PathImpl implements Path, Serializable {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 		for ( int i = 1; i < nodeList.size(); i++ ) {
-			NodeImpl nodeImpl = ( NodeImpl ) nodeList.get( i );
+			NodeImpl nodeImpl = (NodeImpl) nodeList.get( i );
 			if ( nodeImpl.getName() != null ) {
 				if ( !first ) {
 					builder.append( PROPERTY_PATH_SEPARATOR );
@@ -225,7 +225,7 @@ public final class PathImpl implements Path, Serializable {
 			return false;
 		}
 
-		PathImpl path = ( PathImpl ) o;
+		PathImpl path = (PathImpl) o;
 		if ( nodeList != null && !nodeList.equals( path.nodeList ) ) {
 			return false;
 		}
@@ -258,7 +258,7 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = null;
 		NodeImpl node = null;
 		for ( int i = 0; i < path.nodeList.size(); i++ ) {
-			node = ( NodeImpl ) path.nodeList.get( i );
+			node = (NodeImpl) path.nodeList.get( i );
 			NodeImpl newNode = new NodeImpl( node, parent );
 			this.nodeList.add( newNode );
 			parent = newNode;

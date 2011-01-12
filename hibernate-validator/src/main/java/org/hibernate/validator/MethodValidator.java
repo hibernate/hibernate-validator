@@ -19,7 +19,6 @@ package org.hibernate.validator;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Set;
-
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
@@ -52,7 +51,7 @@ import javax.validation.groups.Default;
  * declaration
  * </p>
  * <p/>
- * 
+ *
  * <pre>
  * &#064;NotNull
  * &#064;Valid
@@ -97,7 +96,7 @@ import javax.validation.groups.Default;
  * <code>MethodValidator</code> instances are obtained by
  * {@link Validator#unwrap(Class) unwrapping} a {@link Validator} object:
  * </p>
- * 
+ *
  * <pre>
  * Validator validator = ...;
  * MethodValidator methodValidator = validator.unwrap(MethodValidator.class);
@@ -109,7 +108,7 @@ import javax.validation.groups.Default;
  * Validation implementations on the classpath, this can be done be explicitly
  * choosing HV as validation provider:
  * <p/>
- * 
+ *
  * <pre>
  * MethodValidator methodValidator = Validation.byProvider(HibernateValidator.class)
  * 	.configure()
@@ -122,7 +121,7 @@ import javax.validation.groups.Default;
  * If not stated otherwise, none of this interface's methods allow
  * <code>null</code> as parameter value.
  * </p>
- * 
+ *
  * @author Gunnar Morling
  */
 public interface MethodValidator {

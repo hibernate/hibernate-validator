@@ -16,13 +16,13 @@
 */
 package org.hibernate.validator.test.engine.methodlevel.service;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
+
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
  * @author Gunnar Morling
@@ -81,12 +81,10 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return new Customer( null );
 	}
 
-	@Override
 	public List<Customer> cascadingIterableReturnValue() {
 		return Arrays.asList( null, new Customer( null ) );
 	}
 
-	@Override
 	public Map<String, Customer> cascadingMapReturnValue() {
 
 		Map<String, Customer> theValue = newHashMap();
@@ -94,7 +92,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return theValue;
 	}
 
-	@Override
 	public Customer[] cascadingArrayReturnValue() {
 		return new Customer[] { null, new Customer( null ) };
 	}
@@ -110,5 +107,4 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	public void overriddenMethodWithConstraint(int param) {
 
 	}
-
 }

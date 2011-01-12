@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -95,7 +94,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
+		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new StandardValidationContext<T>(
 				rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
@@ -103,7 +102,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) rootBean.getClass();
+		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		return new StandardValidationContext<T>(
 				rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver
 		);
@@ -121,7 +120,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
+		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
 				rootBeanClass,
 				object,
@@ -135,7 +134,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> MethodValidationContext<T> getContextForValidateParameters(Method method, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = ( Class<T> ) object.getClass();
+		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
 				rootBeanClass,
 				object,

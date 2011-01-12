@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -41,6 +40,8 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
+
+import com.googlecode.jtype.TypeUtils;
 
 import org.hibernate.validator.MethodConstraintViolation;
 import org.hibernate.validator.MethodValidator;
@@ -58,8 +59,6 @@ import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
-
-import com.googlecode.jtype.TypeUtils;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -405,7 +404,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 			Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-			valueContext.setCurrentValidatedValue( ( V ) valueToValidate );
+			valueContext.setCurrentValidatedValue( (V) valueToValidate );
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
 
@@ -482,16 +481,16 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
-			iter = ( ( Iterable<?> ) value ).iterator();
+			iter = ( (Iterable<?>) value ).iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( ReflectionHelper.isMap( type ) ) {
-			Map<?, ?> map = ( Map<?, ?> ) value;
+			Map<?, ?> map = (Map<?, ?>) value;
 			iter = map.entrySet().iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( TypeUtils.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( ( Object[] ) value );
+			List<?> arrayList = Arrays.asList( (Object[]) value );
 			iter = arrayList.iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
@@ -532,9 +531,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		while ( iter.hasNext() ) {
 			value = iter.next();
 			if ( value instanceof Map.Entry ) {
-				mapKey = ( ( Map.Entry<?, ?> ) value ).getKey();
+				mapKey = ( (Map.Entry<?, ?>) value ).getKey();
 				valueContext.setKey( mapKey );
-				value = ( ( Map.Entry<?, ?> ) value ).getValue();
+				value = ( (Map.Entry<?, ?>) value ).getValue();
 			}
 			else if ( isIndexable ) {
 				valueContext.setIndex( i );
@@ -572,7 +571,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T> void validateProperty(T object, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 
 		@SuppressWarnings("unchecked")
-		final Class<T> beanType = ( Class<T> ) object.getClass();
+		final Class<T> beanType = (Class<T>) object.getClass();
 
 		Set<BeanMetaConstraint<T, ?>> metaConstraints = new HashSet<BeanMetaConstraint<T, ?>>();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
@@ -638,7 +637,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
 
 		//TODO GM: is that right?
-		BeanMetaData<T> beanMetaData = getBeanMetaData( ( Class<T> ) object.getClass() );
+		BeanMetaData<T> beanMetaData = getBeanMetaData( (Class<T>) object.getClass() );
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
@@ -663,7 +662,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				valueContext.setCurrentGroup( groupClass );
 				if ( isValidationRequired( context, valueContext, metaConstraint ) ) {
 					Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-					valueContext.setCurrentValidatedValue( ( V ) valueToValidate );
+					valueContext.setCurrentValidatedValue( (V) valueToValidate );
 					metaConstraint.validateConstraint( context, valueContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 				}
@@ -1079,7 +1078,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					}
 
 					@SuppressWarnings("unchecked")
-					Class<T> valueClass = ( Class<T> ) ( newValue == null ? type : newValue.getClass() );
+					Class<T> valueClass = (Class<T>) ( newValue == null ? type : newValue.getClass() );
 
 					return collectMetaConstraintsForPath(
 							valueClass,
