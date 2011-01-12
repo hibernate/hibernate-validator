@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.cfg.defs.GenericConstraintDef;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**

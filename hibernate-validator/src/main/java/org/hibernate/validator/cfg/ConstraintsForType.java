@@ -21,7 +21,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
-import org.hibernate.validator.cfg.defs.GenericConstraintDef;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.TYPE;

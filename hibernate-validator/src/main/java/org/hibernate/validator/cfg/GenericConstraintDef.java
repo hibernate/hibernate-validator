@@ -15,13 +15,10 @@
  * limitations under the License.
  */
 
-package org.hibernate.validator.cfg.defs;
+package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-
-import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * A {@link ConstraintDef} class which can be used to configure any constraint
