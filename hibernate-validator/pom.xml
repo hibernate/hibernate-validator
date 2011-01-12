@@ -270,7 +270,7 @@
                     <sourceDirectory>${basedir}/src/main/docbook</sourceDirectory>
                     <masterTranslation>en-US</masterTranslation>
                     <translations>
-                        <!--translation>zh-CN</translation-->
+                        <translation>zh-CN</translation>
                     </translations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>

@@ -5,35 +5,65 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2010-07-06 14:46+0000\n"
+"POT-Creation-Date: 2011-01-12 15:42+0000\n"
 "PO-Revision-Date: 2010-07-06 23:46+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Tag: title
-#: preface.xml:25
+#: preface.xml:24
 #, no-c-format
 msgid "Preface"
 msgstr "序言"
 
 #. Tag: para
-#: preface.xml:27
+#: preface.xml:26
 #, no-c-format
-msgid "Validating data is a common task that occurs throughout any application, from the presentation layer to the persistence layer. Often the same validation logic is implemented in each layer, proving time consuming and error-prone. To avoid duplication of these validations in each layer, developers often bundle validation logic directly into the domain model, cluttering domain classes with validation code which is really metadata about the class itself."
-msgstr "数据校验是任何一个应用程序都会用到的功能,无论是显示层还是持久层. 通常,相同的校验逻辑会分散在各个层中, 这样,不仅浪费了时间还会导致错误的发生(译注: 重复代码). 为了避免重复, 开发人员经常会把这些校验逻辑直接写在领域模型里面, 但是这样又把领域模型代码和校验代码混杂在了一起, 而这些校验逻辑更应该是描述领域模型的元数据."
+msgid ""
+"Validating data is a common task that occurs throughout any application, "
+"from the presentation layer to the persistence layer. Often the same "
+"validation logic is implemented in each layer, proving time consuming and "
+"error-prone. To avoid duplication of these validations in each layer, "
+"developers often bundle validation logic directly into the domain model, "
+"cluttering domain classes with validation code which is really metadata "
+"about the class itself."
+msgstr ""
+"数据校验是任何一个应用程序都会用到的功能,无论是显示层还是持久层. 通常,相同的"
+"校验逻辑会分散在各个层中, 这样,不仅浪费了时间还会导致错误的发生(译注: 重复代"
+"码). 为了避免重复, 开发人员经常会把这些校验逻辑直接写在领域模型里面, 但是这样"
+"又把领域模型代码和校验代码混杂在了一起, 而这些校验逻辑更应该是描述领域模型的"
+"元数据."
 
 #. Tag: para
-#: preface.xml:46
+#: preface.xml:45
 #, no-c-format
-msgid "JSR 303 - Bean Validation - defines a metadata model and API for entity validation. The default metadata source is annotations, with the ability to override and extend the meta-data through the use of XML. The API is not tied to a specific application tier or programming model. It is specifically not tied to either the web tier or the persistence tier, and is available for both server-side application programming, as well as rich client Swing application developers."
-msgstr "JSR 303 - Bean Validation - 为实体验证定义了元数据模型和API. 默认的元数据模型是通过Annotations来描述的,但是也可以使用XML来重载或者扩展. Bean Validation API 并不局限于应用程序的某一层或者哪种编程模型, 例如,如图所示, Bean Validation 可以被用在任何一层, 或者是像类似Swing的富客户端程序中."
+msgid ""
+"JSR 303 - Bean Validation - defines a metadata model and API for entity "
+"validation. The default metadata source is annotations, with the ability to "
+"override and extend the meta-data through the use of XML. The API is not "
+"tied to a specific application tier or programming model. It is specifically "
+"not tied to either the web tier or the persistence tier, and is available "
+"for both server-side application programming, as well as rich client Swing "
+"application developers."
+msgstr ""
+"JSR 303 - Bean Validation - 为实体验证定义了元数据模型和API. 默认的元数据模型"
+"是通过Annotations来描述的,但是也可以使用XML来重载或者扩展. Bean Validation "
+"API 并不局限于应用程序的某一层或者哪种编程模型, 例如,如图所示, Bean "
+"Validation 可以被用在任何一层, 或者是像类似Swing的富客户端程序中."
 
 #. Tag: para
-#: preface.xml:65
+#: preface.xml:64
 #, no-c-format
-msgid "Hibernate Validator is the reference implementation of this JSR."
-msgstr "Hibernate Validator 是这个JSR的参考实现."
+msgid ""
+"Hibernate Validator is the reference implementation of this JSR. The "
+"implementation itself as well as the Bean Validation API and TCK are all "
+"provided and distributed under the <ulink url=\"http://www.apache.org/"
+"licenses/LICENSE-2.0\">Apache Software License 2.0</ulink>."
+msgstr ""
 
+#~ msgid "Hibernate Validator is the reference implementation of this JSR."
+#~ msgstr "Hibernate Validator 是这个JSR的参考实现."
