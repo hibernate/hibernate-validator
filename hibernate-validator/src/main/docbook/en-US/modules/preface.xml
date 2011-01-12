@@ -20,49 +20,50 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-  <preface id="preface">
-    <title>Preface</title>
+<preface id="preface">
+  <title>Preface</title>
 
-    <para>Validating data is a common task that occurs throughout any
-    application, from the presentation layer to the persistence layer. Often
-    the same validation logic is implemented in each layer, proving time
-    consuming and error-prone. To avoid duplication of these validations in
-    each layer, developers often bundle validation logic directly into the
-    domain model, cluttering domain classes with validation code which is
-    really metadata about the class itself.</para>
+  <para>Validating data is a common task that occurs throughout any
+  application, from the presentation layer to the persistence layer. Often the
+  same validation logic is implemented in each layer, proving time consuming
+  and error-prone. To avoid duplication of these validations in each layer,
+  developers often bundle validation logic directly into the domain model,
+  cluttering domain classes with validation code which is really metadata
+  about the class itself.</para>
 
-    <mediaobject>
+  <mediaobject>
+    <imageobject role="fo">
+      <imagedata align="center" contentdepth="" contentwidth="150mm"
+                 fileref="application-layers.png" scalefit="" />
+    </imageobject>
+
+    <imageobject role="html">
+      <imagedata depth="" fileref="application-layers.png" scalefit="1" />
+    </imageobject>
+  </mediaobject>
+
+  <para>JSR 303 - Bean Validation - defines a metadata model and API for
+  entity validation. The default metadata source is annotations, with the
+  ability to override and extend the meta-data through the use of XML. The API
+  is not tied to a specific application tier or programming model. It is
+  specifically not tied to either the web tier or the persistence tier, and is
+  available for both server-side application programming, as well as rich
+  client Swing application developers.</para>
+
+  <para><mediaobject>
       <imageobject role="fo">
         <imagedata align="center" contentdepth="" contentwidth="150mm"
-                   fileref="application-layers.png" scalefit="" />
+                   fileref="application-layers2.png" scalefit="" />
       </imageobject>
 
       <imageobject role="html">
-        <imagedata depth="" fileref="application-layers.png" scalefit="1" />
+        <imagedata depth="" fileref="application-layers2.png" scalefit="1" />
       </imageobject>
-    </mediaobject>
+    </mediaobject></para>
 
-    <para>JSR 303 - Bean Validation - defines a metadata model and API for
-    entity validation. The default metadata source is annotations, with the
-    ability to override and extend the meta-data through the use of XML. The
-    API is not tied to a specific application tier or programming model. It is
-    specifically not tied to either the web tier or the persistence tier, and
-    is available for both server-side application programming, as well as rich
-    client Swing application developers.</para>
-
-    <para><mediaobject>
-        <imageobject role="fo">
-          <imagedata align="center" contentdepth="" contentwidth="150mm"
-                     fileref="application-layers2.png" scalefit="" />
-        </imageobject>
-
-        <imageobject role="html">
-          <imagedata depth="" fileref="application-layers2.png" scalefit="1" />
-        </imageobject>
-      </mediaobject></para>
-
-    <para>Hibernate Validator is the reference implementation of this
-    JSR.</para>
-  </preface>
-
-
+  <para>Hibernate Validator is the reference implementation of this JSR. The
+  implementation itself as well as the Bean Validation API and TCK are all
+  provided and distributed under the <ulink
+  url="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License
+  2.0</ulink>.</para>
+</preface>
