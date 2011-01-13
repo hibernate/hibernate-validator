@@ -252,6 +252,15 @@
                     <bottom>
                         <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
