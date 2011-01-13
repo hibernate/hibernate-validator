@@ -1,5 +1,8 @@
 
-                          Hibernate Validator
+  Hibernate Validator
+  ==================================================
+  Version: 4.2.0.Beta1, 13.01.2011
+
 
   What is it?
   -----------
@@ -26,7 +29,7 @@
   -------------
 
   The full list of changes for this release can be found at
-  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11091
+  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11030
 
   System Requirements
   -------------------
@@ -36,13 +39,13 @@
   Using Hibernate Validator
   -------------------------
 
-  - In case you use the distribution archive from the download site, copy hibernate-validator-*.jar together
-    with all jar files from lib into the classpath of your application. You can switch the slf4j binding
+  - In case you use the distribution archive from the download site, copy hibernate-validator-<version>.jar together
+    with all jar files from lib/required into the classpath of your application. You can switch the slf4j binding
     jars for log4j (log4j-<version>.jar and slf4j-log4j12-<version>.jar) with the slf4j binding files of
     your choice. See http://www.slf4j.org/manual.html
-    In case you are using Java 5 you have to also include all the jar files from the jdk5 subdirectory.
-    The jar files contain the classes needed for using JAXB. If XML configuration is disabled via
-    Configuration.ignoreXmlConfiguration the jar files from the jdk5 subdirectory don't have to be added. 
+    In case you are using Java 5 you have to also include all the jar files from the lib/jdk5 directory.
+    The jar files contain the classes needed for JAXB. If you don't use the xml configuration and XML configuration
+    is disabled via Configuration.ignoreXmlConfiguration the jar files from the lib/jdk5 directory don't have to be added.
 
   or 
 
@@ -51,16 +54,21 @@
     <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
-        <version>${project.version}</version>
+        <version>4.2.0.Beta1</version>
     </dependency>
 
     Hibernate Validator can be found in the JBoss Maven repository:
     http://repository.jboss.org/nexus/content/groups/public-jboss/
 
+  hibernate-validator-annotation-processor-<version>.jar is an optional jar which can be integrated with your build
+  environment respectively IDE to verify that constraint annotations are correctly used. Refer to the online
+  documentation for more information.
+
   Licensing
   ---------
 
-  Please see the file called license.txt
+  Hibernate Validator itself as well as the Bean Validation API and TCK are all provided and distributed under
+  the Apache Software License 2.0. Refer to license.txt for more information
 
   Hibernate Validator URLs
   ------------------------
