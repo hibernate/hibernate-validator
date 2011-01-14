@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
@@ -45,10 +47,11 @@
 
     <modules>
         <module>hibernate-validator</module>
-        <module>hibernate-validator-archetype</module>
-        <module>hibernate-validator-legacy</module>
         <module>hibernate-validator-tck-runner</module>
         <module>hibernate-validator-annotation-processor</module>
+        <module>hibernate-validator-archetype</module>
+        <module>hibernate-validator-distribution</module>
+        <module>hibernate-validator-legacy</module>
     </modules>
 
     <dependencyManagement>
@@ -56,6 +59,11 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator-annotation-processor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -163,21 +171,10 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
-                    </descriptors>
-                    <finalName>hibernate-validator-${project.version}</finalName>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.0</version>
                 <configuration>
-                    <goals>deploy assembly:assembly</goals>
+                    <goals>deploy</goals>
                 </configuration>
             </plugin>
         </plugins>
@@ -203,7 +200,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.0.2</version>
+                    <version>2.3.2</version>
                     <configuration>
                         <source>1.5</source>
                         <target>1.5</target>
@@ -214,7 +211,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.4.3</version>
                     <configuration>
-                        <forkMode>always</forkMode>
+                        <forkMode>once</forkMode>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <includes>
                             <include>**/*Test.java</include>
