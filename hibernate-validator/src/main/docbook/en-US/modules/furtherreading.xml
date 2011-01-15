@@ -23,16 +23,16 @@
 <chapter id="validator-further-reading">
   <title>Further reading</title>
 
-  <para>Last but not least, a few pointers to further information. A great
-  source for examples is the Bean Validation TCK which can is available for
-  anonymous access in the Hibernate <ulink
-  url="http://anonsvn.jboss.org/repos/hibernate/validator/trunk">SVN
-  repository</ulink>. Alternatively you can view the tests using <ulink
-  url="http://fisheye.jboss.org/browse/Hibernate/beanvalidation/trunk/validation-tck/src/main/java/org/hibernate/jsr303/tck/tests">Hibernate's
-  fisheye</ulink> installation. <ulink
-  url="http://jcp.org/en/jsr/detail?id=303">The JSR 303</ulink> specification
-  itself is also a great way to deepen your understanding of Bean Validation
-  resp. Hibernate Validator.</para>
+  <para>Last but not least, a few pointers to further information.</para>
+
+  <para>A great source for examples is the Bean Validation TCK which is
+  available for anonymous access on <ulink
+  url="https://github.com/beanvalidation/beanvalidation-tck">GitHub</ulink>.
+  In particular the TCK's <ulink
+  url="https://github.com/beanvalidation/beanvalidation-tck/tree/master/src/main/java/org/hibernate/jsr303/tck/tests">tests</ulink>
+  might be of interest. <ulink url="http://jcp.org/en/jsr/detail?id=303">The
+  JSR 303</ulink> specification itself is also a great way to deepen your
+  understanding of Bean Validation resp. Hibernate Validator.</para>
 
   <para>If you have any further questions to Hibernate Validator or want to
   share some of your use cases have a look at the <ulink
