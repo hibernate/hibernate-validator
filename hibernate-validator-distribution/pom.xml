@@ -29,6 +29,8 @@
     </description>
 
     <dependencies>
+    	<!-- The modules to include in the distribution. Any non-optional dependencies will 
+             automatically be included as well -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -38,7 +40,7 @@
             <artifactId>hibernate-validator-annotation-processor</artifactId>
         </dependency>
 
-        <!-- Need to list out dependencies here again in order to include them via assembly dependency set -->
+        <!-- Need to list out optional dependencies here again in order to include them via assembly dependency set -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
