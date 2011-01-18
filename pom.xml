@@ -54,6 +54,10 @@
         <module>hibernate-validator-legacy</module>
     </modules>
 
+    <properties>
+        <slf4jVersion>1.6.1</slf4jVersion>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -89,12 +93,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.5.6</version>
+                <version>${slf4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.5.6</version>
+                <version>${slf4jVersion}</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.jtype</groupId>
