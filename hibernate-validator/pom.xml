@@ -37,16 +37,6 @@
         </dependency>
 
         <!--
-        Runtime dependencies
-        -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <!--
         Provided dependencies.
         JAXB is needed when running on Java5. In this environment these dependencies have to be added (unless
         xml configuration is explicitly disabled via Configuration.ignoreXmlConfiguration)
@@ -98,6 +88,11 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
