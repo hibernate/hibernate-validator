@@ -20,27 +20,26 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
-import org.joda.time.base.AbstractInstant;
+import org.joda.time.ReadableInstant;
 
 /**
- * Check if Joda Time type who inherit from
- * {@code org.joda.time.base.AbstractInstant}
+ * Check if Joda Time type who implements
+ * {@code org.joda.time.ReadableInstant}
  * is in the past.
  *
  * @author Kevin Pollet
  */
-public class PastValidatorForAbstractInstant implements ConstraintValidator<Past, AbstractInstant> {
-
+public class PastValidatorForReadableInstant implements ConstraintValidator<Past, ReadableInstant> {
 
 	public void initialize(Past constraintAnnotation) {
 	}
 
-	public boolean isValid(AbstractInstant value, ConstraintValidatorContext context) {
+	public boolean isValid(ReadableInstant value, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
 
-		return value.isBeforeNow();
+		return value.isBefore( null );
 	}
 }

@@ -16,26 +16,26 @@
 */
 package org.hibernate.validator.test.constraints.impl;
 
-import junit.framework.Assert;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.MutableDateTime;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.constraints.impl.PastValidatorForAbstractInstant;
+import org.hibernate.validator.constraints.impl.PastValidatorForReadableInstant;
 
 /**
  * @author Kevin Pollet
  */
-public class PastValidatorForAbstractInstantTest {
+public class PastValidatorForReadableInstantTest {
 
-	private static PastValidatorForAbstractInstant validator;
+	private static PastValidatorForReadableInstant validator;
 
 	@BeforeClass
 	public static void init() {
-		validator = new PastValidatorForAbstractInstant();
+		validator = new PastValidatorForReadableInstant();
 	}
 
 	@Test

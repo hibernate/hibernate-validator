@@ -20,21 +20,21 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
-import org.joda.time.base.AbstractPartial;
+import org.joda.time.ReadablePartial;
 
 /**
- * Check if Joda Time type who inherit from
- * {@code org.joda.time.base.AbstractPartial}
+ * Check if Joda Time type who implements
+ * {@code org.joda.time.ReadablePartial}
  * is in the past.
  *
  * @author Kevin Pollet
  */
-public class PastValidatorForAbstractPartial implements ConstraintValidator<Past, AbstractPartial> {
+public class PastValidatorForReadablePartial implements ConstraintValidator<Past, ReadablePartial> {
 
 	public void initialize(Past constraintAnnotation) {
 	}
 
-	public boolean isValid(AbstractPartial value, ConstraintValidatorContext context) {
+	public boolean isValid(ReadablePartial value, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( value == null ) {
 			return true;

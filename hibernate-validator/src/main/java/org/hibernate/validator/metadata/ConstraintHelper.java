@@ -59,10 +59,10 @@ import org.hibernate.validator.constraints.impl.MinValidatorForNumber;
 import org.hibernate.validator.constraints.impl.MinValidatorForString;
 import org.hibernate.validator.constraints.impl.NotNullValidator;
 import org.hibernate.validator.constraints.impl.NullValidator;
-import org.hibernate.validator.constraints.impl.PastValidatorForAbstractInstant;
-import org.hibernate.validator.constraints.impl.PastValidatorForAbstractPartial;
 import org.hibernate.validator.constraints.impl.PastValidatorForCalendar;
 import org.hibernate.validator.constraints.impl.PastValidatorForDate;
+import org.hibernate.validator.constraints.impl.PastValidatorForReadableInstant;
+import org.hibernate.validator.constraints.impl.PastValidatorForReadablePartial;
 import org.hibernate.validator.constraints.impl.PatternValidator;
 import org.hibernate.validator.constraints.impl.SizeValidatorForArray;
 import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfBoolean;
@@ -149,8 +149,8 @@ public class ConstraintHelper {
 		constraintList.add( PastValidatorForCalendar.class );
 		constraintList.add( PastValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
-			constraintList.add( PastValidatorForAbstractInstant.class );
-			constraintList.add( PastValidatorForAbstractPartial.class );
+			constraintList.add( PastValidatorForReadableInstant.class );
+			constraintList.add( PastValidatorForReadablePartial.class );
 		}
 		builtinConstraints.put( Past.class, constraintList );
 
