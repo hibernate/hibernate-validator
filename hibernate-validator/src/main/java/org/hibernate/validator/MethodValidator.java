@@ -148,7 +148,7 @@ public interface MethodValidator {
 																   Class<?>... groups);
 
 	/**
-	 * Validates the parameters of a given method.
+	 * Validates all parameters of a given method.
 	 *
 	 * @param <T> The type hosting the invoked method.
 	 * @param object The object on which the given method was invoked.
@@ -163,7 +163,7 @@ public interface MethodValidator {
 	 * @return A set with the constraint violations caused by this validation.
 	 *         Will be empty, of no error occurs, but never null.
 	 */
-	public <T> Set<MethodConstraintViolation<T>> validateParameters(T object,
+	public <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object,
 																	Method method, Object[] parameterValues, Class<?>... groups);
 
 	/**

@@ -182,7 +182,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return context.getFailingConstraints();
 	}
 
-	public final <T> Set<MethodConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
+	public final <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, "The object to be validated must not be null" );
 		Contracts.assertNotNull( method, "The method to be validated must not be null" );

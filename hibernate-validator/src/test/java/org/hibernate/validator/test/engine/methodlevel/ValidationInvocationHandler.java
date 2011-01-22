@@ -62,7 +62,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 			);
 		}
 		else {
-			constraintViolations = validator.validateParameters( wrapped, method, args, groups );
+			constraintViolations = validator.validateAllParameters( wrapped, method, args, groups );
 		}
 
 		if ( !constraintViolations.isEmpty() ) {
