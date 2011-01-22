@@ -16,14 +16,18 @@
 */
 package org.hibernate.validator.ap;
 
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.io.File;
+
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLong;
@@ -60,9 +64,7 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeVali
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Miscellaneous tests for {@link ConstraintValidationProcessor}.
@@ -327,6 +329,27 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 71 ),
 				new DiagnosticExpectation( Kind.ERROR, 79 ),
 				new DiagnosticExpectation( Kind.ERROR, 87 )
+		);
+	}
+
+	/**
+	 * HV-418: No error shall be raised, when @Past/@Future are given at Joda
+	 * date/time types.
+	 */
+	@Test()
+	public void timeConstraintsAllowedAtJodaTypes() {
+
+		File sourceFile1 = compilerHelper.getSourceFile( ModelWithJodaTypes.class );
+
+		boolean compilationResult = compilerHelper.compile(
+				new ConstraintValidationProcessor(), diagnostics, sourceFile1
+		);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 49 ),
+				new DiagnosticExpectation( Kind.ERROR, 50 )
 		);
 	}
 }
