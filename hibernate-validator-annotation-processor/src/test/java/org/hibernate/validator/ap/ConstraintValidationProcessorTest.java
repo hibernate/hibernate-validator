@@ -63,7 +63,6 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeVali
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSerializable;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
-
 import org.testng.annotations.Test;
 
 /**
@@ -348,8 +347,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 49 ),
-				new DiagnosticExpectation( Kind.ERROR, 50 )
+				new DiagnosticExpectation( Kind.ERROR, 59 ),
+				new DiagnosticExpectation( Kind.ERROR, 60 )
 		);
 	}
 }

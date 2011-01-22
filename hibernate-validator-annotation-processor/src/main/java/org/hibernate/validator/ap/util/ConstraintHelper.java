@@ -173,9 +173,8 @@ public class ConstraintHelper {
 				Future.class, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
 		);
 		registerAllowedTypesForBuiltInConstraintByNames(
-				Future.class, CollectionHelper.<String>asSet(
-				"org.joda.time.base.AbstractPartial", "org.joda.time.base.AbstractInstant"
-		)
+				Future.class,
+				CollectionHelper.<String>asSet( "org.joda.time.ReadablePartial", "org.joda.time.ReadableInstant" )
 		);
 		registerAllowedTypesForBuiltInConstraint(
 				Max.class, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
@@ -189,9 +188,8 @@ public class ConstraintHelper {
 				Past.class, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
 		);
 		registerAllowedTypesForBuiltInConstraintByNames(
-				Past.class, CollectionHelper.<String>asSet(
-				"org.joda.time.base.AbstractPartial", "org.joda.time.base.AbstractInstant"
-		)
+				Past.class, 
+				CollectionHelper.<String>asSet( "org.joda.time.ReadablePartial", "org.joda.time.ReadableInstant" )
 		);
 
 		registerAllowedTypesForBuiltInConstraint( Pattern.class, CollectionHelper.<Class<?>>asSet( String.class ) );
