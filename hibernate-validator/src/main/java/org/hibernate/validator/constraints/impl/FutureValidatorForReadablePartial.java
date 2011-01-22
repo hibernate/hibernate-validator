@@ -20,27 +20,26 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
-import org.joda.time.base.AbstractInstant;
+import org.joda.time.ReadablePartial;
 
 /**
- * Check if Joda Time type who inherit from
- * {@code org.joda.time.base.AbstractInstant}
+ * Check if Joda Time type who implements
+ * {@code org.joda.time.ReadablePartial}
  * is in the future.
  *
  * @author Kevin Pollet
  */
-public class FutureValidatorForAbstractInstant implements ConstraintValidator<Future, AbstractInstant> {
-
+public class FutureValidatorForReadablePartial implements ConstraintValidator<Future, ReadablePartial> {
 
 	public void initialize(Future constraintAnnotation) {
 	}
 
-	public boolean isValid(AbstractInstant value, ConstraintValidatorContext context) {
+	public boolean isValid(ReadablePartial value, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
 
-		return value.isAfterNow();
+		return value.toDateTime( null ).isAfterNow();
 	}
 }

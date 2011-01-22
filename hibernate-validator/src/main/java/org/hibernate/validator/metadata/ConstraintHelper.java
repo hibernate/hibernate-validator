@@ -49,10 +49,10 @@ import org.hibernate.validator.constraints.impl.DecimalMinValidatorForNumber;
 import org.hibernate.validator.constraints.impl.DecimalMinValidatorForString;
 import org.hibernate.validator.constraints.impl.DigitsValidatorForNumber;
 import org.hibernate.validator.constraints.impl.DigitsValidatorForString;
-import org.hibernate.validator.constraints.impl.FutureValidatorForAbstractInstant;
-import org.hibernate.validator.constraints.impl.FutureValidatorForAbstractPartial;
 import org.hibernate.validator.constraints.impl.FutureValidatorForCalendar;
 import org.hibernate.validator.constraints.impl.FutureValidatorForDate;
+import org.hibernate.validator.constraints.impl.FutureValidatorForReadableInstant;
+import org.hibernate.validator.constraints.impl.FutureValidatorForReadablePartial;
 import org.hibernate.validator.constraints.impl.MaxValidatorForNumber;
 import org.hibernate.validator.constraints.impl.MaxValidatorForString;
 import org.hibernate.validator.constraints.impl.MinValidatorForNumber;
@@ -85,7 +85,7 @@ import org.hibernate.validator.util.ReflectionHelper;
  */
 public class ConstraintHelper {
 
-	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.base.AbstractInstant";
+	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.base.ReadableInstant";
 
 	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
@@ -122,8 +122,8 @@ public class ConstraintHelper {
 		constraintList.add( FutureValidatorForCalendar.class );
 		constraintList.add( FutureValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
-			constraintList.add( FutureValidatorForAbstractInstant.class );
-			constraintList.add( FutureValidatorForAbstractPartial.class );
+			constraintList.add( FutureValidatorForReadableInstant.class );
+			constraintList.add( FutureValidatorForReadablePartial.class );
 		}
 		builtinConstraints.put( Future.class, constraintList );
 

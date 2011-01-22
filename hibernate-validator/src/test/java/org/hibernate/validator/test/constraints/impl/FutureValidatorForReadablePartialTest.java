@@ -16,25 +16,25 @@
 */
 package org.hibernate.validator.test.constraints.impl;
 
-import junit.framework.Assert;
+import org.hibernate.validator.constraints.impl.FutureValidatorForReadablePartial;
+
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Partial;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.constraints.impl.FutureValidatorForAbstractPartial;
 
 /**
  * @author Kevin Pollet
  */
-public class FutureValidatorForAbstractPartialTest {
+public class FutureValidatorForReadablePartialTest {
 
-	private static FutureValidatorForAbstractPartial validator;
+	private static FutureValidatorForReadablePartial validator;
 
 	@BeforeClass
 	public static void init() {
-		validator = new FutureValidatorForAbstractPartial();
+		validator = new FutureValidatorForReadablePartial();
 	}
 
 	@Test
