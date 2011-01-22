@@ -16,10 +16,15 @@
 */
 package org.hibernate.validator.ap.testutil;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.annotation.processing.Processor;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
@@ -30,9 +35,6 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Infrastructure for unit tests based on the Java Compiler API.
@@ -45,13 +47,20 @@ public class CompilerTestHelper {
 
 	private final String sourceBaseDir;
 
-	private final String pathToBeanValidationApiJar;
-
-	public CompilerTestHelper(JavaCompiler compiler, String sourceBaseDir, String pathToBeanValidationApiJar) {
+	public CompilerTestHelper(JavaCompiler compiler) {
 
 		this.compiler = compiler;
-		this.sourceBaseDir = sourceBaseDir;
-		this.pathToBeanValidationApiJar = pathToBeanValidationApiJar;
+
+		String basePath;
+
+		try {
+			basePath = new File( "." ).getCanonicalPath();
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException( e );
+		}
+
+		this.sourceBaseDir = basePath + "/src/test/java";
 	}
 
 	/**
@@ -119,7 +128,7 @@ public class CompilerTestHelper {
 
 		List<String> options = new ArrayList<String>();
 
-		options.addAll( Arrays.asList( "-classpath", pathToBeanValidationApiJar, "-d", "target" ) );
+		options.addAll( Arrays.asList( "-classpath", System.getProperty( "java.class.path" ), "-d", "target" ) );
 
 		if ( diagnosticKind != null ) {
 			options.add( "-AdiagnosticKind=" + diagnosticKind );
