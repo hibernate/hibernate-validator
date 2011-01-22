@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -132,7 +133,12 @@ public class ConstraintHelper {
 	 */
 	private final Name CONSTRAINT_ANNOTATION_PACKAGE_NAME;
 
-	private static Map<Name, Set<TypeMirror>> builtInConstraints;
+	/**
+	 * Contains the supported types for the built-in constraints. Keyed by
+	 * constraint annotation type names, each value is a set with the allowed
+	 * types for the mapped constraint.
+	 */
+	private Map<Name, Set<TypeMirror>> builtInConstraints;
 
 	private Elements elementUtils;
 
@@ -166,6 +172,11 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint(
 				Future.class, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
 		);
+		registerAllowedTypesForBuiltInConstraintByNames(
+				Future.class, CollectionHelper.<String>asSet(
+				"org.joda.time.base.AbstractPartial", "org.joda.time.base.AbstractInstant"
+		)
+		);
 		registerAllowedTypesForBuiltInConstraint(
 				Max.class, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
 		);
@@ -177,22 +188,28 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint(
 				Past.class, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
 		);
+		registerAllowedTypesForBuiltInConstraintByNames(
+				Past.class, CollectionHelper.<String>asSet(
+				"org.joda.time.base.AbstractPartial", "org.joda.time.base.AbstractInstant"
+		)
+		);
+
 		registerAllowedTypesForBuiltInConstraint( Pattern.class, CollectionHelper.<Class<?>>asSet( String.class ) );
 		registerAllowedTypesForBuiltInConstraint(
 				Size.class, CollectionHelper.<Class<?>>asSet(
-						Object[].class,
-						boolean[].class,
-						byte[].class,
-						char[].class,
-						double[].class,
-						float[].class,
-						int[].class,
-						long[].class,
-						short[].class,
-						Collection.class,
-						Map.class,
-						String.class
-				)
+				Object[].class,
+				boolean[].class,
+				byte[].class,
+				char[].class,
+				double[].class,
+				float[].class,
+				int[].class,
+				long[].class,
+				short[].class,
+				Collection.class,
+				Map.class,
+				String.class
+		)
 		);
 	}
 
@@ -637,13 +654,34 @@ public class ConstraintHelper {
 
 	private void registerAllowedTypesForBuiltInConstraint(Class<? extends Annotation> annotation, Set<Class<?>> allowedTypes) {
 
-		Set<TypeMirror> mirrorsForAllowedTypes = CollectionHelper.newHashSet();
+		Set<TypeMirror> allowedTypesForConstraint = getAllowedTypesForBuiltInConstraint( annotation );
 
 		for ( Class<?> oneAllowedType : allowedTypes ) {
-			mirrorsForAllowedTypes.add( annotationApiHelper.getMirrorForType( oneAllowedType ) );
+			allowedTypesForConstraint.add( annotationApiHelper.getMirrorForType( oneAllowedType ) );
+		}
+	}
+
+	private void registerAllowedTypesForBuiltInConstraintByNames(Class<? extends Annotation> annotation, Set<String> allowedTypes) {
+
+		Set<TypeMirror> allowedTypesForConstraint = getAllowedTypesForBuiltInConstraint( annotation );
+
+		for ( String oneAllowedType : allowedTypes ) {
+			allowedTypesForConstraint.add( annotationApiHelper.getDeclaredTypeByName( oneAllowedType ) );
+		}
+	}
+
+	private Set<TypeMirror> getAllowedTypesForBuiltInConstraint(Class<? extends Annotation> annotation) {
+
+		Name key = elementUtils.getName( annotation.getSimpleName() );
+		Set<TypeMirror> allowedTypes = builtInConstraints.get( key );
+
+		// create a mapping for the given annotation type if required
+		if ( allowedTypes == null ) {
+			allowedTypes = CollectionHelper.newHashSet();
+			builtInConstraints.put( key, allowedTypes );
 		}
 
-		builtInConstraints.put( elementUtils.getName( annotation.getSimpleName() ), mirrorsForAllowedTypes );
+		return allowedTypes;
 	}
 
 	/**
@@ -653,8 +691,8 @@ public class ConstraintHelper {
 	 *
 	 * @param constraintAnnotationType The type to check.
 	 *
-	 * @return True, if the given type is a constraint annotation, false
-	 *         otherwise.
+	 * @return True, if the given type is a built-in constraint annotation type,
+	 *         false otherwise.
 	 */
 	private boolean isBuiltInConstraint(DeclaredType constraintAnnotationType) {
 

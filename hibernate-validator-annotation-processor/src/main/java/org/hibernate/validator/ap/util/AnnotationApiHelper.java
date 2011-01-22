@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -148,19 +150,36 @@ public class AnnotationApiHelper {
 
 	private TypeMirror getMirrorForNonArrayType(Class<?> clazz) {
 
+		TypeMirror theValue = null;
+
 		if ( clazz.isPrimitive() ) {
-			return primitiveMirrors.get( clazz );
+			theValue = primitiveMirrors.get( clazz );
 		}
 		else {
-
-			TypeElement typeElement = elementUtils.getTypeElement( clazz.getCanonicalName() );
-
-			if ( typeElement != null ) {
-				return typeUtils.getDeclaredType( typeElement );
-			}
+			theValue = getDeclaredTypeByName( clazz.getCanonicalName() );
 		}
 
-		throw new AssertionError( "Couldn't find a type element for class " + clazz );
+		if ( theValue != null ) {
+			return theValue;
+		}
+		else {
+			throw new AssertionError( "Couldn't find a type mirror for class " + clazz );
+		}
+	}
+
+	/**
+	 * Returns the {@link DeclaredType} for the given class name.
+	 *
+	 * @param className A fully qualified class name, e.g. "java.lang.String".
+	 *
+	 * @return A {@link DeclaredType} representing the type with the given name,
+	 *         or null, if no such type exists.
+	 */
+	public DeclaredType getDeclaredTypeByName(String className) {
+
+		TypeElement typeElement = elementUtils.getTypeElement( className );
+
+		return typeElement != null ? typeUtils.getDeclaredType( typeElement ) : null;
 	}
 
 	/**
