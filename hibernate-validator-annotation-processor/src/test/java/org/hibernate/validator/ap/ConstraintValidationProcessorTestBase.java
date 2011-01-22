@@ -20,12 +20,10 @@ import javax.tools.DiagnosticCollector;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-
 import org.hibernate.validator.ap.testutil.CompilerTestHelper;
 
-import static org.testng.Assert.assertNotNull;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 /**
  * Base class providing common functionality for all tests for the constraint validation processor using the Java compiler
@@ -42,22 +40,8 @@ public abstract class ConstraintValidationProcessorTestBase {
 	@BeforeClass
 	public static void setUpCompilerHelper() {
 
-		String testSourceBaseDir = System.getProperty( "testSourceBaseDir" );
-		String pathToBeanValidationApiJar = System.getProperty( "pathToBeanValidationApiJar" );
-
-		assertNotNull(
-				testSourceBaseDir,
-				"The system property testSourceBaseDir has to be set and point to the base directory of the test java sources."
-		);
-		assertNotNull(
-				pathToBeanValidationApiJar,
-				"The system property pathToBeanValidationApiJar has to be set and point to the BV API Jars."
-		);
-
 		compilerHelper =
-				new CompilerTestHelper(
-						ToolProvider.getSystemJavaCompiler(), testSourceBaseDir, pathToBeanValidationApiJar
-				);
+				new CompilerTestHelper( ToolProvider.getSystemJavaCompiler() );
 	}
 
 	@BeforeMethod

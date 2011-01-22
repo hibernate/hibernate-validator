@@ -19,52 +19,6 @@
                     <compilerArgument>-proc:none</compilerArgument>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <stripVersion>true</stripVersion>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>javax.validation</groupId>
-                                    <artifactId>validation-api</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>testSourceBaseDir</name>
-                            <value>${basedir}/src/test/java</value>
-                        </property>
-                        <!-- 
-                        	Used to specify the class path for the JavaCompiler in tests. For some reason 
-							this is not required within eclipse. The JavaCompiler there has access to all dependencies
-							of the program by default.
-							TODO GM: find a better way to solve this issue
-						 -->
-                        <property>
-                            <name>pathToBeanValidationApiJar</name>
-                            <value>${project.build.directory}/lib/validation-api.jar</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <dependencies>
