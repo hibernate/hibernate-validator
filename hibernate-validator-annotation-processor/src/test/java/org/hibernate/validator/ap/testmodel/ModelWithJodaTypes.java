@@ -24,6 +24,8 @@ import javax.validation.constraints.Past;
 
 import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
 
 public class ModelWithJodaTypes {
 
@@ -37,11 +39,19 @@ public class ModelWithJodaTypes {
 	
 	@Past
 	@Future
-	public DateMidnight jodaInstant;
+	public ReadableInstant jodaInstant;
 
 	@Past
 	@Future
-	public LocalDate jodaPartial;
+	public DateMidnight jodaDateMidnight;
+	
+	@Past
+	@Future
+	public ReadablePartial jodaPartial;
+
+	@Past
+	@Future
+	public LocalDate jodaLocalDate;
 	
 	/**
 	 * Not allowed.
