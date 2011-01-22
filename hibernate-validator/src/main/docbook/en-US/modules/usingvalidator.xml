@@ -1132,10 +1132,10 @@ public void testOrderedChecksWithRedefinedDefault() {
             <entry>yes</entry>
 
             <entry>field/property. Supported types are
-            <classname>java.util.Date</classname> and
-            <classname>java.util.Calendar</classname>,
-            Joda Time classes which inherit from <classname>org.joda.time.base.AbstractPartial</classname>
-            and <classname>org.joda.time.base.AbstractInstant</classname>.</entry>
+            <classname>java.util.Date</classname>,
+            <classname>java.util.Calendar</classname> and
+            Joda Time classes which implement <classname>org.joda.time.ReadablePartial</classname>
+            and <classname>org.joda.time.ReadableInstant</classname>.</entry>
 
             <entry>Checks whether the annotated date is in the future.</entry>
 
@@ -1253,10 +1253,10 @@ public void testOrderedChecksWithRedefinedDefault() {
             <entry>yes</entry>
 
             <entry>field/property. Supported types are
-            <classname>java.util.Date</classname> and
-            <classname>java.util.Calendar</classname>,
-            Joda Time classes which inherit from <classname>org.joda.time.base.AbstractPartial</classname>
-            and <classname>org.joda.time.base.AbstractInstant</classname>.</entry>
+            <classname>java.util.Date</classname>,
+            <classname>java.util.Calendar</classname> and
+            Joda Time classes which implement <classname>org.joda.time.ReadablePartial</classname>
+            and <classname>org.joda.time.ReadableInstant</classname>.</entry>
 
             <entry>Checks whether the annotated date is in the past.</entry>
 
