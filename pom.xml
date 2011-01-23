@@ -51,7 +51,6 @@
         <module>hibernate-validator-annotation-processor</module>
         <module>hibernate-validator-archetype</module>
         <module>hibernate-validator-distribution</module>
-        <module>hibernate-validator-legacy</module>
     </modules>
 
     <properties>
