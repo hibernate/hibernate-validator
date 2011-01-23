@@ -85,7 +85,7 @@ import org.hibernate.validator.util.ReflectionHelper;
  */
 public class ConstraintHelper {
 
-	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.base.ReadableInstant";
+	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 
 	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
