@@ -1133,9 +1133,13 @@ public void testOrderedChecksWithRedefinedDefault() {
 
             <entry>field/property. Supported types are
             <classname>java.util.Date</classname>,
-            <classname>java.util.Calendar</classname> and
-            Joda Time classes which implement <classname>org.joda.time.ReadablePartial</classname>
-            and <classname>org.joda.time.ReadableInstant</classname>.</entry>
+            <classname>java.util.Calendar</classname>; In addition to these
+            types demanded by the BV specification Hibernate Validator
+            provides support for any implements of
+            <classname>org.joda.time.ReadablePartial</classname> and
+            <classname>org.joda.time.ReadableInstant</classname>, if the
+            <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
+            date/time API is on the class path.</entry>
 
             <entry>Checks whether the annotated date is in the future.</entry>
 
@@ -1254,9 +1258,13 @@ public void testOrderedChecksWithRedefinedDefault() {
 
             <entry>field/property. Supported types are
             <classname>java.util.Date</classname>,
-            <classname>java.util.Calendar</classname> and
-            Joda Time classes which implement <classname>org.joda.time.ReadablePartial</classname>
-            and <classname>org.joda.time.ReadableInstant</classname>.</entry>
+            <classname>java.util.Calendar</classname>; In addition to these
+            types demanded by the BV specification Hibernate Validator
+            provides support for any implements of
+            <classname>org.joda.time.ReadablePartial</classname> and
+            <classname>org.joda.time.ReadableInstant</classname>, if the
+            <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
+            date/time API is on the class path.</entry>
 
             <entry>Checks whether the annotated date is in the past.</entry>
 
