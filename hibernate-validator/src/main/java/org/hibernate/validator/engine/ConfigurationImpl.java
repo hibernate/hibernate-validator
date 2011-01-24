@@ -51,6 +51,7 @@ import org.hibernate.validator.xml.ValidationXmlParser;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -74,6 +75,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean ignoreXmlConfiguration = false;
 	private Set<InputStream> configurationStreams = new HashSet<InputStream>();
 	private ConstraintMapping mapping;
+	private boolean failFast;
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -119,6 +121,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			throw new IllegalArgumentException( "The stream cannot be null." );
 		}
 		validationBootstrapParameters.addMapping( stream );
+		return this;
+	}
+
+	public final HibernateValidatorConfiguration failFast(boolean failFast) {
+		this.failFast = failFast;
 		return this;
 	}
 
@@ -191,6 +198,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public final Set<InputStream> getMappingStreams() {
 		return validationBootstrapParameters.getMappings();
+	}
+
+	public final boolean isFailFast() {
+		return failFast;
 	}
 
 	public final ConstraintValidatorFactory getConstraintValidatorFactory() {

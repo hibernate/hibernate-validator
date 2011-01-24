@@ -27,6 +27,7 @@ import org.hibernate.validator.resourceloading.ResourceBundleLocator;
  *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
 
@@ -74,4 +75,14 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	HibernateValidatorConfiguration addMapping(ConstraintMapping mapping);
 
+
+	/**
+	 * Enable or Disable failFast. When failFast is enabled the validation
+	 * will stop on the first constraint violation detected.
+	 *
+	 * @param failFast true to enable failFast
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	HibernateValidatorConfiguration failFast(boolean failFast);
 }
