@@ -21,7 +21,7 @@ package org.hibernate.validator.util;
  */
 public final class Version {
 	static {
-		LoggerFactory.make().info( "Hibernate Search {}", getVersionString() );
+		LoggerFactory.make().info( "Hibernate Validator {}", getVersionString() );
 	}
 
 	public static String getVersionString() {
