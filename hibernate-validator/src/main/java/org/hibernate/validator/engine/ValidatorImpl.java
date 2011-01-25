@@ -66,6 +66,7 @@ import org.hibernate.validator.util.ReflectionHelper;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ValidatorImpl implements Validator, MethodValidator {
 
@@ -103,12 +104,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private final BeanMetaDataCache beanMetaDataCache;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
+	/**
+	 * Indicates if validation have to be stopped on first constraint violation.
+	 */
+	private final boolean failFast;
+
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache, boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.constraintHelper = constraintHelper;
 		this.beanMetaDataCache = beanMetaDataCache;
+		this.failFast = failFast;
 
 		groupChainGenerator = new GroupChainGenerator();
 	}

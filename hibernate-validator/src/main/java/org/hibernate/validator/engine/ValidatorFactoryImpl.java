@@ -35,6 +35,8 @@ import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
+import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.CascadeDef;
 import org.hibernate.validator.cfg.ConstraintDefAccessor;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -60,7 +62,7 @@ import org.hibernate.validator.xml.XmlMappingParser;
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class ValidatorFactoryImpl implements ValidatorFactory {
+public class ValidatorFactoryImpl implements ValidatorFactory, HibernateValidatorFactory {
 
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
@@ -115,6 +117,10 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 	}
 
 	public <T> T unwrap(Class<T> type) {
+		if ( HibernateValidatorFactory.class.equals( type ) ) {
+			T result = type.cast( this );
+			return result;
+		}
 		throw new ValidationException( "Type " + type + " not supported" );
 	}
 
@@ -124,7 +130,19 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 				messageInterpolator,
 				traversableResolver,
 				constraintHelper,
-				beanMetaDataCache
+				beanMetaDataCache,
+				failFast
+		);
+	}
+
+	public HibernateValidatorContext usingHibernateContext() {
+		return new HibernateValidatorContextImpl(
+				constraintValidatorFactory,
+				messageInterpolator,
+				traversableResolver,
+				constraintHelper,
+				beanMetaDataCache,
+				failFast
 		);
 	}
 
