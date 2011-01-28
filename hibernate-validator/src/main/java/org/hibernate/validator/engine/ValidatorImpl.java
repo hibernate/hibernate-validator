@@ -128,7 +128,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		ValidationContext<T, ConstraintViolation<T>> validationContext = ValidationContext.getContextForValidate(
-				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
+				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver(), failFast
 		);
 
 		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext( object, PathImpl.createRootPath() );
@@ -178,7 +178,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				object,
 				messageInterpolator,
 				constraintValidatorFactory,
-				getCachingTraversableResolver()
+				getCachingTraversableResolver(),
+				failFast
 		);
 
 		Object[] parameterValues = new Object[method.getParameterTypes().length];
@@ -202,7 +203,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
-				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
+				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver(), failFast
 		);
 
 		validateParametersInContext( context, object, parameterValues, groupChain );
@@ -217,14 +218,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
-				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver()
+				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver(), failFast
 		);
 
 		validateReturnValueInContext( context, object, method, returnValue, groupChain );
 
 		return context.getFailingConstraints();
 	}
-
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return getBeanMetaData( clazz ).getBeanDescriptor();
@@ -286,12 +286,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
 			validateConstraintsForCurrentGroup( context, valueContext );
+			if ( context.shouldFailFast() ) {
+				return context.getFailingConstraints();
+			}
 		}
 		groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
 			validateCascadedConstraints( context, valueContext );
+			if ( context.shouldFailFast() ) {
+				return context.getFailingConstraints();
+			}
 		}
 
 		// now we process sequences. For sequences I have to traverse the object graph since I have to stop processing when an error occurs.
@@ -303,7 +309,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				valueContext.setCurrentGroup( group.getGroup() );
 
 				validateConstraintsForCurrentGroup( context, valueContext );
+				if ( context.shouldFailFast() ) {
+					return context.getFailingConstraints();
+				}
+
 				validateCascadedConstraints( context, valueContext );
+				if ( context.shouldFailFast() ) {
+					return context.getFailingConstraints();
+				}
 
 				if ( context.getFailingConstraints().size() > numberOfViolations ) {
 					break;
@@ -355,6 +368,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					boolean tmp = validateConstraint(
 							validationContext, valueContext, metaConstraint
 					);
+					if ( validationContext.shouldFailFast() ) {
+						return;
+					}
 					validationSuccessful = validationSuccessful && tmp;
 					// reset the path
 					valueContext.setPropertyPath( currentPath );
@@ -380,6 +396,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			boolean validationSuccessful = true;
 			for ( BeanMetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
 				boolean tmp = validateConstraint( validationContext, valueContext, metaConstraint );
+				if ( validationContext.shouldFailFast() ) {
+					return;
+				}
 				validationSuccessful = validationSuccessful && tmp;
 				// reset the path
 				valueContext.setPropertyPath( currentPath );
@@ -400,6 +419,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( BeanMetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
 			validateConstraint( validationContext, valueContext, metaConstraint );
+			if ( validationContext.shouldFailFast() ) {
+				return;
+			}
 			// reset the path to the state before this call
 			valueContext.setPropertyPath( currentPath );
 		}
@@ -452,6 +474,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 							isIndexable,
 							valueContext
 					);
+					if ( validationContext.shouldFailFast() ) {
+						return;
+					}
 				}
 			}
 			// reset the path
@@ -578,6 +603,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				}
 
 				validateInContext( newValueContext, context, groupChain );
+				if ( context.shouldFailFast() ) {
+					return;
+				}
 			}
 			i++;
 		}
@@ -617,6 +645,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					group,
 					cachedResolver
 			);
+			if ( shouldFailFast( failingConstraintViolations ) ) {
+				return;
+			}
 		}
 
 		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
@@ -633,7 +664,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 						group,
 						cachedResolver
 				);
-
+				if ( shouldFailFast( failingConstraintViolations ) ) {
+					return;
+				}
 				if ( failingConstraintViolations.size() > numberOfConstraintViolationsBefore ) {
 					break;
 				}
@@ -669,7 +702,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 						object,
 						messageInterpolator,
 						constraintValidatorFactory,
-						cachedTraversableResolver
+						cachedTraversableResolver,
+						failFast
 				);
 				ValueContext<U, V> valueContext = ValueContext.getLocalExecutionContext(
 						hostingBeanInstance, path
@@ -680,6 +714,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					valueContext.setCurrentValidatedValue( (V) valueToValidate );
 					metaConstraint.validateConstraint( context, valueContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
+					if ( shouldFailFast( failingConstraintViolations ) ) {
+						return;
+					}
 				}
 			}
 			if ( failingConstraintViolations.size() > numberOfConstraintViolationsBefore ) {
@@ -712,6 +749,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					group,
 					cachedTraversableResolver
 			);
+			if ( shouldFailFast( failingConstraintViolations ) ) {
+				return;
+			}
 		}
 
 		// process sequences
@@ -729,7 +769,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 						group,
 						cachedTraversableResolver
 				);
-
+				if ( shouldFailFast( failingConstraintViolations ) ) {
+					return;
+				}
 				if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
 					break;
 				}
@@ -762,7 +804,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> groupClass : groupList ) {
 			for ( MetaConstraint<U, ?> metaConstraint : metaConstraints ) {
 				ValidationContext<U, ConstraintViolation<U>> context = ValidationContext.getContextForValidateValue(
-						beanType, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver
+						beanType, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver, failFast
 				);
 				ValueContext<U, V> valueContext = ValueContext.getLocalExecutionContext( beanType, path );
 				valueContext.setCurrentGroup( groupClass );
@@ -770,6 +812,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				if ( isValidationRequired( context, valueContext, metaConstraint ) ) {
 					metaConstraint.validateConstraint( context, valueContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
+					if ( shouldFailFast( failingConstraintViolations ) ) {
+						return;
+					}
 				}
 			}
 			if ( failingConstraintViolations.size() > numberOfConstraintViolations ) {
@@ -790,6 +835,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			validateParametersForGroup( validationContext, object, parameterValues, groupIterator.next() );
+			if ( validationContext.shouldFailFast() ) {
+				return;
+			}
 		}
 
 		// now process sequences, stop after the first erroneous group
@@ -800,6 +848,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				int numberOfFailingConstraint = validateParametersForGroup(
 						validationContext, object, parameterValues, group
 				);
+				if ( validationContext.shouldFailFast() ) {
+					return;
+				}
 				if ( numberOfFailingConstraint > 0 ) {
 					break;
 				}
@@ -864,6 +915,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					numberOfViolationsOfCurrentGroup += validateParameterForGroup(
 							validationContext, valueContext, parameterMetaData
 					);
+					if ( validationContext.shouldFailFast() ) {
+						return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
+					}
 				}
 			}
 
@@ -893,6 +947,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 				//TODO GM: consider violations from cascaded validation
 				validateCascadedMethodConstraints( validationContext, cascadingvalueContext );
+				if ( validationContext.shouldFailFast() ) {
+					break;
+				}
 			}
 		}
 
@@ -923,6 +980,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 
 			metaConstraint.validateConstraint( validationContext, valueContext );
+			if ( validationContext.shouldFailFast() ) {
+				break;
+			}
 		}
 
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
@@ -941,6 +1001,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		// process first single groups
 		while ( groupIterator.hasNext() ) {
 			validateReturnValueForGroup( context, bean, value, groupIterator.next() );
+			if ( context.shouldFailFast() ) {
+				return;
+			}
 		}
 
 		// now process sequences, stop after the first erroneous group
@@ -951,6 +1014,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				int numberOfFailingConstraint = validateReturnValueForGroup(
 						context, bean, value, group
 				);
+				if ( context.shouldFailFast() ) {
+					return;
+				}
 				if ( numberOfFailingConstraint > 0 ) {
 					break;
 				}
@@ -1000,6 +1066,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 						validateReturnValueForGroup(
 								validationContext, valueContext, constraintsOfOneClass.getValue()
 						);
+				if ( validationContext.shouldFailFast() ) {
+					return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
+				}
 			}
 
 			//stop processing after first group with errors occurred
@@ -1033,6 +1102,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				continue;
 			}
 			metaConstraint.validateConstraint( validationContext, valueContext );
+			if ( validationContext.shouldFailFast() ) {
+				break;
+			}
 		}
 
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
@@ -1234,6 +1306,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Whether or not the validation should fail on the first constraint
+	 * violation.
+	 *
+	 * @param failingConstraintViolations
+	 * @param <T> the type of validated bean
+	 *
+	 * @return true if the validation process should fail fast
+	 */
+	private <T> boolean shouldFailFast(Set<ConstraintViolation<T>> failingConstraintViolations) {
+		return failFast && failingConstraintViolations.size() > 0;
 	}
 }
 

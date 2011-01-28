@@ -34,9 +34,10 @@ public class StandardValidationContext <T> extends ValidationContext<T, Constrai
 	protected StandardValidationContext(Class<T> rootBeanClass, T rootBean,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
-			TraversableResolver traversableResolver) {
+			TraversableResolver traversableResolver,
+			boolean failFast) {
 		
-		super(rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver);
+		super(rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast);
 	}
 	
 	@Override

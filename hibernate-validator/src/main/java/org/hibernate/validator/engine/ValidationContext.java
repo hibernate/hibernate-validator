@@ -92,33 +92,39 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	 */
 	private final TraversableResolver traversableResolver;
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	/**
+	 * Whether or not validation should failed on the first constraint violation.
+	 */
+	private final boolean failFast;
+
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new StandardValidationContext<T>(
-				rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver
+				rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast
 		);
 	}
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		return new StandardValidationContext<T>(
-				rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver
+				rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast
 		);
 	}
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateValue(Class<T> rootBeanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateValue(Class<T> rootBeanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
 		return new StandardValidationContext<T>(
 				rootBeanClass,
 				null,
 				messageInterpolator,
 				constraintValidatorFactory,
-				traversableResolver
+				traversableResolver,
+				failFast
 		);
 	}
 
-	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
@@ -128,11 +134,13 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 				parameterIndex,
 				messageInterpolator,
 				constraintValidatorFactory,
-				traversableResolver
+				traversableResolver,
+				failFast
+
 		);
 	}
 
-	public static <T> MethodValidationContext<T> getContextForValidateParameters(Method method, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	public static <T> MethodValidationContext<T> getContextForValidateParameters(Method method, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
@@ -141,17 +149,19 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 				method,
 				messageInterpolator,
 				constraintValidatorFactory,
-				traversableResolver
+				traversableResolver,
+				failFast
 		);
 	}
 
-	protected ValidationContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver) {
+	protected ValidationContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
 
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.messageInterpolator = messageInterpolator;
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.traversableResolver = traversableResolver;
+		this.failFast = failFast;
 
 		processedObjects = new HashMap<Class<?>, IdentitySet>();
 		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
@@ -166,13 +176,16 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		return rootBeanClass;
 	}
 
-
 	public final TraversableResolver getTraversableResolver() {
 		return traversableResolver;
 	}
 
 	public final MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
+	}
+
+	public final boolean shouldFailFast() {
+		return failFast && !failingConstraintViolations.isEmpty();
 	}
 
 	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor);
@@ -263,7 +276,6 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 			processedPaths.put( value, set );
 		}
 	}
-
 
 	private void markProcessForCurrentGroup(Object value, Class<?> group) {
 		if ( processedObjects.containsKey( group ) ) {

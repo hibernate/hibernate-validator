@@ -48,7 +48,8 @@ public class MethodValidationContext<T> extends ValidationContext<T, MethodConst
 									  Method method,
 									  MessageInterpolator messageInterpolator,
 									  ConstraintValidatorFactory constraintValidatorFactory,
-									  TraversableResolver traversableResolver) {
+									  TraversableResolver traversableResolver,
+									  boolean failFast) {
 
 		this(
 				rootBeanClass,
@@ -57,7 +58,8 @@ public class MethodValidationContext<T> extends ValidationContext<T, MethodConst
 				null,
 				messageInterpolator,
 				constraintValidatorFactory,
-				traversableResolver
+				traversableResolver,
+				failFast
 		);
 
 	}
@@ -67,9 +69,10 @@ public class MethodValidationContext<T> extends ValidationContext<T, MethodConst
 									  Integer parameterIndex,
 									  MessageInterpolator messageInterpolator,
 									  ConstraintValidatorFactory constraintValidatorFactory,
-									  TraversableResolver traversableResolver) {
+									  TraversableResolver traversableResolver,
+									  boolean failFast) {
 
-		super( rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver );
+		super( rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast );
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;
