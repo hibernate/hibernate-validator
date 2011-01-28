@@ -22,7 +22,7 @@ import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolation
  */
 public class FailFastTest {
 	@Test
-	public void testFailFastNotSet() {
+	public void testFailFastDefaultBehaviour() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 

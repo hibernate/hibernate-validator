@@ -25,11 +25,12 @@ import javax.validation.Validator;
  * Provide Hibernate Validator context specific configuration and
  * standard Bean Validation configuration.
  *
+ * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface HibernateValidatorContext {
 	/**
-	 * Enable or Disable failFast. When failFast is enabled the validation
+	 * Enable or disable fail fast. When fail fast is enabled the validation
 	 * will stop on the first constraint violation detected.
 	 *
 	 * @param failFast true to enable failFast

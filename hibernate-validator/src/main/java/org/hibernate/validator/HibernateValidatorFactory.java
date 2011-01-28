@@ -17,12 +17,15 @@
 package org.hibernate.validator;
 
 /**
- * Provide Hibernate validator extension to ValidatorFactory.
+ * Provide Hibernate Validator extensions to ValidatorFactory
  *
+ * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface HibernateValidatorFactory {
-
+	/**
+	 * Refine Validator configuration via options from
+	 * Bean Validation as well as specific ones from Hibernate Validator
+	 */
 	HibernateValidatorContext usingHibernateContext();
-
 }
