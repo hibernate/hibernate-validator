@@ -22,6 +22,18 @@ import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolation
  */
 public class FailFastTest {
 	@Test
+	public void testFailFastNotSet() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		A testInstance = new A();
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
+		assertNumberOfViolations( constraintViolations, 2 );
+	}
+
+	@Test
 	public void testFailFastSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
@@ -39,21 +51,51 @@ public class FailFastTest {
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
 		final Validator validator =
-				factory.unwrap(HibernateValidatorFactory.class)
-					.usingHibernateContext()
+				factory.unwrap( HibernateValidatorFactory.class )
+						.usingHibernateContext()
 						.failFast( true )
-					.getValidator();
+						.getValidator();
 		A testInstance = new A();
 
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
+	@Test
+	public void testFailFastSetWithProperty() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "true" )
+				.buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		A testInstance = new A();
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
+
+	@Test
+	public void testFailFastSetWithInvalidProperty() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+
+		//Default fail fast property value is false
+		final ValidatorFactory factory = configuration.addProperty(
+				HibernateValidatorConfiguration.FAIL_FAST, "not correct"
+		).buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		A testInstance = new A();
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
+		assertNumberOfViolations( constraintViolations, 2 );
+	}
+
 	class A {
 		@NotNull
 		String b;
 
-		@NotNull @Email
+		@NotNull
+		@Email
 		String c;
 	}
 }

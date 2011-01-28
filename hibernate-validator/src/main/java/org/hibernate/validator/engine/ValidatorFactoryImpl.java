@@ -35,6 +35,7 @@ import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.CascadeDef;
@@ -83,6 +84,8 @@ public class ValidatorFactoryImpl implements ValidatorFactory, HibernateValidato
 		this.constraintHelper = new ConstraintHelper();
 		this.beanMetaDataCache = new BeanMetaDataCache();
 
+		Boolean tmpFailFast = null;
+
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
 			initXmlConfiguration( configurationState.getMappingStreams() );
@@ -93,11 +96,13 @@ public class ValidatorFactoryImpl implements ValidatorFactory, HibernateValidato
 			if ( hibernateSpecificConfig.getMapping() != null ) {
 				initProgrammaticConfiguration( hibernateSpecificConfig.getMapping() );
 			}
-			this.failFast = hibernateSpecificConfig.isFailFast();
+			tmpFailFast = hibernateSpecificConfig.getFailFast();
 		}
-		else {
-			this.failFast = false;
+		if ( tmpFailFast == null ) {
+			String failFastPropValue = configurationState.getProperties().get( HibernateValidatorConfiguration.FAIL_FAST );
+			tmpFailFast = Boolean.valueOf( failFastPropValue );
 		}
+		this.failFast = tmpFailFast;
 	}
 
 	public Validator getValidator() {
