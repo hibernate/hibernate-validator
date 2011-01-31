@@ -31,6 +31,7 @@ import org.hibernate.validator.util.Contracts;
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class PathImpl implements Path, Serializable {
 
@@ -43,7 +44,7 @@ public final class PathImpl implements Path, Serializable {
 	 *
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
-	private static final Pattern PATH_PATTERN = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
+	private static final Pattern PATH_PATTERN = Pattern.compile( "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*)(\\[(\\w*)\\])?(\\.(.*))*" );
 	private static final int PROPERTY_NAME_GROUP = 1;
 	private static final int INDEXED_GROUP = 2;
 	private static final int INDEX_GROUP = 3;
