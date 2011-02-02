@@ -254,7 +254,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 			);
 
 			Member member = null;
-			if ( !config.getProperty().isEmpty() ) {
+			if ( !(config.getProperty().length() == 0) ) {
 				member = ReflectionHelper.getMember(
 						config.getBeanType(), config.getProperty(), config.getElementType()
 				);
