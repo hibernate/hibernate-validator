@@ -23,17 +23,40 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
 
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.TestUtil;
+
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ValidatorTest {
+
+	/**
+	 * HV-376
+	 */
+	@Test
+	public void testValidatePropertyWithCurrencySymbol() {
+		Validator validator = TestUtil.getValidator();
+		Ticket testInstance = new Ticket();
+		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateProperty( testInstance, "€price" );
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
+
+	@Test
+	public void testValidateValueWithCurrencySymbol() {
+		Validator validator = TestUtil.getValidator();
+		Ticket testInstance = new Ticket();
+		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateValue(
+				Ticket.class, "€price", testInstance.€price
+		);
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
 
 	/**
 	 * HV-208
@@ -69,5 +92,10 @@ public class ValidatorTest {
 		public boolean hasB() {
 			return b;
 		}
+	}
+
+	class Ticket {
+		@NotNull
+		Float €price;
 	}
 }
