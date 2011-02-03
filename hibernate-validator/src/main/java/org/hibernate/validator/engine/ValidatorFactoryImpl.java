@@ -85,7 +85,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		}
 
 		if ( configurationState instanceof ConfigurationImpl ) {
-			ConfigurationImpl hibernateSpecificConfig = ( ConfigurationImpl ) configurationState;
+			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 			if ( hibernateSpecificConfig.getMapping() != null ) {
 				initProgrammaticConfiguration( hibernateSpecificConfig.getMapping() );
 			}
@@ -134,7 +134,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 		for ( Class<?> clazz : mapping.getConfiguredClasses() ) {
 			@SuppressWarnings("unchecked")
-			Class<T> beanClass = ( Class<T> ) clazz;
+			Class<T> beanClass = (Class<T>) clazz;
 
 			// for each configured entity we have to check whether any of the interfaces or super classes is configured
 			// via the programmatic api as well
@@ -186,7 +186,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 		AnnotationIgnores annotationIgnores = mappingParser.getAnnotationIgnores();
 		for ( Class<?> clazz : xmlConfiguredClasses ) {
 			@SuppressWarnings("unchecked")
-			Class<T> beanClass = ( Class<T> ) clazz;
+			Class<T> beanClass = (Class<T>) clazz;
 
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = newHashMap();
@@ -224,14 +224,14 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
-					( A ) constraint.getDescriptor().getAnnotation(),
+					(A) constraint.getDescriptor().getAnnotation(),
 					constraintHelper,
 					constraint.getElementType(),
 					definedIn
 			);
 
 			//TODO GM: avoid this cast
-			BeanMetaConstraint<?, ? extends Annotation> asBeanMetaConstraint = ( BeanMetaConstraint<?, ? extends Annotation> ) constraint;
+			BeanMetaConstraint<?, ? extends Annotation> asBeanMetaConstraint = (BeanMetaConstraint<?, ? extends Annotation>) constraint;
 			BeanMetaConstraint<T, A> newMetaConstraint = new BeanMetaConstraint<T, A>(
 					descriptor,
 					asBeanMetaConstraint.getLocation().getBeanClass(),
@@ -247,21 +247,21 @@ public class ValidatorFactoryImpl implements ValidatorFactory {
 																				Class<T> rootClass, Class<?> hierarchyClass,
 																				Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints) {
 		for ( ConstraintDefAccessor<?> config : definitions ) {
-			A annotation = ( A ) createAnnotationProxy( config );
+			A annotation = (A) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 					annotation, constraintHelper, config.getElementType(), definedIn
 			);
 
 			Member member = null;
-			if ( !(config.getProperty().length() == 0) ) {
+			if ( config.getProperty().length() != 0 ) {
 				member = ReflectionHelper.getMember(
 						config.getBeanType(), config.getProperty(), config.getElementType()
 				);
 			}
 
 			BeanMetaConstraint<T, A> metaConstraint = new BeanMetaConstraint<T, A>(
-					constraintDescriptor, ( Class<T> ) config.getBeanType(), member
+					constraintDescriptor, (Class<T>) config.getBeanType(), member
 			);
 			addConstraintToMap( hierarchyClass, metaConstraint, constraints );
 		}
