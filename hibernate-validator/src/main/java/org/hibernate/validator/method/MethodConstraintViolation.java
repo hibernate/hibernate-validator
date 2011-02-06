@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2011, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -21,8 +21,8 @@ import javax.validation.ConstraintViolation;
 
 
 /**
- * Extends {@link ConstraintViolation} by adding attributes specific for
- * method-level validation.
+ * Describes the violation of a method-level constraint by providing access
+ * to the method/parameter hosting the violated constraint etc.
  *
  * @author Gunnar Morling
  * @see MethodValidator

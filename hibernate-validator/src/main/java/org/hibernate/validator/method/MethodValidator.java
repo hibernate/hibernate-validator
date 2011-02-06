@@ -19,10 +19,10 @@ package org.hibernate.validator.method;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Set;
+
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
-
 
 /**
  * <p>
@@ -32,24 +32,25 @@ import javax.validation.groups.Default;
  * </p>
  * <p>
  * The purpose of this API is to provide a facility for the <a
- * href="http://en.wikipedia.org/wiki/Design_by_contract">Programming by
- * Contract</a> approach for systems design based on the concepts defined by the
+ * href="http://en.wikipedia.org/wiki/Programming_by_contract">Programming by
+ * Contract</a> approach to program design based on the concepts defined by the
  * Bean Validation API. More specifically this means that any Bean Validation
  * constraints (built-in as well as custom constraints) can be used to describe
  * </p>
  * <ul>
  * <li>
- * any preconditions that must be met before a method invocation (by annotating
+ * any preconditions that must be met before a method may legally be invoked (by annotating
  * method parameters with constraints) and</li>
  * <li>
- * any postconditions that are guaranteed after a method invocation (by
+ * any postconditions that are guaranteed after a method invocation returns (by
  * annotating methods).</li>
  * </ul>
  * <p>
- * These constraints can relate to the parameters/return values themselves but
- * it is also possible to trigger a recursive validation of these values using
- * the special {@link Valid} annotation. If for instance considering the method
- * declaration
+ * These constraints may be declared directly on a method's parameters and/or return values.
+ * Alternatively, by annotating method parameters/return values with the special {@link Valid}
+ * annotation a recursive validation of those parameters/return
+ * values against the constraints defined on their types can be triggered.
+ * Consider for instance the method declaration
  * </p>
  * <p/>
  *
@@ -61,24 +62,24 @@ import javax.validation.groups.Default;
  * }
  * </pre>
  * <p>
- * the following conditions would hold (provided the method validation is
- * triggered automatically by some integration layer, see below):
+ * Here, the validation engine will check for the following pre- and postconditions (provided
+ * the method validation is triggered automatically by some integration layer, see below):
  * </p>
  * <ul>
  * <li>The name parameter is guaranteed to be not null and at least 5 characters
- * long. In especially it is not necessary that the implementor of the method
- * performs these checks manually.</li>
+ * long. In particular it is not necessary for the implementor of this method to
+ * perform these checks manually.</li>
  * <li>It is guaranteed that the call yields a non-null object, which itself is
- * valid with respect to all the bean validation constraints applying for it's
- * type. In especially it is not necessary for the caller to perform these
+ * valid according to all the bean validation constraints declared on its type.
+ * In particular it is not necessary for the caller to perform these
  * checks manually.</li>
  * </ul>
  * <p>
- * This service only copes with the actual <em>validation</em> of method
+ * This service only deals with the actual <em>validation</em> of method
  * parameters/return values itself, but not with the <em>invocation</em> of such
  * a validation. It is expected that this invocation is triggered by an
  * integration layer using AOP or similar method interception facilities such as
- * JDK's {@link Proxy} API or <a
+ * the JDK's {@link Proxy} API or <a
  * href="http://jcp.org/en/jsr/detail?id=299">CDI</a> (
  * "JSR 299: Contexts and Dependency Injection for the Java<sup>TM</sup> EE platform"
  * ).
@@ -165,7 +166,7 @@ public interface MethodValidator {
 	 *         Will be empty, of no error occurs, but never null.
 	 */
 	public <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object,
-																	Method method, Object[] parameterValues, Class<?>... groups);
+																	   Method method, Object[] parameterValues, Class<?>... groups);
 
 	/**
 	 * Validates the return value of a given method.
