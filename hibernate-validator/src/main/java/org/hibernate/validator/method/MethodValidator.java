@@ -179,5 +179,16 @@ public interface MethodValidator {
 	 * @return A set with the constraint violations caused by this validation.
 	 *         Will be empty, of no error occurs, but never null.
 	 */
-	<T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups);
+	<T> Set<MethodConstraintViolation<T>> validateReturnValue(T object,
+															  Method method, Object returnValue, Class<?>... groups);
+
+	/**
+	 * Returns a descriptor providing access to constraint-related meta data for
+	 * the given type.
+	 *
+	 * @param clazz The type of interest.
+	 *
+	 * @return A descriptor for the given type, will never be null.
+	 */
+	TypeDescriptor getConstraintsForType(Class<?> clazz);
 }

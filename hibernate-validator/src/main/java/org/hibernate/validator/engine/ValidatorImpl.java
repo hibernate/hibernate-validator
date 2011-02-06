@@ -58,6 +58,7 @@ import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
+import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -250,6 +251,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return getBeanMetaData( clazz ).getBeanDescriptor();
+	}
+
+	public final TypeDescriptor getConstraintsForType(Class<?> clazz) {
+		throw new UnsupportedOperationException( "Not yet implemented." );
 	}
 
 	public final <T> T unwrap(Class<T> type) {
