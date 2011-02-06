@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator;
+package org.hibernate.validator.method;
 
 import java.lang.reflect.Method;
 import javax.validation.ConstraintViolation;
+
 
 /**
  * Extends {@link ConstraintViolation} by adding attributes specific for

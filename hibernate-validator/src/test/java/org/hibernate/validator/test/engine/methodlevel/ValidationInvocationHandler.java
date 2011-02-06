@@ -20,9 +20,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import org.hibernate.validator.MethodConstraintViolation;
-import org.hibernate.validator.MethodConstraintViolationException;
-import org.hibernate.validator.MethodValidator;
+import org.hibernate.validator.method.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodConstraintViolationException;
+import org.hibernate.validator.method.MethodValidator;
 
 /**
  * An invocation handler used to test method-level validation.

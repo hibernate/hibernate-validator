@@ -43,8 +43,6 @@ import javax.validation.metadata.BeanDescriptor;
 
 import com.googlecode.jtype.TypeUtils;
 
-import org.hibernate.validator.MethodConstraintViolation;
-import org.hibernate.validator.MethodValidator;
 import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
@@ -57,6 +55,8 @@ import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.method.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 

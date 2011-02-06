@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodConstraintViolation;
 
 /**
  * @author Gunnar Morling

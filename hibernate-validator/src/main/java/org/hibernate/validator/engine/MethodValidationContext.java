@@ -22,7 +22,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodConstraintViolation;
 
 /**
  * A {@link ValidationContext} implementation which creates and manages

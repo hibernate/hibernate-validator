@@ -14,11 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator;
+package org.hibernate.validator.method;
 
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.ValidationException;
+
 
 /**
  * Exception class to be thrown by integrators of HV's method level validation feature.

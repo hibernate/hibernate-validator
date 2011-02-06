@@ -23,9 +23,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.MethodConstraintViolation;
-import org.hibernate.validator.MethodConstraintViolationException;
-import org.hibernate.validator.MethodValidator;
+import org.hibernate.validator.method.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodConstraintViolationException;
+import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;

@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator;
+package org.hibernate.validator.method;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
+
 
 /**
  * <p>
