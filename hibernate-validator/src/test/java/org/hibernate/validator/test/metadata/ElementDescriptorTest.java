@@ -21,13 +21,16 @@ import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.TestUtil;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 
 /**
@@ -82,5 +85,42 @@ public class ElementDescriptorTest {
 		catch ( UnsupportedOperationException e ) {
 			// success
 		}
+	}
+
+	@Test
+	public void testAtValidDefinedInHierarchyForPropertyDescriptor() {
+
+		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithoutAtValid.class, "order" );
+		assertTrue(
+				propertyDescriptor.isCascaded(),
+				"@Valid defined on getter in super type should be reflected by PropertyDescriptor."
+		);
+	}
+
+	@Test
+	public void testAtValidDefinedLocallyForPropertyDescriptor() {
+
+		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithAtValid.class, "order" );
+		assertTrue(
+				propertyDescriptor.isCascaded(),
+				"@Valid defined on local getter in type hierarchy should be reflected by PropertyDescriptor."
+		);
+	}
+
+	@Test
+	public void testAtValidNotDefinedForPropertyDescriptor() {
+
+		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithoutAtValid2.class, "order" );
+		assertFalse(
+				propertyDescriptor.isCascaded(),
+				"@Valid given neither locally nor in hierarchy should be reflected by PropertyDescriptor."
+		);
+	}
+
+	@Test
+	public void testGetNameFromPropertyDescriptor() {
+
+		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithoutAtValid2.class, "order" );
+		assertEquals( propertyDescriptor.getPropertyName(), "order" );
 	}
 }
