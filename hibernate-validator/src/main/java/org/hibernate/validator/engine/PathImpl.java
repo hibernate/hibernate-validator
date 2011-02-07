@@ -44,7 +44,11 @@ public final class PathImpl implements Path, Serializable {
 	 *
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
-	private static final Pattern PATH_PATTERN = Pattern.compile( "([^\\[\\.]+)(\\[(\\w*)\\])?(\\.(.*))*" );
+	private static final String LEADING_PROPERTY_GROUP = "[^\\[\\.]+";  // everything up to a [ or .
+	private static final String OPTIONAL_INDEX_GROUP = "\\[(\\w*)\\]";
+	private static final String REMAINING_PROPERTY_STRING = "\\.(.*)";  // processed recursively
+
+	private static final Pattern PATH_PATTERN = Pattern.compile( "(" + LEADING_PROPERTY_GROUP + ")(" + OPTIONAL_INDEX_GROUP + ")?(" + REMAINING_PROPERTY_STRING + ")*" );
 	private static final int PROPERTY_NAME_GROUP = 1;
 	private static final int INDEXED_GROUP = 2;
 	private static final int INDEX_GROUP = 3;
