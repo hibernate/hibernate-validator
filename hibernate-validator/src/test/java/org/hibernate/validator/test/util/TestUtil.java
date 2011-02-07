@@ -18,6 +18,7 @@ package org.hibernate.validator.test.util;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +49,7 @@ import static org.testng.FileAssert.fail;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class TestUtil {
 
@@ -99,6 +101,16 @@ public class TestUtil {
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, String property) {
 		Validator validator = getValidator();
 		return validator.getConstraintsForClass( clazz ).getConstraintsForProperty( property );
+	}
+
+	public static Object getMethodValidationProxy(ValidationInvocationHandler handler) {
+		final Class<?> wrappedObjectClass = handler.getWrapped().getClass();
+
+		return Proxy.newProxyInstance(
+				wrappedObjectClass.getClassLoader(),
+				wrappedObjectClass.getInterfaces(),
+				handler
+		);
 	}
 
 	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations, String... messages) {

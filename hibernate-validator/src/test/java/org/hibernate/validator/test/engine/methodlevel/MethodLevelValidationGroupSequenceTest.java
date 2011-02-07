@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.test.engine.methodlevel;
 
-import java.lang.reflect.Proxy;
 import javax.validation.Validation;
 
 import org.testng.annotations.BeforeMethod;
@@ -31,9 +30,11 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
+import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
 import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -59,13 +60,11 @@ public class MethodLevelValidationGroupSequenceTest {
 				.getValidator()
 				.unwrap( MethodValidator.class );
 
-		customerRepository = (CustomerRepositoryWithRedefinedDefaultGroup) Proxy.newProxyInstance(
-				getClass().getClassLoader(),
-				new Class<?>[] { CustomerRepositoryWithRedefinedDefaultGroup.class },
-				new ValidationInvocationHandler(
-						new CustomerRepositoryWithRedefinedDefaultGroupImpl(), validator, groups
-				)
+		ValidationInvocationHandler handler = new ValidationInvocationHandler(
+				new CustomerRepositoryWithRedefinedDefaultGroupImpl(), validator, groups
 		);
+
+		customerRepository = (CustomerRepositoryWithRedefinedDefaultGroup) getMethodValidationProxy( handler );
 	}
 
 	@Test

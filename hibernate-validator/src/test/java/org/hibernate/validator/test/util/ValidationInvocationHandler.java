@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.engine.methodlevel;
+package org.hibernate.validator.test.util;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -78,5 +78,9 @@ public class ValidationInvocationHandler implements InvocationHandler {
 		}
 
 		return result;
+	}
+
+	public Object getWrapped() {
+		return wrapped;
 	}
 }
