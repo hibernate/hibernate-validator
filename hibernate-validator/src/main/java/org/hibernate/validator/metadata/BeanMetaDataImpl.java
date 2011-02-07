@@ -41,11 +41,14 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
+import org.hibernate.validator.DefaultGroupSequenceProvider;
+import org.hibernate.validator.GroupSequenceProvider;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.ReflectionHelper.newInstance;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -97,6 +100,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 
 	/**
+	 * The default group sequence provider.
+	 * @see org.hibernate.validator.GroupSequenceProvider
+	 * @see DefaultGroupSequenceProvider
+	 */
+	private DefaultGroupSequenceProvider<T> defaultGroupSequenceProvider;
+
+	/**
 	 * Object keeping track of all constraints.
 	 */
 	private final ConstraintHelper constraintHelper;
@@ -128,6 +138,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
+		this.defaultGroupSequenceProvider = null;
 
 		createMetaData( annotationIgnores, beanMetaDataCache );
 		if ( !defaultGroupSequence.isEmpty() ) {
@@ -241,8 +252,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableList( defaultGroupSequence );
 	}
 
+	public List<Class<?>> getDefaultGroupSequence(T objectState) {
+		List<Class<?>> dynamicDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( objectState );
+		return getValidDefaultGroupSequence( dynamicDefaultGroupSequence );
+	}
+
 	public boolean defaultGroupSequenceIsRedefined() {
-		return defaultGroupSequence.size() > 1;
+		return defaultGroupSequence.size() > 1 || defaultGroupSequenceProvider != null;
+	}
+
+	public boolean isDefaultGroupSequenceProvider() {
+		return defaultGroupSequenceProvider != null;
 	}
 
 	public Set<PropertyDescriptor> getConstrainedProperties() {
@@ -250,18 +270,23 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void setDefaultGroupSequence(List<Class<?>> groupSequence) {
-		defaultGroupSequence = new ArrayList<Class<?>>();
+		defaultGroupSequence = getValidDefaultGroupSequence( groupSequence );
+	}
+
+	private List<Class<?>> getValidDefaultGroupSequence(List<Class<?>> groupSequence) {
+		List<Class<?>> validDefaultGroupSequence = new ArrayList<Class<?>>();
+
 		boolean groupSequenceContainsDefault = false;
 		for ( Class<?> group : groupSequence ) {
 			if ( group.getName().equals( beanClass.getName() ) ) {
-				defaultGroupSequence.add( Default.class );
+				validDefaultGroupSequence.add( Default.class );
 				groupSequenceContainsDefault = true;
 			}
 			else if ( group.getName().equals( Default.class.getName() ) ) {
 				throw new GroupDefinitionException( "'Default.class' cannot appear in default group sequence list." );
 			}
 			else {
-				defaultGroupSequence.add( group );
+				validDefaultGroupSequence.add( group );
 			}
 		}
 		if ( !groupSequenceContainsDefault ) {
@@ -271,9 +296,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			log.trace(
 					"Members of the default group sequence for bean {} are: {}",
 					beanClass.getName(),
-					defaultGroupSequence
+					validDefaultGroupSequence
 			);
 		}
+
+		return validDefaultGroupSequence;
 	}
 
 	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<T, ? extends Annotation> metaConstraint) {
@@ -364,15 +391,28 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private void initDefaultGroupSequence() {
 		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
+		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
 		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
-		if ( groupSequenceAnnotation == null ) {
-			groupSequence.add( beanClass );
-		}
-		else {
-			groupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
+
+		if ( groupSequenceAnnotation != null && groupSequenceProviderAnnotation != null ) {
+			throw new GroupDefinitionException(
+					"GroupSequence and GroupSequenceProvider annotations cannot be used at the same time"
+			);
 		}
 
-		setDefaultGroupSequence( groupSequence );
+		if ( groupSequenceProviderAnnotation != null ) {
+			defaultGroupSequenceProvider = newInstance(
+					groupSequenceProviderAnnotation.value(), "the default group sequence provider"
+			);
+		}
+		else if ( groupSequenceAnnotation != null ) {
+			groupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
+			setDefaultGroupSequence( groupSequence );
+		}
+		else {
+			groupSequence.add( beanClass );
+			setDefaultGroupSequence( groupSequence );
+		}
 	}
 
 	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
@@ -581,7 +621,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return metaData;
 	}
 
-
 	/**
 	 * Finds all constraint annotations defined for the given field/method and returns them in a list of
 	 * constraint descriptors.
@@ -678,7 +717,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		return metaData;
 	}
-
 
 	private ConstraintOrigin determineOrigin(Class<?> clazz) {
 		if ( clazz.equals( beanClass ) ) {

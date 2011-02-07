@@ -53,6 +53,20 @@ public interface BeanMetaData<T> {
 	List<Class<?>> getDefaultGroupSequence();
 
 	/**
+	 * Get the dynamic composition of the default group sequence according
+	 * to the current bean state.
+	 *
+	 * @param objectState the object state
+	 * @return A map mapping defined group sequences to a list of groups.
+	 */
+	List<Class<?>> getDefaultGroupSequence(T objectState);
+
+	/**
+	 * @return {@code true} if a default group sequence provider is defined.
+	 */
+	boolean isDefaultGroupSequenceProvider();
+
+	/**
 	 * @return {@code true} if the entity redefines the default group sequence, {@code false} otherwise.
 	 */
 	boolean defaultGroupSequenceIsRedefined();
