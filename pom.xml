@@ -55,7 +55,6 @@
 
     <properties>
         <slf4jVersion>1.6.1</slf4jVersion>
-
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

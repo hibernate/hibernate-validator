@@ -334,6 +334,7 @@ public final class PathImpl implements Path, Serializable {
 	 * <a href="http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#3.8">chapter 3.8</a>
 	 *
 	 * @param identifier the identifier string
+	 *
 	 * @return true if the given identifier is a valid Java Identifier
 	 *
 	 * @throws IllegalArgumentException if the identifier is null
@@ -352,8 +353,6 @@ public final class PathImpl implements Path, Serializable {
 				return false;
 			}
 		}
-
 		return true;
 	}
-
 }
