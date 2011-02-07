@@ -31,6 +31,7 @@ import org.hibernate.validator.util.Contracts;
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class PathImpl implements Path, Serializable {
 
@@ -43,7 +44,11 @@ public final class PathImpl implements Path, Serializable {
 	 *
 	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
 	 */
-	private static final Pattern PATH_PATTERN = Pattern.compile( "(\\w+)(\\[(\\w*)\\])?(\\.(.*))*" );
+	private static final String LEADING_PROPERTY_GROUP = "[^\\[\\.]+";  // everything up to a [ or .
+	private static final String OPTIONAL_INDEX_GROUP = "\\[(\\w*)\\]";
+	private static final String REMAINING_PROPERTY_STRING = "\\.(.*)";  // processed recursively
+
+	private static final Pattern PATH_PATTERN = Pattern.compile( "(" + LEADING_PROPERTY_GROUP + ")(" + OPTIONAL_INDEX_GROUP + ")?(" + REMAINING_PROPERTY_STRING + ")*" );
 	private static final int PROPERTY_NAME_GROUP = 1;
 	private static final int INDEXED_GROUP = 2;
 	private static final int INDEX_GROUP = 3;
@@ -284,8 +289,12 @@ public final class PathImpl implements Path, Serializable {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );
 			if ( matcher.matches() ) {
 
-				// create the node
 				String value = matcher.group( PROPERTY_NAME_GROUP );
+				if ( !isValidJavaIdentifier( value ) ) {
+					throw new IllegalArgumentException( value + " is not a valid Java Identifier" );
+				}
+
+				// create the node
 				path.addNode( value );
 
 				// is the node indexable
@@ -319,4 +328,32 @@ public final class PathImpl implements Path, Serializable {
 
 		return path;
 	}
+
+	/**
+	 * Validate that the given identifier is a valid Java identifier according to the Java Language Specification,
+	 * <a href="http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#3.8">chapter 3.8</a>
+	 *
+	 * @param identifier the identifier string
+	 * @return true if the given identifier is a valid Java Identifier
+	 *
+	 * @throws IllegalArgumentException if the identifier is null
+	 */
+	private static boolean isValidJavaIdentifier(String identifier) {
+		Contracts.assertNotNull( identifier, "identifier param cannot be null" );
+
+		final char[] identifierChars = identifier.toCharArray();
+
+		if ( identifierChars.length == 0 || !Character.isJavaIdentifierStart( (int) identifierChars[0] ) ) {
+			return false;
+		}
+
+		for ( int i = 1; i < identifierChars.length; i++ ) {
+			if ( !Character.isJavaIdentifierPart( (int) identifierChars[i] ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 }

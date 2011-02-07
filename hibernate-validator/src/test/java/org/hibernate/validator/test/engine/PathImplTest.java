@@ -40,6 +40,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class PathImplTest {
 
@@ -74,6 +75,35 @@ public class PathImplTest {
 		assertFalse( propIter.hasNext() );
 
 		assertEquals( path.toString(), property );
+	}
+
+	@Test
+	public void testParsingPropertyWithCurrencySymbol() {
+		PathImpl path = PathImpl.createPathFromString( "€Amount" );
+		Iterator<Path.Node> it = path.iterator();
+
+		assertEquals( it.next().getName(), "€Amount" );
+	}
+
+	@Test
+	public void testParsingPropertyWithGermanCharacter() {
+		PathImpl path = PathImpl.createPathFromString( "höchstBetrag" );
+		Iterator<Path.Node> it = path.iterator();
+
+		assertEquals( it.next().getName(), "höchstBetrag" );
+	}
+
+	@Test
+	public void testParsingPropertyWithUnicodeCharacter() {
+		PathImpl path = PathImpl.createPathFromString( "höchst\u00f6Betrag" );
+		Iterator<Path.Node> it = path.iterator();
+
+		assertEquals( it.next().getName(), "höchst\u00f6Betrag" );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testParsingInvalidJavaProperty() {
+		PathImpl.createPathFromString( "1invalid" );
 	}
 
 	@Test
