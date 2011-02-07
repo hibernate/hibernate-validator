@@ -269,7 +269,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
+			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
+				 groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
+			}
+			else {
+				groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
+			}
 		}
 
 		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
@@ -358,7 +363,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForRedefinedDefaultGroupOnMainEntity(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
-		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
+		List<Class<?>> defaultGroupSequence;
+		if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
+			defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+		}
+		else {
+			defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
+		}
+
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 			valueContext.setCurrentGroup( defaultSequenceMember );
