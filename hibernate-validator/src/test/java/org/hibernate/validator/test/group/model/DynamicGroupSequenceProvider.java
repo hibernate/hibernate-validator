@@ -14,11 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.group;
+package org.hibernate.validator.test.group.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.test.group.model.StrongCheck;
+import org.hibernate.validator.test.group.model.User;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public interface StrongCheck {
+public class DynamicGroupSequenceProvider implements DefaultGroupSequenceProvider<User> {
+
+	public List<Class<?>> getValidationGroups(User user) {
+		List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
+		defaultGroupSequence.add( User.class );
+
+		if ( user.isAdmin() ) {
+			defaultGroupSequence.add( StrongCheck.class );
+		}
+
+		return defaultGroupSequence;
+	}
 
 }

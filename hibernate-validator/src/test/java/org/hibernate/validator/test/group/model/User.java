@@ -14,27 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.group;
+package org.hibernate.validator.test.group.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class DynamicGroupSequenceProvider implements DefaultGroupSequenceProvider<User> {
+@GroupSequenceProvider(DynamicGroupSequenceProvider.class)
+public class User {
 
-	public List<Class<?>> getValidationGroups(User user) {
-		List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
-		defaultGroupSequence.add( User.class );
+	private boolean admin;
 
-		if ( user.isAdmin() ) {
-			defaultGroupSequence.add( StrongCheck.class );
-		}
+	//Define message to avoid comparison problem with validation error message
+	//with a different locale than en
+	@Pattern(regexp = "\\w+", message = "must match \"{regexp}\"")
+	@Length(min = 10, max = 20, message = "length must be between {min} and {max}", groups = StrongCheck.class)
+	private String password;
 
-		return defaultGroupSequence;
+	public User(String password) {
+		this( password, false );
+	}
+
+	public User(String password, boolean admin) {
+		this.password = password;
+		this.admin = admin;
+	}
+
+	public boolean isAdmin() {
+		return admin;
 	}
 
 }

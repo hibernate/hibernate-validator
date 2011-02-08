@@ -14,38 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.group;
-
-import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.constraints.Length;
+package org.hibernate.validator.test.group.model;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-@GroupSequenceProvider(DynamicGroupSequenceProvider.class)
-public class User {
-
-	private boolean admin;
-
-	//Define message to avoid comparison problem with validation error message
-	//with a different locale than en
-	@Pattern(regexp = "\\w+", message = "must match \"{regexp}\"")
-	@Length(min = 10, max = 20, message = "length must be between {min} and {max}", groups = StrongCheck.class)
-	private String password;
-
-	public User(String password) {
-		this( password, false );
-	}
-
-	public User(String password, boolean admin) {
-		this.password = password;
-		this.admin = admin;
-	}
-
-	public boolean isAdmin() {
-		return admin;
-	}
+public interface StrongCheck {
 
 }

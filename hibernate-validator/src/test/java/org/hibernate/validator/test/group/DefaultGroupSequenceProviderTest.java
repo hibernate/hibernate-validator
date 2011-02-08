@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.test.group;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -24,12 +25,15 @@ import javax.validation.GroupDefinitionException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.method.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodValidator;
+import org.hibernate.validator.test.group.model.User;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
@@ -42,9 +46,12 @@ public class DefaultGroupSequenceProviderTest {
 
 	private static Validator validator;
 
+	private static MethodValidator methodValidator;
+
 	@BeforeClass
 	public static void init() {
 		validator = getValidator();
+		methodValidator = validator.unwrap( MethodValidator.class );
 	}
 
 	@Test
@@ -60,39 +67,59 @@ public class DefaultGroupSequenceProviderTest {
 	}
 
 	@Test
+	public void testValidateUserProviderDefaultGroupSequence() {
+		User user = new User( "wrong$$password" );
+		Set<ConstraintViolation<User>> violations = validator.validate( user );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
+	}
+
+
+	@Test
 	public void testValidateNotAdminUserProviderDefaultGroupSequence() {
 		User user = new User( "wrong$$password" );
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
 
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
-	}
 
-	@Test
-	public void testValidateAdminUserProviderDefaultGroupSequence() {
-		User user = new User( "short", true );
-		Set<ConstraintViolation<User>> violations = validator.validate( user );
+		User admin = new User( "short", true );
+		violations = validator.validate( admin );
 
 		assertNumberOfViolations( violations, 1 );
-		Assert.assertEquals( violations.iterator().next().getMessage(), "length must be between 10 and 20" );
+		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
 	}
 
 	@Test
-	public void testValidatePropertyNotAdminUserProviderDefaultGroupSequence() {
+	public void testValidatePropertyUserProviderDefaultGroupSequence() {
 		User user = new User( "wrong$$password" );
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
 
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
+
+		User admin = new User( "short", true );
+		violations = validator.validateProperty( admin, "password" );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
 	}
 
 	@Test
-	public void testValidatePropertyAdminUserProviderDefaultGroupSequence() {
-		User user = new User( "short", true );
-		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
+	public void testValidateReturnValueProviderDefaultGroupSequence() throws NoSuchMethodException {
+		C c = new CImpl();
+		Method fooMethod = C.class.getDeclaredMethod( "foo", String.class );
 
+		Set<MethodConstraintViolation<C>> violations = methodValidator.validateReturnValue(
+				c, fooMethod, c.foo( null )
+		);
 		assertNumberOfViolations( violations, 1 );
-		Assert.assertEquals( violations.iterator().next().getMessage(), "length must be between 10 and 20" );
+		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+
+		violations = methodValidator.validateReturnValue( c, fooMethod, c.foo( "foo" ) );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
 	}
 
 	@GroupSequenceProvider(NullGroupSequenceProvider.class)
@@ -111,8 +138,36 @@ public class DefaultGroupSequenceProviderTest {
 
 	}
 
+	@GroupSequenceProvider(MethodGroupSequenceProvider.class)
+	static interface C {
+
+		@NotNull(message = "may not be null")
+		@Length(min = 10, max = 20, groups = TestGroup.class, message = "length must be between {min} and {max}")
+		public String foo(String param);
+
+	}
+
+	static class CImpl implements C {
+
+		public String foo(String param) {
+			return param;
+		}
+
+	}
+
 	interface TestGroup {
 
+	}
+
+	public static class MethodGroupSequenceProvider implements DefaultGroupSequenceProvider<C> {
+
+		public List<Class<?>> getValidationGroups(C object) {
+			List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
+			defaultGroupSequence.add( TestGroup.class );
+			defaultGroupSequence.add( C.class );
+
+			return defaultGroupSequence;
+		}
 	}
 
 	public static class NullGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
