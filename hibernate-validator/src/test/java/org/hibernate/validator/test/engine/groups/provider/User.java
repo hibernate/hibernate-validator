@@ -29,8 +29,10 @@ public class User {
 
 	private boolean admin;
 
-	@Pattern( regexp = "\\w+" )
-	@Length(min = 10, groups = StrongCheck.class)
+	//Define message to avoid comparison problem with validation error message
+	//with a different locale than en
+	@Pattern(regexp = "\\w+", message = "must match \"{regexp}\"")
+	@Length(min = 10, max = 20, message = "length must be between {min} and {max}", groups = StrongCheck.class)
 	private String password;
 
 	public User(String password) {

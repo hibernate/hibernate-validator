@@ -34,7 +34,6 @@ public class DynamicGroupSequenceProvider implements DefaultGroupSequenceProvide
 			defaultGroupSequence.add( StrongCheck.class );
 		}
 
-		System.out.println(defaultGroupSequence);
 		return defaultGroupSequence;
 	}
 

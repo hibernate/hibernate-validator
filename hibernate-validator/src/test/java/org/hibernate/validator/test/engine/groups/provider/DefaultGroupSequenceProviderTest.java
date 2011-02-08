@@ -16,14 +16,20 @@
  */
 package org.hibernate.validator.test.engine.groups.provider;
 
-import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.GroupDefinitionException;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import org.hibernate.validator.DefaultGroupSequenceProvider;
+import org.hibernate.validator.GroupSequenceProvider;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
@@ -34,64 +40,98 @@ import static org.hibernate.validator.test.util.TestUtil.getValidator;
  */
 public class DefaultGroupSequenceProviderTest {
 
-	private static ResourceBundle resourceBundle;
-
 	private static Validator validator;
 
 	@BeforeClass
 	public static void init() {
 		validator = getValidator();
-		resourceBundle = ResourceBundle.getBundle( "org.hibernate.validator.ValidationMessages" );
 	}
 
 	@Test
-	public void testValidateNotAdminUserGroupSequenceDefinition() {
-		String errorMessage = resourceBundle.getString( "javax.validation.constraints.Pattern.message" );
-		errorMessage = errorMessage.replace( "{regexp}", "\\w+" );
+	public void testNullProviderDefaultGroupSequence() {
+		Set<ConstraintViolation<A>> violations = validator.validate( new A() );
 
+		assertNumberOfViolations( violations, 1 );
+	}
+
+	@Test(expectedExceptions = GroupDefinitionException.class)
+	public void testNotValidProviderDefaultGroupSequenceDefinition() {
+		validator.validate( new B() );
+	}
+
+	@Test
+	public void testValidateNotAdminUserProviderDefaultGroupSequence() {
 		User user = new User( "wrong$$password" );
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
 
 		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, errorMessage );
+		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
 	}
 
 	@Test
-	public void testValidateAdminUserGroupSequenceDefinition() {
-		String errorMessage = resourceBundle.getString( "org.hibernate.validator.constraints.Length.message" );
-		errorMessage = errorMessage.replace( "{min}", "10" );
-		errorMessage = errorMessage.replace( "{max}", String.valueOf( Integer.MAX_VALUE ) );
-
+	public void testValidateAdminUserProviderDefaultGroupSequence() {
 		User user = new User( "short", true );
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
 
 		assertNumberOfViolations( violations, 1 );
-		Assert.assertEquals( violations.iterator().next().getMessage(), errorMessage );
+		Assert.assertEquals( violations.iterator().next().getMessage(), "length must be between 10 and 20" );
 	}
 
 	@Test
-	public void testValidatePropertyNotAdminUserGroupSequenceDefinition() {
-		String errorMessage = resourceBundle.getString( "javax.validation.constraints.Pattern.message" );
-		errorMessage = errorMessage.replace( "{regexp}", "\\w+" );
-
+	public void testValidatePropertyNotAdminUserProviderDefaultGroupSequence() {
 		User user = new User( "wrong$$password" );
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
 
 		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, errorMessage );
+		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
 	}
 
 	@Test
-	public void testValidatePropertyAdminUserGroupSequenceDefinition() {
-		String errorMessage = resourceBundle.getString( "org.hibernate.validator.constraints.Length.message" );
-		errorMessage = errorMessage.replace( "{min}", "10" );
-		errorMessage = errorMessage.replace( "{max}", String.valueOf( Integer.MAX_VALUE ) );
-
+	public void testValidatePropertyAdminUserProviderDefaultGroupSequence() {
 		User user = new User( "short", true );
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
 
 		assertNumberOfViolations( violations, 1 );
-		Assert.assertEquals( violations.iterator().next().getMessage(), errorMessage );
+		Assert.assertEquals( violations.iterator().next().getMessage(), "length must be between 10 and 20" );
+	}
+
+	@GroupSequenceProvider(NullGroupSequenceProvider.class)
+	static class A {
+
+		@NotNull
+		String c;
+
+		@NotNull(groups = TestGroup.class)
+		String d;
+
+	}
+
+	@GroupSequenceProvider(InvalidGroupSequenceProvider.class)
+	static class B {
+
+	}
+
+	interface TestGroup {
+
+	}
+
+	public static class NullGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
+
+		public List<Class<?>> getValidationGroups(A object) {
+			return null;
+		}
+
+	}
+
+	public static class InvalidGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
+
+		public List<Class<?>> getValidationGroups(B object) {
+			List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
+			defaultGroupSequence.add( TestGroup.class );
+
+			return defaultGroupSequence;
+		}
+
 	}
 
 }
