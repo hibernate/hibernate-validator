@@ -18,10 +18,10 @@ package org.hibernate.validator.method.metadata;
 
 import java.lang.reflect.Method;
 import java.util.Set;
+
 import javax.validation.Valid;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 
 /**
  * Describes a constrained Java type and the constraints associated to it.
@@ -31,16 +31,20 @@ import javax.validation.metadata.PropertyDescriptor;
 public interface TypeDescriptor extends ElementDescriptor {
 
 	/**
-	 * Whether this type has any class-, property- or method-level constraints
-	 * or not. This is <code>true</code>, if
-	 * {@link BeanDescriptor#isBeanConstrained()} would return true for the same
-	 * type. Furthermore this will be true, if
+	 * Whether this type has any class-, property- (field or getter style) or
+	 * method-level constraints or not. This is the case if
 	 * <ul>
-	 * <li>a constraint is hosted on any of this type's method's parameters</li>
+	 * <li>a constraint is hosted at this type itself,</li>
+	 * <li>a constraint is hosted on any of this type's bean properties
+	 * (represented by fields or getter methods),</li>
+	 * <li>any of this type's bean properties (represented by fields or getter
+	 * methods) is marked for cascaded validation with the {@link Valid}
+	 * annotation,</li>
+	 * <li>a constraint is hosted on any of this type's method's parameters,</li>
 	 * <li>any of this type's method's parameters is marked for cascaded
-	 * validation with the {@link Valid} annotation</li>
+	 * validation with the {@link Valid} annotation,</li>
 	 * <li>a constraint is hosted on the return value of any of this type's
-	 * methods</li>
+	 * methods or</li>
 	 * <li>the return value of any of this type's methods is marked for cascaded
 	 * validation with the {@link Valid} annotation</li>
 	 * </ul>
@@ -49,16 +53,6 @@ public interface TypeDescriptor extends ElementDescriptor {
 	 *         <code>false</code>
 	 */
 	boolean isTypeConstrained();
-
-	/**
-	 * @see BeanDescriptor#getConstrainedProperties()
-	 */
-	Set<PropertyDescriptor> getConstrainedProperties();
-
-	/**
-	 * @see BeanDescriptor#getConstraintsForProperty(String)
-	 */
-	PropertyDescriptor getConstraintsForProperty(String propertyName);
 
 	/**
 	 * Returns a set with the constrained methods of this type.
@@ -80,4 +74,10 @@ public interface TypeDescriptor extends ElementDescriptor {
 	 */
 	MethodDescriptor getConstraintsForMethod(Method method);
 
+	/**
+	 * Returns a descriptor for the bean related constraints of this type.
+	 *
+	 * @return A bean descriptor. Will never be null, also if this type has no bean properties.
+	 */
+	BeanDescriptor getBeanDescriptor();
 }
