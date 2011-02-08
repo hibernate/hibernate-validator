@@ -14,29 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator;
+package org.hibernate.validator.group;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.List;
 
 /**
- * The GroupSequenceProvider annotation defines the SequenceProvider
- * class responsible to return the composing classes of the Default dynamic
- * group sequence definition.
- *
- * @see javax.validation.GroupSequence
+ * The default dynamic group sequence provider contract. An group sequence provider
+ * must implement this contract and provide a default constructor.
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-@Retention(RUNTIME)
-@Target({TYPE})
-public @interface GroupSequenceProvider {
+public interface DefaultGroupSequenceProvider<T> {
 	/**
-	 * The default group sequence provider implementation.
+	 * This method is responsible to provide the composing classes of the default group sequence.
+	 * The object parameter allow the provider implementation to dynamically compose the default
+	 * group sequence in function of the validated value object state.
+	 *
+	 * @param object the value being validated
+	 *
+	 * @return the class list composing the Default GroupSequence definition
 	 */
-	Class<? extends DefaultGroupSequenceProvider> value();
+	List<Class<?>> getValidationGroups(T object);
 }

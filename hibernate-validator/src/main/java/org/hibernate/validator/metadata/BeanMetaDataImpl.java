@@ -41,8 +41,8 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.DefaultGroupSequenceProvider;
-import org.hibernate.validator.GroupSequenceProvider;
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -101,7 +101,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	/**
 	 * The default group sequence provider.
-	 * @see org.hibernate.validator.GroupSequenceProvider
+	 * @see org.hibernate.validator.group.GroupSequenceProvider
 	 * @see DefaultGroupSequenceProvider
 	 */
 	private DefaultGroupSequenceProvider<T> defaultGroupSequenceProvider;

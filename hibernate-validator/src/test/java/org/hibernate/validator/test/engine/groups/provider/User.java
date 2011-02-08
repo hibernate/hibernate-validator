@@ -18,7 +18,7 @@ package org.hibernate.validator.test.engine.groups.provider;
 
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.GroupSequenceProvider;
+import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.constraints.Length;
 
 /**

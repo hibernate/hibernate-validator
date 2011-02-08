@@ -19,7 +19,7 @@ package org.hibernate.validator.test.engine.groups.provider;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.validator.DefaultGroupSequenceProvider;
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
