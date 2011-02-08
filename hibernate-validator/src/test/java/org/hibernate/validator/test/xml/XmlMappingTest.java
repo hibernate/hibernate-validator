@@ -25,10 +25,11 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.TestUtil;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
@@ -121,6 +122,29 @@ public class XmlMappingTest {
 		final Validator validator = validatorFactory.getValidator();
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
+		assertEquals( violations.size(), 0 );
+	}
+
+	@Test
+	public void testMultipleMappingFilesForSameClass() {
+
+		final Configuration<?> configuration = TestUtil.getConfiguration();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "a.xml" ) );
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "b.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+		B b = new B();
+		b.setFoo( 0 );
+		Set<ConstraintViolation<B>> violations = validator.validate( b );
+		assertEquals( violations.size(), 2 );
+
+		b.setFoo( 1 );
+		violations = validator.validate( b );
+		assertEquals( violations.size(), 1 );
+
+		b.setFoo( 18 );
+		violations = validator.validate( b );
 		assertEquals( violations.size(), 0 );
 	}
 }

@@ -45,6 +45,7 @@ import org.hibernate.validator.util.privilegedactions.GetConstructor;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.util.privilegedactions.GetField;
 import org.hibernate.validator.util.privilegedactions.GetMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.util.privilegedactions.LoadClass;
@@ -175,18 +176,18 @@ public final class ReflectionHelper {
 		}
 		return name;
 	}
-	
+
 	/**
 	 * Checks whether the given method's name is a valid JavaBeans getter name,
 	 * meaning it starts with "is" or "has".
-	 * 
-	 * @param member
-	 *            The method of interest.
+	 *
+	 * @param member The method of interest.
+	 *
 	 * @return True, if the given method is a JavaBeans getter method, false
 	 *         otherwise.
 	 */
 	public static boolean isGetterMethod(Method member) {
-		return getPropertyName(member) != null;
+		return getPropertyName( member ) != null;
 	}
 
 	/**
@@ -503,6 +504,26 @@ public final class ReflectionHelper {
 	 * @return Returns the field with the specified name or <code>null</code> if it does not exist.
 	 */
 	public static Field getField(Class<?> clazz, String fieldName) {
+		GetField action = GetField.action( clazz, fieldName );
+		final Field field;
+		if ( System.getSecurityManager() != null ) {
+			field = AccessController.doPrivileged( action );
+		}
+		else {
+			field = action.run();
+		}
+		return field;
+	}
+
+	/**
+	 * Returns the declared field with the specified name or <code>null</code> if it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param fieldName The field name.
+	 *
+	 * @return Returns the declared field with the specified name or <code>null</code> if it does not exist.
+	 */
+	public static Field getDeclaredField(Class<?> clazz, String fieldName) {
 		GetDeclaredField action = GetDeclaredField.action( clazz, fieldName );
 		final Field field;
 		if ( System.getSecurityManager() != null ) {
@@ -522,8 +543,22 @@ public final class ReflectionHelper {
 	 *
 	 * @return Returns {@code true} if the field exists, {@code false} otherwise.
 	 */
+	public static boolean containsDeclaredField(Class<?> clazz, String fieldName) {
+		Field field = getDeclaredField( clazz, fieldName );
+		return field != null;
+	}
+
+	/**
+	 * Checks whether the specified class contains a field with the given name.
+	 *
+	 * @param clazz The class to check.
+	 * @param fieldName The field name.
+	 *
+	 * @return Returns {@code true} if the field exists, {@code false} otherwise.
+	 */
 	public static boolean containsField(Class<?> clazz, String fieldName) {
-		return getField( clazz, fieldName ) != null;
+		Field field = getField( clazz, fieldName );
+		return field != null;
 	}
 
 	/**
