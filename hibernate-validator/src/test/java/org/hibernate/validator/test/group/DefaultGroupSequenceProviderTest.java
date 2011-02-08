@@ -73,16 +73,6 @@ public class DefaultGroupSequenceProviderTest {
 
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
-	}
-
-
-	@Test
-	public void testValidateNotAdminUserProviderDefaultGroupSequence() {
-		User user = new User( "wrong$$password" );
-		Set<ConstraintViolation<User>> violations = validator.validate( user );
-
-		assertNumberOfViolations( violations, 1 );
-		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
 
 		User admin = new User( "short", true );
 		violations = validator.validate( admin );
