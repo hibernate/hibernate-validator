@@ -38,7 +38,6 @@ public class DefaultGroupSequenceProviderTest {
 
 	private static Validator validator;
 
-
 	@BeforeClass
 	public static void init() {
 		validator = getValidator();
@@ -46,7 +45,7 @@ public class DefaultGroupSequenceProviderTest {
 	}
 
 	@Test
-	public void testNotAdminUserGroupSequenceDefinition() {
+	public void testValidateNotAdminUserGroupSequenceDefinition() {
 		String errorMessage = resourceBundle.getString( "javax.validation.constraints.Pattern.message" );
 		errorMessage = errorMessage.replace( "{regexp}", "\\w+" );
 
@@ -58,13 +57,38 @@ public class DefaultGroupSequenceProviderTest {
 	}
 
 	@Test
-	public void testAdminUserGroupSequenceDefinition() {
+	public void testValidateAdminUserGroupSequenceDefinition() {
 		String errorMessage = resourceBundle.getString( "org.hibernate.validator.constraints.Length.message" );
 		errorMessage = errorMessage.replace( "{min}", "10" );
 		errorMessage = errorMessage.replace( "{max}", String.valueOf( Integer.MAX_VALUE ) );
 
 		User user = new User( "short", true );
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
+
+		assertNumberOfViolations( violations, 1 );
+		Assert.assertEquals( violations.iterator().next().getMessage(), errorMessage );
+	}
+
+	@Test
+	public void testValidatePropertyNotAdminUserGroupSequenceDefinition() {
+		String errorMessage = resourceBundle.getString( "javax.validation.constraints.Pattern.message" );
+		errorMessage = errorMessage.replace( "{regexp}", "\\w+" );
+
+		User user = new User( "wrong$$password" );
+		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, errorMessage );
+	}
+
+	@Test
+	public void testValidatePropertyAdminUserGroupSequenceDefinition() {
+		String errorMessage = resourceBundle.getString( "org.hibernate.validator.constraints.Length.message" );
+		errorMessage = errorMessage.replace( "{min}", "10" );
+		errorMessage = errorMessage.replace( "{max}", String.valueOf( Integer.MAX_VALUE ) );
+
+		User user = new User( "short", true );
+		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
 
 		assertNumberOfViolations( violations, 1 );
 		Assert.assertEquals( violations.iterator().next().getMessage(), errorMessage );

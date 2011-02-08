@@ -653,7 +653,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			groupList = beanMetaData.getDefaultGroupSequence();
+			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
+				groupList = beanMetaData.getDefaultGroupSequence( object );
+			}
+			else {
+				groupList = beanMetaData.getDefaultGroupSequence();
+			}
 		}
 		else {
 			groupList = new ArrayList<Class<?>>();
