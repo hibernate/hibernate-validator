@@ -253,8 +253,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public List<Class<?>> getDefaultGroupSequence(T objectState) {
-		List<Class<?>> dynamicDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( objectState );
-		return getValidDefaultGroupSequence( dynamicDefaultGroupSequence );
+		List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( objectState );
+
+		if ( providerDefaultGroupSequence == null ) {
+			providerDefaultGroupSequence = new ArrayList<Class<?>>();
+			providerDefaultGroupSequence.add( beanClass );
+		}
+
+		return getValidDefaultGroupSequence( providerDefaultGroupSequence );
 	}
 
 	public boolean defaultGroupSequenceIsRedefined() {
