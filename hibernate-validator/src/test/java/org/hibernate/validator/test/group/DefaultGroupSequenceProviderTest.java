@@ -68,7 +68,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test
 	public void testValidateUserProviderDefaultGroupSequence() {
-		User user = new User( "wrong$$password" );
+		User user = new User( "$password" );
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
 
 		assertNumberOfViolations( violations, 1 );
@@ -83,7 +83,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test
 	public void testValidatePropertyUserProviderDefaultGroupSequence() {
-		User user = new User( "wrong$$password" );
+		User user = new User( "$password" );
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
 
 		assertNumberOfViolations( violations, 1 );
@@ -99,7 +99,7 @@ public class DefaultGroupSequenceProviderTest {
 	@Test
 	public void testValidateValueUserProviderDefaultGroupSequence() {
 		Set<ConstraintViolation<User>> violations = validator.validateValue(
-				User.class, "password", "wrong$$password"
+				User.class, "password", "$password"
 		);
 
 		assertNumberOfViolations( violations, 1 );
