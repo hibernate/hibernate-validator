@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.engine;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -25,14 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.ValidatorContext;
-import javax.validation.ValidatorFactory;
 import javax.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -54,6 +49,8 @@ import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.xml.XmlMappingParser;
 
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
  * implementation of the {@code ValidatorFactory} interface.
@@ -63,7 +60,7 @@ import org.hibernate.validator.xml.XmlMappingParser;
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class ValidatorFactoryImpl implements ValidatorFactory, HibernateValidatorFactory {
+public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
@@ -99,7 +96,8 @@ public class ValidatorFactoryImpl implements ValidatorFactory, HibernateValidato
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 		}
 		if ( tmpFailFast == null ) {
-			String failFastPropValue = configurationState.getProperties().get( HibernateValidatorConfiguration.FAIL_FAST );
+			String failFastPropValue = configurationState.getProperties()
+					.get( HibernateValidatorConfiguration.FAIL_FAST );
 			tmpFailFast = Boolean.valueOf( failFastPropValue );
 		}
 		this.failFast = tmpFailFast;
@@ -129,18 +127,7 @@ public class ValidatorFactoryImpl implements ValidatorFactory, HibernateValidato
 		throw new ValidationException( "Type " + type + " not supported" );
 	}
 
-	public ValidatorContext usingContext() {
-		return new ValidatorContextImpl(
-				constraintValidatorFactory,
-				messageInterpolator,
-				traversableResolver,
-				constraintHelper,
-				beanMetaDataCache,
-				failFast
-		);
-	}
-
-	public HibernateValidatorContext usingHibernateContext() {
+	public HibernateValidatorContext usingContext() {
 		return new HibernateValidatorContextImpl(
 				constraintValidatorFactory,
 				messageInterpolator,
