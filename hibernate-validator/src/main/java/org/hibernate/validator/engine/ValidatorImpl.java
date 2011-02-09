@@ -317,16 +317,20 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return;
 		}
 
-		// if we are validating the default group we have to distinguish between the case where the main entity type redefines the default group and where not
+		// if we are validating the default group we have to distinguish between the case where the main entity type
+		// redefines the default group and where not.
+		// When the default group is validated, but the current bean does not redefine the default group sequence
+		// in this case we have to check whether any of the super-types (and the constraints hosted on it) re-defines
+		// the default group sequence. In this case this sequence must be applied
 		if ( validatedBeanRedefinesDefault ) {
-			validateConstraintsForRedefinedDefaultGroupOnMainEntity( validationContext, valueContext, beanMetaData );
+			validateConstraintsForRedefinedDefaultGroup( validationContext, valueContext, beanMetaData );
 		}
 		else {
-			validateConstraintsForRedefinedDefaultGroup( validationContext, valueContext, beanMetaData );
+			validateConstraintsForDefaultGroup( validationContext, valueContext, beanMetaData );
 		}
 	}
 
-	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForRedefinedDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
+	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<U, ? extends Annotation>>> entry : beanMetaData.getMetaConstraintsAsMap()
 				.entrySet() ) {
 
@@ -360,7 +364,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForRedefinedDefaultGroupOnMainEntity(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
+	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForRedefinedDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
 		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
 
 		PathImpl currentPath = valueContext.getPropertyPath();
