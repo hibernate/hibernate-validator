@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.hibernate.validator;
 
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
-import javax.validation.TraversableResolver;
-import javax.validation.Validator;
+import javax.validation.ValidatorContext;
 
 /**
  * Provide Hibernate Validator context specific configuration and
@@ -28,7 +26,7 @@ import javax.validation.Validator;
  * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public interface HibernateValidatorContext {
+public interface HibernateValidatorContext extends ValidatorContext {
 	/**
 	 * Enable or disable fail fast. When fail fast is enabled the validation
 	 * will stop on the first constraint violation detected.
@@ -38,41 +36,4 @@ public interface HibernateValidatorContext {
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorContext failFast(boolean failFast);
-
-	/**
-	 * Defines the message interpolator implementation used by the
-	 * <code>Validator</code>.
-	 * If not set or if null is passed as a parameter,
-	 * the message interpolator of the <code>ValidatorFactory</code>
-	 * is used.
-	 *
-	 * @return self following the chaining method pattern
-	 */
-	HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
-
-	/**
-	 * Defines the traversable resolver implementation used by the
-	 * <code>Validator</code>.
-	 * If not set or if null is passed as a parameter,
-	 * the traversable resolver of the <code>ValidatorFactory</code> is used.
-	 *
-	 * @return self following the chaining method pattern
-	 */
-	HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver);
-
-	/**
-	 * Defines the constraint validator factory implementation used by the
-	 * <code>Validator</code>.
-	 * If not set or if null is passed as a parameter,
-	 * the constraint validator factory of the <code>ValidatorFactory</code> is used.
-	 *
-	 * @return self following the chaining method pattern
-	 */
-	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
-
-	/**
-	 * @return an initialized <code>Validator</code> instance respecting the defined state.
-	 *         Validator instances can be pooled and shared by the implementation.
-	 */
-	Validator getValidator();
 }
