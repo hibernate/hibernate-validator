@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.hibernate.validator;
+
+import javax.validation.ValidatorFactory;
 
 /**
  * Provide Hibernate Validator extensions to ValidatorFactory
@@ -22,10 +25,10 @@ package org.hibernate.validator;
  * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public interface HibernateValidatorFactory {
+public interface HibernateValidatorFactory extends ValidatorFactory {
 	/**
 	 * Refine Validator configuration via options from
 	 * Bean Validation as well as specific ones from Hibernate Validator
 	 */
-	HibernateValidatorContext usingHibernateContext();
+	HibernateValidatorContext usingContext();
 }
