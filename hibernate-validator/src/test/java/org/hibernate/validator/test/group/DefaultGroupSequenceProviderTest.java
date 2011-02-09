@@ -97,6 +97,16 @@ public class DefaultGroupSequenceProviderTest {
 	}
 
 	@Test
+	public void testValidateValueUserProviderDefaultGroupSequence() {
+		Set<ConstraintViolation<User>> violations = validator.validateValue(
+				User.class, "password", "wrong$$password"
+		);
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
+	}
+
+	@Test
 	public void testValidateReturnValueProviderDefaultGroupSequence() throws NoSuchMethodException {
 		C c = new CImpl();
 		Method fooMethod = C.class.getDeclaredMethod( "foo", String.class );

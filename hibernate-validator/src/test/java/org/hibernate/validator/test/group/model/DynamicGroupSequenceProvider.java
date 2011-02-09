@@ -32,7 +32,7 @@ public class DynamicGroupSequenceProvider implements DefaultGroupSequenceProvide
 		List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 		defaultGroupSequence.add( User.class );
 
-		if ( user.isAdmin() ) {
+		if ( user != null && user.isAdmin() ) {
 			defaultGroupSequence.add( StrongCheck.class );
 		}
 
