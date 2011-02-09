@@ -86,9 +86,9 @@ public interface BeanMetaData<T> {
 	/**
 	 * Returns the constraint-related meta data for the given method of the
 	 * class represented by this bean meta data.
-	 * 
-	 * @param method
-	 *            The method of interest.
+	 *
+	 * @param method The method of interest.
+	 *
 	 * @return A map with constraint-related meta data, keyed by the class
 	 *         defining it (will only contain more than one entry, if the given
 	 *         method is overwritten from an interface or base class. In this
@@ -96,7 +96,7 @@ public interface BeanMetaData<T> {
 	 *         hierarchy is returned).
 	 */
 	Map<Class<?>, MethodMetaData> getMetaDataForMethod(Method method);
-	
+
 	/**
 	 * Return {@code PropertyDescriptor} for the given property.
 	 *
@@ -108,8 +108,10 @@ public interface BeanMetaData<T> {
 	PropertyDescriptor getPropertyDescriptor(String property);
 
 	/**
-	 * return true if the property exists on the object
-	 * even if the property does not host any constraint nor is cascaded
+	 * @param name The name of the property
+	 *
+	 * @return true if the property exists on the object
+	 *         even if the property does not host any constraint nor is cascaded
 	 */
 	boolean isPropertyPresent(String name);
 

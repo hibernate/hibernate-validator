@@ -124,13 +124,11 @@ public class DefaultGroupSequenceProviderTest {
 
 	@GroupSequenceProvider(NullGroupSequenceProvider.class)
 	static class A {
-
 		@NotNull
 		String c;
 
 		@NotNull(groups = TestGroup.class)
 		String d;
-
 	}
 
 	@GroupSequenceProvider(InvalidGroupSequenceProvider.class)
@@ -144,7 +142,6 @@ public class DefaultGroupSequenceProviderTest {
 		@NotNull(message = "may not be null")
 		@Length(min = 10, max = 20, groups = TestGroup.class, message = "length must be between {min} and {max}")
 		public String foo(String param);
-
 	}
 
 	static class CImpl implements C {
@@ -152,7 +149,6 @@ public class DefaultGroupSequenceProviderTest {
 		public String foo(String param) {
 			return param;
 		}
-
 	}
 
 	interface TestGroup {
@@ -186,7 +182,5 @@ public class DefaultGroupSequenceProviderTest {
 
 			return defaultGroupSequence;
 		}
-
 	}
-
 }

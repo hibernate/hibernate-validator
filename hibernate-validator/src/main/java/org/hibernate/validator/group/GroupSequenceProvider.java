@@ -27,15 +27,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * class responsible to return the composing classes of the Default dynamic
  * group sequence definition.
  *
- * @see javax.validation.GroupSequence
- *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @see javax.validation.GroupSequence
  */
 @Retention(RUNTIME)
-@Target({TYPE})
+@Target( { TYPE })
 public @interface GroupSequenceProvider {
 	/**
-	 * The default group sequence provider implementation.
+	 * @return The default group sequence provider implementation.
 	 */
 	Class<? extends DefaultGroupSequenceProvider> value();
 }

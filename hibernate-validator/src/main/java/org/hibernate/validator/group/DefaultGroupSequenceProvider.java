@@ -32,9 +32,11 @@ public interface DefaultGroupSequenceProvider<T> {
 	 * group sequence in function of the validated value state.
 	 * </p>
 	 *
-	 * @param object the value being validated or null if this provider is used within the {@linkplain javax.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue} method
+	 * @param object the value being validated or {@code null} if this provider is used within the
+	 * {@linkplain javax.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue} method
 	 *
-	 * @return the class list composing the Default GroupSequence definition, if null is returned it's assumed to be the Default group.
+	 * @return the class list specifying the default group sequence, if {@code null} is returned
+	 * it's assumed to be the Default group.
 	 */
 	List<Class<?>> getValidationGroups(T object);
 }
