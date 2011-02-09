@@ -11,6 +11,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.slf4j.Logger;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
@@ -18,15 +19,23 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.method.MethodConstraintViolationException;
+import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidationInvocationHandler;
+import org.hibernate.validator.util.LoggerFactory;
 
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
+import static org.testng.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class FailFastTest {
+	private static final Logger log = LoggerFactory.make();
+
 	@Test
 	public void testFailFastDefaultBehaviour() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
@@ -39,57 +48,57 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 	}
 
-//	@Test
-//	public void testFailFastMethodValidationDefaultBehaviour() {
-//		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
-//		final ValidatorFactory factory = configuration.buildValidatorFactory();
-//
-//		final Validator validator = factory.getValidator();
-//		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
-//
-//		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-//		TestService service = (TestService) getMethodValidationProxy( handler );
-//
-//		try {
-//			service.testMethod( " ", null );
-//			fail();
-//		}
-//		catch ( MethodConstraintViolationException e ) {
-//			assertNumberOfViolations( e.getConstraintViolations(), 3 );
-//		}
-//	}
-//
-//	@Test
-//	public void testFailFastSetOnValidatorFactory() {
-//		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
-//		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
-//
-//		final Validator validator = factory.getValidator();
-//		A testInstance = new A();
-//
-//		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
-//		assertNumberOfViolations( constraintViolations, 1 );
-//	}
-//
-//	@Test
-//	public void testFailFastMethodValidationSetOnValidatorFactory() {
-//		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
-//		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
-//
-//		final Validator validator = factory.getValidator();
-//		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
-//
-//		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-//		TestService service = (TestService) getMethodValidationProxy( handler );
-//
-//		try {
-//			service.testMethod( "a", null );
-//			fail();
-//		}
-//		catch ( MethodConstraintViolationException e ) {
-//			assertNumberOfViolations( e.getConstraintViolations(), 1 );
-//		}
-//	}
+	@Test
+	public void testFailFastMethodValidationDefaultBehaviour() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
+
+		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
+		TestService service = (TestService) getMethodValidationProxy( handler );
+
+		try {
+			service.testMethod( " ", null );
+			fail();
+		}
+		catch ( MethodConstraintViolationException e ) {
+			assertNumberOfViolations( e.getConstraintViolations(), 3 );
+		}
+	}
+
+	@Test
+	public void testFailFastSetOnValidatorFactory() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		A testInstance = new A();
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
+
+	@Test
+	public void testFailFastMethodValidationSetOnValidatorFactory() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
+
+		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
+		TestService service = (TestService) getMethodValidationProxy( handler );
+
+		try {
+			service.testMethod( "a", null );
+			fail();
+		}
+		catch ( MethodConstraintViolationException e ) {
+			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+		}
+	}
 
 	@Test
 	public void testFailFastSetOnValidator() {
@@ -107,29 +116,29 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-//	@Test
-//	public void testFailFastMethodValidationSetOnValidator() {
-//		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
-//		final ValidatorFactory factory = configuration.buildValidatorFactory();
-//
-//		final Validator validator =
-//				factory.unwrap( HibernateValidatorFactory.class )
-//						.usingHibernateContext()
-//						.failFast( true )
-//						.getValidator();
-//		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
-//
-//		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-//		TestService service = (TestService) getMethodValidationProxy( handler );
-//
-//		try {
-//			service.testMethod( " ", null );
-//			fail();
-//		}
-//		catch ( MethodConstraintViolationException e ) {
-//			assertNumberOfViolations( e.getConstraintViolations(), 1 );
-//		}
-//	}
+	@Test
+	public void testFailFastMethodValidationSetOnValidator() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.buildValidatorFactory();
+
+		final Validator validator =
+				factory.unwrap( HibernateValidatorFactory.class )
+						.usingContext()
+						.failFast( true )
+						.getValidator();
+		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
+
+		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
+		TestService service = (TestService) getMethodValidationProxy( handler );
+
+		try {
+			service.testMethod( " ", null );
+			fail();
+		}
+		catch ( MethodConstraintViolationException e ) {
+			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+		}
+	}
 
 	@Test
 	public void testFailFastSetWithProperty() {
@@ -144,26 +153,26 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-//	@Test
-//	public void testFailFastMethodValidationSetWithProperty() {
-//		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
-//		final ValidatorFactory factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "true" )
-//				.buildValidatorFactory();
-//
-//		final Validator validator = factory.getValidator();
-//		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
-//
-//		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-//		TestService service = (TestService) getMethodValidationProxy( handler );
-//
-//		try {
-//			service.testMethod( " ", null );
-//			fail();
-//		}
-//		catch ( MethodConstraintViolationException e ) {
-//			assertNumberOfViolations( e.getConstraintViolations(), 1 );
-//		}
-//	}
+	@Test
+	public void testFailFastMethodValidationSetWithProperty() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "true" )
+				.buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
+
+		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
+		TestService service = (TestService) getMethodValidationProxy( handler );
+
+		try {
+			service.testMethod( " ", null );
+			fail();
+		}
+		catch ( MethodConstraintViolationException e ) {
+			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+		}
+	}
 
 	@Test
 	public void testFailFastSetWithInvalidProperty() {
@@ -181,7 +190,6 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 	}
 
-	@Test
 	public void testFailSafePerf() {
 		final Validator regularValidator = TestUtil.getConfiguration().buildValidatorFactory().getValidator();
 		final Validator failFastValidator = TestUtil.getConfiguration()
@@ -212,7 +220,7 @@ public class FailFastTest {
 		}
 		long timeOfFailFast = System.nanoTime() - start;
 
-		System.err.println( "Regular = " + timeOfRegular + "\n FailFast:" + timeOfFailFast );
+		log.debug( "Regular = " + timeOfRegular + "\n FailFast:" + timeOfFailFast );
 	}
 
 	private void validateBatch(Validator validator) {
@@ -268,5 +276,4 @@ public class FailFastTest {
 		public void testMethod(String param1, String param2) {
 		}
 	}
-
 }
