@@ -48,23 +48,23 @@ public interface BeanMetaData<T> {
 	List<Member> getCascadedMembers();
 
 	/**
-	 * @return A map mapping defined group sequences to a list of groups.
-	 */
-	List<Class<?>> getDefaultGroupSequence();
-
-	/**
-	 * Get the dynamic composition of the default group sequence according
-	 * to the current bean state.
+	 * Get the composition of the default group sequence.
+	 * <p>
+	 * If the bean state is given in parameter and the bean metadata has a default group sequence provider then the
+	 * dynamic default group sequence composition is returned. In the other cases the default group sequence
+	 * redefinition specified by BV is used.
+	 * </p>
 	 *
-	 * @param objectState the object state
-	 * @return A map mapping defined group sequences to a list of groups.
+	 * @param beanState the bean state.
+	 *
+	 * @return a list of classes representing the default group sequence.
 	 */
-	List<Class<?>> getDefaultGroupSequence(T objectState);
+	List<Class<?>> getDefaultGroupSequence(T beanState);
 
 	/**
 	 * @return {@code true} if a default group sequence provider is defined.
 	 */
-	boolean isDefaultGroupSequenceProvider();
+	boolean hasDefaultGroupSequenceProvider();
 
 	/**
 	 * @return {@code true} if the entity redefines the default group sequence, {@code false} otherwise.

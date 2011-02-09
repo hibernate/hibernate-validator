@@ -93,7 +93,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 			this.groups = new ArrayList<Class<?>>();
 			for ( Class<?> clazz : classes ) {
 				if ( Default.class.equals( clazz ) && metaDataBean.defaultGroupSequenceIsRedefined() ) {
-					this.groups.addAll( metaDataBean.getDefaultGroupSequence() );
+					this.groups.addAll( metaDataBean.getDefaultGroupSequence( null ) );
 				}
 				else {
 					groups.add( clazz );

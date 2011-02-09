@@ -19,20 +19,22 @@ package org.hibernate.validator.group;
 import java.util.List;
 
 /**
- * The default dynamic group sequence provider contract. An group sequence provider
- * must implement this contract and provide a default constructor.
+ * The default dynamic group sequence provider contract. A provider must implement
+ * this contract and provide a public default constructor.
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface DefaultGroupSequenceProvider<T> {
 	/**
 	 * This method is responsible to provide the composing classes of the default group sequence.
+	 * <p>
 	 * The object parameter allow the provider implementation to dynamically compose the default
-	 * group sequence in function of the validated value object state.
+	 * group sequence in function of the validated value state.
+	 * </p>
 	 *
-	 * @param object the value being validated
+	 * @param object the value being validated or null if this provider is used within the {@linkplain javax.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue} method
 	 *
-	 * @return the class list composing the Default GroupSequence definition
+	 * @return the class list composing the Default GroupSequence definition, if null is returned it's assumed to be the Default group.
 	 */
 	List<Class<?>> getValidationGroups(T object);
 }

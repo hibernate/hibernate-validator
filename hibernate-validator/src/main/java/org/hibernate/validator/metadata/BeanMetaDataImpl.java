@@ -248,26 +248,28 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return propertyNames.contains( name );
 	}
 
-	public List<Class<?>> getDefaultGroupSequence() {
+	public List<Class<?>> getDefaultGroupSequence(T beanState) {
+
+		if ( hasDefaultGroupSequenceProvider() ) {
+
+			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
+			if ( providerDefaultGroupSequence == null ) {
+				providerDefaultGroupSequence = new ArrayList<Class<?>>();
+				providerDefaultGroupSequence.add( beanClass );
+			}
+
+			return getValidDefaultGroupSequence( providerDefaultGroupSequence );
+
+		}
+
 		return Collections.unmodifiableList( defaultGroupSequence );
 	}
 
-	public List<Class<?>> getDefaultGroupSequence(T objectState) {
-		List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( objectState );
-
-		if ( providerDefaultGroupSequence == null ) {
-			providerDefaultGroupSequence = new ArrayList<Class<?>>();
-			providerDefaultGroupSequence.add( beanClass );
-		}
-
-		return getValidDefaultGroupSequence( providerDefaultGroupSequence );
-	}
-
 	public boolean defaultGroupSequenceIsRedefined() {
-		return defaultGroupSequence.size() > 1 || defaultGroupSequenceProvider != null;
+		return defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
 	}
 
-	public boolean isDefaultGroupSequenceProvider() {
+	public boolean hasDefaultGroupSequenceProvider() {
 		return defaultGroupSequenceProvider != null;
 	}
 

@@ -269,12 +269,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
-				 groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
-			}
-			else {
-				groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
-			}
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
 		}
 
 		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
@@ -334,10 +329,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForRedefinedDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<U, ? extends Annotation>>> entry : beanMetaData.getMetaConstraintsAsMap()
 				.entrySet() ) {
-			Class<?> hostingBeanClass = entry.getKey();
+
+			Class<U> hostingBeanClass = (Class<U>) entry.getKey();
 			List<BeanMetaConstraint<U, ? extends Annotation>> constraints = entry.getValue();
 
-			List<Class<?>> defaultGroupSequence = getBeanMetaData( hostingBeanClass ).getDefaultGroupSequence();
+			BeanMetaData<U> hostingBeanMetaData = getBeanMetaData( hostingBeanClass );
+			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+
 			PathImpl currentPath = valueContext.getPropertyPath();
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 				valueContext.setCurrentGroup( defaultSequenceMember );
@@ -363,13 +361,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForRedefinedDefaultGroupOnMainEntity(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
-		List<Class<?>> defaultGroupSequence;
-		if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
-			defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-		}
-		else {
-			defaultGroupSequence = beanMetaData.getDefaultGroupSequence();
-		}
+		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
 
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
@@ -653,12 +645,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
-				groupList = beanMetaData.getDefaultGroupSequence( object );
-			}
-			else {
-				groupList = beanMetaData.getDefaultGroupSequence();
-			}
+			groupList = beanMetaData.getDefaultGroupSequence( object );
 		}
 		else {
 			groupList = new ArrayList<Class<?>>();
@@ -754,7 +741,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			groupList = beanMetaData.getDefaultGroupSequence();
+			groupList = beanMetaData.getDefaultGroupSequence( null );
 		}
 		else {
 			groupList = new ArrayList<Class<?>>();
@@ -785,12 +772,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
-				groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( (U) object ) );
-			}
-			else {
-				groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
-			}
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( (U) object ) );
 		}
 
 		// process first single groups
@@ -834,12 +816,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
-				groupList = beanMetaData.getDefaultGroupSequence( (U) object );
-			}
-			else {
-				groupList = beanMetaData.getDefaultGroupSequence();
-			}
+			groupList = beanMetaData.getDefaultGroupSequence( (U) object );
 		}
 		else {
 			groupList = Arrays.<Class<?>>asList( group.getGroup() );
@@ -945,12 +922,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
-				groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( (U) bean) );
-			}
-			else {
-				groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence() );
-			}
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( (U) bean ) );
 		}
 
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
@@ -993,12 +965,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			if ( beanMetaData.isDefaultGroupSequenceProvider() ) {
-				groupList = beanMetaData.getDefaultGroupSequence( (U) bean);
-			}
-			else {
-				groupList = beanMetaData.getDefaultGroupSequence();
-			}
+			groupList = beanMetaData.getDefaultGroupSequence( (U) bean );
 		}
 		else {
 			groupList = Arrays.<Class<?>>asList( group.getGroup() );
