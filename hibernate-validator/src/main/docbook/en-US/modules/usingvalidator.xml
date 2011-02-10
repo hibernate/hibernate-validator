@@ -1016,7 +1016,7 @@ public void testOrderedChecksWithRedefinedDefault() {
         <example id="example-rental-car-group-sequence-provider">
           <title>RentalCar with @GroupSequenceProvider</title>
 
-          <programlisting language="JAVA" role="JAVA">@GroupSequence(RentalCarGroupSequenceProvider.class)
+          <programlisting language="JAVA" role="JAVA">@GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
 public class RentalCar extends Car {
     private boolean rented;    
 
