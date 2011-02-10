@@ -24,12 +24,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * The {@code GroupSequenceProvider} annotation defines the {@code DefaultGroupSequenceProvider}
- * class responsible to return the list of classes defining the default group sequence for the annotated class.
+ * class responsible to return the list of classes defining the default group sequence for the annotated type.
  * <p>
  * Note:
  * <ul>
- * <li>It is not allowed to to use {@code GroupSequenceProvider} and {@link javax.validation.GroupSequence} together on
- * the same class.</li>
+ * <li>It is not allowed to use {@code GroupSequenceProvider} and {@link javax.validation.GroupSequence} together on
+ * the same type.</li>
  * <li>{@code GroupSequenceProvider} is a Hibernate Validator specific annotation and not portable.</li>
  * </ul>
  *
@@ -40,8 +40,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target( { TYPE })
 public @interface GroupSequenceProvider {
+
 	/**
 	 * @return The default group sequence provider implementation.
 	 */
-	Class<? extends DefaultGroupSequenceProvider> value();
+	Class<? extends DefaultGroupSequenceProvider<?>> value();
 }

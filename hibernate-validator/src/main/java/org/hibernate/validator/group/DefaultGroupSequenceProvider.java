@@ -21,11 +21,12 @@ import java.util.List;
 /**
  * This class defines the dynamic group sequence provider contract.
  * <p>
- * In order to redefine dynamically the default group sequence for a class X, the {@link GroupSequenceProvider} annotation
- * must be placed on X, specifying as its value a concrete implementation of {@code DefaultGroupSequenceProvider}.
+ * In order to redefine dynamically the default group sequence for a type T, the {@link GroupSequenceProvider} annotation
+ * must be placed on T, specifying as its value a concrete implementation of {@code DefaultGroupSequenceProvider}, which
+ * must be parametrized with the type T.
  * </p>
  * <p>
- * If during the validation process the {@code Default} group is validated for X, the actual validated instance
+ * If during the validation process the {@code Default} group is validated for T, the actual validated instance
  * is passed to the {@code DefaultGroupSequenceProvider} to determine the default group sequence.
  * </p>
  * <p>
@@ -35,10 +36,13 @@ import java.util.List;
  * <li>Implementations must be thread-safe.</li>
  * </ul>
  *
+ * @param <T> The type for which an implementation is defined.
+ *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Hardy Ferentschik
  */
 public interface DefaultGroupSequenceProvider<T> {
+
 	/**
 	 * This method returns the default group sequence for the given instance.
 	 * <p>
@@ -49,7 +53,7 @@ public interface DefaultGroupSequenceProvider<T> {
 	 * {@linkplain javax.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue}.
 	 *
 	 * @return a list of classes specifying the default group sequence. The same constraints to the redefined group list
-	 * applies as for lists defined via {@code GroupSequence}. In particular the list has to contain the class T.
+	 *         apply as for lists defined via {@code GroupSequence}. In particular the list has to contain the type T.
 	 */
 	List<Class<?>> getValidationGroups(T object);
 }

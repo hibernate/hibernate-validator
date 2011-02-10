@@ -405,7 +405,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		if ( groupSequenceProviderAnnotation != null ) {
-			defaultGroupSequenceProvider = newInstance(
+
+			//Note: this leaves space for ClassCastExceptions when invoking getValidationGroups()
+			//on a provider which actually is not parametrized with T; we better check whether the
+			//the specified provider actually is for type T in order to throw a clear exception
+			defaultGroupSequenceProvider = (DefaultGroupSequenceProvider<T>) newInstance(
 					groupSequenceProviderAnnotation.value(), "the default group sequence provider"
 			);
 		}
