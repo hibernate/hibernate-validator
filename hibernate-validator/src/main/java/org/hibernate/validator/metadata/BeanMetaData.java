@@ -62,11 +62,6 @@ public interface BeanMetaData<T> {
 	List<Class<?>> getDefaultGroupSequence(T beanState);
 
 	/**
-	 * @return {@code true} if a default group sequence provider is defined.
-	 */
-	boolean hasDefaultGroupSequenceProvider();
-
-	/**
 	 * @return {@code true} if the entity redefines the default group sequence, {@code false} otherwise.
 	 */
 	boolean defaultGroupSequenceIsRedefined();

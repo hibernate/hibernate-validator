@@ -101,6 +101,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	/**
 	 * The default group sequence provider.
+	 *
 	 * @see org.hibernate.validator.group.GroupSequenceProvider
 	 * @see DefaultGroupSequenceProvider
 	 */
@@ -249,17 +250,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public List<Class<?>> getDefaultGroupSequence(T beanState) {
-
 		if ( hasDefaultGroupSequenceProvider() ) {
-
 			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
-			if ( providerDefaultGroupSequence == null ) {
-				providerDefaultGroupSequence = new ArrayList<Class<?>>();
-				providerDefaultGroupSequence.add( beanClass );
-			}
-
 			return getValidDefaultGroupSequence( providerDefaultGroupSequence );
-
 		}
 
 		return Collections.unmodifiableList( defaultGroupSequence );
@@ -269,7 +262,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
 	}
 
-	public boolean hasDefaultGroupSequenceProvider() {
+	private boolean hasDefaultGroupSequenceProvider() {
 		return defaultGroupSequenceProvider != null;
 	}
 
@@ -285,16 +278,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		List<Class<?>> validDefaultGroupSequence = new ArrayList<Class<?>>();
 
 		boolean groupSequenceContainsDefault = false;
-		for ( Class<?> group : groupSequence ) {
-			if ( group.getName().equals( beanClass.getName() ) ) {
-				validDefaultGroupSequence.add( Default.class );
-				groupSequenceContainsDefault = true;
-			}
-			else if ( group.getName().equals( Default.class.getName() ) ) {
-				throw new GroupDefinitionException( "'Default.class' cannot appear in default group sequence list." );
-			}
-			else {
-				validDefaultGroupSequence.add( group );
+		if ( groupSequence != null ) {
+			for ( Class<?> group : groupSequence ) {
+				if ( group.getName().equals( beanClass.getName() ) ) {
+					validDefaultGroupSequence.add( Default.class );
+					groupSequenceContainsDefault = true;
+				}
+				else if ( group.getName().equals( Default.class.getName() ) ) {
+					throw new GroupDefinitionException( "'Default.class' cannot appear in default group sequence list." );
+				}
+				else {
+					validDefaultGroupSequence.add( group );
+				}
 			}
 		}
 		if ( !groupSequenceContainsDefault ) {
@@ -745,7 +740,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		sb.append( ", methodMetaConstraints=" ).append( methodMetaConstraints );
 		sb.append( ", cascadedMembers=" ).append( cascadedMembers );
 		sb.append( ", propertyDescriptors=" ).append( propertyDescriptors );
-		sb.append( ", defaultGroupSequence=" ).append( defaultGroupSequence );
+		sb.append( ", defaultGroupSequence=" ).append( getDefaultGroupSequence( null ) );
 		sb.append( ", constraintHelper=" ).append( constraintHelper );
 		sb.append( '}' );
 		return sb.toString();

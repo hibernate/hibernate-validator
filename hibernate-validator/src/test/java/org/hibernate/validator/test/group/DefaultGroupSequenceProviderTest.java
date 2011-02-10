@@ -54,7 +54,7 @@ public class DefaultGroupSequenceProviderTest {
 		methodValidator = validator.unwrap( MethodValidator.class );
 	}
 
-	@Test
+	@Test(expectedExceptions = GroupDefinitionException.class)
 	public void testNullProviderDefaultGroupSequence() {
 		Set<ConstraintViolation<A>> violations = validator.validate( new A() );
 
