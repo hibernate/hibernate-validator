@@ -879,8 +879,8 @@ public interface CarChecks {
 
       <para>By default, constraints are evaluated in no particular order and
       this regardless of which groups they belong to. In some situations,
-      however, it is useful to control the order of the constraints
-      evaluation. In our example from <xref
+      however, it is useful to control the order of the constraint evaluation.
+      In our example from <xref
       linkend="validator-usingvalidator-validationgroups" /> we could for
       example require that first all default car constraints are passing
       before we check the road worthiness of the car. Finally before we drive
@@ -933,32 +933,47 @@ public void testOrderedChecks() {
     <section id="section-default-group-class">
       <title>Redefining the default group sequence of a class</title>
 
-      <para>The @GroupSequence annotation also fulfills a second purpose. It
-      allows you to redefine what the Default group means for a given class.
-      To redefine <classname>Default</classname> for a class, place a
-      <classname>@GroupSequence</classname> annotation on the class. The
-      defined groups in the annotation express the sequence of groups that
-      substitute <classname>Default</classname> for this class. <xref
-      linkend="example-rental-car" /> introduces a new class RentalCar with a
-      redfined default group. With this definition the check for all three
-      groups can be rewritten as seen in <xref
-      linkend="example-testOrderedChecksWithRedefinedDefault" />.</para>
+      <section>
+        <title>@GroupSequence</title>
 
-      <example id="example-rental-car">
-        <title>RentalCar</title>
+        <para>The <classname>@GroupSequence</classname> annotation also
+        fulfills a second purpose. It allows you to redefine what the
+        <constant>Default</constant> group means for a given class. To
+        redefine <classname>Default</classname> for a given class, add a
+        <classname>@GroupSequence</classname> annotation to the class. The
+        defined groups in the annotation express the sequence of groups that
+        substitute <classname>Default</classname> for this class. <xref
+        linkend="example-rental-car" /> introduces a new class
+        <classname>RentalCar</classname> with a redfined default group. With
+        this definition the check for all three groups can be rewritten as
+        seen in <xref
+        linkend="example-testOrderedChecksWithRedefinedDefault" />.</para>
 
-        <programlisting language="JAVA" role="JAVA">@GroupSequence({ RentalCar.class, CarChecks.class })
+        <example id="example-rental-car">
+          <title>RentalCar with @GroupSequence</title>
+
+          <programlisting language="JAVA" role="JAVA">@GroupSequence({ RentalCar.class, CarChecks.class, DriverChecks.class })
 public class RentalCar extends Car {
+    private boolean rented;    
+
     public RentalCar(String manufacturer, String licencePlate, int seatCount) {
         super( manufacturer, licencePlate, seatCount );
     }
+
+   public boolean isRented() {
+        return rented;
+    }
+
+    public void setRented(booelan rented) {
+        this.rented = rented;
+    }
 }</programlisting>
-      </example>
+        </example>
 
-      <example id="example-testOrderedChecksWithRedefinedDefault">
-        <title>testOrderedChecksWithRedefinedDefault</title>
+        <example id="example-testOrderedChecksWithRedefinedDefault">
+          <title>testOrderedChecksWithRedefinedDefault</title>
 
-        <programlisting language="JAVA" role="JAVA">@Test
+          <programlisting language="JAVA" role="JAVA">@Test
 public void testOrderedChecksWithRedefinedDefault() {
     RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
     rentalCar.setPassedVehicleInspection( true );
@@ -968,17 +983,74 @@ public void testOrderedChecksWithRedefinedDefault() {
     john.passedDrivingTest( true );
     rentalCar.setDriver( john );
 
-    assertEquals( 0, validator.validate( rentalCar, Default.class, DriverChecks.class ).size() );
+    assertEquals( 0, validator.validate( rentalCar, Default.class ).size() );
 }</programlisting>
-      </example>
+        </example>
 
-      <note>
-        <para>Due to the fact that there cannot be a cyclic dependency in the
-        group and group sequence definitions one cannot just add
-        <classname>Default</classname> to the sequence redefining
-        <classname>Default</classname> for a class. Instead the class itself
-        should be added!</para>
-      </note>
+        <note>
+          <para>Due to the fact that there cannot be a cyclic dependency in
+          the group and group sequence definitions one cannot just add
+          <classname>Default</classname> to the sequence redefining
+          <classname>Default</classname> for a class. Instead the class itself
+          should be added!</para>
+        </note>
+      </section>
+
+      <section>
+        <title>@GroupSequenceProvider</title>
+
+        <para>The <classname>@javax.validation.GroupSequence</classname>
+        annotation is a standardized Bean Validation annotation. As seen in
+        the previous section it allows you to statically redefine the default
+        group sequence for a class. Hibernate Validator also offers a custom,
+        non standardized annotation -
+        <classname>org.hibernate.validator.group.GroupSequenceProvider
+        </classname>- which allows for dynamic redefinition of the default
+        group sequence. Using the rental car scenario again, one could
+        dynamically add the driver checks depending on whether the car is
+        rented or not. <xref
+        linkend="example-rental-car-group-sequence-provider" /> and <xref
+        linkend="example-group-sequence-provider-implementation" /> show how
+        this use-case would be implemented.</para>
+
+        <example id="example-rental-car-group-sequence-provider">
+          <title>RentalCar with @GroupSequenceProvider</title>
+
+          <programlisting language="JAVA" role="JAVA">@GroupSequence(RentalCarGroupSequenceProvider.class)
+public class RentalCar extends Car {
+    private boolean rented;    
+
+    public RentalCar(String manufacturer, String licencePlate, int seatCount) {
+        super( manufacturer, licencePlate, seatCount );
+    }
+
+   public boolean isRented() {
+        return rented;
+    }
+
+    public void setRented(booelan rented) {
+        this.rented = rented;
+    }
+}</programlisting>
+        </example>
+
+        <example id="example-group-sequence-provider-implementation" label="">
+          <title>DefaultGroupSequenceProvider implementation</title>
+
+          <programlisting language="JAVA" role="JAVA">public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvider&lt;RentalCar&gt; {
+    public List&lt;Class&lt;?&gt;&gt; getValidationGroups(RentalCar car) {
+        List&lt;Class&lt;?&gt;&gt; defaultGroupSequence = new ArrayList&lt;Class&lt;?&gt;&gt;();
+        defaultGroupSequence.add( RentalCar.class, CarChecks.class );
+
+        if ( car != null &amp;&amp; car.isRented() ) {
+            defaultGroupSequence.add( DriverChecks.class );
+        }
+
+        return defaultGroupSequence;
+    }
+}</programlisting>
+        </example>
+      </section>
     </section>
   </section>
 
