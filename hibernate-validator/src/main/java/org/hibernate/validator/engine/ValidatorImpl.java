@@ -623,18 +623,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T> void validateProperty(T object, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T, U> void validateProperty(T object, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 
 		@SuppressWarnings("unchecked")
 		final Class<T> beanType = (Class<T>) object.getClass();
 
 		Set<BeanMetaConstraint<T, ?>> metaConstraints = new HashSet<BeanMetaConstraint<T, ?>>();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
-		Object hostingBeanInstance = collectMetaConstraintsForPath(
-				beanType, object, propertyIter, metaConstraints
+		ValueContext<T, U> valueContext = collectMetaConstraintsForPath(
+				beanType, object, propertyIter, propertyPath, metaConstraints
 		);
 
-		if ( hostingBeanInstance == null ) {
+		if ( valueContext.getCurrentBean() == null ) {
 			throw new IllegalArgumentException( "Invalid property path." );
 		}
 
@@ -653,7 +653,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					propertyPath,
 					failingConstraintViolations,
 					metaConstraints,
-					hostingBeanInstance,
+					valueContext.getCurrentBean(),
 					group,
 					cachedResolver
 			);
@@ -672,7 +672,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 						propertyPath,
 						failingConstraintViolations,
 						metaConstraints,
-						hostingBeanInstance,
+						valueContext.getCurrentBean(),
 						group,
 						cachedResolver
 				);
@@ -696,12 +696,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolationsBefore = failingConstraintViolations.size();
 
-		//TODO GM: is that right?
-		BeanMetaData<T> beanMetaData = getBeanMetaData( (Class<T>) object.getClass() );
+		BeanMetaData<U> beanMetaData = getBeanMetaData( (Class<U>) hostingBeanInstance.getClass() );
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			groupList = beanMetaData.getDefaultGroupSequence( object );
+			groupList = beanMetaData.getDefaultGroupSequence( hostingBeanInstance );
 		}
 		else {
 			groupList = new ArrayList<Class<?>>();
@@ -738,9 +737,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T> void validateValue(Class<T> beanType, Object value, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T, U> void validateValue(Class<T> beanType, Object value, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 		Set<BeanMetaConstraint<T, ?>> metaConstraints = new HashSet<BeanMetaConstraint<T, ?>>();
-		collectMetaConstraintsForPath( beanType, null, propertyPath.iterator(), metaConstraints );
+		ValueContext<T, U> valueContext = collectMetaConstraintsForPath(
+				beanType, null, propertyPath.iterator(), propertyPath, metaConstraints
+		);
+		Class<T> hostingBeanType = valueContext.getCurrentBeanType();
 
 		if ( metaConstraints.size() == 0 ) {
 			return;
@@ -755,6 +757,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			Group group = groupIterator.next();
 			validateValueForGroup(
 					beanType,
+					hostingBeanType,
 					value,
 					propertyPath,
 					failingConstraintViolations,
@@ -775,6 +778,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Group group : sequence ) {
 				validateValueForGroup(
 						beanType,
+						hostingBeanType,
 						value,
 						propertyPath,
 						failingConstraintViolations,
@@ -792,8 +796,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <U, V> void validateValueForGroup(
+	private <T, U, V> void validateValueForGroup(
 			Class<U> beanType,
+			Class<T> hostingBeanType,
 			V value,
 			PathImpl path,
 			Set<ConstraintViolation<U>> failingConstraintViolations,
@@ -802,8 +807,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolations = failingConstraintViolations.size();
 
-		//TODO GM: is that right?
-		BeanMetaData<U> beanMetaData = getBeanMetaData( beanType );
+		BeanMetaData<T> beanMetaData = getBeanMetaData( hostingBeanType );
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
@@ -819,7 +823,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				ValidationContext<U, ConstraintViolation<U>> context = ValidationContext.getContextForValidateValue(
 						beanType, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver, failFast
 				);
-				ValueContext<U, V> valueContext = ValueContext.getLocalExecutionContext( beanType, path );
+				ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext( hostingBeanType, path );
 				valueContext.setCurrentGroup( groupClass );
 				valueContext.setCurrentValidatedValue( value );
 				if ( isValidationRequired( context, valueContext, metaConstraint ) ) {
@@ -1131,13 +1135,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @param clazz the class type to check for constraints.
 	 * @param value While resolving the property path this instance points to the current object. Might be <code>null</code>.
 	 * @param propertyIter an instance of <code>PropertyIterator</code> in order to iterate the items of the original property path.
+	 * @param propertyPath the property for which constraints have to be collected
 	 * @param metaConstraints Set of <code>MetaConstraint</code>s to collect all matching constraints.
 	 *
-	 * @return Returns the bean hosting the constraints which match the specified property path.
+	 * @return Returns an instance of <code>ValueContext</code> which describe the context associated to the validation of the given propertyPath
 	 */
-	private <T> Object collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, Set<BeanMetaConstraint<T, ?>> metaConstraints) {
+	private <T, U> ValueContext<T, U> collectMetaConstraintsForPath(Class<T> clazz, T value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Set<BeanMetaConstraint<T, ?>> metaConstraints) {
 		Path.Node elem = propertyIter.next();
-		Object newValue = value;
+		T newValue = value;
 
 		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
 		//use precomputed method list as ReflectionHelper#containsMember is slow
@@ -1162,13 +1167,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( elem.getName() ) ) {
 					Type type = ReflectionHelper.typeOf( m );
-					newValue = newValue == null ? null : ReflectionHelper.getValue( m, newValue );
+					newValue = newValue == null ? null : (T) ReflectionHelper.getValue( m, newValue );
 					if ( elem.isInIterable() ) {
 						if ( newValue != null && elem.getIndex() != null ) {
-							newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
+							newValue = (T) ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
 						}
 						else if ( newValue != null && elem.getKey() != null ) {
-							newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
+							newValue = (T) ReflectionHelper.getMappedValue( newValue, elem.getKey() );
 						}
 						else if ( newValue != null ) {
 							throw new IllegalArgumentException( "Property path must provide index or map key" );
@@ -1183,12 +1188,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 							valueClass,
 							newValue,
 							propertyIter,
+							propertyPath,
 							metaConstraints
 					);
 				}
 			}
 		}
-		return newValue;
+
+		if ( newValue == null ) {
+			return ValueContext.getLocalExecutionContext( clazz, propertyPath );
+		}
+		return ValueContext.getLocalExecutionContext( value, propertyPath );
 	}
 
 	private <U> BeanMetaData<U> getBeanMetaData(Class<U> beanClass) {
