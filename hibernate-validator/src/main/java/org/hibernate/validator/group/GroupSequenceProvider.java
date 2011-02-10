@@ -23,11 +23,18 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The GroupSequenceProvider annotation defines the SequenceProvider
- * class responsible to return the composing classes of the Default dynamic
- * group sequence definition.
+ * The {@code GroupSequenceProvider} annotation defines the {@code DefaultGroupSequenceProvider}
+ * class responsible to return the list of classes defining the default group sequence for the annotated class.
+ * <p>
+ * Note:
+ * <ul>
+ * <li>It is not allowed to to use {@code GroupSequenceProvider} and {@link javax.validation.GroupSequence} together on
+ * the same class.</li>
+ * <li>{@code GroupSequenceProvider} is a Hibernate Validator specific annotation and not portable.</li>
+ * </ul>
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Hardy Ferentschik
  * @see javax.validation.GroupSequence
  */
 @Retention(RUNTIME)

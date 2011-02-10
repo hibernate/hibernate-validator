@@ -19,24 +19,37 @@ package org.hibernate.validator.group;
 import java.util.List;
 
 /**
- * The default dynamic group sequence provider contract. A provider must implement
- * this contract and provide a public default constructor.
+ * This class defines the dynamic group sequence provider contract.
+ * <p>
+ * In order to redefine dynamically the default group sequence for a class X, the {@link GroupSequenceProvider} annotation
+ * must be placed on X, specifying as its value a concrete implementation of {@code DefaultGroupSequenceProvider}.
+ * </p>
+ * <p>
+ * If during the validation process the {@code Default} group is validated for X, the actual validated instance
+ * is passed to the {@code DefaultGroupSequenceProvider} to determine the default group sequence.
+ * </p>
+ * <p>
+ * Note:
+ * <ul>
+ * <li>Implementations must provide a public default constructor.</li>
+ * <li>Implementations must be thread-safe.</li>
+ * </ul>
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Hardy Ferentschik
  */
 public interface DefaultGroupSequenceProvider<T> {
 	/**
-	 * This method is responsible to provide the composing classes of the default group sequence.
+	 * This method returns the default group sequence for the given instance.
 	 * <p>
-	 * The object parameter allow the provider implementation to dynamically compose the default
-	 * group sequence in function of the validated value state.
+	 * The object parameter allows to dynamically compose the default group sequence in function of the validated value state.
 	 * </p>
 	 *
-	 * @param object the value being validated or {@code null} if this provider is used within the
-	 * {@linkplain javax.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue} method
+	 * @param object the instance being validated. This value can be {@code null} in case this method was called as part of
+	 * {@linkplain javax.validation.Validator#validateValue(Class, String, Object, Class[]) Validator#validateValue}.
 	 *
-	 * @return the class list specifying the default group sequence, if {@code null} is returned
-	 * it's assumed to be the Default group.
+	 * @return a list of classes specifying the default group sequence. The same constraints to the redefined group list
+	 * applies as for lists defined via {@code GroupSequence}. In particular the list has to contain the class T.
 	 */
 	List<Class<?>> getValidationGroups(T object);
 }
