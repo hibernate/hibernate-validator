@@ -18,13 +18,17 @@ package org.hibernate.validator.test.engine;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.GroupSequence;
+import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
@@ -36,6 +40,26 @@ import static org.testng.Assert.assertTrue;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ValidatorTest {
+
+	/**
+	 * HV-429
+	 */
+	@Test
+	public void testValidatePropertyWithRedefinedDefaultGroupSequence() {
+		Validator validator = TestUtil.getValidator();
+		A testInstance = new A();
+		testInstance.c = new C( "aaa" );
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validateProperty( testInstance, "c.id" );
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
+
+	@Test
+	public void testValidateValueWithRedefinedDefaultGroupSequence() {
+		Validator validator = TestUtil.getValidator();
+		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue(A.class, "c.id", "aaa" );
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
 
 	/**
 	 * HV-376
@@ -83,6 +107,9 @@ public class ValidatorTest {
 	class A {
 		@NotNull
 		String b;
+
+		@Valid
+		C c;
 	}
 
 	class B {
@@ -92,6 +119,20 @@ public class ValidatorTest {
 		public boolean hasB() {
 			return b;
 		}
+	}
+
+	@GroupSequence( { TestGroup.class, C.class })
+	class C {
+		@Pattern(regexp = "[0-9]+", groups = TestGroup.class)
+		@Length(min = 2)
+		String id;
+
+		C(String id) {
+			this.id = id;
+		}
+	}
+
+	interface TestGroup {
 	}
 
 	class Ticket {
