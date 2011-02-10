@@ -1028,7 +1028,7 @@ public class RentalCar extends Car {
         return rented;
     }
 
-    public void setRented(booelan rented) {
+    public void setRented(boolean rented) {
         this.rented = rented;
     }
 }</programlisting>
