@@ -60,7 +60,7 @@ import static org.hibernate.validator.util.ReflectionHelper.newInstance;
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	/**
-	 * Used as prefix for parameter names, if no explicite names are given.
+	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
 	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
 
@@ -148,7 +148,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<T, ?>>> entry : constraints.entrySet() ) {
 			Class<?> clazz = entry.getKey();
 
-			//will hold the method constraints (getter and non-getter) of the given class keyed by method
+			// will hold the method constraints (getter and non-getter) of the given class keyed by method
 			Map<Method, List<BeanMetaConstraint<?, ? extends Annotation>>> constraintsByMethod = newHashMap();
 
 			for ( BeanMetaConstraint<T, ?> constraint : entry.getValue() ) {
@@ -392,6 +392,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Checks whether there is a default group sequence defined for this class.
 	 * See HV-113.
 	 */
+	@SuppressWarnings("unchecked")
 	private void initDefaultGroupSequence() {
 		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
