@@ -1,0 +1,315 @@
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2011-02-11 15:21+0000\n"
+"PO-Revision-Date: 2011-02-11 14:56+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh-CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: customoptions.xml:24
+#, no-c-format
+msgid "Hibernate Validator specific configuration"
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:27
+#, no-c-format
+msgid ""
+"Use of the features described in the following sections is not portable "
+"between Bean Validation providers/implementations."
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:31
+#, no-c-format
+msgid ""
+"The Bean Validation specification allows implementators to add provider "
+"specific options. The easiest way to do this is via "
+"<methodname>Configuration.addProperty(String name, String value)</"
+"methodname> which allows to pass any arbitrary property. If you want to "
+"expose the option programmatically (in a type-safe manner) there are three "
+"other options depending on where you want to make the option available."
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:39
+#, no-c-format
+msgid ""
+"You can add the option onto a custom <classname>Configuration</classname> "
+"instance. This custom configuration can be explicitly requested during the "
+"bootstrapping process using <methodname>Validation.byProvider(Class&lt;U&gt; "
+"providerType)</methodname>. This is the approach taken for exposing the "
+"programmatic constraint configuration API (see <xref linkend="
+"\"programmaticapi\"/> ) as well as the abiltiy to configure a custom "
+"ResourceBundleLocator (see <xref linkend=\"section-resource-bundle-locator\"/"
+">)."
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:48
+#, no-c-format
+msgid ""
+"You cam also add the option accessible on you <classname>ValidatorFactory</"
+"classname> implementation and then access it via "
+"<methodname>ValidatorFactory.unwrap(Class&lt;T&gt; type)</methodname> (see "
+"<xref linkend=\"example-fail-fast-factory\"/>)."
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:53
+#, no-c-format
+msgid ""
+"Last but not least, you can also add the option to your "
+"<classname>Validator</classname> implementation and unwrap the "
+"<classname>Validator</classname> instance itself using <methodname>Validator."
+"unwrap(Class&lt;T&gt; type)</methodname>. This is how the method level "
+"validation API is exposed in Hibernate Validator (see ?)."
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:60
+#, no-c-format
+msgid ""
+"In the following sections weare having a closer look at some of the "
+"Hibernate Validator specific features."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:64
+#, no-c-format
+msgid "Fail fast mode"
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:66
+#, no-c-format
+msgid ""
+"Hibernate Validator allows to return from the current validation as soon as "
+"the first constraint violation occurs. This is called the fail fast mode and "
+"can be useful for validation of large object graphs where you are only "
+"interested whether there is a constraint violation or not. <xref linkend="
+"\"example-fail-fast-property\"/>, <xref linkend=\"example-fail-fast-"
+"configuration\"/> and <xref linkend=\"example-fail-fast-factory\"/> show "
+"multiple ways to enable the fail fast mode."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:76
+#, no-c-format
+msgid "Enabling <option>failFast</option> via a property"
+msgstr ""
+
+#. Tag: programlisting
+#: customoptions.xml:78
+#, no-c-format
+msgid ""
+"HibernateValidatorConfiguration configuration = Validation.byProvider"
+"( HibernateValidator.class ).configure();\n"
+"ValidatorFactory factory = configuration.addProperty( \"hibernate.validator."
+"fail_fast\", \"true\" ).buildValidatorFactory();\n"
+"Validator validator = factory.getValidator();\n"
+"\n"
+"// do some actual fail fast validation\n"
+"..."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:82
+#, no-c-format
+msgid ""
+"Enabling <option>failFast</option> at the <classname>Configuration</"
+"classname> level"
+msgstr ""
+
+#. Tag: programlisting
+#: customoptions.xml:85
+#, no-c-format
+msgid ""
+"HibernateValidatorConfiguration configuration = Validation.byProvider"
+"( HibernateValidator.class ).configure();\n"
+"ValidatorFactory factory = configuration.failFast().buildValidatorFactory"
+"();\n"
+"Validator validator = factory.getValidator();\n"
+"\n"
+"// do some actual fail fast validation\n"
+"..."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:89
+#, no-c-format
+msgid ""
+"Enabling <option>failFast</option> at the <classname>ValidatorFactory</"
+"classname> level"
+msgstr ""
+
+#. Tag: programlisting
+#: customoptions.xml:92
+#, no-c-format
+msgid ""
+"HibernateValidatorConfiguration configuration = Validation.byProvider"
+"( HibernateValidator.class ).configure();\n"
+"ValidatorFactory factory = configuration.buildValidatorFactory();\n"
+"\n"
+"Validator validator = factory.getValidator();\n"
+"\n"
+"// do some non fail fast validation\n"
+"...\n"
+"\n"
+"validator = factory.unwrap( HibernateValidatorFactory.class )\n"
+"            .usingContext()\n"
+"            .failFast()\n"
+"            .getValidator();\n"
+"\n"
+"// do fail fast validation\n"
+"..."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:97 customoptions.xml:115
+#, no-c-format
+msgid "Programmatic constraint definition"
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:99
+#, no-c-format
+msgid ""
+"Hibernate Validator allows to configure constraints not only via annotations "
+"and xml, but also via a programmatic API. This API can be used exclusively "
+"or in combination with annotations and xml. If used in combination "
+"programmatic constraints are additive to otherwise configured constraints."
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:105
+#, no-c-format
+msgid ""
+"The programmatic API is centered around the <classname>ConstraintMapping</"
+"classname> class which can be found together with its supporting classes in "
+"the <package>org.hibernate.validator.cfg</package> package. "
+"<classname>ConstraintMapping</classname> is the entry point to a fluent API "
+"allowing the definition of constraints. <xref lang=\"\" linkend=\"example-"
+"constraint-mapping\"/> shows how the API can be used."
+msgstr ""
+
+#. Tag: programlisting
+#: customoptions.xml:117
+#, no-c-format
+msgid ""
+"ConstraintMapping mapping = new ConstraintMapping();\n"
+"mapping.type( Car.class )\n"
+"    .property( \"manufacturer\", FIELD )\n"
+"        .constraint( NotNullDef.class )\n"
+"    .property( \"licensePlate\", FIELD )\n"
+"        .constraint( NotNullDef.class )\n"
+"        .constraint( SizeDef.class )\n"
+"            .min( 2 )\n"
+"            .max( 14 )\n"
+"    .property( \"seatCount\", FIELD )\n"
+"        .constraint( MinDef.class )\n"
+"            .value ( 2 )\n"
+".type( RentalCar.class )\n"
+"    .property( \"rentalStation\", METHOD)\n"
+"        .constraint( NotNullDef.class );"
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:120
+#, no-c-format
+msgid ""
+"As you can see you can configure constraints on multiple classes and "
+"properties using method chaining. The constraint definition classes "
+"<classname>NotNullDef</classname>, <classname>SizeDef</classname> and "
+"<classname>MinDef</classname> are helper classes which allow to configure "
+"constraint parameters in a type-safe fashion. Definition classes exists for "
+"all built-in constraints in the <classname>org.hibernate.validator.cfg.defs</"
+"classname> package. For a custom constraint you can either create your own "
+"definition class extending <classname>ConstraintDef</classname> or you can "
+"use the <classname>genericConstraint</classname> method as seen in <xref "
+"linkend=\"example-generic-constraint-mapping\"/>."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:133
+#, no-c-format
+msgid ""
+"Programmatic constraint definition using <classname>GenericConstraintDef</"
+"classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: customoptions.xml:136
+#, no-c-format
+msgid ""
+"ConstraintMapping mapping = new ConstraintMapping();\n"
+"mapping.type( Car.class )\n"
+"    .property( \"licensePlate\", FIELD )\n"
+"        .genericConstraint( CheckCase.class )\n"
+"            .param( \"value\", CaseMode.UPPER );"
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:139
+#, no-c-format
+msgid ""
+"Last but not least, you can also define cascading constraints as well as the "
+"default group sequence of an entity."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:143
+#, no-c-format
+msgid "Cascading constraints and group redefinition"
+msgstr ""
+
+#. Tag: programlisting
+#: customoptions.xml:145
+#, no-c-format
+msgid ""
+"ConstraintMapping mapping = new ConstraintMapping();\n"
+"mapping.type( Car.class )\n"
+"    .valid( \"driver\", FIELD )\n"
+".type( RentalCar.class)\n"
+"    .defaultGroupSequence( RentalCar.class, CarChecks.class );"
+msgstr ""
+
+#. Tag: para
+#: customoptions.xml:148
+#, no-c-format
+msgid ""
+"Once you have your <classname>ConstraintMapping</classname> you will have to "
+"pass it to the configuration. Since the programmatic configuration is not "
+"part of the official Bean Validation specification you will have to get hold "
+"of the Hibernate Validator specific configuration instance. See <xref "
+"linkend=\"example-hibernate-specific-config\"/>."
+msgstr ""
+
+#. Tag: title
+#: customoptions.xml:155
+#, no-c-format
+msgid "Creating a Hibernate Validator specific configuration"
+msgstr ""
+
+#. Tag: programlisting
+#: customoptions.xml:157
+#, no-c-format
+msgid ""
+"ConstraintMapping mapping = new ConstraintMapping();\n"
+"// configure mapping instance\n"
+"\n"
+"HibernateValidatorConfiguration config = Validation.byProvider"
+"( HibernateValidator.class ).configure();\n"
+"config.addMapping( mapping );\n"
+"ValidatorFactory factory = config.buildValidatorFactory();\n"
+"Validator validator = factory.getValidator();"
+msgstr ""

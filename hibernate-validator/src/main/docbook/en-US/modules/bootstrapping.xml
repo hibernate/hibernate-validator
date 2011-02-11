@@ -203,7 +203,7 @@ Validator validator = factory.getValidator();
       <methodname>Configuration.getDefaultMessageInterpolator()</methodname>.</para>
     </tip>
 
-    <section>
+    <section id="section-resource-bundle-locator" label="">
       <title>ResourceBundleLocator</title>
 
       <para>A common use case is the ability to specify your own resource
