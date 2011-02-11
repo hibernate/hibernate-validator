@@ -75,7 +75,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean ignoreXmlConfiguration = false;
 	private Set<InputStream> configurationStreams = new HashSet<InputStream>();
 	private ConstraintMapping mapping;
-	private Boolean failFast;
+	private boolean failFast;
 
 	public ConfigurationImpl(BootstrapState state) {
 		if ( state.getValidationProviderResolver() == null ) {
@@ -124,8 +124,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	public final HibernateValidatorConfiguration failFast(boolean failFast) {
-		this.failFast = failFast;
+	public final HibernateValidatorConfiguration failFast() {
+		this.failFast = true;
 		return this;
 	}
 
@@ -200,7 +200,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getMappings();
 	}
 
-	public final Boolean getFailFast() {
+	public final boolean getFailFast() {
 		return failFast;
 	}
 

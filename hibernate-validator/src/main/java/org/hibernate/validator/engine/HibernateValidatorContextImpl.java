@@ -43,11 +43,11 @@ public class HibernateValidatorContextImpl implements HibernateValidatorContext 
 
 
 	public HibernateValidatorContextImpl(ConstraintValidatorFactory constraintValidatorFactory,
-										MessageInterpolator factoryMessageInterpolator,
-										TraversableResolver factoryTraversableResolver,
-										ConstraintHelper constraintHelper,
-										BeanMetaDataCache beanMetaDataCache,
-										boolean failFast) {
+										 MessageInterpolator factoryMessageInterpolator,
+										 TraversableResolver factoryTraversableResolver,
+										 ConstraintHelper constraintHelper,
+										 BeanMetaDataCache beanMetaDataCache,
+										 boolean failFast) {
 
 		this.factoryConstraintValidatorFactory = constraintValidatorFactory;
 		this.factoryMessageInterpolator = factoryMessageInterpolator;
@@ -61,8 +61,8 @@ public class HibernateValidatorContextImpl implements HibernateValidatorContext 
 		constraintValidatorFactory( factoryConstraintValidatorFactory );
 	}
 
-	public HibernateValidatorContext failFast(boolean failFast) {
-		this.failFast = failFast;
+	public HibernateValidatorContext failFast() {
+		this.failFast = true;
 		return this;
 	}
 

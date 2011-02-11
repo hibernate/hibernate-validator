@@ -28,12 +28,10 @@ import javax.validation.ValidatorContext;
  */
 public interface HibernateValidatorContext extends ValidatorContext {
 	/**
-	 * Enable or disable fail fast. When fail fast is enabled the validation
+	 * Enables the fail fast mode. When fail fast is enabled the validation
 	 * will stop on the first constraint violation detected.
-	 *
-	 * @param failFast true to enable failFast
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 */
-	HibernateValidatorContext failFast(boolean failFast);
+	HibernateValidatorContext failFast();
 }

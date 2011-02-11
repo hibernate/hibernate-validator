@@ -28,11 +28,12 @@ import org.hibernate.validator.resourceloading.ResourceBundleLocator;
  * @author Emmanuel Bernard
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Hardy Ferentschik
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
 	/**
-	 * Property corresponding to the #failFast method.
-	 * Accepts true or false. Defaults to false.
+	 * Property corresponding to the {@link #failFast} method.
+	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
 	 */
 	public final static String FAIL_FAST = "hibernate.validator.fail_fast";
 
@@ -82,12 +83,10 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 
 
 	/**
-	 * Enable or disable fail fast. When fail fast is enabled the validation
+	 * Enables the fail fast mode. When fail fast is enabled the validation
 	 * will stop on the first constraint violation detected.
-	 *
-	 * @param failFast true to enable fail fast
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 */
-	HibernateValidatorConfiguration failFast(boolean failFast);
+	HibernateValidatorConfiguration failFast();
 }
