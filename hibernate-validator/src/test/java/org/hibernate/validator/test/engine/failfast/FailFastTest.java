@@ -20,6 +20,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.util.TestUtil;
@@ -39,13 +40,14 @@ import static org.testng.Assert.fail;
 public class FailFastTest {
 	private static final Logger log = LoggerFactory.make();
 
+	private final A testInstance = new A();
+
 	@Test
 	public void testFailFastDefaultBehaviour() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
-		A testInstance = new A();
 
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertNumberOfViolations( constraintViolations, 2 );
@@ -72,19 +74,17 @@ public class FailFastTest {
 	}
 
 	@Test
-	public void testFailFastSetOnValidatorFactory() {
+	public void testFailFastSetOnConfiguration() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.failFast().buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
-		A testInstance = new A();
-
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
 	@Test
-	public void testFailFastMethodValidationSetOnValidatorFactory() {
+	public void testFailFastMethodValidationOnConfiguration() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.failFast().buildValidatorFactory();
 
@@ -104,7 +104,7 @@ public class FailFastTest {
 	}
 
 	@Test
-	public void testFailFastSetOnValidator() {
+	public void testFailFastSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
@@ -113,14 +113,28 @@ public class FailFastTest {
 						.usingContext()
 						.failFast()
 						.getValidator();
-		A testInstance = new A();
-
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
 	@Test
-	public void testFailFastMethodValidationSetOnValidator() {
+	public void testFailFastSetOnValidator() {
+		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.buildValidatorFactory();
+
+		Validator validator =  factory.getValidator();
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
+		assertNumberOfViolations( constraintViolations, 2 );
+
+		validator = validator.unwrap( ValidatorImpl.class ).failFast(true);
+
+		constraintViolations = validator.validate( testInstance );
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
+
+	@Test
+	public void testFailFastMethodValidationSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
@@ -145,8 +159,6 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastSetWithProperty() {
-		A testInstance = new A();
-
 		// with fail fast
 		HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		ValidatorFactory factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "true" )
@@ -198,8 +210,6 @@ public class FailFastTest {
 		).buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
-		A testInstance = new A();
-
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertNumberOfViolations( constraintViolations, 2 );
 	}

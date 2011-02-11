@@ -107,7 +107,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	/**
 	 * Indicates if validation have to be stopped on first constraint violation.
 	 */
-	private final boolean failFast;
+	private boolean failFast;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache, boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -203,7 +203,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
-				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver(), failFast
+				method,
+				object,
+				messageInterpolator,
+				constraintValidatorFactory,
+				getCachingTraversableResolver(),
+				failFast
 		);
 
 		validateParametersInContext( context, object, parameterValues, groupChain );
@@ -218,7 +223,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
-				method, object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver(), failFast
+				method,
+				object,
+				messageInterpolator,
+				constraintValidatorFactory,
+				getCachingTraversableResolver(),
+				failFast
 		);
 
 		validateReturnValueInContext( context, object, method, returnValue, groupChain );
@@ -236,6 +246,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		throw new ValidationException( "Type " + type + " not supported" );
+	}
+
+	/**
+	 * Turns the fail fast mode on or off. When fail fast is enabled the validation
+	 * will stop on the first constraint violation detected.
+	 *
+	 * @param failFast {@code true} to enable fail fast mode, {@code false} otherwise.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	public ValidatorImpl failFast(boolean failFast) {
+		this.failFast = failFast;
+		return this;
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {
@@ -353,7 +376,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<U, ? extends Annotation>>> entry : beanMetaData.getMetaConstraintsAsMap()
 				.entrySet() ) {
-
+			@SuppressWarnings("unchecked")
 			Class<U> hostingBeanClass = (Class<U>) entry.getKey();
 			List<BeanMetaConstraint<U, ? extends Annotation>> constraints = entry.getValue();
 
@@ -440,8 +463,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-			Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-			valueContext.setCurrentValidatedValue( (V) valueToValidate );
+			@SuppressWarnings("unchecked")
+			V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+			valueContext.setCurrentValidatedValue( valueToValidate );
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
 
@@ -515,6 +539,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @param type the type of the cascaded field or property.
 	 * @param value the actual value.
+	 * @param valueContext context object containing state about the currently validated instance
 	 *
 	 * @return An iterator over the value of a cascaded property.
 	 */
@@ -710,8 +735,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				);
 				valueContext.setCurrentGroup( groupClass );
 				if ( isValidationRequired( context, valueContext, metaConstraint ) ) {
-					Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-					valueContext.setCurrentValidatedValue( (V) valueToValidate );
+					@SuppressWarnings("unchecked")
+					V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+					valueContext.setCurrentValidatedValue( valueToValidate );
 					metaConstraint.validateConstraint( context, valueContext );
 					failingConstraintViolations.addAll( context.getFailingConstraints() );
 					if ( shouldFailFast( failingConstraintViolations ) ) {
@@ -824,8 +850,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, GroupChain groupChain) {
-
 		Method method = validationContext.getMethod();
+		@SuppressWarnings("unchecked")
 		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( (U) object ) );
@@ -989,7 +1015,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <V, T, U> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
-
+		@SuppressWarnings("unchecked")
 		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
@@ -1026,11 +1052,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	//TODO GM: if possible integrate with validateParameterForGroup()
 	private <T, U, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext, T bean, V value, Group group) {
-
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		Method method = validationContext.getMethod();
-
+		@SuppressWarnings("unchecked")
 		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
 		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
 
@@ -1309,10 +1334,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	/**
-	 * Whether or not the validation should fail on the first constraint
-	 * violation.
+	 * Whether or not the validation should fail on the first constraint violation.
 	 *
-	 * @param failingConstraintViolations
+	 * @param failingConstraintViolations the set of failing constraint violations so far
 	 * @param <T> the type of validated bean
 	 *
 	 * @return true if the validation process should fail fast
