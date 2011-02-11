@@ -20,7 +20,7 @@ package org.hibernate.validator;
 import javax.validation.ValidatorFactory;
 
 /**
- * Provide Hibernate Validator extensions to ValidatorFactory
+ * Provide Hibernate Validator extensions to ValidatorFactory.
  *
  * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
