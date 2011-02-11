@@ -81,7 +81,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintHelper = new ConstraintHelper();
 		this.beanMetaDataCache = new BeanMetaDataCache();
 
-		Boolean tmpFailFast = null;
+		boolean tmpFailFast = false;
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
@@ -93,13 +93,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			if ( hibernateSpecificConfig.getMapping() != null ) {
 				initProgrammaticConfiguration( hibernateSpecificConfig.getMapping() );
 			}
+			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 		}
-		if ( tmpFailFast == null ) {
-			String failFastPropValue = configurationState.getProperties()
-					.get( HibernateValidatorConfiguration.FAIL_FAST );
-			tmpFailFast = Boolean.valueOf( failFastPropValue );
-		}
+		tmpFailFast = checkPropertiesForFailFast(
+				configurationState, tmpFailFast
+		);
+
 		this.failFast = tmpFailFast;
 	}
 
@@ -121,8 +121,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	public <T> T unwrap(Class<T> type) {
 		if ( HibernateValidatorFactory.class.equals( type ) ) {
-			T result = type.cast( this );
-			return result;
+			return type.cast( this );
 		}
 		throw new ValidationException( "Type " + type + " not supported" );
 	}
@@ -277,7 +276,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			}
 
 			BeanMetaConstraint<T, A> metaConstraint = new BeanMetaConstraint<T, A>(
-					constraintDescriptor, (Class<T>) config.getBeanType(), member
+					constraintDescriptor, config.getBeanType(), member
 			);
 			addConstraintToMap( hierarchyClass, metaConstraint, constraints );
 		}
@@ -349,4 +348,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return annotation;
 	}
 
+	private boolean checkPropertiesForFailFast(ConfigurationState configurationState, boolean programmaticConfiguredFailFast) {
+		boolean failFast = programmaticConfiguredFailFast;
+		String failFastPropValue = configurationState.getProperties().get( HibernateValidatorConfiguration.FAIL_FAST );
+		if ( failFastPropValue != null ) {
+			boolean tmpFailFast = Boolean.valueOf( failFastPropValue );
+			if ( programmaticConfiguredFailFast && !tmpFailFast ) {
+				throw new ValidationException(
+						"Inconsistent fail fast configuration. Fail fast enabled via programmatic API, " +
+								"but explicitly disabled via properties"
+				);
+			}
+			failFast = tmpFailFast;
+		}
+		return failFast;
+	}
 }
