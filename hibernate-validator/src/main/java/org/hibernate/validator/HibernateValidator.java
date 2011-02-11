@@ -23,7 +23,6 @@ import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.engine.ConfigurationImpl;
-import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.ValidatorFactoryImpl;
 
 /**
