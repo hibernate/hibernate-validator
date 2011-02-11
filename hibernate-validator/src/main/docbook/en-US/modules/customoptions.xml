@@ -68,8 +68,9 @@
     fast mode and can be useful for validation of large object graphs where
     you are only interested whether there is a constraint violation or not.
     <xref linkend="example-fail-fast-property" />, <xref
-    linkend="example-fail-fast-configuration" /> and <xref
-    linkend="example-fail-fast-factory" /> show multiple ways to enable the
+    linkend="example-fail-fast-configuration" />, <xref
+    linkend="example-fail-fast-factory" /> and <xref
+    linkend="example-fail-fast-validator" /> show multiple ways to enable the
     fail fast mode.</para>
 
     <example floatstyle="" id="example-fail-fast-property">
@@ -111,6 +112,24 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
             .usingContext()
             .failFast()
             .getValidator();
+
+// do fail fast validation
+...</programlisting>
+    </example>
+
+    <example id="example-fail-fast-validator">
+      <title>Enabling <option>failFast</option> at the
+      <classname>Validator</classname> level</title>
+
+      <programlisting>HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
+ValidatorFactory factory = configuration.buildValidatorFactory();
+
+Validator validator = factory.getValidator();
+
+// do some non fail fast validation
+...
+
+validator.unwrap( ValidatorImpl.class ).failFast( true );
 
 // do fail fast validation
 ...</programlisting>
