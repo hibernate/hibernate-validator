@@ -20,7 +20,6 @@ package org.hibernate.validator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
-import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 
 /**
