@@ -61,8 +61,8 @@ public class HibernateValidatorContextImpl implements HibernateValidatorContext 
 		constraintValidatorFactory( factoryConstraintValidatorFactory );
 	}
 
-	public HibernateValidatorContext failFast() {
-		this.failFast = true;
+	public HibernateValidatorContext failFast(boolean failFast) {
+		this.failFast = failFast;
 		return this;
 	}
 

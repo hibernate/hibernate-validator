@@ -81,12 +81,13 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	HibernateValidatorConfiguration addMapping(ConstraintMapping mapping);
 
-
 	/**
-	 * Enables the fail fast mode. When fail fast is enabled the validation
+	 * En- or disables the fail fast mode. When fail fast is enabled the validation
 	 * will stop on the first constraint violation detected.
+	 *
+	 * @param failFast {@code true} to enable fail fast, {@code false} otherwise.
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 */
-	HibernateValidatorConfiguration failFast();
+	HibernateValidatorConfiguration failFast(boolean failFast);
 }
