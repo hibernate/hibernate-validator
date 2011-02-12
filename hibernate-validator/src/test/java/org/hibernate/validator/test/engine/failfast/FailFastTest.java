@@ -118,22 +118,6 @@ public class FailFastTest {
 	}
 
 	@Test
-	public void testFailFastSetOnValidator() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
-		final ValidatorFactory factory = configuration.buildValidatorFactory();
-
-		Validator validator =  factory.getValidator();
-
-		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 2 );
-
-		validator = validator.unwrap( ValidatorImpl.class ).failFast(true);
-
-		constraintViolations = validator.validate( testInstance );
-		assertNumberOfViolations( constraintViolations, 1 );
-	}
-
-	@Test
 	public void testFailFastMethodValidationSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();

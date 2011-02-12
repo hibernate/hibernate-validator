@@ -107,7 +107,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	/**
 	 * Indicates if validation have to be stopped on first constraint violation.
 	 */
-	private boolean failFast;
+	private final boolean failFast;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache, boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -246,19 +246,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		throw new ValidationException( "Type " + type + " not supported" );
-	}
-
-	/**
-	 * Turns the fail fast mode on or off. When fail fast is enabled the validation
-	 * will stop on the first constraint violation detected.
-	 *
-	 * @param failFast {@code true} to enable fail fast mode, {@code false} otherwise.
-	 *
-	 * @return {@code this} following the chaining method pattern
-	 */
-	public ValidatorImpl failFast(boolean failFast) {
-		this.failFast = failFast;
-		return this;
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {
