@@ -105,7 +105,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private final BeanMetaDataCache beanMetaDataCache;
 
 	/**
-	 * Indicates if validation have to be stopped on first constraint violation.
+	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
 	private final boolean failFast;
 

@@ -20,15 +20,18 @@ package org.hibernate.validator;
 import javax.validation.ValidatorFactory;
 
 /**
- * Provide Hibernate Validator extensions to ValidatorFactory.
+ * Provides Hibernate Validator extensions to {@link ValidatorFactory}.
  *
  * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface HibernateValidatorFactory extends ValidatorFactory {
+
 	/**
-	 * Refine Validator configuration via options from
-	 * Bean Validation as well as specific ones from Hibernate Validator
+	 * Returns a context for validator configuration via options from the
+	 * Bean Validation API as well as specific ones from Hibernate Validator.
+	 *
+	 * @return A context for validator configuration.
 	 */
 	HibernateValidatorContext usingContext();
 }

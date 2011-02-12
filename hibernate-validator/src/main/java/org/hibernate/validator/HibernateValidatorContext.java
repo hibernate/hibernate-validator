@@ -20,16 +20,25 @@ package org.hibernate.validator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
+import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 
 /**
- * Provide Hibernate Validator context specific configuration and
- * standard Bean Validation configuration.
+ * Represents a Hibernate Validator specific context that is used to create
+ * {@link Validator} instances. Adds additional configuration options to those
+ * provided by {@link ValidatorContext}.
  *
  * @author Emmanuel Bernard
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface HibernateValidatorContext extends ValidatorContext {
+
+	HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
+
+	HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver);
+
+	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
+
 	/**
 	 * En- or disables the fail fast mode. When fail fast is enabled the validation
 	 * will stop on the first constraint violation detected.
@@ -40,9 +49,4 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	HibernateValidatorContext failFast(boolean failFast);
 
-	HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
-
-	HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver);
-
-	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
 }

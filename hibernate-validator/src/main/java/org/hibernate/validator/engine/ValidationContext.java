@@ -93,7 +93,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	private final TraversableResolver traversableResolver;
 
 	/**
-	 * Whether or not validation should failed on the first constraint violation.
+	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
 
