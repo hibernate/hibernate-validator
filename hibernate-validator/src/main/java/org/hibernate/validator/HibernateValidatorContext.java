@@ -17,6 +17,10 @@
 
 package org.hibernate.validator;
 
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.MessageInterpolator;
+import javax.validation.TraversableResolver;
+import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 
 /**
@@ -28,10 +32,18 @@ import javax.validation.ValidatorContext;
  */
 public interface HibernateValidatorContext extends ValidatorContext {
 	/**
-	 * Enables the fail fast mode. When fail fast is enabled the validation
+	 * En- or disables the fail fast mode. When fail fast is enabled the validation
 	 * will stop on the first constraint violation detected.
+	 *
+	 * @param failFast {@code true} to enable fail fast, {@code false} otherwise.
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 */
-	HibernateValidatorContext failFast();
+	HibernateValidatorContext failFast(boolean failFast);
+
+	HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
+
+	HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver);
+
+	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
 }
