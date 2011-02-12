@@ -20,7 +20,6 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
-import javax.validation.ValidatorContext;
 
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
@@ -30,10 +29,19 @@ import org.hibernate.validator.metadata.ConstraintHelper;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Gunnar Morling
  */
-public class ValidatorContextImpl implements ValidatorContext {
+public class ValidatorContextImpl implements HibernateValidatorContext {
 
-	private final HibernateValidatorContext delegate;
+	private MessageInterpolator messageInterpolator;
+	private TraversableResolver traversableResolver;
+	private ConstraintValidatorFactory constraintValidatorFactory;
+	private final MessageInterpolator factoryMessageInterpolator;
+	private final TraversableResolver factoryTraversableResolver;
+	private final ConstraintValidatorFactory factoryConstraintValidatorFactory;
+	private final ConstraintHelper constraintHelper;
+	private final BeanMetaDataCache beanMetaDataCache;
+	private boolean failFast;
 
 	public ValidatorContextImpl(ConstraintValidatorFactory constraintValidatorFactory,
 								MessageInterpolator factoryMessageInterpolator,
@@ -42,32 +50,61 @@ public class ValidatorContextImpl implements ValidatorContext {
 								BeanMetaDataCache beanMetaDataCache,
 								boolean failFast) {
 
-		this.delegate = new HibernateValidatorContextImpl(
-				constraintValidatorFactory,
-				factoryMessageInterpolator,
-				factoryTraversableResolver,
-				constraintHelper,
-				beanMetaDataCache,
-				failFast
-		);
+		this.factoryConstraintValidatorFactory = constraintValidatorFactory;
+		this.factoryMessageInterpolator = factoryMessageInterpolator;
+		this.factoryTraversableResolver = factoryTraversableResolver;
+		this.constraintHelper = constraintHelper;
+		this.beanMetaDataCache = beanMetaDataCache;
+		this.failFast = failFast;
+
+		messageInterpolator( factoryMessageInterpolator );
+		traversableResolver( factoryTraversableResolver );
+		constraintValidatorFactory( factoryConstraintValidatorFactory );
 	}
 
-	public ValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
-		delegate.messageInterpolator( messageInterpolator );
+	public HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
+		if ( messageInterpolator == null ) {
+			this.messageInterpolator = factoryMessageInterpolator;
+		}
+		else {
+			this.messageInterpolator = messageInterpolator;
+		}
 		return this;
 	}
 
-	public ValidatorContext traversableResolver(TraversableResolver traversableResolver) {
-		delegate.traversableResolver( traversableResolver );
+	public HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver) {
+		if ( traversableResolver == null ) {
+			this.traversableResolver = factoryTraversableResolver;
+		}
+		else {
+			this.traversableResolver = traversableResolver;
+		}
 		return this;
 	}
 
-	public ValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory) {
-		delegate.constraintValidatorFactory( factory );
+	public HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory) {
+		if ( constraintValidatorFactory == null ) {
+			this.constraintValidatorFactory = factoryConstraintValidatorFactory;
+		}
+		else {
+			this.constraintValidatorFactory = factory;
+		}
+		return this;
+	}
+
+	public HibernateValidatorContext failFast(boolean failFast) {
+		this.failFast = failFast;
 		return this;
 	}
 
 	public Validator getValidator() {
-		return delegate.getValidator();
+		return new ValidatorImpl(
+				constraintValidatorFactory,
+				messageInterpolator,
+				traversableResolver,
+				constraintHelper,
+				beanMetaDataCache,
+				failFast
+		);
 	}
 }

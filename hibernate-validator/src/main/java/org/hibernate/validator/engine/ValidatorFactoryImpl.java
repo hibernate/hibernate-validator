@@ -127,7 +127,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	public HibernateValidatorContext usingContext() {
-		return new HibernateValidatorContextImpl(
+		return new ValidatorContextImpl(
 				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
