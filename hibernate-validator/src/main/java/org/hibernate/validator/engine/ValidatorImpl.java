@@ -1117,18 +1117,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	/**
-	 * Collects all <code>MetaConstraint</code>s which match the given path relative to the specified root class.
+	 * Collects all {@code MetaConstraint}s which match the given path relative to the specified root class.
 	 * <p>
 	 * This method is called recursively.
 	 * </p>
 	 *
-	 * @param clazz the class type to check for constraints.
-	 * @param value While resolving the property path this instance points to the current object. Might be <code>null</code>.
-	 * @param propertyIter an instance of <code>PropertyIterator</code> in order to iterate the items of the original property path.
-	 * @param propertyPath the property for which constraints have to be collected
-	 * @param metaConstraints Set of <code>MetaConstraint</code>s to collect all matching constraints.
+	 * @param clazz The class type to check for constraints.
+	 * @param value While resolving the property path this instance points to the current object. Might be {@code null}.
+	 * @param propertyIter An instance of {@code PropertyIterator} in order to iterate the items of the original property path.
+	 * @param propertyPath The property path for which constraints have to be collected.
+	 * @param metaConstraints Set of {@code MetaConstraint}s to collect all matching constraints.
 	 *
-	 * @return Returns an instance of <code>ValueContext</code> which describe the context associated to the validation of the given propertyPath.
+	 * @return Returns an instance of {@code ValueContext} which describes the context associated to the given property path.
 	 */
 	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, T value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Set<BeanMetaConstraint<T, ?>> metaConstraints) {
 		Path.Node elem = propertyIter.next();
