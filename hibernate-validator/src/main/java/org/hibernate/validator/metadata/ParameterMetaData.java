@@ -75,8 +75,10 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 			sb.append( ", " );
 		}
 
+		String constraintsAsString = sb.length() > 0 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
+
 		return "ParameterMetaData [index=" + index + "], name=" + name + "], constraints=["
-				+ sb.substring( 0, sb.length() - 2 ) + "], isCascading=" + isCascading + "]";
+				+ constraintsAsString + "], isCascading=" + isCascading + "]";
 	}
 
 }
