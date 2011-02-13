@@ -137,7 +137,7 @@ public class TestUtil {
 		List<String> actualConstraintTypes = new ArrayList<String>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualConstraintTypes.add(
-					( ( Annotation ) violation.getConstraintDescriptor().getAnnotation() ).annotationType().getName()
+					( (Annotation) violation.getConstraintDescriptor().getAnnotation() ).annotationType().getName()
 			);
 		}
 
@@ -254,6 +254,17 @@ public class TestUtil {
 		}
 
 		return !p2Iterator.hasNext();
+	}
+
+	public static void assertSize(Iterable<?> iterable, int expectedCount) {
+
+		int i = 0;
+
+		for ( @SuppressWarnings("unused") Object o : iterable ) {
+			i++;
+		}
+
+		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
 	}
 
 	private static class CustomValidationXmlClassLoader extends ClassLoader {

@@ -34,6 +34,7 @@ import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 
+import static org.hibernate.validator.test.util.TestUtil.assertSize;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -123,17 +124,6 @@ public class BeanMetaDataImplTest {
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDefinitionException() {
 
 		setupBeanMetaData( BazImpl.class );
-	}
-
-	private void assertSize(Iterable<?> iterable, int expectedCount) {
-
-		int i = 0;
-
-		for ( @SuppressWarnings("unused") Object o : iterable ) {
-			i++;
-		}
-
-		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
 	}
 
 	public static interface Foo {
