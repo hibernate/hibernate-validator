@@ -333,26 +333,25 @@ public final class PathImpl implements Path, Serializable {
 	 * Validate that the given identifier is a valid Java identifier according to the Java Language Specification,
 	 * <a href="http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#3.8">chapter 3.8</a>
 	 *
-	 * @param identifier the identifier string
+	 * @param identifier string identifier to validate
 	 *
 	 * @return true if the given identifier is a valid Java Identifier
 	 *
-	 * @throws IllegalArgumentException if the identifier is null
+	 * @throws IllegalArgumentException if the given identifier is {@code null}
 	 */
 	private static boolean isValidJavaIdentifier(String identifier) {
 		Contracts.assertNotNull( identifier, "identifier param cannot be null" );
 
-		final char[] identifierChars = identifier.toCharArray();
-
-		if ( identifierChars.length == 0 || !Character.isJavaIdentifierStart( (int) identifierChars[0] ) ) {
+		if ( identifier.length() == 0 || !Character.isJavaIdentifierStart( (int) identifier.charAt( 0 ) ) ) {
 			return false;
 		}
 
-		for ( int i = 1; i < identifierChars.length; i++ ) {
-			if ( !Character.isJavaIdentifierPart( (int) identifierChars[i] ) ) {
+		for ( int i = 1; i < identifier.length(); i++ ) {
+			if ( !Character.isJavaIdentifierPart( (int) identifier.charAt( i ) ) ) {
 				return false;
 			}
 		}
 		return true;
 	}
+
 }
