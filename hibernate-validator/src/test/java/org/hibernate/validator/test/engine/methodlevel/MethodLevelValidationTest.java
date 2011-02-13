@@ -31,9 +31,9 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.method.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodConstraintViolation.Kind;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
-import org.hibernate.validator.method.MethodConstraintViolation.Kind;
 import org.hibernate.validator.test.engine.methodlevel.model.Address;
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
@@ -58,6 +58,8 @@ public class MethodLevelValidationTest {
 
 	private CustomerRepository customerRepository;
 
+	private RepositoryBase<Customer> repositoryBase;
+
 	@BeforeMethod
 	public void setUpDefaultMethodValidator() {
 		setUpValidator();
@@ -75,7 +77,7 @@ public class MethodLevelValidationTest {
 				new CustomerRepositoryImpl(), validator, parameterIndex, groups
 		);
 
-		customerRepository = (CustomerRepository) getMethodValidationProxy( handler );
+		repositoryBase = customerRepository = (CustomerRepository) getMethodValidationProxy( handler );
 	}
 
 	private void setUpValidator(Class<?>... groups) {
@@ -621,10 +623,10 @@ public class MethodLevelValidationTest {
 	}
 
 	@Test
-	public void constraintsOnOverriddenMethodAddUpInHierarchy() {
+	public void overridingMethodStrengthensReturnValueConstraint() {
 
 		try {
-			customerRepository.overriddenMethodWithConstraint( 1 );
+			customerRepository.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
 		catch ( MethodConstraintViolationException e ) {
@@ -632,7 +634,24 @@ public class MethodLevelValidationTest {
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
 					"must be greater than or equal to 5",
-					"must be greater than or equal to 6"
+					"must be greater than or equal to 10"
+			);
+		}
+	}
+
+	@Test
+	public void runtimeTypeDefinesConstraintsToApply() {
+
+		try {
+			repositoryBase.overriddenMethodWithReturnValueConstraint();
+			fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e.getConstraintViolations(),
+					"must be greater than or equal to 5",
+					"must be greater than or equal to 10"
 			);
 		}
 	}

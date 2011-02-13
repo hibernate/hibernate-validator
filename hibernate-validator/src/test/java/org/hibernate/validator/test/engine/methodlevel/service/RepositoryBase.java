@@ -40,9 +40,11 @@ public interface RepositoryBase<T> {
 	void bar(@NotNull @Valid Customer customer);
 
 	/**
-	 * Used to test, that multiple constraints on overridden methods add up.
+	 * Used to test, that in an inheritance hierarchy multiple return value
+	 * constraints for an overridden method are joined.
 	 */
-	void overriddenMethodWithConstraint(@Min(5) int param);
+	@Min(5)
+	int overriddenMethodWithReturnValueConstraint();
 
 	@Valid
 	Customer overriddenMethodWithCascadingReturnValue();

@@ -104,7 +104,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	}
 
-	public void overriddenMethodWithConstraint(int param) {
-
+	public int overriddenMethodWithReturnValueConstraint() {
+		return 3;
 	}
 }

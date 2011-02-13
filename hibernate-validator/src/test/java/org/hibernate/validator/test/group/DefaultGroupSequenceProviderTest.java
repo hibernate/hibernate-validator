@@ -106,7 +106,8 @@ public class DefaultGroupSequenceProviderTest {
 		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
 	}
 
-	@Test
+	//TODO GM: define behavior with respect to sequences for return value validation
+	@Test(enabled = false)
 	public void testValidateReturnValueProviderDefaultGroupSequence() throws NoSuchMethodException {
 		C c = new CImpl();
 		Method fooMethod = C.class.getDeclaredMethod( "foo", String.class );

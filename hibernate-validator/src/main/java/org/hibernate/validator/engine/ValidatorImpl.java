@@ -836,12 +836,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T, U> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, GroupChain groupChain) {
-		Method method = validationContext.getMethod();
-		@SuppressWarnings("unchecked")
-		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
+	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, GroupChain groupChain) {
+
+		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
+
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( (U) object ) );
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( object ) );
 		}
 
 		// process first single groups
@@ -871,13 +871,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T, U> int validateParametersForGroup(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, Group group) {
+	private <T> int validateParametersForGroup(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, Group group) {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		Method method = validationContext.getMethod();
 
-		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
+		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
 		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
 
 		//used for retrieval of parameter names; we'll take the names from the lowest method in the hierarchy
@@ -891,7 +891,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			groupList = beanMetaData.getDefaultGroupSequence( (U) object );
+			groupList = beanMetaData.getDefaultGroupSequence( object );
 		}
 		else {
 			groupList = Arrays.<Class<?>>asList( group.getGroup() );
@@ -1001,12 +1001,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <V, T, U> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
-		@SuppressWarnings("unchecked")
-		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
+	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
+
+		BeanMetaData<T> beanMetaData = getBeanMetaData( context.getRootBeanClass() );
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( (U) bean ) );
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( bean ) );
 		}
 
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
@@ -1038,12 +1038,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	//TODO GM: if possible integrate with validateParameterForGroup()
-	private <T, U, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext, T bean, V value, Group group) {
+	private <T, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext, T bean, V value, Group group) {
+
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		Method method = validationContext.getMethod();
-		@SuppressWarnings("unchecked")
-		BeanMetaData<U> beanMetaData = (BeanMetaData<U>) getBeanMetaData( method.getDeclaringClass() );
+
+		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
 		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
@@ -1054,7 +1055,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
-			groupList = beanMetaData.getDefaultGroupSequence( (U) bean );
+			groupList = beanMetaData.getDefaultGroupSequence( bean );
 		}
 		else {
 			groupList = Arrays.<Class<?>>asList( group.getGroup() );
