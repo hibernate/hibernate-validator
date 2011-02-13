@@ -45,7 +45,7 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	void cascadingParameter(@NotNull @Valid Customer param1, @NotNull @Valid Customer param2);
 
-	void foo(@Min(1) Long id);
+	void foo(Long id);
 
 	void bar(Customer customer);
 

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
@@ -39,6 +40,8 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	private final List<BeanMetaConstraint<?, ? extends Annotation>> constraints;
 
 	private final boolean isCascading;
+
+	private final boolean hasParameterConstraints;
 
 	public MethodMetaData(
 			Method method,
@@ -58,6 +61,17 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		this.parameterMetaData = parameterMetaData;
 		this.constraints = constraints;
 		this.isCascading = isCascading;
+
+		boolean foundParameterConstraint = false;
+
+		for ( Entry<Integer, ParameterMetaData> oneParameter : parameterMetaData.entrySet() ) {
+			if ( oneParameter.getValue().isCascading() || oneParameter.getValue().iterator().hasNext() ) {
+				foundParameterConstraint = true;
+				break;
+			}
+		}
+
+		this.hasParameterConstraints = foundParameterConstraint;
 	}
 
 	/**
@@ -99,11 +113,64 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		return isCascading;
 	}
 
+	/**
+	 * Whether this method has at least one cascaded parameter or at least one
+	 * parameter with constraints.
+	 *
+	 * @return <code>True</code>, if this method has at least one cascading or
+	 *         constrained parameter, <code>false</code> otherwise.
+	 */
+	public boolean hasParameterConstraints() {
+		return hasParameterConstraints;
+	}
+
 	@Override
 	public String toString() {
 		return "MethodMetaData [method=" + method + ", parameterMetaData="
 				+ parameterMetaData + ", constraints=" + constraints
-				+ ", isCascading=" + isCascading + "]";
+				+ ", isCascading=" + isCascading + ", hasParameterConstraints="
+				+ hasParameterConstraints + "]";
+	}
+
+	/**
+	 * It is expected that there is exactly one instance of this type for a
+	 * given method in a type system. This method is therefore only based on the
+	 * hash code defined by the represented {@link Method}.
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
+		return result;
+	}
+
+	/**
+	 * It is expected that there is exactly one instance of this type for a
+	 * given method in a type system. This method is therefore only based on
+	 * the equality as defined by the represented {@link Method}.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		MethodMetaData other = (MethodMetaData) obj;
+		if ( method == null ) {
+			if ( other.method != null ) {
+				return false;
+			}
+		}
+		else if ( !method.equals( other.method ) ) {
+			return false;
+		}
+		return true;
 	}
 
 }

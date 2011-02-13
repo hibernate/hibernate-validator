@@ -18,7 +18,10 @@ package org.hibernate.validator.test.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import javax.validation.ConstraintDefinitionException;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.testng.annotations.Test;
 
@@ -95,6 +98,33 @@ public class BeanMetaDataImplTest {
 		return new BeanMetaDataImpl<T>( clazz, new ConstraintHelper(), new BeanMetaDataCache() );
 	}
 
+	@Test(
+			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
+	)
+	public void parameterConstraintsAddedInSubTypeCausesDefinitionException() {
+
+		setupBeanMetaData( FooExtImpl.class );
+	}
+
+	@Test(
+			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, but there are.*"
+	)
+	public void constraintStrengtheningInSubTypeCausesDefinitionException() {
+
+		setupBeanMetaData( BarExtImpl.class );
+	}
+
+	@Test(
+			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
+	)
+	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDefinitionException() {
+
+		setupBeanMetaData( BazImpl.class );
+	}
+
 	private void assertSize(Iterable<?> iterable, int expectedCount) {
 
 		int i = 0;
@@ -104,5 +134,62 @@ public class BeanMetaDataImplTest {
 		}
 
 		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
+	}
+
+	public static interface Foo {
+
+		void foo(String s);
+	}
+
+	public static interface FooExt extends Foo {
+
+		/**
+		 * Adds constraints to an un-constrained method from a super-type, which is not allowed.
+		 */
+		void foo(@NotNull String s);
+	}
+
+	public static class FooExtImpl implements FooExt {
+
+		public void foo(String s) {
+		}
+	}
+
+	public static interface Bar {
+
+		void bar(@NotNull String s);
+	}
+
+	public static interface BarExt extends Bar {
+
+		/**
+		 * Adds constraints to a constrained method from a super-type, which is not allowed.
+		 */
+		void bar(@Size(min = 3) String s);
+	}
+
+	public static class BarExtImpl implements BarExt {
+
+		public void bar(String s) {
+		}
+	}
+
+	public static interface Baz1 {
+
+		void baz(String s);
+	}
+
+	public static interface Baz2 {
+
+		void baz(@Size(min = 3) String s);
+	}
+
+	public static class BazImpl implements Baz1, Baz2 {
+
+		/**
+		 * Implements a method defined by two interfaces, with di a super-type, which is not allowed.
+		 */
+		public void baz(String s) {
+		}
 	}
 }

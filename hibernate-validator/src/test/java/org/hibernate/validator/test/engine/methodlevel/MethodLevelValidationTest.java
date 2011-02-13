@@ -379,28 +379,6 @@ public class MethodLevelValidationTest {
 	}
 
 	@Test
-	public void constraintsAtOverridingMethodAreEvaluated() {
-
-		try {
-
-			customerRepository.foo( Long.valueOf( 0 ) );
-			fail( "Expected MethodConstraintViolationException wasn't thrown." );
-		}
-		catch ( MethodConstraintViolationException e ) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "must be greater than or equal to 1" );
-			assertEquals( constraintViolation.getMethod().getName(), "foo" );
-			assertEquals( constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class );
-			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 0 ) );
-			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-		}
-	}
-
-	@Test
 	public void parameterValidationOfParameterlessMethod() {
 		customerRepository.boz();
 	}

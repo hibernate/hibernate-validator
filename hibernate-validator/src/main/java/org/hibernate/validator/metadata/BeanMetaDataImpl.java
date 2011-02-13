@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import javax.validation.ConstraintDefinitionException;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -48,6 +49,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.ReflectionHelper.newInstance;
 
 /**
@@ -83,6 +85,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = new HashMap<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>>();
 
 	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = new HashMap<Class<?>, Map<Method, MethodMetaData>>();
+
+	/**
+	 * Contains meta data for all method's of this type (including the method's
+	 * from its super types). Used only at construction time to determine whether
+	 * there are any illegal parameter constraints for overridden methods in a
+	 * inheritance tree.
+	 */
+	private final Set<MethodMetaData> allMethods = newHashSet();
 
 	/**
 	 * List of cascaded members.
@@ -199,6 +209,58 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				addCascadedMember( member );
 			}
 		}
+
+		checkParameterConstraints();
+	}
+
+	/**
+	 * Checks that there are no invalid parameter constraints defined at this
+	 * type's methods. The following rules apply:
+	 * <ul>
+	 * <li>Only the root method of an overridden method in an inheritance
+	 * hierarchy may be annotated with parameter constraints in order to avoid
+	 * the strengthening of a method's preconditions by additional parameter
+	 * constraints defined at sub-types. If the root method itself has no
+	 * parameter constraints, also no parameter constraints may be added in
+	 * sub-types.</li>
+	 * <li>If there are multiple root methods for an method in an inheritance
+	 * hierarchy (e.g. by implementing two interfaces defining the same method)
+	 * no parameter constraints for this method are allowed at all in order to
+	 * avoid a strengthening of a method's preconditions in parallel types.</li>
+	 * </ul>
+	 */
+	private void checkParameterConstraints() {
+
+		for ( MethodMetaData oneMethod : getMethodsWithParameterConstraints( allMethods ) ) {
+
+			Set<MethodMetaData> methodsWithSameSignature = getMethodsWithSameSignature( allMethods, oneMethod );
+			Set<MethodMetaData> methodsWithSameSignatureAndParameterConstraints = getMethodsWithParameterConstraints(
+					methodsWithSameSignature
+			);
+
+			if ( methodsWithSameSignatureAndParameterConstraints.size() > 1 ) {
+				throw new ConstraintDefinitionException(
+						"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, " +
+								"but there are parameter constraints defined at all of the following overridden methods: " +
+								methodsWithSameSignatureAndParameterConstraints
+				);
+			}
+
+			for ( MethodMetaData oneMethodWithSameSignature : methodsWithSameSignature ) {
+				if ( !oneMethod.getMethod().getDeclaringClass()
+						.isAssignableFrom( oneMethodWithSameSignature.getMethod().getDeclaringClass() ) ) {
+					throw new ConstraintDefinitionException(
+							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
+									"The following method itself has no parameter constraints but it is not defined one a sub-type of " +
+									oneMethod.getMethod().getDeclaringClass() +
+									": " + oneMethodWithSameSignature
+					);
+				}
+			}
+
+		}
+
+
 	}
 
 	public Class<T> getBeanClass() {
@@ -335,6 +397,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
+
+		allMethods.add( methodMetaData );
 
 		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get( clazz );
 
@@ -654,7 +718,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *
 	 * @param method The method to check for constraints annotations.
 	 *
-	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
+	 * @return A meta data object describing the constraints specified for the
+	 *         given method.
 	 */
 	private MethodMetaData getMethodMetaData(Method method) {
 
@@ -733,6 +798,52 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		else {
 			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
 		}
+	}
+
+	/**
+	 * Returns a set with those methods from the given pile of methods that have
+	 * the same method as the specified one. If the given method itself is part
+	 * of the specified pile of methods, it also will be contained in the result
+	 * set.
+	 *
+	 * @param methods The methods to search in.
+	 * @param methodToCheck The method to compare against.
+	 *
+	 * @return A set with methods with the same signature as the given one. May
+	 *         be empty, but never null.
+	 */
+	private Set<MethodMetaData> getMethodsWithSameSignature(Iterable<MethodMetaData> methods, MethodMetaData methodToCheck) {
+
+		Set<MethodMetaData> theValue = newHashSet();
+
+		for ( MethodMetaData oneMethod : methods ) {
+			if ( ReflectionHelper.haveSameSignature( oneMethod.getMethod(), methodToCheck.getMethod() ) ) {
+				theValue.add( oneMethod );
+			}
+		}
+		return theValue;
+	}
+
+	/**
+	 * Returns a set with those methods from the given pile of methods that have
+	 * at least one constrained parameter or at least one parameter annotated
+	 * with {@link Valid}.
+	 *
+	 * @param methods The methods to search in.
+	 *
+	 * @return A set with constrained methods. May be empty, but never null.
+	 */
+	private Set<MethodMetaData> getMethodsWithParameterConstraints(Iterable<MethodMetaData> methods) {
+
+		Set<MethodMetaData> theValue = newHashSet();
+
+		for ( MethodMetaData oneMethod : methods ) {
+			if ( oneMethod.hasParameterConstraints() ) {
+				theValue.add( oneMethod );
+			}
+		}
+
+		return theValue;
 	}
 
 	@Override
