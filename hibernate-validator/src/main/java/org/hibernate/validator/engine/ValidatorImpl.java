@@ -623,14 +623,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T, U> void validateProperty(T object, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T, U, V> void validateProperty(T object, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 
 		@SuppressWarnings("unchecked")
 		final Class<T> beanType = (Class<T>) object.getClass();
 
 		Set<BeanMetaConstraint<T, ?>> metaConstraints = new HashSet<BeanMetaConstraint<T, ?>>();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
-		ValueContext<T, U> valueContext = collectMetaConstraintsForPath(
+		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
 				beanType, object, propertyIter, propertyPath, metaConstraints
 		);
 
@@ -731,9 +731,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T, U> void validateValue(Class<T> beanType, U value, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
+	private <T, U, V> void validateValue(Class<T> beanType, V value, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
 		Set<BeanMetaConstraint<T, ?>> metaConstraints = new HashSet<BeanMetaConstraint<T, ?>>();
-		ValueContext<T, U> valueContext = collectMetaConstraintsForPath(
+		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
 				beanType, null, propertyPath.iterator(), propertyPath, metaConstraints
 		);
 		valueContext.setCurrentValidatedValue( value );
@@ -787,15 +787,15 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V> void validateValueForGroup(
-			Class<U> beanType,
-			ValueContext<T, V> valueContext,
-			Set<ConstraintViolation<U>> failingConstraintViolations,
-			Set<BeanMetaConstraint<U, ?>> metaConstraints,
+			Class<T> beanType,
+			ValueContext<U, V> valueContext,
+			Set<ConstraintViolation<T>> failingConstraintViolations,
+			Set<BeanMetaConstraint<T, ?>> metaConstraints,
 			Group group,
 			TraversableResolver cachedTraversableResolver) {
 		int numberOfConstraintViolations = failingConstraintViolations.size();
 
-		BeanMetaData<T> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
@@ -807,8 +807,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		for ( Class<?> groupClass : groupList ) {
-			for ( MetaConstraint<U, ?> metaConstraint : metaConstraints ) {
-				ValidationContext<U, ConstraintViolation<U>> context = ValidationContext.getContextForValidateValue(
+			for ( MetaConstraint<T, ?> metaConstraint : metaConstraints ) {
+				ValidationContext<T, ConstraintViolation<T>> context = ValidationContext.getContextForValidateValue(
 						beanType, messageInterpolator, constraintValidatorFactory, cachedTraversableResolver, failFast
 				);
 				valueContext.setCurrentGroup( groupClass );
@@ -1126,7 +1126,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @return Returns an instance of <code>ValueContext</code> which describe the context associated to the validation of the given propertyPath.
 	 */
-	private <T, U> ValueContext<T, U> collectMetaConstraintsForPath(Class<T> clazz, T value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Set<BeanMetaConstraint<T, ?>> metaConstraints) {
+	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, T value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Set<BeanMetaConstraint<T, ?>> metaConstraints) {
 		Path.Node elem = propertyIter.next();
 		T newValue = value;
 
@@ -1182,9 +1182,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		if ( newValue == null ) {
-			return ValueContext.getLocalExecutionContext( clazz, propertyPath );
+			return ValueContext.getLocalExecutionContext( (Class<U>) clazz, propertyPath );
 		}
-		return ValueContext.getLocalExecutionContext( value, propertyPath );
+		return ValueContext.getLocalExecutionContext( (U) value, propertyPath );
 	}
 
 	private <U> BeanMetaData<U> getBeanMetaData(Class<U> beanClass) {
