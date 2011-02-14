@@ -106,8 +106,7 @@ public class DefaultGroupSequenceProviderTest {
 		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
 	}
 
-	//TODO GM: define behavior with respect to sequences for return value validation
-	@Test(enabled = false)
+	@Test
 	public void testValidateReturnValueProviderDefaultGroupSequence() throws NoSuchMethodException {
 		C c = new CImpl();
 		Method fooMethod = C.class.getDeclaredMethod( "foo", String.class );
@@ -137,7 +136,6 @@ public class DefaultGroupSequenceProviderTest {
 
 	}
 
-	@GroupSequenceProvider(MethodGroupSequenceProvider.class)
 	static interface C {
 
 		@NotNull(message = "may not be null")
@@ -145,6 +143,7 @@ public class DefaultGroupSequenceProviderTest {
 		public String foo(String param);
 	}
 
+	@GroupSequenceProvider(MethodGroupSequenceProvider.class)
 	static class CImpl implements C {
 
 		public String foo(String param) {
@@ -156,12 +155,12 @@ public class DefaultGroupSequenceProviderTest {
 
 	}
 
-	public static class MethodGroupSequenceProvider implements DefaultGroupSequenceProvider<C> {
+	public static class MethodGroupSequenceProvider implements DefaultGroupSequenceProvider<CImpl> {
 
-		public List<Class<?>> getValidationGroups(C object) {
+		public List<Class<?>> getValidationGroups(CImpl object) {
 			List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 			defaultGroupSequence.add( TestGroup.class );
-			defaultGroupSequence.add( C.class );
+			defaultGroupSequence.add( CImpl.class );
 
 			return defaultGroupSequence;
 		}
