@@ -657,13 +657,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			List<Group> sequence = sequenceIterator.next();
-			int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 			for ( Group group : sequence ) {
-				validatePropertyForGroup( valueContext, validationContext, metaConstraints, group );
+				int numberOfConstraintViolations = validatePropertyForGroup(
+						valueContext, validationContext, metaConstraints, group
+				);
 				if ( validationContext.shouldFailFast() ) {
 					return validationContext.getFailingConstraints();
 				}
-				if ( validationContext.getFailingConstraints().size() > numberOfConstraintViolationsBefore ) {
+				if ( numberOfConstraintViolations > 0 ) {
 					break;
 				}
 			}
@@ -672,10 +673,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints();
 	}
 
-	private <T, U, V> void validatePropertyForGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Set<BeanMetaConstraint<T, ?>> metaConstraints, Group group) {
-
+	private <T, U, V> int validatePropertyForGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Set<BeanMetaConstraint<T, ?>> metaConstraints, Group group) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
-
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 
 		List<Class<?>> groupList;
@@ -696,7 +695,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					valueContext.setCurrentValidatedValue( valueToValidate );
 					metaConstraint.validateConstraint( validationContext, valueContext );
 					if ( validationContext.shouldFailFast() ) {
-						return;
+						return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 					}
 				}
 			}
@@ -704,6 +703,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				break;
 			}
 		}
+
+		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
 	private <T, U, V> void validateValue(Class<T> beanType, V value, PathImpl propertyPath, Set<ConstraintViolation<T>> failingConstraintViolations, GroupChain groupChain) {
