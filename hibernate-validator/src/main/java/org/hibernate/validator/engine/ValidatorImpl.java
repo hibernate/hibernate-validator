@@ -254,7 +254,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	public final TypeDescriptor getConstraintsForType(Class<?> clazz) {
-		throw new UnsupportedOperationException( "Not yet implemented." );
+		return getBeanMetaData( clazz ).getTypeDescriptor();
 	}
 
 	public final <T> T unwrap(Class<T> type) {

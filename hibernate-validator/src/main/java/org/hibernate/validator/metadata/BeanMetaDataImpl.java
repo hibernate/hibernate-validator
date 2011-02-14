@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -70,6 +71,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
 
+	private static final Logger log = LoggerFactory.make();
+
 	/**
 	 * The root bean class for this meta data.
 	 */
@@ -79,6 +82,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * The main element descriptor for {@link #beanClass}.
 	 */
 	private BeanDescriptorImpl<T> beanDescriptor;
+
+	private TypeDescriptor typeDescriptor;
 
 	/**
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class

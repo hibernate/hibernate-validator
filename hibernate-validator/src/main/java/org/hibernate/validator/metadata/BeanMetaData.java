@@ -26,10 +26,13 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.method.metadata.TypeDescriptor;
+
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public interface BeanMetaData<T> {
 
@@ -42,6 +45,11 @@ public interface BeanMetaData<T> {
 	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.
 	 */
 	BeanDescriptor getBeanDescriptor();
+
+	/**
+	 * @return An instance of {@link TypeDescriptor} describing the bean this meta data applies for.
+	 */
+	TypeDescriptor getTypeDescriptor();
 
 	/**
 	 * @return A list of all cascaded methods and fields (methods/fields annotated with &#064;Valid).
