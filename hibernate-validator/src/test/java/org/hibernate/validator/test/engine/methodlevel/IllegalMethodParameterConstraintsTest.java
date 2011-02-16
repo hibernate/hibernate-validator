@@ -89,64 +89,54 @@ public class IllegalMethodParameterConstraintsTest {
 		);
 	}
 
-	public static interface Foo {
+	private static interface Foo {
 
 		void foo(String s);
 	}
 
-	public static interface FooExt extends Foo {
+	private static class FooExtImpl implements Foo {
 
 		/**
 		 * Adds constraints to an un-constrained method from a super-type, which is not allowed.
 		 */
-		void foo(@NotNull String s);
-	}
-
-	public static class FooExtImpl implements FooExt {
-
-		public void foo(String s) {
+		public void foo(@NotNull String s) {
 		}
 	}
 
-	public static interface Bar {
+	private static interface Bar {
 
 		void bar(@NotNull String s);
 	}
 
-	public static interface BarExt extends Bar {
+	private static class BarExtImpl implements Bar {
 
 		/**
 		 * Adds constraints to a constrained method from a super-type, which is not allowed.
 		 */
-		void bar(@Size(min = 3) String s);
-	}
-
-	public static class BarExtImpl implements BarExt {
-
-		public void bar(String s) {
+		public void bar(@Size(min = 3) String s) {
 		}
 	}
 
-	public static interface Baz1 {
+	private static interface Baz1 {
 
 		void baz(String s);
 	}
 
-	public static interface Baz2 {
+	private static interface Baz2 {
 
 		void baz(@Size(min = 3) String s);
 	}
 
-	public static class BazImpl implements Baz1, Baz2 {
+	private static class BazImpl implements Baz1, Baz2 {
 
 		/**
-		 * Implements a method defined by two interfaces, with di a super-type, which is not allowed.
+		 * Implements a method defined by two interfaces (one with parameter constraints), which is not allowed.
 		 */
 		public void baz(String s) {
 		}
 	}
 
-	public static interface Qux {
+	private static interface Qux {
 
 		@NotNull
 		public String getQux();
@@ -154,18 +144,13 @@ public class IllegalMethodParameterConstraintsTest {
 		public void qux(String s);
 	}
 
-	public static interface QuxExt extends Qux {
-
-		public void qux(@NotNull String s);
-	}
-
-	public static class QuxImpl implements QuxExt {
+	private static class QuxImpl implements Qux {
 
 		public String getQux() {
 			return null;
 		}
 
-		public void qux(String s) {
+		public void qux(@NotNull String s) {
 		}
 
 	}
