@@ -840,6 +840,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
 
+		//the method invocation can't be validated as this bean has one or more illegal parameter constraints
+		if ( beanMetaData.getParameterConstraintDefinitionException() != null ) {
+			throw beanMetaData.getParameterConstraintDefinitionException();
+		}
+
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( object ) );
 		}

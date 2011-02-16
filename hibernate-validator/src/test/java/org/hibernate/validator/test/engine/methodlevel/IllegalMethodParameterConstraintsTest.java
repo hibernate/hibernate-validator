@@ -16,7 +16,9 @@
 */
 package org.hibernate.validator.test.engine.methodlevel;
 
+import java.util.Set;
 import javax.validation.ConstraintDefinitionException;
+import javax.validation.ConstraintViolation;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -24,7 +26,9 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidator;
+import static org.hibernate.validator.test.util.TestUtil.getValidator;
 
 /**
  * Integration test for {@link ValidatorImpl} and {@link BeanMetaDataImpl} which
@@ -64,6 +68,24 @@ public class IllegalMethodParameterConstraintsTest {
 
 		getMethodValidator().validateAllParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
+		);
+	}
+
+	@Test(
+			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints.*"
+	)
+	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() {
+
+		QuxImpl qux = new QuxImpl();
+
+		//validating a property is fine
+		Set<ConstraintViolation<QuxImpl>> violations = getValidator().validate( qux );
+		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+
+		//but method validation fails due to illegal parameter constraints being defined
+		getMethodValidator().validateAllParameters(
+				qux, QuxImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
 
@@ -122,6 +144,30 @@ public class IllegalMethodParameterConstraintsTest {
 		 */
 		public void baz(String s) {
 		}
+	}
+
+	public static interface Qux {
+
+		@NotNull
+		public String getQux();
+
+		public void qux(String s);
+	}
+
+	public static interface QuxExt extends Qux {
+
+		public void qux(@NotNull String s);
+	}
+
+	public static class QuxImpl implements QuxExt {
+
+		public String getQux() {
+			return null;
+		}
+
+		public void qux(String s) {
+		}
+
 	}
 
 }

@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.ConstraintDefinitionException;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -115,4 +116,22 @@ public interface BeanMetaData<T> {
 	 *         as cascaded (@Valid).
 	 */
 	Set<PropertyDescriptor> getConstrainedProperties();
+
+	/**
+	 * Returns a {@link ConstraintDefinitionException} describing an illegal
+	 * method parameter constraint of the represented bean, if such an illegal
+	 * constraint exists. This exception is created - but not thrown - when
+	 * instantiating this meta data object. The rationale for this approach is
+	 * that an illegal method parameter constraint shall not hinder standard
+	 * validation of the represented bean as defined by the Bean Validation API.
+	 * Only if actually a method validation is performed on that bean, this
+	 * exception will be thrown by the validation engine.
+	 *
+	 * @return A {@link ConstraintDefinitionException} describing an illegal
+	 *         method parameter constraint of the represented bean, or
+	 *         <code>null</code> if the represented bean has no parameter
+	 *         constraints at all or only valid ones.
+	 */
+	ConstraintDefinitionException getParameterConstraintDefinitionException();
+
 }
