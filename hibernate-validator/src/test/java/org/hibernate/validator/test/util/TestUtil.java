@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.PathImpl;
+import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.util.LoggerFactory;
 
 import static org.testng.Assert.assertEquals;
@@ -67,6 +68,10 @@ public class TestUtil {
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
 		return hibernateValidator;
+	}
+
+	public static MethodValidator getMethodValidator() {
+		return getValidator().unwrap( MethodValidator.class );
 	}
 
 	public static Configuration<HibernateValidatorConfiguration> getConfiguration() {
