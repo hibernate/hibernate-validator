@@ -651,6 +651,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return context.getFailingConstraints();
 		}
 
+		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
+		}
+
 		// process first single groups
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
@@ -692,6 +697,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		if ( metaConstraintsMap.size() == 0 ) {
 			return context.getFailingConstraints();
+		}
+
+		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
 		}
 
 		// process groups
