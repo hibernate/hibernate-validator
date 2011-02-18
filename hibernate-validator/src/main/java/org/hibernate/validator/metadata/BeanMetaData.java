@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConstraintDefinitionException;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -118,20 +118,28 @@ public interface BeanMetaData<T> {
 	Set<PropertyDescriptor> getConstrainedProperties();
 
 	/**
-	 * Returns a {@link ConstraintDefinitionException} describing an illegal
-	 * method parameter constraint of the represented bean, if such an illegal
-	 * constraint exists. This exception is created - but not thrown - when
-	 * instantiating this meta data object. The rationale for this approach is
-	 * that an illegal method parameter constraint shall not hinder standard
-	 * validation of the represented bean as defined by the Bean Validation API.
-	 * Only if actually a method validation is performed on that bean, this
-	 * exception will be thrown by the validation engine.
+	 * <p>Checks the method parameter constraints of the type represented by this
+	 * meta data object for correctness.
+	 * </p>
+	 * <p>
+	 * The following rules apply for this check:
+	 * </p>
+	 * <ul>
+	 * <li>Only the root method of an overridden method in an inheritance
+	 * hierarchy may be annotated with parameter constraints in order to avoid
+	 * the strengthening of a method's preconditions by additional parameter
+	 * constraints defined at sub-types. If the root method itself has no
+	 * parameter constraints, also no parameter constraints may be added in
+	 * sub-types.</li>
+	 * <li>If there are multiple root methods for an method in an inheritance
+	 * hierarchy (e.g. by implementing two interfaces defining the same method)
+	 * no parameter constraints for this method are allowed at all in order to
+	 * avoid a strengthening of a method's preconditions in parallel types.</li>
+	 * </ul>
 	 *
-	 * @return A {@link ConstraintDefinitionException} describing an illegal
-	 *         method parameter constraint of the represented bean, or
-	 *         <code>null</code> if the represented bean has no parameter
-	 *         constraints at all or only valid ones.
+	 * @throws ConstraintDeclarationException In case the represented bean
+	 * has an illegal method parameter constraint.
 	 */
-	ConstraintDefinitionException getParameterConstraintDefinitionException();
+	public void assertMethodParameterConstraintsCorrectness() throws ConstraintDeclarationException;
 
 }

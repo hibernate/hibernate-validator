@@ -17,7 +17,7 @@
 package org.hibernate.validator.test.engine.methodlevel;
 
 import java.util.Set;
-import javax.validation.ConstraintDefinitionException;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -39,7 +39,7 @@ import static org.hibernate.validator.test.util.TestUtil.getValidator;
 public class IllegalMethodParameterConstraintsTest {
 
 	@Test(
-			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
 	)
 	public void parameterConstraintsAddedInSubTypeCausesDefinitionException() {
@@ -50,7 +50,7 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	@Test(
-			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, but there are.*"
 	)
 	public void constraintStrengtheningInSubTypeCausesDefinitionException() {
@@ -61,7 +61,7 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	@Test(
-			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
 	)
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDefinitionException() {
@@ -72,7 +72,7 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	@Test(
-			expectedExceptions = ConstraintDefinitionException.class,
+			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints.*"
 	)
 	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() {

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.validation.ConstraintDefinitionException;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -131,12 +131,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * A definition exception in case the represented bean contains any illegal
 	 * method parameter constraints. Such illegal parameter constraints shall
-	 * not hinder standard bean/property validation of this type. Therefore this
-	 * exception is created when instantiating this meta data object, but it
-	 * will only be thrown by the validation engine when actually a method
-	 * invocation is validated.
+	 * not hinder standard bean/property validation of this type as defined by
+	 * the Bean Validation API. Therefore this exception is created when
+	 * instantiating this meta data object, but it will only be thrown by the
+	 * validation engine when actually a method validation is performed.
 	 */
-	private ConstraintDefinitionException parameterConstraintDefinitionException;
+	private final ConstraintDeclarationException parameterConstraintDeclarationException;
 
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this(
@@ -220,34 +220,19 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		checkParameterConstraints();
+		parameterConstraintDeclarationException = checkParameterConstraints();
 	}
 
 	/**
 	 * <p>
 	 * Checks that there are no invalid parameter constraints defined at this
-	 * type's methods. This check will only populate
-	 * {@link BeanMetaDataImpl#parameterConstraintDefinitionException}, but it
-	 * won't be thrown here. This happens lazily, when a method validation is
-	 * actually performed.
-	 * </p>
-	 * <p>
-	 * The following rules apply:
-	 * </p>
-	 * <ul>
-	 * <li>Only the root method of an overridden method in an inheritance
-	 * hierarchy may be annotated with parameter constraints in order to avoid
-	 * the strengthening of a method's preconditions by additional parameter
-	 * constraints defined at sub-types. If the root method itself has no
-	 * parameter constraints, also no parameter constraints may be added in
-	 * sub-types.</li>
-	 * <li>If there are multiple root methods for an method in an inheritance
-	 * hierarchy (e.g. by implementing two interfaces defining the same method)
-	 * no parameter constraints for this method are allowed at all in order to
-	 * avoid a strengthening of a method's preconditions in parallel types.</li>
-	 * </ul>
+	 * type's methods.
+	 *
+	 * @return A {@link ConstraintDeclarationException} describing the first illegal
+	 *         method parameter constraint found or <code>null</code>, if this type has no
+	 *         such illegal constraints.
 	 */
-	private void checkParameterConstraints() {
+	private ConstraintDeclarationException checkParameterConstraints() {
 
 		for ( MethodMetaData oneMethod : getMethodsWithParameterConstraints( allMethods ) ) {
 
@@ -257,30 +242,34 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			);
 
 			if ( methodsWithSameSignatureAndParameterConstraints.size() > 1 ) {
-				parameterConstraintDefinitionException = new ConstraintDefinitionException(
+				return new ConstraintDeclarationException(
 						"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, " +
 								"but there are parameter constraints defined at all of the following overridden methods: " +
 								methodsWithSameSignatureAndParameterConstraints
 				);
-				return;
 			}
 
 			for ( MethodMetaData oneMethodWithSameSignature : methodsWithSameSignature ) {
 				if ( !oneMethod.getMethod().getDeclaringClass()
 						.isAssignableFrom( oneMethodWithSameSignature.getMethod().getDeclaringClass() ) ) {
-					parameterConstraintDefinitionException = new ConstraintDefinitionException(
+					return new ConstraintDeclarationException(
 							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
 									"The following method itself has no parameter constraints but it is not defined one a sub-type of " +
 									oneMethod.getMethod().getDeclaringClass() +
 									": " + oneMethodWithSameSignature
 					);
-					return;
 				}
 			}
-
 		}
 
+		return null;
+	}
 
+	public void assertMethodParameterConstraintsCorrectness() {
+
+		if ( parameterConstraintDeclarationException != null ) {
+			throw parameterConstraintDeclarationException;
+		}
 	}
 
 	public Class<T> getBeanClass() {
@@ -350,10 +339,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public Set<PropertyDescriptor> getConstrainedProperties() {
 		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
-	}
-
-	public ConstraintDefinitionException getParameterConstraintDefinitionException() {
-		return parameterConstraintDefinitionException;
 	}
 
 	private void setDefaultGroupSequence(List<Class<?>> groupSequence) {
