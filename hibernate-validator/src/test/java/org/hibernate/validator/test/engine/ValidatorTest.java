@@ -29,10 +29,10 @@ import javax.validation.metadata.BeanDescriptor;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.TestUtil.getValidator;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -45,20 +45,41 @@ public class ValidatorTest {
 	 * HV-429
 	 */
 	@Test
-	public void testValidatePropertyWithRedefinedDefaultGroupSequence() {
-		Validator validator = TestUtil.getValidator();
+	public void testValidatePropertyWithRedefinedDefaultGroupOnMainEntity() {
+		Validator validator = getValidator();
 		A testInstance = new A();
 		testInstance.c = new C( "aaa" );
 
 		Set<ConstraintViolation<A>> constraintViolations = validator.validateProperty( testInstance, "c.id" );
 		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "c.id" );
 	}
 
 	@Test
-	public void testValidateValueWithRedefinedDefaultGroupSequence() {
-		Validator validator = TestUtil.getValidator();
-		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue(A.class, "c.id", "aaa" );
+	public void testValidatePropertyWithRedefinedDefaultGroupOnSuperClass() {
+		Validator validator = getValidator();
+		A testInstance = new A();
+		testInstance.d = new D( "aa" );
+
+		Set<ConstraintViolation<A>> constraintViolations = validator.validateProperty( testInstance, "d.e" );
 		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "d.e" );
+	}
+
+	@Test
+	public void testValidateValueWithRedefinedDefaultGroupOnMainEntity() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue( A.class, "c.id", "aaa" );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "c.id" );
+	}
+
+	@Test
+	public void testValidateValueWithRedefinedDefaultGroupOnSuperClass() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue( A.class, "d.e", "aa" );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "d.e" );
 	}
 
 	/**
@@ -66,7 +87,7 @@ public class ValidatorTest {
 	 */
 	@Test
 	public void testValidatePropertyWithCurrencySymbol() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
 		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateProperty( testInstance, "€price" );
 		assertNumberOfViolations( constraintViolations, 1 );
@@ -74,7 +95,7 @@ public class ValidatorTest {
 
 	@Test
 	public void testValidateValueWithCurrencySymbol() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
 		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateValue(
 				Ticket.class, "€price", testInstance.€price
@@ -87,7 +108,7 @@ public class ValidatorTest {
 	 */
 	@Test
 	public void testPropertyPathDoesNotStartWithLeadingDot() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = getValidator();
 		A testInstance = new A();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validate( testInstance );
 		assertNumberOfViolations( constraintViolations, 1 );
@@ -99,7 +120,7 @@ public class ValidatorTest {
 	 */
 	@Test
 	public void testHasBoolean() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = getValidator();
 		BeanDescriptor beanDescr = validator.getConstraintsForClass( B.class );
 		assertTrue( beanDescr.isBeanConstrained() );
 	}
@@ -110,6 +131,9 @@ public class ValidatorTest {
 
 		@Valid
 		C c;
+
+		@Valid
+		D d;
 	}
 
 	class B {
@@ -132,11 +156,36 @@ public class ValidatorTest {
 		}
 	}
 
-	interface TestGroup {
+	@GroupSequence( { TestGroup.class, E.class })
+	class E {
+		String e;
+
+		E(String e) {
+			this.e = e;
+		}
+
+		@Pattern(regexp = "[0-9]+", groups = TestGroup.class)
+		public String getE() {
+			return e;
+		}
+	}
+
+	class D extends E {
+		D(String e) {
+			super( e );
+		}
+
+		@Length(min = 2)
+		public String getE() {
+			return super.getE();
+		}
 	}
 
 	class Ticket {
 		@NotNull
 		Float €price;
+	}
+
+	interface TestGroup {
 	}
 }
