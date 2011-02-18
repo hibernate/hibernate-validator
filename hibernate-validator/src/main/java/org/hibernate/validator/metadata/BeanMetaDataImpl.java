@@ -89,7 +89,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Contains meta data for all method's of this type (including the method's
 	 * from its super types). Used only at construction time to determine whether
-	 * there are any illegal parameter constraints for overridden methods in a
+	 * there are any illegal parameter constraints for overridden methods in an
 	 * inheritance tree.
 	 */
 	private final Set<MethodMetaData> allMethods = newHashSet();
@@ -224,7 +224,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	/**
-	 * <p>
 	 * Checks that there are no invalid parameter constraints defined at this
 	 * type's methods.
 	 *

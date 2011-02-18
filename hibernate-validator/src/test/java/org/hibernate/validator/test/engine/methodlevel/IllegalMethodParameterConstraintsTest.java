@@ -19,11 +19,13 @@ package org.hibernate.validator.test.engine.methodlevel;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
@@ -42,21 +44,10 @@ public class IllegalMethodParameterConstraintsTest {
 			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
 	)
-	public void parameterConstraintsAddedInSubTypeCausesDefinitionException() {
+	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
 
 		getMethodValidator().validateAllParameters(
-				new FooExtImpl(), FooExtImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
-	}
-
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, but there are.*"
-	)
-	public void constraintStrengtheningInSubTypeCausesDefinitionException() {
-
-		getMethodValidator().validateAllParameters(
-				new BarExtImpl(), BarExtImpl.class.getDeclaredMethods()[0], new Object[] { }
+				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
 
@@ -64,7 +55,29 @@ public class IllegalMethodParameterConstraintsTest {
 			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
 	)
-	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDefinitionException() {
+	public void atValidAddedInSubTypeCausesDeclarationException() {
+
+		getMethodValidator().validateAllParameters(
+				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
+		);
+	}
+
+	@Test(
+			expectedExceptions = ConstraintDeclarationException.class,
+			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, but there are.*"
+	)
+	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
+
+		getMethodValidator().validateAllParameters(
+				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
+		);
+	}
+
+	@Test(
+			expectedExceptions = ConstraintDeclarationException.class,
+			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
+	)
+	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
 
 		getMethodValidator().validateAllParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
@@ -94,7 +107,7 @@ public class IllegalMethodParameterConstraintsTest {
 		void foo(String s);
 	}
 
-	private static class FooExtImpl implements Foo {
+	private static class FooImpl implements Foo {
 
 		/**
 		 * Adds constraints to an un-constrained method from a super-type, which is not allowed.
@@ -108,7 +121,7 @@ public class IllegalMethodParameterConstraintsTest {
 		void bar(@NotNull String s);
 	}
 
-	private static class BarExtImpl implements Bar {
+	private static class BarImpl implements Bar {
 
 		/**
 		 * Adds constraints to a constrained method from a super-type, which is not allowed.
@@ -152,7 +165,20 @@ public class IllegalMethodParameterConstraintsTest {
 
 		public void qux(@NotNull String s) {
 		}
+	}
 
+	private static interface Zap {
+
+		void foo(String s);
+	}
+
+	private static class ZapImpl implements Zap {
+
+		/**
+		 * Adds @Valid to an un-constrained method from a super-type, which is not allowed.
+		 */
+		public void foo(@Valid String s) {
+		}
 	}
 
 }
