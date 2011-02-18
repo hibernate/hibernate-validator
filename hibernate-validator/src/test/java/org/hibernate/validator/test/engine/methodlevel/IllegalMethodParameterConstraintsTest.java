@@ -169,7 +169,7 @@ public class IllegalMethodParameterConstraintsTest {
 
 	private static interface Zap {
 
-		void foo(String s);
+		void zap(String s);
 	}
 
 	private static class ZapImpl implements Zap {
@@ -177,7 +177,7 @@ public class IllegalMethodParameterConstraintsTest {
 		/**
 		 * Adds @Valid to an un-constrained method from a super-type, which is not allowed.
 		 */
-		public void foo(@Valid String s) {
+		public void zap(@Valid String s) {
 		}
 	}
 

@@ -129,7 +129,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<String> propertyNames = new HashSet<String>( 30 );
 
 	/**
-	 * A definition exception in case the represented bean contains any illegal
+	 * A declaration exception in case the represented bean contains any illegal
 	 * method parameter constraints. Such illegal parameter constraints shall
 	 * not hinder standard bean/property validation of this type as defined by
 	 * the Bean Validation API. Therefore this exception is created when
@@ -253,7 +253,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						.isAssignableFrom( oneMethodWithSameSignature.getMethod().getDeclaringClass() ) ) {
 					return new ConstraintDeclarationException(
 							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
-									"The following method itself has no parameter constraints but it is not defined one a sub-type of " +
+									"The following method itself has no parameter constraints but it is not defined on a sub-type of " +
 									oneMethod.getMethod().getDeclaringClass() +
 									": " + oneMethodWithSameSignature
 					);
@@ -810,7 +810,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	/**
 	 * Returns a set with those methods from the given pile of methods that have
-	 * the same method as the specified one. If the given method itself is part
+	 * the same signature as the specified one. If the given method itself is part
 	 * of the specified pile of methods, it also will be contained in the result
 	 * set.
 	 *
