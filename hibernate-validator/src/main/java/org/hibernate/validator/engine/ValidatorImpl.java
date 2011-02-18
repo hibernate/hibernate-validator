@@ -704,7 +704,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
 		}
 
-		// process groups
+		// process first single groups
 		Iterator<Group> groupIterator = groupChain.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
@@ -715,7 +715,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 		}
 
-		// process sequences
+		// now process sequences, stop after the first erroneous group
 		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			List<Group> sequence = sequenceIterator.next();
@@ -748,6 +748,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V> int validatePropertyForCurrentGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 
+		// we do not validate the default group, nothing special to do
 		if ( !valueContext.validatingDefault() ) {
 			int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 			Collection<List<BeanMetaConstraint<T, ?>>> propertyMetaConstraints = metaConstraintsMap.values();
@@ -770,17 +771,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 		}
 
+		// we are validating the default group and the main entity hosting the property re-defines the default group
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			return validatePropertyForRedefinedDefaultGroup(
 					valueContext, validationContext, metaConstraintsMap, beanMetaData
 			);
 		}
 
+		// we are validating the default group and the main entity don't re-defines the default group
 		return validatePropertyForDefaultGroup( valueContext, validationContext, metaConstraintsMap );
 	}
 
 	/**
-	 * Validates the property for the default group when the default group is redefined on the bean hosting
+	 * Validates the property for the default group when it's redefined on the bean hosting
 	 * the property to validate.
 	 *
 	 * @param valueContext The current validation context.
@@ -1169,9 +1172,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @param value While resolving the property path this instance points to the current object. Might be {@code null}.
 	 * @param propertyIter An instance of {@code PropertyIterator} in order to iterate the items of the original property path.
 	 * @param propertyPath The property path for which constraints have to be collected.
-	 * @param metaConstraintsMap Map containing {@code MetaConstraint}s for the property associated to their declaring class.
+	 * @param metaConstraintsMap An instance of {@code Map} where {@code MetaConstraint}s which match the given path are saved for each class in the hosting class hierarchy.
 	 *
-	 * @return Returns an instance of {@code ValueContext} which describes the context associated to the given property path.
+	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
 	 */
 	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, T value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
 		Path.Node elem = propertyIter.next();
