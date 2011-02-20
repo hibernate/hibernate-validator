@@ -16,38 +16,33 @@
 */
 package org.hibernate.validator.test.metadata;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
 
-import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
  * @author Gunnar Morling
  */
-@ScriptAssert(lang = "javascript", script = "some script")
-public class CustomerRepository {
+public class CustomerRepositoryExt extends CustomerRepository {
 
-	public Customer createCustomer(String firstName, @NotNull String lastName) {
+	public Customer createCustomer(String firstName, String lastName) {
 		return null;
 	}
 
-	public void saveCustomer(@Valid Customer customer) {
+	public void saveCustomer(Customer customer) {
 	}
 
 	public void updateCustomer(Customer customer) {
 	}
 
-	@Valid
 	public Customer foo() {
 		return null;
 	}
 
-	@NotNull
 	public Customer bar() {
 		return null;
 	}
 
-	@NotNull
+	@Min(0)
 	public int baz() {
 		return 0;
 	}

@@ -95,6 +95,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = newHashMap();
 
+	private Map<Method, AggregatedMethodMetaData> aggregatedMethodMetaData = newHashMap();
+
 	/**
 	 * Contains meta data for all method's of this type (including the method's
 	 * from its super types). Used only at construction time to determine whether
@@ -354,6 +356,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
+	public AggregatedMethodMetaData getAggregatedMethodMetaData(Method method) {
+		return aggregatedMethodMetaData.get( method );
+	}
+
 	public PropertyDescriptor getPropertyDescriptor(String property) {
 		return propertyDescriptors.get( property );
 	}
@@ -450,6 +456,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
 		allMethods.add( methodMetaData );
 
+		addToAggregation( methodMetaData );
+
 		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get( clazz );
 
 		if ( constraintsOfClass == null ) {
@@ -472,6 +480,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				addCascadedMember( methodMetaData.getMethod() );
 			}
 		}
+	}
+
+	private void addToAggregation(MethodMetaData metaData) {
+
+		Method method = metaData.getMethod();
+
+		for ( AggregatedMethodMetaData oneAggregatedMetaData : aggregatedMethodMetaData.values() ) {
+
+			if ( ReflectionHelper.haveSameSignature( method, oneAggregatedMetaData.getMethod() ) ) {
+				oneAggregatedMetaData.addMetaData( metaData );
+				return;
+			}
+		}
+
+		AggregatedMethodMetaData newMetaData = new AggregatedMethodMetaData( metaData );
+		aggregatedMethodMetaData.put( method, newMetaData );
 	}
 
 	private void addCascadedMember(Member member) {
