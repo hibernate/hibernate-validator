@@ -27,7 +27,6 @@ import org.hibernate.validator.constraints.ScriptAssert;
 @ScriptAssert(lang = "javascript", script = "some script")
 public class CustomerRepository {
 
-	@Valid
 	public Customer createCustomer(String firstName, @NotNull String lastName) {
 		return null;
 	}
@@ -38,7 +37,14 @@ public class CustomerRepository {
 	public void updateCustomer(Customer customer) {
 	}
 
-	public void foo() {
+	@Valid
+	public Customer foo() {
+		return null;
+	}
+
+	@NotNull
+	public Customer bar() {
+		return null;
 	}
 
 }

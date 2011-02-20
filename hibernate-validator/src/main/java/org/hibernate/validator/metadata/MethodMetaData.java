@@ -35,6 +35,10 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 
 	private final Method method;
 
+	/**
+	 * Constrained-related meta data for this method's parameters, keyed by
+	 * parameter index.
+	 */
 	private final Map<Integer, ParameterMetaData> parameterMetaData;
 
 	private final List<BeanMetaConstraint<?, ? extends Annotation>> constraints;
@@ -86,11 +90,14 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	/**
 	 * Constraint meta data for the specified parameter.
 	 *
-	 * @param parameterIndex The index in this method's parameter array of the parameter of interest.
+	 * @param parameterIndex The index in this method's parameter array of the parameter of
+	 * interest.
 	 *
-	 * @return Meta data for the specified parameter. Will never be <code>null</code.>
+	 * @return Meta data for the specified parameter. Will never be
+	 *         <code>null</code.>
 	 *
-	 * @throws IllegalArgumentException In case this method doesn't have a parameter with the specified index.
+	 * @throws IllegalArgumentException In case this method doesn't have a parameter with the
+	 * specified index.
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
@@ -111,23 +118,41 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	}
 
 	/**
-	 * Whether cascading validation for the represented method shall be performed or not.
+	 * Whether cascading validation for the return value of the represented
+	 * method shall be performed or not.
 	 *
-	 * @return <code>True</code>, if cascading validation for the represented method shall be performed, <code>false</code> otherwise.
+	 * @return <code>True</code>, if cascading validation for the represented
+	 *         method's return value shall be performed, <code>false</code>
+	 *         otherwise.
 	 */
 	public boolean isCascading() {
 		return isCascading;
 	}
 
 	/**
-	 * Whether this method has at least one cascaded parameter or at least one
-	 * parameter with constraints.
+	 * Whether the represented method is constrained or not. This is the case if
+	 * it has at least one constrained parameter, at least one parameter marked
+	 * for cascaded validation, at least one return value constraint or if the
+	 * return value is marked for cascaded validation.
 	 *
-	 * @return <code>True</code>, if this method has at least one cascading or
-	 *         constrained parameter, <code>false</code> otherwise.
+	 * @return <code>True</code>, if this method is constrained by any means,
+	 *         <code>false</code> otherwise.
 	 */
-	public boolean hasParameterConstraints() {
-		return hasParameterConstraints;
+	public boolean isConstrained() {
+
+		//is the return value constrained?
+		if ( isCascading || !constraints.isEmpty() ) {
+			return true;
+		}
+
+		//is one of the parameters constrained?
+		for ( ParameterMetaData oneParameter : parameterMetaData.values() ) {
+			if ( oneParameter.isConstrained() ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
