@@ -88,13 +88,19 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	 *
 	 * @param parameterIndex The index in this method's parameter array of the parameter of interest.
 	 *
-	 * @return Meta data for the specified parameter. May be {@link ParameterMetaData#NULL} but will never be <code>null</code.>
+	 * @return Meta data for the specified parameter. Will never be <code>null</code.>
+	 *
+	 * @throws IllegalArgumentException In case this method doesn't have a parameter with the specified index.
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
 		ParameterMetaData theValue = parameterMetaData.get( parameterIndex );
 
-		return theValue != null ? theValue : ParameterMetaData.NULL;
+		if ( theValue == null ) {
+			throw new IllegalArgumentException( "Method " + method + " doesn't have a parameter with index " + parameterIndex );
+		}
+
+		return theValue;
 	}
 
 	/**

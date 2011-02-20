@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,10 +26,6 @@ import java.util.List;
  * @author Gunnar Morling
  */
 public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends Annotation>> {
-
-	public final static ParameterMetaData NULL = new ParameterMetaData(
-			0, null, Collections.<MetaConstraint<?, ? extends Annotation>>emptyList(), false
-	);
 
 	private final int index;
 
@@ -58,6 +53,19 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 
 	public boolean isCascading() {
 		return isCascading;
+	}
+
+	/**
+	 * Whether this parameter is constrained or not. This is the case, if this
+	 * parameter has at least one constraint or a cascaded validation shall be
+	 * performed for it.
+	 *
+	 * @return <code>True</code>, if this parameter is constrained,
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean isConstrained() {
+
+		return isCascading || !constraints.isEmpty();
 	}
 
 	public Iterator<MetaConstraint<?, ? extends Annotation>> iterator() {
