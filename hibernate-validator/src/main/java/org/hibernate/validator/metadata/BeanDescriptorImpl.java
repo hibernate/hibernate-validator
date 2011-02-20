@@ -16,19 +16,26 @@
 */
 package org.hibernate.validator.metadata;
 
+import java.lang.reflect.Method;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.method.metadata.MethodDescriptor;
+import org.hibernate.validator.method.metadata.TypeDescriptor;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
-public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
+public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor, TypeDescriptor {
 
 	public BeanDescriptorImpl(BeanMetaData<T> beanMetaData) {
 		super( beanMetaData.getBeanClass(), beanMetaData );
 	}
+
+	//BeanDescriptor methods
 
 	public final boolean isBeanConstrained() {
 		return getMetaDataBean().getMetaConstraintsAsMap().size() > 0;
@@ -43,5 +50,23 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
 		return getMetaDataBean().getConstrainedProperties();
+	}
+
+	//TypeDescriptor methods
+
+	public boolean isTypeConstrained() {
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
+	public Set<MethodDescriptor> getConstrainedMethods() {
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
+	public MethodDescriptor getConstraintsForMethod(Method method) {
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
+	public BeanDescriptor getBeanDescriptor() {
+		return this;
 	}
 }

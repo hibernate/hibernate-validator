@@ -83,8 +83,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private BeanDescriptorImpl<T> beanDescriptor;
 
-	private TypeDescriptor typeDescriptor;
-
 	/**
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
 	 * (eg super class or interface) in which they are defined.
@@ -322,10 +320,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return beanDescriptor;
 	}
 
+	public TypeDescriptor getTypeDescriptor() {
+		return beanDescriptor;
+	}
+
 	public Set<Member> getCascadedMembers() {
 		return Collections.unmodifiableSet( cascadedMembers );
 	}
-
+	
 	public Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> getMetaConstraintsAsMap() {
 		return Collections.unmodifiableMap( metaConstraints );
 	}
