@@ -17,12 +17,7 @@
 package org.hibernate.validator.method;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Set;
-
-import javax.validation.Valid;
-import javax.validation.Validator;
-import javax.validation.groups.Default;
 
 /**
  * <p>
@@ -47,7 +42,7 @@ import javax.validation.groups.Default;
  * </ul>
  * <p>
  * These constraints may be declared directly on a method's parameters and/or return values.
- * Alternatively, by annotating method parameters/return values with the special {@link Valid}
+ * Alternatively, by annotating method parameters/return values with the special {@link javax.validation.Valid}
  * annotation a recursive validation of those parameters/return
  * values against the constraints defined on their types can be triggered.
  * Consider for instance the method declaration
@@ -79,7 +74,7 @@ import javax.validation.groups.Default;
  * parameters/return values itself, but not with the <em>invocation</em> of such
  * a validation. It is expected that this invocation is triggered by an
  * integration layer using AOP or similar method interception facilities such as
- * the JDK's {@link Proxy} API or <a
+ * the JDK's {@link java.lang.reflect.Proxy} API or <a
  * href="http://jcp.org/en/jsr/detail?id=299">CDI</a> (
  * "JSR 299: Contexts and Dependency Injection for the Java<sup>TM</sup> EE platform"
  * ).
@@ -96,7 +91,7 @@ import javax.validation.groups.Default;
  * </p>
  * <p>
  * <code>MethodValidator</code> instances are obtained by
- * {@link Validator#unwrap(Class) unwrapping} a {@link Validator} object:
+ * {@link javax.validation.Validator#unwrap(Class) unwrapping} a {@link javax.validation.Validator} object:
  * </p>
  *
  * <pre>
@@ -139,15 +134,17 @@ public interface MethodValidator {
 	 * @param parameterIndex The index of the parameter to be validated within the given
 	 * method's parameter array.
 	 * @param groups A - potentially empty - number of validation groups for which
-	 * the validation shall be performed. The @link {@link Default}
+	 * the validation shall be performed. The @link {@link javax.validation.groups.Default}
 	 * group will be validated if no group is given.
 	 *
 	 * @return A set with the constraint violations caused by this validation.
 	 *         Will be empty, of no error occurs, but never null.
 	 */
-	public <T> Set<MethodConstraintViolation<T>> validateParameter(T object,
-																   Method method, Object parameterValue, int parameterIndex,
-																   Class<?>... groups);
+	<T> Set<MethodConstraintViolation<T>> validateParameter(T object,
+															Method method,
+															Object parameterValue,
+															int parameterIndex,
+															Class<?>... groups);
 
 	/**
 	 * Validates all parameters of a given method.
@@ -159,14 +156,13 @@ public interface MethodValidator {
 	 * @param parameterValues The values provided by the caller for the given method's
 	 * parameters.
 	 * @param groups A - potentially empty - number of validation groups for which
-	 * the validation shall be performed. The @link {@link Default}
+	 * the validation shall be performed. The @link {@link javax.validation.groups.Default}
 	 * group will be validated if no group is given.
 	 *
 	 * @return A set with the constraint violations caused by this validation.
 	 *         Will be empty, of no error occurs, but never null.
 	 */
-	public <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object,
-																	   Method method, Object[] parameterValues, Class<?>... groups);
+	<T> Set<MethodConstraintViolation<T>> validateAllParameters(T object, Method method, Object[] parameterValues, Class<?>... groups);
 
 	/**
 	 * Validates the return value of a given method.
@@ -177,14 +173,11 @@ public interface MethodValidator {
 	 * validated.
 	 * @param returnValue The value returned by the invoked method.
 	 * @param groups A - potentially empty - number of validation groups for which
-	 * the validation shall be performed. The @link {@link Default}
+	 * the validation shall be performed. The @link {@link javax.validation.groups.Default}
 	 * group will be validated if no group is given.
 	 *
 	 * @return A set with the constraint violations caused by this validation.
 	 *         Will be empty, of no error occurs, but never null.
 	 */
-	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object,
-																	 Method method, Object returnValue, Class<?>... groups);
-
-	//getConstraintsForMethod()
+	<T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups);
 }

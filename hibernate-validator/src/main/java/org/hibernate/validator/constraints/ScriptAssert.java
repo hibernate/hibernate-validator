@@ -19,10 +19,7 @@ package org.hibernate.validator.constraints;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngineManager;
 import javax.validation.Constraint;
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.Payload;
 
 import org.hibernate.validator.constraints.impl.ScriptAssertValidator;
@@ -83,7 +80,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author Gunnar Morling
  */
-@Target({ TYPE })
+@Target( { TYPE })
 @Retention(RUNTIME)
 @Constraint(validatedBy = ScriptAssertValidator.class)
 @Documented
@@ -97,8 +94,8 @@ public @interface ScriptAssert {
 
 	/**
 	 * @return The name of the script language used by this constraint as
-	 *         expected by the JSR 223 {@link ScriptEngineManager}. A
-	 *         {@link ConstraintDeclarationException} will be thrown upon script
+	 *         expected by the JSR 223 {@link javax.script.ScriptEngineManager}. A
+	 *         {@link javax.validation.ConstraintDeclarationException} will be thrown upon script
 	 *         evaluation, if no engine for the given language could be found.
 	 */
 	String lang();
@@ -108,10 +105,10 @@ public @interface ScriptAssert {
 	 *         <code>Boolean.TRUE</code>, if the annotated element could
 	 *         successfully be validated, otherwise <code>Boolean.FALSE</code>.
 	 *         Returning null or any type other than Boolean will cause a
-	 *         {@link ConstraintDeclarationException} upon validation. Any
+	 *         {@link javax.validation.ConstraintDeclarationException} upon validation. Any
 	 *         exception occurring during script evaluation will be wrapped into
 	 *         a ConstraintDeclarationException, too. Within the script, the
-	 *         validated object can be accessed from the {@link ScriptContext
+	 *         validated object can be accessed from the {@link javax.script.ScriptContext
 	 *         script context} using the name specified in the
 	 *         <code>alias</code> attribute.
 	 */
@@ -126,7 +123,7 @@ public @interface ScriptAssert {
 	/**
 	 * Defines several {@code @ScriptAssert} annotations on the same element.
 	 */
-	@Target({ TYPE })
+	@Target( { TYPE })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {

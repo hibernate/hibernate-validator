@@ -19,7 +19,6 @@ package org.hibernate.validator.constraints.impl;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
 import javax.validation.constraints.Digits;
 
 /**
