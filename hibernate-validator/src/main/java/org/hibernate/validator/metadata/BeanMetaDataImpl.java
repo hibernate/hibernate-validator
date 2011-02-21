@@ -512,8 +512,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			// HV-262
 			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
+			boolean metaDataCached = cachedMetaData != null;
 			List<ConstraintDescriptorImpl<?>> fieldMetaData;
-			if ( cachedMetaData != null && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
+			if ( metaDataCached && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
 				fieldMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 				for ( BeanMetaConstraint<?, ?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap()
 						.get( clazz ) ) {
@@ -536,7 +537,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				addMetaConstraint( clazz, metaConstraint );
 			}
 
-			if ( (cachedMetaData != null && cachedMetaData.getCascadedMembers().contains( field )) || field.isAnnotationPresent( Valid.class ) ) {
+			// HV-433 Make sure the field is marked as cascaded in case it was configured via xml/programmatic API or
+			// it hosts the @Valid annotation
+			boolean isCascadedField = metaDataCached && cachedMetaData.getCascadedMembers().contains( field );
+			if ( isCascadedField || field.isAnnotationPresent( Valid.class ) ) {
 				addCascadedMember( field );
 			}
 		}

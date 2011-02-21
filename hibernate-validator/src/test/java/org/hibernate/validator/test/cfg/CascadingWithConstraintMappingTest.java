@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.hibernate.validator.test.cfg;
 
 import java.util.Set;
@@ -35,6 +36,9 @@ import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolation
 
 public class CascadingWithConstraintMappingTest {
 
+	/**
+	 * See HV-433
+	 */
 	@Test
 	public void testCascadedValidationInHierarchyWithConstraintMapping() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
@@ -51,7 +55,6 @@ public class CascadingWithConstraintMappingTest {
 
 		Baz baz = new Baz();
 		baz.bar = new Bar();
-
 
 		Set<ConstraintViolation<Baz>> violations = validator.validate( baz );
 
