@@ -479,7 +479,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @param valueContext Collected information for single validation
 	 */
 	private <T, U, V> void validateCascadedConstraints(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
-		List<Member> cascadedMembers = getBeanMetaData( valueContext.getCurrentBeanType() ).getCascadedMembers();
+		Set<Member> cascadedMembers = getBeanMetaData( valueContext.getCurrentBeanType() ).getCascadedMembers();
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( Member member : cascadedMembers ) {
 			Type type = ReflectionHelper.typeOf( member );
@@ -1227,7 +1227,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 		}
 		else {
-			List<Member> cascadedMembers = metaData.getCascadedMembers();
+			Set<Member> cascadedMembers = metaData.getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( elem.getName() ) ) {
 					Type type = ReflectionHelper.typeOf( m );

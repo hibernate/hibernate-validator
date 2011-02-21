@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -156,7 +157,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 
 			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = newHashMap();
-			List<Member> cascadedMembers = new ArrayList<Member>();
+			Set<Member> cascadedMembers = new HashSet<Member>();
 
 			for ( Class<?> classInHierarchy : classes ) {
 
@@ -205,7 +206,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = newHashMap();
-			List<Member> cascadedMembers = new ArrayList<Member>();
+			Set<Member> cascadedMembers = new HashSet<Member>();
 			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
 			// some constraints might be configured in super classes or interfaces. The xml configuration does not
 			// imply any order so we have to check whether any of the super classes or interfaces of a given bean has
@@ -296,14 +297,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private void addXmlCascadedMember(XmlMappingParser mappingParser,
 									  Class<?> hierarchyClass,
-									  List<Member> cascadedMembers) {
+									  Set<Member> cascadedMembers) {
 		for ( Member m : mappingParser.getCascadedMembersForClass( hierarchyClass ) ) {
 			cascadedMembers.add( m );
 		}
 	}
 
 	private void addProgrammaticConfiguredCascade(List<CascadeDef> cascades,
-												  List<Member> cascadedMembers) {
+												  Set<Member> cascadedMembers) {
 
 		for ( CascadeDef cascade : cascades ) {
 			Member m = ReflectionHelper.getMember(

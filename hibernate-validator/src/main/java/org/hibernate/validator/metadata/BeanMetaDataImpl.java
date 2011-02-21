@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.util.CollectionHelper;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -82,13 +83,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
 	 * (eg super class or interface) in which they are defined.
 	 */
-	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = new HashMap<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>>();
+	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = CollectionHelper.newHashMap();
 
 	/**
 	 * Map containing information about method constraints. The key is the class in which the method constraint
 	 * is defined and the value is a map itself mapping the constraint method to its metadata.
 	 */
-	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = new HashMap<Class<?>, Map<Method, MethodMetaData>>();
+	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = CollectionHelper.newHashMap();
 
 	/**
 	 * Contains meta data for all method's of this type (including the method's
@@ -101,12 +102,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * List of cascaded members.
 	 */
-	private List<Member> cascadedMembers = new ArrayList<Member>();
+	private Set<Member> cascadedMembers = CollectionHelper.newHashSet();
 
 	/**
 	 * Maps field and method names to their <code>ElementDescriptorImpl</code>.
 	 */
-	private Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<String, PropertyDescriptor>();
+	private Map<String, PropertyDescriptor> propertyDescriptors = CollectionHelper.newHashMap();
 
 	/**
 	 * The default groups sequence for this bean class.
@@ -142,33 +143,60 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private final ConstraintDeclarationException parameterConstraintDeclarationException;
 
+	/**
+	 * Constructor used for creating the bean meta data using annotations only
+	 *
+	 * @param beanClass The bean type for which to create the meta data
+	 * @param constraintHelper constraint helper
+	 * @param beanMetaDataCache the cache of already configured meta data instances
+	 */
 	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
 		this(
 				beanClass,
 				constraintHelper,
 				new ArrayList<Class<?>>(),
 				new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>(),
-				new ArrayList<Member>(),
+				new HashSet<Member>(),
 				new AnnotationIgnores(),
 				beanMetaDataCache
 		);
 	}
 
+	/**
+	 * Constructor used when creating a bean meta data instance via the xml or programmatic API. In this case
+	 * additional metadata (the already configured constraints, cascaded members, etc) are passed as well.
+	 *
+	 * @param beanClass The bean type for which to create the meta data
+	 * @param constraintHelper constraint helper
+	 * @param defaultGroupSequence programmatic/xml configured default group sequence (overrides annotations)
+	 * @param constraints programmatic/xml configured constraints
+	 * @param cascadedMembers programmatic/xml configured cascaded members
+	 * @param annotationIgnores in xml configured ignores for annotations
+	 * @param beanMetaDataCache the cache of already configured meta data instances
+	 */
 	public BeanMetaDataImpl(Class<T> beanClass,
 							ConstraintHelper constraintHelper,
 							List<Class<?>> defaultGroupSequence,
 							Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints,
-							List<Member> cascadedMembers,
+							Set<Member> cascadedMembers,
 							AnnotationIgnores annotationIgnores,
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
 		this.defaultGroupSequenceProvider = null;
+		for ( Member member : cascadedMembers ) {
+			addCascadedMember( member );
+		}
 
+		// start the annotation discovery phase (look for annotations in the whole class hierarchy)
 		createMetaData( annotationIgnores, beanMetaDataCache );
+
+		// set the default explicitly specified default group sequence after the discovery process is complete
 		if ( !defaultGroupSequence.isEmpty() ) {
 			setDefaultGroupSequence( defaultGroupSequence );
 		}
+
+		// add the explicitly configured constraints
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<T, ?>>> entry : constraints.entrySet() ) {
 			Class<?> clazz = entry.getKey();
 
@@ -209,21 +237,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 		}
-		for ( Member member : cascadedMembers ) {
-			// in case a method was specified as cascaded but did not have any constraints we have to register it here
-			if ( member instanceof Method && getMetaDataForMethod( (Method) member ) == null ) {
-				MethodMetaData methodMetaData = new MethodMetaData(
-						(Method) member,
-						Collections.<BeanMetaConstraint<?, ? extends Annotation>>emptyList(),
-						true
-				);
-				addMethodMetaConstraint( member.getDeclaringClass(), methodMetaData );
-			}
-			else {
-				addCascadedMember( member );
-			}
-		}
-
 		parameterConstraintDeclarationException = checkParameterConstraints();
 	}
 
@@ -283,8 +296,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return beanDescriptor;
 	}
 
-	public List<Member> getCascadedMembers() {
-		return Collections.unmodifiableList( cascadedMembers );
+	public Set<Member> getCascadedMembers() {
+		return Collections.unmodifiableSet( cascadedMembers );
 	}
 
 	public Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> getMetaConstraintsAsMap() {
@@ -731,9 +744,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *         given method.
 	 */
 	private MethodMetaData getMethodMetaData(Method method) {
-
 		Map<Integer, ParameterMetaData> parameterConstraints = getParameterMetaData( method );
-		boolean isCascading = isValidAnnotationPresent( method );
+		boolean isCascading = isValidAnnotationPresent( method ) || cascadedMembers.contains( method );
 		List<BeanMetaConstraint<?, ? extends Annotation>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
 
