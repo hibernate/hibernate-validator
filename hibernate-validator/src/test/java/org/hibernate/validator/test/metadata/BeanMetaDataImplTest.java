@@ -22,12 +22,12 @@ import javax.validation.constraints.Min;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 
@@ -39,6 +39,9 @@ import static org.testng.Assert.assertTrue;
 /**
  * Unit test for {@link BeanMetaData}.
  *
+ * TODO GM: Check, whether these tests are still needed. They seem redundant to
+ * {@link MethodMetaDataTest} and {@link AggregatedMethodMetaDataTest}.
+ *
  * @author Gunnar Morling
  */
 public class BeanMetaDataImplTest {
@@ -49,7 +52,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "baz" );
-		MethodMetaData methodMetaData = metaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -65,8 +68,8 @@ public class BeanMetaDataImplTest {
 
 		BeanMetaData<CustomerRepositoryImpl> metaData = setupBeanMetaData( CustomerRepositoryImpl.class );
 
-		Method method = CustomerRepository.class.getMethod( "baz" );
-		MethodMetaData methodMetaData = metaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		Method method = CustomerRepositoryImpl.class.getMethod( "baz" );
+		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataForMethod( method );
 
 		assertIterableSize( methodMetaData, 1 );
 		assertEquals( methodMetaData.getMethod(), method );
@@ -85,7 +88,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
-		MethodMetaData methodMetaData = metaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );

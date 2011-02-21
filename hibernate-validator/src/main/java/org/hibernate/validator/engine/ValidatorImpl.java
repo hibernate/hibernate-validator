@@ -943,7 +943,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
-		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
+		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method )
+				.getMetaDataByDefiningType();
+		;
 
 		//used for retrieval of parameter names; we'll take the names from the lowest method in the hierarchy
 		MethodMetaData methodMetaDataOfDeclaringType = methodMetaDataByType.get( method.getDeclaringClass() );
@@ -1110,7 +1112,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
-		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method );
+		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method )
+				.getMetaDataByDefiningType();
+		;
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1368,7 +1372,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private boolean isCascadeRequired(Method method, int parameterIndex) {
 
 		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
-		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method )
+				.getMetaDataByDefiningType();
 
 		for ( MethodMetaData oneMethodMetaData : methodMetaData.values() ) {
 			if ( oneMethodMetaData.getParameterMetaData( parameterIndex ).isCascading() ) {
@@ -1390,7 +1395,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private boolean isCascadeRequired(Method method) {
 
 		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
-		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method )
+				.getMetaDataByDefiningType();
 
 		for ( MethodMetaData oneMethodMetaData : methodMetaData.values() ) {
 			if ( oneMethodMetaData.isCascading() ) {

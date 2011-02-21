@@ -53,7 +53,7 @@ public class MethodMetaDataTest {
 	public void methodWithConstrainedParameter() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "createCustomer", String.class, String.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -65,7 +65,7 @@ public class MethodMetaDataTest {
 	public void methodWithCascadedParameter() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -77,7 +77,7 @@ public class MethodMetaDataTest {
 	public void methodWithConstrainedReturnValue() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "bar" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -92,7 +92,7 @@ public class MethodMetaDataTest {
 	public void methodWithCascadedReturnValue() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "foo" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );
@@ -104,7 +104,7 @@ public class MethodMetaDataTest {
 	public void unconstrainedMethod() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).get( CustomerRepository.class );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );

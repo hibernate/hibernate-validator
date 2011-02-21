@@ -93,13 +93,11 @@ public interface BeanMetaData<T> {
 	 *
 	 * @param method The method of interest.
 	 *
-	 * @return A map with constraint-related meta data, keyed by the class
-	 *         defining it (will only contain more than one entry, if the given
-	 *         method is overwritten from an interface or base class. In this
-	 *         case an entry for each class/interface in the inheritance
-	 *         hierarchy is returned).
+	 * @return An aggregated view on the constraint related meta data from the
+	 *         given method all the methods from super-types which it overrides
+	 *         or implements.
 	 */
-	Map<Class<?>, MethodMetaData> getMetaDataForMethod(Method method);
+	AggregatedMethodMetaData getMetaDataForMethod(Method method);
 
 	/**
 	 * Return {@code PropertyDescriptor} for the given property.

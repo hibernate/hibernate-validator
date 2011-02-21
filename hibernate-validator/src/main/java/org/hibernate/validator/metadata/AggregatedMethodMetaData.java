@@ -84,6 +84,29 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	}
 
 	/**
+	 * Returns a single method meta data from this aggregation.
+	 *
+	 * @param method The method to retrieve the meta data for. Must either be the
+	 * method represented by this meta data object or one method from
+	 * a super-type, which the method represented by this meta data
+	 * object overrides/implements.
+	 *
+	 * @return The meta data for the given method or null if this aggregation
+	 *         doesn't contain any meta data for that method.
+	 */
+	public MethodMetaData getMetaDataForMethod(Method method) {
+		return metaDataByDefiningType.get( method.getDeclaringClass() );
+	}
+
+	/**
+	 * TODO GM: If possible remove; I think, this shouldn't be required by clients.
+	 */
+	@Deprecated
+	public Map<Class<?>, MethodMetaData> getMetaDataByDefiningType() {
+		return metaDataByDefiningType;
+	}
+
+	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
 	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {
