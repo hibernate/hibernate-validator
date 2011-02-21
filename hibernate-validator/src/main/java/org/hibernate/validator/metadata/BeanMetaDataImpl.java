@@ -341,7 +341,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public AggregatedMethodMetaData getMetaDataForMethod(Method method) {
-		return methodMetaData.get( method );
+
+		AggregatedMethodMetaData theValue = methodMetaData.get( method );
+
+		if ( theValue != null ) {
+			return theValue;
+		}
+
+		//maybe the given method is one not defined on the type represented by this bean
+		//meta data object but up in the hierarchy, so search using the method signature
+		for ( AggregatedMethodMetaData oneMethodMetaData : methodMetaData.values() ) {
+			if ( ReflectionHelper.haveSameSignature( method, oneMethodMetaData.getMethod() ) ) {
+				return oneMethodMetaData;
+			}
+		}
+
+		return null;
 	}
 
 	public PropertyDescriptor getPropertyDescriptor(String property) {

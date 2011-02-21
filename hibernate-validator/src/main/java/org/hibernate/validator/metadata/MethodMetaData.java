@@ -155,6 +155,17 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		return false;
 	}
 
+	/**
+	 * Whether this method has at least one cascaded parameter or at least one
+	 * parameter with constraints.
+	 *
+	 * @return <code>True</code>, if this method has at least one cascading or
+	 *         constrained parameter, <code>false</code> otherwise.
+	 */
+	public boolean hasParameterConstraints() {
+		return hasParameterConstraints;
+	}
+
 	@Override
 	public String toString() {
 		return "MethodMetaData [method=" + method + ", parameterMetaData="
