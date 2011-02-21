@@ -172,5 +172,4 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		}
 		return true;
 	}
-
 }

@@ -80,5 +80,4 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 		return "ParameterMetaData [index=" + index + "], name=" + name + "], constraints=["
 				+ constraintsAsString + "], isCascading=" + isCascading + "]";
 	}
-
 }
