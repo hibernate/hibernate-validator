@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.ap.checks;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -24,7 +23,7 @@ import javax.lang.model.element.Element;
 /**
  * The result of the execution of a {@link ConstraintCheck}. Comprises
  * information about the location at which the error occurred and a message
- * describing the occured error.
+ * describing the occurred error.
  *
  * @author Gunnar Morling
  */
@@ -47,7 +46,7 @@ public class ConstraintCheckError {
 	 * <p/>
 	 * <code>org.hibernate.validator.ap.ValidationProcessorMessages.</code>
 	 * @param messageParameters An array with values to put into the error message template
-	 * using {@link MessageFormat}. The number of elements must match
+	 * using {@link java.text.MessageFormat}. The number of elements must match
 	 * the number of place holders in the message template.
 	 */
 	public ConstraintCheckError(Element element,
@@ -108,7 +107,7 @@ public class ConstraintCheckError {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		ConstraintCheckError other = ( ConstraintCheckError ) obj;
+		ConstraintCheckError other = (ConstraintCheckError) obj;
 		if ( annotationMirror == null ) {
 			if ( other.annotationMirror != null ) {
 				return false;
@@ -138,5 +137,4 @@ public class ConstraintCheckError {
 		}
 		return true;
 	}
-
 }

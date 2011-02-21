@@ -20,12 +20,11 @@ package org.hibernate.validator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
-import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 
 /**
  * Represents a Hibernate Validator specific context that is used to create
- * {@link Validator} instances. Adds additional configuration options to those
+ * {@link javax.validation.Validator} instances. Adds additional configuration options to those
  * provided by {@link ValidatorContext}.
  *
  * @author Emmanuel Bernard

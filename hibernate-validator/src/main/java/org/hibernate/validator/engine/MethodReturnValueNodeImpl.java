@@ -17,10 +17,9 @@
 package org.hibernate.validator.engine;
 
 import java.lang.reflect.Method;
-import javax.validation.Path.Node;
 
 /**
- * A {@link Node} implementation representing a single method parameter.
+ * A {@link javax.validation.Path.Node} implementation representing a single method parameter.
  *
  * @author Gunnar Morling
  */

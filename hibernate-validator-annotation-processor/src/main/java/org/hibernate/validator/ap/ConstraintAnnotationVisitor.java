@@ -18,18 +18,15 @@ package org.hibernate.validator.ap;
 
 import java.util.List;
 import java.util.Set;
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.tools.Diagnostic.Kind;
 
-import org.hibernate.validator.ap.checks.ConstraintCheck;
 import org.hibernate.validator.ap.checks.ConstraintCheckError;
 import org.hibernate.validator.ap.checks.ConstraintCheckFactory;
 import org.hibernate.validator.ap.checks.ConstraintChecks;
@@ -38,10 +35,10 @@ import org.hibernate.validator.ap.util.ConstraintHelper;
 import org.hibernate.validator.ap.util.MessagerAdapter;
 
 /**
- * An {@link ElementVisitor} that visits annotated elements (type declarations,
- * methods and fields) and applies different {@link ConstraintCheck}s to them.
+ * An {@link javax.lang.model.element.ElementVisitor} that visits annotated elements (type declarations,
+ * methods and fields) and applies different {@link org.hibernate.validator.ap.checks.ConstraintCheck}s to them.
  * Each {@link ConstraintCheckError} occurred will be reported using the
- * {@link Messager} API.
+ * {@link javax.annotation.processing.Messager} API.
  *
  * @author Gunnar Morling.
  */
