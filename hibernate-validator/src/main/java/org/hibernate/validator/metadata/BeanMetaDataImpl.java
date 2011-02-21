@@ -61,12 +61,12 @@ import static org.hibernate.validator.util.ReflectionHelper.newInstance;
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
+	private static final Logger log = LoggerFactory.make();
+
 	/**
 	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
 	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
-
-	private static final Logger log = LoggerFactory.make();
 
 	/**
 	 * The root bean class for this meta data.
@@ -84,6 +84,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = new HashMap<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>>();
 
+	/**
+	 * Map containing information about method constraints. The key is the class in which the method constraint
+	 * is defined and the value is a map itself mapping the constraint method to its metadata.
+	 */
 	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = new HashMap<Class<?>, Map<Method, MethodMetaData>>();
 
 	/**
@@ -192,7 +196,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				}
 			}
 
-			//register the constraints for each method in methodMetaConstraints. Constraints at getters will also registered in metaConstraints
+			// register the constraints for each method in methodMetaConstraints. Constraints at getters will also registered in metaConstraints
 			for ( Entry<Method, List<BeanMetaConstraint<?, ? extends Annotation>>> methodAndConstraints : constraintsByMethod
 					.entrySet() ) {
 
@@ -296,12 +300,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public Map<Class<?>, MethodMetaData> getMetaDataForMethod(Method method) {
-
 		Map<Class<?>, MethodMetaData> theValue = new HashMap<Class<?>, MethodMetaData>();
 
 		for ( Entry<Class<?>, Map<Method, MethodMetaData>> methodsOfOneClass : methodMetaConstraints.entrySet() ) {
 			for ( Entry<Method, MethodMetaData> oneMethodEntry : methodsOfOneClass.getValue().entrySet() ) {
-
 				if ( ReflectionHelper.haveSameSignature( method, oneMethodEntry.getKey() ) ) {
 					theValue.put( methodsOfOneClass.getKey(), oneMethodEntry.getValue() );
 				}
@@ -405,7 +407,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
-
 		allMethods.add( methodMetaData );
 
 		Map<Method, MethodMetaData> constraintsOfClass = methodMetaConstraints.get( clazz );
@@ -551,7 +552,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-
 		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
 
 		for ( Method method : declaredMethods ) {
@@ -573,7 +573,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private MethodMetaData getFromCache(Class<?> clazz, Method method, BeanMetaDataCache beanMetaDataCache) {
-
 		BeanMetaDataImpl<?> cachedBeanMetaData = beanMetaDataCache.getBeanMetaData( clazz );
 
 		if ( cachedBeanMetaData != null ) {
@@ -760,7 +759,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *         parameter index.
 	 */
 	private Map<Integer, ParameterMetaData> getParameterMetaData(Method method) {
-
 		Map<Integer, ParameterMetaData> metaData = newHashMap();
 
 		int i = 0;
@@ -821,7 +819,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *         be empty, but never null.
 	 */
 	private Set<MethodMetaData> getMethodsWithSameSignature(Iterable<MethodMetaData> methods, MethodMetaData methodToCheck) {
-
 		Set<MethodMetaData> theValue = newHashSet();
 
 		for ( MethodMetaData oneMethod : methods ) {
@@ -842,7 +839,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @return A set with constrained methods. May be empty, but never null.
 	 */
 	private Set<MethodMetaData> getMethodsWithParameterConstraints(Iterable<MethodMetaData> methods) {
-
 		Set<MethodMetaData> theValue = newHashSet();
 
 		for ( MethodMetaData oneMethod : methods ) {
