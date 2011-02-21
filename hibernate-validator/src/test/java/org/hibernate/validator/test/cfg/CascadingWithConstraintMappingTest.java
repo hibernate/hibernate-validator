@@ -31,6 +31,7 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 
@@ -40,7 +41,7 @@ public class CascadingWithConstraintMappingTest {
 	 * See HV-433
 	 */
 	@Test
-	public void testCascadedValidationInHierarchyWithConstraintMapping() {
+	public void testProgrammaticCascadingValidationFieldAccess() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
@@ -62,6 +63,29 @@ public class CascadingWithConstraintMappingTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
+	@Test
+	public void testProgrammaticCascadingValidationMethodAccess() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping newMapping = new ConstraintMapping();
+		newMapping
+				.type( Bar2.class )
+				.property( "string", METHOD )
+				.constraint( NotNullDef.class )
+				.type( Foo2.class )
+				.valid( "bar", METHOD );
+		config.addMapping( newMapping );
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Baz2 baz = new Baz2();
+		baz.bar = new Bar2();
+
+		Set<ConstraintViolation<Baz2>> violations = validator.validate( baz );
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+	}
+
 	private static class Bar {
 		private String string;
 	}
@@ -71,5 +95,24 @@ public class CascadingWithConstraintMappingTest {
 	}
 
 	private static class Baz extends Foo {
+	}
+
+	private static class Bar2 {
+		private String string;
+
+		public String getString() {
+			return string;
+		}
+	}
+
+	private static class Foo2 {
+		protected Bar2 bar;
+
+		public Bar2 getBar() {
+			return bar;
+		}
+	}
+
+	private static class Baz2 extends Foo2 {
 	}
 }
