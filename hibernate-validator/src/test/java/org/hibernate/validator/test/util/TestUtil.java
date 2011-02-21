@@ -261,8 +261,7 @@ public class TestUtil {
 		return !p2Iterator.hasNext();
 	}
 
-	public static void assertSize(Iterable<?> iterable, int expectedCount) {
-
+	public static void assertIterableSize(Iterable<?> iterable, int expectedCount) {
 		int i = 0;
 
 		for ( @SuppressWarnings("unused") Object o : iterable ) {
