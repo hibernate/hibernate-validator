@@ -46,7 +46,7 @@ public interface BeanMetaData<T> {
 	/**
 	 * @return A list of all cascaded methods and fields (methods/fields annotated with &#064;Valid).
 	 */
-	List<Member> getCascadedMembers();
+	Set<Member> getCascadedMembers();
 
 	/**
 	 * Get the composition of the default group sequence.
