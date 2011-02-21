@@ -750,25 +750,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		// we do not validate the default group, nothing special to do
 		if ( !valueContext.validatingDefault() ) {
-			int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
-			Collection<List<BeanMetaConstraint<T, ?>>> propertyMetaConstraints = metaConstraintsMap.values();
-			for ( List<BeanMetaConstraint<T, ?>> metaConstraints : propertyMetaConstraints ) {
-				for ( BeanMetaConstraint<T, ?> metaConstraint : metaConstraints ) {
-					if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-						if ( valueContext.getCurrentBean() != null ) {
-							@SuppressWarnings("unchecked")
-							V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
-							valueContext.setCurrentValidatedValue( valueToValidate );
-						}
-						metaConstraint.validateConstraint( validationContext, valueContext );
-						if ( validationContext.shouldFailFast() ) {
-							return validationContext.getFailingConstraints()
-									.size() - numberOfConstraintViolationsBefore;
-						}
-					}
-				}
-			}
-			return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
+			return validatePropertyForNonDefaultGroup( valueContext, validationContext, metaConstraintsMap );
 		}
 
 		// we are validating the default group and the main entity hosting the property re-defines the default group
@@ -780,6 +762,42 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		// we are validating the default group and the main entity don't re-defines the default group
 		return validatePropertyForDefaultGroup( valueContext, validationContext, metaConstraintsMap );
+	}
+
+	/**
+	 * Validates the property constraints for the current {@code ValueContext} group.
+	 * <p>
+	 * The current {@code ValueContext} group is not the default group.
+	 * </p>
+	 *
+	 * @param valueContext The current validation context.
+	 * @param validationContext The global validation context.
+	 * @param metaConstraintsMap All constraints associated to the property.
+	 *
+	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
+	 */
+	private <T, U, V> int validatePropertyForNonDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
+		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
+
+		Collection<List<BeanMetaConstraint<T, ?>>> propertyMetaConstraints = metaConstraintsMap.values();
+		for ( List<BeanMetaConstraint<T, ?>> metaConstraints : propertyMetaConstraints ) {
+			for ( BeanMetaConstraint<T, ?> metaConstraint : metaConstraints ) {
+				if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+					if ( valueContext.getCurrentBean() != null ) {
+						@SuppressWarnings("unchecked")
+						V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+						valueContext.setCurrentValidatedValue( valueToValidate );
+					}
+					metaConstraint.validateConstraint( validationContext, valueContext );
+					if ( validationContext.shouldFailFast() ) {
+						return validationContext.getFailingConstraints()
+								.size() - numberOfConstraintViolationsBefore;
+					}
+				}
+			}
+		}
+
+		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
 	/**
