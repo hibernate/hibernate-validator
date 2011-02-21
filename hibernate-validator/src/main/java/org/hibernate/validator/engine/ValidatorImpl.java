@@ -81,6 +81,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private final transient GroupChainGenerator groupChainGenerator;
 
+	/**
+	 * Reference to shared {@code ConstraintValidatorFactory}.
+	 */
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 
 	/**
@@ -240,7 +243,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				failFast
 		);
 
-		validateReturnValueInContext( context, object, method, returnValue, groupChain );
+		validateReturnValueInContext( context, object, returnValue, groupChain );
 
 		return context.getFailingConstraints();
 	}
@@ -1058,7 +1061,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, Method method, V value, GroupChain groupChain) {
+	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, V value, GroupChain groupChain) {
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( context.getRootBeanClass() );
 
@@ -1194,16 +1197,16 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
 	 */
-	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, T value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
+	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
 		Path.Node elem = propertyIter.next();
-		T newValue = value;
+		Object newValue = value;
 
 		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
 		//use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( !metaData.isPropertyPresent( elem.getName() ) ) {
 			throw new IllegalArgumentException(
-					"Invalid property path. There is no property " + elem.getName() + " in entity " + metaData.getBeanClass()
-							.getName()
+					"Invalid property path. There is no property " + elem.getName() + " in entity "
+							+ metaData.getBeanClass().getName()
 			);
 		}
 
@@ -1228,13 +1231,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( elem.getName() ) ) {
 					Type type = ReflectionHelper.typeOf( m );
-					newValue = newValue == null ? null : (T) ReflectionHelper.getValue( m, newValue );
+					newValue = newValue == null ? null : ReflectionHelper.getValue( m, newValue );
 					if ( elem.isInIterable() ) {
 						if ( newValue != null && elem.getIndex() != null ) {
-							newValue = (T) ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
+							newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
 						}
 						else if ( newValue != null && elem.getKey() != null ) {
-							newValue = (T) ReflectionHelper.getMappedValue( newValue, elem.getKey() );
+							newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
 						}
 						else if ( newValue != null ) {
 							throw new IllegalArgumentException( "Property path must provide index or map key" );
@@ -1242,12 +1245,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 						type = ReflectionHelper.getIndexedType( type );
 					}
 
+					// todo check the use of generics in this method. it really does not make sense - HF
 					@SuppressWarnings("unchecked")
-					Class<T> valueClass = (Class<T>) ( newValue == null ? type : newValue.getClass() );
-
+					Class<T> castedValueClass = (Class<T>) ( newValue == null ? type : newValue.getClass() );
+					@SuppressWarnings("unchecked")
+					T castedValue = (T) newValue;
 					return collectMetaConstraintsForPath(
-							valueClass,
-							newValue,
+							castedValueClass,
+							castedValue,
 							propertyIter,
 							propertyPath,
 							metaConstraintsMap
