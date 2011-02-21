@@ -140,6 +140,5 @@ public interface BeanMetaData<T> {
 	 * @throws ConstraintDeclarationException In case the represented bean
 	 * has an illegal method parameter constraint.
 	 */
-	public void assertMethodParameterConstraintsCorrectness() throws ConstraintDeclarationException;
-
+	void assertMethodParameterConstraintsCorrectness() throws ConstraintDeclarationException;
 }
