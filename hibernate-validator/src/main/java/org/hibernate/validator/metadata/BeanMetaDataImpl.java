@@ -44,7 +44,6 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.util.CollectionHelper;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -75,7 +74,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Class<T> beanClass;
 
 	/**
-	 * The main element descriptor for <code>beanClass</code>.
+	 * The main element descriptor for {@link #beanClass}.
 	 */
 	private BeanDescriptorImpl<T> beanDescriptor;
 
@@ -83,13 +82,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
 	 * (eg super class or interface) in which they are defined.
 	 */
-	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = CollectionHelper.newHashMap();
+	private Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> metaConstraints = newHashMap();
 
 	/**
 	 * Map containing information about method constraints. The key is the class in which the method constraint
 	 * is defined and the value is a map itself mapping the constraint method to its metadata.
 	 */
-	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = CollectionHelper.newHashMap();
+	private Map<Class<?>, Map<Method, MethodMetaData>> methodMetaConstraints = newHashMap();
 
 	/**
 	 * Contains meta data for all method's of this type (including the method's
@@ -97,22 +96,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * there are any illegal parameter constraints for overridden methods in an
 	 * inheritance tree.
 	 */
-	private final Set<MethodMetaData> allMethods = newHashSet();
+	private Set<MethodMetaData> allMethods = newHashSet();
 
 	/**
 	 * List of cascaded members.
 	 */
-	private Set<Member> cascadedMembers = CollectionHelper.newHashSet();
+	private Set<Member> cascadedMembers = newHashSet();
 
 	/**
-	 * Maps field and method names to their <code>ElementDescriptorImpl</code>.
+	 * Maps field and method names to their {@code ElementDescriptorImpl}.
 	 */
-	private Map<String, PropertyDescriptor> propertyDescriptors = CollectionHelper.newHashMap();
+	private Map<String, PropertyDescriptor> propertyDescriptors = newHashMap();
 
 	/**
 	 * The default groups sequence for this bean class.
 	 */
-	private List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
+	private List<Class<?>> defaultGroupSequence = newArrayList();
 
 	/**
 	 * The default group sequence provider.
@@ -131,7 +130,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * A list of all property names in the class (constrained and un-constrained).
 	 */
 	// Used to avoid ReflectionHelper#containsMember which is slow
-	private final Set<String> propertyNames = new HashSet<String>( 30 );
+	private final Set<String> propertyNames = newHashSet( 30 );
 
 	/**
 	 * A declaration exception in case the represented bean contains any illegal
@@ -238,6 +237,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		}
 		parameterConstraintDeclarationException = checkParameterConstraints();
+
+		// allMethods is not need anymore after the class is initialized
+		allMethods = null;
 	}
 
 	/**
@@ -245,7 +247,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * type's methods.
 	 *
 	 * @return A {@link ConstraintDeclarationException} describing the first illegal
-	 *         method parameter constraint found or <code>null</code>, if this type has no
+	 *         method parameter constraint found or {@code null}, if this type has no
 	 *         such illegal constraints.
 	 */
 	private ConstraintDeclarationException checkParameterConstraints() {
@@ -875,7 +877,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		sb.append( ", cascadedMembers=" ).append( cascadedMembers );
 		sb.append( ", propertyDescriptors=" ).append( propertyDescriptors );
 		sb.append( ", defaultGroupSequence=" ).append( getDefaultGroupSequence( null ) );
-		sb.append( ", constraintHelper=" ).append( constraintHelper );
 		sb.append( '}' );
 		return sb.toString();
 	}

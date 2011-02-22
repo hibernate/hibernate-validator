@@ -33,17 +33,28 @@ public class CollectionHelper {
 		return new HashMap<K, V>();
 	}
 
+	public static <K, V> HashMap<K, V> newHashMap(int size) {
+		return new HashMap<K, V>( size );
+	}
+
 	public static <T> HashSet<T> newHashSet() {
 		return new HashSet<T>();
+	}
+
+	public static <T> HashSet<T> newHashSet(int size) {
+		return new HashSet<T>( size );
 	}
 
 	public static <T> ArrayList<T> newArrayList() {
 		return new ArrayList<T>();
 	}
 
+	public static <T> ArrayList<T> newArrayList(int size) {
+		return new ArrayList<T>( size );
+	}
+
 	public static <T> Set<T> asSet(T... ts) {
 
 		return new HashSet<T>( Arrays.asList( ts ) );
 	}
-
 }
