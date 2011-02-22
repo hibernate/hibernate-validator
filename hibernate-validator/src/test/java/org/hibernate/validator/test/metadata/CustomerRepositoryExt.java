@@ -24,6 +24,9 @@ import javax.validation.constraints.Min;
  */
 public class CustomerRepositoryExt extends CustomerRepository {
 
+	public static class CustomerExtension extends Customer {
+	}
+
 	public Customer createCustomer(String firstName, String lastName) {
 		return null;
 	}
@@ -38,7 +41,7 @@ public class CustomerRepositoryExt extends CustomerRepository {
 		return null;
 	}
 
-	public Customer bar() {
+	public CustomerExtension bar() {
 		return null;
 	}
 

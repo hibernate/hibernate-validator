@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
+import org.hibernate.validator.test.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.util.Contracts.assertNotNull;
@@ -99,5 +100,30 @@ public class MethodDescriptorTest {
 
 		assertNotNull( unconstrainedMethodDescriptor );
 		assertFalse( unconstrainedMethodDescriptor.hasConstraints() );
+	}
+
+	@Test
+	public void testGetElementClass() throws Exception {
+
+		//set up a descriptor for the base type
+		TypeDescriptor typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepository.class );
+		assertNotNull( typeDescriptor );
+
+		Method method = CustomerRepository.class.getMethod( "bar" );
+		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+
+		//the return type as defined in the base type
+		assertNotNull( methodDescriptor );
+		assertEquals( methodDescriptor.getElementClass(), Customer.class );
+
+		//now set up a descriptor for the derived type
+		typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepositoryExt.class );
+		assertNotNull( typeDescriptor );
+
+		methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+
+		//the return type is now the one as defined in the derived type (covariant return type) 
+		assertNotNull( methodDescriptor );
+		assertEquals( methodDescriptor.getElementClass(), CustomerExtension.class );
 	}
 }
