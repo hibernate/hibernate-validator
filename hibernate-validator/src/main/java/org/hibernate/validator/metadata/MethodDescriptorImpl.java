@@ -36,7 +36,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	}
 
 	public Method getMethod() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return methodMetaData.getMethod();
 	}
 
 	public List<ParameterDescriptor> getParameterConstraints() {
@@ -44,7 +44,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	}
 
 	public boolean isCascaded() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return methodMetaData.isCascading();
 	}
 
 }
