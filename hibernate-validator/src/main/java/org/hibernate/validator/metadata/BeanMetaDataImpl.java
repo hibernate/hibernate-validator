@@ -122,9 +122,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private DefaultGroupSequenceProvider<T> defaultGroupSequenceProvider;
 
 	/**
-	 * Object keeping track of all constraints.
+	 * Object used to determine whether a given annotation is a constraint. Only used during initialization.
 	 */
-	private final ConstraintHelper constraintHelper;
+	private ConstraintHelper constraintHelper;
 
 	/**
 	 * A list of all property names in the class (constrained and un-constrained).
@@ -238,8 +238,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		parameterConstraintDeclarationException = checkParameterConstraints();
 
-		// allMethods is not need anymore after the class is initialized
+		// reset class member we don't need any longer
 		allMethods = null;
+		this.constraintHelper = null;
 	}
 
 	/**
