@@ -51,4 +51,7 @@ public class CustomerRepository {
 	public int baz() {
 		return 0;
 	}
+
+	public void qux() {
+	}
 }

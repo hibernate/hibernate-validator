@@ -46,4 +46,7 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public int baz() {
 		return 0;
 	}
+
+	public void zap() {
+	}
 }

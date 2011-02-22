@@ -77,7 +77,16 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	public MethodDescriptor getConstraintsForMethod(Method method) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+
+		AggregatedMethodMetaData methodMetaData = getMetaDataBean().getMetaDataForMethod( method );
+
+		if ( methodMetaData == null ) {
+			throw new IllegalArgumentException(
+					"No meta data for method " + method + " could be found on type " + getMetaDataBean().getBeanClass()
+			);
+		}
+
+		return new MethodDescriptorImpl( getMetaDataBean(), methodMetaData );
 	}
 
 	public BeanDescriptor getBeanDescriptor() {

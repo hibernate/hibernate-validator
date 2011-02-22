@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.test.metadata;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import javax.validation.Valid;
@@ -26,6 +27,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.test.util.TestUtil;
 
@@ -122,6 +124,53 @@ public class TypeDescriptorTest {
 
 		assertNotNull( beanDescriptor );
 		assertEquals( beanDescriptor.getElementClass(), CustomerRepository.class );
+	}
+
+	@Test
+	public void testGetConstraintsForMethod() throws Exception {
+
+		Method method = CustomerRepository.class.getMethod( "foo" );
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( method );
+
+		assertNotNull( methodDescriptor );
+	}
+
+	/**
+	 * A method descriptor can be retrieved by specifying an overridden method
+	 * from a base type.
+	 */
+	@Test
+	public void testGetConstraintsForOverriddenMethod() throws Exception {
+
+		Method method = CustomerRepository.class.getMethod( "foo" );
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( method );
+
+		assertNotNull( methodDescriptor );
+	}
+
+	/**
+	 * A method descriptor can be retrieved by specifying a method from a base
+	 * type (qux() is not defined on CustomerRepositoryExt, but only on
+	 * CustomerRepository).
+	 */
+	@Test
+	public void testGetConstraintsForMethodFromBaseType() throws Exception {
+
+		Method method = CustomerRepository.class.getMethod( "qux" );
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( method );
+
+		assertNotNull( methodDescriptor );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testGetConstraintsForMethodFailsDueToUnknownMethod() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "zap" );
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		descriptor.getConstraintsForMethod( method );
 	}
 
 	private TypeDescriptor getTypeDescriptor(Class<?> clazz) {
