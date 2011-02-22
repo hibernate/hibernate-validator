@@ -17,6 +17,7 @@
 
 package org.hibernate.validator.test.cfg;
 
+import java.lang.reflect.Method;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -28,7 +29,10 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
+import org.hibernate.validator.method.MethodConstraintViolation;
+import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -45,74 +49,96 @@ public class CascadingWithConstraintMappingTest {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
-				.type( Bar.class )
+				.type( C.class )
 				.property( "string", FIELD )
 				.constraint( NotNullDef.class )
-				.type( Foo.class )
-				.valid( "bar", FIELD );
+				.type( A.class )
+				.valid( "c", FIELD );
 		config.addMapping( newMapping );
 		ValidatorFactory factory = config.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		Baz baz = new Baz();
-		baz.bar = new Bar();
+		B b = new B();
+		b.c = new C();
 
-		Set<ConstraintViolation<Baz>> violations = validator.validate( baz );
+		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
+	/**
+	 * See HV-433
+	 */
 	@Test
 	public void testProgrammaticCascadingValidationMethodAccess() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
-				.type( Bar2.class )
+				.type( C.class )
 				.property( "string", METHOD )
 				.constraint( NotNullDef.class )
-				.type( Foo2.class )
-				.valid( "bar", METHOD );
+				.type( A.class )
+				.valid( "c", METHOD );
 		config.addMapping( newMapping );
 		ValidatorFactory factory = config.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		Baz2 baz = new Baz2();
-		baz.bar = new Bar2();
+		B b = new B();
+		b.c = new C();
 
-		Set<ConstraintViolation<Baz2>> violations = validator.validate( baz );
+		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
-	private static class Bar {
-		private String string;
+	/**
+	 * See HV-433
+	 */
+	@Test
+	public void testProgrammaticCascadingMethodValidation() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping newMapping = new ConstraintMapping();
+		newMapping
+				.type( C.class )
+				.property( "string", METHOD )
+				.constraint( NotNullDef.class )
+				.type( A.class )
+				.valid( "c", METHOD );
+		config.addMapping( newMapping );
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
+
+		B b = new B();
+		b.c = new C();
+		Method method = ReflectionHelper.getMethod( B.class, "getC" );
+
+		Set<MethodConstraintViolation<B>> violations = methodValidator.validateReturnValue(
+				b, method, b.getC()
+		);
+
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
-	private static class Foo {
-		protected Bar bar;
+	private static class A {
+		protected C c;
+
+		public C getC() {
+			return c;
+		}
 	}
 
-	private static class Baz extends Foo {
+	private static class B extends A {
 	}
 
-	private static class Bar2 {
+	private static class C {
 		private String string;
 
 		public String getString() {
 			return string;
 		}
-	}
-
-	private static class Foo2 {
-		protected Bar2 bar;
-
-		public Bar2 getBar() {
-			return bar;
-		}
-	}
-
-	private static class Baz2 extends Foo2 {
 	}
 }
