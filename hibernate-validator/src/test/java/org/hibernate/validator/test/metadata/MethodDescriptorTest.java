@@ -17,6 +17,11 @@
 package org.hibernate.validator.test.metadata;
 
 import java.lang.reflect.Method;
+import java.util.Set;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.Scope;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -125,5 +130,44 @@ public class MethodDescriptorTest {
 		//the return type is now the one as defined in the derived type (covariant return type) 
 		assertNotNull( methodDescriptor );
 		assertEquals( methodDescriptor.getElementClass(), CustomerExtension.class );
+	}
+
+	@Test
+	public void testGetConstraintDescriptors() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
+		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+
+		assertNotNull( methodDescriptor );
+		assertEquals( methodDescriptor.getConstraintDescriptors().size(), 1 );
+		assertEquals(
+				methodDescriptor.getConstraintDescriptors().iterator().next().getAnnotation().annotationType(),
+				NotNull.class
+		);
+
+		method = CustomerRepositoryExt.class.getMethod( "baz" );
+		methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+
+		assertNotNull( methodDescriptor );
+		assertEquals( methodDescriptor.getConstraintDescriptors().size(), 2 );
+	}
+
+	@Test
+	public void testFindConstraintLookingAt() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
+		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+		assertNotNull( methodDescriptor );
+
+		Set<ConstraintDescriptor<?>> constraintDescriptors = methodDescriptor.findConstraints()
+				.lookingAt( Scope.LOCAL_ELEMENT )
+				.getConstraintDescriptors();
+		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( constraintDescriptors.iterator().next().getAnnotation().annotationType(), Min.class );
+
+		constraintDescriptors = methodDescriptor.findConstraints()
+				.lookingAt( Scope.HIERARCHY )
+				.getConstraintDescriptors();
+		assertEquals( constraintDescriptors.size(), 2 );
 	}
 }
