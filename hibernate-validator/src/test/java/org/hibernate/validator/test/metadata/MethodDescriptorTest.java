@@ -84,4 +84,20 @@ public class MethodDescriptorTest {
 		assertNotNull( nonCascadingMethodDescriptor );
 		assertFalse( nonCascadingMethodDescriptor.isCascaded() );
 	}
+
+	@Test
+	public void testHasConstraints() throws Exception {
+
+		Method constrainedMethod = CustomerRepositoryExt.class.getMethod( "bar" );
+		MethodDescriptor constrainedMethodDescriptor = typeDescriptor.getConstraintsForMethod( constrainedMethod );
+
+		assertNotNull( constrainedMethodDescriptor );
+		assertTrue( constrainedMethodDescriptor.hasConstraints() );
+
+		Method unconstrainedMethod = CustomerRepositoryExt.class.getMethod( "qux" );
+		MethodDescriptor unconstrainedMethodDescriptor = typeDescriptor.getConstraintsForMethod( unconstrainedMethod );
+
+		assertNotNull( unconstrainedMethodDescriptor );
+		assertFalse( unconstrainedMethodDescriptor.hasConstraints() );
+	}
 }
