@@ -16,33 +16,160 @@
 */
 package org.hibernate.validator.test.metadata;
 
+import java.util.List;
+import java.util.Set;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.method.MethodValidator;
+import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
+ * Unit test for {@link TypeDescriptor} and its creation.
+ *
  * @author Gunnar Morling
  */
 public class TypeDescriptorTest {
 
 	@Test
-	public void retrieveTypeDescriptor() {
+	public void testGetElementClass() {
 
-		MethodValidator methodValidator = TestUtil.getMethodValidator();
-
-		TypeDescriptor typeDescriptor = methodValidator.getConstraintsForType( Customer.class );
-		assertNotNull( typeDescriptor );
-		assertEquals( typeDescriptor.getElementClass(), Customer.class );
-
-		BeanDescriptor beanDescriptor = typeDescriptor.getBeanDescriptor();
-		assertNotNull( beanDescriptor );
-		assertEquals( beanDescriptor.getElementClass(), Customer.class );
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		assertEquals( descriptor.getElementClass(), CustomerRepository.class );
 	}
+
+	@Test
+	public void testIsTypeConstrainedForUnconstrainedType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( UnconstrainedType.class );
+
+		assertFalse( descriptor.isTypeConstrained() );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForBeanConstrainedType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+
+		assertTrue( descriptor.isTypeConstrained() );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForParameterConstrainedType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( ParameterConstrainedType.class );
+
+		assertTrue( descriptor.isTypeConstrained() );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForReturnValueConstrainedType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( ReturnValueConstrainedType.class );
+
+		assertTrue( descriptor.isTypeConstrained() );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForCascadingParameterType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CascadingParameterType.class );
+
+		assertTrue( descriptor.isTypeConstrained() );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForCascadingReturnValueType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CascadingReturnValueType.class );
+
+		assertTrue( descriptor.isTypeConstrained() );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForDerivedConstrainedType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( DerivedConstrainedType.class );
+
+		assertTrue( descriptor.isTypeConstrained() );
+	}
+
+	@Test
+	public void testGetConstraintDescriptors() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		Set<ConstraintDescriptor<?>> constraintDescriptors = descriptor.getConstraintDescriptors();
+
+		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( constraintDescriptors.iterator().next().getAnnotation().annotationType(), ScriptAssert.class );
+	}
+
+	@Test
+	public void testGetBeanDescriptor() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		BeanDescriptor beanDescriptor = descriptor.getBeanDescriptor();
+
+		assertNotNull( beanDescriptor );
+		assertEquals( beanDescriptor.getElementClass(), CustomerRepository.class );
+	}
+
+	private TypeDescriptor getTypeDescriptor(Class<?> clazz) {
+		return TestUtil.getMethodValidator().getConstraintsForType( clazz );
+	}
+
+	private static class UnconstrainedType {
+
+		public void foo(String foo) {
+
+		}
+	}
+
+	private static class ParameterConstrainedType {
+
+		public void foo(@NotNull String foo) {
+
+		}
+	}
+
+	private static class CascadingParameterType {
+
+		public void foo(@Valid List<String> foo) {
+
+		}
+	}
+
+	private static class ReturnValueConstrainedType {
+
+		@NotNull
+		public String foo(String foo) {
+			return null;
+		}
+	}
+
+	private static class CascadingReturnValueType {
+
+		@Valid
+		public List<String> foo(String foo) {
+			return null;
+		}
+	}
+
+	private static class DerivedConstrainedType extends ParameterConstrainedType {
+
+		public void foo(String foo) {
+
+		}
+	}
+
 }

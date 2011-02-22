@@ -359,6 +359,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return null;
 	}
 
+	public Set<AggregatedMethodMetaData> getAllMethodMetaData() {
+		return new HashSet<AggregatedMethodMetaData>( methodMetaData.values() );
+	}
+
 	public PropertyDescriptor getPropertyDescriptor(String property) {
 		return propertyDescriptors.get( property );
 	}
@@ -954,7 +958,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		sb.append( "{beanClass=" ).append( beanClass );
 		sb.append( ", beanDescriptor=" ).append( beanDescriptor );
 		sb.append( ", metaConstraints=" ).append( metaConstraints );
-		sb.append( ", aggregatedMethodMetaData=" ).append( methodMetaData );
+		sb.append( ", methodMetaData=" ).append( methodMetaData );
 		sb.append( ", cascadedMembers=" ).append( cascadedMembers );
 		sb.append( ", propertyDescriptors=" ).append( propertyDescriptors );
 		sb.append( ", defaultGroupSequence=" ).append( getDefaultGroupSequence( null ) );

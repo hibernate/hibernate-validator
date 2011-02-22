@@ -72,6 +72,13 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 		return false;
 	}
 
+	/**
+	 * Whether the represented method itself or any of the method's up in the
+	 * inheritance hierarchy which it overrides/implements is constrained.
+	 *
+	 * @return <code>True</code>, if this method is constrained by any means,
+	 *         <code>false</code> otherwise.
+	 */
 	public boolean isConstrained() {
 
 		for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
@@ -120,6 +127,13 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 		}
 
 		return theValue.iterator();
+	}
+
+	@Override
+	public String toString() {
+		return "AggregatedMethodMetaData [method=" + method
+				+ ", isCascading=" + isCascading() + ", isConstrained="
+				+ isConstrained() + "]";
 	}
 
 	@Override

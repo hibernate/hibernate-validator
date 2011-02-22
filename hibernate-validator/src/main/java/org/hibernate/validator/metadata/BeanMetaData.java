@@ -100,6 +100,15 @@ public interface BeanMetaData<T> {
 	AggregatedMethodMetaData getMetaDataForMethod(Method method);
 
 	/**
+	 * Returns the constraint-related meta data for all the methods of the type
+	 * represented by this bean meta data.
+	 *
+	 * @return A set with constraint-related method meta data. May be empty, but
+	 *         will never be null.
+	 */
+	Set<AggregatedMethodMetaData> getAllMethodMetaData();
+
+	/**
 	 * Return {@code PropertyDescriptor} for the given property.
 	 *
 	 * @param property the property for which to retrieve the descriptor.

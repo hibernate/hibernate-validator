@@ -55,7 +55,21 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	//TypeDescriptor methods
 
 	public boolean isTypeConstrained() {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+
+		//are there any bean/property constraints?
+		if ( isBeanConstrained() ) {
+			return true;
+		}
+
+		//are there any method-level constraints?
+		for ( AggregatedMethodMetaData oneMethodMetaData : getMetaDataBean().getAllMethodMetaData() ) {
+
+			if ( oneMethodMetaData.isConstrained() ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public Set<MethodDescriptor> getConstrainedMethods() {
