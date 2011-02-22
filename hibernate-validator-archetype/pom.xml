@@ -59,15 +59,30 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-archetype-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
+    <profiles>
+        <!-- When removing the parent project configuration this profile can be removed -->
+        <profile>
+            <id>archetype</id>
+            <activation>
+                <file>
+                    <exists>archetype.properties</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-archetype-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <repositories>
         <repository>
-            <id>jboss</id>
+            <id>jboss-public-repository</id>
             <url>https://repository.jboss.org/nexus/content/repositories/public</url>
         </repository>
     </repositories>
