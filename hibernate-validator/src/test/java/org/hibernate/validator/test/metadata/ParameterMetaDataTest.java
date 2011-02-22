@@ -29,6 +29,7 @@ import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 
+import static org.hibernate.validator.test.util.TestUtil.assertIterableSize;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -62,7 +63,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 1 );
 		assertEquals( parameterMetaData.getParameterName(), "arg1" );
-		assertSize( parameterMetaData, 1 );
+		assertIterableSize( parameterMetaData, 1 );
 		assertEquals(
 				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
@@ -80,7 +81,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 0 );
 		assertEquals( parameterMetaData.getParameterName(), "arg0" );
-		assertSize( parameterMetaData, 0 );
+		assertIterableSize( parameterMetaData, 0 );
 	}
 
 	@Test
@@ -93,7 +94,7 @@ public class ParameterMetaDataTest {
 
 		assertFalse( parameterMetaData.isCascading() );
 		assertFalse( parameterMetaData.isConstrained() );
-		assertSize( parameterMetaData, 0 );
+		assertIterableSize( parameterMetaData, 0 );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -103,20 +104,5 @@ public class ParameterMetaDataTest {
 		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
 
 		methodMetaData.getParameterMetaData( 0 );
-	}
-
-	/**
-	 * TODO GM: invoke on TestUtil, once it is merged.
-	 */
-	@Deprecated
-	private void assertSize(Iterable<?> iterable, int expectedCount) {
-
-		int i = 0;
-
-		for ( @SuppressWarnings("unused") Object o : iterable ) {
-			i++;
-		}
-
-		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
 	}
 }

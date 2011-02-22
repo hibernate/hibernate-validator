@@ -130,6 +130,7 @@ public class TypeDescriptorTest {
 
 	private static class UnconstrainedType {
 
+		@SuppressWarnings("unused")
 		public void foo(String foo) {
 
 		}
@@ -137,6 +138,7 @@ public class TypeDescriptorTest {
 
 	private static class ParameterConstrainedType {
 
+		@SuppressWarnings("unused")
 		public void foo(@NotNull String foo) {
 
 		}
@@ -144,6 +146,7 @@ public class TypeDescriptorTest {
 
 	private static class CascadingParameterType {
 
+		@SuppressWarnings("unused")
 		public void foo(@Valid List<String> foo) {
 
 		}
@@ -152,6 +155,7 @@ public class TypeDescriptorTest {
 	private static class ReturnValueConstrainedType {
 
 		@NotNull
+		@SuppressWarnings("unused")
 		public String foo(String foo) {
 			return null;
 		}
@@ -160,6 +164,7 @@ public class TypeDescriptorTest {
 	private static class CascadingReturnValueType {
 
 		@Valid
+		@SuppressWarnings("unused")
 		public List<String> foo(String foo) {
 			return null;
 		}

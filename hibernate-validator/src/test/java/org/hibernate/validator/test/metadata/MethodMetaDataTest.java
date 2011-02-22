@@ -28,6 +28,7 @@ import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MethodMetaData;
 
+import static org.hibernate.validator.test.util.TestUtil.assertIterableSize;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -58,7 +59,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
 	}
 
 	@Test
@@ -70,7 +71,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
 	}
 
 	@Test
@@ -82,7 +83,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 1 );
+		assertIterableSize( methodMetaData, 1 );
 		assertEquals(
 				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
@@ -97,7 +98,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
 	}
 
 	@Test
@@ -109,21 +110,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertFalse( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
 	}
 
-	/**
-	 * TODO GM: invoke on TestUtil, once it is merged.
-	 */
-	@Deprecated
-	private void assertSize(Iterable<?> iterable, int expectedCount) {
-
-		int i = 0;
-
-		for ( @SuppressWarnings("unused") Object o : iterable ) {
-			i++;
-		}
-
-		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
-	}
 }
