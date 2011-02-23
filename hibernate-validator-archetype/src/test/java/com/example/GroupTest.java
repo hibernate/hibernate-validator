@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.quickstart;
+package com.example;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -24,6 +24,13 @@ import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
 import static org.junit.Assert.assertEquals;
+
+import com.example.Car;
+import com.example.CarChecks;
+import com.example.Driver;
+import com.example.DriverChecks;
+import com.example.OrderedChecks;
+import com.example.RentalCar;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

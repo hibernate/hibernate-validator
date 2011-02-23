@@ -14,16 +14,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.quickstart;
-
-import javax.validation.GroupSequence;
+package com.example;
 
 /**
  * @author Hardy Ferentschik
  */
-@GroupSequence({ RentalCar.class, CarChecks.class })
-public class RentalCar extends Car {
-	public RentalCar(String manufacturer, String licencePlate, int seatCount) {
-		super( manufacturer, licencePlate, seatCount );
-	}
+public interface CarChecks {
 }

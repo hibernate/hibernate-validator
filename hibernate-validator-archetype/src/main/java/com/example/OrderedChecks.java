@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.quickstart;
+package com.example;
 
 import javax.validation.GroupSequence;
 import javax.validation.groups.Default;

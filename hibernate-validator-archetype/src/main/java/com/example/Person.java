@@ -14,10 +14,28 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.quickstart;
+package com.example;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface DriverChecks {
+public class Person {
+	@NotNull
+	private String name;
+
+	public Person(String name) {
+		super();
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }
+

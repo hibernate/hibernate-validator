@@ -14,28 +14,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.quickstart;
+package com.example;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.GroupSequence;
 
 /**
  * @author Hardy Ferentschik
  */
-public class Person {
-	@NotNull
-	private String name;
-
-	public Person(String name) {
-		super();
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+@GroupSequence({ RentalCar.class, CarChecks.class })
+public class RentalCar extends Car {
+	public RentalCar(String manufacturer, String licencePlate, int seatCount) {
+		super( manufacturer, licencePlate, seatCount );
 	}
 }
-

@@ -18,7 +18,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.hibernate</groupId>
+    <groupId>com.example</groupId>
     <artifactId>hibernate-validator-quickstart</artifactId>
     <packaging>jar</packaging>
     <name>Hibernate Validator Quickstart</name>
