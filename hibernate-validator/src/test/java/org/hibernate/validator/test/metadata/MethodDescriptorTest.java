@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.metadata;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.method.metadata.MethodDescriptor;
+import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.test.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.util.TestUtil;
@@ -169,5 +171,29 @@ public class MethodDescriptorTest {
 				.lookingAt( Scope.HIERARCHY )
 				.getConstraintDescriptors();
 		assertEquals( constraintDescriptors.size(), 2 );
+	}
+
+	@Test
+	public void testGetParameterConstraints() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
+		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+		assertNotNull( methodDescriptor );
+
+		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();
+		assertNotNull( parameterConstraints );
+		assertEquals( parameterConstraints.size(), 2 );
+	}
+
+	@Test
+	public void testGetParameterConstraintsForParameterlessMethod() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
+		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+		assertNotNull( methodDescriptor );
+
+		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();
+		assertNotNull( parameterConstraints );
+		assertEquals( parameterConstraints.size(), 0 );
 	}
 }

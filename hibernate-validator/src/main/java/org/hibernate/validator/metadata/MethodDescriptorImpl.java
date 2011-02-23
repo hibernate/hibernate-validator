@@ -23,6 +23,8 @@ import java.util.List;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+
 /**
  * @author Gunnar Morling
  */
@@ -46,7 +48,14 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	}
 
 	public List<ParameterDescriptor> getParameterConstraints() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+
+		List<ParameterDescriptor> theValue = newArrayList();
+
+		for ( ParameterMetaData oneParameter : methodMetaData.getAllParameterMetaData() ) {
+			theValue.add( new ParameterDescriptorImpl( getMetaDataBean(), oneParameter ) );
+		}
+
+		return theValue;
 	}
 
 	public boolean isCascaded() {
