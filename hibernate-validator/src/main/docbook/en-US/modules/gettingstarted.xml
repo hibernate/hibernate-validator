@@ -98,11 +98,12 @@
         <title>Using Maven's archetype plugin to create a sample project using
         Hibernate Validator</title>
 
-        <programlisting>mvn archetype:create -DarchetypeGroupId=org.hibernate \
-                     -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \
-                     -DarchetypeVersion=&version; \
-                     -DgroupId=com.mycompany 
-                     -DartifactId=hv-quickstart</programlisting>
+        <programlisting>mvn archetype:generate -DarchetypeGroupId=org.hibernate \
+                       -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \
+                       -DarchetypeVersion=&version; \
+                       -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public-jboss/ \
+                       -DgroupId=com.mycompany \
+                       -DartifactId=hv-quickstart</programlisting>
       </example></para>
 
     <para>Maven will create your project in the directory hv-quickstart.
