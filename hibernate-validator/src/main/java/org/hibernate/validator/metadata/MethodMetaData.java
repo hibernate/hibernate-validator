@@ -21,8 +21,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
@@ -36,10 +34,9 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	private final Method method;
 
 	/**
-	 * Constrained-related meta data for this method's parameters, keyed by
-	 * parameter index.
+	 * Constrained-related meta data for this method's parameters.
 	 */
-	private final Map<Integer, ParameterMetaData> parameterMetaData;
+	private final List<ParameterMetaData> parameterMetaData;
 
 	private final List<BeanMetaConstraint<?, ? extends Annotation>> constraints;
 
@@ -52,12 +49,12 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 			List<BeanMetaConstraint<?, ? extends Annotation>> constraints,
 			boolean isCascading) {
 
-		this( method, Collections.<Integer, ParameterMetaData>emptyMap(), constraints, isCascading );
+		this( method, Collections.<ParameterMetaData>emptyList(), constraints, isCascading );
 	}
 
 	public MethodMetaData(
 			Method method,
-			Map<Integer, ParameterMetaData> parameterMetaData,
+			List<ParameterMetaData> parameterMetaData,
 			List<BeanMetaConstraint<?, ? extends Annotation>> constraints,
 			boolean isCascading) {
 
@@ -68,8 +65,8 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 
 		boolean foundParameterConstraint = false;
 
-		for ( Entry<Integer, ParameterMetaData> oneParameter : parameterMetaData.entrySet() ) {
-			if ( oneParameter.getValue().isCascading() || oneParameter.getValue().iterator().hasNext() ) {
+		for ( ParameterMetaData oneParameter : parameterMetaData ) {
+			if ( oneParameter.isCascading() || oneParameter.iterator().hasNext() ) {
 				foundParameterConstraint = true;
 				break;
 			}
@@ -101,13 +98,11 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
-		ParameterMetaData theValue = parameterMetaData.get( parameterIndex );
-
-		if ( theValue == null ) {
+		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
 			throw new IllegalArgumentException( "Method " + method + " doesn't have a parameter with index " + parameterIndex );
 		}
 
-		return theValue;
+		return parameterMetaData.get( parameterIndex );
 	}
 
 	/**
@@ -146,7 +141,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		}
 
 		//is one of the parameters constrained?
-		for ( ParameterMetaData oneParameter : parameterMetaData.values() ) {
+		for ( ParameterMetaData oneParameter : parameterMetaData ) {
 			if ( oneParameter.isConstrained() ) {
 				return true;
 			}

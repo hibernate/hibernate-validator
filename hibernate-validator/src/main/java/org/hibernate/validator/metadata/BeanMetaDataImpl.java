@@ -806,7 +806,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private MethodMetaData findMethodMetaData(Method method) {
 
-		Map<Integer, ParameterMetaData> parameterConstraints = getParameterMetaData( method );
+		List<ParameterMetaData> parameterConstraints = getParameterMetaData( method );
 		boolean isCascading = isValidAnnotationPresent( method ) || cascadedMembers.contains( method );
 		List<BeanMetaConstraint<?, ? extends Annotation>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
@@ -831,11 +831,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *
 	 * @param method The method of interest.
 	 *
-	 * @return A map with parameter meta data for the given method, keyed by
-	 *         parameter index.
+	 * @return A list with parameter meta data for the given method.
 	 */
-	private Map<Integer, ParameterMetaData> getParameterMetaData(Method method) {
-		Map<Integer, ParameterMetaData> metaData = newHashMap();
+	private List<ParameterMetaData> getParameterMetaData(Method method) {
+		List<ParameterMetaData> metaData = newArrayList();
 
 		int i = 0;
 		for ( Annotation[] annotationsOfOneParameter : method.getParameterAnnotations() ) {
@@ -864,8 +863,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				}
 			}
 
-			metaData.put(
-					i, new ParameterMetaData( i, parameterName, constraintsOfOneParameter, parameterIsCascading )
+			metaData.add(
+					new ParameterMetaData( i, parameterName, constraintsOfOneParameter, parameterIsCascading )
 			);
 			i++;
 		}
