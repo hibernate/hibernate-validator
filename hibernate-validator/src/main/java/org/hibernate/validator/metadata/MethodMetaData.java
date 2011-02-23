@@ -106,6 +106,18 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	}
 
 	/**
+	 * Returns meta data for all parameters of the represented method.
+	 *
+	 * @return A list with parameter meta data. The length corresponds to the
+	 *         number of parameters of the method represented by this meta data
+	 *         object, so an empty list may be returned (in case of a
+	 *         parameterless method), but never <code>null</code>.
+	 */
+	public List<ParameterMetaData> getAllParameterMetaData() {
+		return parameterMetaData;
+	}
+
+	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
 	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {

@@ -60,6 +60,7 @@ public class MethodMetaDataTest {
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
+		assertEquals( methodMetaData.getAllParameterMetaData().size(), 2 );
 	}
 
 	@Test
@@ -72,6 +73,7 @@ public class MethodMetaDataTest {
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
+		assertEquals( methodMetaData.getAllParameterMetaData().size(), 1 );
 	}
 
 	@Test
@@ -87,6 +89,7 @@ public class MethodMetaDataTest {
 		assertEquals(
 				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
+		assertEquals( methodMetaData.getAllParameterMetaData().size(), 0 );
 	}
 
 	@Test
@@ -99,6 +102,7 @@ public class MethodMetaDataTest {
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
+		assertEquals( methodMetaData.getAllParameterMetaData().size(), 0 );
 	}
 
 	@Test
@@ -111,6 +115,7 @@ public class MethodMetaDataTest {
 		assertFalse( methodMetaData.isCascading() );
 		assertFalse( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
+		assertEquals( methodMetaData.getAllParameterMetaData().size(), 1 );
 	}
 
 }
