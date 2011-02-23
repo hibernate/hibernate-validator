@@ -23,16 +23,20 @@ import org.hibernate.validator.method.metadata.ParameterDescriptor;
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
 
+	private ParameterMetaData parameterMetaData;
+
 	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ParameterMetaData parameterMetaData) {
 		super( parameterMetaData.getType(), metaDataBean );
+
+		this.parameterMetaData = parameterMetaData;
 	}
 
 	public boolean isCascaded() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return parameterMetaData.isCascading();
 	}
 
 	public int getIndex() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return parameterMetaData.getIndex();
 	}
 
 }
