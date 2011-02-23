@@ -27,6 +27,8 @@ import java.util.List;
  */
 public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends Annotation>> {
 
+	private final Class<?> type;
+
 	private final int index;
 
 	private final String name;
@@ -35,12 +37,17 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 
 	private final boolean isCascading;
 
-	public ParameterMetaData(int index, String name, List<MetaConstraint<?, ? extends Annotation>> constraints, boolean isCascading) {
+	public ParameterMetaData(int index, Class<?> type, String name, List<MetaConstraint<?, ? extends Annotation>> constraints, boolean isCascading) {
 
 		this.index = index;
+		this.type = type;
 		this.name = name;
 		this.constraints = constraints;
 		this.isCascading = isCascading;
+	}
+
+	public Class<?> getType() {
+		return type;
 	}
 
 	public int getIndex() {
@@ -85,7 +92,7 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 
 		String constraintsAsString = sb.length() > 0 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-		return "ParameterMetaData [index=" + index + "], name=" + name + "], constraints=["
+		return "ParameterMetaData [type=" + type + "], [index=" + index + "], name=" + name + "], constraints=["
 				+ constraintsAsString + "], isCascading=" + isCascading + "]";
 	}
 }

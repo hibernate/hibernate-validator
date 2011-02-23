@@ -62,6 +62,7 @@ public class ParameterMetaDataTest {
 		assertFalse( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 1 );
+		assertEquals( parameterMetaData.getType(), String.class );
 		assertEquals( parameterMetaData.getParameterName(), "arg1" );
 		assertIterableSize( parameterMetaData, 1 );
 		assertEquals(
@@ -80,6 +81,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 0 );
+		assertEquals( parameterMetaData.getType(), Customer.class );
 		assertEquals( parameterMetaData.getParameterName(), "arg0" );
 		assertIterableSize( parameterMetaData, 0 );
 	}

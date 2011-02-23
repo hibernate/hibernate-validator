@@ -837,6 +837,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		List<ParameterMetaData> metaData = newArrayList();
 
 		int i = 0;
+		Class<?>[] parameterTypes = method.getParameterTypes();
+
 		for ( Annotation[] annotationsOfOneParameter : method.getParameterAnnotations() ) {
 
 			boolean parameterIsCascading = false;
@@ -864,7 +866,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			metaData.add(
-					new ParameterMetaData( i, parameterName, constraintsOfOneParameter, parameterIsCascading )
+					new ParameterMetaData(
+							i, parameterTypes[0], parameterName, constraintsOfOneParameter, parameterIsCascading
+					)
 			);
 			i++;
 		}
