@@ -53,6 +53,30 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	}
 
 	/**
+	 * Returns meta data for all parameters of the represented method.
+	 *
+	 * @return A list with parameter meta data. The length corresponds to the
+	 *         number of parameters of the method represented by this meta data
+	 *         object, so an empty list may be returned (in case of a
+	 *         parameterless method), but never <code>null</code>.
+	 */
+	public List<ParameterMetaData> getAllParameterMetaData() {
+
+		//there may be at most one constrained method meta data in the hierarchy;
+		//if there is one, return this
+		for ( MethodMetaData oneMethod : metaDataByDefiningType.values() ) {
+
+			if ( oneMethod.hasParameterConstraints() ) {
+				return oneMethod.getAllParameterMetaData();
+			}
+		}
+
+		// the given method is unconstrained, so return the parameter meta data
+		// for the given method itself
+		return metaDataByDefiningType.get( method.getDeclaringClass() ).getAllParameterMetaData();
+	}
+
+	/**
 	 * Whether a cascaded validation of the return value of the represented
 	 * method shall be performed or not. This is the case if either the method
 	 * itself is annotated with {@link Valid} or any of the method's up in the

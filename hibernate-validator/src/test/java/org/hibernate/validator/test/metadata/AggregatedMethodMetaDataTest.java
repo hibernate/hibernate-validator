@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.metadata;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.BeforeMethod;
@@ -26,7 +27,9 @@ import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.ParameterMetaData;
 
+import static org.hibernate.validator.test.util.TestUtil.assertIterableSize;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -57,7 +60,21 @@ public class AggregatedMethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
+
+		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		assertEquals( parameterMetaData.size(), 2 );
+
+		assertFalse( parameterMetaData.get( 0 ).isConstrained() );
+		assertFalse( parameterMetaData.get( 0 ).isCascading() );
+
+		assertTrue( parameterMetaData.get( 1 ).isConstrained() );
+		assertFalse( parameterMetaData.get( 1 ).isCascading() );
+		assertIterableSize( parameterMetaData.get( 1 ), 1 );
+		assertEquals(
+				parameterMetaData.get( 1 ).iterator().next().getDescriptor().getAnnotation().annotationType(),
+				NotNull.class
+		);
 	}
 
 	@Test
@@ -69,7 +86,14 @@ public class AggregatedMethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
+
+		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		assertEquals( parameterMetaData.size(), 1 );
+
+		assertTrue( parameterMetaData.get( 0 ).isConstrained() );
+		assertTrue( parameterMetaData.get( 0 ).isCascading() );
+		assertIterableSize( parameterMetaData.get( 0 ), 0 );
 	}
 
 	@Test
@@ -81,10 +105,13 @@ public class AggregatedMethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 1 );
+		assertIterableSize( methodMetaData, 1 );
 		assertEquals(
 				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
+
+		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		assertEquals( parameterMetaData.size(), 0 );
 	}
 
 	@Test
@@ -96,7 +123,7 @@ public class AggregatedMethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 2 );
+		assertIterableSize( methodMetaData, 2 );
 	}
 
 	@Test
@@ -108,7 +135,7 @@ public class AggregatedMethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
 	}
 
 	@Test
@@ -120,21 +147,7 @@ public class AggregatedMethodMetaDataTest {
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertFalse( methodMetaData.isConstrained() );
-		assertSize( methodMetaData, 0 );
+		assertIterableSize( methodMetaData, 0 );
 	}
 
-	/**
-	 * TODO GM: invoke on TestUtil, once it is merged.
-	 */
-	@Deprecated
-	private void assertSize(Iterable<?> iterable, int expectedCount) {
-
-		int i = 0;
-
-		for ( @SuppressWarnings("unused") Object o : iterable ) {
-			i++;
-		}
-
-		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
-	}
 }
