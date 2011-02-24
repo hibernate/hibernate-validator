@@ -16,17 +16,17 @@
 */
 package org.hibernate.validator.test.metadata;
 
-import java.lang.reflect.Method;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.Scope;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.test.util.TestUtil;
 
-import static org.hibernate.validator.util.Contracts.assertNotNull;
+import static org.hibernate.validator.test.util.TestUtil.getParameterDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -36,104 +36,102 @@ import static org.testng.Assert.assertTrue;
  */
 public class ParameterDescriptorTest {
 
-	private TypeDescriptor typeDescriptor;
+	private ParameterDescriptor createCustomerParameter1;
+	private ParameterDescriptor createCustomerParameter2;
 
 	@BeforeMethod
-	public void setUpDescriptor() {
+	public void setUpDescriptors() {
 
-		typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepositoryExt.class );
-		assertNotNull( typeDescriptor );
+		createCustomerParameter1 = getParameterDescriptor(
+				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { String.class, String.class }, 0
+		);
+		createCustomerParameter2 = getParameterDescriptor(
+				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { String.class, String.class }, 1
+		);
 	}
 
 	@Test
-	public void testGetElementClass() throws Exception {
+	public void testGetElementClass() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
-		ParameterDescriptor parameterDescriptor = typeDescriptor.getConstraintsForMethod( method )
-				.getParameterConstraints()
-				.get( 0 );
-
-		assertNotNull( parameterDescriptor );
-		assertEquals( parameterDescriptor.getElementClass(), String.class );
+		assertEquals( createCustomerParameter1.getElementClass(), String.class );
 	}
 
 	@Test
-	public void testHasConstraints() throws Exception {
+	public void testHasConstraints() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
-
-		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method )
-				.getParameterConstraints()
-				.get( 0 );
-		assertNotNull( parameterDescriptor1 );
-		assertFalse( parameterDescriptor1.hasConstraints() );
-
-		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method )
-				.getParameterConstraints()
-				.get( 1 );
-		assertNotNull( parameterDescriptor2 );
-		assertTrue( parameterDescriptor2.hasConstraints() );
+		assertFalse( createCustomerParameter1.hasConstraints() );
+		assertTrue( createCustomerParameter2.hasConstraints() );
 	}
 
 	@Test
-	public void testGetConstraintDescriptors() throws Exception {
+	public void testGetConstraintDescriptors() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
+		assertTrue( createCustomerParameter1.getConstraintDescriptors().isEmpty() );
 
-		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method )
-				.getParameterConstraints()
-				.get( 0 );
-		assertNotNull( parameterDescriptor1 );
-		assertTrue( parameterDescriptor1.getConstraintDescriptors().isEmpty() );
-
-		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method )
-				.getParameterConstraints()
-				.get( 1 );
-		assertNotNull( parameterDescriptor2 );
-		assertEquals( parameterDescriptor2.getConstraintDescriptors().size(), 1 );
-
+		assertEquals( createCustomerParameter2.getConstraintDescriptors().size(), 1 );
 		assertEquals(
-				parameterDescriptor2.getConstraintDescriptors().iterator().next().getAnnotation().annotationType(),
+				createCustomerParameter2.getConstraintDescriptors().iterator().next().getAnnotation().annotationType(),
 				NotNull.class
 		);
 	}
 
 	@Test
-	public void testGetIndex() throws Exception {
+	public void testFindConstraintLookingAtLocalElement() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
+		Set<ConstraintDescriptor<?>> constraintDescriptors =
+				createCustomerParameter2.findConstraints().lookingAt( Scope.LOCAL_ELEMENT ).getConstraintDescriptors();
 
-		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method )
-				.getParameterConstraints()
-				.get( 0 );
-		assertNotNull( parameterDescriptor1 );
-		assertEquals( parameterDescriptor1.getIndex(), 0 );
+		assertEquals(
+				constraintDescriptors.size(),
+				0,
+				"No local constraint for CustomerRepositoryExt#createCustomer(), arg1, expected."
+		);
 
-		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method )
-				.getParameterConstraints()
-				.get( 1 );
-		assertNotNull( parameterDescriptor2 );
-		assertEquals( parameterDescriptor2.getIndex(), 1 );
+		ParameterDescriptor createCustomerParameter2OnBaseType = getParameterDescriptor(
+				CustomerRepository.class, "createCustomer", new Class<?>[] { String.class, String.class }, 1
+		);
+
+		constraintDescriptors =
+				createCustomerParameter2OnBaseType.findConstraints()
+						.lookingAt( Scope.LOCAL_ELEMENT )
+						.getConstraintDescriptors();
+
+		assertEquals(
+				constraintDescriptors.size(),
+				1,
+				"One local constraint for CustomerRepository#createCustomer(), arg1, expected."
+		);
 	}
 
 	@Test
-	public void testIsCascaded() throws Exception {
+	public void testFindConstraintLookingAtHierarchy() {
 
-		Method method1 = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
+		Set<ConstraintDescriptor<?>> constraintDescriptors =
+				createCustomerParameter2.findConstraints().lookingAt( Scope.HIERARCHY ).getConstraintDescriptors();
 
-		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method1 )
-				.getParameterConstraints()
-				.get( 0 );
-		assertNotNull( parameterDescriptor1 );
-		assertFalse( parameterDescriptor1.isCascaded() );
+		assertEquals(
+				constraintDescriptors.size(),
+				1,
+				"One hierarchy constraint for CustomerRepositoryExt#createCustomer(), arg1, expected."
+		);
+	}
 
-		Method method2 = CustomerRepositoryExt.class.getMethod( "saveCustomer", Customer.class );
+	@Test
+	public void testGetIndex() {
 
-		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method2 )
-				.getParameterConstraints()
-				.get( 0 );
-		assertNotNull( parameterDescriptor2 );
-		assertTrue( parameterDescriptor2.isCascaded() );
+		assertEquals( createCustomerParameter1.getIndex(), 0 );
+		assertEquals( createCustomerParameter2.getIndex(), 1 );
+	}
+
+	@Test
+	public void testIsCascaded() {
+
+		assertFalse( createCustomerParameter1.isCascaded() );
+
+		ParameterDescriptor saveCustomerParameter = getParameterDescriptor(
+				CustomerRepositoryExt.class, "saveCustomer", new Class<?>[] { Customer.class }, 0
+		);
+		assertTrue( saveCustomerParameter.isCascaded() );
 	}
 
 }

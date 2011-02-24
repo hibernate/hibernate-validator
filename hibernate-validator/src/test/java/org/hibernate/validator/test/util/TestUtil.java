@@ -41,6 +41,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.PathImpl;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
+import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 
 import static org.hibernate.validator.util.Contracts.assertNotNull;
@@ -115,6 +116,7 @@ public class TestUtil {
 	public static MethodDescriptor getMethodDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
 
 		Method method;
+
 		try {
 			method = clazz.getMethod( methodName, parameterTypes );
 		}
@@ -132,6 +134,14 @@ public class TestUtil {
 		return methodDescriptor;
 	}
 
+	public static ParameterDescriptor getParameterDescriptor(Class<?> clazz, String methodName, Class<?>[] parameterTypes, int parameterIndex) {
+	
+		ParameterDescriptor parameterDescriptor = getMethodDescriptor(clazz, methodName, parameterTypes).getParameterConstraints().get(parameterIndex);
+		assertNotNull( parameterDescriptor );
+
+		return parameterDescriptor;
+	}
+	
 	public static Object getMethodValidationProxy(ValidationInvocationHandler handler) {
 		final Class<?> wrappedObjectClass = handler.getWrapped().getClass();
 

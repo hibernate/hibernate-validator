@@ -24,7 +24,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.Scope;
 
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.method.metadata.MethodDescriptor;
@@ -45,15 +44,6 @@ import static org.testng.Assert.assertTrue;
  */
 public class MethodDescriptorTest {
 
-	private TypeDescriptor typeDescriptor;
-
-	@BeforeMethod
-	public void setUpDescriptor() {
-
-		typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepositoryExt.class );
-		assertNotNull( typeDescriptor );
-	}
-
 	@Test
 	public void testGetMethod() throws Exception {
 
@@ -68,6 +58,9 @@ public class MethodDescriptorTest {
 	@Test
 	public void testGetMethodForOverriddenMethod() throws Exception {
 
+		TypeDescriptor typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepositoryExt.class );
+		assertNotNull( typeDescriptor );
+		
 		Method methodFromBaseType = CustomerRepository.class.getMethod( "foo" );
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
 		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( methodFromBaseType );
