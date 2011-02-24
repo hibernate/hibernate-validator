@@ -238,7 +238,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		parameterConstraintDeclarationException = checkParameterConstraints();
 
-		// reset class member we don't need any longer
+		// reset class members we don't need any longer
 		allMethods = null;
 		this.constraintHelper = null;
 	}
