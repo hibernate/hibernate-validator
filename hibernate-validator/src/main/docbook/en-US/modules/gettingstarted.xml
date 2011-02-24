@@ -112,6 +112,13 @@
     <para><programlisting>mvn test</programlisting> Maven will compile the
     example code and run the implemented unit tests. Let's have a look at the
     actual code.</para>
+
+    <note>
+        <para>From version 4.2.0.Beta2, the maven command <command>mvn archetype:create</command>
+        will be no longer supported and will fail. You should use the command described in the above listing.
+        If you want more details, look at <ulink url="http://maven.apache.org/archetype/maven-archetype-plugin/">
+        Maven Archetype plugin</ulink> page.</para>
+    </note>
   </section>
 
   <section id="validator-gettingstarted-createmodel">
