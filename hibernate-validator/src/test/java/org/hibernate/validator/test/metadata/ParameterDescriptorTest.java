@@ -17,20 +17,13 @@
 package org.hibernate.validator.test.metadata;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Set;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.Scope;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.test.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.util.Contracts.assertNotNull;
@@ -56,39 +49,91 @@ public class ParameterDescriptorTest {
 	public void testGetElementClass() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
-		ParameterDescriptor parameterDescriptor = typeDescriptor.getConstraintsForMethod( method ).getParameterConstraints().get(0);
+		ParameterDescriptor parameterDescriptor = typeDescriptor.getConstraintsForMethod( method )
+				.getParameterConstraints()
+				.get( 0 );
 
 		assertNotNull( parameterDescriptor );
 		assertEquals( parameterDescriptor.getElementClass(), String.class );
 	}
-	
+
+	@Test
+	public void testHasConstraints() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
+
+		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method )
+				.getParameterConstraints()
+				.get( 0 );
+		assertNotNull( parameterDescriptor1 );
+		assertFalse( parameterDescriptor1.hasConstraints() );
+
+		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method )
+				.getParameterConstraints()
+				.get( 1 );
+		assertNotNull( parameterDescriptor2 );
+		assertTrue( parameterDescriptor2.hasConstraints() );
+	}
+
+	@Test
+	public void testGetConstraintDescriptors() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
+
+		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method )
+				.getParameterConstraints()
+				.get( 0 );
+		assertNotNull( parameterDescriptor1 );
+		assertTrue( parameterDescriptor1.getConstraintDescriptors().isEmpty() );
+
+		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method )
+				.getParameterConstraints()
+				.get( 1 );
+		assertNotNull( parameterDescriptor2 );
+		assertEquals( parameterDescriptor2.getConstraintDescriptors().size(), 1 );
+
+		assertEquals(
+				parameterDescriptor2.getConstraintDescriptors().iterator().next().getAnnotation().annotationType(),
+				NotNull.class
+		);
+	}
+
 	@Test
 	public void testGetIndex() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
 
-		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method ).getParameterConstraints().get(0);
+		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method )
+				.getParameterConstraints()
+				.get( 0 );
 		assertNotNull( parameterDescriptor1 );
 		assertEquals( parameterDescriptor1.getIndex(), 0 );
-		
-		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method ).getParameterConstraints().get(1);
+
+		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method )
+				.getParameterConstraints()
+				.get( 1 );
 		assertNotNull( parameterDescriptor2 );
 		assertEquals( parameterDescriptor2.getIndex(), 1 );
 	}
-	
+
 	@Test
 	public void testIsCascaded() throws Exception {
 
 		Method method1 = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
 
-		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method1 ).getParameterConstraints().get(0);
+		ParameterDescriptor parameterDescriptor1 = typeDescriptor.getConstraintsForMethod( method1 )
+				.getParameterConstraints()
+				.get( 0 );
 		assertNotNull( parameterDescriptor1 );
 		assertFalse( parameterDescriptor1.isCascaded() );
 
 		Method method2 = CustomerRepositoryExt.class.getMethod( "saveCustomer", Customer.class );
 
-		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method2 ).getParameterConstraints().get(0);
+		ParameterDescriptor parameterDescriptor2 = typeDescriptor.getConstraintsForMethod( method2 )
+				.getParameterConstraints()
+				.get( 0 );
 		assertNotNull( parameterDescriptor2 );
 		assertTrue( parameterDescriptor2.isCascaded() );
 	}
+
 }

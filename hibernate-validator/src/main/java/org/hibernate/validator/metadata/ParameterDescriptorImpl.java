@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.metadata;
 
+import java.lang.annotation.Annotation;
+
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 /**
@@ -29,6 +31,11 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 		super( parameterMetaData.getType(), metaDataBean );
 
 		this.parameterMetaData = parameterMetaData;
+
+		//add constraints of the represented parameter to the constraint descriptor list
+		for ( MetaConstraint<?, ? extends Annotation> oneConstraint : parameterMetaData ) {
+			addConstraintDescriptor( oneConstraint.getDescriptor() );
+		}
 	}
 
 	public boolean isCascaded() {

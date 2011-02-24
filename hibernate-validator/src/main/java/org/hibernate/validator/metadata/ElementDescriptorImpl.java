@@ -34,10 +34,11 @@ import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
 
 /**
- * Describe a validated element (class, field or property).
+ * Describes a validated element (class, field or property).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ElementDescriptorImpl implements ElementDescriptor {
 	private final BeanMetaData<?> metaDataBean;
@@ -49,7 +50,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		this.type = type;
 	}
 
-	public final  void addConstraintDescriptor(ConstraintDescriptorImpl<?> constraintDescriptor) {
+	public final void addConstraintDescriptor(ConstraintDescriptorImpl<?> constraintDescriptor) {
 		constraintDescriptors.add( constraintDescriptor );
 	}
 
@@ -83,6 +84,10 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 			elementTypes.add( ElementType.TYPE );
 			elementTypes.add( ElementType.METHOD );
 			elementTypes.add( ElementType.FIELD );
+
+			//for a bean descriptor there will be no parameter constraints, so we can safely add this element type here
+			elementTypes.add( ElementType.PARAMETER );
+
 			definedInSet = new HashSet<ConstraintOrigin>();
 			definedInSet.add( ConstraintOrigin.DEFINED_LOCALLY );
 			definedInSet.add( ConstraintOrigin.DEFINED_IN_HIERARCHY );

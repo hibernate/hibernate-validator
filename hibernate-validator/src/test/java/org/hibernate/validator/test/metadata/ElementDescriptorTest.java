@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.test.metadata;
 
+import java.lang.annotation.ElementType;
 import java.util.Set;
 import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
@@ -27,6 +28,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.TestUtil;
 
+import static org.hibernate.validator.test.util.TestUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -35,9 +37,9 @@ import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ElementDescriptorTest {
-
 
 	@Test
 	public void testGetTypeForConstrainedBean() {
@@ -50,6 +52,20 @@ public class ElementDescriptorTest {
 	public void testGetTypeForConstrainedProperty() {
 		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		assertEquals( elementDescriptor.getElementClass(), Integer.class, "Wrong type." );
+	}
+
+	@Test
+	public void testThatMethodLevelConstraintsAreNotReflectedByBeanDescriptor() {
+
+		BeanDescriptor beanDescriptor = getValidator().getConstraintsForClass( CustomerRepository.class );
+
+		Set<ConstraintDescriptor<?>> constraintDescriptors = beanDescriptor.getConstraintDescriptors();
+		assertEquals( constraintDescriptors.size(), 1, "Only the class-level @ScriptAssert is expected." );
+
+		constraintDescriptors = beanDescriptor.findConstraints()
+				.declaredOn( ElementType.PARAMETER )
+				.getConstraintDescriptors();
+		assertEquals( constraintDescriptors.size(), 0 );
 	}
 
 	/**
