@@ -52,4 +52,9 @@ public class CustomerRepositoryExt extends CustomerRepository {
 
 	public void zap() {
 	}
+
+	@Min(0)
+	public int zip() {
+		return 0;
+	}
 }

@@ -24,6 +24,8 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -73,7 +75,18 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	public Set<MethodDescriptor> getConstrainedMethods() {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+
+		BeanMetaData<?> beanMetaData = getMetaDataBean();
+
+		Set<MethodDescriptor> theValue = newHashSet();
+
+		for ( AggregatedMethodMetaData oneMethodMetaData : beanMetaData.getAllMethodMetaData() ) {
+			if ( oneMethodMetaData.isConstrained() ) {
+				theValue.add( new MethodDescriptorImpl( beanMetaData, oneMethodMetaData ) );
+			}
+		}
+
+		return theValue;
 	}
 
 	public MethodDescriptor getConstraintsForMethod(Method method) {

@@ -42,6 +42,7 @@ import org.hibernate.validator.engine.PathImpl;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
+import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 
 import static org.hibernate.validator.util.Contracts.assertNotNull;
@@ -113,6 +114,15 @@ public class TestUtil {
 		return validator.getConstraintsForClass( clazz ).getConstraintsForProperty( property );
 	}
 
+
+	public static TypeDescriptor getTypeDescriptor(Class<?> clazz) {
+
+		TypeDescriptor typeDescriptor = getMethodValidator().getConstraintsForType( clazz );
+		assertNotNull( typeDescriptor );
+
+		return typeDescriptor;
+	}
+
 	public static MethodDescriptor getMethodDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
 
 		Method method;
@@ -127,21 +137,21 @@ public class TestUtil {
 			);
 		}
 
-		MethodDescriptor methodDescriptor = getMethodValidator().getConstraintsForType( clazz )
-				.getConstraintsForMethod( method );
+		MethodDescriptor methodDescriptor = getTypeDescriptor( clazz ).getConstraintsForMethod( method );
 		assertNotNull( methodDescriptor );
 
 		return methodDescriptor;
 	}
 
 	public static ParameterDescriptor getParameterDescriptor(Class<?> clazz, String methodName, Class<?>[] parameterTypes, int parameterIndex) {
-	
-		ParameterDescriptor parameterDescriptor = getMethodDescriptor(clazz, methodName, parameterTypes).getParameterConstraints().get(parameterIndex);
+
+		MethodDescriptor methodDescriptor = getMethodDescriptor( clazz, methodName, parameterTypes );
+		ParameterDescriptor parameterDescriptor = methodDescriptor.getParameterConstraints().get( parameterIndex );
 		assertNotNull( parameterDescriptor );
 
 		return parameterDescriptor;
 	}
-	
+
 	public static Object getMethodValidationProxy(ValidationInvocationHandler handler) {
 		final Class<?> wrappedObjectClass = handler.getWrapped().getClass();
 

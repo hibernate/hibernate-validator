@@ -29,8 +29,10 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.test.util.TestUtil;
 
+import static org.hibernate.validator.test.util.TestUtil.getTypeDescriptor;
+import static org.hibernate.validator.util.CollectionHelper.asSet;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -173,8 +175,40 @@ public class TypeDescriptorTest {
 		descriptor.getConstraintsForMethod( method );
 	}
 
-	private TypeDescriptor getTypeDescriptor(Class<?> clazz) {
-		return TestUtil.getMethodValidator().getConstraintsForType( clazz );
+	@Test
+	public void testGetConstrainedMethods() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
+
+		assertEquals( constrainedMethods.size(), 5 );
+		assertEquals(
+				getMethodNames( constrainedMethods ), asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz" )
+		);
+	}
+
+	@Test
+	public void testGetConstrainedMethodsForDerivedType() {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
+		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
+
+		assertEquals( constrainedMethods.size(), 6 );
+		assertEquals(
+				getMethodNames( constrainedMethods ),
+				asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz", "zip" )
+		);
+	}
+
+	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {
+
+		Set<String> theValue = newHashSet();
+
+		for ( MethodDescriptor methodDescriptor : descriptors ) {
+			theValue.add( methodDescriptor.getMethod().getName() );
+		}
+
+		return theValue;
 	}
 
 	private static class UnconstrainedType {
