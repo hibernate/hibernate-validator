@@ -30,9 +30,11 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
+import org.hibernate.validator.test.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.util.TestUtil;
 
+import static org.hibernate.validator.test.util.TestUtil.getMethodDescriptor;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -55,11 +57,8 @@ public class MethodDescriptorTest {
 	@Test
 	public void testGetMethod() throws Exception {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
-
-		assertNotNull( methodDescriptor );
-		assertEquals( methodDescriptor.getMethod(), method );
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
+		assertEquals( methodDescriptor.getMethod(), CustomerRepositoryExt.class.getMethod( "foo" ) );
 	}
 
 	/**
@@ -78,88 +77,56 @@ public class MethodDescriptorTest {
 	}
 
 	@Test
-	public void testIsCascaded() throws Exception {
+	public void testIsCascaded() {
 
-		Method cascadingMethod = CustomerRepositoryExt.class.getMethod( "foo" );
-		MethodDescriptor cascadingMethodDescriptor = typeDescriptor.getConstraintsForMethod( cascadingMethod );
-
-		assertNotNull( cascadingMethodDescriptor );
+		MethodDescriptor cascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
 		assertTrue( cascadingMethodDescriptor.isCascaded() );
 
-		Method nonCascadingMethod = CustomerRepositoryExt.class.getMethod( "baz" );
-		MethodDescriptor nonCascadingMethodDescriptor = typeDescriptor.getConstraintsForMethod( nonCascadingMethod );
-
-		assertNotNull( nonCascadingMethodDescriptor );
+		MethodDescriptor nonCascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 		assertFalse( nonCascadingMethodDescriptor.isCascaded() );
 	}
 
 	@Test
-	public void testHasConstraints() throws Exception {
+	public void testHasConstraints() {
 
-		Method constrainedMethod = CustomerRepositoryExt.class.getMethod( "bar" );
-		MethodDescriptor constrainedMethodDescriptor = typeDescriptor.getConstraintsForMethod( constrainedMethod );
-
-		assertNotNull( constrainedMethodDescriptor );
+		MethodDescriptor constrainedMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "bar" );
 		assertTrue( constrainedMethodDescriptor.hasConstraints() );
 
-		Method unconstrainedMethod = CustomerRepositoryExt.class.getMethod( "qux" );
-		MethodDescriptor unconstrainedMethodDescriptor = typeDescriptor.getConstraintsForMethod( unconstrainedMethod );
-
-		assertNotNull( unconstrainedMethodDescriptor );
+		MethodDescriptor unconstrainedMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "qux" );
 		assertFalse( unconstrainedMethodDescriptor.hasConstraints() );
 	}
 
 	@Test
-	public void testGetElementClass() throws Exception {
-
-		//set up a descriptor for the base type
-		TypeDescriptor typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepository.class );
-		assertNotNull( typeDescriptor );
-
-		Method method = CustomerRepository.class.getMethod( "bar" );
-		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+	public void testGetElementClass() {
 
 		//the return type as defined in the base type
-		assertNotNull( methodDescriptor );
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepository.class, "bar" );
 		assertEquals( methodDescriptor.getElementClass(), Customer.class );
 
-		//now set up a descriptor for the derived type
-		typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepositoryExt.class );
-		assertNotNull( typeDescriptor );
-
-		methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
-
-		//the return type is now the one as defined in the derived type (covariant return type) 
-		assertNotNull( methodDescriptor );
+		//the return type is now the one as defined in the derived type (covariant return type)
+		methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "bar" );
 		assertEquals( methodDescriptor.getElementClass(), CustomerExtension.class );
 	}
 
 	@Test
-	public void testGetConstraintDescriptors() throws Exception {
+	public void testGetConstraintDescriptors() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
-		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "bar" );
 
-		assertNotNull( methodDescriptor );
 		assertEquals( methodDescriptor.getConstraintDescriptors().size(), 1 );
 		assertEquals(
 				methodDescriptor.getConstraintDescriptors().iterator().next().getAnnotation().annotationType(),
 				NotNull.class
 		);
 
-		method = CustomerRepositoryExt.class.getMethod( "baz" );
-		methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
-
-		assertNotNull( methodDescriptor );
+		methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 		assertEquals( methodDescriptor.getConstraintDescriptors().size(), 2 );
 	}
 
 	@Test
-	public void testFindConstraintLookingAt() throws Exception {
+	public void testFindConstraintLookingAt() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
-		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
-		assertNotNull( methodDescriptor );
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors = methodDescriptor.findConstraints()
 				.lookingAt( Scope.LOCAL_ELEMENT )
@@ -174,11 +141,24 @@ public class MethodDescriptorTest {
 	}
 
 	@Test
-	public void testGetParameterConstraints() throws Exception {
+	public void testFindConstraintMatchingGroups() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", String.class, String.class );
-		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
-		assertNotNull( methodDescriptor );
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
+
+		Set<ConstraintDescriptor<?>> constraintDescriptors = methodDescriptor.findConstraints()
+				.unorderedAndMatchingGroups( ValidationGroup.class )
+				.getConstraintDescriptors();
+
+		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( constraintDescriptors.iterator().next().getAnnotation().annotationType(), NotNull.class );
+	}
+
+	@Test
+	public void testGetParameterConstraints() {
+
+		MethodDescriptor methodDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class, "createCustomer", String.class, String.class
+		);
 
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();
 		assertNotNull( parameterConstraints );
@@ -186,11 +166,9 @@ public class MethodDescriptorTest {
 	}
 
 	@Test
-	public void testGetParameterConstraintsForParameterlessMethod() throws Exception {
+	public void testGetParameterConstraintsForParameterlessMethod() {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
-		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( method );
-		assertNotNull( methodDescriptor );
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();
 		assertNotNull( parameterConstraints );

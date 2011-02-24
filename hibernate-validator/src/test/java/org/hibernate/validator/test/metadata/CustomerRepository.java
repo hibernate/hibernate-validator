@@ -27,6 +27,9 @@ import org.hibernate.validator.constraints.ScriptAssert;
 @ScriptAssert(lang = "javascript", script = "some script")
 public class CustomerRepository {
 
+	public static interface ValidationGroup {
+	}
+
 	public Customer createCustomer(String firstName, @NotNull String lastName) {
 		return null;
 	}
@@ -47,7 +50,7 @@ public class CustomerRepository {
 		return null;
 	}
 
-	@NotNull
+	@NotNull(groups = ValidationGroup.class)
 	public int baz() {
 		return 0;
 	}

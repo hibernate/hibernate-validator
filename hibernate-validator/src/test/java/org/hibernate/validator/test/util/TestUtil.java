@@ -18,8 +18,10 @@ package org.hibernate.validator.test.util;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -38,8 +40,10 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.engine.PathImpl;
 import org.hibernate.validator.method.MethodValidator;
+import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 
+import static org.hibernate.validator.util.Contracts.assertNotNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.FileAssert.fail;
@@ -106,6 +110,26 @@ public class TestUtil {
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, String property) {
 		Validator validator = getValidator();
 		return validator.getConstraintsForClass( clazz ).getConstraintsForProperty( property );
+	}
+
+	public static MethodDescriptor getMethodDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+
+		Method method;
+		try {
+			method = clazz.getMethod( methodName, parameterTypes );
+		}
+		catch ( Exception e ) {
+			throw new RuntimeException(
+					"Couldn't retrieve a method object for method with name " + methodName + " and parameter types " + Arrays
+							.toString( parameterTypes ), e
+			);
+		}
+
+		MethodDescriptor methodDescriptor = getMethodValidator().getConstraintsForType( clazz )
+				.getConstraintsForMethod( method );
+		assertNotNull( methodDescriptor );
+
+		return methodDescriptor;
 	}
 
 	public static Object getMethodValidationProxy(ValidationInvocationHandler handler) {
