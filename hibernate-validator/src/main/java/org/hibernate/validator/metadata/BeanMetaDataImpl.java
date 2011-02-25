@@ -64,12 +64,12 @@ import static org.hibernate.validator.util.ReflectionHelper.getMethods;
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
+	private static final Logger log = LoggerFactory.make();
+
 	/**
 	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
 	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
-
-	private static final Logger log = LoggerFactory.make();
 
 	/**
 	 * The root bean class for this meta data.
@@ -327,7 +327,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public Set<Member> getCascadedMembers() {
 		return Collections.unmodifiableSet( cascadedMembers );
 	}
-	
+
 	public Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> getMetaConstraintsAsMap() {
 		return Collections.unmodifiableMap( metaConstraints );
 	}
@@ -867,7 +867,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			metaData.add(
 					new ParameterMetaData(
-							i, parameterTypes[0], parameterName, constraintsOfOneParameter, parameterIsCascading
+							i, parameterTypes[i], parameterName, constraintsOfOneParameter, parameterIsCascading
 					)
 			);
 			i++;

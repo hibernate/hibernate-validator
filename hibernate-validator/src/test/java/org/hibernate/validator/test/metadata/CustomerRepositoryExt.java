@@ -27,7 +27,7 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public static class CustomerExtension extends Customer {
 	}
 
-	public Customer createCustomer(String firstName, String lastName) {
+	public Customer createCustomer(CharSequence firstName, String lastName) {
 		return null;
 	}
 

@@ -53,7 +53,7 @@ public class MethodMetaDataTest {
 	@Test
 	public void methodWithConstrainedParameter() throws Exception {
 
-		Method method = CustomerRepository.class.getMethod( "createCustomer", String.class, String.class );
+		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
 
 		assertEquals( methodMetaData.getMethod(), method );

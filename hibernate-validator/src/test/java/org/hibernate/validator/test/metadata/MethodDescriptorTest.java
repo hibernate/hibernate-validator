@@ -58,9 +58,10 @@ public class MethodDescriptorTest {
 	@Test
 	public void testGetMethodForOverriddenMethod() throws Exception {
 
-		TypeDescriptor typeDescriptor = TestUtil.getMethodValidator().getConstraintsForType( CustomerRepositoryExt.class );
+		TypeDescriptor typeDescriptor = TestUtil.getMethodValidator()
+				.getConstraintsForType( CustomerRepositoryExt.class );
 		assertNotNull( typeDescriptor );
-		
+
 		Method methodFromBaseType = CustomerRepository.class.getMethod( "foo" );
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
 		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( methodFromBaseType );
@@ -150,7 +151,7 @@ public class MethodDescriptorTest {
 	public void testGetParameterConstraints() {
 
 		MethodDescriptor methodDescriptor = getMethodDescriptor(
-				CustomerRepositoryExt.class, "createCustomer", String.class, String.class
+				CustomerRepositoryExt.class, "createCustomer", CharSequence.class, String.class
 		);
 
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();

@@ -43,17 +43,18 @@ public class ParameterDescriptorTest {
 	public void setUpDescriptors() {
 
 		createCustomerParameter1 = getParameterDescriptor(
-				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { String.class, String.class }, 0
+				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { CharSequence.class, String.class }, 0
 		);
 		createCustomerParameter2 = getParameterDescriptor(
-				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { String.class, String.class }, 1
+				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { CharSequence.class, String.class }, 1
 		);
 	}
 
 	@Test
 	public void testGetElementClass() {
 
-		assertEquals( createCustomerParameter1.getElementClass(), String.class );
+		assertEquals( createCustomerParameter1.getElementClass(), CharSequence.class );
+		assertEquals( createCustomerParameter2.getElementClass(), String.class );
 	}
 
 	@Test
@@ -88,7 +89,7 @@ public class ParameterDescriptorTest {
 		);
 
 		ParameterDescriptor createCustomerParameter2OnBaseType = getParameterDescriptor(
-				CustomerRepository.class, "createCustomer", new Class<?>[] { String.class, String.class }, 1
+				CustomerRepository.class, "createCustomer", new Class<?>[] { CharSequence.class, String.class }, 1
 		);
 
 		constraintDescriptors =

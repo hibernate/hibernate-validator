@@ -30,7 +30,7 @@ public class CustomerRepository {
 	public static interface ValidationGroup {
 	}
 
-	public Customer createCustomer(String firstName, @NotNull String lastName) {
+	public Customer createCustomer(CharSequence firstName, @NotNull String lastName) {
 		return null;
 	}
 
