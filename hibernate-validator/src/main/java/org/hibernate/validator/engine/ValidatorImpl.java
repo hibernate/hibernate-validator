@@ -48,6 +48,7 @@ import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableResolver;
+import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
@@ -943,12 +944,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
-		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method )
-				.getMetaDataByDefiningType();
-		;
-
-		//used for retrieval of parameter names; we'll take the names from the lowest method in the hierarchy
-		MethodMetaData methodMetaDataOfDeclaringType = methodMetaDataByType.get( method.getDeclaringClass() );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		Map<Class<?>, MethodMetaData> methodMetaDataByType = methodMetaData.getMetaDataByDefiningType();
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -980,7 +977,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					}
 
 					Object value = parameterValues[i];
-					String parameterName = methodMetaDataOfDeclaringType.getParameterMetaData( i ).getParameterName();
+					String parameterName = methodMetaData.getParameterMetaData( i ).getParameterName();
 
 					// validate constraints at parameter itself
 					ValueContext<T, Object> valueContext = ValueContext.getLocalExecutionContext(
@@ -1016,9 +1013,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 
 			Object value = parameterValues[i];
-			String parameterName = methodMetaDataOfDeclaringType.getParameterMetaData( i ).getParameterName();
+			ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( i );
+			String parameterName = parameterMetaData.getParameterName();
 
-			if ( isCascadeRequired( method, i ) && value != null ) {
+			if ( parameterMetaData.isCascading() && value != null ) {
 
 				ValueContext<Object, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext(
 						value, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
@@ -1112,9 +1110,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
-		Map<Class<?>, MethodMetaData> methodMetaDataByType = beanMetaData.getMetaDataForMethod( method )
-				.getMetaDataByDefiningType();
-		;
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		Map<Class<?>, MethodMetaData> methodMetaDataByType = methodMetaData.getMetaDataByDefiningType();
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1160,7 +1157,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		// cascaded validation if required
-		if ( isCascadeRequired( method ) && value != null ) {
+		if ( methodMetaData.isCascading() && value != null ) {
 
 			ValueContext<V, Object> cascadingvalueContext = ValueContext.getLocalExecutionContext(
 					value, PathImpl.createPathForMethodReturnValue( method )
@@ -1359,52 +1356,5 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return isReachable && isCascadable;
 	}
 
-	/**
-	 * Checks whether a cascaded validation is required for the given parameter
-	 * of the given method or not.
-	 *
-	 * @param method The method of interest.
-	 * @param parameterIndex The parameter of interest's index within the method's
-	 * parameter list.
-	 *
-	 * @return True, if a cascaded validation is required, false otherwise.
-	 */
-	private boolean isCascadeRequired(Method method, int parameterIndex) {
-
-		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
-		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method )
-				.getMetaDataByDefiningType();
-
-		for ( MethodMetaData oneMethodMetaData : methodMetaData.values() ) {
-			if ( oneMethodMetaData.getParameterMetaData( parameterIndex ).isCascading() ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Checks whether a cascaded validation is required when validating the
-	 * return value of of the given method or not.
-	 *
-	 * @param method The method of interest. parameter list.
-	 *
-	 * @return True, if a cascaded validation is required, false otherwise.
-	 */
-	private boolean isCascadeRequired(Method method) {
-
-		BeanMetaData<?> beanMetaData = getBeanMetaData( method.getDeclaringClass() );
-		Map<Class<?>, MethodMetaData> methodMetaData = beanMetaData.getMetaDataForMethod( method )
-				.getMetaDataByDefiningType();
-
-		for ( MethodMetaData oneMethodMetaData : methodMetaData.values() ) {
-			if ( oneMethodMetaData.isCascading() ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 }
 
