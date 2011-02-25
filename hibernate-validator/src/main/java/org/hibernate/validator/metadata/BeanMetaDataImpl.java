@@ -628,8 +628,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		for ( Method method : declaredMethods ) {
 
-			// HV-172
-			if ( Modifier.isStatic( method.getModifiers() ) || annotationIgnores.isIgnoreAnnotations( method ) ) {
+			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
+			// anyway and possibly hide the actual method with the same signature in the built meta model
+			if ( Modifier.isStatic( method.getModifiers() ) || annotationIgnores.isIgnoreAnnotations( method ) || method
+					.isSynthetic() ) {
 				continue;
 			}
 
