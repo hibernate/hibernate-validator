@@ -75,6 +75,9 @@ public class AggregatedMethodMetaDataTest {
 				parameterMetaData.get( 1 ).iterator().next().getDescriptor().getAnnotation().annotationType(),
 				NotNull.class
 		);
+
+		assertEquals( parameterMetaData.get( 0 ), methodMetaData.getParameterMetaData( 0 ) );
+		assertEquals( parameterMetaData.get( 1 ), methodMetaData.getParameterMetaData( 1 ) );
 	}
 
 	@Test
@@ -94,6 +97,8 @@ public class AggregatedMethodMetaDataTest {
 		assertTrue( parameterMetaData.get( 0 ).isConstrained() );
 		assertTrue( parameterMetaData.get( 0 ).isCascading() );
 		assertIterableSize( parameterMetaData.get( 0 ), 0 );
+
+		assertEquals( parameterMetaData.get( 0 ), methodMetaData.getParameterMetaData( 0 ) );
 	}
 
 	@Test

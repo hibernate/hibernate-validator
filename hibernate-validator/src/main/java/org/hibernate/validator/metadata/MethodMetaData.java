@@ -91,7 +91,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	 * interest.
 	 *
 	 * @return Meta data for the specified parameter. Will never be
-	 *         <code>null</code.>
+	 *         <code>null</code>.
 	 *
 	 * @throws IllegalArgumentException In case this method doesn't have a parameter with the
 	 * specified index.

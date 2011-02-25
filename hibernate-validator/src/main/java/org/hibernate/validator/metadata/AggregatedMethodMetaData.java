@@ -53,6 +53,28 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	}
 
 	/**
+	 * Returns meta data for the specified parameter of the represented method.
+	 *
+	 * @return Meta data for the specified parameter. Will never be
+	 *         <code>null</code>.
+	 */
+	public ParameterMetaData getParameterMetaData(int parameterIndex) {
+
+		//there may be at most one constrained method meta data in the hierarchy;
+		//if there is one, return this
+		for ( MethodMetaData oneMethod : metaDataByDefiningType.values() ) {
+
+			if ( oneMethod.hasParameterConstraints() ) {
+				return oneMethod.getParameterMetaData( parameterIndex );
+			}
+		}
+
+		// the given method is unconstrained, so return the parameter meta data
+		// for the given method itself
+		return metaDataByDefiningType.get( method.getDeclaringClass() ).getParameterMetaData( parameterIndex );
+	}
+
+	/**
 	 * Returns meta data for all parameters of the represented method.
 	 *
 	 * @return A list with parameter meta data. The length corresponds to the
