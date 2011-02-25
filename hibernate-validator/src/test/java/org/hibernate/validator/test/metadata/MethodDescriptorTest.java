@@ -117,7 +117,7 @@ public class MethodDescriptorTest {
 		assertEquals( methodDescriptor.getConstraintDescriptors().size(), 2 );
 	}
 
-	@Test
+	@Test(enabled = false, description = "Temporarily disabled due to HV-443")
 	public void testFindConstraintLookingAt() {
 
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );

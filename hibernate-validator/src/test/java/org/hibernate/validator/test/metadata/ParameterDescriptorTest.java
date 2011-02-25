@@ -76,7 +76,7 @@ public class ParameterDescriptorTest {
 		);
 	}
 
-	@Test
+	@Test(enabled = false, description = "Temporarily disabled due to HV-443")
 	public void testFindConstraintLookingAtLocalElement() {
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors =
