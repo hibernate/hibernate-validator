@@ -19,6 +19,8 @@ package org.hibernate.validator.method;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import org.hibernate.validator.method.metadata.TypeDescriptor;
+
 /**
  * <p>
  * Provides an API for method-level constraint validation, based on <a
