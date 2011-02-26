@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -90,10 +91,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Contains constrained related meta data for all methods of the type
 	 * represented by this bean meta data. Keyed by method, values are an
-	 * aggregated view on each method together with all the methods from
-	 * super-types which it overrides or implements.
+	 * aggregated view on each method together with all the methods from the
+	 * inheritance hierarchy with the same signature.
 	 */
-	private Map<Method, AggregatedMethodMetaData> methodMetaData = newHashMap();
+	private Map<Method, AggregatedMethodMetaData> methodMetaData;
 
 	/**
 	 * Contains meta data for all method's of this type (including the method's
@@ -102,6 +103,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * inheritance tree.
 	 */
 	private Set<MethodMetaData> allMethods = newHashSet();
+
+	/**
+	 * Builders used for gathering method meta data. Used only at construction
+	 * time.
+	 */
+	private Set<AggregatedMethodMetaData.Builder> methodMetaDataBuilders = newHashSet();
 
 	/**
 	 * List of cascaded members.
@@ -259,9 +266,34 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 		parameterConstraintDeclarationException = checkParameterConstraints();
 
+		methodMetaData = Collections.unmodifiableMap( buildMethodMetaData() );
+
 		// reset class members we don't need any longer
+		methodMetaDataBuilders = null;
 		allMethods = null;
 		this.constraintHelper = null;
+	}
+
+	/**
+	 * Builds up the method meta data for this type by invoking each builder in
+	 * {@link #methodMetaDataBuilders}.
+	 */
+	private Map<Method, AggregatedMethodMetaData> buildMethodMetaData() {
+
+		Map<Method, AggregatedMethodMetaData> theValue = newHashMap();
+
+		for ( AggregatedMethodMetaData.Builder oneBuilder : methodMetaDataBuilders ) {
+
+			AggregatedMethodMetaData aggregatedMethodMetaData = oneBuilder.build();
+
+			//register the aggregated meta data for each underlying method for a quick
+			//read access
+			for ( MethodMetaData oneMethodMetaData : aggregatedMethodMetaData.getAllMethodMetaData() ) {
+				theValue.put( oneMethodMetaData.getMethod(), aggregatedMethodMetaData );
+			}
+		}
+
+		return theValue;
 	}
 
 	/**
@@ -341,22 +373,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public AggregatedMethodMetaData getMetaDataForMethod(Method method) {
-
-		AggregatedMethodMetaData theValue = methodMetaData.get( method );
-
-		if ( theValue != null ) {
-			return theValue;
-		}
-
-		//maybe the given method is one not defined on the type represented by this bean
-		//meta data object but up in the hierarchy, so search using the method signature
-		for ( AggregatedMethodMetaData oneMethodMetaData : methodMetaData.values() ) {
-			if ( ReflectionHelper.haveSameSignature( method, oneMethodMetaData.getMethod() ) ) {
-				return oneMethodMetaData;
-			}
-		}
-
-		return null;
+		return methodMetaData.get( method );
 	}
 
 	public Set<AggregatedMethodMetaData> getAllMethodMetaData() {
@@ -478,10 +495,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	/**
 	 * <p>
-	 * Adds the given method meta data to the aggregated method meta data for
-	 * this method signature. In case no aggregated meta data exists yet for
-	 * this method signature, one will be created with the given method meta
-	 * data as base entry.
+	 * Adds the given method meta data to the aggregated method meta data
+	 * builder for this method signature. In case no aggregation builder exists
+	 * yet for this method signature, one will be created with the given method
+	 * meta data as base entry.
 	 * </p>
 	 * <p>
 	 * As the type hierarchy is traversed bottom-up when building the bean meta
@@ -494,20 +511,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private void addToAggregatedMetaData(MethodMetaData metaData) {
 
-		Method method = metaData.getMethod();
+		// add the given meta data to an existing aggregation builder ...
+		for ( Builder oneBuilder : methodMetaDataBuilders ) {
 
-		// add the given meta data to the existing aggregation ...
-		for ( AggregatedMethodMetaData oneAggregatedMetaData : methodMetaData.values() ) {
-
-			if ( ReflectionHelper.haveSameSignature( method, oneAggregatedMetaData.getMethod() ) ) {
-				oneAggregatedMetaData.addMetaData( metaData );
+			if ( oneBuilder.accepts( metaData ) ) {
+				oneBuilder.addMetaData( metaData );
 				return;
 			}
 		}
 
-		// ... or create a new aggregation
-		AggregatedMethodMetaData newMetaData = new AggregatedMethodMetaData( metaData );
-		methodMetaData.put( method, newMetaData );
+		// ... or create a new builder
+		Builder newBuilder = new AggregatedMethodMetaData.Builder( metaData );
+		methodMetaDataBuilders.add( newBuilder );
 	}
 
 	private void addCascadedMember(Member member) {

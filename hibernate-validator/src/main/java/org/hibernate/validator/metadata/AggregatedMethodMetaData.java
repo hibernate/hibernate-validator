@@ -18,17 +18,27 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
+
+import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
+ * <p>
  * An aggregated view of the constraint related meta data for a given method and
  * all the methods in the inheritance hierarchy which it overrides or
  * implements.
+ * </p>
+ * <p>
+ * Instances are retrieved by creating a {@link Builder} and adding all required
+ * {@link MethodMetaData} objects to it. Instances are read-only after creation.
+ * </p>
  *
  * @author Gunnar Morling
  */
@@ -36,21 +46,142 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 
 	private final Method method;
 
-	private final Map<Class<?>, MethodMetaData> metaDataByDefiningType = newHashMap();
+	private final Map<Class<?>, MethodMetaData> metaDataByDefiningType;
 
-	public AggregatedMethodMetaData(MethodMetaData metaData) {
+	private final boolean isCascading;
 
-		this.method = metaData.getMethod();
-		metaDataByDefiningType.put( metaData.getMethod().getDeclaringClass(), metaData );
+	private final boolean isConstrained;
+
+	private final List<BeanMetaConstraint<?, ? extends Annotation>> returnValueConstraints;
+
+	private final List<ParameterMetaData> parameterMetaData;
+
+	private AggregatedMethodMetaData(
+			Builder builder,
+			List<BeanMetaConstraint<?, ? extends Annotation>> returnValueConstraints,
+			List<ParameterMetaData> parameterMetaData) {
+
+		method = builder.method;
+		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
+		isCascading = builder.isCascading;
+		isConstrained = builder.isConstrained;
+
+		this.returnValueConstraints = Collections.unmodifiableList( returnValueConstraints );
+		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
+	}
+
+	/**
+	 * Creates new {@link AggregatedMethodMetaData} instances.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public static class Builder {
+
+		private final Method method;
+
+		private final Map<Class<?>, MethodMetaData> metaDataByDefiningType = newHashMap();
+
+		private boolean isCascading;
+
+		private boolean isConstrained;
+
+		/**
+		 * Creates a new builder based on the given method meta data.
+		 *
+		 * @param metaData The base method for this builder. This is the lowest
+		 * method with a given signature within a type hierarchy.
+		 */
+		public Builder(MethodMetaData metaData) {
+
+			method = metaData.getMethod();
+			metaDataByDefiningType.put( method.getDeclaringClass(), metaData );
+			isCascading = metaData.isCascading();
+			isConstrained = metaData.isConstrained();
+		}
+
+		/**
+		 * Whether the given method can be added to this builder or not. This is
+		 * the case if the given method has the same signature as this builder's
+		 * base method (and originates from the same type hierarchy, which
+		 * currently is not checked).
+		 *
+		 * @param metaData The method of interest.
+		 *
+		 * @return <code>True</code>, if the given method can be added to this
+		 *         builder, <code>false</code> otherwise.
+		 */
+		public boolean accepts(MethodMetaData metaData) {
+			return ReflectionHelper.haveSameSignature( method, metaData.getMethod() );
+		}
+
+		/**
+		 * Adds the given method to this builder. It must be checked with
+		 * {@link #accepts(MethodMetaData)} before, whether this is allowed or
+		 * not.
+		 *
+		 * @param metaData The meta data to add.
+		 */
+		public void addMetaData(MethodMetaData metaData) {
+
+			metaDataByDefiningType.put( metaData.getMethod().getDeclaringClass(), metaData );
+
+			isCascading = isCascading || metaData.isCascading();
+			isConstrained = isConstrained || metaData.isConstrained();
+		}
+
+		/**
+		 * Creates a new, read-only {@link AggregatedMethodMetaData} object from
+		 * this builder.
+		 *
+		 * @return An {@code AggregatedMethodMetaData} object
+		 */
+		public AggregatedMethodMetaData build() {
+			return new AggregatedMethodMetaData( this, collectReturnValueConstraints(), findParameterMetaData() );
+		}
+
+		/**
+		 * Collects all return value constraints from this builder's method
+		 * hierarchy.
+		 *
+		 * @return A list with all return value constraints.
+		 */
+		private List<BeanMetaConstraint<?, ? extends Annotation>> collectReturnValueConstraints() {
+
+			List<BeanMetaConstraint<?, ? extends Annotation>> theValue = newArrayList();
+
+			for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
+				for ( BeanMetaConstraint<?, ? extends Annotation> oneConstraint : oneMethodMetaData ) {
+					theValue.add( oneConstraint );
+				}
+			}
+
+			return theValue;
+		}
+
+		/**
+		 * Finds the one method from the underlying hierarchy with parameter
+		 * constraints. If no method in the hierarchy is parameter constrained,
+		 * the parameter meta data from this builder's base method is returned.
+		 *
+		 * @return The parameter meta data for this builder's method.
+		 */
+		private List<ParameterMetaData> findParameterMetaData() {
+
+			for ( MethodMetaData oneMethod : metaDataByDefiningType.values() ) {
+
+				if ( oneMethod.hasParameterConstraints() ) {
+					return oneMethod.getAllParameterMetaData();
+				}
+			}
+
+			return metaDataByDefiningType.get( method.getDeclaringClass() ).getAllParameterMetaData();
+		}
 	}
 
 	public Method getMethod() {
 		return method;
 	}
 
-	public void addMetaData(MethodMetaData metaData) {
-		metaDataByDefiningType.put( metaData.getMethod().getDeclaringClass(), metaData );
-	}
 
 	/**
 	 * Returns meta data for the specified parameter of the represented method.
@@ -59,19 +190,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	 *         <code>null</code>.
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
-
-		//there may be at most one constrained method meta data in the hierarchy;
-		//if there is one, return this
-		for ( MethodMetaData oneMethod : metaDataByDefiningType.values() ) {
-
-			if ( oneMethod.hasParameterConstraints() ) {
-				return oneMethod.getParameterMetaData( parameterIndex );
-			}
-		}
-
-		// the given method is unconstrained, so return the parameter meta data
-		// for the given method itself
-		return metaDataByDefiningType.get( method.getDeclaringClass() ).getParameterMetaData( parameterIndex );
+		return parameterMetaData.get( parameterIndex );
 	}
 
 	/**
@@ -83,19 +202,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	 *         parameterless method), but never <code>null</code>.
 	 */
 	public List<ParameterMetaData> getAllParameterMetaData() {
-
-		//there may be at most one constrained method meta data in the hierarchy;
-		//if there is one, return this
-		for ( MethodMetaData oneMethod : metaDataByDefiningType.values() ) {
-
-			if ( oneMethod.hasParameterConstraints() ) {
-				return oneMethod.getAllParameterMetaData();
-			}
-		}
-
-		// the given method is unconstrained, so return the parameter meta data
-		// for the given method itself
-		return metaDataByDefiningType.get( method.getDeclaringClass() ).getAllParameterMetaData();
+		return parameterMetaData;
 	}
 
 	/**
@@ -108,14 +215,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	 *         performed, <code>false</code> otherwise.
 	 */
 	public boolean isCascading() {
-
-		for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
-			if ( oneMethodMetaData.isCascading() ) {
-				return true;
-			}
-		}
-
-		return false;
+		return isCascading;
 	}
 
 	/**
@@ -126,14 +226,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean isConstrained() {
-
-		for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
-			if ( oneMethodMetaData.isConstrained() ) {
-				return true;
-			}
-		}
-
-		return false;
+		return isConstrained;
 	}
 
 	/**
@@ -151,6 +244,10 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 		return metaDataByDefiningType.get( method.getDeclaringClass() );
 	}
 
+	public Iterable<MethodMetaData> getAllMethodMetaData() {
+		return metaDataByDefiningType.values();
+	}
+
 	/**
 	 * TODO GM: If possible remove; I think, this shouldn't be required by clients.
 	 */
@@ -163,16 +260,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	 * An iterator with the return value constraints of the represented method.
 	 */
 	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {
-
-		List<BeanMetaConstraint<?, ? extends Annotation>> theValue = newArrayList();
-
-		for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
-			for ( BeanMetaConstraint<?, ? extends Annotation> oneConstraint : oneMethodMetaData ) {
-				theValue.add( oneConstraint );
-			}
-		}
-
-		return theValue.iterator();
+		return returnValueConstraints.iterator();
 	}
 
 	@Override
