@@ -66,7 +66,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 		boolean foundParameterConstraint = false;
 
 		for ( ParameterMetaData oneParameter : parameterMetaData ) {
-			if ( oneParameter.isCascading() || oneParameter.iterator().hasNext() ) {
+			if ( oneParameter.isConstrained() ) {
 				foundParameterConstraint = true;
 				break;
 			}
@@ -147,19 +147,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	 */
 	public boolean isConstrained() {
 
-		//is the return value constrained?
-		if ( isCascading || !constraints.isEmpty() ) {
-			return true;
-		}
-
-		//is one of the parameters constrained?
-		for ( ParameterMetaData oneParameter : parameterMetaData ) {
-			if ( oneParameter.isConstrained() ) {
-				return true;
-			}
-		}
-
-		return false;
+		return isCascading || !constraints.isEmpty() || hasParameterConstraints;
 	}
 
 	/**
