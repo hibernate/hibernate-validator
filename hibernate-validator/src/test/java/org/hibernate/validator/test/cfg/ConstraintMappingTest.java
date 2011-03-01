@@ -16,10 +16,14 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.GroupDefinitionException;
+import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -39,6 +43,8 @@ import org.hibernate.validator.cfg.defs.NotEmptyDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -53,6 +59,7 @@ import static org.testng.Assert.assertTrue;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ConstraintMappingTest {
 
@@ -291,6 +298,94 @@ public class ConstraintMappingTest {
 	}
 
 	@Test
+	public void testDefaultGroupSequenceProvider() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping
+				.type( Marathon.class )
+				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class )
+				.property( "name", METHOD )
+				.constraint( NotNullDef.class ).groups( Foo.class )
+				.property( "runners", METHOD )
+				.constraint( NotEmptyDef.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+
+		marathon.setName( "Stockholm Marathon" );
+		violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
+	}
+
+	@Test(expectedExceptions = GroupDefinitionException.class)
+	public void testDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping
+				.type( Marathon.class )
+				.defaultGroupSequence( Foo.class, Marathon.class )
+				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class )
+				.property( "name", METHOD )
+				.constraint( NotNullDef.class ).groups( Foo.class )
+				.property( "runners", METHOD )
+				.constraint( NotEmptyDef.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		validator.validate( new Marathon() );
+	}
+
+	@Test(expectedExceptions = GroupDefinitionException.class)
+	public void testProgrammaticDefaultGroupSequenceDefinitionOnClassWithGroupProviderAnnotation() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( B.class )
+				.defaultGroupSequence( Foo.class, B.class )
+				.property( "b", FIELD )
+				.constraint( NotNullDef.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		validator.validate( new B() );
+	}
+
+	@Test(expectedExceptions = GroupDefinitionException.class)
+	public void testProgrammaticDefaultGroupSequenceProviderDefinitionOnClassWithGroupSequenceAnnotation() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( A.class )
+				.defaultGroupSequenceProvider( ADefaultGroupSequenceProvider.class )
+				.property( "a", FIELD )
+				.constraint( NotNullDef.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		validator.validate( new A() );
+	}
+
+	@Test
 	public void testMultipleConstraintOfTheSameType() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
@@ -400,6 +495,34 @@ public class ConstraintMappingTest {
 	}
 
 	public interface Foo {
+	}
+
+	@GroupSequence( { Foo.class, A.class })
+	private static class A {
+		String a;
+	}
+
+	@GroupSequenceProvider(BDefaultGroupSequenceProvider.class)
+	private static class B {
+		String b;
+	}
+
+	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
+		public List<Class<?>> getValidationGroups(Marathon object) {
+			return Arrays.asList( Foo.class, Marathon.class );
+		}
+	}
+
+	public static class BDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
+		public List<Class<?>> getValidationGroups(B object) {
+			return Arrays.asList( Foo.class, B.class );
+		}
+	}
+
+	public static class ADefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
+		public List<Class<?>> getValidationGroups(A object) {
+			return Arrays.asList( Foo.class, A.class );
+		}
 	}
 }
 
