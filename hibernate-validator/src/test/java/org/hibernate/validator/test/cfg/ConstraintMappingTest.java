@@ -328,7 +328,7 @@ public class ConstraintMappingTest {
 	}
 
 	@Test(expectedExceptions = GroupDefinitionException.class)
-	public void testDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
+	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -350,7 +350,7 @@ public class ConstraintMappingTest {
 	}
 
 	@Test(expectedExceptions = GroupDefinitionException.class)
-	public void testProgrammaticDefaultGroupSequenceDefinitionOnClassWithGroupProviderAnnotation() {
+	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -368,7 +368,7 @@ public class ConstraintMappingTest {
 	}
 
 	@Test(expectedExceptions = GroupDefinitionException.class)
-	public void testProgrammaticDefaultGroupSequenceProviderDefinitionOnClassWithGroupSequenceAnnotation() {
+	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
 		ConstraintMapping mapping = new ConstraintMapping();
