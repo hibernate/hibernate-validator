@@ -58,6 +58,7 @@ import static org.hibernate.validator.util.ReflectionHelper.newInstance;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
@@ -154,6 +155,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				beanClass,
 				constraintHelper,
 				new ArrayList<Class<?>>(),
+				null,
 				new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>(),
 				new HashSet<Member>(),
 				new AnnotationIgnores(),
@@ -168,6 +170,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param beanClass The bean type for which to create the meta data
 	 * @param constraintHelper constraint helper
 	 * @param defaultGroupSequence programmatic/xml configured default group sequence (overrides annotations)
+	 * @param defaultGroupSequenceProvider programmatic configured default group sequence provider class (overrides annotations)
 	 * @param constraints programmatic/xml configured constraints
 	 * @param cascadedMembers programmatic/xml configured cascaded members
 	 * @param annotationIgnores in xml configured ignores for annotations
@@ -176,6 +179,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public BeanMetaDataImpl(Class<T> beanClass,
 							ConstraintHelper constraintHelper,
 							List<Class<?>> defaultGroupSequence,
+							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
 							Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints,
 							Set<Member> cascadedMembers,
 							AnnotationIgnores annotationIgnores,
@@ -193,6 +197,25 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		// set the default explicitly specified default group sequence after the discovery process is complete
 		if ( !defaultGroupSequence.isEmpty() ) {
 			setDefaultGroupSequence( defaultGroupSequence );
+		}
+
+		// set the default explicitly specified default group sequence provider after the discovery process is complete
+		if ( defaultGroupSequenceProvider != null ) {
+			//Note: this leaves space for ClassCastExceptions when invoking getValidationGroups()
+			//on a provider which actually is not parametrized with T; we better check whether the
+			//the specified provider actually is for type T in order to throw a clear exception
+			this.defaultGroupSequenceProvider = (DefaultGroupSequenceProvider<T>) newInstance(
+					defaultGroupSequenceProvider,
+					"the default group sequence provider"
+			);
+		}
+
+		// validates that programmatic/xml definition of default group sequence or default group sequence provider
+		// doesn't introduce illegal default group sequence definition.
+		if ( hasDefaultGroupSequenceProvider() && this.defaultGroupSequence.size() > 1 ) {
+			throw new GroupDefinitionException(
+					"Default Group sequence and default group sequence provider cannot be defined at the same time"
+			);
 		}
 
 		// add the explicitly configured constraints
@@ -494,7 +517,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		if ( groupSequenceProviderAnnotation != null ) {
-
 			//Note: this leaves space for ClassCastExceptions when invoking getValidationGroups()
 			//on a provider which actually is not parametrized with T; we better check whether the
 			//the specified provider actually is for type T in order to throw a clear exception
