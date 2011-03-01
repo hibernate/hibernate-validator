@@ -55,7 +55,7 @@ public final class ConstraintsForType {
 	/**
 	 * Adds a new constraint.
 	 *
-	 * @param definition The constraint definition class
+	 * @param definition The constraint definition class.
 	 *
 	 * @return A constraint definition class allowing to specify additional constraint parameters.
 	 */
@@ -72,17 +72,19 @@ public final class ConstraintsForType {
 	}
 
 	/**
-	 * Adds a new constraint in a generic way. The attributes of the constraint can later on be
-	 * set by invoking {@link GenericConstraintDef#addParameter(String, Object)}.
+	 * Adds a new constraint in a generic way.
+	 * <p>
+	 * The attributes of the constraint can later on be set by invoking
+	 * {@link GenericConstraintDef#addParameter(String, Object)}.
+	 * </p>
 	 *
-	 * @param <A> The annotation type of the constraint to add
-	 * @param definition The constraint to add
+	 * @param <A> The annotation type of the constraint to add.
+	 * @param definition The constraint to add.
 	 *
-	 * @return A generic constraint definition class allowing to specify additional constraint parameters
+	 * @return A generic constraint definition class allowing to specify additional constraint parameters.
 	 */
 	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
-
-		GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
+		final GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
 				beanClass, definition, property, elementType, mapping
 		);
 
@@ -91,13 +93,16 @@ public final class ConstraintsForType {
 	}
 
 	/**
-	 * Changes the property for which added constraints apply. Until this method is called constraints apply on
-	 * class level. After calling this method constraints apply on the specified property with the given access type.
+	 * Changes the property for which added constraints apply.
+	 * <p>
+	 * Until this method is called constraints apply on class level. After calling this method constraints
+	 * apply on the specified property with the given access type.
+	 * </p>
 	 *
-	 * @param property The property on which to apply the following constraints (Java Bean notation)
-	 * @param type The access type (field/property)
+	 * @param property The property on which to apply the following constraints (Java Bean notation).
+	 * @param type The access type (field/property).
 	 *
-	 * @return Returns itself for method chaining
+	 * @return Returns itself for method chaining.
 	 */
 	public ConstraintsForType property(String property, ElementType type) {
 		return new ConstraintsForType( beanClass, property, type, mapping );
@@ -135,9 +140,9 @@ public final class ConstraintsForType {
 	/**
 	 * Creates a new {@code ConstraintsForType} in order to define constraints on a new bean type.
 	 *
-	 * @param type the bean type
+	 * @param type The bean type.
 	 *
-	 * @return a new {@code ConstraintsForType} instance
+	 * @return Returns a new {@code ConstraintsForType} instance.
 	 */
 	public ConstraintsForType type(Class<?> type) {
 		return new ConstraintsForType( type, mapping );
