@@ -283,7 +283,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	 * @throws ConstraintDeclarationException In case the represented method has an illegal parameter
 	 * constraint.
 	 */
-	public void assertMethodParameterConstraintsCorrectness() throws ConstraintDeclarationException {
+	public void assertCorrectnessOfMethodParameterConstraints() throws ConstraintDeclarationException {
 
 		if ( parameterConstraintDeclarationException != null ) {
 			throw parameterConstraintDeclarationException;
