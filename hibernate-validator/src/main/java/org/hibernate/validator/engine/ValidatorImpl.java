@@ -55,7 +55,6 @@ import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
@@ -946,7 +945,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
 		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
-		Map<Class<?>, MethodMetaData> methodMetaDataByType = methodMetaData.getMetaDataByDefiningType();
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -967,35 +965,29 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 			int numberOfViolationsOfCurrentGroup = 0;
 
-			for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaDataByType.entrySet() ) {
+			for ( int i = 0; i < parameterValues.length; i++ ) {
 
-				for ( int i = 0; i < parameterValues.length; i++ ) {
+				//ignore this parameter if this validation is for a single parameter and this is not the right one
+				if ( validationContext.getParameterIndex() != null && !validationContext.getParameterIndex()
+						.equals( i ) ) {
+					continue;
+				}
 
-					//ignore this parameter if this validation is for a single parameter and this is not the right one
-					if ( validationContext.getParameterIndex() != null && !validationContext.getParameterIndex()
-							.equals( i ) ) {
-						continue;
-					}
+				Object value = parameterValues[i];
+				String parameterName = methodMetaData.getParameterMetaData( i ).getParameterName();
 
-					Object value = parameterValues[i];
-					String parameterName = methodMetaData.getParameterMetaData( i ).getParameterName();
+				// validate constraints at parameter itself
+				ValueContext<T, Object> valueContext = ValueContext.getLocalExecutionContext(
+						object, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
+				);
+				valueContext.setCurrentValidatedValue( value );
+				valueContext.setCurrentGroup( oneGroup );
 
-					// validate constraints at parameter itself
-					ValueContext<T, Object> valueContext = ValueContext.getLocalExecutionContext(
-							object, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
-					);
-					valueContext.setCurrentValidatedValue( value );
-					valueContext.setCurrentGroup( oneGroup );
-
-					ParameterMetaData parameterMetaData = constraintsOfOneClass.getValue()
-							.getParameterMetaData( valueContext.getParameterIndex() );
-
-					numberOfViolationsOfCurrentGroup += validateParameterForGroup(
-							validationContext, valueContext, parameterMetaData
-					);
-					if ( validationContext.shouldFailFast() ) {
-						return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
-					}
+				numberOfViolationsOfCurrentGroup += validateParameterForGroup(
+						validationContext, valueContext, methodMetaData.getParameterMetaData( i )
+				);
+				if ( validationContext.shouldFailFast() ) {
+					return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 				}
 			}
 
@@ -1112,7 +1104,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
 		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
-		Map<Class<?>, MethodMetaData> methodMetaDataByType = methodMetaData.getMetaDataByDefiningType();
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1140,15 +1131,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			valueContext.setCurrentValidatedValue( value );
 			valueContext.setCurrentGroup( oneGroup );
 
-			for ( Entry<Class<?>, MethodMetaData> constraintsOfOneClass : methodMetaDataByType.entrySet() ) {
-
-				numberOfViolationsOfCurrentGroup +=
-						validateReturnValueForGroup(
-								validationContext, valueContext, constraintsOfOneClass.getValue()
-						);
-				if ( validationContext.shouldFailFast() ) {
-					return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
-				}
+			numberOfViolationsOfCurrentGroup +=
+					validateReturnValueForGroup(
+							validationContext, valueContext, methodMetaData
+					);
+			if ( validationContext.shouldFailFast() ) {
+				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 			}
 
 			//stop processing after first group with errors occurred
@@ -1172,11 +1160,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext,
-												   ValueContext<T, V> valueContext, MethodMetaData constraintsOfOneClass) {
+												   ValueContext<T, V> valueContext, AggregatedMethodMetaData methodMetaData) {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintsOfOneClass ) {
+		for ( MetaConstraint<?, ? extends Annotation> metaConstraint : methodMetaData ) {
 
 			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 				continue;

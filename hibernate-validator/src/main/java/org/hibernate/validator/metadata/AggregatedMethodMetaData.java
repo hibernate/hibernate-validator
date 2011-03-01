@@ -361,14 +361,6 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	}
 
 	/**
-	 * TODO GM: If possible remove; I think, this shouldn't be required by clients.
-	 */
-	@Deprecated
-	public Map<Class<?>, MethodMetaData> getMetaDataByDefiningType() {
-		return metaDataByDefiningType;
-	}
-
-	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
 	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {
