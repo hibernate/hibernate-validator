@@ -25,24 +25,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**
  * Top level class for constraints configured via the programmatic API.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.om)
  */
 public class ConstraintMapping {
 	private final Map<Class<?>, List<ConstraintDef<?, ?>>> constraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
+	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
 
 	public ConstraintMapping() {
 		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?, ?>>>();
 		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
 		this.configuredClasses = new HashSet<Class<?>>();
 		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
+		this.defaultGroupSequenceProviders = new HashMap<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>>();
 	}
 
 	/**
@@ -99,6 +103,18 @@ public class ConstraintMapping {
 		}
 	}
 
+	/**
+	 * Returns the class of the default group sequence provider defined
+	 * for the given bean type.
+	 *
+	 * @param beanType The bean type.
+	 *
+	 * @return The default group sequence provider defined class or {@code null} if none.
+	 */
+	public final Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProvider(Class<?> beanType) {
+		return defaultGroupSequenceProviders.get( beanType );
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -126,6 +142,10 @@ public class ConstraintMapping {
 
 	protected final void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
+	}
+
+	protected final <T extends DefaultGroupSequenceProvider<?>> void addDefaultGroupSequenceProvider(Class<?> beanClass, Class<T> defaultGroupSequenceProviderClass) {
+		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
 	}
 
 	protected final void addConstraintConfig(ConstraintDef<?, ?> definition) {
