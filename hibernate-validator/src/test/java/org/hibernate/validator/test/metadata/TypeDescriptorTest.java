@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.test.metadata;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import javax.validation.Valid;
@@ -131,9 +130,8 @@ public class TypeDescriptorTest {
 	@Test
 	public void testGetConstraintsForMethod() throws Exception {
 
-		Method method = CustomerRepository.class.getMethod( "foo" );
 		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
-		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( method );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "foo" );
 
 		assertNotNull( methodDescriptor );
 	}
@@ -145,9 +143,8 @@ public class TypeDescriptorTest {
 	@Test
 	public void testGetConstraintsForOverriddenMethod() throws Exception {
 
-		Method method = CustomerRepository.class.getMethod( "foo" );
 		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
-		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( method );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "foo" );
 
 		assertNotNull( methodDescriptor );
 	}
@@ -160,9 +157,8 @@ public class TypeDescriptorTest {
 	@Test
 	public void testGetConstraintsForMethodFromBaseType() throws Exception {
 
-		Method method = CustomerRepository.class.getMethod( "qux" );
 		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
-		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( method );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "qux" );
 
 		assertNotNull( methodDescriptor );
 	}
@@ -170,9 +166,8 @@ public class TypeDescriptorTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testGetConstraintsForMethodFailsDueToUnknownMethod() throws Exception {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "zap" );
 		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
-		descriptor.getConstraintsForMethod( method );
+		descriptor.getConstraintsForMethod( "zap" );
 	}
 
 	@Test
@@ -205,7 +200,7 @@ public class TypeDescriptorTest {
 		Set<String> theValue = newHashSet();
 
 		for ( MethodDescriptor methodDescriptor : descriptors ) {
-			theValue.add( methodDescriptor.getMethod().getName() );
+			theValue.add( methodDescriptor.getMethodName() );
 		}
 
 		return theValue;

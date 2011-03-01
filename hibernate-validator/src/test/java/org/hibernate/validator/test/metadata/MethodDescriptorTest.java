@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.test.metadata;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.Min;
@@ -28,10 +27,8 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.test.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.metadata.CustomerRepositoryExt.CustomerExtension;
-import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.getMethodDescriptor;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
@@ -48,26 +45,7 @@ public class MethodDescriptorTest {
 	public void testGetMethod() throws Exception {
 
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
-		assertEquals( methodDescriptor.getMethod(), CustomerRepositoryExt.class.getMethod( "foo" ) );
-	}
-
-	/**
-	 * The descriptor is retrieved using foo() from the base type, but it
-	 * references foo() from the type represented by the type descriptor.
-	 */
-	@Test
-	public void testGetMethodForOverriddenMethod() throws Exception {
-
-		TypeDescriptor typeDescriptor = TestUtil.getMethodValidator()
-				.getConstraintsForType( CustomerRepositoryExt.class );
-		assertNotNull( typeDescriptor );
-
-		Method methodFromBaseType = CustomerRepository.class.getMethod( "foo" );
-		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		MethodDescriptor methodDescriptor = typeDescriptor.getConstraintsForMethod( methodFromBaseType );
-
-		assertNotNull( methodDescriptor );
-		assertEquals( methodDescriptor.getMethod(), method );
+		assertEquals( methodDescriptor.getMethodName(), "foo" );
 	}
 
 	@Test
@@ -157,6 +135,14 @@ public class MethodDescriptorTest {
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();
 		assertNotNull( parameterConstraints );
 		assertEquals( parameterConstraints.size(), 2 );
+
+		ParameterDescriptor parameterDescriptor1 = parameterConstraints.get( 0 );
+		assertEquals( parameterDescriptor1.getElementClass(), CharSequence.class );
+		assertFalse( parameterDescriptor1.hasConstraints() );
+
+		ParameterDescriptor parameterDescriptor2 = parameterConstraints.get( 1 );
+		assertEquals( parameterDescriptor2.getElementClass(), String.class );
+		assertTrue( parameterDescriptor2.hasConstraints() );
 	}
 
 	@Test

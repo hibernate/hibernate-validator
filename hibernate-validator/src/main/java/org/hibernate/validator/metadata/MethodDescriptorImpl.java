@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import org.hibernate.validator.method.metadata.MethodDescriptor;
@@ -43,8 +42,8 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		}
 	}
 
-	public Method getMethod() {
-		return methodMetaData.getMethod();
+	public String getMethodName() {
+		return methodMetaData.getMethod().getName();
 	}
 
 	public List<ParameterDescriptor> getParameterConstraints() {

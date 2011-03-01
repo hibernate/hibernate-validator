@@ -18,10 +18,8 @@ package org.hibernate.validator.test.util;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -125,19 +123,9 @@ public class TestUtil {
 
 	public static MethodDescriptor getMethodDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
 
-		Method method;
-
-		try {
-			method = clazz.getMethod( methodName, parameterTypes );
-		}
-		catch ( Exception e ) {
-			throw new RuntimeException(
-					"Couldn't retrieve a method object for method with name " + methodName + " and parameter types " + Arrays
-							.toString( parameterTypes ), e
-			);
-		}
-
-		MethodDescriptor methodDescriptor = getTypeDescriptor( clazz ).getConstraintsForMethod( method );
+		MethodDescriptor methodDescriptor = getTypeDescriptor( clazz ).getConstraintsForMethod(
+				methodName, parameterTypes
+		);
 		assertNotNull( methodDescriptor );
 
 		return methodDescriptor;

@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -89,7 +90,19 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		return theValue;
 	}
 
-	public MethodDescriptor getConstraintsForMethod(Method method) {
+	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
+
+		Method method;
+
+		try {
+			method = getMetaDataBean().getBeanClass().getMethod( methodName, parameterTypes );
+		}
+		catch ( Exception e ) {
+			throw new IllegalArgumentException(
+					"Could not retrieve a method object for the method name " + methodName + " and parameter types " + Arrays
+							.toString( parameterTypes ), e
+			);
+		}
 
 		AggregatedMethodMetaData methodMetaData = getMetaDataBean().getMetaDataForMethod( method );
 

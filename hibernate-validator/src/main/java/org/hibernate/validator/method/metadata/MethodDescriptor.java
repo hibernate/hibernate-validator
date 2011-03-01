@@ -16,24 +16,23 @@
  */
 package org.hibernate.validator.method.metadata;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.metadata.ElementDescriptor;
 
 /**
- * Describes a constrained method and the constraints associated with it.
+ * Describes a method and the constraints associated with it.
  *
  * @author Gunnar Morling
  */
 public interface MethodDescriptor extends ElementDescriptor {
 
 	/**
-	 * Returns the method represented by this descriptor.
+	 * Returns the name of the method represented by this descriptor.
 	 *
-	 * @return The method represented by this descriptor.
+	 * @return The name of the method represented by this descriptor.
 	 */
-	Method getMethod();
+	String getMethodName();
 
 	/**
 	 * <p>
@@ -41,11 +40,7 @@ public interface MethodDescriptor extends ElementDescriptor {
 	 * </p>
 	 * <p>
 	 * The size of this list corresponds with the number of this method's
-	 * parameters. If there are no constraints defined for a given parameter
-	 * (neither locally nor in the inheritance hierarchy) and this parameter is
-	 * also not annotated with {@link Valid} (neither locally nor in the
-	 * inheritance hierarchy), the returned list will contain <code>null</code>
-	 * at the position representing that parameter.
+	 * parameters.
 	 * </p>
 	 *
 	 * @return A list with descriptors for this method's parameters. An empty
@@ -55,8 +50,9 @@ public interface MethodDescriptor extends ElementDescriptor {
 
 	/**
 	 * Whether a cascaded validation for this method's return value shall be
-	 * performed or not. This is the case if this method is annotated with the
-	 * {@link Valid} annotation either locally or in the inheritance hierarchy.
+	 * performed or not. This is the case if this method is marked for a
+	 * cascaded validation (e.g. by annotating it with the {@link Valid}
+	 * annotation) either locally or in the inheritance hierarchy.
 	 *
 	 * @return <code>True</code>, if this method's return value shall be
 	 *         validated recursively, <code>false</code> otherwise.

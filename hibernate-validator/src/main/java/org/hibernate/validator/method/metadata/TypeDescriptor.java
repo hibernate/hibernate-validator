@@ -16,9 +16,7 @@
  */
 package org.hibernate.validator.method.metadata;
 
-import java.lang.reflect.Method;
 import java.util.Set;
-
 import javax.validation.Valid;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ElementDescriptor;
@@ -65,14 +63,18 @@ public interface TypeDescriptor extends ElementDescriptor {
 	/**
 	 * Returns a descriptor for the specified method.
 	 *
-	 * @param method The method of interest.
+	 * @param methodName The name of the method to retrieve a descriptor for.
+	 * @param parameterTypes The types of the parameters of the method to retrieve a
+	 * descriptor for, in the order as they are defined in the method
+	 * signature.
 	 *
 	 * @return A descriptor for the specified method. Will never be null.
 	 *
-	 * @throws IllegalArgumentException if method is null or is not a method of the type represented
-	 * by this descriptor.
+	 * @throws IllegalArgumentException if {@code methodName} is null or no method with the given
+	 * name and parameter types is defined on the type represented
+	 * by this descriptor or its super types.
 	 */
-	MethodDescriptor getConstraintsForMethod(Method method);
+	MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes);
 
 	/**
 	 * Returns a descriptor for the bean related constraints of this type.
