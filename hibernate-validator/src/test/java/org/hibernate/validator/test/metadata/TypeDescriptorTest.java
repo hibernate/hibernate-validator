@@ -35,6 +35,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -163,11 +164,18 @@ public class TypeDescriptorTest {
 		assertNotNull( methodDescriptor );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testGetConstraintsForMethodFailsDueToUnknownMethod() throws Exception {
+	@Test
+	public void testGetConstraintsForUnknownMethod() throws Exception {
 
 		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
-		descriptor.getConstraintsForMethod( "zap" );
+		assertNull( descriptor.getConstraintsForMethod( "zap" ) );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testGetConstraintsFailsForNullMethod() throws Exception {
+
+		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		descriptor.getConstraintsForMethod( null );
 	}
 
 	@Test

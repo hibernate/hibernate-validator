@@ -68,11 +68,11 @@ public interface TypeDescriptor extends ElementDescriptor {
 	 * descriptor for, in the order as they are defined in the method
 	 * signature.
 	 *
-	 * @return A descriptor for the specified method. Will never be null.
+	 * @return A descriptor for the specified method or <code>null</null>, if no method
+	 *         with the given name and parameter types is declared on the type represented
+	 *         by this descriptor or its super types.
 	 *
-	 * @throws IllegalArgumentException if {@code methodName} is null or no method with the given
-	 * name and parameter types is defined on the type represented
-	 * by this descriptor or its super types.
+	 * @throws IllegalArgumentException if {@code methodName} is null.
 	 */
 	MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes);
 

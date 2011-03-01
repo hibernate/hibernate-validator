@@ -17,13 +17,13 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
+import org.hibernate.validator.util.Contracts;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
@@ -92,27 +92,20 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 
+		Contracts.assertNotNull( methodName, "The method name must not be null" );
+
 		Method method;
 
 		try {
 			method = getMetaDataBean().getBeanClass().getMethod( methodName, parameterTypes );
 		}
+		//No method with the given name/parameter types exists on this type. To be consistent  
+		//with getConstraintsForProperty() this is signaled by simply returning null
 		catch ( Exception e ) {
-			throw new IllegalArgumentException(
-					"Could not retrieve a method object for the method name " + methodName + " and parameter types " + Arrays
-							.toString( parameterTypes ), e
-			);
+			return null;
 		}
 
-		AggregatedMethodMetaData methodMetaData = getMetaDataBean().getMetaDataForMethod( method );
-
-		if ( methodMetaData == null ) {
-			throw new IllegalArgumentException(
-					"No meta data for method " + method + " could be found on type " + getMetaDataBean().getBeanClass()
-			);
-		}
-
-		return new MethodDescriptorImpl( getMetaDataBean(), methodMetaData );
+		return new MethodDescriptorImpl( getMetaDataBean(), getMetaDataBean().getMetaDataForMethod( method ) );
 	}
 
 	public BeanDescriptor getBeanDescriptor() {
