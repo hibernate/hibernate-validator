@@ -21,6 +21,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.TYPE;
@@ -30,6 +31,7 @@ import static java.lang.annotation.ElementType.TYPE;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class ConstraintsForType {
 	private static final String EMPTY_PROPERTY = "";
@@ -115,6 +117,18 @@ public final class ConstraintsForType {
 	 */
 	public ConstraintsForType defaultGroupSequence(Class<?>... defaultGroupSequence) {
 		mapping.addDefaultGroupSequence( beanClass, Arrays.asList( defaultGroupSequence ) );
+		return this;
+	}
+
+	/**
+	 * Defines the default group sequence provider for the bean class of this instance.
+	 *
+	 * @param defaultGroupSequenceProviderClass The default group sequence provider class.
+	 *
+	 * @return Returns itself for method chaining.
+	 */
+	public <T extends DefaultGroupSequenceProvider<?>> ConstraintsForType defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
+		mapping.addDefaultGroupSequenceProvider( beanClass, defaultGroupSequenceProviderClass );
 		return this;
 	}
 
