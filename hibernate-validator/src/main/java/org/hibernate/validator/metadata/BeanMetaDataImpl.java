@@ -214,7 +214,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		// doesn't introduce illegal default group sequence definition.
 		if ( hasDefaultGroupSequenceProvider() && this.defaultGroupSequence.size() > 1 ) {
 			throw new GroupDefinitionException(
-					"Default Group sequence and default group sequence provider cannot be defined at the same time"
+					"Default group sequence and default group sequence provider cannot be defined at the same time"
 			);
 		}
 
