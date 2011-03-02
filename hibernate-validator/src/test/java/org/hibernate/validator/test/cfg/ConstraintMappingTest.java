@@ -327,7 +327,10 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
 	}
 
-	@Test(expectedExceptions = GroupDefinitionException.class)
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
+	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
@@ -349,7 +352,10 @@ public class ConstraintMappingTest {
 		validator.validate( new Marathon() );
 	}
 
-	@Test(expectedExceptions = GroupDefinitionException.class)
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
+	)
 	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
@@ -367,7 +373,10 @@ public class ConstraintMappingTest {
 		validator.validate( new B() );
 	}
 
-	@Test(expectedExceptions = GroupDefinitionException.class)
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
+	)
 	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 
