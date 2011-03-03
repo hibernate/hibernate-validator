@@ -68,7 +68,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		int processedValuesFromDescriptor = 0;
-		final Method[] declaredMethods = ReflectionHelper.getMethods( annotationType );
+		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : declaredMethods ) {
 			if ( descriptor.containsElement( m.getName() ) ) {
 				result.put( m.getName(), descriptor.valueOf( m.getName() ) );

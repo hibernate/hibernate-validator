@@ -254,7 +254,6 @@ public final class ReflectionHelper {
 		return member;
 	}
 
-
 	/**
 	 * Returns the type of the field of return type of a method.
 	 *
@@ -584,7 +583,7 @@ public final class ReflectionHelper {
 	 * Returns the method with the specified name or {@code null} if it does not exist.
 	 *
 	 * @param clazz The class to check.
-	 * @param methodName The property name.
+	 * @param methodName The method name.
 	 *
 	 * @return Returns the method with the specified property or {@code null}if it does not exist.
 	 */
@@ -607,7 +606,7 @@ public final class ReflectionHelper {
 	 *
 	 * @return Returns the declared methods for this class.
 	 */
-	public static Method[] getMethods(Class<?> clazz) {
+	public static Method[] getDeclaredMethods(Class<?> clazz) {
 		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
 		final Method[] methods;
 		if ( System.getSecurityManager() != null ) {
@@ -624,9 +623,9 @@ public final class ReflectionHelper {
 	 *
 	 * @param clazz The class for which to retrieve the methods.
 	 *
-	 * @return Returns the declared methods for this class.
+	 * @return Returns the methods for this class.
 	 */
-	public static Method[] getAllMethods(Class<?> clazz) {
+	public static Method[] getMethods(Class<?> clazz) {
 		GetMethods action = GetMethods.action( clazz );
 		final Method[] methods;
 		if ( System.getSecurityManager() != null ) {

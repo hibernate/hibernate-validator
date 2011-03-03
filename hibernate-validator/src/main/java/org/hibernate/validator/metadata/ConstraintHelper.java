@@ -287,7 +287,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
-		final Method[] methods = ReflectionHelper.getMethods( annotationType );
+		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) ) {
 				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";

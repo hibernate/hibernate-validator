@@ -294,7 +294,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
-		final Method[] declaredMethods = ReflectionHelper.getMethods( annotation.annotationType() );
+		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotation.annotationType() );
 		Map<String, Object> parameters = new HashMap<String, Object>( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
 			try {
@@ -327,7 +327,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
-		final Method[] methods = ReflectionHelper.getMethods( annotationType );
+		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
 				addOverrideAttributes(

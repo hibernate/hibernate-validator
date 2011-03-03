@@ -51,7 +51,7 @@ import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.ReflectionHelper.newInstance;
-import static org.hibernate.validator.util.ReflectionHelper.getAllMethods;
+import static org.hibernate.validator.util.ReflectionHelper.getMethods;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -582,7 +582,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		final Method[] declaredMethods = ReflectionHelper.getMethods( clazz );
+		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( clazz );
 
 		for ( Method method : declaredMethods ) {
 
@@ -881,7 +881,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@SuppressWarnings("unchecked")
 	private <U extends DefaultGroupSequenceProvider<?>> DefaultGroupSequenceProvider<T> newGroupSequenceProviderInstance(Class<U> providerClass) {
-		Method[] providerMethods = getAllMethods( providerClass );
+		Method[] providerMethods = getMethods( providerClass );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 
