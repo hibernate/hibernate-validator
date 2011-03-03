@@ -494,16 +494,15 @@ public final class ReflectionHelper {
 		return map.get( key );
 	}
 
-
 	/**
-	 * Returns the field with the specified name or <code>null</code> if it does not exist.
+	 * Returns the declared field with the specified name or {@code null} if it does not exist.
 	 *
 	 * @param clazz The class to check.
 	 * @param fieldName The field name.
 	 *
-	 * @return Returns the field with the specified name or <code>null</code> if it does not exist.
+	 * @return Returns the declared field with the specified name or {@code null} if it does not exist.
 	 */
-	public static Field getField(Class<?> clazz, String fieldName) {
+	public static Field getDeclaredField(Class<?> clazz, String fieldName) {
 		GetDeclaredField action = GetDeclaredField.action( clazz, fieldName );
 		final Field field;
 		if ( System.getSecurityManager() != null ) {
@@ -516,15 +515,15 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the specified class contains a field with the given name.
+	 * Checks whether the specified class contains a declared field with the given name.
 	 *
 	 * @param clazz The class to check.
 	 * @param fieldName The field name.
 	 *
 	 * @return Returns {@code true} if the field exists, {@code false} otherwise.
 	 */
-	public static boolean containsField(Class<?> clazz, String fieldName) {
-		return getField( clazz, fieldName ) != null;
+	public static boolean containsDeclaredField(Class<?> clazz, String fieldName) {
+		return getDeclaredField( clazz, fieldName ) != null;
 	}
 
 	/**
@@ -534,7 +533,7 @@ public final class ReflectionHelper {
 	 *
 	 * @return Returns the fields for this class.
 	 */
-	public static Field[] getFields(Class<?> clazz) {
+	public static Field[] getDeclaredFields(Class<?> clazz) {
 		GetDeclaredFields action = GetDeclaredFields.action( clazz );
 		final Field[] fields;
 		if ( System.getSecurityManager() != null ) {

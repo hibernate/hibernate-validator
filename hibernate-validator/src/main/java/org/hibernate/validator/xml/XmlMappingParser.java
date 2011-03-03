@@ -211,11 +211,11 @@ public class XmlMappingParser {
 			else {
 				fieldNames.add( fieldName );
 			}
-			final boolean containsField = ReflectionHelper.containsField( beanClass, fieldName );
+			final boolean containsField = ReflectionHelper.containsDeclaredField( beanClass, fieldName );
 			if ( !containsField ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the fieldType  " + fieldName );
 			}
-			final Field field = ReflectionHelper.getField( beanClass, fieldName );
+			final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
 
 			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.isIgnoreAnnotations() == null ? false : fieldType.isIgnoreAnnotations();

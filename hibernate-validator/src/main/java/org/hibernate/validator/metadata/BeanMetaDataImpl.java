@@ -525,7 +525,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		final Field[] fields = ReflectionHelper.getFields( clazz );
+		final Field[] fields = ReflectionHelper.getDeclaredFields( clazz );
 		for ( Field field : fields ) {
 			addToPropertyNameList( field );
 
