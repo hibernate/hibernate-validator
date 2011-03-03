@@ -63,7 +63,10 @@ import static org.testng.Assert.assertTrue;
  */
 public class ConstraintMappingTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test(
+			expectedExceptions = IllegalArgumentException.class,
+			expectedExceptionsMessageRegExp = "The mapping cannot be null."
+	)
 	public void testNullConstraintMapping() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		config.addMapping( (ConstraintMapping) null );
@@ -329,6 +332,32 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* has the wrong type"
+	)
+	public void testDefaultGroupSequenceProviderDefinedWithWrongType() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping
+				.type( Marathon.class )
+				.defaultGroupSequenceProvider( BDefaultGroupSequenceProvider.class )
+				.property( "name", METHOD )
+				.constraint( NotNullDef.class ).groups( Foo.class )
+				.property( "runners", METHOD )
+				.constraint( NotEmptyDef.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Marathon marathon = new Marathon();
+
+		validator.validate( marathon );
+	}
+
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
 			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
@@ -466,7 +495,10 @@ public class ConstraintMappingTest {
 		assertNumberOfViolations( violations, 0 );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test(
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = "Null is not a valid bean type"
+	)
 	public void testNullBean() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( null )
@@ -503,7 +535,7 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );
 	}
 
-	public interface Foo {
+	private interface Foo {
 	}
 
 	@GroupSequence( { Foo.class, A.class })

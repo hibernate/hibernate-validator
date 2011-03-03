@@ -18,6 +18,7 @@ package org.hibernate.validator.test.group;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -54,16 +55,28 @@ public class DefaultGroupSequenceProviderTest {
 		methodValidator = validator.unwrap( MethodValidator.class );
 	}
 
-	@Test(expectedExceptions = GroupDefinitionException.class)
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
+	)
 	public void testNullProviderDefaultGroupSequence() {
-		Set<ConstraintViolation<A>> violations = validator.validate( new A() );
-
-		assertNumberOfViolations( violations, 1 );
+		validator.validate( new A() );
 	}
 
-	@Test(expectedExceptions = GroupDefinitionException.class)
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
+	)
 	public void testNotValidProviderDefaultGroupSequenceDefinition() {
 		validator.validate( new B() );
+	}
+
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* has the wrong type"
+	)
+	public void testDefinitionOfDefaultGroupSequenceProviderWithWrongType() {
+		validator.validate( new D() );
 	}
 
 	@Test
@@ -123,7 +136,7 @@ public class DefaultGroupSequenceProviderTest {
 	}
 
 	@GroupSequenceProvider(NullGroupSequenceProvider.class)
-	static class A {
+	private static class A {
 		@NotNull
 		String c;
 
@@ -132,11 +145,10 @@ public class DefaultGroupSequenceProviderTest {
 	}
 
 	@GroupSequenceProvider(InvalidGroupSequenceProvider.class)
-	static class B {
-
+	private static class B {
 	}
 
-	static interface C {
+	private static interface C {
 
 		@NotNull(message = "may not be null")
 		@Length(min = 10, max = 20, groups = TestGroup.class, message = "length must be between {min} and {max}")
@@ -144,25 +156,24 @@ public class DefaultGroupSequenceProviderTest {
 	}
 
 	@GroupSequenceProvider(MethodGroupSequenceProvider.class)
-	static class CImpl implements C {
+	private static class CImpl implements C {
 
 		public String foo(String param) {
 			return param;
 		}
 	}
 
-	interface TestGroup {
+	@GroupSequenceProvider(NullGroupSequenceProvider.class)
+	private static class D {
+	}
 
+	private interface TestGroup {
 	}
 
 	public static class MethodGroupSequenceProvider implements DefaultGroupSequenceProvider<CImpl> {
 
 		public List<Class<?>> getValidationGroups(CImpl object) {
-			List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
-			defaultGroupSequence.add( TestGroup.class );
-			defaultGroupSequence.add( CImpl.class );
-
-			return defaultGroupSequence;
+			return Arrays.asList( TestGroup.class, CImpl.class );
 		}
 	}
 
@@ -171,7 +182,6 @@ public class DefaultGroupSequenceProviderTest {
 		public List<Class<?>> getValidationGroups(A object) {
 			return null;
 		}
-
 	}
 
 	public static class InvalidGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
