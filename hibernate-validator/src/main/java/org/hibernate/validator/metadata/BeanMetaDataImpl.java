@@ -51,6 +51,7 @@ import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.ReflectionHelper.newInstance;
+import static org.hibernate.validator.util.ReflectionHelper.getAllMethods;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -201,13 +202,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		// set the default explicitly specified default group sequence provider after the discovery process is complete
 		if ( defaultGroupSequenceProvider != null ) {
-			//Note: this leaves space for ClassCastExceptions when invoking getValidationGroups()
-			//on a provider which actually is not parametrized with T; we better check whether the
-			//the specified provider actually is for type T in order to throw a clear exception
-			this.defaultGroupSequenceProvider = (DefaultGroupSequenceProvider<T>) newInstance(
-					defaultGroupSequenceProvider,
-					"the default group sequence provider"
-			);
+			this.defaultGroupSequenceProvider = newGroupSequenceProviderInstance( defaultGroupSequenceProvider );
 		}
 
 		// validates that programmatic/xml definition of default group sequence or default group sequence provider
@@ -517,12 +512,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		if ( groupSequenceProviderAnnotation != null ) {
-			//Note: this leaves space for ClassCastExceptions when invoking getValidationGroups()
-			//on a provider which actually is not parametrized with T; we better check whether the
-			//the specified provider actually is for type T in order to throw a clear exception
-			defaultGroupSequenceProvider = (DefaultGroupSequenceProvider<T>) newInstance(
-					groupSequenceProviderAnnotation.value(), "the default group sequence provider"
-			);
+			defaultGroupSequenceProvider = newGroupSequenceProviderInstance( groupSequenceProviderAnnotation.value() );
 		}
 		else if ( groupSequenceAnnotation != null ) {
 			groupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
@@ -887,6 +877,26 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		return theValue;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <U extends DefaultGroupSequenceProvider<?>> DefaultGroupSequenceProvider<T> newGroupSequenceProviderInstance(Class<U> providerClass) {
+		Method[] providerMethods = getAllMethods( providerClass );
+		for ( Method method : providerMethods ) {
+			Class<?>[] paramTypes = method.getParameterTypes();
+
+			if ( "getValidationGroups".equals( method.getName() ) && paramTypes.length == 1
+					&& !method.isBridge() && beanClass.isAssignableFrom( paramTypes[0] ) ) {
+
+				return (DefaultGroupSequenceProvider<T>) newInstance(
+						providerClass, "the default group sequence provider"
+				);
+			}
+		}
+
+		throw new GroupDefinitionException(
+				"The default group sequence provider defined for " + beanClass.getName() + " has the wrong type"
+		);
 	}
 
 	@Override

@@ -47,6 +47,7 @@ import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.util.privilegedactions.GetMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
+import org.hibernate.validator.util.privilegedactions.GetMethods;
 import org.hibernate.validator.util.privilegedactions.LoadClass;
 import org.hibernate.validator.util.privilegedactions.NewInstance;
 import org.hibernate.validator.util.privilegedactions.SetAccessibility;
@@ -57,6 +58,7 @@ import org.hibernate.validator.util.privilegedactions.SetAccessibility;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class ReflectionHelper {
 	private static String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
@@ -599,14 +601,33 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Returns the methods of the specified class.
+	 * Returns the declared methods of the specified class.
 	 *
 	 * @param clazz The class for which to retrieve the methods.
 	 *
-	 * @return Returns the methods for this class.
+	 * @return Returns the declared methods for this class.
 	 */
 	public static Method[] getMethods(Class<?> clazz) {
 		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
+		final Method[] methods;
+		if ( System.getSecurityManager() != null ) {
+			methods = AccessController.doPrivileged( action );
+		}
+		else {
+			methods = action.run();
+		}
+		return methods;
+	}
+
+	/**
+	 * Returns the methods of the specified class (include inherited methods).
+	 *
+	 * @param clazz The class for which to retrieve the methods.
+	 *
+	 * @return Returns the declared methods for this class.
+	 */
+	public static Method[] getAllMethods(Class<?> clazz) {
+		GetMethods action = GetMethods.action( clazz );
 		final Method[] methods;
 		if ( System.getSecurityManager() != null ) {
 			methods = AccessController.doPrivileged( action );
