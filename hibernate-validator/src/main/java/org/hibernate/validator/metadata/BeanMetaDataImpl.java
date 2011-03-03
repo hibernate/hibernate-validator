@@ -499,7 +499,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Checks whether there is a default group sequence defined for this class.
 	 * See HV-113.
 	 */
-	@SuppressWarnings("unchecked")
 	private void initDefaultGroupSequence() {
 		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
@@ -882,11 +881,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@SuppressWarnings("unchecked")
 	private <U extends DefaultGroupSequenceProvider<?>> DefaultGroupSequenceProvider<T> newGroupSequenceProviderInstance(Class<U> providerClass) {
 		Method[] providerMethods = getMethods( providerClass );
+
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
-
-			if ( "getValidationGroups".equals( method.getName() ) && paramTypes.length == 1
-					&& !method.isBridge() && beanClass.isAssignableFrom( paramTypes[0] ) ) {
+			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
+					&& paramTypes.length == 1 && beanClass.isAssignableFrom( paramTypes[0] ) ) {
 
 				return (DefaultGroupSequenceProvider<T>) newInstance(
 						providerClass, "the default group sequence provider"
