@@ -141,10 +141,12 @@ public class ConstraintMapping {
 	}
 
 	protected final void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
+		configuredClasses.add( beanClass );
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
 	}
 
 	protected final <T extends DefaultGroupSequenceProvider<?>> void addDefaultGroupSequenceProvider(Class<?> beanClass, Class<T> defaultGroupSequenceProviderClass) {
+		configuredClasses.add( beanClass );
 		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
 	}
 

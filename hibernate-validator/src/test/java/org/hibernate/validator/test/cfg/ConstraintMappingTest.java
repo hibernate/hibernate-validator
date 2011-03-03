@@ -340,20 +340,14 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
 				.type( Marathon.class )
-				.defaultGroupSequenceProvider( BDefaultGroupSequenceProvider.class )
-				.property( "name", METHOD )
-				.constraint( NotNullDef.class ).groups( Foo.class )
-				.property( "runners", METHOD )
-				.constraint( NotEmptyDef.class );
+				.defaultGroupSequenceProvider( BDefaultGroupSequenceProvider.class );
 
 		config.addMapping( mapping );
 
 		ValidatorFactory factory = config.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		Marathon marathon = new Marathon();
-
-		validator.validate( marathon );
+		validator.validate( new Marathon() );
 	}
 
 	@Test(
@@ -535,6 +529,40 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );
 	}
 
+	/**
+	 * HV-444
+	 */
+	@Test
+	public void testDefaultGroupSequenceDefinedOnClassWithNoConstraints() {
+		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping
+				.type( Marathon.class )
+				.property( "name", METHOD )
+				.constraint( NotNullDef.class ).groups( Foo.class )
+				.property( "runners", METHOD )
+				.constraint( NotEmptyDef.class )
+				.type( ExtendedMarathon.class )
+				.defaultGroupSequence( Foo.class, ExtendedMarathon.class );
+
+		config.addMapping( mapping );
+
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		ExtendedMarathon extendedMarathon = new ExtendedMarathon();
+
+		Set<ConstraintViolation<ExtendedMarathon>> violations = validator.validate( extendedMarathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "may not be null" );
+
+		extendedMarathon.setName( "Stockholm Marathon" );
+		violations = validator.validate( extendedMarathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
+	}
+
 	private interface Foo {
 	}
 
@@ -546,6 +574,9 @@ public class ConstraintMappingTest {
 	@GroupSequenceProvider(BDefaultGroupSequenceProvider.class)
 	private static class B {
 		String b;
+	}
+
+	private static class ExtendedMarathon extends Marathon {
 	}
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
