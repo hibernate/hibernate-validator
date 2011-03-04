@@ -55,7 +55,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithConstrainedParameter() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -84,7 +84,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithCascadedParameter() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "saveCustomer", Customer.class );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -105,7 +105,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithConstrainedReturnValue() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -123,7 +123,7 @@ public class AggregatedMethodMetaDataTest {
 	public void returnValueConstraintsAddUpInHierarchy() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -135,7 +135,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithCascadedReturnValue() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );
@@ -147,7 +147,7 @@ public class AggregatedMethodMetaDataTest {
 	public void unconstrainedMethod() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "updateCustomer", Customer.class );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );

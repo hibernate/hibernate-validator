@@ -52,7 +52,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "baz" );
-		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -69,7 +69,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepositoryImpl> metaData = setupBeanMetaData( CustomerRepositoryImpl.class );
 
 		Method method = CustomerRepositoryImpl.class.getMethod( "baz" );
-		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertIterableSize( methodMetaData, 1 );
 		assertEquals( methodMetaData.getMethod(), method );
@@ -88,7 +88,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
-		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );

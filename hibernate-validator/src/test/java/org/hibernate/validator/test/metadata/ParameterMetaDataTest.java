@@ -55,7 +55,7 @@ public class ParameterMetaDataTest {
 	public void constrainedParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 1 );
 
@@ -74,7 +74,7 @@ public class ParameterMetaDataTest {
 	public void cascadingParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -90,7 +90,7 @@ public class ParameterMetaDataTest {
 	public void unconstrainedParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -103,7 +103,7 @@ public class ParameterMetaDataTest {
 	public void illegalParameterIndexCausesException() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "foo" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method ).getMetaDataForMethod( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
 		methodMetaData.getParameterMetaData( 0 );
 	}

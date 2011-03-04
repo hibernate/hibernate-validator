@@ -105,7 +105,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 			return null;
 		}
 
-		return new MethodDescriptorImpl( getMetaDataBean(), getMetaDataBean().getMetaDataForMethod( method ) );
+		return new MethodDescriptorImpl( getMetaDataBean(), getMetaDataBean().getMetaDataFor( method ) );
 	}
 
 	public BeanDescriptor getBeanDescriptor() {

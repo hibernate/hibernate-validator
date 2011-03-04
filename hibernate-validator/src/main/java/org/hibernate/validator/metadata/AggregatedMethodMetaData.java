@@ -352,7 +352,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	 * @return The meta data for the given method or null if this aggregation
 	 *         doesn't contain any meta data for that method.
 	 */
-	public MethodMetaData getMetaDataForMethod(Method method) {
+	public MethodMetaData getSingleMetaDataFor(Method method) {
 		return metaDataByDefiningType.get( method.getDeclaringClass() );
 	}
 

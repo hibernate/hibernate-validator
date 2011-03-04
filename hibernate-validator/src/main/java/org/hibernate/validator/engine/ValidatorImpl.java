@@ -903,7 +903,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
 
 		//assert that there are no illegal method parameter constraints
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( validationContext.getMethod() );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getMethod() );
 		methodMetaData.assertCorrectnessOfMethodParameterConstraints();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
@@ -944,7 +944,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1103,7 +1103,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( method );
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in

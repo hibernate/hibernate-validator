@@ -303,7 +303,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableList( constraintList );
 	}
 
-	public AggregatedMethodMetaData getMetaDataForMethod(Method method) {
+	public AggregatedMethodMetaData getMetaDataFor(Method method) {
 		return methodMetaData.get( method );
 	}
 
@@ -406,7 +406,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
 
-		addToAggregatedMetaData( methodMetaData );
+		addToBuilder( methodMetaData );
 
 		if ( ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) ) {
 
@@ -439,7 +439,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 *
 	 * @param metaData The method meta data to add.
 	 */
-	private void addToAggregatedMetaData(MethodMetaData metaData) {
+	private void addToBuilder(MethodMetaData metaData) {
 
 		// add the given meta data to an existing aggregation builder ...
 		for ( Builder oneBuilder : methodMetaDataBuilders ) {
@@ -595,10 +595,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		BeanMetaDataImpl<?> cachedBeanMetaData = beanMetaDataCache.getBeanMetaData( clazz );
 
 		if ( cachedBeanMetaData != null ) {
-			AggregatedMethodMetaData cachedMethodMetaData = cachedBeanMetaData.getMetaDataForMethod( method );
+			AggregatedMethodMetaData cachedMethodMetaData = cachedBeanMetaData.getMetaDataFor( method );
 
 			if ( cachedMethodMetaData != null ) {
-				return cachedMethodMetaData.getMetaDataForMethod( method );
+				return cachedMethodMetaData.getSingleMetaDataFor( method );
 			}
 		}
 
