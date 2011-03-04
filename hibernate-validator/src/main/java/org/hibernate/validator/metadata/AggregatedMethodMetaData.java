@@ -18,16 +18,20 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * <p>
@@ -56,10 +60,21 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 
 	private final List<ParameterMetaData> parameterMetaData;
 
+	/**
+	 * A declaration exception in case this method contains any illegal method
+	 * parameter constraints. Such illegal parameter constraints shall not
+	 * hinder standard bean/property validation as defined by the Bean
+	 * Validation API. Therefore this exception is created when building up the
+	 * meta data for validated beans, but it will only be thrown by the
+	 * validation engine when actually a method validation is performed.
+	 */
+	private final ConstraintDeclarationException parameterConstraintDeclarationException;
+
 	private AggregatedMethodMetaData(
 			Builder builder,
 			List<BeanMetaConstraint<?, ? extends Annotation>> returnValueConstraints,
-			List<ParameterMetaData> parameterMetaData) {
+			List<ParameterMetaData> parameterMetaData,
+			ConstraintDeclarationException parameterConstraintDeclarationException) {
 
 		method = builder.method;
 		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
@@ -68,6 +83,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 
 		this.returnValueConstraints = Collections.unmodifiableList( returnValueConstraints );
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
+		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
 	}
 
 	/**
@@ -136,7 +152,9 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 		 * @return An {@code AggregatedMethodMetaData} object
 		 */
 		public AggregatedMethodMetaData build() {
-			return new AggregatedMethodMetaData( this, collectReturnValueConstraints(), findParameterMetaData() );
+			return new AggregatedMethodMetaData(
+					this, collectReturnValueConstraints(), findParameterMetaData(), checkParameterConstraints()
+			);
 		}
 
 		/**
@@ -175,6 +193,100 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 			}
 
 			return metaDataByDefiningType.get( method.getDeclaringClass() ).getAllParameterMetaData();
+		}
+
+		/**
+		 * Checks that there are no invalid parameter constraints defined at
+		 * this builder's methods.
+		 *
+		 * @return A {@link ConstraintDeclarationException} describing the first
+		 *         illegal method parameter constraint found or {@code null}, if
+		 *         the methods of this builder have no such illegal constraints.
+		 */
+		private ConstraintDeclarationException checkParameterConstraints() {
+
+			Collection<MethodMetaData> allMethods = metaDataByDefiningType.values();
+			Set<MethodMetaData> methodsWithParameterConstraints = getMethodsWithParameterConstraints( allMethods );
+
+			if ( methodsWithParameterConstraints.isEmpty() ) {
+				return null;
+			}
+
+			if ( methodsWithParameterConstraints.size() > 1 ) {
+				return new ConstraintDeclarationException(
+						"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, " +
+								"but there are parameter constraints defined at all of the following overridden methods: " +
+								methodsWithParameterConstraints
+				);
+			}
+
+			MethodMetaData constrainedMethod = methodsWithParameterConstraints.iterator().next();
+
+			for ( MethodMetaData oneMethod : allMethods ) {
+
+				if ( !constrainedMethod.getMethod()
+						.getDeclaringClass()
+						.isAssignableFrom( oneMethod.getMethod().getDeclaringClass() ) ) {
+					return new ConstraintDeclarationException(
+							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
+									"The following method itself has no parameter constraints but it is not defined on a sub-type of " +
+									constrainedMethod.getMethod().getDeclaringClass() + ": " + oneMethod
+					);
+				}
+			}
+
+			return null;
+		}
+
+		/**
+		 * Returns a set with those methods from the given pile of methods that have
+		 * at least one constrained parameter or at least one parameter annotated
+		 * with {@link Valid}.
+		 *
+		 * @param methods The methods to search in.
+		 *
+		 * @return A set with constrained methods. May be empty, but never null.
+		 */
+		private Set<MethodMetaData> getMethodsWithParameterConstraints(Iterable<MethodMetaData> methods) {
+			Set<MethodMetaData> theValue = newHashSet();
+
+			for ( MethodMetaData oneMethod : methods ) {
+				if ( oneMethod.hasParameterConstraints() ) {
+					theValue.add( oneMethod );
+				}
+			}
+
+			return theValue;
+		}
+	}
+
+	/**
+	 * <p>
+	 * Checks the parameter constraints of this method for correctness.
+	 * </p>
+	 * <p>
+	 * The following rules apply for this check:
+	 * </p>
+	 * <ul>
+	 * <li>Only the root method of an overridden method in an inheritance
+	 * hierarchy may be annotated with parameter constraints in order to avoid
+	 * the strengthening of a method's preconditions by additional parameter
+	 * constraints defined at sub-types. If the root method itself has no
+	 * parameter constraints, also no parameter constraints may be added in
+	 * sub-types.</li>
+	 * <li>If there are multiple root methods for an method in an inheritance
+	 * hierarchy (e.g. by implementing two interfaces defining the same method)
+	 * no parameter constraints for this method are allowed at all in order to
+	 * avoid a strengthening of a method's preconditions in parallel types.</li>
+	 * </ul>
+	 *
+	 * @throws ConstraintDeclarationException In case the represented method has an illegal parameter
+	 * constraint.
+	 */
+	public void assertMethodParameterConstraintsCorrectness() throws ConstraintDeclarationException {
+
+		if ( parameterConstraintDeclarationException != null ) {
+			throw parameterConstraintDeclarationException;
 		}
 	}
 

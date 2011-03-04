@@ -904,7 +904,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
 
 		//assert that there are no illegal method parameter constraints
-		beanMetaData.assertMethodParameterConstraintsCorrectness();
+		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataForMethod( validationContext.getMethod() );
+		methodMetaData.assertMethodParameterConstraintsCorrectness();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( object ) );

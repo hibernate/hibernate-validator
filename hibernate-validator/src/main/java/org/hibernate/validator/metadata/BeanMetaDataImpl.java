@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -52,8 +51,8 @@ import org.hibernate.validator.util.ReflectionHelper;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.util.ReflectionHelper.newInstance;
 import static org.hibernate.validator.util.ReflectionHelper.getMethods;
+import static org.hibernate.validator.util.ReflectionHelper.newInstance;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -97,14 +96,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<Method, AggregatedMethodMetaData> methodMetaData;
 
 	/**
-	 * Contains meta data for all method's of this type (including the method's
-	 * from its super types). Used only at construction time to determine whether
-	 * there are any illegal parameter constraints for overridden methods in an
-	 * inheritance tree.
-	 */
-	private Set<MethodMetaData> allMethods = newHashSet();
-
-	/**
 	 * Builders used for gathering method meta data. Used only at construction
 	 * time.
 	 */
@@ -143,16 +134,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	// Used to avoid ReflectionHelper#containsMember which is slow
 	private final Set<String> propertyNames = newHashSet( 30 );
-
-	/**
-	 * A declaration exception in case the represented bean contains any illegal
-	 * method parameter constraints. Such illegal parameter constraints shall
-	 * not hinder standard bean/property validation of this type as defined by
-	 * the Bean Validation API. Therefore this exception is created when
-	 * instantiating this meta data object, but it will only be thrown by the
-	 * validation engine when actually a method validation is performed.
-	 */
-	private final ConstraintDeclarationException parameterConstraintDeclarationException;
 
 	/**
 	 * Constructor used for creating the bean meta data using annotations only
@@ -264,13 +245,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 		}
-		parameterConstraintDeclarationException = checkParameterConstraints();
 
 		methodMetaData = Collections.unmodifiableMap( buildMethodMetaData() );
 
 		// reset class members we don't need any longer
 		methodMetaDataBuilders = null;
-		allMethods = null;
 		this.constraintHelper = null;
 	}
 
@@ -294,54 +273,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		return theValue;
-	}
-
-	/**
-	 * Checks that there are no invalid parameter constraints defined at this
-	 * type's methods.
-	 *
-	 * @return A {@link ConstraintDeclarationException} describing the first illegal
-	 *         method parameter constraint found or {@code null}, if this type has no
-	 *         such illegal constraints.
-	 */
-	private ConstraintDeclarationException checkParameterConstraints() {
-
-		for ( MethodMetaData oneMethod : getMethodsWithParameterConstraints( allMethods ) ) {
-
-			Set<MethodMetaData> methodsWithSameSignature = getMethodsWithSameSignature( allMethods, oneMethod );
-			Set<MethodMetaData> methodsWithSameSignatureAndParameterConstraints = getMethodsWithParameterConstraints(
-					methodsWithSameSignature
-			);
-
-			if ( methodsWithSameSignatureAndParameterConstraints.size() > 1 ) {
-				return new ConstraintDeclarationException(
-						"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, " +
-								"but there are parameter constraints defined at all of the following overridden methods: " +
-								methodsWithSameSignatureAndParameterConstraints
-				);
-			}
-
-			for ( MethodMetaData oneMethodWithSameSignature : methodsWithSameSignature ) {
-				if ( !oneMethod.getMethod().getDeclaringClass()
-						.isAssignableFrom( oneMethodWithSameSignature.getMethod().getDeclaringClass() ) ) {
-					return new ConstraintDeclarationException(
-							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
-									"The following method itself has no parameter constraints but it is not defined on a sub-type of " +
-									oneMethod.getMethod().getDeclaringClass() +
-									": " + oneMethodWithSameSignature
-					);
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public void assertMethodParameterConstraintsCorrectness() {
-
-		if ( parameterConstraintDeclarationException != null ) {
-			throw parameterConstraintDeclarationException;
-		}
 	}
 
 	public Class<T> getBeanClass() {
@@ -474,7 +405,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
-		allMethods.add( methodMetaData );
 
 		addToAggregatedMetaData( methodMetaData );
 
@@ -900,50 +830,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		else {
 			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
 		}
-	}
-
-	/**
-	 * Returns a set with those methods from the given pile of methods that have
-	 * the same signature as the specified one. If the given method itself is part
-	 * of the specified pile of methods, it also will be contained in the result
-	 * set.
-	 *
-	 * @param methods The methods to search in.
-	 * @param methodToCheck The method to compare against.
-	 *
-	 * @return A set with methods with the same signature as the given one. May
-	 *         be empty, but never null.
-	 */
-	private Set<MethodMetaData> getMethodsWithSameSignature(Iterable<MethodMetaData> methods, MethodMetaData methodToCheck) {
-		Set<MethodMetaData> theValue = newHashSet();
-
-		for ( MethodMetaData oneMethod : methods ) {
-			if ( ReflectionHelper.haveSameSignature( oneMethod.getMethod(), methodToCheck.getMethod() ) ) {
-				theValue.add( oneMethod );
-			}
-		}
-		return theValue;
-	}
-
-	/**
-	 * Returns a set with those methods from the given pile of methods that have
-	 * at least one constrained parameter or at least one parameter annotated
-	 * with {@link Valid}.
-	 *
-	 * @param methods The methods to search in.
-	 *
-	 * @return A set with constrained methods. May be empty, but never null.
-	 */
-	private Set<MethodMetaData> getMethodsWithParameterConstraints(Iterable<MethodMetaData> methods) {
-		Set<MethodMetaData> theValue = newHashSet();
-
-		for ( MethodMetaData oneMethod : methods ) {
-			if ( oneMethod.hasParameterConstraints() ) {
-				theValue.add( oneMethod );
-			}
-		}
-
-		return theValue;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -88,7 +88,7 @@ public class IllegalMethodParameterConstraintsTest {
 			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints.*"
 	)
-	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() {
+	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() throws Exception {
 
 		QuxImpl qux = new QuxImpl();
 
@@ -98,7 +98,7 @@ public class IllegalMethodParameterConstraintsTest {
 
 		//but method validation fails due to illegal parameter constraints being defined
 		getMethodValidator().validateAllParameters(
-				qux, QuxImpl.class.getDeclaredMethods()[0], new Object[] { }
+				qux, QuxImpl.class.getDeclaredMethod( "qux", String.class ), new Object[] { }
 		);
 	}
 

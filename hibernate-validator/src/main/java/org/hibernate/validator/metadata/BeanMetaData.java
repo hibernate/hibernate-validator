@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -132,28 +131,4 @@ public interface BeanMetaData<T> {
 	 */
 	Set<PropertyDescriptor> getConstrainedProperties();
 
-	/**
-	 * <p>Checks the method parameter constraints of the type represented by this
-	 * meta data object for correctness.
-	 * </p>
-	 * <p>
-	 * The following rules apply for this check:
-	 * </p>
-	 * <ul>
-	 * <li>Only the root method of an overridden method in an inheritance
-	 * hierarchy may be annotated with parameter constraints in order to avoid
-	 * the strengthening of a method's preconditions by additional parameter
-	 * constraints defined at sub-types. If the root method itself has no
-	 * parameter constraints, also no parameter constraints may be added in
-	 * sub-types.</li>
-	 * <li>If there are multiple root methods for an method in an inheritance
-	 * hierarchy (e.g. by implementing two interfaces defining the same method)
-	 * no parameter constraints for this method are allowed at all in order to
-	 * avoid a strengthening of a method's preconditions in parallel types.</li>
-	 * </ul>
-	 *
-	 * @throws ConstraintDeclarationException In case the represented bean
-	 * has an illegal method parameter constraint.
-	 */
-	void assertMethodParameterConstraintsCorrectness() throws ConstraintDeclarationException;
 }
