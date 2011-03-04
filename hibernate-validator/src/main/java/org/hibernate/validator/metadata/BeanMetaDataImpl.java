@@ -880,8 +880,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@SuppressWarnings("unchecked")
 	private <U extends DefaultGroupSequenceProvider<?>> DefaultGroupSequenceProvider<T> newGroupSequenceProviderInstance(Class<U> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
+		if ( providerClass.isInterface() ) {
+			throw new GroupDefinitionException(
+					"The default group sequence provider defined for " + beanClass.getName() + " must be an implementation of the DefaultGroupSequenceProvider interface"
+			);
+		}
 
+		Method[] providerMethods = getMethods( providerClass );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
