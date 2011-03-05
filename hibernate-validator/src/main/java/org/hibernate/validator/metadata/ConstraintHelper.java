@@ -208,7 +208,7 @@ public class ConstraintHelper {
 		boolean isMultiValueConstraint = false;
 		final Method method = ReflectionHelper.getMethod( annotationType, "value" );
 		if ( method != null ) {
-			Class returnType = method.getReturnType();
+			Class<?> returnType = method.getReturnType();
 			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
 				@SuppressWarnings("unchecked")
 				Class<? extends Annotation> componentType = (Class<? extends Annotation>) returnType.getComponentType();
@@ -237,7 +237,7 @@ public class ConstraintHelper {
 		try {
 			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
 			if ( method != null ) {
-				Class returnType = method.getReturnType();
+				Class<?> returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
 					Annotation[] annotations = (Annotation[]) method.invoke( annotation );
 					for ( Annotation a : annotations ) {

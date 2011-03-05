@@ -19,7 +19,7 @@ package org.hibernate.validator.metadata;
 import javax.validation.metadata.PropertyDescriptor;
 
 /**
- * Describe a validated element (class, field or property).
+ * Describes a validated element (class, field or property).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

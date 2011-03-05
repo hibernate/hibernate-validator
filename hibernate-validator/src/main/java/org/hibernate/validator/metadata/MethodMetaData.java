@@ -59,20 +59,21 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 			boolean isCascading) {
 
 		this.method = method;
-		this.parameterMetaData = parameterMetaData;
-		this.constraints = constraints;
+		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
+		this.constraints = Collections.unmodifiableList( constraints );
 		this.isCascading = isCascading;
+		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
+	}
 
-		boolean foundParameterConstraint = false;
+	private boolean hasParameterConstraints(List<ParameterMetaData> parameterMetaData) {
 
 		for ( ParameterMetaData oneParameter : parameterMetaData ) {
 			if ( oneParameter.isConstrained() ) {
-				foundParameterConstraint = true;
-				break;
+				return true;
 			}
 		}
 
-		this.hasParameterConstraints = foundParameterConstraint;
+		return false;
 	}
 
 	/**

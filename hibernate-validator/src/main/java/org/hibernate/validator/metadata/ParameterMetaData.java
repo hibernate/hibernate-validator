@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 		this.index = index;
 		this.type = type;
 		this.name = name;
-		this.constraints = constraints;
+		this.constraints = Collections.unmodifiableList( constraints );
 		this.isCascading = isCascading;
 	}
 
