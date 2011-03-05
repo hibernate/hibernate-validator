@@ -844,7 +844,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
-					&& paramTypes.length == 1 && beanClass.isAssignableFrom( paramTypes[0] ) ) {
+					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
 
 				return (DefaultGroupSequenceProvider<T>) newInstance(
 						providerClass, "the default group sequence provider"
