@@ -52,6 +52,11 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CaseMode;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.BazDefaultGroupSequenceProvider;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooDefaultGroupSequenceProvider;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.QuxDefaultGroupSequenceProvider;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.SampleDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.inheritedvalidator.AbstractCustomConstraintValidator;
 import org.hibernate.validator.ap.testmodel.inheritedvalidator.CustomConstraint;
 import org.hibernate.validator.ap.testmodel.inheritedvalidator.CustomConstraintValidator;
@@ -63,12 +68,14 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeVali
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSerializable;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
+
 import org.testng.annotations.Test;
 
 /**
  * Miscellaneous tests for {@link ConstraintValidationProcessor}.
  *
  * @author Gunnar Morling.
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ConstraintValidationProcessorTest extends ConstraintValidationProcessorTestBase {
 
@@ -328,6 +335,34 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 71 ),
 				new DiagnosticExpectation( Kind.ERROR, 79 ),
 				new DiagnosticExpectation( Kind.ERROR, 87 )
+		);
+	}
+
+	@Test
+	public void groupSequenceProvider() {
+		File sourceFile1 = compilerHelper.getSourceFile( BazDefaultGroupSequenceProvider.class );
+		File sourceFile2 = compilerHelper.getSourceFile( FooDefaultGroupSequenceProvider.class );
+		File sourceFile3 = compilerHelper.getSourceFile( QuxDefaultGroupSequenceProvider.class );
+		File sourceFile4 = compilerHelper.getSourceFile( SampleDefaultGroupSequenceProvider.class );
+		File sourceFile5 = compilerHelper.getSourceFile( GroupSequenceProviderDefinition.class );
+
+		boolean compilationResult = compilerHelper.compile(
+				new ConstraintValidationProcessor(),
+				diagnostics,
+				sourceFile1,
+				sourceFile2,
+				sourceFile3,
+				sourceFile4,
+				sourceFile5
+		);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 35 ),
+				new DiagnosticExpectation( Kind.ERROR, 40 ),
+				new DiagnosticExpectation( Kind.ERROR, 44 ),
+				new DiagnosticExpectation( Kind.ERROR, 48 )
 		);
 	}
 
