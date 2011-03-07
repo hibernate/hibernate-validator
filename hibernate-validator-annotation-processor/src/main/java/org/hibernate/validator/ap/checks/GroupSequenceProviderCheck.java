@@ -34,6 +34,18 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**
+ * Checks that the {@link org.hibernate.validator.group.GroupSequenceProvider}
+ * annotation definition is valid.
+ * <p>
+ * This check ensure that :
+ * <ul>
+ * <li>The annotation is not defined on an interface.</li>
+ * <li>The annotation defines an implementation of {@link DefaultGroupSequenceProvider}, not an interface.</li>
+ * <li>The hosting class is not already annotated with {@linkplain GroupSequence @GroupSequence}.</li>
+ * <li>The provider generic type definition is a supertype of the annotated class.</li>
+ * </ul>
+ * </p>
+ *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
