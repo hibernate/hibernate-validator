@@ -128,7 +128,7 @@ public class ConstraintHelper {
 		/**
 		 * Given annotation is the @GroupSequenceProvider annotation.
 		 */
-		DYNAMIC_DEFAULT_GROUP_SEQUENCE_ANNOTATION,
+		GROUP_SEQUENCE_PROVIDER_ANNOTATION,
 
 		/**
 		 * Given annotation is not related to the BV API (e.g. @Resource).
@@ -256,8 +256,8 @@ public class ConstraintHelper {
 		else if ( isConstraintMetaAnnotation( annotationMirror ) ) {
 			return AnnotationType.CONSTRAINT_META_ANNOTATION;
 		}
-		else if ( isDynamicDefaultGroupSequenceAnnotation( annotationMirror ) ) {
-			return AnnotationType.DYNAMIC_DEFAULT_GROUP_SEQUENCE_ANNOTATION;
+		else if ( isGroupSequenceProviderAnnotation( annotationMirror ) ) {
+			return AnnotationType.GROUP_SEQUENCE_PROVIDER_ANNOTATION;
 		}
 		else {
 			return AnnotationType.NO_CONSTRAINT_ANNOTATION;
@@ -462,7 +462,7 @@ public class ConstraintHelper {
 	 * @return True, if the given mirror represents the @GroupSequenceProvider annotation, false
 	 *         otherwise.
 	 */
-	private boolean isDynamicDefaultGroupSequenceAnnotation(
+	private boolean isGroupSequenceProviderAnnotation(
 			AnnotationMirror annotationMirror) {
 
 		return typeUtils.isSameType(

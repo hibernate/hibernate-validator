@@ -36,13 +36,13 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class DynamicDefaultGroupSequenceCheck extends AbstractConstraintCheck {
+public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 
 	private final Types typeUtils;
 	private final AnnotationApiHelper annotationApiHelper;
 	private final TypeMirror defaultGroupSequenceProviderType;
 
-	public DynamicDefaultGroupSequenceCheck(AnnotationApiHelper annotationApiHelper, Types typeUtils) {
+	public GroupSequenceProviderCheck(AnnotationApiHelper annotationApiHelper, Types typeUtils) {
 		this.typeUtils = typeUtils;
 		this.annotationApiHelper = annotationApiHelper;
 		this.defaultGroupSequenceProviderType = annotationApiHelper.getMirrorForType( DefaultGroupSequenceProvider.class );

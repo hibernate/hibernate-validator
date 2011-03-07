@@ -123,8 +123,8 @@ public class ConstraintCheckFactory {
 		);
 		nonAnnotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
 		nonAnnotationTypeChecks.put(
-				AnnotationType.DYNAMIC_DEFAULT_GROUP_SEQUENCE_ANNOTATION,
-				new SingleValuedChecks( new DynamicDefaultGroupSequenceCheck( annotationApiHelper, typeUtils ) )
+				AnnotationType.GROUP_SEQUENCE_PROVIDER_ANNOTATION,
+				new SingleValuedChecks( new GroupSequenceProviderCheck( annotationApiHelper, typeUtils ) )
 		);
 	}
 
