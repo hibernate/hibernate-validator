@@ -53,12 +53,15 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.group.GroupSequenceProvider;
+
 /**
  * Helper class that deals with all constraint-related stuff, such as
  * determining whether a given annotation represents a constraint annotation or
  * whether a given annotation is allowed to be declared at a given element.
  *
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class ConstraintHelper {
 
@@ -91,6 +94,7 @@ public class ConstraintHelper {
 	 * The type of an annotation with respect to the BV API.
 	 *
 	 * @author Gunnar Morling
+	 * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
 	 */
 	public enum AnnotationType {
 
@@ -120,6 +124,11 @@ public class ConstraintHelper {
 		 * Given annotation is the @Constraint meta-annotation.
 		 */
 		CONSTRAINT_META_ANNOTATION,
+
+		/**
+		 * Given annotation is the @GroupSequenceProvider annotation.
+		 */
+		DYNAMIC_DEFAULT_GROUP_SEQUENCE_ANNOTATION,
 
 		/**
 		 * Given annotation is not related to the BV API (e.g. @Resource).
@@ -246,6 +255,9 @@ public class ConstraintHelper {
 		}
 		else if ( isConstraintMetaAnnotation( annotationMirror ) ) {
 			return AnnotationType.CONSTRAINT_META_ANNOTATION;
+		}
+		else if ( isDynamicDefaultGroupSequenceAnnotation( annotationMirror ) ) {
+			return AnnotationType.DYNAMIC_DEFAULT_GROUP_SEQUENCE_ANNOTATION;
 		}
 		else {
 			return AnnotationType.NO_CONSTRAINT_ANNOTATION;
@@ -439,6 +451,23 @@ public class ConstraintHelper {
 		return typeUtils.isSameType(
 				annotationMirror.getAnnotationType(),
 				annotationApiHelper.getMirrorForType( Valid.class )
+		);
+	}
+
+	/**
+	 * Checks, whether the given mirror represents the {@link GroupSequenceProvider} annotation.
+	 *
+	 * @param annotationMirror The annotation mirror of interest.
+	 *
+	 * @return True, if the given mirror represents the @GroupSequenceProvider annotation, false
+	 *         otherwise.
+	 */
+	private boolean isDynamicDefaultGroupSequenceAnnotation(
+			AnnotationMirror annotationMirror) {
+
+		return typeUtils.isSameType(
+				annotationMirror.getAnnotationType(),
+				annotationApiHelper.getMirrorForType( GroupSequenceProvider.class )
 		);
 	}
 
