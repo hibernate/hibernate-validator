@@ -67,7 +67,7 @@
     <title>ORM integration</title>
 
     <para>Hibernate Validator integrates with both Hibernate and all pure Java
-    Persistence providers. </para>
+    Persistence providers.</para>
 
     <tip>
       <para>When lazy loaded associations are supposed to be validated it is
@@ -195,5 +195,25 @@
 &lt;/h:form&gt;
 </programlisting>
     </example>
+
+    <tip>
+      <para>The integration between JSF 2 and Bean Validation is described in
+      the "Bean Validation Integration" chapter of <ulink
+      url="http://jcp.org/en/jsr/detail?id=314">JSR-314</ulink>. It is
+      interesting to know that JSF 2 implements a custom MessageInterpolator
+      to ensure ensure proper localization. To encourage the use of the Bean
+      Validation message facility, JSF 2 will per default only display the
+      generated Bean Validation message. This can, however, be configured via
+      the application resource bundle by providing the following configuration
+      (<parameter>{0}</parameter> is replaced with the Bean Validation message
+      and <parameter>{1}</parameter> is replaced with the JSF component
+      label):</para>
+
+      <programlisting>javax.faces.validator.BeanValidator.MESSAGE={1}: {0}</programlisting>
+
+      <para>The default is:</para>
+
+      <programlisting>javax.faces.validator.BeanValidator.MESSAGE={0}</programlisting>
+    </tip>
   </section>
 </chapter>
