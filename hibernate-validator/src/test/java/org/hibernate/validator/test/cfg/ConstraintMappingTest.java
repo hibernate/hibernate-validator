@@ -352,26 +352,6 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* must be an implementation of the DefaultGroupSequenceProvider interface"
-	)
-	public void testDefaultGroupSequenceProviderDefinedWithInterface() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
-		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
-				.defaultGroupSequenceProvider( NoImplDefaultGroupSequenceProvider.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
-
-		validator.validate( new Marathon() );
-	}
-
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
 			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
@@ -615,9 +595,6 @@ public class ConstraintMappingTest {
 		public List<Class<?>> getValidationGroups(A object) {
 			return Arrays.asList( Foo.class, A.class );
 		}
-	}
-
-	public static interface NoImplDefaultGroupSequenceProvider extends DefaultGroupSequenceProvider<Marathon> {
 	}
 }
 
