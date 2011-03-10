@@ -76,7 +76,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 		if ( !element.getKind().isClass() ) {
 			checkErrors.add(
 					new ConstraintCheckError(
-							element, annotation, "GROUP_SEQUENCE_PROVIDER_MUST_BE_DEFINED_ON_CLASS"
+							element, annotation, "GROUP_SEQUENCE_PROVIDER_ANNOTATION_MUST_BE_DEFINED_ON_A_CLASS"
 					)
 			);
 
@@ -87,7 +87,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 					new ConstraintCheckError(
 							element,
 							annotation,
-							"GROUP_SEQUENCE_PROVIDER_NOT_ALLOWED_ON_CLASS_ANNOTATED_WITH_GROUP_SEQUENCE"
+							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_NOT_ALLOWED_ON_CLASS_WITH_GROUP_SEQUENCE_ANNOTATION"
 					)
 			);
 		}
@@ -130,7 +130,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 					new ConstraintCheckError(
 							element,
 							annotation,
-							"GROUP_SEQUENCE_PROVIDER_CLASS_MUST_BE_AN_IMPLEMENTATION"
+							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_MUST_BE_AN_IMPLEMENTATION_CLASS"
 					)
 			);
 		}
@@ -140,8 +140,9 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 					new ConstraintCheckError(
 							element,
 							annotation,
-							"GROUP_SEQUENCE_PROVIDER_DEFINE_PROVIDER_FOR_WRONG_TYPE",
-							defaultGroupSequenceProviderGenericType
+							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_DEFINED_PROVIDER_CLASS_WITH_WRONG_TYPE",
+							defaultGroupSequenceProviderGenericType,
+							element.asType()
 					)
 			);
 		}
