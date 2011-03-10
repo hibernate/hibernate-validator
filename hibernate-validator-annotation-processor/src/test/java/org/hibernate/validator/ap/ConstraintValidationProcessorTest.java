@@ -53,6 +53,7 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.BazDefaultGroupSequenceProvider;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarBazDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition;
@@ -347,6 +348,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		File sourceFile4 = compilerHelper.getSourceFile( QuxDefaultGroupSequenceProvider.class );
 		File sourceFile5 = compilerHelper.getSourceFile( SampleDefaultGroupSequenceProvider.class );
 		File sourceFile6 = compilerHelper.getSourceFile( FooBarDefaultGroupSequenceProvider.class );
+		File sourceFile7 = compilerHelper.getSourceFile( FooBarBazDefaultGroupSequenceProvider.class );
 
 		boolean compilationResult = compilerHelper.compile(
 				new ConstraintValidationProcessor(),
@@ -356,17 +358,19 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				sourceFile3,
 				sourceFile4,
 				sourceFile5,
-				sourceFile6
+				sourceFile6,
+				sourceFile7
 		);
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 35 ),
-				new DiagnosticExpectation( Kind.ERROR, 40 ),
 				new DiagnosticExpectation( Kind.ERROR, 44 ),
-				new DiagnosticExpectation( Kind.ERROR, 48 ),
-				new DiagnosticExpectation( Kind.ERROR, 52 )
+				new DiagnosticExpectation( Kind.ERROR, 52 ),
+				new DiagnosticExpectation( Kind.ERROR, 60 ),
+				new DiagnosticExpectation( Kind.ERROR, 68 ),
+				new DiagnosticExpectation( Kind.ERROR, 76 )
 		);
 	}
 

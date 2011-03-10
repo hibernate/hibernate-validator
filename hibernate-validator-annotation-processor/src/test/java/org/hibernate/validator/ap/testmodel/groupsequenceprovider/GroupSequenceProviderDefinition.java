@@ -37,19 +37,43 @@ public class GroupSequenceProviderDefinition {
 	public static class Sample {
 	}
 
+	/**
+	 * Not allowed. Default group sequence provider class defines
+	 * a wrong generic type.
+	 */
 	@GroupSequenceProvider(FooDefaultGroupSequenceProvider.class)
 	public static class Bar {
 	}
 
+	/**
+	 * Not allowed. Default group sequence provider class is an
+	 * interface.
+	 */
 	@GroupSequenceProvider(BazDefaultGroupSequenceProvider.class)
 	public static class Baz {
 	}
 
+	/**
+	 * Not allowed. GroupSequenceProvider annotation is added on
+	 * on an interface.
+	 */
 	@GroupSequenceProvider(QuxDefaultGroupSequenceProvider.class)
 	public interface Qux {
 	}
 
+	/**
+	 * Not allowed. Default group sequence provider class is
+	 * abstract.
+	 */
 	@GroupSequenceProvider(FooBarDefaultGroupSequenceProvider.class)
 	public static class FooBar {
+	}
+
+	/**
+	 * Not allowed. Default group sequence provider class has
+	 * no public default constructor.
+	 */
+	@GroupSequenceProvider(FooBarBazDefaultGroupSequenceProvider.class)
+	public static class FooBarBaz {
 	}
 }

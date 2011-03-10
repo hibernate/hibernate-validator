@@ -21,10 +21,13 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.Types;
 import javax.validation.GroupSequence;
@@ -34,15 +37,15 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**
- * Checks that the {@link org.hibernate.validator.group.GroupSequenceProvider}
- * annotation definition is valid.
+ * Checks that the {@link org.hibernate.validator.group.GroupSequenceProvider} annotation definition is valid.
  * <p>
  * This check ensure that :
  * <ul>
  * <li>The annotation is not defined on an interface.</li>
- * <li>The annotation defines an implementation of {@link DefaultGroupSequenceProvider}, not an interface or an abstract class.</li>
- * <li>The hosting class is not already annotated with {@linkplain GroupSequence @GroupSequence}.</li>
- * <li>The provider generic type definition is a (super-)type of the annotated class.</li>
+ * <li>The annotation defines an implementation class of {@link DefaultGroupSequenceProvider}, not an interface or an abstract class.</li>
+ * <li>The annotation defines a class with a public default constructor.</li>
+ * <li>The annotation defines a default group sequence provider class for a (super-)type of the annotated class.</li>
+ * <li>The class hosting the annotation is not already annotated with {@linkplain GroupSequence @GroupSequence}.</li>
  * </ul>
  * </p>
  *
@@ -79,7 +82,6 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 							element, annotation, "GROUP_SEQUENCE_PROVIDER_ANNOTATION_MUST_BE_DEFINED_ON_A_CLASS"
 					)
 			);
-
 		}
 
 		if ( element.getAnnotation( GroupSequence.class ) != null ) {
@@ -133,6 +135,51 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_MUST_BE_AN_IMPLEMENTATION_CLASS"
 					)
 			);
+		}
+
+		//checking presence of public default constructor makes sense only if the value element is a class.
+		if ( valueElement.getKind().isClass() ) {
+			Boolean hasPublicDefaultConstructor = valueElement.accept(
+					new ElementKindVisitor6<Boolean, Void>() {
+
+						@Override
+						public Boolean visitTypeAsClass(TypeElement typeElement, Void aVoid) {
+							Boolean hasPublicDefaultConstructor = Boolean.FALSE;
+							List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
+
+							for ( Element enclosedElement : enclosedElements ) {
+								hasPublicDefaultConstructor = enclosedElement.accept( this, null );
+								if ( hasPublicDefaultConstructor ) {
+									break;
+								}
+							}
+							return hasPublicDefaultConstructor;
+						}
+
+						@Override
+						public Boolean visitExecutable(ExecutableElement executableElement, Void aVoid) {
+							if ( executableElement.getKind() == ElementKind.CONSTRUCTOR
+									&& executableElement.getModifiers().contains( Modifier.PUBLIC )
+									&& executableElement.getParameters().isEmpty() ) {
+
+								return Boolean.TRUE;
+							}
+							return Boolean.FALSE;
+						}
+
+					}, null
+			);
+
+			if ( !hasPublicDefaultConstructor ) {
+				checkErrors.add(
+						new ConstraintCheckError(
+								element,
+								annotation,
+								"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_CLASS_MUST_HAVE_DEFAULT_CONSTRUCTOR",
+								valueType
+						)
+				);
+			}
 		}
 
 		if ( !typeUtils.isSubtype( element.asType(), defaultGroupSequenceProviderGenericType ) ) {
