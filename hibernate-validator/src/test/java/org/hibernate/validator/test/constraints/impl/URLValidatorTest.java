@@ -16,13 +16,20 @@
 */
 package org.hibernate.validator.test.constraints.impl;
 
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.impl.URLValidator;
+import org.hibernate.validator.test.util.TestUtil;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
+import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -117,5 +124,38 @@ public class URLValidatorTest {
 		validator.initialize( url );
 
 		assertTrue( validator.isValid( "", null ) );
+	}
+
+	@Test
+	public void testRegExp() {
+		Validator validator = TestUtil.getValidator();
+
+		URLContainer container = new URLContainer();
+		container.setUrl( "http://my.domain.com/index.html" );
+		Set<ConstraintViolation<URLContainer>> violations = validator.validate( container );
+		assertNumberOfViolations( violations, 0 );
+
+		container.setUrl( "http://my.domain.com/index.htm" );
+		violations = validator.validate( container );
+		assertNumberOfViolations( violations, 0 );
+
+		container.setUrl( "http://my.domain.com/index" );
+		violations = validator.validate( container );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
+
+		container.setUrl( "http://my.domain.com/index.asp" );
+		violations = validator.validate( container );
+		assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
+		assertNumberOfViolations( violations, 1 );
+	}
+
+	static class URLContainer {
+		@URL(regexp = "^http://\\S+[\\.htm|\\.html]{1}$")
+		String url;
+
+		public void setUrl(String url) {
+			this.url = url;
+		}
 	}
 }

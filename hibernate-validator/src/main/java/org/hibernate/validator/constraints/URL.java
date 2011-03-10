@@ -20,7 +20,10 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
+import javax.validation.ReportAsSingleViolation;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.impl.URLValidator;
 
@@ -38,25 +41,58 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Documented
 @Constraint(validatedBy = URLValidator.class)
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Target( { METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
+@ReportAsSingleViolation
+@Pattern(regexp = "")
+/**
+ * {@code URL} is a field/method level constraint which can be applied on a string to assert that the string
+ * represents a valid URL. Per default the constraint verifies that the annotated value conforms to
+ * <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC2396</a>. Via the parameters {@code protocol}, {@code host}
+ * and {@code port} one can assert the corresponding parts of the parsed URL.
+ * <p>
+ * Due to the fact that RFC2396 is a very generic specification it often is not restrictive enough for a given usecase.
+ * In this case one can also specify the optional {@code regexp} and {@code flags} parameters. This way an additional
+ * Java regular expression can be specified which the string (URL) has to match.
+ * </p>
+ */
 public @interface URL {
-	public abstract String protocol() default "";
+	String message() default "{org.hibernate.validator.constraints.URL.message}";
 
-	public abstract String host() default "";
+	Class<?>[] groups() default { };
 
-	public abstract int port() default -1;
+	Class<? extends Payload>[] payload() default { };
 
-	public abstract String message() default "{org.hibernate.validator.constraints.URL.message}";
+	/**
+	 * @return the protocol (scheme) the annotated string must match, eg ftp or http.
+	 *         Per default any protocol is allowed
+	 */
+	String protocol() default "";
 
-	public abstract Class<?>[] groups() default { };
+	/**
+	 * @return the host the annotated string must match, eg localhost. Per default any host is allowed
+	 */
+	String host() default "";
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	/**
+	 * @return the port the annotated string must match, eg 80. Per default any port is allowed
+	 */
+	int port() default -1;
+
+	/**
+	 * @return a regular expression the annotated must match. The default is any string ('.*')
+	 */
+	@OverridesAttribute(constraint = Pattern.class, name = "regexp") String regexp() default ".*";
+
+	/**
+	 * @return used in combination with {@link #regexp()} in order to specify a regular expression option
+	 */
+	@OverridesAttribute(constraint = Pattern.class, name = "flags") Pattern.Flag[] flags() default { };
 
 	/**
 	 * Defines several {@code @URL} annotations on the same element.
 	 */
-	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Target( { METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {

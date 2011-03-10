@@ -1413,7 +1413,7 @@ public class RentalCar extends Car {
           </row>
 
           <row>
-            <entry>@URL(protocol=, host=, port=)</entry>
+            <entry>@URL(protocol=, host=, port=, regexp=, flags=)</entry>
 
             <entry>no</entry>
 
@@ -1424,7 +1424,10 @@ public class RentalCar extends Car {
             parameters <parameter>protocol</parameter>,
             <parameter>host</parameter> or <parameter>port</parameter> is
             specified the URL must match the specified values in the according
-            part.</entry>
+            part. The optional parameters <parameter>regexp</parameter> and
+            <parameter>flags</parameter> allow for specifiny an additional
+            regular expression including flags which the URL must match.
+            </entry>
 
             <entry>none</entry>
           </row>
