@@ -16,40 +16,16 @@
  */
 package org.hibernate.validator.ap.testmodel.groupsequenceprovider;
 
-import javax.validation.GroupSequence;
+import java.util.List;
 
-import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+
+import static org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition.FooBar;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class GroupSequenceProviderDefinition {
+public abstract class FooBarDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<FooBar> {
 
-	@GroupSequenceProvider(FooDefaultGroupSequenceProvider.class)
-	public static class Foo {
-	}
-
-	/**
-	 * Not allowed
-	 */
-	@GroupSequenceProvider(SampleDefaultGroupSequenceProvider.class)
-	@GroupSequence( { Sample.class })
-	public static class Sample {
-	}
-
-	@GroupSequenceProvider(FooDefaultGroupSequenceProvider.class)
-	public static class Bar {
-	}
-
-	@GroupSequenceProvider(BazDefaultGroupSequenceProvider.class)
-	public static class Baz {
-	}
-
-	@GroupSequenceProvider(QuxDefaultGroupSequenceProvider.class)
-	public interface Qux {
-	}
-
-	@GroupSequenceProvider(FooBarDefaultGroupSequenceProvider.class)
-	public static class FooBar {
-	}
+	public abstract List<Class<?>> getValidationGroups(FooBar object);
 }

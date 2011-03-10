@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
@@ -39,9 +40,9 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * This check ensure that :
  * <ul>
  * <li>The annotation is not defined on an interface.</li>
- * <li>The annotation defines an implementation of {@link DefaultGroupSequenceProvider}, not an interface.</li>
+ * <li>The annotation defines an implementation of {@link DefaultGroupSequenceProvider}, not an interface or an abstract class.</li>
  * <li>The hosting class is not already annotated with {@linkplain GroupSequence @GroupSequence}.</li>
- * <li>The provider generic type definition is a super-type of the annotated class.</li>
+ * <li>The provider generic type definition is a (super-)type of the annotated class.</li>
  * </ul>
  * </p>
  *
@@ -120,15 +121,16 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 
 						return null;
 					}
+
 				}, null
 		);
 
-		if ( !valueElement.getKind().isClass() ) {
+		if ( valueElement.getKind().isInterface() || valueElement.getModifiers().contains( Modifier.ABSTRACT ) ) {
 			checkErrors.add(
 					new ConstraintCheckError(
 							element,
 							annotation,
-							"GROUP_SEQUENCE_PROVIDER_CLASS_MAY_NOT_BE_AN_INTERFACE"
+							"GROUP_SEQUENCE_PROVIDER_CLASS_MUST_BE_AN_IMPLEMENTATION"
 					)
 			);
 		}

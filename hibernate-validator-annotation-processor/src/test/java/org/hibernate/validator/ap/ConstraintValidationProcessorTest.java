@@ -53,6 +53,7 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.BazDefaultGroupSequenceProvider;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.QuxDefaultGroupSequenceProvider;
@@ -340,11 +341,12 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 
 	@Test
 	public void groupSequenceProvider() {
-		File sourceFile1 = compilerHelper.getSourceFile( BazDefaultGroupSequenceProvider.class );
-		File sourceFile2 = compilerHelper.getSourceFile( FooDefaultGroupSequenceProvider.class );
-		File sourceFile3 = compilerHelper.getSourceFile( QuxDefaultGroupSequenceProvider.class );
-		File sourceFile4 = compilerHelper.getSourceFile( SampleDefaultGroupSequenceProvider.class );
-		File sourceFile5 = compilerHelper.getSourceFile( GroupSequenceProviderDefinition.class );
+		File sourceFile1 = compilerHelper.getSourceFile( GroupSequenceProviderDefinition.class );
+		File sourceFile2 = compilerHelper.getSourceFile( BazDefaultGroupSequenceProvider.class );
+		File sourceFile3 = compilerHelper.getSourceFile( FooDefaultGroupSequenceProvider.class );
+		File sourceFile4 = compilerHelper.getSourceFile( QuxDefaultGroupSequenceProvider.class );
+		File sourceFile5 = compilerHelper.getSourceFile( SampleDefaultGroupSequenceProvider.class );
+		File sourceFile6 = compilerHelper.getSourceFile( FooBarDefaultGroupSequenceProvider.class );
 
 		boolean compilationResult = compilerHelper.compile(
 				new ConstraintValidationProcessor(),
@@ -353,7 +355,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				sourceFile2,
 				sourceFile3,
 				sourceFile4,
-				sourceFile5
+				sourceFile5,
+				sourceFile6
 		);
 
 		assertFalse( compilationResult );
@@ -362,7 +365,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 35 ),
 				new DiagnosticExpectation( Kind.ERROR, 40 ),
 				new DiagnosticExpectation( Kind.ERROR, 44 ),
-				new DiagnosticExpectation( Kind.ERROR, 48 )
+				new DiagnosticExpectation( Kind.ERROR, 48 ),
+				new DiagnosticExpectation( Kind.ERROR, 52 )
 		);
 	}
 
