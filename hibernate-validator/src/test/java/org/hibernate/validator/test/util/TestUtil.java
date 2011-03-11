@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.test.util;
 
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,19 +27,18 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.spi.ValidationProvider;
 
-import org.slf4j.Logger;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.engine.PathImpl;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.util.LoggerFactory;
 
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 import static org.testng.Assert.assertEquals;
@@ -57,9 +54,6 @@ import static org.testng.FileAssert.fail;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class TestUtil {
-
-	private static final Logger log = LoggerFactory.make();
-
 	private static Validator hibernateValidator;
 
 	private TestUtil() {
@@ -72,6 +66,15 @@ public class TestUtil {
 			hibernateValidator = configuration.buildValidatorFactory().getValidator();
 		}
 		return hibernateValidator;
+	}
+
+	public static Validator getValidatorForMapping(ConstraintMapping... mappings) {
+		assertNotNull( mappings );
+		HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
+		for ( ConstraintMapping mapping : mappings ) {
+			config.addMapping( mapping );
+		}
+		return config.buildValidatorFactory().getValidator();
 	}
 
 	public static MethodValidator getMethodValidator() {
@@ -93,18 +96,6 @@ public class TestUtil {
 	public static <T extends Configuration<T>, U extends ValidationProvider<T>> T getConfiguration(Class<U> type, Locale locale) {
 		Locale.setDefault( locale );
 		return Validation.byProvider( type ).configure();
-	}
-
-	/**
-	 * @param path The path to the xml file which should server as <code>validation.xml</code> for the returned
-	 * <code>Validator</code>.
-	 *
-	 * @return A <code>Validator</code> instance which respects the configuration specified in the file with the path
-	 *         <code>path</code>.
-	 */
-	public static Validator getValidatorWithCustomConfiguration(String path) {
-		Thread.currentThread().setContextClassLoader( new CustomValidationXmlClassLoader( path ) );
-		return getConfiguration().buildValidatorFactory().getValidator();
 	}
 
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, String property) {
@@ -174,7 +165,7 @@ public class TestUtil {
 		List<String> actualConstraintTypes = new ArrayList<String>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualConstraintTypes.add(
-					( (Annotation) violation.getConstraintDescriptor().getAnnotation() ).annotationType().getName()
+					( violation.getConstraintDescriptor().getAnnotation() ).annotationType().getName()
 			);
 		}
 
@@ -296,28 +287,11 @@ public class TestUtil {
 	public static void assertIterableSize(Iterable<?> iterable, int expectedCount) {
 		int i = 0;
 
+		//noinspection UnusedDeclaration
 		for ( @SuppressWarnings("unused") Object o : iterable ) {
 			i++;
 		}
 
 		assertEquals( i, expectedCount, "Actual size of iterable [" + iterable + "] differed from expected size." );
-	}
-
-	private static class CustomValidationXmlClassLoader extends ClassLoader {
-		private final String customValidationXmlPath;
-
-		CustomValidationXmlClassLoader(String pathToCustomValidationXml) {
-			super( CustomValidationXmlClassLoader.class.getClassLoader() );
-			customValidationXmlPath = pathToCustomValidationXml;
-		}
-
-		public InputStream getResourceAsStream(String path) {
-			String finalPath = path;
-			if ( "META-INF/validation.xml".equals( path ) ) {
-				log.info( "Using {} as validation.xml", customValidationXmlPath );
-				finalPath = customValidationXmlPath;
-			}
-			return super.getResourceAsStream( finalPath );
-		}
 	}
 }

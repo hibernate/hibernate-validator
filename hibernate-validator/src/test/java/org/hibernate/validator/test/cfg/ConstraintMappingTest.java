@@ -69,8 +69,7 @@ public class ConstraintMappingTest {
 	)
 	public void testNullConstraintMapping() {
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-		config.addMapping( (ConstraintMapping) null );
-		config.buildValidatorFactory();
+		config.addMapping( (ConstraintMapping) null ).buildValidatorFactory();
 	}
 
 	@Test
@@ -123,17 +122,11 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testSingleConstraint() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( NotNullDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( new Marathon() );
 		assertNumberOfViolations( violations, 1 );
@@ -142,20 +135,13 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testThatSpecificParameterCanBeSetAfterInvokingMethodFromBaseType() {
-
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( SizeDef.class )
 				.message( "too short" )
 				.min( 3 );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -170,9 +156,6 @@ public class ConstraintMappingTest {
 	 */
 	@Test
 	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
-
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.genericConstraint( MarathonConstraint.class )
@@ -181,11 +164,7 @@ public class ConstraintMappingTest {
 				.constraint( SizeDef.class )
 				.message( "name too short" )
 				.min( 3 );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -197,8 +176,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testInheritedConstraint() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
 				.type( Marathon.class )
@@ -207,11 +184,7 @@ public class ConstraintMappingTest {
 				.type( Tournament.class )
 				.property( "tournamentDate", METHOD )
 				.constraint( FutureDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -226,19 +199,13 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testValid() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.valid( "runners", METHOD )
 				.type( Runner.class )
 				.property( "paidEntryFee", FIELD )
 				.constraint( AssertTrueDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -272,8 +239,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testDefaultGroupSequence() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
 				.type( Marathon.class )
@@ -282,11 +247,7 @@ public class ConstraintMappingTest {
 				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
 				.constraint( NotEmptyDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 
@@ -302,8 +263,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testDefaultGroupSequenceProvider() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
 				.type( Marathon.class )
@@ -312,11 +271,7 @@ public class ConstraintMappingTest {
 				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
 				.constraint( NotEmptyDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 
@@ -335,17 +290,25 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* has the wrong type"
 	)
 	public void testDefaultGroupSequenceProviderDefinedWithWrongType() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
 				.type( Marathon.class )
 				.defaultGroupSequenceProvider( BDefaultGroupSequenceProvider.class );
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
-		config.addMapping( mapping );
+		validator.validate( new Marathon() );
+	}
 
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+	@Test(
+			expectedExceptions = GroupDefinitionException.class,
+			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* must be an implementation of the DefaultGroupSequenceProvider interface"
+	)
+	public void testDefaultGroupSequenceProviderDefinedWithInterface() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping
+				.type( Marathon.class )
+				.defaultGroupSequenceProvider( NoImplDefaultGroupSequenceProvider.class );
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		validator.validate( new Marathon() );
 	}
@@ -355,8 +318,6 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
 				.type( Marathon.class )
@@ -366,11 +327,7 @@ public class ConstraintMappingTest {
 				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
 				.constraint( NotEmptyDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		validator.validate( new Marathon() );
 	}
@@ -380,18 +337,12 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
 	)
 	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( B.class )
 				.defaultGroupSequence( Foo.class, B.class )
 				.property( "b", FIELD )
 				.constraint( NotNullDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		validator.validate( new B() );
 	}
@@ -401,36 +352,24 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
 	)
 	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( A.class )
 				.defaultGroupSequenceProvider( ADefaultGroupSequenceProvider.class )
 				.property( "a", FIELD )
 				.constraint( NotNullDef.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		validator.validate( new A() );
 	}
 
 	@Test
 	public void testMultipleConstraintOfTheSameType() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( SizeDef.class ).min( 5 )
 				.constraint( SizeDef.class ).min( 10 );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Foo" );
@@ -468,12 +407,7 @@ public class ConstraintMappingTest {
 				.genericConstraint( MarathonConstraint.class )
 				.param( "minRunner", 100 )
 				.message( "Needs more runners" );
-
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Stockholm Marathon" );
@@ -499,43 +433,25 @@ public class ConstraintMappingTest {
 				.genericConstraint( MarathonConstraint.class );
 
 		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-		config.addMapping( mapping );
-		config.buildValidatorFactory();
+		config.addMapping( mapping ).buildValidatorFactory();
 	}
 
-	/**
-	 * HV-355 (parameter names of RangeDef wrong)
-	 */
-	@Test
+	@Test(description = "HV-355 (parameter names of RangeDef wrong)")
 	public void testRangeDef() {
-
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Runner.class )
 				.property( "age", METHOD )
 				.constraint( RangeDef.class )
 				.min( 12 )
 				.max( 99 );
-
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
-
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );
 	}
 
-	/**
-	 * HV-444
-	 */
-	@Test
+	@Test(description = "HV-444")
 	public void testDefaultGroupSequenceDefinedOnClassWithNoConstraints() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping
 				.type( Marathon.class )
@@ -545,11 +461,7 @@ public class ConstraintMappingTest {
 				.constraint( NotEmptyDef.class )
 				.type( ExtendedMarathon.class )
 				.defaultGroupSequence( Foo.class, ExtendedMarathon.class );
-
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		ExtendedMarathon extendedMarathon = new ExtendedMarathon();
 
@@ -595,6 +507,9 @@ public class ConstraintMappingTest {
 		public List<Class<?>> getValidationGroups(A object) {
 			return Arrays.asList( Foo.class, A.class );
 		}
+	}
+
+	public static interface NoImplDefaultGroupSequenceProvider extends DefaultGroupSequenceProvider<Marathon> {
 	}
 }
 

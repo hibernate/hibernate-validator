@@ -21,12 +21,9 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.method.MethodConstraintViolation;
@@ -40,13 +37,8 @@ import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraint
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 
 public class CascadingWithConstraintMappingTest {
-
-	/**
-	 * See HV-433
-	 */
-	@Test
+	@Test(description = "HV-433")
 	public void testProgrammaticCascadingValidationFieldAccess() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
 				.type( C.class )
@@ -54,9 +46,7 @@ public class CascadingWithConstraintMappingTest {
 				.constraint( NotNullDef.class )
 				.type( A.class )
 				.valid( "c", FIELD );
-		config.addMapping( newMapping );
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -67,12 +57,8 @@ public class CascadingWithConstraintMappingTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
-	/**
-	 * See HV-433
-	 */
-	@Test
+	@Test(description = "HV-433")
 	public void testProgrammaticCascadingValidationMethodAccess() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
 				.type( C.class )
@@ -80,9 +66,7 @@ public class CascadingWithConstraintMappingTest {
 				.constraint( NotNullDef.class )
 				.type( A.class )
 				.valid( "c", METHOD );
-		config.addMapping( newMapping );
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -93,12 +77,8 @@ public class CascadingWithConstraintMappingTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
-	/**
-	 * See HV-433
-	 */
-	@Test
+	@Test(description = "HV-433")
 	public void testProgrammaticCascadingMethodValidation() {
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
 				.type( C.class )
@@ -106,9 +86,7 @@ public class CascadingWithConstraintMappingTest {
 				.constraint( NotNullDef.class )
 				.type( A.class )
 				.valid( "c", METHOD );
-		config.addMapping( newMapping );
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( newMapping );
 		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
 		B b = new B();

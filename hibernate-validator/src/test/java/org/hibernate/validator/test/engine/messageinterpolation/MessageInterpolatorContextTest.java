@@ -42,7 +42,6 @@ import static org.easymock.EasyMock.verify;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.testng.Assert.assertTrue;
 
-
 /**
  * Tests for HV-333
  *
@@ -52,7 +51,6 @@ public class MessageInterpolatorContextTest {
 
 	@org.testng.annotations.Test
 	public void testInterpolatorContext() throws Exception {
-
 		// use programmatic mapping api to configure constraint
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Test.class )
