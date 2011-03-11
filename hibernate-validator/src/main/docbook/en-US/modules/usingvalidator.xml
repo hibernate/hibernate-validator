@@ -1420,14 +1420,14 @@ public class RentalCar extends Car {
             <entry>field/property. The supported type is
             <classname>String</classname>.</entry>
 
-            <entry>Check if the annotated string is a valid URL. If any of
-            parameters <parameter>protocol</parameter>,
-            <parameter>host</parameter> or <parameter>port</parameter> is
-            specified the URL must match the specified values in the according
-            part. The optional parameters <parameter>regexp</parameter> and
-            <parameter>flags</parameter> allow for specifiny an additional
-            regular expression including flags which the URL must match.
-            </entry>
+            <entry>Check if the annotated string is a valid URL according to
+            RFC2396. If any of the optional parameters
+            <parameter>protocol</parameter>, <parameter>host</parameter> or
+            <parameter>port</parameter> are specified, the corresponding URL
+            fragments must match the specified values. The optional parameters
+            <parameter>regexp</parameter> and <parameter>flags</parameter>
+            allow to specify an additional regular expression (including
+            regular expression flags) which the URL must match.</entry>
 
             <entry>none</entry>
           </row>
