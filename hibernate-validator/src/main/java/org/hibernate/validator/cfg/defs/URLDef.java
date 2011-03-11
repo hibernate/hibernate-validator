@@ -16,6 +16,7 @@
 package org.hibernate.validator.cfg.defs;
 
 import java.lang.annotation.ElementType;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -42,6 +43,16 @@ public class URLDef extends ConstraintDef<URLDef, URL> {
 
 	public URLDef port(int port) {
 		addParameter( "port", port );
+		return this;
+	}
+
+	public URLDef regexp(String regexp) {
+		addParameter( "regexp", regexp );
+		return this;
+	}
+
+	public URLDef flags(Pattern.Flag[] flags) {
+		addParameter( "flags", flags );
 		return this;
 	}
 }

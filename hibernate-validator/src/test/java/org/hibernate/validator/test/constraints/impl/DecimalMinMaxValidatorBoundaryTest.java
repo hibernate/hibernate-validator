@@ -19,13 +19,10 @@ package org.hibernate.validator.test.constraints.impl;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import javax.validation.constraints.DecimalMin;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.DecimalMaxDef;
 import org.hibernate.validator.cfg.defs.DecimalMinDef;
@@ -43,19 +40,13 @@ public class DecimalMinMaxValidatorBoundaryTest {
 
 	@Test
 	public void testDecimalMinValue() {
-
 		// use programmatic mapping api to configure constraint
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
 				.property( "d", FIELD )
 				.constraint( DecimalMinDef.class )
 				.value( "0.100000000000000005" );
-
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		this.d = 0.1;
 
@@ -66,7 +57,6 @@ public class DecimalMinMaxValidatorBoundaryTest {
 
 	@Test
 	public void testDecimalMaxValue() {
-
 		// use programmatic mapping api to configure constraint
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
@@ -74,11 +64,7 @@ public class DecimalMinMaxValidatorBoundaryTest {
 				.constraint( DecimalMaxDef.class )
 				.value( "0.1" );
 
-		HibernateValidatorConfiguration config = TestUtil.getConfiguration( HibernateValidator.class );
-		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = TestUtil.getValidatorForMapping( mapping );
 
 		this.d = 0.1;
 

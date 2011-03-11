@@ -22,14 +22,18 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.impl.URLValidator;
 import org.hibernate.validator.test.util.TestUtil;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
+import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.TestUtil.getValidatorForMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -52,7 +56,6 @@ public class URLValidatorTest {
 		assertFalse( validator.isValid( "ftp//abc.de", null ) );
 		assertTrue( validator.isValid( "ftp://abc.de", null ) );
 	}
-
 
 	@Test
 	public void testIsValidUrlWithProtocolSpecified() {
@@ -112,9 +115,8 @@ public class URLValidatorTest {
 		assertTrue( validator.isValid( "http://www.hibernate.org:80", null ) );
 	}
 
-	@Test
+	@Test(description = "HV-323")
 	public void testIsValidEmptyString() {
-		// HV-323
 		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
 		descriptor.setValue( "protocol", "http" );
 		descriptor.setValue( "host", "www.hibernate.org" );
@@ -126,11 +128,26 @@ public class URLValidatorTest {
 		assertTrue( validator.isValid( "", null ) );
 	}
 
-	@Test
+	@Test(description = "HV-406")
 	public void testRegExp() {
+		// first run the test with @URL configured via annotations
 		Validator validator = TestUtil.getValidator();
+		URLContainer container = new URLContainerAnnotated();
+		runUrlContainerValidation( validator, container );
 
-		URLContainer container = new URLContainer();
+		// now the same test with programmatic configuration
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( URLContainerNoAnnotations.class )
+				.property( "url", METHOD )
+				.constraint( URLDef.class )
+				.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" );
+		validator = getValidatorForMapping( mapping );
+
+		container = new URLContainerNoAnnotations();
+		runUrlContainerValidation( validator, container );
+	}
+
+	private void runUrlContainerValidation(Validator validator, URLContainer container) {
 		container.setUrl( "http://my.domain.com/index.html" );
 		Set<ConstraintViolation<URLContainer>> violations = validator.validate( container );
 		assertNumberOfViolations( violations, 0 );
@@ -150,12 +167,25 @@ public class URLValidatorTest {
 		assertNumberOfViolations( violations, 1 );
 	}
 
-	static class URLContainer {
-		@URL(regexp = "^http://\\S+[\\.htm|\\.html]{1}$")
-		String url;
+	static abstract class URLContainer {
+		public String url;
 
 		public void setUrl(String url) {
 			this.url = url;
 		}
+
+		public String getUrl() {
+			return url;
+		}
+	}
+
+	static class URLContainerAnnotated extends URLContainer {
+		@URL(regexp = "^http://\\S+[\\.htm|\\.html]{1}$")
+		public String getUrl() {
+			return url;
+		}
+	}
+
+	static class URLContainerNoAnnotations extends URLContainer {
 	}
 }
