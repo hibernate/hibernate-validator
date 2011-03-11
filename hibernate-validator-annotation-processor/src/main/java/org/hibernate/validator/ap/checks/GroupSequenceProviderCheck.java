@@ -16,12 +16,12 @@
  */
 package org.hibernate.validator.ap.checks;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -65,27 +65,26 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 
 	@Override
 	public Set<ConstraintCheckError> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
-		Set<ConstraintCheckError> checkErrors = CollectionHelper.newHashSet();
+		Set<ConstraintCheckError> errors = CollectionHelper.newHashSet();
 
-		checkErrors.addAll( checkHostingElement( element, annotation ) );
-		checkErrors.addAll( checkGroupSequenceProviderAnnotationValue( element, annotation ) );
+		errors.addAll( checkHostingElement( element, annotation ) );
+		errors.addAll( checkAnnotationValue( element, annotation ) );
 
-		return checkErrors;
+		return errors;
 	}
 
 	private Set<ConstraintCheckError> checkHostingElement(TypeElement element, AnnotationMirror annotation) {
-		Set<ConstraintCheckError> checkErrors = CollectionHelper.newHashSet();
-
 		if ( !element.getKind().isClass() ) {
-			checkErrors.add(
+			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element, annotation, "GROUP_SEQUENCE_PROVIDER_ANNOTATION_MUST_BE_DEFINED_ON_A_CLASS"
 					)
 			);
 		}
 
+		//this error should be raised only if the GroupSequenceProvider annotations is on a class
 		if ( element.getAnnotation( GroupSequence.class ) != null ) {
-			checkErrors.add(
+			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element,
 							annotation,
@@ -94,84 +93,30 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 			);
 		}
 
-		return checkErrors;
+		return Collections.emptySet();
 	}
 
-	private Set<ConstraintCheckError> checkGroupSequenceProviderAnnotationValue(TypeElement element, AnnotationMirror annotation) {
-		Set<ConstraintCheckError> checkErrors = CollectionHelper.newHashSet();
+	private Set<ConstraintCheckError> checkAnnotationValue(TypeElement element, AnnotationMirror annotation) {
+		Set<ConstraintCheckError> errors = CollectionHelper.newHashSet();
 		AnnotationValue value = annotationApiHelper.getAnnotationValue( annotation, "value" );
 		TypeMirror valueType = (TypeMirror) value.getValue();
-		Element valueElement = typeUtils.asElement( valueType );
-
-		TypeMirror defaultGroupSequenceProviderGenericType = valueType.accept(
-				new SimpleTypeVisitor6<TypeMirror, Void>() {
-
-					@Override
-					public TypeMirror visitDeclared(DeclaredType declaredType, Void aVoid) {
-						TypeMirror eraseType = typeUtils.erasure( declaredType );
-						if ( typeUtils.isSameType( eraseType, defaultGroupSequenceProviderType ) ) {
-							return declaredType.getTypeArguments().get( 0 );
-						}
-
-						List<? extends TypeMirror> superTypes = typeUtils.directSupertypes( declaredType );
-						for ( TypeMirror superType : superTypes ) {
-							TypeMirror genericProviderType = superType.accept( this, aVoid );
-							if ( genericProviderType != null ) {
-								return genericProviderType;
-							}
-						}
-
-						return null;
-					}
-
-				}, null
-		);
+		TypeElement valueElement = (TypeElement) typeUtils.asElement( valueType );
 
 		if ( valueElement.getKind().isInterface() || valueElement.getModifiers().contains( Modifier.ABSTRACT ) ) {
-			checkErrors.add(
+			errors.add(
 					new ConstraintCheckError(
 							element,
 							annotation,
 							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_MUST_BE_AN_IMPLEMENTATION_CLASS"
 					)
 			);
+
 		}
-
-		//checking presence of public default constructor makes sense only if the value element is a class.
-		if ( valueElement.getKind().isClass() ) {
-			Boolean hasPublicDefaultConstructor = valueElement.accept(
-					new ElementKindVisitor6<Boolean, Void>() {
-
-						@Override
-						public Boolean visitTypeAsClass(TypeElement typeElement, Void aVoid) {
-							Boolean hasPublicDefaultConstructor = Boolean.FALSE;
-							List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
-
-							for ( Element enclosedElement : enclosedElements ) {
-								hasPublicDefaultConstructor = enclosedElement.accept( this, null );
-								if ( hasPublicDefaultConstructor ) {
-									break;
-								}
-							}
-							return hasPublicDefaultConstructor;
-						}
-
-						@Override
-						public Boolean visitExecutable(ExecutableElement executableElement, Void aVoid) {
-							if ( executableElement.getKind() == ElementKind.CONSTRUCTOR
-									&& executableElement.getModifiers().contains( Modifier.PUBLIC )
-									&& executableElement.getParameters().isEmpty() ) {
-
-								return Boolean.TRUE;
-							}
-							return Boolean.FALSE;
-						}
-
-					}, null
-			);
-
-			if ( !hasPublicDefaultConstructor ) {
-				checkErrors.add(
+		else {
+			//the TypeElement hosting the annotation is a concrete implementation of the DefaultGroupSequenceProvider
+			//interface. In that case, we need to check that it has a public default constructor.
+			if ( !hasPublicDefaultConstructor( valueElement ) ) {
+				errors.add(
 						new ConstraintCheckError(
 								element,
 								annotation,
@@ -182,18 +127,92 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 			}
 		}
 
-		if ( !typeUtils.isSubtype( element.asType(), defaultGroupSequenceProviderGenericType ) ) {
-			checkErrors.add(
+		TypeMirror genericProviderType = retrieveGenericProviderType( valueType );
+		if ( !typeUtils.isSubtype( element.asType(), genericProviderType ) ) {
+			errors.add(
 					new ConstraintCheckError(
 							element,
 							annotation,
 							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_DEFINED_PROVIDER_CLASS_WITH_WRONG_TYPE",
-							defaultGroupSequenceProviderGenericType,
+							genericProviderType,
 							element.asType()
 					)
 			);
 		}
 
-		return checkErrors;
+		return errors;
+	}
+
+	/**
+	 * Checks that the given {@code TypeElement} has a public
+	 * default constructor.
+	 *
+	 * @param element The {@code TypeElement} to check.
+	 *
+	 * @return True if the given {@code TypeElement} has a public default constructor, false otherwise
+	 */
+	private boolean hasPublicDefaultConstructor(TypeElement element) {
+		return element.accept(
+				new ElementKindVisitor6<Boolean, Void>( Boolean.FALSE ) {
+
+					@Override
+					public Boolean visitTypeAsClass(TypeElement typeElement, Void aVoid) {
+						List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
+						for ( Element enclosedElement : enclosedElements ) {
+							if ( enclosedElement.accept( this, aVoid ) ) {
+								return Boolean.TRUE;
+							}
+						}
+						return Boolean.FALSE;
+					}
+
+					@Override
+					public Boolean visitExecutableAsConstructor(ExecutableElement constructorElement, Void aVoid) {
+						if ( constructorElement.getModifiers().contains( Modifier.PUBLIC )
+								&& constructorElement.getParameters().isEmpty() ) {
+
+							return Boolean.TRUE;
+						}
+						return Boolean.FALSE;
+					}
+
+				}, null
+		);
+	}
+
+	/**
+	 * Retrieves the default group sequence provider generic type defined by the given {@code TypeMirror}.
+	 *
+	 * @param typeMirror The {@code TypeMirror} instance.
+	 *
+	 * @return The generic type or {@code null} if the given type doesn't implement the {@link DefaultGroupSequenceProvider} interface.
+	 */
+	private TypeMirror retrieveGenericProviderType(TypeMirror typeMirror) {
+		return typeMirror.accept(
+				new SimpleTypeVisitor6<TypeMirror, Void>() {
+
+					@Override
+					public TypeMirror visitDeclared(DeclaredType declaredType, Void aVoid) {
+						TypeMirror eraseType = typeUtils.erasure( declaredType );
+						if ( typeUtils.isSameType( eraseType, defaultGroupSequenceProviderType ) ) {
+							List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+							if ( !typeArguments.isEmpty() ) {
+								return typeArguments.get( 0 );
+							}
+							return null;
+						}
+
+						List<? extends TypeMirror> superTypes = typeUtils.directSupertypes( declaredType );
+						for ( TypeMirror superType : superTypes ) {
+							TypeMirror genericProviderType = superType.accept( this, aVoid );
+							if ( genericProviderType != null ) {
+								return genericProviderType;
+							}
+						}
+						return null;
+					}
+
+				}, null
+		);
 	}
 }
