@@ -111,6 +111,11 @@
         <para>only such annotation types are annotated with constraint
         annotations which are constraint annotations themselves</para>
       </listitem>
+
+      <listitem>
+        <para>definition of dynamic default group sequence with @GroupSequenceProvider
+        is valid</para>
+      </listitem>
     </itemizedlist>
   </section>
 
