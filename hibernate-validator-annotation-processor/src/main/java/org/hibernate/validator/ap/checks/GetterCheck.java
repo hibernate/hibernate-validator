@@ -30,13 +30,27 @@ import org.hibernate.validator.ap.util.CollectionHelper;
  * @author Gunnar Morling
  */
 public class GetterCheck extends AbstractConstraintCheck {
+
+	private final boolean methodConstraintsSupported;
+
+	public GetterCheck(boolean methodConstraintsSupported) {
+		this.methodConstraintsSupported  = methodConstraintsSupported;
+	}
+
 	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
 												 AnnotationMirror annotation) {
 
-		if ( !isGetterMethod( element ) ) {
+		if ( !methodConstraintsSupported && !isGetterMethod( element ) ) {
 			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element, annotation, "ONLY_GETTERS_MAY_BE_ANNOTATED"
+					)
+			);
+		}
+		else if (!hasReturnValue(element)) {
+			return CollectionHelper.asSet(
+					new ConstraintCheckError(
+							element, annotation, "ONLY_NON_VOID_METHODS_MAY_BE_ANNOTATED"
 					)
 			);
 		}

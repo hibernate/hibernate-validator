@@ -54,4 +54,36 @@ public class MethodLevelValidationUsingBuiltInConstraints {
 	public static String getStringStatically() {
 		return null;
 	}
+
+	/**
+	 * No getter, but allowed with -AmethodConstraintsSupported.
+	 */
+	@Size(min = 10)
+	public String doSomething() {
+		return null;
+	}
+
+	/**
+	 * Also with -AmethodConstraintsSupported not allowed, as return type doesn't match.
+	 */
+	@Size(min = 10)
+	public Date doSomethingReturningDate() {
+		return null;
+	}
+
+	/**
+	 * Also with -AmethodConstraintsSupported not allowed. No return type.
+	 */
+	@Size(min = 10)
+	public void voidDoSomething() {
+	}
+
+	/**
+	 * Also with -AmethodConstraintsSupported not allowed. Static method.
+	 */
+	@Size(min = 10)
+	public static String staticDoSomething() {
+		return null;
+	}
+
 }

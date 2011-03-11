@@ -58,7 +58,7 @@ public class ConstraintCheckFactory {
 
 	private final static SingleValuedChecks NULL_CHECKS = new SingleValuedChecks();
 
-	public ConstraintCheckFactory(Types typeUtils, ConstraintHelper constraintHelper, AnnotationApiHelper annotationApiHelper) {
+	public ConstraintCheckFactory(Types typeUtils, ConstraintHelper constraintHelper, AnnotationApiHelper annotationApiHelper, boolean methodConstraintsSupported) {
 
 		this.constraintHelper = constraintHelper;
 
@@ -80,16 +80,16 @@ public class ConstraintCheckFactory {
 		methodChecks = CollectionHelper.newHashMap();
 		methodChecks.put(
 				AnnotationType.CONSTRAINT_ANNOTATION,
-				new SingleValuedChecks( new GetterCheck(), new StaticCheck(), new TypeCheck( constraintHelper ) )
+				new SingleValuedChecks( new GetterCheck(methodConstraintsSupported), new StaticCheck(), new TypeCheck( constraintHelper ) )
 		);
 		methodChecks.put(
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION, new MultiValuedChecks(
-						constraintHelper, new GetterCheck(), new StaticCheck(), new TypeCheck( constraintHelper )
+						constraintHelper, new GetterCheck(methodConstraintsSupported), new StaticCheck(), new TypeCheck( constraintHelper )
 				)
 		);
 		methodChecks.put(
 				AnnotationType.GRAPH_VALIDATION_ANNOTATION,
-				new SingleValuedChecks( new GetterCheck(), new StaticCheck(), new PrimitiveCheck() )
+				new SingleValuedChecks( new GetterCheck(methodConstraintsSupported), new StaticCheck(), new PrimitiveCheck() )
 		);
 		methodChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
 

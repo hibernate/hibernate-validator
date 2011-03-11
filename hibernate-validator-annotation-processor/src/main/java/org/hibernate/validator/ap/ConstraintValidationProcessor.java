@@ -40,14 +40,20 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  * href="http://jcp.org/en/jsr/detail?id=303">Bean Validation</a> constraints.
  * The processor supports the following options:
  * <ul>
- * <li><code>diagnosticKind</code>: the severity with which any occurred problems
- * shall be reported. Must be given in form of the string representation of a
- * value from {@link javax.tools.Diagnostic.Kind}, e.g.
+ * <li><code>diagnosticKind</code>: the severity with which any occurred
+ * problems shall be reported. Must be given in form of the string
+ * representation of a value from {@link javax.tools.Diagnostic.Kind}, e.g.
  * "diagnosticKind=WARNING". Default is Kind.ERROR.</li>
- * <li>TODO GM: validationMode: whether spec compliance shall be checked
- * strictly or loosely (e.g. by allowing validators for parametrized types)</li>
- * </ul>
- *
+ * <li><code>verbose</code>: whether a verbose output shall be created or not.
+ * Must be given as String parsable by {@link Boolean#parseBoolean}. Default is
+ * <code>false</code>.</li>
+ * <li><code>methodConstraintsSupported</code>: Whether constraints at other
+ * methods than JavaBeans getter methods may be annotated with constraints. Must
+ * be given as String parsable by {@link Boolean#parseBoolean}. Can be set to
+ * <code>false</code> in order to allow only getter based property constraints
+ * but not method level constraints as supported by Hibernate Validator. Default
+ * is <code>true</code>.</li>
+ * 
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
@@ -55,7 +61,8 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 @SupportedOptions({
 		ConstraintValidationProcessor.DIAGNOSTIC_KIND_PROCESSOR_OPTION_NAME,
-		ConstraintValidationProcessor.VERBOSE_PROCESSOR_OPTION_NAME
+		ConstraintValidationProcessor.VERBOSE_PROCESSOR_OPTION_NAME,
+		ConstraintValidationProcessor.METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION_NAME
 })
 public class ConstraintValidationProcessor extends AbstractProcessor {
 
@@ -69,6 +76,12 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 	 * The name of the processor option for activating verbose message reporting.
 	 */
 	public final static String VERBOSE_PROCESSOR_OPTION_NAME = "verbose";
+	
+	/**
+	 * The name of the processor option for allowing constraints at methods
+	 * other than getter methods.
+	 */
+	public final static String METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION_NAME = "methodConstraintsSupported";
 
 	/**
 	 * The diagnostic kind to be used if no or an invalid kind is given as processor option.
@@ -89,12 +102,20 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 	 */
 	private boolean verbose;
 
+	/**
+	 * Whether method constraints are allowed at any method (true) or only
+	 * getter methods (false).
+	 */
+	private boolean methodConstraintsSupported;
+
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 
 		super.init( processingEnv );
 
 		this.verbose = isVerbose();
+		this.methodConstraintsSupported = methodConstraintsSupported();
+		
 		messager = new MessagerAdapter( processingEnv.getMessager(), getDiagnosticKind() );
 	}
 
@@ -108,7 +129,7 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 		);
 
 		ElementVisitor<Void, List<AnnotationMirror>> visitor = new ConstraintAnnotationVisitor(
-				processingEnv, messager, verbose
+				processingEnv, messager, verbose, methodConstraintsSupported
 		);
 
 		for ( TypeElement oneAnnotation : annotations ) {
@@ -178,4 +199,13 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 		return theValue;
 	}
 
+	/**
+	 * Retrieves the value for the "methodConstraintsSupported" property from the options.
+	 *
+	 * @return The value for the "methodConstraintsSupported" property.
+	 */
+	private boolean methodConstraintsSupported() {
+
+		return Boolean.parseBoolean( processingEnv.getOptions().get( METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION_NAME ) );
+	}
 }

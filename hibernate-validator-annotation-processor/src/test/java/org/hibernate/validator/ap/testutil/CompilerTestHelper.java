@@ -16,15 +16,11 @@
 */
 package org.hibernate.validator.ap.testutil;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.annotation.processing.Processor;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
@@ -35,6 +31,9 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Infrastructure for unit tests based on the Java Compiler API.
@@ -79,30 +78,30 @@ public class CompilerTestHelper {
 	}
 
 	/**
-	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, File...)
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, File...)
 	 */
 	public boolean compile(
 			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, File... sourceFiles) {
 
-		return compile( annotationProcessor, diagnostics, null, null, sourceFiles );
+		return compile( annotationProcessor, diagnostics, null, null, null, sourceFiles );
 	}
 
 	/**
-	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, File...)
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, File...)
 	 */
 	public boolean compile(
 			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, File... sourceFiles) {
 
-		return compile( annotationProcessor, diagnostics, diagnosticKind, null, sourceFiles );
+		return compile( annotationProcessor, diagnostics, diagnosticKind, null, null, sourceFiles );
 	}
 
 	/**
-	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, File...)
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, File...)
 	 */
 	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, boolean verbose, File... sourceFiles) {
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, boolean verbose, boolean allowMethodConstraints, File... sourceFiles) {
 
-		return compile( annotationProcessor, diagnostics, null, verbose, sourceFiles );
+		return compile( annotationProcessor, diagnostics, null, verbose, allowMethodConstraints, sourceFiles );
 	}
 
 	/**
@@ -119,7 +118,7 @@ public class CompilerTestHelper {
 	 *         any errors), false otherwise.
 	 */
 	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, Boolean verbose, File... sourceFiles) {
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, Boolean verbose, Boolean allowMethodConstraints, File... sourceFiles) {
 
 		StandardJavaFileManager fileManager =
 				compiler.getStandardFileManager( null, null, null );
@@ -136,6 +135,10 @@ public class CompilerTestHelper {
 
 		if ( verbose != null ) {
 			options.add( "-Averbose=" + verbose.toString() );
+		}
+
+		if ( allowMethodConstraints != null ) {
+			options.add( "-AmethodConstraintsSupported=" + allowMethodConstraints.toString() );
 		}
 
 		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, options, null, compilationUnits );
@@ -168,7 +171,10 @@ public class CompilerTestHelper {
 		else {
 
 			if ( diagnosticsList.size() != expectations.length ) {
-				System.out.println( diagnosticsList );
+
+				for ( Diagnostic<? extends JavaFileObject> oneDiagnostic : diagnosticsList ) {
+					System.out.println( oneDiagnostic );
+				}
 			}
 
 			assertEquals( diagnosticsList.size(), expectations.length, "Wrong number of diagnostics." );

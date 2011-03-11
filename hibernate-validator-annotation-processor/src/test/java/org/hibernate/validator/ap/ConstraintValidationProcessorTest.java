@@ -16,14 +16,11 @@
 */
 package org.hibernate.validator.ap;
 
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 import java.io.File;
-
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
+
+import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
@@ -71,7 +68,9 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeVali
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
-import org.testng.annotations.Test;
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Miscellaneous tests for {@link ConstraintValidationProcessor}.
@@ -103,7 +102,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		// compile with -AdiagnosticKind=Kind.WARNING and -Averbose=true
 		boolean compilationResult =
 				compilerHelper.compile(
-						new ConstraintValidationProcessor(), diagnostics, Kind.WARNING, true, sourceFile
+						new ConstraintValidationProcessor(), diagnostics, Kind.WARNING, true, false, sourceFile
 				);
 
 		// compilation succeeds as there are problems, but Kind.WARNING won't stop compilation
@@ -175,7 +174,37 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 31 ),
 				new DiagnosticExpectation( Kind.ERROR, 38 ),
 				new DiagnosticExpectation( Kind.ERROR, 46 ),
-				new DiagnosticExpectation( Kind.ERROR, 53 )
+				new DiagnosticExpectation( Kind.ERROR, 53 ),
+				new DiagnosticExpectation( Kind.ERROR, 61 ),
+				new DiagnosticExpectation( Kind.ERROR, 69 ),
+				new DiagnosticExpectation( Kind.ERROR, 77 ),
+				new DiagnosticExpectation( Kind.ERROR, 84 )
+		);
+	}
+
+	/**
+	 * Constraints are allowed at non-getters per processor option, but all other
+	 * checks (no static methods allowed etc.) still apply.
+	 */
+	@Test
+	public void methodLevelConstraintsAllowedAtNonGetterMethods() {
+
+		File sourceFile = compilerHelper.getSourceFile( MethodLevelValidationUsingBuiltInConstraints.class );
+
+		//compile with -AmethodConstraintsSupported
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 46 ),
+				new DiagnosticExpectation( Kind.ERROR, 53 ),
+				new DiagnosticExpectation( Kind.ERROR, 69 ),
+				new DiagnosticExpectation( Kind.ERROR, 77 ),
+				new DiagnosticExpectation( Kind.ERROR, 84 )
 		);
 	}
 

@@ -51,11 +51,11 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	private final boolean verbose;
 
 	public ConstraintAnnotationVisitor(
-			ProcessingEnvironment processingEnvironment, MessagerAdapter messager, boolean verbose) {
+			ProcessingEnvironment processingEnvironment, MessagerAdapter messager, boolean verbose, boolean methodConstraintsSupported) {
 
 		this.messager = messager;
 		this.verbose = verbose;
-
+		
 		AnnotationApiHelper annotationApiHelper = new AnnotationApiHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
 		);
@@ -65,7 +65,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 		);
 
 		constraintCheckFactory = new ConstraintCheckFactory(
-				processingEnvironment.getTypeUtils(), constraintHelper, annotationApiHelper
+				processingEnvironment.getTypeUtils(), constraintHelper, annotationApiHelper, methodConstraintsSupported
 		);
 	}
 
