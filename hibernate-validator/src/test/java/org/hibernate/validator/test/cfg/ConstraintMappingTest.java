@@ -35,7 +35,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.ConstraintsForType;
 import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.defs.FutureDef;
 import org.hibernate.validator.cfg.defs.MinDef;
@@ -150,11 +149,7 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "too short" );
 	}
 
-	/**
-	 * HV-404: Introducing {@link ConstraintsForType#genericConstraint(Class)} allows to set
-	 * specific parameters on following specific constraints.
-	 */
-	@Test
+	@Test(description = "HV-404: Introducing ConstraintsForType#genericConstraint(Class) allows to set specific parameters on following specific constraints.")
 	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
@@ -177,8 +172,7 @@ public class ConstraintMappingTest {
 	@Test
 	public void testInheritedConstraint() {
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
+		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( NotNullDef.class )
 				.type( Tournament.class )
@@ -224,11 +218,9 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "The class class org.hibernate.validator.test.cfg.Marathon does not have a property 'numberOfHelpers' with access METHOD"
 	)
 	public void testSingleConstraintWrongAccessType() throws Throwable {
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		try {
-			mapping
-					.type( Marathon.class )
+			mapping.type( Marathon.class )
 					.property( "numberOfHelpers", METHOD )
 					.constraint( NotNullDef.class );
 		}
@@ -240,8 +232,7 @@ public class ConstraintMappingTest {
 	@Test
 	public void testDefaultGroupSequence() {
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
+		mapping.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
 				.property( "name", METHOD )
 				.constraint( NotNullDef.class ).groups( Foo.class )
@@ -264,8 +255,7 @@ public class ConstraintMappingTest {
 	@Test
 	public void testDefaultGroupSequenceProvider() {
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
+		mapping.type( Marathon.class )
 				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class )
 				.property( "name", METHOD )
 				.constraint( NotNullDef.class ).groups( Foo.class )
@@ -291,25 +281,9 @@ public class ConstraintMappingTest {
 	)
 	public void testDefaultGroupSequenceProviderDefinedWithWrongType() {
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
+		mapping.type( Marathon.class )
 				.defaultGroupSequenceProvider( BDefaultGroupSequenceProvider.class );
 		Validator validator = TestUtil.getValidatorForMapping( mapping );
-
-		validator.validate( new Marathon() );
-	}
-
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* must be an implementation of the DefaultGroupSequenceProvider interface"
-	)
-	public void testDefaultGroupSequenceProviderDefinedWithInterface() {
-		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
-				.defaultGroupSequenceProvider( NoImplDefaultGroupSequenceProvider.class );
-		Validator validator = TestUtil.getValidatorForMapping( mapping );
-
 		validator.validate( new Marathon() );
 	}
 
@@ -319,8 +293,7 @@ public class ConstraintMappingTest {
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
+		mapping.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
 				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class )
 				.property( "name", METHOD )
@@ -328,7 +301,6 @@ public class ConstraintMappingTest {
 				.property( "runners", METHOD )
 				.constraint( NotEmptyDef.class );
 		Validator validator = TestUtil.getValidatorForMapping( mapping );
-
 		validator.validate( new Marathon() );
 	}
 
@@ -343,7 +315,6 @@ public class ConstraintMappingTest {
 				.property( "b", FIELD )
 				.constraint( NotNullDef.class );
 		Validator validator = TestUtil.getValidatorForMapping( mapping );
-
 		validator.validate( new B() );
 	}
 
@@ -358,7 +329,6 @@ public class ConstraintMappingTest {
 				.property( "a", FIELD )
 				.constraint( NotNullDef.class );
 		Validator validator = TestUtil.getValidatorForMapping( mapping );
-
 		validator.validate( new A() );
 	}
 
@@ -453,8 +423,7 @@ public class ConstraintMappingTest {
 	@Test(description = "HV-444")
 	public void testDefaultGroupSequenceDefinedOnClassWithNoConstraints() {
 		ConstraintMapping mapping = new ConstraintMapping();
-		mapping
-				.type( Marathon.class )
+		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
@@ -507,9 +476,6 @@ public class ConstraintMappingTest {
 		public List<Class<?>> getValidationGroups(A object) {
 			return Arrays.asList( Foo.class, A.class );
 		}
-	}
-
-	public static interface NoImplDefaultGroupSequenceProvider extends DefaultGroupSequenceProvider<Marathon> {
 	}
 }
 
