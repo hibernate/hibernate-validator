@@ -27,7 +27,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.spi.ValidationProvider;
 

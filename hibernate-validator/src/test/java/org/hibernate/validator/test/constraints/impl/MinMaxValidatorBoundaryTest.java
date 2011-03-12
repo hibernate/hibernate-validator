@@ -26,12 +26,11 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.TestUtil;
 
-import static junit.framework.Assert.assertFalse;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 
 /**
- * Check correct behaviour of {@link org.hibernate.validator.constraints.impl.MinValidatorForNumber} and
+ * Check correct behavior of {@link org.hibernate.validator.constraints.impl.MinValidatorForNumber} and
  * {@link org.hibernate.validator.constraints.impl.MaxValidatorForNumber} on boundary values.
  * <p/>
  * The chosen numbers: 9223372036854775806l and 9223372036854775807l cast to
@@ -73,5 +72,3 @@ public class MinMaxValidatorBoundaryTest {
 		assertCorrectConstraintTypes( constraintViolations, Max.class );
 	}
 }
-
-
