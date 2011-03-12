@@ -51,7 +51,7 @@ public class URLDef extends ConstraintDef<URLDef, URL> {
 		return this;
 	}
 
-	public URLDef flags(Pattern.Flag[] flags) {
+	public URLDef flags(Pattern.Flag... flags) {
 		addParameter( "flags", flags );
 		return this;
 	}

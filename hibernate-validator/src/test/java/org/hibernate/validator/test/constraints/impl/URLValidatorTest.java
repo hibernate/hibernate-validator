@@ -19,6 +19,7 @@ package org.hibernate.validator.test.constraints.impl;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.Pattern.Flag;
 
 import org.testng.annotations.Test;
 
@@ -133,7 +134,7 @@ public class URLValidatorTest {
 		// first run the test with @URL configured via annotations
 		Validator validator = TestUtil.getValidator();
 		URLContainer container = new URLContainerAnnotated();
-		runUrlContainerValidation( validator, container );
+		runUrlContainerValidation( validator, container, true );
 
 		// now the same test with programmatic configuration
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -144,10 +145,31 @@ public class URLValidatorTest {
 		validator = getValidatorForMapping( mapping );
 
 		container = new URLContainerNoAnnotations();
-		runUrlContainerValidation( validator, container );
+		runUrlContainerValidation( validator, container, true );
 	}
 
-	private void runUrlContainerValidation(Validator validator, URLContainer container) {
+	@Test(description = "HV-406")
+	public void testRegExpCaseInsensitive() {
+
+		// first run the test with @URL configured via annotations
+		Validator validator = TestUtil.getValidator();
+		URLContainer container = new CaseInsensitiveURLContainerAnnotated();
+		runUrlContainerValidation( validator, container, false );
+
+		// now the same test with programmatic configuration
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( URLContainerNoAnnotations.class )
+				.property( "url", METHOD )
+				.constraint( URLDef.class )
+				.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
+				.flags( Flag.CASE_INSENSITIVE );
+		validator = getValidatorForMapping( mapping );
+
+		container = new URLContainerNoAnnotations();
+		runUrlContainerValidation( validator, container, false );
+	}
+
+	private void runUrlContainerValidation(Validator validator, URLContainer container, boolean caseSensitive) {
 		container.setUrl( "http://my.domain.com/index.html" );
 		Set<ConstraintViolation<URLContainer>> violations = validator.validate( container );
 		assertNumberOfViolations( violations, 0 );
@@ -163,29 +185,47 @@ public class URLValidatorTest {
 
 		container.setUrl( "http://my.domain.com/index.asp" );
 		violations = validator.validate( container );
-		assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
 		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
+
+		container.setUrl( "http://my.domain.com/index.HTML" );
+		violations = validator.validate( container );
+		assertNumberOfViolations( violations, caseSensitive ? 1 : 0 );
+		if ( caseSensitive ) {
+			assertCorrectConstraintViolationMessages( violations, "must be a valid URL" );
+		}
+
 	}
 
-	static abstract class URLContainer {
+	private static abstract class URLContainer {
 		public String url;
 
 		public void setUrl(String url) {
 			this.url = url;
 		}
 
+		@SuppressWarnings("unused")
 		public String getUrl() {
 			return url;
 		}
 	}
 
-	static class URLContainerAnnotated extends URLContainer {
+	private static class URLContainerAnnotated extends URLContainer {
 		@URL(regexp = "^http://\\S+[\\.htm|\\.html]{1}$")
 		public String getUrl() {
 			return url;
 		}
 	}
 
-	static class URLContainerNoAnnotations extends URLContainer {
+	private static class CaseInsensitiveURLContainerAnnotated extends URLContainer {
+
+		@URL(regexp = "^http://\\S+[\\.htm|\\.html]{1}$", flags = Flag.CASE_INSENSITIVE)
+		public String getUrl() {
+			return url;
+		}
 	}
+
+	private static class URLContainerNoAnnotations extends URLContainer {
+	}
+
 }
