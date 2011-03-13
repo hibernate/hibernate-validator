@@ -57,19 +57,6 @@
     org.hibernate:hibernate-validator-annotation-processor.</para>
   </note>
 
-  <warning>
-    <para>A first version of the Hibernate Validator Annotation Processor is
-    part of Hibernate Validator since release 4.1. It is currently still under
-    development and should therefore be considered as an experimental feature.
-    Some <link linkend="section-known-issues">known issues</link> can be found
-    at the end of this chapter. In case any problems arise when using the
-    processor feel free to ask for help at the <ulink
-    url="https://forum.hibernate.org/viewforum.php?f=9">forum</ulink> or
-    create an issue within<ulink
-    url="http://opensource.atlassian.com/projects/hibernate/browse/HV/component/10356">
-    JIRA</ulink>.</para>
-  </warning>
-
   <section>
     <title>Prerequisites</title>
 
@@ -83,8 +70,8 @@
   <section id="section-features-of-the-ap">
     <title>Features</title>
 
-    <para>As of Hibernate Validator 4.1 the Hibernate Validator Annotation
-    Processor checks that:</para>
+    <para>As of Hibernate Validator &version; the Hibernate Validator
+    Annotation Processor checks that:</para>
 
     <itemizedlist>
       <listitem>
@@ -93,17 +80,12 @@
       </listitem>
 
       <listitem>
-        <para>JavaBean getter methods are annotated in case of property
-        validation</para>
+        <para>only non-static fields or methods are annotated with constraint
+        annotations</para>
       </listitem>
 
       <listitem>
-        <para>only non-static fields or properties are annotated with
-        constraint annotations</para>
-      </listitem>
-
-      <listitem>
-        <para>only non-primitive fields or properties are annotated with
+        <para>only non-primitive fields or methods are annotated with
         @Valid</para>
       </listitem>
 
@@ -113,8 +95,8 @@
       </listitem>
 
       <listitem>
-        <para>definition of dynamic default group sequence with @GroupSequenceProvider
-        is valid</para>
+        <para>definition of dynamic default group sequence with
+        @GroupSequenceProvider is valid</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -151,6 +133,17 @@
             <classname>ERROR</classname> will cause compilation to halt
             whenever the AP detects a constraint problem. Defaults to
             <classname>ERROR</classname>.</entry>
+          </row>
+
+          <row>
+            <entry><varname>methodConstraintsSupported</varname></entry>
+
+            <entry>Controls whether constraints are allowed at methods of any
+            kind. Must be set to <varname>true</varname> when working with
+            method level constraints as supported by Hibernate Validator. Can
+            be set to <varname>false</varname> to allow constraints only at
+            JavaBeans getter methods as defined by the Bean Validation API.
+            Defaults to <varname>true</varname>.</entry>
           </row>
 
           <row>
