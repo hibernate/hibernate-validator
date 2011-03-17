@@ -58,7 +58,7 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration"&gt;
     &lt;default-provider&gt;org.hibernate.validator.HibernateValidator&lt;/default-provider&gt;
-    &lt;message-interpolator&gt;org.hibernate.validator.engine.ResourceBundleMessageInterpolator&lt;/message-interpolator&gt;
+    &lt;message-interpolator&gt;org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator&lt;/message-interpolator&gt;
     &lt;traversable-resolver&gt;org.hibernate.validator.engine.resolver.DefaultTraversableResolver&lt;/traversable-resolver&gt;
     &lt;constraint-validator-factory&gt;org.hibernate.validator.engine.ConstraintValidatorFactoryImpl&lt;/constraint-validator-factory&gt;
     &lt;constraint-mapping&gt;/constraints-car.xml&lt;/constraint-mapping&gt;
@@ -95,8 +95,7 @@
     configuration. See <xref linkend="section-mapping-constraints" />.</para>
 
     <para>Last but not least, you can specify provider specific properties via
-    the <property>property</property> nodes. Hibernate Validator does
-    currently not make use of any custom properties.</para>
+    the <property>property</property> nodes.</para>
   </section>
 
   <section>
