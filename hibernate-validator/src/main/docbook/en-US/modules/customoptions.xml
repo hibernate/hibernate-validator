@@ -179,16 +179,27 @@ mapping.type( Car.class )
       </example></para>
 
     <para>Last but not least, you can also define cascading constraints as
-    well as the default group sequence of an entity.</para>
+    well as the default group sequence or the default group sequence provider
+    of an entity.</para>
 
     <para><example>
-        <title>Cascading constraints and group redefinition</title>
+        <title>Cascading constraints and default group redefinition</title>
 
         <programlisting>ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .valid( "driver", FIELD )
 .type( RentalCar.class)
     .defaultGroupSequence( RentalCar.class, CarChecks.class ); </programlisting>
+      </example></para>
+
+	<para><example>
+        <title>Cascading constraints and dynamic default group redefinition</title>
+
+        <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+mapping.type( Car.class )
+    .valid( "driver", FIELD )
+.type( RentalCar.class)
+    .defaultGroupSequenceProvider( RentalCarGroupSequenceProvider.class ); </programlisting>
       </example></para>
 
     <para>Once you have your <classname>ConstraintMapping</classname> you will
