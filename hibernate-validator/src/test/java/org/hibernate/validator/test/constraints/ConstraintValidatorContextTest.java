@@ -30,7 +30,7 @@ import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.TestUtil.patchAreEqual;
+import static org.hibernate.validator.test.util.TestUtil.pathsAreEqual;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -103,7 +103,7 @@ public class ConstraintValidatorContextTest {
 				.addConstraintViolation();
 
 		messageAndPathList = context.getMessageAndPathList();
-		assertMessageAndPath( messageAndPathList.get( 0 ), message, "foo[test].bar.fubar" );
+     		assertMessageAndPath( messageAndPathList.get( 0 ), message, "foo[test].bar.fubar" );
 
 		context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
@@ -154,7 +154,7 @@ public class ConstraintValidatorContextTest {
 
 	private void assertMessageAndPath(MessageAndPath messageAndPath, String expectedMessage, String expectedPath) {
 		assertTrue(
-				patchAreEqual( messageAndPath.getPath(), PathImpl.createPathFromString( expectedPath ) ),
+				pathsAreEqual( messageAndPath.getPath(), PathImpl.createPathFromString( expectedPath ) ),
 				"Path do not match: " + messageAndPath.getPath() + " - " + expectedPath
 		);
 		assertEquals( messageAndPath.getMessage(), expectedMessage, "Wrong message" );
