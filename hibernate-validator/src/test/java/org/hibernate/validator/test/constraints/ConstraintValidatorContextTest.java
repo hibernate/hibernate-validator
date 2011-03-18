@@ -29,8 +29,8 @@ import org.hibernate.validator.engine.PathImpl;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.TestUtil.assertEqualPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.TestUtil.patchAreEqual;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -153,7 +153,10 @@ public class ConstraintValidatorContextTest {
 	}
 
 	private void assertMessageAndPath(MessageAndPath messageAndPath, String expectedMessage, String expectedPath) {
-		assertEqualPaths( messageAndPath.getPath(), PathImpl.createPathFromString( expectedPath ) );
+		assertTrue(
+				patchAreEqual( messageAndPath.getPath(), PathImpl.createPathFromString( expectedPath ) ),
+				"Path do not match: " + messageAndPath.getPath() + " - " + expectedPath
+		);
 		assertEquals( messageAndPath.getMessage(), expectedMessage, "Wrong message" );
 	}
 }

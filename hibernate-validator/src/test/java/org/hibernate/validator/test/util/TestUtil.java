@@ -190,7 +190,7 @@ public class TestUtil {
 			Path expectedPath = PathImpl.createPathFromString( propertyPath );
 			boolean containsPath = false;
 			for ( Path actualPath : propertyPathsOfViolations ) {
-				if ( assertEqualPaths( expectedPath, actualPath ) ) {
+				if ( patchAreEqual( expectedPath, actualPath ) ) {
 					containsPath = true;
 					break;
 				}
@@ -236,7 +236,7 @@ public class TestUtil {
 		assertEquals( violations.size(), expectedViolations, "Wrong number of constraint violations" );
 	}
 
-	public static boolean assertEqualPaths(Path p1, Path p2) {
+	public static boolean patchAreEqual(Path p1, Path p2) {
 		Iterator<Path.Node> p1Iterator = p1.iterator();
 		Iterator<Path.Node> p2Iterator = p2.iterator();
 		while ( p1Iterator.hasNext() ) {

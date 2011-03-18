@@ -28,13 +28,13 @@ import javax.validation.metadata.ConstraintDescriptor;
 public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
 
 	private final List<MessageAndPath> messageAndPaths = new ArrayList<MessageAndPath>( 3 );
-	private final PathImpl propertyPath;
+	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
 
 	public ConstraintValidatorContextImpl(PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
-		this.propertyPath = propertyPath;
+		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
 
@@ -47,7 +47,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
-		return new ErrorBuilderImpl( messageTemplate, propertyPath );
+		return new ErrorBuilderImpl( messageTemplate, PathImpl.createCopy( basePath ) );
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {
@@ -64,7 +64,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		List<MessageAndPath> returnedMessageAndPaths = new ArrayList<MessageAndPath>( messageAndPaths );
 		if ( !defaultDisabled ) {
 			returnedMessageAndPaths.add(
-					new MessageAndPath( getDefaultConstraintMessageTemplate(), propertyPath )
+					new MessageAndPath( getDefaultConstraintMessageTemplate(), basePath )
 			);
 		}
 		return returnedMessageAndPaths;
@@ -131,6 +131,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
+			propertyPath.addNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
@@ -165,6 +166,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
+			propertyPath.addNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
