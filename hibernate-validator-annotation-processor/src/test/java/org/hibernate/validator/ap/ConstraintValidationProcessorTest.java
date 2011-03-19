@@ -166,7 +166,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		File sourceFile = compilerHelper.getSourceFile( MethodLevelValidationUsingBuiltInConstraints.class );
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, false, sourceFile );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -353,7 +353,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		File sourceFile1 = compilerHelper.getSourceFile( ValidationUsingAtValidAnnotation.class );
 
 		boolean compilationResult = compilerHelper.compile(
-				new ConstraintValidationProcessor(), diagnostics, sourceFile1
+				new ConstraintValidationProcessor(), diagnostics, false, false, sourceFile1
 		);
 
 		assertFalse( compilationResult );

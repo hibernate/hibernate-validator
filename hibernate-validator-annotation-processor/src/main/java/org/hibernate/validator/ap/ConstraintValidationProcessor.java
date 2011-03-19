@@ -206,6 +206,13 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 	 */
 	private boolean methodConstraintsSupported() {
 
-		return Boolean.parseBoolean( processingEnv.getOptions().get( METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION_NAME ) );
+		String methodConstraintsSupported = processingEnv.getOptions().get( METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION_NAME );
+		
+		//allow method constraints by default
+		if(methodConstraintsSupported == null) {
+			return true;
+		}
+		
+		return Boolean.parseBoolean( methodConstraintsSupported );
 	}
 }
