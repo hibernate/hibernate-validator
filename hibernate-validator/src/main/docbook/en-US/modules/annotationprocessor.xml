@@ -90,6 +90,12 @@
       </listitem>
 
       <listitem>
+        <para>only such methods are annotated with constraint annotations
+        which are valid JavaBeans getter methods (optionally, see
+        below)</para>
+      </listitem>
+
+      <listitem>
         <para>only such annotation types are annotated with constraint
         annotations which are constraint annotations themselves</para>
       </listitem>
