@@ -31,6 +31,7 @@ import org.hibernate.validator.ap.checks.ConstraintCheckError;
 import org.hibernate.validator.ap.checks.ConstraintCheckFactory;
 import org.hibernate.validator.ap.checks.ConstraintChecks;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
+import org.hibernate.validator.ap.util.Configuration;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 import org.hibernate.validator.ap.util.MessagerAdapter;
 
@@ -51,11 +52,11 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	private final boolean verbose;
 
 	public ConstraintAnnotationVisitor(
-			ProcessingEnvironment processingEnvironment, MessagerAdapter messager, boolean verbose, boolean methodConstraintsSupported) {
+			ProcessingEnvironment processingEnvironment, MessagerAdapter messager, Configuration configuration) {
 
 		this.messager = messager;
-		this.verbose = verbose;
-		
+		this.verbose = configuration.isVerbose();
+
 		AnnotationApiHelper annotationApiHelper = new AnnotationApiHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
 		);
@@ -65,7 +66,10 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 		);
 
 		constraintCheckFactory = new ConstraintCheckFactory(
-				processingEnvironment.getTypeUtils(), constraintHelper, annotationApiHelper, methodConstraintsSupported
+				processingEnvironment.getTypeUtils(),
+				constraintHelper,
+				annotationApiHelper,
+				configuration.methodConstraintsSupported()
 		);
 	}
 
