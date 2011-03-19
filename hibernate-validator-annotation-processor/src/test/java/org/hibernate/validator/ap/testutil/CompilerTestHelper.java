@@ -30,6 +30,7 @@ import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
+import org.hibernate.validator.ap.util.Configuration;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import static org.testng.Assert.assertEquals;
@@ -130,15 +131,21 @@ public class CompilerTestHelper {
 		options.addAll( Arrays.asList( "-classpath", System.getProperty( "java.class.path" ), "-d", "target" ) );
 
 		if ( diagnosticKind != null ) {
-			options.add( "-AdiagnosticKind=" + diagnosticKind );
+			options.add( String.format( "-A%s=%s", Configuration.DIAGNOSTIC_KIND_PROCESSOR_OPTION, diagnosticKind ) );
 		}
 
 		if ( verbose != null ) {
-			options.add( "-Averbose=" + verbose.toString() );
+			options.add( String.format( "-A%s=%b", Configuration.VERBOSE_PROCESSOR_OPTION, verbose ) );
 		}
 
 		if ( allowMethodConstraints != null ) {
-			options.add( "-AmethodConstraintsSupported=" + allowMethodConstraints.toString() );
+			options.add(
+					String.format(
+							"-A%s=%b",
+							Configuration.METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION,
+							allowMethodConstraints
+					)
+			);
 		}
 
 		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, options, null, compilationUnits );
