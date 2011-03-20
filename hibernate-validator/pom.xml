@@ -271,6 +271,15 @@
                     <sourceDocumentName>master.xml</sourceDocumentName>
                     <sourceDirectory>${basedir}/src/main/docbook</sourceDirectory>
                     <masterTranslation>en-US</masterTranslation>
+                    <translations>
+                        <translation>zh-CN</translation>
+                    </translations>
+                    <!-- 
+                        The jdookbook plug-in doesn't define an expression for this property, therefore
+                        it can't be passed on the command line. To address this issue the value is retrieved
+                        from a custom property, which itself can be set using -DignoreTranslations=...  
+                    -->
+                    <ignoreTranslations>${jdocbook.ignoreTranslations}</ignoreTranslations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
@@ -314,11 +323,6 @@
                             <goal>translate</goal>
                             <goal>generate</goal>
                         </goals>
-                        <configuration>
-                            <translations>
-                                <translation>zh-CN</translation>
-                            </translations>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
