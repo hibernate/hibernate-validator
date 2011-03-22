@@ -14,12 +14,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.engine.groups;
+package org.hibernate.validator.test.engine.groups.groupchaingenerator;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
- * Group executed first in the validation
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public interface First {
+public class ZipCodeCoherenceValidator implements ConstraintValidator<ZipCodeCoherenceChecker, Address> {
+
+	public void initialize(ZipCodeCoherenceChecker parameters) {
+	}
+
+	public boolean isValid(Address value, ConstraintValidatorContext constraintValidatorContext) {
+		return false;
+	}
 }

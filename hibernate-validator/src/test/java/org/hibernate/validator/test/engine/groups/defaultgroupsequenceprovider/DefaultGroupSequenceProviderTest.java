@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.group;
+package org.hibernate.validator.test.engine.groups.defaultgroupsequenceprovider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,7 +34,6 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
-import org.hibernate.validator.test.group.model.User;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
