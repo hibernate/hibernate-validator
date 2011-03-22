@@ -102,7 +102,6 @@ public class TestUtil {
 		return validator.getConstraintsForClass( clazz ).getConstraintsForProperty( property );
 	}
 
-
 	public static TypeDescriptor getTypeDescriptor(Class<?> clazz) {
 
 		TypeDescriptor typeDescriptor = getMethodValidator().getConstraintsForType( clazz );
