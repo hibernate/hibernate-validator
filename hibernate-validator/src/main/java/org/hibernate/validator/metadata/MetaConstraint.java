@@ -33,7 +33,7 @@ import org.hibernate.validator.metadata.location.ConstraintLocation;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public abstract class MetaConstraint<T, A extends Annotation> {
+public abstract class MetaConstraint<A extends Annotation> {
 
 	/**
 	 * The constraint tree created from the constraint annotation.

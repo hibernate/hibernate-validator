@@ -73,14 +73,14 @@ public class XmlMappingParser {
 	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
 	private final ConstraintHelper constraintHelper;
 	private final AnnotationIgnores annotationIgnores;
-	private final Map<Class<?>, List<MetaConstraint<?, ? extends Annotation>>> constraintMap;
+	private final Map<Class<?>, List<MetaConstraint<? extends Annotation>>> constraintMap;
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	public XmlMappingParser(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
 		this.annotationIgnores = new AnnotationIgnores();
-		this.constraintMap = new HashMap<Class<?>, List<MetaConstraint<?, ? extends Annotation>>>();
+		this.constraintMap = new HashMap<Class<?>, List<MetaConstraint<? extends Annotation>>>();
 		this.cascadedMembers = new HashMap<Class<?>, List<Member>>();
 		this.defaultSequences = new HashMap<Class<?>, List<Class<?>>>();
 	}
@@ -112,12 +112,12 @@ public class XmlMappingParser {
 		return annotationIgnores;
 	}
 
-	public final <T> List<MetaConstraint<T, ? extends Annotation>> getConstraintsForClass(Class<T> beanClass) {
-		List<MetaConstraint<T, ? extends Annotation>> list = new ArrayList<MetaConstraint<T, ? extends Annotation>>();
+	public final <T> List<MetaConstraint<? extends Annotation>> getConstraintsForClass(Class<T> beanClass) {
+		List<MetaConstraint<? extends Annotation>> list = new ArrayList<MetaConstraint<? extends Annotation>>();
 		if ( constraintMap.containsKey( beanClass ) ) {
-			for ( MetaConstraint<?, ? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
+			for ( MetaConstraint<? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
 				@SuppressWarnings("unchecked") // safe cast since the list of meta constraints is always specific to the bean type
-						MetaConstraint<T, ? extends Annotation> boundMetaConstraint = (MetaConstraint<T, ? extends Annotation>) metaConstraint;
+						MetaConstraint<? extends Annotation> boundMetaConstraint = metaConstraint;
 				list.add( boundMetaConstraint );
 			}
 			return list;
@@ -230,7 +230,7 @@ public class XmlMappingParser {
 
 			// constraints
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
-				MetaConstraint<?, ?> metaConstraint = createMetaConstraint(
+				MetaConstraint<?> metaConstraint = createMetaConstraint(
 						constraint, beanClass, field, defaultPackage
 				);
 				addMetaConstraint( beanClass, metaConstraint );
@@ -267,7 +267,7 @@ public class XmlMappingParser {
 
 			// constraints
 			for ( ConstraintType constraint : getterType.getConstraint() ) {
-				MetaConstraint<?, ?> metaConstraint = createMetaConstraint(
+				MetaConstraint<?> metaConstraint = createMetaConstraint(
 						constraint, beanClass, method, defaultPackage
 				);
 				addMetaConstraint( beanClass, metaConstraint );
@@ -293,17 +293,17 @@ public class XmlMappingParser {
 
 		// constraints
 		for ( ConstraintType constraint : classType.getConstraint() ) {
-			MetaConstraint<?, ?> metaConstraint = createMetaConstraint( constraint, beanClass, null, defaultPackage );
+			MetaConstraint<?> metaConstraint = createMetaConstraint( constraint, beanClass, null, defaultPackage );
 			addMetaConstraint( beanClass, metaConstraint );
 		}
 	}
 
-	private void addMetaConstraint(Class<?> beanClass, MetaConstraint<?, ?> metaConstraint) {
+	private void addMetaConstraint(Class<?> beanClass, MetaConstraint<?> metaConstraint) {
 		if ( constraintMap.containsKey( beanClass ) ) {
 			constraintMap.get( beanClass ).add( metaConstraint );
 		}
 		else {
-			List<MetaConstraint<?, ? extends Annotation>> constraintList = new ArrayList<MetaConstraint<?, ? extends Annotation>>();
+			List<MetaConstraint<? extends Annotation>> constraintList = new ArrayList<MetaConstraint<? extends Annotation>>();
 			constraintList.add( metaConstraint );
 			constraintMap.put( beanClass, constraintList );
 		}
@@ -331,7 +331,7 @@ public class XmlMappingParser {
 		return groupSequence;
 	}
 
-	private <A extends Annotation, T> MetaConstraint<?, ?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, Member member, String defaultPackage) {
+	private <A extends Annotation, T> MetaConstraint<?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, Member member, String defaultPackage) {
 		@SuppressWarnings("unchecked")
 		Class<A> annotationClass = (Class<A>) getClass( constraint.getAnnotation(), defaultPackage );
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
@@ -374,7 +374,7 @@ public class XmlMappingParser {
 				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new BeanMetaConstraint<T, A>( constraintDescriptor, beanClass, member );
+		return new BeanMetaConstraint<A>( constraintDescriptor, beanClass, member );
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {

@@ -156,7 +156,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			// via the programmatic api as well
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
 
-			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = newHashMap();
+			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
 			Set<Member> cascadedMembers = new HashSet<Member>();
 
 			for ( Class<?> classInHierarchy : classes ) {
@@ -206,7 +206,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			Class<T> beanClass = (Class<T>) clazz;
 
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
-			Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints = newHashMap();
+			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
 			Set<Member> cascadedMembers = new HashSet<Member>();
 			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
 			// some constraints might be configured in super classes or interfaces. The xml configuration does not
@@ -237,8 +237,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@SuppressWarnings("unchecked")
 	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser,
 																	   Class<T> rootClass,
-																	   Class<?> hierarchyClass, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints) {
-		for ( MetaConstraint<?, ? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
+																	   Class<?> hierarchyClass, Map<Class<?>, List<BeanMetaConstraint<?>>> constraints) {
+		for ( MetaConstraint<? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
 
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
@@ -249,8 +249,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 
 			//TODO GM: avoid this cast
-			BeanMetaConstraint<?, ? extends Annotation> asBeanMetaConstraint = (BeanMetaConstraint<?, ? extends Annotation>) constraint;
-			BeanMetaConstraint<T, A> newMetaConstraint = new BeanMetaConstraint<T, A>(
+			BeanMetaConstraint<? extends Annotation> asBeanMetaConstraint = (BeanMetaConstraint<? extends Annotation>) constraint;
+			BeanMetaConstraint<A> newMetaConstraint = new BeanMetaConstraint<A>(
 					descriptor,
 					asBeanMetaConstraint.getLocation().getBeanClass(),
 					asBeanMetaConstraint.getLocation().getMember()
@@ -263,7 +263,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@SuppressWarnings("unchecked")
 	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefAccessor<?>> definitions,
 																				Class<T> rootClass, Class<?> hierarchyClass,
-																				Map<Class<?>, List<BeanMetaConstraint<T, ?>>> constraints) {
+																				Map<Class<?>, List<BeanMetaConstraint<?>>> constraints) {
 		for ( ConstraintDefAccessor<?> config : definitions ) {
 			A annotation = (A) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
@@ -278,14 +278,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				);
 			}
 
-			BeanMetaConstraint<T, A> metaConstraint = new BeanMetaConstraint<T, A>(
+			BeanMetaConstraint<A> metaConstraint = new BeanMetaConstraint<A>(
 					constraintDescriptor, config.getBeanType(), member
 			);
 			addConstraintToMap( hierarchyClass, metaConstraint, constraints );
 		}
 	}
 
-	private <M extends MetaConstraint<?, ? extends Annotation>> void addConstraintToMap(Class<?> hierarchyClass, M constraint, Map<Class<?>, List<M>> constraints) {
+	private <M extends MetaConstraint<? extends Annotation>> void addConstraintToMap(Class<?> hierarchyClass, M constraint, Map<Class<?>, List<M>> constraints) {
 
 		List<M> constraintList = constraints.get( hierarchyClass );
 

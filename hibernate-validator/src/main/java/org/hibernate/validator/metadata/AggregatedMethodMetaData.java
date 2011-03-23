@@ -46,7 +46,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends Annotation>> {
+public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? extends Annotation>> {
 
 	private final Method method;
 
@@ -56,7 +56,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 
 	private final boolean isConstrained;
 
-	private final List<BeanMetaConstraint<?, ? extends Annotation>> returnValueConstraints;
+	private final List<BeanMetaConstraint<? extends Annotation>> returnValueConstraints;
 
 	private final List<ParameterMetaData> parameterMetaData;
 
@@ -72,7 +72,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 
 	private AggregatedMethodMetaData(
 			Builder builder,
-			List<BeanMetaConstraint<?, ? extends Annotation>> returnValueConstraints,
+			List<BeanMetaConstraint<? extends Annotation>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException) {
 
@@ -163,12 +163,12 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 		 *
 		 * @return A list with all return value constraints.
 		 */
-		private List<BeanMetaConstraint<?, ? extends Annotation>> collectReturnValueConstraints() {
+		private List<BeanMetaConstraint<? extends Annotation>> collectReturnValueConstraints() {
 
-			List<BeanMetaConstraint<?, ? extends Annotation>> theValue = newArrayList();
+			List<BeanMetaConstraint<? extends Annotation>> theValue = newArrayList();
 
 			for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
-				for ( BeanMetaConstraint<?, ? extends Annotation> oneConstraint : oneMethodMetaData ) {
+				for ( BeanMetaConstraint<? extends Annotation> oneConstraint : oneMethodMetaData ) {
 					theValue.add( oneConstraint );
 				}
 			}
@@ -363,7 +363,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<?, 
 	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
-	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {
+	public Iterator<BeanMetaConstraint<? extends Annotation>> iterator() {
 		return returnValueConstraints.iterator();
 	}
 

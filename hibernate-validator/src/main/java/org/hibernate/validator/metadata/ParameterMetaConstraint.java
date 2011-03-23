@@ -26,8 +26,7 @@ import org.hibernate.validator.metadata.location.MethodParameterConstraintLocati
  *
  * @author Gunnar Morling
  */
-public class ParameterMetaConstraint<T, A extends Annotation> extends
-		MetaConstraint<T, A> {
+public class ParameterMetaConstraint<T, A extends Annotation> extends MetaConstraint<A> {
 
 	/**
 	 * Creates a new {@link ParameterMetaConstraint} representing a method
@@ -43,5 +42,4 @@ public class ParameterMetaConstraint<T, A extends Annotation> extends
 
 		super( constraintDescriptor, new MethodParameterConstraintLocation( method, parameterIndex ) );
 	}
-
 }

@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Gunnar Morling
  */
-public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends Annotation>> {
+public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Annotation>> {
 
 	private final Method method;
 
@@ -38,7 +38,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	 */
 	private final List<ParameterMetaData> parameterMetaData;
 
-	private final List<BeanMetaConstraint<?, ? extends Annotation>> constraints;
+	private final List<BeanMetaConstraint<? extends Annotation>> constraints;
 
 	private final boolean isCascading;
 
@@ -46,7 +46,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 
 	public MethodMetaData(
 			Method method,
-			List<BeanMetaConstraint<?, ? extends Annotation>> constraints,
+			List<BeanMetaConstraint<? extends Annotation>> constraints,
 			boolean isCascading) {
 
 		this( method, Collections.<ParameterMetaData>emptyList(), constraints, isCascading );
@@ -55,7 +55,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	public MethodMetaData(
 			Method method,
 			List<ParameterMetaData> parameterMetaData,
-			List<BeanMetaConstraint<?, ? extends Annotation>> constraints,
+			List<BeanMetaConstraint<? extends Annotation>> constraints,
 			boolean isCascading) {
 
 		this.method = method;
@@ -121,7 +121,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<?, ? extends 
 	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
-	public Iterator<BeanMetaConstraint<?, ? extends Annotation>> iterator() {
+	public Iterator<BeanMetaConstraint<? extends Annotation>> iterator() {
 		return constraints.iterator();
 	}
 

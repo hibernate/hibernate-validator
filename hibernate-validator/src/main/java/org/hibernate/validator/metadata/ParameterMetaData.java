@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Gunnar Morling
  */
-public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends Annotation>> {
+public class ParameterMetaData implements Iterable<MetaConstraint<? extends Annotation>> {
 
 	private final Class<?> type;
 
@@ -34,11 +34,11 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 
 	private final String name;
 
-	private final List<MetaConstraint<?, ? extends Annotation>> constraints;
+	private final List<MetaConstraint<? extends Annotation>> constraints;
 
 	private final boolean isCascading;
 
-	public ParameterMetaData(int index, Class<?> type, String name, List<MetaConstraint<?, ? extends Annotation>> constraints, boolean isCascading) {
+	public ParameterMetaData(int index, Class<?> type, String name, List<MetaConstraint<? extends Annotation>> constraints, boolean isCascading) {
 
 		this.index = index;
 		this.type = type;
@@ -76,7 +76,7 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 		return isCascading || !constraints.isEmpty();
 	}
 
-	public Iterator<MetaConstraint<?, ? extends Annotation>> iterator() {
+	public Iterator<MetaConstraint<? extends Annotation>> iterator() {
 		return constraints.iterator();
 	}
 
@@ -86,7 +86,7 @@ public class ParameterMetaData implements Iterable<MetaConstraint<?, ? extends A
 		//display short annotation type names
 		StringBuilder sb = new StringBuilder();
 
-		for ( MetaConstraint<?, ? extends Annotation> oneConstraint : constraints ) {
+		for ( MetaConstraint<? extends Annotation> oneConstraint : constraints ) {
 			sb.append( oneConstraint.getDescriptor().getAnnotation().annotationType().getSimpleName() );
 			sb.append( ", " );
 		}

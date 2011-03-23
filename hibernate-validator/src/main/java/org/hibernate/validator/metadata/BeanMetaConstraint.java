@@ -29,7 +29,7 @@ import org.hibernate.validator.util.ReflectionHelper;
  *
  * @author Gunnar Morling
  */
-public class BeanMetaConstraint<T, A extends Annotation> extends MetaConstraint<T, A> {
+public class BeanMetaConstraint<A extends Annotation> extends MetaConstraint<A> {
 
 	/**
 	 * Creates a new {@link BeanMetaConstraint}.
@@ -47,7 +47,7 @@ public class BeanMetaConstraint<T, A extends Annotation> extends MetaConstraint<
 	 * Returns the location of this constraint.
 	 */
 	public BeanConstraintLocation getLocation() {
-		return ( BeanConstraintLocation ) location;
+		return (BeanConstraintLocation) location;
 	}
 
 	/**
@@ -65,5 +65,4 @@ public class BeanMetaConstraint<T, A extends Annotation> extends MetaConstraint<
 			return ReflectionHelper.getValue( getLocation().getMember(), o );
 		}
 	}
-
 }

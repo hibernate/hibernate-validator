@@ -33,7 +33,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 		this.parameterMetaData = parameterMetaData;
 
 		//add constraints of the represented parameter to the constraint descriptor list
-		for ( MetaConstraint<?, ? extends Annotation> oneConstraint : parameterMetaData ) {
+		for ( MetaConstraint<? extends Annotation> oneConstraint : parameterMetaData ) {
 			addConstraintDescriptor( oneConstraint.getDescriptor() );
 		}
 	}

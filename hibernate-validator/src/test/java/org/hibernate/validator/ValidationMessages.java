@@ -41,7 +41,7 @@ public class ValidationMessages extends ResourceBundle {
 
 	public ValidationMessages() throws Exception {
 
-		log.info( "For test purposes are we proxying the buildin messages!" );
+		log.info( "For test purposes are we proxying the built-in messages!" );
 		addTestPropertiesToBundle();
 		log.info( "Adding the following properties to default properties {}", messages );
 

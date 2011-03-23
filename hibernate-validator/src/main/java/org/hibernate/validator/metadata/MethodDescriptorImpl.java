@@ -37,7 +37,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		this.methodMetaData = methodMetaData;
 
 		//add the return value constraints of the represented method to the constraint descriptor list
-		for ( BeanMetaConstraint<?, ? extends Annotation> oneConstraint : methodMetaData ) {
+		for ( BeanMetaConstraint<? extends Annotation> oneConstraint : methodMetaData ) {
 			addConstraintDescriptor( oneConstraint.getDescriptor() );
 		}
 	}
