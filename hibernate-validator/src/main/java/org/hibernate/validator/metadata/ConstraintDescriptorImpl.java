@@ -1,4 +1,3 @@
-// $Id: ConstraintDescriptorImpl.java 19825 2010-06-24 21:29:29Z hardy.ferentschik $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -138,7 +137,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final ConstraintOrigin definedOn;
 
     /**
-     * Type indicating how composing constraints should be combined. By default this is set to {@Code ConstraintComposition.CompositionType.AND}.
+     * Type indicating how composing constraints should be combined. By default this is set to {@code ConstraintComposition.CompositionType.AND}.
      */
 	private CompositionType compositionType = AND;
 
