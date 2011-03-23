@@ -451,7 +451,6 @@ public class ConstraintTree<A extends Annotation> {
 		sb.append( "ConstraintTree" );
 		sb.append( "{ descriptor=" ).append( descriptor );
 		sb.append( ", isRoot=" ).append( parent == null );
-		sb.append( ", constraintValidatorCache=" ).append( constraintValidatorCache );
 		sb.append( '}' );
 		return sb.toString();
 	}
