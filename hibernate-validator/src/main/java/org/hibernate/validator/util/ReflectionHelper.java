@@ -177,18 +177,18 @@ public final class ReflectionHelper {
 		}
 		return name;
 	}
-	
+
 	/**
 	 * Checks whether the given method's name is a valid JavaBeans getter name,
 	 * meaning it starts with "is" or "has".
-	 * 
-	 * @param member
-	 *            The method of interest.
+	 *
+	 * @param member The method of interest.
+	 *
 	 * @return True, if the given method is a JavaBeans getter method, false
 	 *         otherwise.
 	 */
 	public static boolean isGetterMethod(Method member) {
-		return getPropertyName(member) != null;
+		return getPropertyName( member ) != null;
 	}
 
 	/**
@@ -637,18 +637,6 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the specified class contains a method with the given name.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The method name.
-	 *
-	 * @return Returns {@code true} if the method exists, {@code false} otherwise.
-	 */
-	public static boolean containsMethod(Class<?> clazz, String methodName) {
-		return getMethod( clazz, methodName ) != null;
-	}
-
-	/**
 	 * Checks, whether the given methods have the same signature, which is the
 	 * case if they have the same name, parameter count and types.
 	 *
@@ -712,34 +700,59 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Get all superclasses and interfaces recursively.
+	 * Get all superclasses and optionally interfaces recursively.
 	 *
 	 * @param clazz The class to start the search with.
+	 * @param includeInterfaces whether or not to include interfaces
 	 *
 	 * @return List of all super classes and interfaces of {@code clazz}. The list contains the class itself! The empty
 	 *         list is returned if {@code clazz} is {@code null}.
 	 */
-	public static List<Class<?>> computeClassHierarchy(Class<?> clazz) {
+	public static List<Class<?>> computeClassHierarchy(Class<?> clazz, boolean includeInterfaces) {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		computeClassHierarchy( clazz, classes );
+		computeClassHierarchy( clazz, classes, includeInterfaces );
 		return classes;
 	}
 
 	/**
 	 * Get all superclasses and interfaces recursively.
 	 *
-	 * @param clazz The class to start the search with.
-	 * @param classes List of classes to which to add all found super classes and interfaces.
+	 * @param clazz The class to start the search with
+	 * @param classes List of classes to which to add all found super classes and interfaces
+	 * @param includeInterfaces whether or not to include interfaces
 	 */
-	private static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes) {
+	private static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes, boolean includeInterfaces) {
 		for ( Class current = clazz; current != null; current = current.getSuperclass() ) {
 			if ( classes.contains( current ) ) {
 				return;
 			}
 			classes.add( current );
-			for ( Class currentInterface : current.getInterfaces() ) {
-				computeClassHierarchy( currentInterface, classes );
+			if ( includeInterfaces ) {
+				for ( Class currentInterface : current.getInterfaces() ) {
+					computeClassHierarchy( currentInterface, classes, includeInterfaces );
+				}
 			}
+		}
+	}
+
+	/**
+	 * Get all interfaces a class directly implements.
+	 *
+	 * @param clazz The class for which to find the interfaces
+	 *
+	 * @return List of all interfaces {@code clazz} implements. The empty list is returned if {@code clazz} does not
+	 *         implement any interfaces or {@code clazz} is {@code null}
+	 */
+	public static List<Class<?>> computeAllImplementedInterfaces(Class<?> clazz) {
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		computeAllImplementedInterfaces( clazz, classes );
+		return classes;
+	}
+
+	private static void computeAllImplementedInterfaces(Class<?> clazz, List<Class<?>> classes) {
+		classes.add( clazz );
+		for ( Class currentInterface : clazz.getInterfaces() ) {
+			computeAllImplementedInterfaces( currentInterface, classes );
 		}
 	}
 
@@ -752,7 +765,7 @@ public final class ReflectionHelper {
 	 * @return {@code true} if {@code clazz} extends or implements {@code superClassOrInterface}, {@code false} otherwise.
 	 */
 	private static boolean extendsOrImplements(Class<?> clazz, Class<?> superClassOrInterface) {
-		List<Class<?>> classes = computeClassHierarchy( clazz );
+		List<Class<?>> classes = computeClassHierarchy( clazz, true );
 		return classes.contains( superClassOrInterface );
 	}
 }

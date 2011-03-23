@@ -24,13 +24,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -61,6 +58,8 @@ import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
+
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -378,20 +377,23 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
-		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<U, ? extends Annotation>>> entry : beanMetaData.getMetaConstraintsAsMap()
-				.entrySet() ) {
-			@SuppressWarnings("unchecked")
-			Class<U> hostingBeanClass = (Class<U>) entry.getKey();
-			List<BeanMetaConstraint<U, ? extends Annotation>> constraints = entry.getValue();
+		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+		boolean defaultGroupSequenceUpdated = false;
 
-			BeanMetaData<U> hostingBeanMetaData = getBeanMetaData( hostingBeanClass );
-			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
+		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
+			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
+
+			if ( !defaultGroupSequenceUpdated && hostingBeanMetaData.defaultGroupSequenceIsRedefined() ) {
+				defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+				defaultGroupSequenceUpdated = true;
+			}
 
 			PathImpl currentPath = valueContext.getPropertyPath();
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 				valueContext.setCurrentGroup( defaultSequenceMember );
 				boolean validationSuccessful = true;
-				for ( BeanMetaConstraint<U, ? extends Annotation> metaConstraint : constraints ) {
+				for ( BeanMetaConstraint<? extends Annotation> metaConstraint : hostingBeanMetaData.getDirectMetaConstraints() ) {
 					boolean tmp = validateConstraint(
 							validationContext, valueContext, metaConstraint
 					);
@@ -421,7 +423,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 			valueContext.setCurrentGroup( defaultSequenceMember );
 			boolean validationSuccessful = true;
-			for ( BeanMetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
+			for ( BeanMetaConstraint<? extends Annotation> metaConstraint : beanMetaData.getMetaConstraints() ) {
 				boolean tmp = validateConstraint( validationContext, valueContext, metaConstraint );
 				if ( validationContext.shouldFailFast() ) {
 					return;
@@ -444,7 +446,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V> void validateConstraintsForNonDefaultGroup(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 		PathImpl currentPath = valueContext.getPropertyPath();
-		for ( BeanMetaConstraint<U, ? extends Annotation> metaConstraint : beanMetaData.getMetaConstraintsAsList() ) {
+		for ( BeanMetaConstraint<? extends Annotation> metaConstraint : beanMetaData.getMetaConstraints() ) {
 			validateConstraint( validationContext, valueContext, metaConstraint );
 			if ( validationContext.shouldFailFast() ) {
 				return;
@@ -459,7 +461,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 	}
 
-	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext, BeanMetaConstraint<U, ?> metaConstraint) {
+	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext, BeanMetaConstraint<?> metaConstraint) {
 		boolean validationSuccessful = true;
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
@@ -641,21 +643,21 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T, ConstraintViolation<T>> context, PathImpl propertyPath, GroupChain groupChain) {
-		Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap = new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>();
+		List<BeanMetaConstraint<?>> metaConstraints = newArrayList();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
 		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
 				context.getRootBeanClass(),
 				context.getRootBean(),
 				propertyIter,
 				propertyPath,
-				metaConstraintsMap
+				metaConstraints
 		);
 
 		if ( valueContext.getCurrentBean() == null ) {
 			throw new IllegalArgumentException( "Invalid property path." );
 		}
 
-		if ( metaConstraintsMap.size() == 0 ) {
+		if ( metaConstraints.size() == 0 ) {
 			return context.getFailingConstraints();
 		}
 
@@ -669,7 +671,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
-			validatePropertyForCurrentGroup( valueContext, context, metaConstraintsMap );
+			validatePropertyForCurrentGroup( valueContext, context, metaConstraints );
 			if ( context.shouldFailFast() ) {
 				return context.getFailingConstraints();
 			}
@@ -682,7 +684,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Group group : sequence ) {
 				valueContext.setCurrentGroup( group.getGroup() );
 				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
-						valueContext, context, metaConstraintsMap
+						valueContext, context, metaConstraints
 				);
 				if ( context.shouldFailFast() ) {
 					return context.getFailingConstraints();
@@ -697,13 +699,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T, ConstraintViolation<T>> context, V value, PathImpl propertyPath, GroupChain groupChain) {
-		Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap = new HashMap<Class<?>, List<BeanMetaConstraint<T, ?>>>();
+		List<BeanMetaConstraint<?>> metaConstraints = newArrayList();
 		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
-				context.getRootBeanClass(), null, propertyPath.iterator(), propertyPath, metaConstraintsMap
+				context.getRootBeanClass(), null, propertyPath.iterator(), propertyPath, metaConstraints
 		);
 		valueContext.setCurrentValidatedValue( value );
 
-		if ( metaConstraintsMap.size() == 0 ) {
+		if ( metaConstraints.size() == 0 ) {
 			return context.getFailingConstraints();
 		}
 
@@ -717,7 +719,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
-			validatePropertyForCurrentGroup( valueContext, context, metaConstraintsMap );
+			validatePropertyForCurrentGroup( valueContext, context, metaConstraints );
 			if ( context.shouldFailFast() ) {
 				return context.getFailingConstraints();
 			}
@@ -730,7 +732,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Group group : sequence ) {
 				valueContext.setCurrentGroup( group.getGroup() );
 				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
-						valueContext, context, metaConstraintsMap
+						valueContext, context, metaConstraints
 				);
 				if ( context.shouldFailFast() ) {
 					return context.getFailingConstraints();
@@ -749,27 +751,27 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @param valueContext The current validation context.
 	 * @param validationContext The global validation context.
-	 * @param metaConstraintsMap All constraints associated to the property.
+	 * @param metaConstraints All constraints associated to the property.
 	 *
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private <T, U, V> int validatePropertyForCurrentGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
+	private <T, U, V> int validatePropertyForCurrentGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> metaConstraints) {
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 
 		// we do not validate the default group, nothing special to do
 		if ( !valueContext.validatingDefault() ) {
-			return validatePropertyForNonDefaultGroup( valueContext, validationContext, metaConstraintsMap );
+			return validatePropertyForNonDefaultGroup( valueContext, validationContext, metaConstraints );
 		}
 
 		// we are validating the default group and the main entity hosting the property re-defines the default group
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			return validatePropertyForRedefinedDefaultGroup(
-					valueContext, validationContext, metaConstraintsMap, beanMetaData
+					valueContext, validationContext, metaConstraints, beanMetaData
 			);
 		}
 
 		// we are validating the default group and the main entity don't re-defines the default group
-		return validatePropertyForDefaultGroup( valueContext, validationContext, metaConstraintsMap );
+		return validatePropertyForDefaultGroup( valueContext, validationContext, metaConstraints );
 	}
 
 	/**
@@ -780,16 +782,48 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @param valueContext The current validation context.
 	 * @param validationContext The global validation context.
-	 * @param metaConstraintsMap All constraints associated to the property.
+	 * @param metaConstraints All constraints associated to the property.
 	 *
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private <T, U, V> int validatePropertyForNonDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
+	private <T, U, V> int validatePropertyForNonDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> metaConstraints) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 
-		Collection<List<BeanMetaConstraint<T, ?>>> propertyMetaConstraints = metaConstraintsMap.values();
-		for ( List<BeanMetaConstraint<T, ?>> metaConstraints : propertyMetaConstraints ) {
-			for ( BeanMetaConstraint<T, ?> metaConstraint : metaConstraints ) {
+		for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
+			if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+				if ( valueContext.getCurrentBean() != null ) {
+					@SuppressWarnings("unchecked")
+					V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+					valueContext.setCurrentValidatedValue( valueToValidate );
+				}
+				metaConstraint.validateConstraint( validationContext, valueContext );
+				if ( validationContext.shouldFailFast() ) {
+					return validationContext.getFailingConstraints()
+							.size() - numberOfConstraintViolationsBefore;
+				}
+			}
+		}
+		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
+	}
+
+	/**
+	 * Validates the property for the default group when it's redefined on the bean hosting
+	 * the property to validate.
+	 *
+	 * @param valueContext The current validation context.
+	 * @param validationContext The global validation context.
+	 * @param metaConstraints All constraints associated to the property.
+	 * @param beanMetaData MetaData of the bean hosting the property to validate.
+	 *
+	 * @return The number of constraint violations raised when validating the default group.
+	 */
+	private <T, U, V> int validatePropertyForRedefinedDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> metaConstraints, BeanMetaData<U> beanMetaData) {
+		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
+		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+
+		for ( Class<?> groupClass : defaultGroupSequence ) {
+			valueContext.setCurrentGroup( groupClass );
+			for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
 				if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 					if ( valueContext.getCurrentBean() != null ) {
 						@SuppressWarnings("unchecked")
@@ -803,45 +837,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					}
 				}
 			}
-		}
 
-		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
-	}
-
-	/**
-	 * Validates the property for the default group when it's redefined on the bean hosting
-	 * the property to validate.
-	 *
-	 * @param valueContext The current validation context.
-	 * @param validationContext The global validation context.
-	 * @param metaConstraintsMap All constraints associated to the property.
-	 * @param beanMetaData MetaData of the bean hosting the property to validate.
-	 *
-	 * @return The number of constraint violations raised when validating the default group.
-	 */
-	private <T, U, V> int validatePropertyForRedefinedDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap, BeanMetaData<U> beanMetaData) {
-		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
-		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-
-		for ( Class<?> groupClass : defaultGroupSequence ) {
-			valueContext.setCurrentGroup( groupClass );
-			Collection<List<BeanMetaConstraint<T, ?>>> propertyMetaConstraints = metaConstraintsMap.values();
-			for ( List<BeanMetaConstraint<T, ?>> metaConstraints : propertyMetaConstraints ) {
-				for ( BeanMetaConstraint<T, ?> metaConstraint : metaConstraints ) {
-					if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-						if ( valueContext.getCurrentBean() != null ) {
-							@SuppressWarnings("unchecked")
-							V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
-							valueContext.setCurrentValidatedValue( valueToValidate );
-						}
-						metaConstraint.validateConstraint( validationContext, valueContext );
-						if ( validationContext.shouldFailFast() ) {
-							return validationContext.getFailingConstraints()
-									.size() - numberOfConstraintViolationsBefore;
-						}
-					}
-				}
-			}
 			if ( validationContext.getFailingConstraints().size() > numberOfConstraintViolationsBefore ) {
 				break;
 			}
@@ -859,23 +855,29 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @param valueContext The current validation context.
 	 * @param validationContext The global validation context.
-	 * @param metaConstraintsMap All constraints associated to the property to check.
+	 * @param constraintList All constraints associated to the property to check.
 	 *
 	 * @return The number of constraint violations raised when validating the default group.
 	 */
-	private <T, U, V, E> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
+	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> constraintList) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
+		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+		boolean defaultGroupSequenceUpdated = false;
 
-		for ( Entry<Class<?>, List<BeanMetaConstraint<T, ?>>> entry : metaConstraintsMap.entrySet() ) {
-			BeanMetaData<E> hostingBeanMetaData = getBeanMetaData( (Class<E>) entry.getKey() );
-			List<BeanMetaConstraint<T, ?>> propertyMetaConstraints = entry.getValue();
-
-			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( (E) valueContext.getCurrentBean() );
+		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
+		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
+			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
+			if ( !defaultGroupSequenceUpdated && hostingBeanMetaData.defaultGroupSequenceIsRedefined() ) {
+				defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+				defaultGroupSequenceUpdated = true;
+			}
 
 			for ( Class<?> groupClass : defaultGroupSequence ) {
 				valueContext.setCurrentGroup( groupClass );
-				for ( BeanMetaConstraint<T, ?> metaConstraint : propertyMetaConstraints ) {
-					if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+				for ( BeanMetaConstraint<?> metaConstraint : hostingBeanMetaData.getDirectMetaConstraints() ) {
+					if ( constraintList.contains( metaConstraint ) &&
+							isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 						if ( valueContext.getCurrentBean() != null ) {
 							@SuppressWarnings("unchecked")
 							V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
@@ -892,9 +894,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					break;
 				}
 			}
-
 		}
-
 		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
@@ -1043,7 +1043,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		for ( MetaConstraint<?, ? extends Annotation> metaConstraint : parameterMetaData ) {
+		for ( MetaConstraint<? extends Annotation> metaConstraint : parameterMetaData ) {
 
 			//ignore constraints not part of the evaluated group
 			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
@@ -1164,7 +1164,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		for ( MetaConstraint<?, ? extends Annotation> metaConstraint : methodMetaData ) {
+		for ( MetaConstraint<? extends Annotation> metaConstraint : methodMetaData ) {
 
 			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 				continue;
@@ -1188,15 +1188,15 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @param value While resolving the property path this instance points to the current object. Might be {@code null}.
 	 * @param propertyIter An instance of {@code PropertyIterator} in order to iterate the items of the original property path.
 	 * @param propertyPath The property path for which constraints have to be collected.
-	 * @param metaConstraintsMap An instance of {@code Map} where {@code MetaConstraint}s which match the given path are saved for each class in the hosting class hierarchy.
+	 * @param metaConstraintsList An instance of {@code Map} where {@code MetaConstraint}s which match the given path are saved for each class in the hosting class hierarchy.
 	 *
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
 	 */
-	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, Map<Class<?>, List<BeanMetaConstraint<T, ?>>> metaConstraintsMap) {
+	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, List<BeanMetaConstraint<?>> metaConstraintsList) {
 		Path.Node elem = propertyIter.next();
 		Object newValue = value;
 
-		final BeanMetaData<T> metaData = getBeanMetaData( clazz );
+		BeanMetaData<?> metaData = getBeanMetaData( clazz );
 		//use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( !metaData.isPropertyPresent( elem.getName() ) ) {
 			throw new IllegalArgumentException(
@@ -1206,18 +1206,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		if ( !propertyIter.hasNext() ) {
-			for ( Entry<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> entry : metaData.getMetaConstraintsAsMap()
-					.entrySet() ) {
-				List<BeanMetaConstraint<T, ?>> propertyMetaConstraints = new ArrayList<BeanMetaConstraint<T, ?>>();
-				List<BeanMetaConstraint<T, ? extends Annotation>> constraints = entry.getValue();
-				for ( BeanMetaConstraint<T, ?> metaConstraint : constraints ) {
+			for ( Class<?> hierarchyClass : metaData.getClassHierarchy() ) {
+				metaData = getBeanMetaData( hierarchyClass );
+				for ( BeanMetaConstraint<? extends Annotation> constraint : metaData.getDirectMetaConstraints() ) {
 					if ( elem.getName() != null && elem.getName()
-							.equals( metaConstraint.getLocation().getPropertyName() ) ) {
-						propertyMetaConstraints.add( metaConstraint );
+							.equals( constraint.getLocation().getPropertyName() ) ) {
+						metaConstraintsList.add( constraint );
 					}
-				}
-				if ( !propertyMetaConstraints.isEmpty() ) {
-					metaConstraintsMap.put( entry.getKey(), propertyMetaConstraints );
 				}
 			}
 		}
@@ -1250,7 +1245,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 							castedValue,
 							propertyIter,
 							propertyPath,
-							metaConstraintsMap
+							metaConstraintsList
 					);
 				}
 			}
@@ -1283,7 +1278,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return new SingleThreadCachedTraversableResolver( traversableResolver );
 	}
 
-	private boolean isValidationRequired(ValidationContext<?, ?> validationContext, ValueContext<?, ?> valueContext, MetaConstraint<?, ?> metaConstraint) {
+	private boolean isValidationRequired(ValidationContext<?, ?> validationContext, ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint) {
 		if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 			return false;
 		}

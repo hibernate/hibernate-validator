@@ -20,7 +20,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -75,16 +74,17 @@ public interface BeanMetaData<T> {
 	boolean defaultGroupSequenceIsRedefined();
 
 	/**
-	 * @return A map of {@code MetaConstraint} instances encapsulating the information of all the constraints
-	 *         defined on the bean mapped to the class in which the constraints is defined.
+	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
+	 *         defined on the bean. This collection includes constraints from super classes as well
 	 */
-	Map<Class<?>, List<BeanMetaConstraint<T, ? extends Annotation>>> getMetaConstraintsAsMap();
+	Set<BeanMetaConstraint<? extends Annotation>> getMetaConstraints();
 
 	/**
-	 * @return A list of {@code MetaConstraint} instances encapsulating the information of all the constraints
-	 *         defined on the bean.
+	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
+	 *         defined on the bean directly (including constraints defined on implemented interfaces). It does not
+	 *         contain constraints from super classes or interfaces implemented by super classes
 	 */
-	List<BeanMetaConstraint<T, ? extends Annotation>> getMetaConstraintsAsList();
+	Set<BeanMetaConstraint<? extends Annotation>> getDirectMetaConstraints();
 
 	/**
 	 * Returns the constraint-related meta data for the given method of the
@@ -130,5 +130,11 @@ public interface BeanMetaData<T> {
 	 *         as cascaded (@Valid).
 	 */
 	Set<PropertyDescriptor> getConstrainedProperties();
+
+	/**
+	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the
+	 *         element itself and goes up the hierarchy chain. Interfaces are not included.
+	 */
+	List<Class<?>> getClassHierarchy();
 
 }

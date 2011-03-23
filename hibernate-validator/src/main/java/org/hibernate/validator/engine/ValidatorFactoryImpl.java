@@ -154,7 +154,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			// for each configured entity we have to check whether any of the interfaces or super classes is configured
 			// via the programmatic api as well
-			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
+			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass, true );
 
 			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
 			Set<Member> cascadedMembers = new HashSet<Member>();
@@ -205,7 +205,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			@SuppressWarnings("unchecked")
 			Class<T> beanClass = (Class<T>) clazz;
 
-			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass );
+			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass, true );
 			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
 			Set<Member> cascadedMembers = new HashSet<Member>();
 			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
