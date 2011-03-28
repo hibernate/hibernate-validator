@@ -157,7 +157,7 @@
 
             <entry>Controls whether detailed processing information shall be
             displayed or not, useful for debugging purposes. Must be either
-            <varname>true</varname> or<varname>false</varname>. Defaults to
+            <varname>true</varname> or <varname>false</varname>. Defaults to
             <varname>false</varname>.</entry>
           </row>
         </tbody>
