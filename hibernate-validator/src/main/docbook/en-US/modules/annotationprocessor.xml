@@ -353,6 +353,10 @@
               </listitem>
 
               <listitem>
+                <para>hibernate-validator-&version;.jar</para>
+              </listitem>
+
+              <listitem>
                 <para>hibernate-validator-annotation-processor-&version;.jar</para>
               </listitem>
             </itemizedlist>
@@ -394,7 +398,7 @@
           <listitem>
             <para>Choose "Enable annotation processing" and enter the
             following as "Processor path":
-            /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar</para>
+            /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar</para>
           </listitem>
 
           <listitem>
@@ -435,11 +439,15 @@
 
           <listitem>
             <para>Go to "Libraries", tab "Processor", and add the following
-            two JARs:</para>
+            JARs:</para>
 
             <itemizedlist>
               <listitem>
                 <para>validation-api-&bvVersion;.jar</para>
+              </listitem>
+
+              <listitem>
+                <para>hibernate-validator-&version;.jar</para>
               </listitem>
 
               <listitem>
