@@ -189,6 +189,10 @@
           </listitem>
 
           <listitem>
+            <para>hibernate-validator-&version;.jar</para>
+          </listitem>
+
+          <listitem>
             <para>hibernate-validator-annotation-processor-&version;.jar</para>
           </listitem>
         </itemizedlist>
@@ -201,8 +205,8 @@
           <title>Using the annotation processor with javac</title>
 
           <programlisting>javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
-   -cp /path/to/validation-api-&bvVersion;.jar \ 
-   -processorpath /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar                  </programlisting>
+   -cp /path/to/validation-api-&bvVersion;.jar \
+   -processorpath /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;:/path/to/hibernate-validator-annotation-processor-&version;.jar</programlisting>
         </example>
       </section>
 
@@ -222,7 +226,7 @@
        destdir="build/classes"
        classpath="/path/to/validation-api-&bvVersion;.jar"&gt;
        &lt;compilerarg value="-processorpath" /&gt;
-       &lt;compilerarg value="/path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar"/&gt;
+       &lt;compilerarg value="/path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;:/path/to/hibernate-validator-annotation-processor-&version;.jar"/&gt;
 &lt;/javac&gt;</programlisting>
         </example>
       </section>
