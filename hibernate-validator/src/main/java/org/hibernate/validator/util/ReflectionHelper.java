@@ -722,13 +722,13 @@ public final class ReflectionHelper {
 	 * @param includeInterfaces whether or not to include interfaces
 	 */
 	private static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes, boolean includeInterfaces) {
-		for ( Class current = clazz; current != null; current = current.getSuperclass() ) {
+		for ( Class<?> current = clazz; current != null; current = current.getSuperclass() ) {
 			if ( classes.contains( current ) ) {
 				return;
 			}
 			classes.add( current );
 			if ( includeInterfaces ) {
-				for ( Class currentInterface : current.getInterfaces() ) {
+				for ( Class<?> currentInterface : current.getInterfaces() ) {
 					computeClassHierarchy( currentInterface, classes, includeInterfaces );
 				}
 			}
@@ -751,7 +751,7 @@ public final class ReflectionHelper {
 
 	private static void computeAllImplementedInterfaces(Class<?> clazz, List<Class<?>> classes) {
 		classes.add( clazz );
-		for ( Class currentInterface : clazz.getInterfaces() ) {
+		for ( Class<?> currentInterface : clazz.getInterfaces() ) {
 			computeAllImplementedInterfaces( currentInterface, classes );
 		}
 	}
