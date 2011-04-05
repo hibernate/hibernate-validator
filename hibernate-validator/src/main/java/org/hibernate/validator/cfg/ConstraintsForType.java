@@ -134,6 +134,14 @@ public final class ConstraintsForType {
 	public ConstraintsForType type(Class<?> type) {
 		return new ConstraintsForType( type, mapping );
 	}
+
+	public ConstraintsForMethod returnValue(String method) {
+		return new ConstraintsForMethod( beanClass, method, mapping );
+	}
+
+	public ConstraintsForMethod parameter(String method, String parameter, int index) {
+		return new ConstraintsForMethod( beanClass, method, parameter, index, mapping );
+	}
 }
 
 

@@ -170,6 +170,14 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		return new ConstraintsForType( type, mapping );
 	}
 
+	public ConstraintsForMethod returnValue(String method) {
+		return new ConstraintsForMethod( beanType, method, mapping );
+	}
+
+	public ConstraintsForMethod parameter(String method, String parameter, int index) {
+		return new ConstraintsForMethod( beanType, method, parameter, index, mapping );
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
