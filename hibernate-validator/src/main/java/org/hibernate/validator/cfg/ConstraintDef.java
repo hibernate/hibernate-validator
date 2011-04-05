@@ -162,17 +162,12 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		return constraintDefinition;
 	}
 
-	public ConstraintsForType property(String property, ElementType type) {
-		return new ConstraintsForType( beanType, property, type, mapping );
+	public ConstraintsForProperty property(String property, ElementType type) {
+		return new ConstraintsForProperty( beanType, property, type, mapping );
 	}
 
 	public ConstraintsForType type(Class<?> type) {
 		return new ConstraintsForType( type, mapping );
-	}
-
-	public ConstraintsForType valid(String property, ElementType type) {
-		mapping.addCascadeConfig( new CascadeDef( beanType, property, type ) );
-		return new ConstraintsForType( beanType, mapping );
 	}
 
 	@Override
@@ -187,5 +182,4 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		sb.append( '}' );
 		return sb.toString();
 	}
-
 }

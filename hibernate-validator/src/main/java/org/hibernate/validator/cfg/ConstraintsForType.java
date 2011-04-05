@@ -38,18 +38,10 @@ public final class ConstraintsForType {
 
 	private final ConstraintMapping mapping;
 	private final Class<?> beanClass;
-	private String property;
-	private ElementType elementType;
 
 	public ConstraintsForType(Class<?> beanClass, ConstraintMapping mapping) {
-		this( beanClass, EMPTY_PROPERTY, TYPE, mapping );
-	}
-
-	public ConstraintsForType(Class<?> beanClass, String property, ElementType type, ConstraintMapping mapping) {
 		this.beanClass = beanClass;
 		this.mapping = mapping;
-		this.property = property;
-		this.elementType = type;
 	}
 
 	/**
@@ -65,7 +57,7 @@ public final class ConstraintsForType {
 		);
 
 		final T constraintDefinition = ReflectionHelper.newConstructorInstance(
-				constructor, beanClass, property, elementType, mapping
+				constructor, beanClass, EMPTY_PROPERTY, TYPE, mapping
 		);
 		mapping.addConstraintConfig( constraintDefinition );
 		return constraintDefinition;
@@ -85,7 +77,7 @@ public final class ConstraintsForType {
 	 */
 	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
 		final GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
-				beanClass, definition, property, elementType, mapping
+				beanClass, definition, EMPTY_PROPERTY, TYPE, mapping
 		);
 
 		mapping.addConstraintConfig( constraintDefinition );
@@ -104,8 +96,8 @@ public final class ConstraintsForType {
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public ConstraintsForType property(String property, ElementType type) {
-		return new ConstraintsForType( beanClass, property, type, mapping );
+	public ConstraintsForProperty property(String property, ElementType type) {
+		return new ConstraintsForProperty( beanClass, property, type, mapping );
 	}
 
 	public ConstraintsForType valid(String property, ElementType type) {
