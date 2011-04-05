@@ -65,6 +65,45 @@ public final class ConstraintsForMethod {
 	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
 		throw new NotImplementedException();
 	}
+
+	public ConstraintsForMethod valid() {
+		throw new NotImplementedException();
+	}
+
+	/**
+	 * Creates a new {@code ConstraintsForType} in order to define constraints on a new bean type.
+	 *
+	 * @param type The bean type.
+	 *
+	 * @return Returns a new {@code ConstraintsForType} instance.
+	 */
+	public ConstraintsForType type(Class<?> type) {
+		return new ConstraintsForType( type, mapping );
+	}
+
+	/**
+	 * Changes the property for which added constraints apply.
+	 * <p>
+	 * Until this method is called constraints apply on class level. After calling this method constraints
+	 * apply on the specified property with the given access type.
+	 * </p>
+	 *
+	 * @param property The property on which to apply the following constraints (Java Bean notation).
+	 * @param type The access type (field/property).
+	 *
+	 * @return Returns itself for method chaining.
+	 */
+	public ConstraintsForProperty property(String property, ElementType type) {
+		return new ConstraintsForProperty( beanClass, property, type, mapping );
+	}
+
+	public ConstraintsForMethod returnValue(String method) {
+		return new ConstraintsForMethod( beanClass, method, mapping );
+	}
+
+	public ConstraintsForMethod parameter(String method, String parameter, int index) {
+		return new ConstraintsForMethod( beanClass, method, parameter, index, mapping );
+	}
 }
 
 
