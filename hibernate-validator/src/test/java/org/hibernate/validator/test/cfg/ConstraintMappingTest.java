@@ -195,7 +195,8 @@ public class ConstraintMappingTest {
 	public void testValid() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
-				.valid( "runners", METHOD )
+				.property( "runners", METHOD )
+				.valid()
 				.type( Runner.class )
 				.property( "paidEntryFee", FIELD )
 				.constraint( AssertTrueDef.class );

@@ -100,11 +100,6 @@ public final class ConstraintsForType {
 		return new ConstraintsForProperty( beanClass, property, type, mapping );
 	}
 
-	public ConstraintsForType valid(String property, ElementType type) {
-		mapping.addCascadeConfig( new CascadeDef( beanClass, property, type ) );
-		return this;
-	}
-
 	/**
 	 * Defines the default groups sequence for the bean class of this instance.
 	 *

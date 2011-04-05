@@ -45,8 +45,9 @@ public class CascadingWithConstraintMappingTest {
 				.property( "string", FIELD )
 				.constraint( NotNullDef.class )
 				.type( A.class )
-				.valid( "c", FIELD );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
+				.property( "c", FIELD )
+				.valid();
+		Validator validator = TestUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -65,8 +66,9 @@ public class CascadingWithConstraintMappingTest {
 				.property( "string", METHOD )
 				.constraint( NotNullDef.class )
 				.type( A.class )
-				.valid( "c", METHOD );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
+				.property( "c", METHOD )
+				.valid();
+		Validator validator = TestUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -85,8 +87,9 @@ public class CascadingWithConstraintMappingTest {
 				.property( "string", METHOD )
 				.constraint( NotNullDef.class )
 				.type( A.class )
-				.valid( "c", METHOD );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
+				.property( "c", METHOD )
+				.valid();
+		Validator validator = TestUtil.getValidatorForMapping( newMapping );
 		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
 		B b = new B();
