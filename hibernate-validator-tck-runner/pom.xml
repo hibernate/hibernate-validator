@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
@@ -22,8 +24,18 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>runtime</scope>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -34,31 +46,15 @@
             <artifactId>jsr303-tck</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.test-harness</groupId>
-            <artifactId>jboss-test-harness-jboss-as-60</artifactId>
-        </dependency>
-
-        <!--
-        Provided dependencies.
-        JAXB is needed when running on Java5. In this environment these dependencies have to be added
-        On Java6 jaxb is part of the runtime environment
-        -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <scope>provided</scope>
+            <groupId>org.jboss.jbossas.as7-cdi-tck</groupId>
+            <artifactId>jbossas-container</artifactId>
         </dependency>
     </dependencies>
 
     <properties>
-        <jboss.home>/opt/java/jboss-6</jboss.home>
+        <jboss.home>${env.JBOSS_HOME}</jboss.home>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug />
+        <remote.debug/>
     </properties>
 
     <build>
@@ -83,24 +79,6 @@
                                     <classifier>suite</classifier>
                                     <overWrite>false</overWrite>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>javax.validation</groupId>
-                                    <artifactId>validation-api</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-validator</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.slf4j</groupId>
-                                    <artifactId>slf4j-log4j12</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -119,6 +97,10 @@
                         <property>
                             <name>validation.provider</name>
                             <value>${validation.provider}</value>
+                        </property>
+                        <property>
+                            <name>org.jboss.testharness.spi.StandaloneContainers</name>
+                            <value>org.hibernate.jsr303.tck.util.StandaloneContainersImpl</value>
                         </property>
                     </systemProperties>
                 </configuration>
@@ -163,6 +145,13 @@
                     <name>incontainer</name>
                 </property>
             </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -174,22 +163,12 @@
                             </suiteXmlFiles>
                             <systemProperties>
                                 <property>
-                                    <name>validation.provider</name>
-                                    <value>${validation.provider}</value>
+                                    <name>java.io.tmpdir</name>
+                                    <value>${project.build.outputDirectory}</value>
                                 </property>
                                 <property>
                                     <name>org.jboss.testharness.standalone</name>
                                     <value>false</value>
-                                </property>
-                                <property>
-                                    <name>jboss.home</name>
-                                    <value>${jboss.home}</value>
-                                </property>
-                                <property>
-                                    <name>org.jboss.testharness.container.javaOpts</name>
-                                    <value>-Xms128m -Xmx512m -XX:MaxPermSize=256m -Dorg.jboss.resolver.warning=true
-                                        -Dvalidation.provider=${validation.provider} ${remote.debug}
-                                    </value>
                                 </property>
                                 <property>
                                     <name>org.jboss.testharness.container.forceRestart</name>
@@ -201,14 +180,101 @@
                                 </property>
                                 <property>
                                     <name>org.jboss.testharness.libraryDirectory</name>
-                                    <value>target/dependency/lib</value>
+                                    <value>${project.build.directory}/dependency/lib</value>
                                 </property>
                                 <property>
                                     <name>org.jboss.testharness.outputDirectory</name>
-                                    <value>target</value>
+                                    <value>${project.build.directory}</value>
+                                </property>
+                                <property>
+                                    <name>jboss.options</name>
+                                    <value>-Xms128m -Xmx512m -XX:MaxPermSize=512m -enableassertions
+                                        -Dvalidation.provider=${validation.provider} ${remote.debug}
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>org.jboss.testharness.spi.Containers</name>
+                                    <value>org.jboss.jbossas.cdiTck.container.ArquillianContainerAdaptor</value>
+                                </property>
+                                <property>
+                                    <name>org.jboss.har2arq.container</name>
+                                    <value>org.jboss.as.arquillian.container.managed.JBossAsManagedContainer</value>
+                                </property>
+                                <property>
+                                    <name>jboss.home</name>
+                                    <value>${jboss.home}</value>
+                                </property>
+                                <property>
+                                    <name>validation.provider</name>
+                                    <value>${validation.provider}</value>
                                 </property>
                             </systemProperties>
                         </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!--
+                 Enabling this profile will bundle the BV API and Hibernate Validator w/ the deployed war files instead of
+                 testing against the AS provided dependencies
+            -->
+            <id>bundled-dependencies</id>
+            <activation>
+                <property>
+                    <name>bundled-dependencies</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <stripVersion>true</stripVersion>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.hibernate.jsr303.tck</groupId>
+                                            <artifactId>jsr303-tck</artifactId>
+                                            <type>xml</type>
+                                            <classifier>suite</classifier>
+                                            <overWrite>false</overWrite>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>javax.validation</groupId>
+                                            <artifactId>validation-api</artifactId>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-validator</artifactId>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.slf4j</groupId>
+                                            <artifactId>slf4j-simple</artifactId>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.slf4j</groupId>
+                                            <artifactId>slf4j-api</artifactId>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -249,6 +315,14 @@
                                 <systemProperty>
                                     <key>org.jboss.testharness.libraryDirectory</key>
                                     <value>target/jsr303-artifacts/dependencies</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>org.jboss.testharness.libraryDirectory</key>
+                                    <value>${project.build.directory}/dependency/lib</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>org.jboss.testharness.spi.StandaloneContainers</key>
+                                    <value>org.hibernate.jsr303.tck.util.StandaloneContainersImpl</value>
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
