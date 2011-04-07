@@ -94,4 +94,8 @@ public final class ConstraintsForProperty {
 	public ConstraintsForProperty property(String property, ElementType type) {
 		return new ConstraintsForProperty( beanClass, property, type, mapping );
 	}
+
+	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
+		return new ConstraintsForMethod( beanClass, method, mapping, parameterTypes );
+	}
 }

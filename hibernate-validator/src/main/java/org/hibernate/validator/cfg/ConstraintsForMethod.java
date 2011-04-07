@@ -12,31 +12,26 @@ import static java.lang.annotation.ElementType.PARAMETER;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class ConstraintsForMethod {
-	private static final String EMPTY_PARAMETER_NAME = "";
 	private static final int EMPTY_PARAMETER_INDEX = -1;
 
 	private final ConstraintMapping mapping;
 	private final Class<?> beanClass;
 	private final String method;
+	private final Class<?>[] parameterTypes;
 	private final ElementType elementType;
-	private final String parameter;
 	private final int index;
 
-	public ConstraintsForMethod(Class<?> beanClass, String method, ConstraintMapping mapping) {
-		this( beanClass, method, METHOD, EMPTY_PARAMETER_NAME, EMPTY_PARAMETER_INDEX, mapping );
+	public ConstraintsForMethod(Class<?> beanClass, String method, ConstraintMapping mapping, Class<?>... parameterTypes) {
+		this( beanClass, method, METHOD, EMPTY_PARAMETER_INDEX, mapping, parameterTypes );
 	}
 
-	public ConstraintsForMethod(Class<?> beanClass, String method, String parameter, int index, ConstraintMapping mapping) {
-		this( beanClass, method, PARAMETER, parameter, index, mapping );
-	}
-
-	private ConstraintsForMethod(Class<?> beanClass, String method, ElementType elementType, String parameter, int index, ConstraintMapping mapping) {
+	private ConstraintsForMethod(Class<?> beanClass, String method, ElementType elementType, int index, ConstraintMapping mapping, Class<?>... parameterTypes) {
 		this.mapping = mapping;
 		this.beanClass = beanClass;
 		this.method = method;
 		this.elementType = elementType;
-		this.parameter = parameter;
 		this.index = index;
+		this.parameterTypes = parameterTypes;
 	}
 
 	/**
@@ -97,12 +92,16 @@ public final class ConstraintsForMethod {
 		return new ConstraintsForProperty( beanClass, property, type, mapping );
 	}
 
-	public ConstraintsForMethod returnValue(String method) {
-		return new ConstraintsForMethod( beanClass, method, mapping );
+	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
+		return new ConstraintsForMethod( beanClass, method, mapping, parameterTypes );
 	}
 
-	public ConstraintsForMethod parameter(String method, String parameter, int index) {
-		return new ConstraintsForMethod( beanClass, method, parameter, index, mapping );
+	public ConstraintsForMethod returnValue() {
+		return new ConstraintsForMethod( beanClass, method, METHOD, index, mapping, parameterTypes );
+	}
+
+	public ConstraintsForMethod parameter(int index) {
+		return new ConstraintsForMethod( beanClass, method, PARAMETER, index, mapping, parameterTypes );
 	}
 }
 

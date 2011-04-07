@@ -24,6 +24,8 @@ import java.util.Map;
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -170,12 +172,12 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		return new ConstraintsForType( type, mapping );
 	}
 
-	public ConstraintsForMethod returnValue(String method) {
-		return new ConstraintsForMethod( beanType, method, mapping );
+	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
+		return new ConstraintsForMethod( beanType, method, mapping, parameterTypes );
 	}
 
-	public ConstraintsForMethod parameter(String method, String parameter, int index) {
-		return new ConstraintsForMethod( beanType, method, parameter, index, mapping );
+	public ConstraintsForMethod parameter(int index) {
+		throw new NotImplementedException();
 	}
 
 	@Override
