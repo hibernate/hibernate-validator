@@ -21,6 +21,10 @@ import javax.validation.ValidationException;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.util.ReflectionHelper.propertyExists;
+
 /**
  * @author Hardy Ferentschik
  */
@@ -34,12 +38,12 @@ public class CascadeDef {
 			throw new ValidationException( "Null is not a valid bean type" );
 		}
 
-		if ( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) {
+		if ( FIELD.equals( elementType ) || METHOD.equals( elementType ) ) {
 			if ( property == null || property.length() == 0 ) {
 				throw new ValidationException( "A valid property name has to be specified" );
 			}
 
-			if ( !ReflectionHelper.propertyExists( beanType, property, elementType ) ) {
+			if ( !propertyExists( beanType, property, elementType ) ) {
 				throw new ValidationException(
 						"The class " + beanType + " does not have a property '"
 								+ property + "' with access " + elementType

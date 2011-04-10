@@ -37,6 +37,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 public class ConstraintMapping {
 	private final Map<Class<?>, List<ConstraintDef<?, ?>>> constraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
+	private final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
@@ -44,6 +45,7 @@ public class ConstraintMapping {
 	public ConstraintMapping() {
 		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?, ?>>>();
 		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
+		this.methodCascadeConfig = new HashMap<Class<?>, List<MethodCascadeDef>>();
 		this.configuredClasses = new HashSet<Class<?>>();
 		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
 		this.defaultGroupSequenceProviders = new HashMap<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>>();
@@ -90,6 +92,10 @@ public class ConstraintMapping {
 		return cascadeConfig;
 	}
 
+	public final Map<Class<?>, List<MethodCascadeDef>> getMethodCascadeConfig() {
+		return methodCascadeConfig;
+	}
+
 	public final Collection<Class<?>> getConfiguredClasses() {
 		return configuredClasses;
 	}
@@ -120,6 +126,7 @@ public class ConstraintMapping {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ConstraintMapping" );
 		sb.append( "{cascadeConfig=" ).append( cascadeConfig );
+		sb.append( ", methodCascadeConfig=" ).append( methodCascadeConfig );
 		sb.append( ", constraintConfig=" ).append( constraintConfig );
 		sb.append( ", configuredClasses=" ).append( configuredClasses );
 		sb.append( ", defaultGroupSequences=" ).append( defaultGroupSequences );
@@ -137,6 +144,19 @@ public class ConstraintMapping {
 			List<CascadeDef> cascadeList = new ArrayList<CascadeDef>();
 			cascadeList.add( cascade );
 			cascadeConfig.put( beanClass, cascadeList );
+		}
+	}
+
+	protected final void addMethodCascadeConfig(MethodCascadeDef cascade) {
+		Class<?> beanClass = cascade.getBeanType();
+		configuredClasses.add( beanClass );
+		if ( methodCascadeConfig.containsKey( beanClass ) ) {
+			methodCascadeConfig.get( beanClass ).add( cascade );
+		}
+		else {
+			List<MethodCascadeDef> cascadeList = new ArrayList<MethodCascadeDef>();
+			cascadeList.add( cascade );
+			methodCascadeConfig.put( beanClass, cascadeList );
 		}
 	}
 

@@ -85,7 +85,8 @@ public final class ConstraintsForMethod {
 	 * @return Returns itself for method chaining.
 	 */
 	public ConstraintsForMethod valid() {
-		throw new NotImplementedException();
+		mapping.addMethodCascadeConfig( new MethodCascadeDef( beanClass, method, index, elementType, parameterTypes ) );
+		return this;
 	}
 
 	/**
