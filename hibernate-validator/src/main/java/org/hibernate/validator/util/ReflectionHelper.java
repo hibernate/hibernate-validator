@@ -46,6 +46,7 @@ import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.util.privilegedactions.GetConstructor;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.util.privilegedactions.GetMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
@@ -586,11 +587,33 @@ public final class ReflectionHelper {
 	 * @param clazz The class to check.
 	 * @param methodName The method name.
 	 *
-	 * @return Returns the method with the specified property or {@code null}if it does not exist.
+	 * @return Returns the method with the specified property or {@code null} if it does not exist.
 	 */
 	public static Method getMethod(Class<?> clazz, String methodName) {
 		Method method;
 		GetMethod action = GetMethod.action( clazz, methodName );
+		if ( System.getSecurityManager() != null ) {
+			method = AccessController.doPrivileged( action );
+		}
+		else {
+			method = action.run();
+		}
+		return method;
+	}
+
+	/**
+	 * Returns the declared method with the specified name and parameter types or {@code null} if
+	 * it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param methodName The method name.
+	 * @param parameterTypes The method parameter types.
+	 *
+	 * @return Returns the declared method with the specified name or {@code null} if it does not exist.
+	 */
+	public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		Method method;
+		GetDeclaredMethod action = GetDeclaredMethod.action( clazz, methodName, parameterTypes );
 		if ( System.getSecurityManager() != null ) {
 			method = AccessController.doPrivileged( action );
 		}
