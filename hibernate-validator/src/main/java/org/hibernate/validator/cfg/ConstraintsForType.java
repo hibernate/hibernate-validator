@@ -131,8 +131,8 @@ public final class ConstraintsForType {
 	 *
 	 * @return Returns a new {@code ConstraintsForProperty} instance allowing method chaining.
 	 */
-	public ConstraintsForProperty property(String property, ElementType type) {
-		return new ConstraintsForProperty( beanClass, property, type, mapping );
+	public ConstraintsForTypeProperty property(String property, ElementType type) {
+		return new ConstraintsForTypeProperty( beanClass, property, type, mapping );
 	}
 
 	/**
@@ -142,13 +142,13 @@ public final class ConstraintsForType {
 	 * apply to the specified method.
 	 * </p>
 	 *
-	 * @param method The method name.
+	 * @param name The method name.
 	 * @param parameterTypes The method parameter types.
 	 *
 	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
 	 */
-	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
-		return new ConstraintsForMethod( beanClass, method, mapping, parameterTypes );
+	public ConstraintsForTypeMethod method(String name, Class<?>... parameterTypes) {
+		return new ConstraintsForTypeMethod( beanClass, name, parameterTypes, mapping );
 	}
 }
 

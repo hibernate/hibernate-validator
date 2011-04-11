@@ -164,19 +164,19 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		return constraintDefinition;
 	}
 
-	public ConstraintsForProperty property(String property, ElementType type) {
-		return new ConstraintsForProperty( beanType, property, type, mapping );
+	public ConstraintsForTypeProperty property(String property, ElementType type) {
+		return new ConstraintsForTypeProperty( beanType, property, type, mapping );
 	}
 
 	public ConstraintsForType type(Class<?> type) {
 		return new ConstraintsForType( type, mapping );
 	}
 
-	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
-		return new ConstraintsForMethod( beanType, method, mapping, parameterTypes );
+	public ConstraintsForTypeMethod method(String name, Class<?>... parameterTypes) {
+		return new ConstraintsForTypeMethod( beanType, name, parameterTypes, mapping );
 	}
 
-	public ConstraintsForMethod parameter(int index) {
+	public ConstraintsForTypeMethodElement parameter(int index) {
 		throw new NotImplementedException();
 	}
 

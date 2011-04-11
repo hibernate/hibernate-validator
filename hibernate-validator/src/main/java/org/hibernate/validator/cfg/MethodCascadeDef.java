@@ -34,31 +34,31 @@ public class MethodCascadeDef {
 	private final ElementType elementType;
 	private final int index;
 
-	public MethodCascadeDef(Class<?> beanType, String method, int index, ElementType elementType, Class<?>... parameterTypes) {
+	public MethodCascadeDef(Class<?> beanType, String methodName, Class<?>[] parameterTypes, int index, ElementType elementType) {
 		if ( beanType == null ) {
 			throw new ValidationException( "Null is not a valid bean type" );
 		}
 
-		if ( method == null || method.length() == 0 ) {
+		if ( methodName == null || methodName.length() == 0 ) {
 			throw new ValidationException( "A valid method name has to be specified" );
 		}
 
 		if ( PARAMETER.equals( elementType ) && ( index < 0 || index >= parameterTypes.length ) ) {
-			throw new ValidationException( "A valid parameter index has to be specified for method " + method );
+			throw new ValidationException( "A valid parameter index has to be specified for method " + methodName );
 		}
 
-		Method foundMethod = getDeclaredMethod( beanType, method, parameterTypes );
-		if ( foundMethod == null || Modifier.isStatic( foundMethod.getModifiers() ) || foundMethod.isSynthetic() ) {
+		Method clazzMethod = getDeclaredMethod( beanType, methodName, parameterTypes );
+		if ( clazzMethod == null || Modifier.isStatic( clazzMethod.getModifiers() ) || clazzMethod.isSynthetic() ) {
 			throw new ValidationException(
 					"The class " + beanType + " doesn't have a method named "
-							+ method + " with parameter types " + Arrays.toString( parameterTypes )
+							+ methodName + " with parameter types " + Arrays.toString( parameterTypes )
 			);
 		}
 
 		this.beanType = beanType;
-		this.method = foundMethod;
-		this.index = index;
+		this.method = clazzMethod;
 		this.elementType = elementType;
+		this.index = index;
 	}
 
 	public Class<?> getBeanType() {

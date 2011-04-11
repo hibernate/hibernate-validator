@@ -21,35 +21,34 @@ import java.lang.annotation.ElementType;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 
 /**
- * Via instances of this class method constraints can be configured for a single bean class.
+ * Via instances of this class constraints can be configured for a single bean class.
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public final class ConstraintsForMethod {
+public final class ConstraintsForTypeMethodElement {
 	private static final int EMPTY_PARAMETER_INDEX = -1;
 
 	private final ConstraintMapping mapping;
 	private final Class<?> beanClass;
-	private final String method;
+	private final String methodName;
 	private final Class<?>[] parameterTypes;
 	private final ElementType elementType;
 	private final int index;
 
-	public ConstraintsForMethod(Class<?> beanClass, String method, ConstraintMapping mapping, Class<?>... parameterTypes) {
-		this( beanClass, method, METHOD, EMPTY_PARAMETER_INDEX, mapping, parameterTypes );
+	public ConstraintsForTypeMethodElement(Class<?> beanClass, String methodName, Class<?>[] parameterTypes, ElementType elementType, ConstraintMapping mapping) {
+		this( beanClass, methodName, parameterTypes, elementType, EMPTY_PARAMETER_INDEX, mapping );
 	}
 
-	private ConstraintsForMethod(Class<?> beanClass, String method, ElementType elementType, int index, ConstraintMapping mapping, Class<?>... parameterTypes) {
-		this.mapping = mapping;
+	public ConstraintsForTypeMethodElement(Class<?> beanClass, String methodName, Class<?>[] parameterTypes, ElementType elementType, int index, ConstraintMapping mapping) {
 		this.beanClass = beanClass;
-		this.method = method;
+		this.methodName = methodName;
+		this.parameterTypes = parameterTypes;
 		this.elementType = elementType;
 		this.index = index;
-		this.parameterTypes = parameterTypes;
+		this.mapping = mapping;
 	}
 
 	/**
@@ -84,9 +83,28 @@ public final class ConstraintsForMethod {
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public ConstraintsForMethod valid() {
-		mapping.addMethodCascadeConfig( new MethodCascadeDef( beanClass, method, index, elementType, parameterTypes ) );
+	public ConstraintsForTypeMethodElement valid() {
+		mapping.addMethodCascadeConfig(
+				new MethodCascadeDef(
+						beanClass,
+						methodName,
+						parameterTypes,
+						index,
+						elementType
+				)
+		);
 		return this;
+	}
+
+	/**
+	 * Changes the parameter for which added constraints apply.
+	 *
+	 * @param index The parameter index.
+	 *
+	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
+	 */
+	public ConstraintsForTypeMethodElement parameter(int index) {
+		return new ConstraintsForTypeMethodElement( beanClass, methodName, parameterTypes, PARAMETER, index, mapping );
 	}
 
 	/**
@@ -108,43 +126,20 @@ public final class ConstraintsForMethod {
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public ConstraintsForProperty property(String property, ElementType type) {
-		return new ConstraintsForProperty( beanClass, property, type, mapping );
+	public ConstraintsForTypeProperty property(String property, ElementType type) {
+		return new ConstraintsForTypeProperty( beanClass, property, type, mapping );
 	}
 
 	/**
 	 * Returns a new {@code ConstraintsForMethod} instance allowing to define
 	 * constraints for the given method.
 	 *
-	 * @param method The method name.
+	 * @param name The method name.
 	 * @param parameterTypes The method parameter types.
 	 *
 	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
 	 */
-	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
-		return new ConstraintsForMethod( beanClass, method, mapping, parameterTypes );
-	}
-
-	/**
-	 * Defines constraints on the return value of the current method.
-	 *
-	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
-	 */
-	public ConstraintsForMethod returnValue() {
-		return new ConstraintsForMethod( beanClass, method, METHOD, index, mapping, parameterTypes );
-	}
-
-	/**
-	 * Changes the parameter for which added constraints apply.
-	 *
-	 * @param index The parameter index.
-	 *
-	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
-	 */
-	public ConstraintsForMethod parameter(int index) {
-		return new ConstraintsForMethod( beanClass, method, PARAMETER, index, mapping, parameterTypes );
+	public ConstraintsForTypeMethod method(String name, Class<?>... parameterTypes) {
+		return new ConstraintsForTypeMethod( beanClass, name, parameterTypes, mapping );
 	}
 }
-
-
-
