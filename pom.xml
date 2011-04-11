@@ -36,6 +36,13 @@
             <organization>Individual</organization>
             <url>http://musingsofaprogrammingaddict.blogspot.com/</url>
         </developer>
+        <developer>
+            <id>kevinpollet</id>
+            <name>Kevin Pollet</name>
+            <email>kevin.pollet@serli.com</email>
+            <organization>Serli</organization>
+            <url>http://www.serli.com</url>
+        </developer>
     </developers>
 
     <mailingLists>
