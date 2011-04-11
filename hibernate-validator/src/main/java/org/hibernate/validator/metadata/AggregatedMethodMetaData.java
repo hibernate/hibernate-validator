@@ -90,6 +90,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 	 * Creates new {@link AggregatedMethodMetaData} instances.
 	 *
 	 * @author Gunnar Morling
+	 * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
 	 */
 	public static class Builder {
 
@@ -139,10 +140,27 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 		 */
 		public void addMetaData(MethodMetaData metaData) {
 
-			metaDataByDefiningType.put( metaData.getMethod().getDeclaringClass(), metaData );
-
 			isCascading = isCascading || metaData.isCascading();
 			isConstrained = isConstrained || metaData.isConstrained();
+
+			Class<?> declaringClass = metaData.getMethod().getDeclaringClass();
+			MethodMetaData mergedMetaData = null;
+			MethodMetaData currentMetaData = metaDataByDefiningType.get( declaringClass );
+
+			if ( currentMetaData != null ) {
+				List<ParameterMetaData> currentParameterMetaData = currentMetaData.getAllParameterMetaData();
+				List<ParameterMetaData> parameterMetaData = metaData.getAllParameterMetaData();
+
+				mergedMetaData = new MethodMetaData(
+						metaData.getMethod(),
+						mergeParameterMetaDatas( currentParameterMetaData, parameterMetaData ),
+						aggregateReturnValueConstraints( currentMetaData, metaData ),
+						isCascading
+				);
+			}
+
+			currentMetaData = ( mergedMetaData == null ? metaData : mergedMetaData );
+			metaDataByDefiningType.put( declaringClass, currentMetaData );
 		}
 
 		/**
@@ -258,6 +276,49 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 
 			return theValue;
 		}
+
+		private List<BeanMetaConstraint<?, ? extends Annotation>> aggregateReturnValueConstraints(MethodMetaData currentMetaData, MethodMetaData metaData) {
+			List<BeanMetaConstraint<?, ? extends Annotation>> mergedConstraints = newArrayList();
+			for ( BeanMetaConstraint<?, ? extends Annotation> constraint : currentMetaData ) {
+				mergedConstraints.add( constraint );
+			}
+			for ( BeanMetaConstraint<?, ? extends Annotation> constraint : metaData ) {
+				mergedConstraints.add( constraint );
+			}
+			return mergedConstraints;
+		}
+
+		private List<ParameterMetaData> mergeParameterMetaDatas(List<ParameterMetaData> currentParameterMetaDatas, List<ParameterMetaData> parameterMetaDatas) {
+			List<ParameterMetaData> mergedParameterMetaDatas = newArrayList( currentParameterMetaDatas.size() );
+
+			int i = 0;
+			for ( ParameterMetaData currentParameterMetadata : currentParameterMetaDatas ) {
+				ParameterMetaData parameterMetaData = parameterMetaDatas.get( i );
+				List<MetaConstraint<?, ? extends Annotation>> aggregatedParameterConstraints = newArrayList();
+
+				for ( MetaConstraint<?, ? extends Annotation> constraint : currentParameterMetadata ) {
+					aggregatedParameterConstraints.add( constraint );
+				}
+
+				for ( MetaConstraint<?, ? extends Annotation> constraint : parameterMetaData ) {
+					aggregatedParameterConstraints.add( constraint );
+				}
+
+				mergedParameterMetaDatas.add(
+						new ParameterMetaData(
+								i,
+								currentParameterMetadata.getType(),
+								currentParameterMetadata.getParameterName(),
+								aggregatedParameterConstraints,
+								currentParameterMetadata.isCascading() || parameterMetaData.isCascading()
+						)
+				);
+
+				i++;
+			}
+
+			return mergedParameterMetaDatas;
+		}
 	}
 
 	/**
@@ -293,7 +354,6 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 	public Method getMethod() {
 		return method;
 	}
-
 
 	/**
 	 * Returns meta data for the specified parameter of the represented method.

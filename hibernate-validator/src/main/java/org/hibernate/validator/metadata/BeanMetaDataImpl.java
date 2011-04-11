@@ -70,7 +70,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
-	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
+	public static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
 
 	/**
 	 * The root bean class for this meta data.
@@ -166,6 +166,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				new ArrayList<Class<?>>(),
 				null,
 				new HashMap<Class<?>, List<BeanMetaConstraint<?>>>(),
+				new HashSet<AggregatedMethodMetaData>(),
 				new HashSet<Member>(),
 				new AnnotationIgnores(),
 				beanMetaDataCache
@@ -181,6 +182,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param defaultGroupSequence programmatic/xml configured default group sequence (overrides annotations)
 	 * @param defaultGroupSequenceProvider programmatic configured default group sequence provider class (overrides annotations)
 	 * @param constraints programmatic/xml configured constraints
+	 * @param methodMetaDatas programmatic configured method constraints
 	 * @param cascadedMembers programmatic/xml configured cascaded members
 	 * @param annotationIgnores in xml configured ignores for annotations
 	 * @param beanMetaDataCache the cache of already configured meta data instances
@@ -190,6 +192,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
 							Map<Class<?>, List<BeanMetaConstraint<?>>> constraints,
+							Set<AggregatedMethodMetaData> methodMetaDatas,
 							Set<Member> cascadedMembers,
 							AnnotationIgnores annotationIgnores,
 							BeanMetaDataCache beanMetaDataCache) {
@@ -262,15 +265,27 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				);
 				addMethodMetaConstraint( clazz, methodMetaData );
 			}
+
 		}
 
 		allMetaConstraints = buildAllConstraintSets();
-		directMetaConstraints = buildDirectConstraintSets();
-
-		methodMetaData = Collections.unmodifiableMap( buildMethodMetaData() );
+    	directMetaConstraints = buildDirectConstraintSets();
+		
+		// add the explicitly configured method constraints, here we need to merge the programmatic and discovered
+		// metadata built with the "automatic" discovering.
+		if ( !methodMetaDatas.isEmpty() ) {
+			for ( AggregatedMethodMetaData aggregatedMethodMetaData : methodMetaDatas ) {
+				for ( MethodMetaData methodMetaData : aggregatedMethodMetaData.getAllMethodMetaData() ) {
+					Method method = methodMetaData.getMethod();
+					addMethodMetaConstraint( method.getDeclaringClass(), methodMetaData );
+				}
+			}
+		}
+		
+		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData() );
 
 		// reset class members we don't need any longer
-		methodMetaDataBuilders = null;
+		this.methodMetaDataBuilders = null;
 		this.constraintHelper = null;
 	}
 

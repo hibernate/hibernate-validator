@@ -19,7 +19,9 @@ package org.hibernate.validator.engine;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,8 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.CascadeDef;
 import org.hibernate.validator.cfg.ConstraintDefAccessor;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.MethodCascadeDef;
+import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
@@ -45,12 +49,19 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.MethodMetaData;
+import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.xml.XmlMappingParser;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
@@ -147,6 +158,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		final Map<Class<?>, List<ConstraintDefAccessor<?>>> constraintsByType = mapping.getConstraintConfig();
 		final Map<Class<?>, List<CascadeDef>> cascadeConfigByType = mapping.getCascadeConfig();
+		final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfigByType = mapping.getMethodCascadeConfig();
 
 		for ( Class<?> clazz : mapping.getConfiguredClasses() ) {
 			@SuppressWarnings("unchecked")
@@ -157,6 +169,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass, true );
 
 			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
+			Set<AggregatedMethodMetaData.Builder> builders = newHashSet();
 			Set<Member> cascadedMembers = new HashSet<Member>();
 
 			for ( Class<?> classInHierarchy : classes ) {
@@ -177,14 +190,28 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				if ( cascadesOfType != null ) {
 					addProgrammaticConfiguredCascade( cascadesOfType, cascadedMembers );
 				}
+
+				// retrieve the cascading method return value and method parameter
+				List<MethodCascadeDef> methodCascadesOfType = methodCascadeConfigByType.get( classInHierarchy );
+				if ( methodCascadesOfType != null ) {
+					addProgrammaticConfiguredMethodCascade( methodCascadesOfType, builders );
+				}
 			}
 
+			// build the programmatic configured method metaData
+			Set<AggregatedMethodMetaData> methodMetaDataMap = newHashSet();
+			for ( AggregatedMethodMetaData.Builder oneBuilder : builders ) {
+				methodMetaDataMap.add( oneBuilder.build() );
+			}
+
+			// create the bean metadata with the programmatic configured constraints and cascade
 			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
 					beanClass,
 					constraintHelper,
 					mapping.getDefaultSequence( beanClass ),
 					mapping.getDefaultGroupSequenceProvider( beanClass ),
 					constraints,
+					methodMetaDataMap,
 					cascadedMembers,
 					new AnnotationIgnores(),
 					beanMetaDataCache
@@ -225,6 +252,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 					mappingParser.getDefaultSequenceForClass( beanClass ),
 					null,
 					constraints,
+					new HashSet<AggregatedMethodMetaData>(),
 					cascadedMembers,
 					annotationIgnores,
 					beanMetaDataCache
@@ -314,6 +342,52 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 			cascadedMembers.add( m );
 		}
+	}
+
+	private void addProgrammaticConfiguredMethodCascade(List<MethodCascadeDef> methodCascades, Set<AggregatedMethodMetaData.Builder> builders) {
+		for ( MethodCascadeDef cascadeDef : methodCascades ) {
+			MethodMetaData methodMetaData = createMethodMetaData( cascadeDef );
+			addMetaDataToBuilder( methodMetaData, builders );
+		}
+	}
+
+	private MethodMetaData createMethodMetaData(MethodCascadeDef cascadeDef) {
+		Method method = cascadeDef.getMethod();
+		List<ParameterMetaData> parameterMetaDatas = newArrayList();
+		List<MetaConstraint<? extends Annotation>> parameterConstraints = Collections.emptyList();
+		List<BeanMetaConstraint<? extends Annotation>> returnConstraints = Collections.emptyList();
+
+		int i = 0;
+		for ( Class<?> parameterType : method.getParameterTypes() ) {
+			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
+			boolean isCascading = PARAMETER.equals( cascadeDef.getElementType() ) && cascadeDef.getIndex() == i;
+
+			parameterMetaDatas.add(
+					new ParameterMetaData(
+							i,
+							parameterType,
+							parameterName,
+							parameterConstraints,
+							isCascading
+					)
+			);
+
+			i++;
+		}
+
+		boolean isCascading = METHOD.equals( cascadeDef.getElementType() );
+		return new MethodMetaData( method, parameterMetaDatas, returnConstraints, isCascading );
+	}
+
+	private void addMetaDataToBuilder(MethodMetaData methodMetaData, Set<AggregatedMethodMetaData.Builder> builders) {
+		for ( AggregatedMethodMetaData.Builder OneBuilder : builders ) {
+			if ( OneBuilder.accepts( methodMetaData ) ) {
+				OneBuilder.addMetaData( methodMetaData );
+				return;
+			}
+		}
+		AggregatedMethodMetaData.Builder builder = new AggregatedMethodMetaData.Builder( methodMetaData );
+		builders.add( builder );
 	}
 
 	/**
