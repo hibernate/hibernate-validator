@@ -27,7 +27,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 import static java.lang.annotation.ElementType.TYPE;
 
 /**
- * Via instances of this class constraints and cascading properties can be configured for a single bean class.
+ * Via instances of this class constraints can be configured for a single bean class.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -129,12 +129,24 @@ public final class ConstraintsForType {
 	 * @param property The property on which to apply the following constraints (Java Bean notation).
 	 * @param type The access type (field/property).
 	 *
-	 * @return Returns itself for method chaining.
+	 * @return Returns a new {@code ConstraintsForProperty} instance allowing method chaining.
 	 */
 	public ConstraintsForProperty property(String property, ElementType type) {
 		return new ConstraintsForProperty( beanClass, property, type, mapping );
 	}
 
+	/**
+	 * Changes the method for which added constraints apply.
+	 * <p>
+	 * Until this method is called constraints apply on class level. After calling this method constraints
+	 * apply to the specified method.
+	 * </p>
+	 *
+	 * @param method The method name.
+	 * @param parameterTypes The method parameter types.
+	 *
+	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
+	 */
 	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
 		return new ConstraintsForMethod( beanClass, method, mapping, parameterTypes );
 	}

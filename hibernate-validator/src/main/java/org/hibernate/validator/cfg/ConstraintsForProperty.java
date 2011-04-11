@@ -1,3 +1,19 @@
+/*
+ * JBoss, Home of Professional Open Source
+ * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
@@ -7,10 +23,11 @@ import java.lang.reflect.Constructor;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
+ * Via instances of this class properties constraints can be configured for a single bean class.
+ *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class ConstraintsForProperty {
-
 	private final ConstraintMapping mapping;
 	private final Class<?> beanClass;
 	private final String property;
@@ -63,6 +80,11 @@ public final class ConstraintsForProperty {
 		return constraintDefinition;
 	}
 
+	/**
+	 * Marks the current property as cascadable.
+	 *
+	 * @return Returns itself for method chaining.
+	 */
 	public ConstraintsForProperty valid() {
 		mapping.addCascadeConfig( new CascadeDef( beanClass, property, elementType ) );
 		return this;
@@ -81,10 +103,6 @@ public final class ConstraintsForProperty {
 
 	/**
 	 * Changes the property for which added constraints apply.
-	 * <p>
-	 * Until this method is called constraints apply on class level. After calling this method constraints
-	 * apply on the specified property with the given access type.
-	 * </p>
 	 *
 	 * @param property The property on which to apply the following constraints (Java Bean notation).
 	 * @param type The access type (field/property).
@@ -95,6 +113,15 @@ public final class ConstraintsForProperty {
 		return new ConstraintsForProperty( beanClass, property, type, mapping );
 	}
 
+	/**
+	 * Returns a new {@code ConstraintsForMethod} instance allowing to define
+	 * constraints for the given method.
+	 *
+	 * @param method The method name.
+	 * @param parameterTypes The method parameter types.
+	 *
+	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
+	 */
 	public ConstraintsForMethod method(String method, Class<?>... parameterTypes) {
 		return new ConstraintsForMethod( beanClass, method, mapping, parameterTypes );
 	}
