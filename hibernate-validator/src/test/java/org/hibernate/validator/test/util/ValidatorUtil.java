@@ -95,6 +95,10 @@ public final class ValidatorUtil {
 		return getValidator().unwrap( MethodValidator.class );
 	}
 
+	public static MethodValidator getMethodValidatorForMapping(ConstraintMapping... mappings) {
+		return getValidatorForMapping( mappings ).unwrap( MethodValidator.class );
+	}
+
 	/**
 	 * Returns the {@code Configuration} object for Hibernate Validator. This method also sets the default locale to
 	 * english.
