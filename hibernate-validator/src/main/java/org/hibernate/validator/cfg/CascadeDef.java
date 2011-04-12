@@ -45,7 +45,7 @@ public class CascadeDef {
 
 			if ( !propertyExists( beanType, property, elementType ) ) {
 				throw new ValidationException(
-						"The class " + beanType + " does not have a property '"
+						"The " + beanType + " does not have a property '"
 								+ property + "' with access " + elementType
 				);
 			}

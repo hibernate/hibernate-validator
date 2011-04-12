@@ -44,14 +44,14 @@ public class MethodCascadeDef {
 		}
 
 		if ( PARAMETER.equals( elementType ) && ( index < 0 || index >= parameterTypes.length ) ) {
-			throw new ValidationException( "A valid parameter index has to be specified for method " + methodName );
+			throw new ValidationException( "A valid parameter index has to be specified for method '" + methodName + "'" );
 		}
 
 		Method clazzMethod = getDeclaredMethod( beanType, methodName, parameterTypes );
 		if ( clazzMethod == null || Modifier.isStatic( clazzMethod.getModifiers() ) || clazzMethod.isSynthetic() ) {
 			throw new ValidationException(
-					"The class " + beanType + " doesn't have a method named "
-							+ methodName + " with parameter types " + Arrays.toString( parameterTypes )
+					"The " + beanType + " doesn't have a method '" + methodName + "' with parameter types "
+							+ Arrays.toString( parameterTypes )
 			);
 		}
 
