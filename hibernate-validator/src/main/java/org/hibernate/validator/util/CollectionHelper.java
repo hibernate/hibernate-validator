@@ -20,12 +20,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Provides some methods for simplified collection instantiation.
  *
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class CollectionHelper {
 
@@ -56,8 +58,17 @@ public class CollectionHelper {
 		return new ArrayList<T>( size );
 	}
 
-	public static <T> Set<T> asSet(T... ts) {
+	public static <T> ArrayList<T> newArrayList(Iterable<T>... iterables) {
+		ArrayList<T> resultList = newArrayList();
+		for ( Iterable<T> oneIterable : iterables ) {
+			for (T oneElement : oneIterable) {
+				resultList.add( oneElement );
+			}
+		}
+		return resultList;
+	}
 
+	public static <T> Set<T> asSet(T... ts) {
 		return new HashSet<T>( Arrays.asList( ts ) );
 	}
 }
