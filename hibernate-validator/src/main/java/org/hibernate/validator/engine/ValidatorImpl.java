@@ -724,21 +724,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
 	private <T, U, V> int validatePropertyForCurrentGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> metaConstraints) {
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
-
 		// we do not validate the default group, nothing special to do
 		if ( !valueContext.validatingDefault() ) {
 			return validatePropertyForNonDefaultGroup( valueContext, validationContext, metaConstraints );
 		}
 
-		// we are validating the default group and the main entity hosting the property re-defines the default group
-		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			return validatePropertyForRedefinedDefaultGroup(
-					valueContext, validationContext, metaConstraints, beanMetaData
-			);
-		}
-
-		// we are validating the default group and the main entity don't re-defines the default group
+		// we are validating the default group, we have to consider that a class in the hierarchy could redefine the default group sequence
 		return validatePropertyForDefaultGroup( valueContext, validationContext, metaConstraints );
 	}
 
@@ -775,46 +766,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	/**
-	 * Validates the property for the default group when it's redefined on the bean hosting
-	 * the property to validate.
-	 *
-	 * @param valueContext The current validation context.
-	 * @param validationContext The global validation context.
-	 * @param metaConstraints All constraints associated to the property.
-	 * @param beanMetaData MetaData of the bean hosting the property to validate.
-	 *
-	 * @return The number of constraint violations raised when validating the default group.
-	 */
-	private <T, U, V> int validatePropertyForRedefinedDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> metaConstraints, BeanMetaData<U> beanMetaData) {
-		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
-		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-
-		for ( Class<?> groupClass : defaultGroupSequence ) {
-			valueContext.setCurrentGroup( groupClass );
-			for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
-				if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-					if ( valueContext.getCurrentBean() != null ) {
-						@SuppressWarnings("unchecked")
-						V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
-						valueContext.setCurrentValidatedValue( valueToValidate );
-					}
-					metaConstraint.validateConstraint( validationContext, valueContext );
-					if ( validationContext.shouldFailFast() ) {
-						return validationContext.getFailingConstraints()
-								.size() - numberOfConstraintViolationsBefore;
-					}
-				}
-			}
-
-			if ( validationContext.getFailingConstraints().size() > numberOfConstraintViolationsBefore ) {
-				break;
-			}
-		}
-
-		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
-	}
-
-	/**
 	 * Validates the property for the default group.
 	 * <p>
 	 * This method checks that the default group sequence is not redefined in the class hierarchy for a superclass
@@ -830,20 +781,21 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> constraintList) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
-		List<Class<?>> defaultGroupSequence = beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-		boolean defaultGroupSequenceUpdated = false;
 
 		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
-			if ( !defaultGroupSequenceUpdated && hostingBeanMetaData.defaultGroupSequenceIsRedefined() ) {
-				defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-				defaultGroupSequenceUpdated = true;
+			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
+			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+			Set<BeanMetaConstraint<? extends Annotation>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+
+			if ( defaultGroupSequenceIsRedefined ) {
+				metaConstraints = hostingBeanMetaData.getMetaConstraints();
 			}
 
 			for ( Class<?> groupClass : defaultGroupSequence ) {
 				valueContext.setCurrentGroup( groupClass );
-				for ( BeanMetaConstraint<?> metaConstraint : hostingBeanMetaData.getDirectMetaConstraints() ) {
+				for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
 					if ( constraintList.contains( metaConstraint ) &&
 							isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 						if ( valueContext.getCurrentBean() != null ) {
@@ -861,6 +813,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				if ( validationContext.getFailingConstraints().size() > numberOfConstraintViolationsBefore ) {
 					break;
 				}
+			}
+
+			// all the hierarchy has been validated, stop validation.
+			if ( defaultGroupSequenceIsRedefined ) {
+				break;
 			}
 		}
 		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
