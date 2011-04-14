@@ -594,7 +594,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetaData ) {
 				ReflectionHelper.setAccessibility( field );
-				BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( field, constraintDescription );
+				BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( clazz, field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
 
@@ -694,13 +694,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
-			BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( null, constraintDescription );
+			BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( clazz, null, constraintDescription );
 			addMetaConstraint( clazz, metaConstraint );
 		}
 	}
 
-	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Member m, ConstraintDescriptorImpl<A> descriptor) {
-		return new BeanMetaConstraint<A>( descriptor, beanClass, m );
+	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Class<?> declaringClass, Member m, ConstraintDescriptorImpl<A> descriptor) {
+		return new BeanMetaConstraint<A>( descriptor, declaringClass, m );
 	}
 
 	private <A extends Annotation> ParameterMetaConstraint<T, A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
@@ -812,7 +812,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		List<BeanMetaConstraint<? extends Annotation>> constraints = new ArrayList<BeanMetaConstraint<? extends Annotation>>();
 
 		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
-			constraints.add( createBeanMetaConstraint( method, oneDescriptor ) );
+			constraints.add( createBeanMetaConstraint( method.getDeclaringClass(), method, oneDescriptor ) );
 		}
 
 		return constraints;
