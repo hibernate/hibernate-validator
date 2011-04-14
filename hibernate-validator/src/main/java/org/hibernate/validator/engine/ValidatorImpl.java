@@ -353,19 +353,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForCurrentGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext) {
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
-
 		// we are not validating the default group there is nothing special to consider. If we are validating the default
 		// group sequence we have to consider that a class in the hierarchy could redefine the default group sequence.
 		if ( !valueContext.validatingDefault() ) {
 			validateConstraintsForNonDefaultGroup( validationContext, valueContext );
 		}
 		else {
-			validateConstraintsForDefaultGroup( validationContext, valueContext, beanMetaData );
+			validateConstraintsForDefaultGroup( validationContext, valueContext );
 		}
 	}
 
-	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext, BeanMetaData<U> beanMetaData) {
+	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext) {
+		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
