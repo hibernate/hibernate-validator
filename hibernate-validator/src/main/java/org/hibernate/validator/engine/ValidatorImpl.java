@@ -787,34 +787,34 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-			Set<BeanMetaConstraint<? extends Annotation>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
-
-			if ( defaultGroupSequenceIsRedefined ) {
-				metaConstraints = hostingBeanMetaData.getMetaConstraints();
-			}
 
 			for ( Class<?> groupClass : defaultGroupSequence ) {
+				boolean validationSuccessful = true;
 				valueContext.setCurrentGroup( groupClass );
-				for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
-					if ( constraintList.contains( metaConstraint ) &&
-							isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+				for ( BeanMetaConstraint<?> metaConstraint : constraintList ) {
+					Class<?> beanClass = metaConstraint.getLocation().getBeanClass();
+					boolean constraintIsDefinedOnSuperClass = beanClass.isAssignableFrom( clazz );
+
+					if ( ( clazz.equals( beanClass ) || defaultGroupSequenceIsRedefined && constraintIsDefinedOnSuperClass )
+							&& isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+
 						if ( valueContext.getCurrentBean() != null ) {
 							@SuppressWarnings("unchecked")
 							V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
 							valueContext.setCurrentValidatedValue( valueToValidate );
 						}
-						metaConstraint.validateConstraint( validationContext, valueContext );
+						boolean tmp = metaConstraint.validateConstraint( validationContext, valueContext );
+						validationSuccessful = validationSuccessful && tmp;
 						if ( validationContext.shouldFailFast() ) {
 							return validationContext.getFailingConstraints()
 									.size() - numberOfConstraintViolationsBefore;
 						}
 					}
 				}
-				if ( validationContext.getFailingConstraints().size() > numberOfConstraintViolationsBefore ) {
+				if ( !validationSuccessful ) {
 					break;
 				}
 			}
-
 			// all the hierarchy has been validated, stop validation.
 			if ( defaultGroupSequenceIsRedefined ) {
 				break;
