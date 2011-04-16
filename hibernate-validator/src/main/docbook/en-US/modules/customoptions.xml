@@ -21,53 +21,27 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="chapter-custom-options">
-  <title>Hibernate Validator specific configuration</title>
+  <title>Hibernate Validator extensions</title>
 
   <note>
-    <para>Use of the features described in the following sections is not
-    portable between Bean Validation providers/implementations.</para>
+    <para>The features described in the following sections are not portable
+    between Bean Validation providers/implementations.</para>
   </note>
 
-  <para>The Bean Validation specification allows implementators to add
-  provider specific options. The easiest way to do this is via
-  <methodname>Configuration.addProperty(String name, String
-  value)</methodname> which allows to pass any arbitrary property. If you want
-  to expose the option programmatically (in a type-safe manner) there are
-  three other options depending on where you want to make the option
-  available.</para>
-
-  <para>You can add the option onto a custom
-  <classname>Configuration</classname> instance. This custom configuration can
-  be explicitly requested during the bootstrapping process using
-  <methodname>Validation.byProvider(Class&lt;U&gt; providerType)</methodname>.
-  This is the approach taken for exposing the programmatic constraint
-  configuration API (see <xref linkend="programmaticapi" /> ) as well as the
-  abiltiy to configure a custom ResourceBundleLocator (see <xref
-  linkend="section-resource-bundle-locator" />).</para>
-
-  <para>You cam also add the option accessible on you
-  <classname>ValidatorFactory</classname> implementation and then access it
-  via <methodname>ValidatorFactory.unwrap(Class&lt;T&gt; type)</methodname>
-  (see <xref linkend="example-fail-fast-factory" />).</para>
-
-  <para>Last but not least, you can also add the option to your
-  <classname>Validator</classname> implementation and unwrap the
-  <classname>Validator</classname> instance itself using
-  <methodname>Validator.unwrap(Class&lt;T&gt; type)</methodname>. This is how
-  the method level validation API is exposed in Hibernate Validator (see
-  ?).</para>
-
-  <para>In the following sections weare having a closer look at some of the
-  Hibernate Validator specific features.</para>
+  <para>In the following sections we are having a closer look at some of the
+  Hibernate Validator specific features. This includes the fail fast mode, the
+  programmatic constraint configuration API and boolean composition of
+  composing constraints.</para>
 
   <section>
     <title>Fail fast mode</title>
 
-    <para>Hibernate Validator allows to return from the current validation as
-    soon as the first constraint violation occurs. This is called the fail
-    fast mode and can be useful for validation of large object graphs where
-    you are only interested whether there is a constraint violation or not.
-    <xref linkend="example-fail-fast-property" />, <xref
+    <para>First off, the fail fast mode. Hibernate Validator allows to return
+    from the current validation as soon as the first constraint violation
+    occurs. This is called the <emphasis>fail fast mode</emphasis> and can be
+    useful for validation of large object graphs where one is only interested
+    whether there is a constraint violation or not. <xref
+    linkend="example-fail-fast-property" />, <xref
     linkend="example-fail-fast-configuration" /> and <xref
     linkend="example-fail-fast-factory" /> show multiple ways to enable the
     fail fast mode.</para>
@@ -75,7 +49,7 @@
     <example floatstyle="" id="example-fail-fast-property">
       <title>Enabling <option>failFast</option> via a property</title>
 
-      <programlisting>HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
+      <programlisting language="" role="">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 ValidatorFactory factory = configuration.addProperty( "hibernate.validator.fail_fast", "true" ).buildValidatorFactory();
 Validator validator = factory.getValidator();
 
@@ -87,7 +61,7 @@ Validator validator = factory.getValidator();
       <title>Enabling <option>failFast</option> at the
       <classname>Configuration</classname> level</title>
 
-      <programlisting>HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
+      <programlisting lang="">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
 Validator validator = factory.getValidator();
 
@@ -99,7 +73,7 @@ Validator validator = factory.getValidator();
       <title>Enabling <option>failFast</option> at the
       <classname>ValidatorFactory</classname> level</title>
 
-      <programlisting>HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
+      <programlisting language="" role="">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 ValidatorFactory factory = configuration.buildValidatorFactory();
 
 Validator validator = factory.getValidator();
@@ -120,11 +94,11 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
   <section id="programmaticapi">
     <title>Programmatic constraint definition</title>
 
-    <para>Hibernate Validator allows to configure constraints not only via
-    annotations and xml, but also via a programmatic API. This API can be used
-    exclusively or in combination with annotations and xml. If used in
-    combination programmatic constraints are additive to otherwise configured
-    constraints.</para>
+    <para>Another addition to the Bean Validation specification is the ability
+    to configure constraints via a fluent API.This API can be used exclusively
+    or in combination with annotations and xml. If used in combination
+    programmatic constraints are additive to constraints configured via the
+    standard configuration capabilties.</para>
 
     <para>The programmatic API is centered around the
     <classname>ConstraintMapping</classname> class which can be found together
@@ -138,7 +112,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     <para><example id="example-constraint-mapping">
         <title>Programmatic constraint definition</title>
 
-        <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "manufacturer", FIELD )
         .constraint( NotNullDef.class )
@@ -171,7 +145,7 @@ mapping.type( Car.class )
         <title>Programmatic constraint definition using
         <classname>GenericConstraintDef</classname></title>
 
-        <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "licensePlate", FIELD )
         .genericConstraint( CheckCase.class )
@@ -185,17 +159,18 @@ mapping.type( Car.class )
     <para><example>
         <title>Cascading constraints and default group redefinition</title>
 
-        <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .valid( "driver", FIELD )
 .type( RentalCar.class)
     .defaultGroupSequence( RentalCar.class, CarChecks.class ); </programlisting>
       </example></para>
 
-	<para><example>
-        <title>Cascading constraints and dynamic default group redefinition</title>
+    <para><example>
+        <title>Cascading constraints and dynamic default group
+        redefinition</title>
 
-        <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .valid( "driver", FIELD )
 .type( RentalCar.class)
@@ -211,7 +186,7 @@ mapping.type( Car.class )
     <para><example id="example-hibernate-specific-config">
         <title>Creating a Hibernate Validator specific configuration</title>
 
-        <programlisting>ConstraintMapping mapping = new ConstraintMapping();
+        <programlisting lang="" language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 // configure mapping instance
 
 HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
@@ -219,5 +194,49 @@ config.addMapping( mapping );
 ValidatorFactory factory = config.buildValidatorFactory();
 Validator validator = factory.getValidator();</programlisting>
       </example></para>
+  </section>
+
+  <section>
+    <title>Boolean composition for constraint composition</title>
+
+    <para>As per Bean Validation specification the constraints of a composed
+    constraint (see <xref linkend="section-constraint-composition" />) are all
+    combined via a logical <emphasis>AND</emphasis>. This means all of the
+    composing constraints need to return <constant>true</constant> in order
+    for a overall successful validation. Hibernate Validator offers an
+    extension to this logical <emphasis>AND</emphasis> combination which
+    allows you to compose constraints via a logical <emphasis>OR</emphasis> or
+    <emphasis>NOT</emphasis>. To do so you have to use the
+    <classname>ConstraintComposition</classname> annotation and the enum
+    <classname>CompositionType</classname> with its values
+    <emphasis>AND</emphasis>, <emphasis>OR</emphasis> and
+    <emphasis>ALL_FALSE</emphasis>. <xref
+    linkend="example-boolean-constraint-composition" /> shows how to build a
+    composing constraints where only one of the constraints have to be
+    successful in order to pass the validation. Either the validated string is
+    all lowercased or it is between two and three characters long.</para>
+
+    <example id="example-boolean-constraint-composition">
+      <title>OR composition of constraints</title>
+
+      <programlisting language="JAVA" role="JAVA"><emphasis role="bold">@ConstraintComposition(OR)</emphasis>
+@Pattern(regexp = "[a-z]")
+@Size(min = 2, max = 3)
+@ReportAsSingleViolation
+@Target({ METHOD, FIELD })
+@Retention(RUNTIME)
+@Constraint(validatedBy = { })
+public @interface PatternOrSize {
+   public abstract String message() default "{PatternOrSize.message}";
+   public abstract Class&lt;?&gt;[] groups() default { };
+   public abstract Class&lt;? extends Payload&gt;[] payload() default { };
+}</programlisting>
+    </example>
+
+    <tip>
+      <para>Using <emphasis>ALL_FALSE</emphasis> as composition type
+      implicitly enforces that only a single violation will get reported in
+      case validation of the constraint compostion fails.</para>
+    </tip>
   </section>
 </chapter>

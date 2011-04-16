@@ -489,7 +489,7 @@ public class CarTest {
   </section>
 
   <section id="validator-customconstraints-compound">
-    <title>Constraint composition</title>
+    <title id="section-constraint-composition">Constraint composition</title>
 
     <para>Looking at the <property>licensePlate</property> field of the
     <classname>Car</classname> class in <xref
