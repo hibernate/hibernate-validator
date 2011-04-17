@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.metadata;
 
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -160,6 +162,28 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 	 */
 	public boolean hasParameterConstraints() {
 		return hasParameterConstraints;
+	}
+
+	public MethodMetaData merge(MethodMetaData otherMetaData) {
+
+		boolean isCascading = isCascading() || otherMetaData.isCascading();
+
+		// 1 - aggregate return value constraints
+		List<BeanMetaConstraint<?, ? extends Annotation>> mergedReturnValueConstraints = newArrayList(
+				this, otherMetaData
+		);
+
+		// 2 - aggregate parameter metaData. The two method MetaData have the same signature, consequently they
+		// have the same number of parameters.
+		List<ParameterMetaData> mergedParameterMetaData = newArrayList();
+		for ( ParameterMetaData oneParameterMetaData : getAllParameterMetaData() ) {
+			mergedParameterMetaData.add(
+					oneParameterMetaData.merge(
+							otherMetaData.getParameterMetaData( oneParameterMetaData.getIndex() )
+					)
+			);
+		}
+		return new MethodMetaData( method, mergedParameterMetaData, mergedReturnValueConstraints, isCascading );
 	}
 
 	@Override

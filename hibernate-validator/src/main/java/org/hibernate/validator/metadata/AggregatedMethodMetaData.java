@@ -139,14 +139,15 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 		 * @param metaData The meta data to add.
 		 */
 		public void addMetaData(MethodMetaData metaData) {
-			Class<?> declaringClass = metaData.getMethod().getDeclaringClass();
 
-			MethodMetaData current = metaDataByDefiningType.get( declaringClass );
-			if ( current != null ) {
-				metaData = aggregateMethodMetaData( current, metaData );
+			MethodMetaData existingMetaData =
+					metaDataByDefiningType.get( metaData.getMethod().getDeclaringClass() );
+
+			if ( existingMetaData != null ) {
+				metaData = existingMetaData.merge( metaData );
 			}
 
-			metaDataByDefiningType.put( declaringClass, metaData );
+			metaDataByDefiningType.put( metaData.getMethod().getDeclaringClass(), metaData );
 			isCascading = isCascading || metaData.isCascading();
 			isConstrained = isConstrained || metaData.isConstrained();
 		}
@@ -265,36 +266,6 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 			return theValue;
 		}
 
-		private MethodMetaData aggregateMethodMetaData(MethodMetaData current, MethodMetaData metaData) {
-			boolean isCascading = current.isCascading() || metaData.isCascading();
-
-			// 1 - aggregate return value constraints
-			List<BeanMetaConstraint<?, ? extends Annotation>> returnConstraints = newArrayList(current, metaData);
-
-			// 2 - aggregate parameter metaData. The two method MetaData have the same signature, consequently they
-			// have the same number of parameters.
-			List<ParameterMetaData> parameterMetaDatas = newArrayList();
-			for ( ParameterMetaData oneParameterMetaData : current.getAllParameterMetaData() ) {
-				parameterMetaDatas.add(
-						aggregateParameterMetaData(
-								oneParameterMetaData,
-								metaData.getParameterMetaData( oneParameterMetaData.getIndex() )
-						)
-				);
-			}
-			return new MethodMetaData( metaData.getMethod(), parameterMetaDatas, returnConstraints, isCascading );
-		}
-
-		private ParameterMetaData aggregateParameterMetaData(ParameterMetaData current, ParameterMetaData metaData) {
-			List<MetaConstraint<?, ? extends Annotation>> parameterConstraints = newArrayList(current, metaData);
-			return new ParameterMetaData(
-					current.getIndex(),
-					current.getType(),
-					current.getParameterName(),
-					parameterConstraints,
-					current.isCascading() || metaData.isCascading()
-			);
-		}
 	}
 
 	/**

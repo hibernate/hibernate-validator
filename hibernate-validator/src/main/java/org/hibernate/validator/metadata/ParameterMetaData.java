@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.metadata;
 
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Iterator;
@@ -78,6 +80,17 @@ public class ParameterMetaData implements Iterable<MetaConstraint<? extends Anno
 
 	public Iterator<MetaConstraint<? extends Annotation>> iterator() {
 		return constraints.iterator();
+	}
+
+	public ParameterMetaData merge(ParameterMetaData otherMetaData) {
+
+		return new ParameterMetaData(
+				index,
+				type,
+				name,
+				newArrayList( this, otherMetaData ),
+				isCascading() || otherMetaData.isCascading()
+		);
 	}
 
 	@Override
