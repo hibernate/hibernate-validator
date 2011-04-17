@@ -126,8 +126,8 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			propertyPath.addNode( name );
-			return this;
+			propertyPath.addNode( leafNodeName );
+			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
