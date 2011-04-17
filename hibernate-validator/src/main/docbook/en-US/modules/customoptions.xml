@@ -203,7 +203,7 @@ Validator validator = factory.getValidator();</programlisting>
     constraint (see <xref linkend="section-constraint-composition" />) are all
     combined via a logical <emphasis>AND</emphasis>. This means all of the
     composing constraints need to return <constant>true</constant> in order
-    for a overall successful validation. Hibernate Validator offers an
+    for an overall successful validation. Hibernate Validator offers an
     extension to this logical <emphasis>AND</emphasis> combination which
     allows you to compose constraints via a logical <emphasis>OR</emphasis> or
     <emphasis>NOT</emphasis>. To do so you have to use the
@@ -212,7 +212,7 @@ Validator validator = factory.getValidator();</programlisting>
     <emphasis>AND</emphasis>, <emphasis>OR</emphasis> and
     <emphasis>ALL_FALSE</emphasis>. <xref
     linkend="example-boolean-constraint-composition" /> shows how to build a
-    composing constraints where only one of the constraints have to be
+    composing constraint where only one of the constraints has to be
     successful in order to pass the validation. Either the validated string is
     all lowercased or it is between two and three characters long.</para>
 
@@ -236,7 +236,7 @@ public @interface PatternOrSize {
     <tip>
       <para>Using <emphasis>ALL_FALSE</emphasis> as composition type
       implicitly enforces that only a single violation will get reported in
-      case validation of the constraint compostion fails.</para>
+      case validation of the constraint composition fails.</para>
     </tip>
   </section>
 </chapter>
