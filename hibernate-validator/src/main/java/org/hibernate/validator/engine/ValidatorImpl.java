@@ -786,16 +786,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
+			Set<BeanMetaConstraint<? extends Annotation>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+
+			if ( defaultGroupSequenceIsRedefined ) {
+				metaConstraints = hostingBeanMetaData.getMetaConstraints();
+			}
 
 			for ( Class<?> groupClass : defaultGroupSequence ) {
 				boolean validationSuccessful = true;
 				valueContext.setCurrentGroup( groupClass );
-				for ( BeanMetaConstraint<?> metaConstraint : constraintList ) {
-					Class<?> beanClass = metaConstraint.getLocation().getBeanClass();
-					boolean constraintIsDefinedOnSuperClass = beanClass.isAssignableFrom( clazz );
-
-					if ( ( clazz.equals( beanClass ) || defaultGroupSequenceIsRedefined && constraintIsDefinedOnSuperClass )
+				for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
+					if ( constraintList.contains( metaConstraint )
 							&& isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 
 						if ( valueContext.getCurrentBean() != null ) {

@@ -136,9 +136,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final ConstraintOrigin definedOn;
 
-    /**
-     * Type indicating how composing constraints should be combined. By default this is set to {@code ConstraintComposition.CompositionType.AND}.
-     */
+	/**
+	 * Type indicating how composing constraints should be combined. By default this is set to {@code ConstraintComposition.CompositionType.AND}.
+	 */
 	private CompositionType compositionType = AND;
 
 
@@ -150,7 +150,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup, ElementType type, ConstraintOrigin definedOn) {
 		this.annotation = annotation;
-		this.annotationType = ( Class<T> ) this.annotation.annotationType();
+		this.annotationType = (Class<T>) this.annotation.annotationType();
 		this.constraintHelper = constraintHelper;
 		this.elementType = type;
 		this.definedOn = definedOn;
@@ -234,7 +234,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : constraintDefinitionClasses ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintValidator<T, ?>> safeValidator = ( Class<? extends ConstraintValidator<T, ?>> ) validator;
+			Class<? extends ConstraintValidator<T, ?>> safeValidator = (Class<? extends ConstraintValidator<T, ?>>) validator;
 			constraintValidatorClasses.add( safeValidator );
 		}
 		return Collections.unmodifiableList( constraintValidatorClasses );
@@ -274,6 +274,29 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	public ConstraintOrigin getDefinedOn() {
 		return definedOn;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		ConstraintDescriptorImpl that = (ConstraintDescriptorImpl) o;
+
+		if ( annotation != null ? !annotation.equals( that.annotation ) : that.annotation != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return annotation != null ? annotation.hashCode() : 0;
 	}
 
 	@Override
@@ -387,16 +410,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				// ignore the usual suspects which will be in almost any constraint, but are no composing constraint
 				continue;
 			}
-			
+
 			//If there is a @ConstraintCompositionType annotation, set its value as the local compositionType field
-			if (constraintHelper.isConstraintComposition(declaredAnnotationType)) {
-				this.setCompositionType(((ConstraintComposition) declaredAnnotation).value());
-				if ( log.isDebugEnabled()) {
+			if ( constraintHelper.isConstraintComposition( declaredAnnotationType ) ) {
+				this.setCompositionType( ( (ConstraintComposition) declaredAnnotation ).value() );
+				if ( log.isDebugEnabled() ) {
 					log.debug( "Adding Bool" + declaredAnnotationType.getName() );
 				}
 				continue;
 			}
-			
+
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType )
 					|| constraintHelper.isBuiltinConstraint( declaredAnnotationType ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
@@ -427,7 +450,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(U declaredAnnotation, Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, int index) {
 		@SuppressWarnings("unchecked")
-		final Class<U> annotationType = ( Class<U> ) declaredAnnotation.annotationType();
+		final Class<U> annotationType = (Class<U>) declaredAnnotation.annotationType();
 		return createComposingConstraintDescriptor(
 				overrideParameters,
 				index,
@@ -503,7 +526,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 
 			@SuppressWarnings("unchecked") // safe due to the check above
-					ClassIndexWrapper that = ( ClassIndexWrapper ) o;
+					ClassIndexWrapper that = (ClassIndexWrapper) o;
 
 			if ( index != that.index ) {
 				return false;

@@ -87,12 +87,44 @@ public class BeanConstraintLocation implements ConstraintLocation {
 		}
 		else {
 			t = ReflectionHelper.typeOf( member );
-			if ( t instanceof Class && ( ( Class<?> ) t ).isPrimitive() ) {
+			if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
 				t = ReflectionHelper.boxedType( t );
 			}
 		}
 
 		return t;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		BeanConstraintLocation that = (BeanConstraintLocation) o;
+
+		if ( beanClass != null ? !beanClass.equals( that.beanClass ) : that.beanClass != null ) {
+			return false;
+		}
+		if ( member != null ? !member.equals( that.member ) : that.member != null ) {
+			return false;
+		}
+		if ( propertyName != null ? !propertyName.equals( that.propertyName ) : that.propertyName != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = member != null ? member.hashCode() : 0;
+		result = 31 * result + ( propertyName != null ? propertyName.hashCode() : 0 );
+		result = 31 * result + ( beanClass != null ? beanClass.hashCode() : 0 );
+		return result;
 	}
 
 	@Override
