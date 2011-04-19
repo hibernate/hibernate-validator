@@ -31,9 +31,11 @@ import java.lang.reflect.WildcardType;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.validation.ValidationException;
 
 import com.googlecode.jtype.TypeUtils;
@@ -383,7 +385,7 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is a iterable type, <code>false</code> otherwise.
 	 */
 	public static boolean isIterable(Type type) {
-		if ( type instanceof Class && extendsOrImplements( (Class) type, Iterable.class ) ) {
+		if ( type instanceof Class && Iterable.class.isAssignableFrom( (Class) type ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -402,7 +404,7 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>Map</code>, <code>false</code> otherwise.
 	 */
 	public static boolean isMap(Type type) {
-		if ( type instanceof Class && extendsOrImplements( (Class) type, Map.class ) ) {
+		if ( type instanceof Class && Map.class.isAssignableFrom( (Class) type ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -421,7 +423,7 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>List</code>, <code>false</code> otherwise.
 	 */
 	public static boolean isList(Type type) {
-		if ( type instanceof Class && extendsOrImplements( (Class) type, List.class ) ) {
+		if ( type instanceof Class && List.class.isAssignableFrom( (Class) type ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -740,32 +742,22 @@ public final class ReflectionHelper {
 	 *
 	 * @param clazz The class for which to find the interfaces
 	 *
-	 * @return List of all interfaces {@code clazz} implements. The empty list is returned if {@code clazz} does not
+	 * @return Set of all interfaces {@code clazz} implements. The empty list is returned if {@code clazz} does not
 	 *         implement any interfaces or {@code clazz} is {@code null}
 	 */
-	public static List<Class<?>> computeAllImplementedInterfaces(Class<?> clazz) {
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+	public static Set<Class<?>> computeAllImplementedInterfaces(Class<?> clazz) {
+		Set<Class<?>> classes = new HashSet<Class<?>>();
 		computeAllImplementedInterfaces( clazz, classes );
 		return classes;
 	}
 
-	private static void computeAllImplementedInterfaces(Class<?> clazz, List<Class<?>> classes) {
-		classes.add( clazz );
+	private static void computeAllImplementedInterfaces(Class<?> clazz, Set<Class<?>> classes) {
+		if ( clazz == null ) {
+			return;
+		}
 		for ( Class<?> currentInterface : clazz.getInterfaces() ) {
+			classes.add( currentInterface );
 			computeAllImplementedInterfaces( currentInterface, classes );
 		}
-	}
-
-	/**
-	 * Checks whether the specified {@code clazz} extends or inherits the specified super class or interface.
-	 *
-	 * @param clazz @{code Class} to check.
-	 * @param superClassOrInterface The super class/interface {@code clazz}.
-	 *
-	 * @return {@code true} if {@code clazz} extends or implements {@code superClassOrInterface}, {@code false} otherwise.
-	 */
-	private static boolean extendsOrImplements(Class<?> clazz, Class<?> superClassOrInterface) {
-		List<Class<?>> classes = computeClassHierarchy( clazz, true );
-		return classes.contains( superClassOrInterface );
 	}
 }

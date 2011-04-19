@@ -353,7 +353,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( metaConstraints.get( beanClass ) != null ) {
 			constraints.addAll( metaConstraints.get( beanClass ) );
 		}
-		for ( Class<?> clazz : computeAllImplementedInterfaces( beanClass ) ) {
+		Set<Class<?>> classAndInterfaces = computeAllImplementedInterfaces( beanClass );
+		classAndInterfaces.add( beanClass );
+		for ( Class<?> clazz : classAndInterfaces ) {
 			if ( metaConstraints.get( clazz ) != null ) {
 				constraints.addAll( metaConstraints.get( clazz ) );
 			}
