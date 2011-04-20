@@ -20,7 +20,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="validator-checkconstraints">
+<chapter id="validator-integration">
   <title>Integration with other frameworks</title>
 
   <para>Hibernate Validator is intended to be used to implement multi-layered

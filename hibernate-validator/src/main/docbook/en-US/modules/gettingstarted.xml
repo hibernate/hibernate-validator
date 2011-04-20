@@ -114,10 +114,12 @@
     actual code.</para>
 
     <note>
-        <para>From version 4.2.0.Beta2, the maven command <command>mvn archetype:create</command>
-        will be no longer supported and will fail. You should use the command described in the above listing.
-        If you want more details, look at <ulink url="http://maven.apache.org/archetype/maven-archetype-plugin/">
-        Maven Archetype plugin</ulink> page.</para>
+      <para>From version 4.2.0.Beta2, the maven command <command>mvn
+      archetype:create</command> will be no longer supported and will fail.
+      You should use the command described in the above listing. If you want
+      more details, look at <ulink
+      url="http://maven.apache.org/archetype/maven-archetype-plugin/"> Maven
+      Archetype plugin</ulink> page.</para>
     </note>
   </section>
 
@@ -303,7 +305,7 @@ public class CarTest {
 
     <para>That concludes our 5 minute tour through the world of Hibernate
     Validator. Continue exploring the code examples or look at further
-    examples referenced in <xref linkend="chapter-further-reading" />. To
+    examples referenced in <xref linkend="validator-further-reading" />. To
     deepen your understanding of Hibernate Validator just continue reading
     <xref linkend="validator-usingvalidator" />. In case your application has
     specific validation requirements have a look at <xref
