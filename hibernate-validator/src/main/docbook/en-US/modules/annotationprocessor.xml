@@ -28,8 +28,8 @@
 
   <itemizedlist>
     <listitem>
-      <para>annotating Strings with @Min to specify a minimum length (instead
-      of using @Size)</para>
+      <para>specifying constraint annotations at unsupported data types (e.g.
+      by annotating a String with @Past)</para>
     </listitem>
 
     <listitem>
@@ -505,9 +505,10 @@
       </listitem>
 
       <listitem>
-        <para>When using the processor within Eclipse, the check of dynamic default group
-        sequence definitions doesn't work. After further investigation, it seems to be an
-        issue with the Eclipse JSR 269 API implementation.</para>
+        <para>When using the processor within Eclipse, the check of dynamic
+        default group sequence definitions doesn't work. After further
+        investigation, it seems to be an issue with the Eclipse JSR 269 API
+        implementation.</para>
       </listitem>
     </itemizedlist>
   </section>
