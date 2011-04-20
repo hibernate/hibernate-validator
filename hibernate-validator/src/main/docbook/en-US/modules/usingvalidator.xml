@@ -1058,7 +1058,7 @@ public class RentalCar extends Car {
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator implements all of the default constraints
-    specified in Bean Validation. Note that using Hibernate Validator some
+    specified in Bean Validation. Note, that using Hibernate Validator some
     constraints can be applied to more data types as required by the Bean
     Validation specification (e.g. @Max can be applied to
     <classname>Strings</classname>). Relying on this feature can impact
@@ -1072,16 +1072,18 @@ public class RentalCar extends Car {
     <table id="table-builtin-constraints">
       <title>Built-in constraints</title>
 
-      <tgroup cols="5">
+      <tgroup cols="6">
         <colspec align="left" />
 
         <thead>
           <row>
             <entry>Annotation</entry>
 
-            <entry>Part of Bean Validation Specification</entry>
+            <entry>Part of BV specification</entry>
 
             <entry>Apply on</entry>
+
+            <entry>Supported data types</entry>
 
             <entry>Use</entry>
 
@@ -1089,17 +1091,18 @@ public class RentalCar extends Car {
           </row>
         </thead>
 
-        <tbody>
+        <tbody valign="top">
           <row>
             <entry>@AssertFalse</entry>
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>boolean</classname> and
-            <classname>Boolean</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check that the annotated element is
+            <entry><classname>Boolean</classname>,
+            <classname>boolean</classname></entry>
+
+            <entry>Checks that the annotated element is
             <constant>false</constant>.</entry>
 
             <entry>none</entry>
@@ -1110,11 +1113,12 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>boolean</classname> and
-            <classname>Boolean</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check that the annotated element is
+            <entry><classname>Boolean</classname>,
+            <classname>boolean</classname></entry>
+
+            <entry>Checks that the annotated element is
             <constant>true</constant>.</entry>
 
             <entry>none</entry>
@@ -1125,11 +1129,12 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check that the annotated string passes the Luhn checksum
-            test. Note, this validation aims to check for user mistake, not
+            <entry><classname>String</classname></entry>
+
+            <entry>Checks that the annotated string passes the Luhn checksum
+            test. Note, this validation aims to check for user mistakes, not
             credit card validity! See also <ulink
             url="http://www.merriampark.com/anatomycc.htm">Anatomy of Credit
             Card Numbers</ulink>.</entry>
@@ -1142,14 +1147,14 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>BigDecimal</classname>,
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
             respective wrappers of the primitive types. Additionally supported
-            by Hibernate Validator: any sub-type of
-            <classname>Number</classname>.</entry>
+            by HV: any sub-type of <classname>Number</classname>.</entry>
 
             <entry>The annotated element must be a number whose value must be
             lower or equal to the specified maximum. The parameter value is
@@ -1164,14 +1169,14 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>BigDecimal</classname>,
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
             respective wrappers of the primitive types. Additionally supported
-            by Hibernate Validator: any sub-type of
-            <classname>Number</classname>.</entry>
+            by HV: any sub-type of <classname>Number</classname>.</entry>
 
             <entry>The annotated element must be a number whose value must be
             higher or equal to the specified minimum. The parameter value is
@@ -1186,16 +1191,16 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>BigDecimal</classname>,
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
             respective wrappers of the primitive types. Additionally supported
-            by Hibernate Validator: any sub-type of
-            <classname>Number</classname>.</entry>
+            by HV: any sub-type of <classname>Number</classname>.</entry>
 
-            <entry>Check whether the property is a number having up to
+            <entry>Checks whether the annoted value is a number having up to
             <literal>integer</literal> digits and <literal>fraction</literal>
             fractional digits.</entry>
 
@@ -1207,10 +1212,11 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check whether the specified string is a valid email
+            <entry><classname>String</classname></entry>
+
+            <entry>Checks whether the specified string is a valid email
             address.</entry>
 
             <entry>none</entry>
@@ -1221,14 +1227,14 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>java.util.Date</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>java.util.Date</classname>,
             <classname>java.util.Calendar</classname>; Additionally supported
-            by Hibernate Validator: any implements of
-            <classname>org.joda.time.ReadablePartial</classname> and
-            <classname>org.joda.time.ReadableInstant</classname>, if the
-            <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
-            date/time API is on the class path.</entry>
+            by HV, if the <ulink url="http://joda-time.sourceforge.net/">Joda
+            Time</ulink> date/time API is on the class path: any
+            implementations of <classname>ReadablePartial</classname> and
+            <classname>ReadableInstant</classname></entry>
 
             <entry>Checks whether the annotated date is in the future.</entry>
 
@@ -1240,10 +1246,11 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Validate that the annotated string is between
+            <entry><classname>String</classname></entry>
+
+            <entry>Validates that the annotated string is between
             <parameter>min</parameter> and <parameter>max</parameter>
             included.</entry>
 
@@ -1255,12 +1262,13 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>BigDecimal</classname>,
             <classname>BigInteger</classname>, <classname>byte</classname>,
             <classname>short</classname>, <classname>int</classname>,
             <classname>long</classname> and the respective wrappers of the
-            primitive types. Additionally supported by Hibernate Validator:
+            primitive types. Additionally supported by HV:
             <classname>String</classname> (the numeric value represented by a
             String is evaluated), any sub-type of
             <classname>Number</classname>.</entry>
@@ -1276,12 +1284,13 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>BigDecimal</classname>,
             <classname>BigInteger</classname>, <classname>byte</classname>,
             <classname>short</classname>, <classname>int</classname>,
             <classname>long</classname> and the respective wrappers of the
-            primitive types. Additionally supported by Hibernate Validator:
+            primitive types. Additionally supported by HV:
             <classname>String</classname> (the numeric value represented by a
             String is evaluated), any sub-type of
             <classname>Number</classname>.</entry>
@@ -1297,9 +1306,11 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Any type is supported.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check that the annotated value is not
+            <entry>Any type</entry>
+
+            <entry>Checks that the annotated value is not
             <constant>null.</constant></entry>
 
             <entry>Column(s) are not null.</entry>
@@ -1310,13 +1321,14 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check that the annotated string is not null and the trimmed
-            length is greater than 0. The difference to @NotEmpty is that this
-            constraint can only be applied on strings and that trailing
-            whitespaces are ignored.</entry>
+            <entry><classname>String</classname></entry>
+
+            <entry>Checks that the annotated string is not null and the
+            trimmed length is greater than 0. The difference to @NotEmpty is
+            that this constraint can only be applied on strings and that
+            trailing whitespaces are ignored.</entry>
 
             <entry>none</entry>
           </row>
@@ -1326,11 +1338,13 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. Supported types are
-            <classname>String</classname>, <classname>Collection</classname>,
-            <classname>Map</classname> and arrays.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check whether the annotated element is not
+            <entry><classname>String</classname>,
+            <classname>Collection</classname>, <classname>Map</classname> and
+            arrays</entry>
+
+            <entry>Checks whether the annotated element is not
             <constant>null</constant> nor empty.</entry>
 
             <entry>none</entry>
@@ -1341,9 +1355,11 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Any type is supported.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check that the annotated value is
+            <entry>Any type</entry>
+
+            <entry>Checks that the annotated value is
             <constant>null.</constant></entry>
 
             <entry>none</entry>
@@ -1354,14 +1370,14 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>java.util.Date</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>java.util.Date</classname>,
             <classname>java.util.Calendar</classname>; Additionally supported
-            by Hibernate Validator: any implements of
-            <classname>org.joda.time.ReadablePartial</classname> and
-            <classname>org.joda.time.ReadableInstant</classname>, if the
-            <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
-            date/time API is on the class path.</entry>
+            by HV, if the <ulink url="http://joda-time.sourceforge.net/">Joda
+            Time</ulink> date/time API is on the class path: any
+            implementations of <classname>ReadablePartial</classname> and
+            <classname>ReadableInstant</classname></entry>
 
             <entry>Checks whether the annotated date is in the past.</entry>
 
@@ -1373,8 +1389,9 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
+            <entry>field/property</entry>
+
+            <entry><classname>String</classname></entry>
 
             <entry>Checks if the annotated string matches the regular
             expression <parameter>regex</parameter> considering the given flag
@@ -1388,14 +1405,15 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
+            <entry>field/property</entry>
+
+            <entry><classname>BigDecimal</classname>,
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+            respective wrappers of the primitive types</entry>
 
-            <entry>Check whether the annotated value lies between (inclusive)
+            <entry>Checks whether the annotated value lies between (inclusive)
             the specified minimum and maximum.</entry>
 
             <entry>none</entry>
@@ -1406,13 +1424,14 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Supported types are
-            <classname>String</classname>, <classname>Collection</classname>,
-            <classname>Map</classname> and
-            <classname>arrays</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check if the annotated element size is between min and max
-            (inclusive).</entry>
+            <entry><classname>String</classname>,
+            <classname>Collection</classname>, <classname>Map</classname> and
+            <classname>arrays</classname></entry>
+
+            <entry>Checks if the annotated element's size is between min and
+            max (inclusive).</entry>
 
             <entry>Column length will be set to max.</entry>
           </row>
@@ -1422,7 +1441,9 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>type. Any type is supported.</entry>
+            <entry>type</entry>
+
+            <entry>Any type</entry>
 
             <entry>Checks whether the given script can successfully be
             evaluated against the annotated element. In order to use this
@@ -1443,10 +1464,11 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
+            <entry>field/property</entry>
 
-            <entry>Check if the annotated string is a valid URL according to
+            <entry><classname>String</classname></entry>
+
+            <entry>Checks if the annotated string is a valid URL according to
             RFC2396. If any of the optional parameters
             <parameter>protocol</parameter>, <parameter>host</parameter> or
             <parameter>port</parameter> are specified, the corresponding URL
@@ -1463,8 +1485,9 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Any non-primitive types are
-            supported.</entry>
+            <entry>field/property</entry>
+
+            <entry>Any non-primitive type</entry>
 
             <entry>Performs validation recursively on the associated object.
             If the object is a collection or an array, the elements are
