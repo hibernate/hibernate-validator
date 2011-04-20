@@ -1058,7 +1058,14 @@ public class RentalCar extends Car {
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator implements all of the default constraints
-    specified in Bean Validation as well as some custom ones. <xref
+    specified in Bean Validation. Note that using Hibernate Validator some
+    constraints can be applied to more data types as required by the Bean
+    Validation specification (e.g. @Max can be applied to
+    <classname>Strings</classname>). Relying on this feature can impact
+    portability of your application between Bean Validation providers.</para>
+
+    <para>In addition to the constraints defined by the Bean Validation API
+    Hibernate Validator provides several useful custom constraints, too. <xref
     linkend="table-builtin-constraints" /> list all constraints available in
     Hibernate Validator.</para>
 
@@ -1088,7 +1095,9 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property</entry>
+            <entry>field/property. Supported types are
+            <classname>boolean</classname> and
+            <classname>Boolean</classname>.</entry>
 
             <entry>Check that the annotated element is
             <constant>false</constant>.</entry>
@@ -1101,7 +1110,9 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property</entry>
+            <entry>field/property. Supported types are
+            <classname>boolean</classname> and
+            <classname>Boolean</classname>.</entry>
 
             <entry>Check that the annotated element is
             <constant>true</constant>.</entry>
@@ -1136,7 +1147,9 @@ public class RentalCar extends Car {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+            respective wrappers of the primitive types. Additionally supported
+            by Hibernate Validator: any sub-type of
+            <classname>Number</classname>.</entry>
 
             <entry>The annotated element must be a number whose value must be
             lower or equal to the specified maximum. The parameter value is
@@ -1156,7 +1169,9 @@ public class RentalCar extends Car {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+            respective wrappers of the primitive types. Additionally supported
+            by Hibernate Validator: any sub-type of
+            <classname>Number</classname>.</entry>
 
             <entry>The annotated element must be a number whose value must be
             higher or equal to the specified minimum. The parameter value is
@@ -1176,7 +1191,9 @@ public class RentalCar extends Car {
             <classname>BigInteger</classname>, <classname>String</classname>,
             <classname>byte</classname>, <classname>short</classname>,
             <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+            respective wrappers of the primitive types. Additionally supported
+            by Hibernate Validator: any sub-type of
+            <classname>Number</classname>.</entry>
 
             <entry>Check whether the property is a number having up to
             <literal>integer</literal> digits and <literal>fraction</literal>
@@ -1190,7 +1207,8 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. Needs to be a string.</entry>
+            <entry>field/property. The supported type is
+            <classname>String</classname>.</entry>
 
             <entry>Check whether the specified string is a valid email
             address.</entry>
@@ -1205,9 +1223,8 @@ public class RentalCar extends Car {
 
             <entry>field/property. Supported types are
             <classname>java.util.Date</classname>,
-            <classname>java.util.Calendar</classname>; In addition to these
-            types demanded by the BV specification Hibernate Validator
-            provides support for any implements of
+            <classname>java.util.Calendar</classname>; Additionally supported
+            by Hibernate Validator: any implements of
             <classname>org.joda.time.ReadablePartial</classname> and
             <classname>org.joda.time.ReadableInstant</classname>, if the
             <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
@@ -1223,7 +1240,8 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. Needs to be a string.</entry>
+            <entry>field/property. The supported type is
+            <classname>String</classname>.</entry>
 
             <entry>Validate that the annotated string is between
             <parameter>min</parameter> and <parameter>max</parameter>
@@ -1239,10 +1257,13 @@ public class RentalCar extends Car {
 
             <entry>field/property. Supported types are
             <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+            <classname>BigInteger</classname>, <classname>byte</classname>,
+            <classname>short</classname>, <classname>int</classname>,
+            <classname>long</classname> and the respective wrappers of the
+            primitive types. Additionally supported by Hibernate Validator:
+            <classname>String</classname> (the numeric value represented by a
+            String is evaluated), any sub-type of
+            <classname>Number</classname>.</entry>
 
             <entry>Checks whether the annotated value is less than or equal to
             the specified maximum.</entry>
@@ -1257,10 +1278,13 @@ public class RentalCar extends Car {
 
             <entry>field/property. Supported types are
             <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+            <classname>BigInteger</classname>, <classname>byte</classname>,
+            <classname>short</classname>, <classname>int</classname>,
+            <classname>long</classname> and the respective wrappers of the
+            primitive types. Additionally supported by Hibernate Validator:
+            <classname>String</classname> (the numeric value represented by a
+            String is evaluated), any sub-type of
+            <classname>Number</classname>.</entry>
 
             <entry>Checks whether the annotated value is higher than or equal
             to the specified minimum.</entry>
@@ -1273,7 +1297,7 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property</entry>
+            <entry>field/property. Any type is supported.</entry>
 
             <entry>Check that the annotated value is not
             <constant>null.</constant></entry>
@@ -1286,7 +1310,8 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property</entry>
+            <entry>field/property. The supported type is
+            <classname>String</classname>.</entry>
 
             <entry>Check that the annotated string is not null and the trimmed
             length is greater than 0. The difference to @NotEmpty is that this
@@ -1301,8 +1326,9 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>field/property. Supported types are String, Collection, Map
-            and arrays.</entry>
+            <entry>field/property. Supported types are
+            <classname>String</classname>, <classname>Collection</classname>,
+            <classname>Map</classname> and arrays.</entry>
 
             <entry>Check whether the annotated element is not
             <constant>null</constant> nor empty.</entry>
@@ -1315,7 +1341,7 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property</entry>
+            <entry>field/property. Any type is supported.</entry>
 
             <entry>Check that the annotated value is
             <constant>null.</constant></entry>
@@ -1330,9 +1356,8 @@ public class RentalCar extends Car {
 
             <entry>field/property. Supported types are
             <classname>java.util.Date</classname>,
-            <classname>java.util.Calendar</classname>; In addition to these
-            types demanded by the BV specification Hibernate Validator
-            provides support for any implements of
+            <classname>java.util.Calendar</classname>; Additionally supported
+            by Hibernate Validator: any implements of
             <classname>org.joda.time.ReadablePartial</classname> and
             <classname>org.joda.time.ReadableInstant</classname>, if the
             <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
@@ -1348,7 +1373,8 @@ public class RentalCar extends Car {
 
             <entry>yes</entry>
 
-            <entry>field/property. Needs to be a string.</entry>
+            <entry>field/property. The supported type is
+            <classname>String</classname>.</entry>
 
             <entry>Checks if the annotated string matches the regular
             expression <parameter>regex</parameter> considering the given flag
@@ -1396,7 +1422,7 @@ public class RentalCar extends Car {
 
             <entry>no</entry>
 
-            <entry>type</entry>
+            <entry>type. Any type is supported.</entry>
 
             <entry>Checks whether the given script can successfully be
             evaluated against the annotated element. In order to use this
