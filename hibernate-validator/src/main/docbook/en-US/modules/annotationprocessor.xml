@@ -20,8 +20,8 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter>
-  <title id="annotation-processor">Annotation Processor</title>
+<chapter id="validator-annotation-processor">
+  <title>Annotation Processor</title>
 
   <para>Have you ever caught yourself by unintentionally doing things
   like</para>
@@ -57,7 +57,7 @@
     org.hibernate:hibernate-validator-annotation-processor.</para>
   </note>
 
-  <section>
+  <section id="validator-annotationprocessor-prerequisites">
     <title>Prerequisites</title>
 
     <para>The Hibernate Validator Annotation Processor is based on the
@@ -67,7 +67,7 @@
     version.</para>
   </section>
 
-  <section id="section-features-of-the-ap">
+  <section id="validator-annotationprocessor-features">
     <title>Features</title>
 
     <para>As of Hibernate Validator &version; the Hibernate Validator
@@ -107,7 +107,7 @@
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="validator-annotationprocessor-options">
     <title>Options</title>
 
     <para>The behavior of the Hibernate Validator Annotation Processor can be
@@ -165,7 +165,7 @@
     </table>
   </section>
 
-  <section>
+  <section id="validator-annotationprocessor-usage">
     <title>Using the Annotation Processor</title>
 
     <para>This section shows in detail how to integrate the Hibernate
@@ -173,10 +173,10 @@
     Maven) as well as IDE-based builds (Eclipse, IntelliJ IDEA,
     NetBeans).</para>
 
-    <section>
+    <section id="validator-annotationprocessor-commandline">
       <title>Command line builds</title>
 
-      <section>
+      <section id="validator-annotationprocessor-javac">
         <title>javac</title>
 
         <para>When compiling on the command line using <ulink
@@ -210,7 +210,7 @@
         </example>
       </section>
 
-      <section>
+      <section id="validator-annotationprocessor-ant">
         <title>Apache Ant</title>
 
         <para>Similar to directly working with javac, the annotation processor
@@ -322,7 +322,7 @@
       </section>
     </section>
 
-    <section>
+    <section id="validator-annotationprocessor-ide">
       <title>IDE builds</title>
 
       <section>
@@ -382,7 +382,7 @@
         </mediaobject>
       </section>
 
-      <section>
+      <section id="validator-annotationprocessor-idea">
         <title>IntelliJ IDEA</title>
 
         <para>The following steps must be followed to use the annotation
@@ -428,7 +428,7 @@
         </mediaobject>
       </section>
 
-      <section>
+      <section id="validator-annotationprocessor-netbeans">
         <title>NetBeans</title>
 
         <para>Starting with version 6.9, also the <ulink
@@ -481,7 +481,7 @@
     </section>
   </section>
 
-  <section id="section-known-issues">
+  <section id="validator-annotationprocessor-known-issues">
     <title>Known issues</title>
 
     <para>The following known issues exist as of May 2010:</para>

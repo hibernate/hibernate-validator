@@ -20,8 +20,8 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter>
-  <title id="chapter-further-reading">Further reading</title>
+<chapter id="validator-further-reading">
+  <title>Further reading</title>
 
   <para>Last but not least, a few pointers to further information. A great
   source for examples is the Bean Validation TCK which can is available for
