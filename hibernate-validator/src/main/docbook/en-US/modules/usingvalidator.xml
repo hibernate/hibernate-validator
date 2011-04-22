@@ -1086,7 +1086,10 @@ public class RentalCar extends Car {
 
         <tgroup cols="4">
           <colspec align="left" />
-
+          <colspec align="left" />
+          <colspec align="left" />
+          <colspec align="left" />
+          
           <thead>
             <row>
               <entry>Annotation</entry>
@@ -1189,7 +1192,7 @@ public class RentalCar extends Car {
               url="http://joda-time.sourceforge.net/">Joda Time</ulink>
               date/time API is on the class path: any implementations of
               <classname>ReadablePartial</classname> and
-              <classname>ReadableInstant.</classname></entry>
+              <classname>ReadableInstant</classname>.</entry>
 
               <entry>Checks whether the annotated date is in the
               future.</entry>
@@ -1264,7 +1267,7 @@ public class RentalCar extends Car {
               url="http://joda-time.sourceforge.net/">Joda Time</ulink>
               date/time API is on the class path: any implementations of
               <classname>ReadablePartial</classname> and
-              <classname>ReadableInstant.</classname></entry>
+              <classname>ReadableInstant</classname>.</entry>
 
               <entry>Checks whether the annotated date is in the past.</entry>
 
@@ -1334,6 +1337,9 @@ public class RentalCar extends Car {
         <title>Custom constraints provided by Hibernate Validator</title>
 
         <tgroup cols="4">
+          <colspec align="left" />
+          <colspec align="left" />
+          <colspec align="left" />
           <colspec align="left" />
 
           <thead>
@@ -1472,7 +1478,7 @@ public class RentalCar extends Car {
       custom constraints provided by Hibernate Validator will fulfill your
       requirements completely. In this case you can literally in a minute
       write your own constraints. We will discuss this in <xref
-      linkend="validator-customconstraints" /></para>
+      linkend="validator-customconstraints" />.</para>
     </section>
   </section>
 </chapter>
