@@ -27,6 +27,9 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  * @author Hardy Ferentschik
  */
 public class DecimalMaxDef extends ConstraintDef<DecimalMaxDef, DecimalMax> {
+	
+	public DecimalMaxDef() {
+	}
 
 	public DecimalMaxDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, DecimalMax.class, property, elementType, mapping );

@@ -26,6 +26,9 @@ import org.hibernate.validator.constraints.Range;
  * @author Hardy Ferentschik
  */
 public class RangeDef extends ConstraintDef<RangeDef, Range> {
+	
+	public RangeDef() {
+	}
 
 	public RangeDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Range.class, property, elementType, mapping );

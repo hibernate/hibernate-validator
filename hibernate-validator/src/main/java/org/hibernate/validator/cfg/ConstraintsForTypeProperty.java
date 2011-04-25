@@ -47,16 +47,20 @@ public final class ConstraintsForTypeProperty {
 	 *
 	 * @return A constraint definition class allowing to specify additional constraint parameters.
 	 */
-	public <A extends Annotation, T extends ConstraintDef<T, A>> T constraint(Class<T> definition) {
-		final Constructor<T> constructor = ReflectionHelper.getConstructor(
-				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
+	public ConstraintsForTypeProperty constraint(ConstraintDef<?, ?> definition) {
+		final Constructor<?> constructor = ReflectionHelper.getConstructor(
+				definition.getClass(), Class.class, String.class, ElementType.class, ConstraintMapping.class
 		);
 
-		final T constraintDefinition = ReflectionHelper.newConstructorInstance(
+		ConstraintDef<?, ?> constraintDefinition = (ConstraintDef<?, ?>) ReflectionHelper.newConstructorInstance(
 				constructor, beanClass, property, elementType, mapping
 		);
+		
+		constraintDefinition.parameters.putAll(definition.parameters);
+		
 		mapping.addConstraintConfig( constraintDefinition );
-		return constraintDefinition;
+		
+		return this;
 	}
 
 	/**
@@ -65,21 +69,25 @@ public final class ConstraintsForTypeProperty {
 	 * The attributes of the constraint can later on be set by invoking
 	 * {@link GenericConstraintDef#addParameter(String, Object)}.
 	 * </p>
-	 *
-	 * @param <A> The annotation type of the constraint to add.
-	 * @param definition The constraint to add.
-	 *
-	 * @return A generic constraint definition class allowing to specify additional constraint parameters.
+	 * 
+	 * @param <A>
+	 *            The annotation type of the constraint to add.
+	 * @param definition
+	 *            The constraint to add.
+	 * 
+	 * @return A generic constraint definition class allowing to specify
+	 *         additional constraint parameters.
 	 */
-	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
+	public <A extends Annotation> ConstraintsForTypeProperty constraint(GenericConstraintDef<A> definition) {
 		final GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
-				beanClass, definition, property, elementType, mapping
+				beanClass, definition.constraintType, property, elementType, mapping
 		);
-
+	
 		mapping.addConstraintConfig( constraintDefinition );
-		return constraintDefinition;
-	}
-
+			
+		return this;
+	 }
+	
 	/**
 	 * Marks the current property as cascadable.
 	 *

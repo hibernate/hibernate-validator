@@ -28,6 +28,9 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  */
 public class MinDef extends ConstraintDef<MinDef, Min> {
 
+	public MinDef() {
+	}
+	
 	public MinDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Min.class, property, elementType, mapping );
 	}

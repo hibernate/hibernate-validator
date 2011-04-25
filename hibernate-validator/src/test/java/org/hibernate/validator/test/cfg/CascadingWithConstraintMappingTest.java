@@ -43,7 +43,7 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", FIELD )
-				.constraint( NotNullDef.class )
+				.constraint( new NotNullDef() )
 				.type( A.class )
 				.property( "c", FIELD )
 				.valid();
@@ -64,7 +64,7 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( NotNullDef.class )
+				.constraint( new NotNullDef() )
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();
@@ -85,7 +85,7 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( NotNullDef.class )
+				.constraint( new NotNullDef() )
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();

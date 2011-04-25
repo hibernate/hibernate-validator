@@ -26,6 +26,9 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  * @author Hardy Ferentschik
  */
 public class DecimalMinDef extends ConstraintDef<DecimalMinDef, DecimalMin> {
+	
+	public DecimalMinDef() {
+	}
 
 	public DecimalMinDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, DecimalMin.class, property, elementType, mapping );

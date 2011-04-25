@@ -28,6 +28,9 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  * @author Hardy Ferentschik
  */
 public class SizeDef extends ConstraintDef<SizeDef, Size> {
+	
+	public SizeDef() {
+	}
 
 	public SizeDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, Size.class, property, elementType, mapping );

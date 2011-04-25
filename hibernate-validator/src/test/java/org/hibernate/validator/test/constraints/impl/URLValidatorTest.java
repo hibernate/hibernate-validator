@@ -140,9 +140,10 @@ public class URLValidatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( URLContainerNoAnnotations.class )
 				.property( "url", METHOD )
-				.constraint( URLDef.class )
-				.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" );
-		validator = getValidatorForProgrammaticMapping( mapping );
+				.constraint( new URLDef()
+					.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
+				);
+		validator = getValidatorForMapping( mapping );
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, true );
@@ -160,10 +161,11 @@ public class URLValidatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( URLContainerNoAnnotations.class )
 				.property( "url", METHOD )
-				.constraint( URLDef.class )
-				.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
-				.flags( Flag.CASE_INSENSITIVE );
-		validator = getValidatorForProgrammaticMapping( mapping );
+				.constraint( new URLDef()
+					.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
+					.flags( Flag.CASE_INSENSITIVE )
+				);
+		validator = getValidatorForMapping( mapping );
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, false );

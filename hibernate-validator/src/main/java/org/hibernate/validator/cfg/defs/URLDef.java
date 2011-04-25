@@ -27,6 +27,9 @@ import org.hibernate.validator.constraints.URL;
  */
 public class URLDef extends ConstraintDef<URLDef, URL> {
 
+	public URLDef() {
+	}
+	
 	public URLDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, URL.class, property, elementType, mapping );
 	}

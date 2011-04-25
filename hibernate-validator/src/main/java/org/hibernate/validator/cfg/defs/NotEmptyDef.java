@@ -26,6 +26,10 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Hardy Ferentschik
  */
 public class NotEmptyDef extends ConstraintDef<NotEmptyDef, NotEmpty> {
+	
+	public NotEmptyDef() {
+	}
+
 	public NotEmptyDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
 		super( beanType, NotEmpty.class, property, elementType, mapping );
 	}

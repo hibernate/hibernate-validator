@@ -55,9 +55,9 @@ public class MessageInterpolatorContextTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Test.class )
 				.property( "test", FIELD )
-				.constraint( MinDef.class )
-				.value( 10 )
-				.message( "{foo}" );
+				.constraint( new MinDef()
+					.value( 10 )
+					.message( "{foo}" ));
 
 		// use a easy mock message interpolator to verify the right for verifying that the right MessageInterpolatorContext
 		// will be passed

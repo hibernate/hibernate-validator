@@ -16,6 +16,8 @@
  */
 package org.hibernate.validator.cfg;
 
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
@@ -82,6 +84,16 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	 */
 	protected final ConstraintMapping mapping;
 
+	public ConstraintDef() {
+		
+		this.constraintType = null;
+		this.parameters = newHashMap();
+		this.beanType = null;
+		this.elementType = null;
+		this.property = null;
+		this.mapping = null;
+	}
+	
 	public ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
 		this( beanType, constraintType, property, elementType, new HashMap<String, Object>(), mapping );
 	}
@@ -116,6 +128,15 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		this.mapping = mapping;
 	}
 
+	public ConstraintDef(Class<A> constraintType) {
+		this.constraintType = constraintType;
+		this.parameters = newHashMap();
+		this.beanType = null;
+		this.elementType = null;
+		this.property = null;
+		this.mapping = null;
+	}
+
 	@SuppressWarnings("unchecked")
 	private C getThis() {
 		return (C) this;
@@ -139,45 +160,6 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	public C payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
 		return getThis();
-	}
-
-	public <B extends Annotation, D extends ConstraintDef<D, B>> D constraint(Class<D> definition) {
-		final Constructor<D> constructor = ReflectionHelper.getConstructor(
-				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
-		);
-
-		final D constraintDefinition = ReflectionHelper.newConstructorInstance(
-				constructor, beanType, property, elementType, mapping
-		);
-
-		mapping.addConstraintConfig( constraintDefinition );
-		return constraintDefinition;
-	}
-
-	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
-
-		GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
-				beanType, definition, property, elementType, mapping
-		);
-
-		mapping.addConstraintConfig( constraintDefinition );
-		return constraintDefinition;
-	}
-
-	public ConstraintsForTypeProperty property(String property, ElementType type) {
-		return new ConstraintsForTypeProperty( beanType, property, type, mapping );
-	}
-
-	public ConstraintsForType type(Class<?> type) {
-		return new ConstraintsForType( type, mapping );
-	}
-
-	public ConstraintsForTypeMethod method(String name, Class<?>... parameterTypes) {
-		return new ConstraintsForTypeMethod( beanType, name, parameterTypes, mapping );
-	}
-
-	public ConstraintsForTypeMethodElement parameter(int index) {
-		throw new NotImplementedException();
 	}
 
 	@Override
