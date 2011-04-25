@@ -1058,20 +1058,20 @@ public class RentalCar extends Car {
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator comprises a basic set of commonly used
-    constraints. These are on hand the constraints defined by the Bean
+    constraints. These are on the one hand the constraints defined by the Bean
     Validation specification and on the other hand several useful custom
     constraints additionally provided by Hibernate Validator.</para>
 
     <section id="validator-defineconstraints-spec">
       <title>Bean Validation constraints</title>
 
-      <para><xref linkend="table-spec-constraints" /> gives an overview on all
-      constraints specified in the Bean Validation API. If you are using the
-      Hibernate object-relational mapper, some of the constraints are
-      considered when creating the DDL for you model (see column "Hibernate
-      metadata impact"). All Bean Validation constraints apply to the
-      field/property level, there are no class-level constraints defined by
-      the specification.</para>
+      <para><xref linkend="table-spec-constraints" /> shows purpose and
+      supported data types of all constraints specified in the Bean Validation
+      API. All these constraints apply to the field/property level, there are
+      no class-level constraints defined in the Bean Validation specification.
+      If you are using the Hibernate object-relational mapper, some of the
+      constraints are taken into account when creating the DDL for your model
+      (see column "Hibernate metadata impact").</para>
 
       <note>
         <para>Hibernate Validator allows some constraints to be applied to
@@ -1086,10 +1086,13 @@ public class RentalCar extends Car {
 
         <tgroup cols="4">
           <colspec align="left" />
+
           <colspec align="left" />
+
           <colspec align="left" />
+
           <colspec align="left" />
-          
+
           <thead>
             <row>
               <entry>Annotation</entry>
@@ -1338,8 +1341,11 @@ public class RentalCar extends Car {
 
         <tgroup cols="4">
           <colspec align="left" />
+
           <colspec align="left" />
+
           <colspec align="left" />
+
           <colspec align="left" />
 
           <thead>
