@@ -1057,411 +1057,434 @@ public class RentalCar extends Car {
   <section id="validator-defineconstraints-builtin">
     <title>Built-in constraints</title>
 
-    <para>Hibernate Validator implements all of the default constraints
-    specified in Bean Validation as well as some custom ones. <xref
-    linkend="table-builtin-constraints" /> list all constraints available in
-    Hibernate Validator.</para>
+    <para>Hibernate Validator comprises a basic set of commonly used
+    constraints. These are on the one hand the constraints defined by the Bean
+    Validation specification and on the other hand several useful custom
+    constraints additionally provided by Hibernate Validator.</para>
 
-    <table id="table-builtin-constraints">
-      <title>Built-in constraints</title>
+    <section id="validator-defineconstraints-spec">
+      <title>Bean Validation constraints</title>
 
-      <tgroup cols="5">
-        <colspec align="left" />
+      <para><xref linkend="table-spec-constraints" /> shows purpose and
+      supported data types of all constraints specified in the Bean Validation
+      API. All these constraints apply to the field/property level, there are
+      no class-level constraints defined in the Bean Validation specification.
+      If you are using the Hibernate object-relational mapper, some of the
+      constraints are taken into account when creating the DDL for your model
+      (see column "Hibernate metadata impact").</para>
 
-        <thead>
-          <row>
-            <entry>Annotation</entry>
+      <note>
+        <para>Hibernate Validator allows some constraints to be applied to
+        more data types than required by the Bean Validation specification
+        (e.g. @Max can be applied to <classname>Strings</classname>). Relying
+        on this feature can impact portability of your application between
+        Bean Validation providers.</para>
+      </note>
 
-            <entry>Part of Bean Validation Specification</entry>
+      <table id="table-spec-constraints">
+        <title>Bean Validation constraints</title>
 
-            <entry>Apply on</entry>
+        <tgroup cols="4">
+          <colspec align="left" />
 
-            <entry>Use</entry>
+          <colspec align="left" />
 
-            <entry>Hibernate Metadata impact</entry>
-          </row>
-        </thead>
+          <colspec align="left" />
 
-        <tbody>
-          <row>
-            <entry>@AssertFalse</entry>
+          <colspec align="left" />
 
-            <entry>yes</entry>
+          <thead>
+            <row>
+              <entry>Annotation</entry>
+
+              <entry>Supported data types</entry>
+
+              <entry>Use</entry>
 
-            <entry>field/property</entry>
+              <entry>Hibernate metadata impact</entry>
+            </row>
+          </thead>
 
-            <entry>Check that the annotated element is
-            <constant>false</constant>.</entry>
+          <tbody valign="top">
+            <row>
+              <entry>@AssertFalse</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry><classname>Boolean</classname>,
+              <classname>boolean</classname></entry>
+
+              <entry>Checks that the annotated element is
+              <constant>false</constant>.</entry>
+
+              <entry>none</entry>
+            </row>
+
+            <row>
+              <entry>@AssertTrue</entry>
+
+              <entry><classname>Boolean</classname>,
+              <classname>boolean</classname></entry>
+
+              <entry>Checks that the annotated element is
+              <constant>true</constant>.</entry>
+
+              <entry>none</entry>
+            </row>
+
+            <row>
+              <entry>@DecimalMax</entry>
+
+              <entry><classname>BigDecimal</classname>,
+              <classname>BigInteger</classname>,
+              <classname>String</classname>, <classname>byte</classname>,
+              <classname>short</classname>, <classname>int</classname>,
+              <classname>long</classname> and the respective wrappers of the
+              primitive types. Additionally supported by HV: any sub-type of
+              <classname>Number</classname>.</entry>
+
+              <entry>The annotated element must be a number whose value must
+              be lower or equal to the specified maximum. The parameter value
+              is the string representation of the max value according to the
+              <classname>BigDecimal</classname> string representation.</entry>
 
-          <row>
-            <entry>@AssertTrue</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>yes</entry>
+            <row>
+              <entry>@DecimalMin</entry>
 
-            <entry>field/property</entry>
+              <entry><classname>BigDecimal</classname>,
+              <classname>BigInteger</classname>,
+              <classname>String</classname>, <classname>byte</classname>,
+              <classname>short</classname>, <classname>int</classname>,
+              <classname>long</classname> and the respective wrappers of the
+              primitive types. Additionally supported by HV: any sub-type of
+              <classname>Number</classname>.</entry>
 
-            <entry>Check that the annotated element is
-            <constant>true</constant>.</entry>
+              <entry>The annotated element must be a number whose value must
+              be higher or equal to the specified minimum. The parameter value
+              is the string representation of the min value according to the
+              <classname>BigDecimal</classname> string representation.</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry>none</entry>
+            </row>
 
-          <row>
-            <entry>@CreditCardNumber</entry>
+            <row>
+              <entry>@Digits(integer=, fraction=)</entry>
+
+              <entry><classname>BigDecimal</classname>,
+              <classname>BigInteger</classname>,
+              <classname>String</classname>, <classname>byte</classname>,
+              <classname>short</classname>, <classname>int</classname>,
+              <classname>long</classname> and the respective wrappers of the
+              primitive types. Additionally supported by HV: any sub-type of
+              <classname>Number</classname>.</entry>
 
-            <entry>no</entry>
+              <entry>Checks whether the annoted value is a number having up to
+              <literal>integer</literal> digits and
+              <literal>fraction</literal> fractional digits.</entry>
 
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
+              <entry>Define column precision and scale.</entry>
+            </row>
 
-            <entry>Check that the annotated string passes the Luhn checksum
-            test. Note, this validation aims to check for user mistake, not
-            credit card validity! See also <ulink
-            url="http://www.merriampark.com/anatomycc.htm">Anatomy of Credit
-            Card Numbers</ulink>.</entry>
+            <row>
+              <entry>@Future</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry><classname>java.util.Date</classname>,
+              <classname>java.util.Calendar</classname>; Additionally
+              supported by HV, if the <ulink
+              url="http://joda-time.sourceforge.net/">Joda Time</ulink>
+              date/time API is on the class path: any implementations of
+              <classname>ReadablePartial</classname> and
+              <classname>ReadableInstant</classname>.</entry>
 
-          <row>
-            <entry>@DecimalMax</entry>
+              <entry>Checks whether the annotated date is in the
+              future.</entry>
 
-            <entry>yes</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+            <row>
+              <entry>@Max</entry>
 
-            <entry>The annotated element must be a number whose value must be
-            lower or equal to the specified maximum. The parameter value is
-            the string representation of the max value according to the
-            <classname>BigDecimal</classname> string representation.</entry>
+              <entry><classname>BigDecimal</classname>,
+              <classname>BigInteger</classname>, <classname>byte</classname>,
+              <classname>short</classname>, <classname>int</classname>,
+              <classname>long</classname> and the respective wrappers of the
+              primitive types. Additionally supported by HV:
+              <classname>String</classname> (the numeric value represented by
+              a String is evaluated), any sub-type of
+              <classname>Number</classname>.</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry>Checks whether the annotated value is less than or equal
+              to the specified maximum.</entry>
 
-          <row>
-            <entry>@DecimalMin</entry>
+              <entry>Add a check constraint on the column.</entry>
+            </row>
 
-            <entry>yes</entry>
+            <row>
+              <entry>@Min</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+              <entry><classname>BigDecimal</classname>,
+              <classname>BigInteger</classname>, <classname>byte</classname>,
+              <classname>short</classname>, <classname>int</classname>,
+              <classname>long</classname> and the respective wrappers of the
+              primitive types. Additionally supported by HV:
+              <classname>String</classname> (the numeric value represented by
+              a String is evaluated), any sub-type of
+              <classname>Number</classname>.</entry>
 
-            <entry>The annotated element must be a number whose value must be
-            higher or equal to the specified minimum. The parameter value is
-            the string representation of the min value according to the
-            <classname>BigDecimal</classname> string representation.</entry>
+              <entry>Checks whether the annotated value is higher than or
+              equal to the specified minimum.</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry>Add a check constraint on the column.</entry>
+            </row>
 
-          <row>
-            <entry>@Digits(integer=, fraction=)</entry>
+            <row>
+              <entry>@NotNull</entry>
 
-            <entry>yes</entry>
+              <entry>Any type</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+              <entry>Checks that the annotated value is not
+              <constant>null.</constant></entry>
 
-            <entry>Check whether the property is a number having up to
-            <literal>integer</literal> digits and <literal>fraction</literal>
-            fractional digits.</entry>
+              <entry>Column(s) are not null.</entry>
+            </row>
 
-            <entry>Define column precision and scale.</entry>
-          </row>
+            <row>
+              <entry>@Null</entry>
 
-          <row>
-            <entry>@Email</entry>
+              <entry>Any type</entry>
 
-            <entry>no</entry>
+              <entry>Checks that the annotated value is
+              <constant>null.</constant></entry>
 
-            <entry>field/property. Needs to be a string.</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>Check whether the specified string is a valid email
-            address.</entry>
+            <row>
+              <entry>@Past</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry><classname>java.util.Date</classname>,
+              <classname>java.util.Calendar</classname>; Additionally
+              supported by HV, if the <ulink
+              url="http://joda-time.sourceforge.net/">Joda Time</ulink>
+              date/time API is on the class path: any implementations of
+              <classname>ReadablePartial</classname> and
+              <classname>ReadableInstant</classname>.</entry>
 
-          <row>
-            <entry>@Future</entry>
+              <entry>Checks whether the annotated date is in the past.</entry>
 
-            <entry>yes</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>field/property. Supported types are
-            <classname>java.util.Date</classname>,
-            <classname>java.util.Calendar</classname>; In addition to these
-            types demanded by the BV specification Hibernate Validator
-            provides support for any implements of
-            <classname>org.joda.time.ReadablePartial</classname> and
-            <classname>org.joda.time.ReadableInstant</classname>, if the
-            <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
-            date/time API is on the class path.</entry>
+            <row>
+              <entry>@Pattern(regex=, flag=)</entry>
 
-            <entry>Checks whether the annotated date is in the future.</entry>
+              <entry><classname>String</classname></entry>
 
-            <entry>none</entry>
-          </row>
+              <entry>Checks if the annotated string matches the regular
+              expression <parameter>regex</parameter> considering the given
+              flag <parameter>match</parameter>.</entry>
 
-          <row>
-            <entry>@Length(min=, max=)</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>no</entry>
+            <row>
+              <entry>@Size(min=, max=)</entry>
 
-            <entry>field/property. Needs to be a string.</entry>
+              <entry><classname>String</classname>,
+              <classname>Collection</classname>, <classname>Map</classname>
+              and <classname>arrays</classname></entry>
 
-            <entry>Validate that the annotated string is between
-            <parameter>min</parameter> and <parameter>max</parameter>
-            included.</entry>
+              <entry>Checks if the annotated element's size is between min and
+              max (inclusive).</entry>
 
-            <entry>Column length will be set to max.</entry>
-          </row>
+              <entry>Column length will be set to max.</entry>
+            </row>
 
-          <row>
-            <entry>@Max</entry>
+            <row>
+              <entry>@Valid</entry>
 
-            <entry>yes</entry>
+              <entry>Any non-primitive type</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+              <entry>Performs validation recursively on the associated object.
+              If the object is a collection or an array, the elements are
+              validated recursively. If the object is a map, the value
+              elements are validated recursively.</entry>
 
-            <entry>Checks whether the annotated value is less than or equal to
-            the specified maximum.</entry>
+              <entry>none</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
 
-            <entry>Add a check constraint on the column.</entry>
-          </row>
+      <note>
+        <para>On top of the parameters indicated in <xref
+        linkend="table-spec-constraints" /> each constraint supports the
+        parameters <parameter>message</parameter>,
+        <parameter>groups</parameter> and <parameter>payload</parameter>. This
+        is a requirement of the Bean Validation specification.</para>
+      </note>
+    </section>
 
-          <row>
-            <entry>@Min</entry>
+    <section id="validator-defineconstraints-hv-constraints">
+      <title>Additional constraints</title>
 
-            <entry>yes</entry>
+      <para>In addition to the constraints defined by the Bean Validation API
+      Hibernate Validator provides several useful custom constraints which are
+      listed in <xref linkend="table-custom-constraints" />. With one
+      exception also these constraints apply to the field/property level, only
+      @ScriptAssert is a class-level constraint.</para>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+      <table id="table-custom-constraints">
+        <title>Custom constraints provided by Hibernate Validator</title>
 
-            <entry>Checks whether the annotated value is higher than or equal
-            to the specified minimum.</entry>
+        <tgroup cols="4">
+          <colspec align="left" />
 
-            <entry>Add a check constraint on the column.</entry>
-          </row>
+          <colspec align="left" />
 
-          <row>
-            <entry>@NotNull</entry>
+          <colspec align="left" />
 
-            <entry>yes</entry>
+          <colspec align="left" />
 
-            <entry>field/property</entry>
+          <thead>
+            <row>
+              <entry>Annotation</entry>
 
-            <entry>Check that the annotated value is not
-            <constant>null.</constant></entry>
+              <entry>Supported data types</entry>
 
-            <entry>Column(s) are not null.</entry>
-          </row>
+              <entry>Use</entry>
 
-          <row>
-            <entry>@NotBlank</entry>
+              <entry>Hibernate metadata impact</entry>
+            </row>
+          </thead>
 
-            <entry>no</entry>
+          <tbody valign="top">
+            <row>
+              <entry>@CreditCardNumber</entry>
 
-            <entry>field/property</entry>
+              <entry><classname>String</classname></entry>
 
-            <entry>Check that the annotated string is not null and the trimmed
-            length is greater than 0. The difference to @NotEmpty is that this
-            constraint can only be applied on strings and that trailing
-            whitespaces are ignored.</entry>
+              <entry>Checks that the annotated string passes the Luhn checksum
+              test. Note, this validation aims to check for user mistakes, not
+              credit card validity! See also <ulink
+              url="http://www.merriampark.com/anatomycc.htm">Anatomy of Credit
+              Card Numbers</ulink>.</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry>none</entry>
+            </row>
 
-          <row>
-            <entry>@NotEmpty</entry>
+            <row>
+              <entry>@Email</entry>
 
-            <entry>no</entry>
+              <entry><classname>String</classname></entry>
 
-            <entry>field/property. Supported types are String, Collection, Map
-            and arrays.</entry>
+              <entry>Checks whether the specified string is a valid email
+              address.</entry>
 
-            <entry>Check whether the annotated element is not
-            <constant>null</constant> nor empty.</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>none</entry>
-          </row>
+            <row>
+              <entry>@Length(min=, max=)</entry>
 
-          <row>
-            <entry>@Null</entry>
+              <entry><classname>String</classname></entry>
 
-            <entry>yes</entry>
+              <entry>Validates that the annotated string is between
+              <parameter>min</parameter> and <parameter>max</parameter>
+              included.</entry>
 
-            <entry>field/property</entry>
+              <entry>Column length will be set to max.</entry>
+            </row>
 
-            <entry>Check that the annotated value is
-            <constant>null.</constant></entry>
+            <row>
+              <entry>@NotBlank</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry><classname>String</classname></entry>
 
-          <row>
-            <entry>@Past</entry>
+              <entry>Checks that the annotated string is not null and the
+              trimmed length is greater than 0. The difference to @NotEmpty is
+              that this constraint can only be applied on strings and that
+              trailing whitespaces are ignored.</entry>
 
-            <entry>yes</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>field/property. Supported types are
-            <classname>java.util.Date</classname>,
-            <classname>java.util.Calendar</classname>; In addition to these
-            types demanded by the BV specification Hibernate Validator
-            provides support for any implements of
-            <classname>org.joda.time.ReadablePartial</classname> and
-            <classname>org.joda.time.ReadableInstant</classname>, if the
-            <ulink url="http://joda-time.sourceforge.net/">Joda Time</ulink>
-            date/time API is on the class path.</entry>
+            <row>
+              <entry>@NotEmpty</entry>
 
-            <entry>Checks whether the annotated date is in the past.</entry>
+              <entry><classname>String</classname>,
+              <classname>Collection</classname>, <classname>Map</classname>
+              and arrays</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry>Checks whether the annotated element is not
+              <constant>null</constant> nor empty.</entry>
 
-          <row>
-            <entry>@Pattern(regex=, flag=)</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>yes</entry>
+            <row>
+              <entry>@Range(min=, max=)</entry>
 
-            <entry>field/property. Needs to be a string.</entry>
+              <entry><classname>BigDecimal</classname>,
+              <classname>BigInteger</classname>,
+              <classname>String</classname>, <classname>byte</classname>,
+              <classname>short</classname>, <classname>int</classname>,
+              <classname>long</classname> and the respective wrappers of the
+              primitive types</entry>
 
-            <entry>Checks if the annotated string matches the regular
-            expression <parameter>regex</parameter> considering the given flag
-            <parameter>match</parameter>.</entry>
+              <entry>Checks whether the annotated value lies between
+              (inclusive) the specified minimum and maximum.</entry>
 
-            <entry>none</entry>
-          </row>
+              <entry>none</entry>
+            </row>
 
-          <row>
-            <entry>@Range(min=, max=)</entry>
+            <row>
+              <entry>@ScriptAssert(lang=, script=, alias=)</entry>
 
-            <entry>no</entry>
+              <entry>Any type</entry>
 
-            <entry>field/property. Supported types are
-            <classname>BigDecimal</classname>,
-            <classname>BigInteger</classname>, <classname>String</classname>,
-            <classname>byte</classname>, <classname>short</classname>,
-            <classname>int</classname>, <classname>long</classname> and the
-            respective wrappers of the primitive types.</entry>
+              <entry>Checks whether the given script can successfully be
+              evaluated against the annotated element. In order to use this
+              constraint, an implementation of the Java Scripting API as
+              defined by JSR 223 ("Scripting for the
+              Java<superscript>TM</superscript> Platform") must part of the
+              class path. This is automatically the case when running on Java
+              6. For older Java versions, the JSR 223 RI can be added manually
+              to the class path.The expressions to be evaluated can be written
+              in any scripting or expression language, for which a JSR 223
+              compatible engine can be found in the class path.</entry>
 
-            <entry>Check whether the annotated value lies between (inclusive)
-            the specified minimum and maximum.</entry>
+              <entry>none</entry>
+            </row>
 
-            <entry>none</entry>
-          </row>
+            <row>
+              <entry>@URL(protocol=, host=, port=, regexp=, flags=)</entry>
 
-          <row>
-            <entry>@Size(min=, max=)</entry>
+              <entry><classname>String</classname></entry>
 
-            <entry>yes</entry>
+              <entry>Checks if the annotated string is a valid URL according
+              to RFC2396. If any of the optional parameters
+              <parameter>protocol</parameter>, <parameter>host</parameter> or
+              <parameter>port</parameter> are specified, the corresponding URL
+              fragments must match the specified values. The optional
+              parameters <parameter>regexp</parameter> and
+              <parameter>flags</parameter> allow to specify an additional
+              regular expression (including regular expression flags) which
+              the URL must match.</entry>
 
-            <entry>field/property. Supported types are
-            <classname>String</classname>, <classname>Collection</classname>,
-            <classname>Map</classname> and
-            <classname>arrays</classname>.</entry>
+              <entry>none</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
 
-            <entry>Check if the annotated element size is between min and max
-            (inclusive).</entry>
-
-            <entry>Column length will be set to max.</entry>
-          </row>
-
-          <row>
-            <entry>@ScriptAssert(lang=, script=, alias=)</entry>
-
-            <entry>no</entry>
-
-            <entry>type</entry>
-
-            <entry>Checks whether the given script can successfully be
-            evaluated against the annotated element. In order to use this
-            constraint, an implementation of the Java Scripting API as defined
-            by JSR 223 ("Scripting for the Java<superscript>TM</superscript>
-            Platform") must part of the class path. This is automatically the
-            case when running on Java 6. For older Java versions, the JSR 223
-            RI can be added manually to the class path.The expressions to be
-            evaluated can be written in any scripting or expression language,
-            for which a JSR 223 compatible engine can be found in the class
-            path.</entry>
-
-            <entry>none</entry>
-          </row>
-
-          <row>
-            <entry>@URL(protocol=, host=, port=, regexp=, flags=)</entry>
-
-            <entry>no</entry>
-
-            <entry>field/property. The supported type is
-            <classname>String</classname>.</entry>
-
-            <entry>Check if the annotated string is a valid URL according to
-            RFC2396. If any of the optional parameters
-            <parameter>protocol</parameter>, <parameter>host</parameter> or
-            <parameter>port</parameter> are specified, the corresponding URL
-            fragments must match the specified values. The optional parameters
-            <parameter>regexp</parameter> and <parameter>flags</parameter>
-            allow to specify an additional regular expression (including
-            regular expression flags) which the URL must match.</entry>
-
-            <entry>none</entry>
-          </row>
-
-          <row>
-            <entry>@Valid</entry>
-
-            <entry>yes</entry>
-
-            <entry>field/property. Any non-primitive types are
-            supported.</entry>
-
-            <entry>Performs validation recursively on the associated object.
-            If the object is a collection or an array, the elements are
-            validated recursively. If the object is a map, the value elements
-            are validated recursively.</entry>
-
-            <entry>none</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
-
-    <note>
-      <para>On top of the parameters indicated in <xref
-      linkend="table-builtin-constraints" /> each constraint supports the
-      parameters <parameter>message</parameter>, <parameter>groups</parameter>
-      and <parameter>payload</parameter>. This is a requirement of the Bean
-      Validation specification.</para>
-    </note>
-
-    <para>In some cases these built-in constraints will not fulfill your
-    requirements. In this case you can literally in a minute write your own
-    constraints. We will discuss this in <xref
-    linkend="validator-customconstraints" /></para>
+      <para>In some cases neither the Bean Validation constraints nor the
+      custom constraints provided by Hibernate Validator will fulfill your
+      requirements completely. In this case you can literally in a minute
+      write your own constraints. We will discuss this in <xref
+      linkend="validator-customconstraints" />.</para>
+    </section>
   </section>
 </chapter>

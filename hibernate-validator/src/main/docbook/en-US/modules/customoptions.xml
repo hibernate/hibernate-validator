@@ -20,7 +20,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="chapter-custom-options">
+<chapter id="validator-extensions">
   <title>Hibernate Validator extensions</title>
 
   <note>
