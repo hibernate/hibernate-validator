@@ -1058,9 +1058,10 @@ public class RentalCar extends Car {
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator comprises a basic set of commonly used
-    constraints. These are on the one hand the constraints defined by the Bean
-    Validation specification and on the other hand several useful custom
-    constraints additionally provided by Hibernate Validator.</para>
+    constraints. These are foremost the constraints defined by the Bean
+    Validation specification (see <xref linkend="table-spec-constraints" />).
+    Additionally, Hibernate Validator provides useful custom constraints (see
+    <xref linkend="table-custom-constraints" />).</para>
 
     <section id="validator-defineconstraints-spec">
       <title>Bean Validation constraints</title>
