@@ -468,13 +468,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Set<Member> cascadedMembers = getBeanMetaData( valueContext.getCurrentBeanType() ).getCascadedMembers();
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( Member member : cascadedMembers ) {
-			Type type = ReflectionHelper.typeOf( member );
 			String newNode = ReflectionHelper.getPropertyName( member );
 			valueContext.appendNode( newNode );
 
 			if ( isCascadeRequired( validationContext, valueContext, member ) ) {
 				Object value = ReflectionHelper.getValue( member, valueContext.getCurrentBean() );
 				if ( value != null ) {
+					Type type = value.getClass();
 					Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
 					boolean isIndexable = isIndexable( type );
 					validateCascadedConstraint(
