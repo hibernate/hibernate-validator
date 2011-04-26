@@ -59,8 +59,8 @@ public class ConstraintMapping {
 	 *
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
-	public final ConstraintsForType type(Class<?> beanClass) {
-		return new ConstraintsForType( beanClass, this );
+	public final TypeConstraintMappingCreationalContext type(Class<?> beanClass) {
+		return new TypeConstraintMappingCreationalContext( beanClass, this );
 	}
 
 	/**
@@ -183,5 +183,3 @@ public class ConstraintMapping {
 		}
 	}
 }
-
-

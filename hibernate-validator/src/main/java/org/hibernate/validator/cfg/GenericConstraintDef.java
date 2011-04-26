@@ -19,6 +19,7 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -37,6 +38,10 @@ public class GenericConstraintDef<A extends Annotation> extends ConstraintDef<Ge
 		super( beanType, constraintType, property, elementType, mapping );
 	}
 
+	public GenericConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
+		super( beanType, constraintType, property, elementType, mapping );
+	}
+	
 	public static <A extends Annotation> GenericConstraintDef<A> from(Class<A> constraintType) {
 		return new GenericConstraintDef<A>(constraintType);
 	}
