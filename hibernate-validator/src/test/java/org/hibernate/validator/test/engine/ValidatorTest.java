@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.test.engine;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
@@ -143,6 +145,15 @@ public class ValidatorTest {
 		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
 	}
 
+	@Test(description = "HV-468")
+	public void testPropertyPath() {
+		Validator validator = getValidator();
+		Foo foo = new Foo();
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( foo );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "bar[0].alwaysNull" );
+	}
+
 	class A {
 		@NotNull
 		String b;
@@ -226,5 +237,21 @@ public class ValidatorTest {
 	}
 
 	class H extends G implements F {
+	}
+
+
+	class Foo {
+		@Valid
+		private Collection<Bar> bar;
+
+		public Foo() {
+			bar = new ArrayList<Bar>();
+			bar.add( new Bar() );
+		}
+	}
+
+	class Bar {
+		@NotNull
+		String alwaysNull;
 	}
 }
