@@ -60,6 +60,7 @@ import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -364,7 +365,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext) {
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		final BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
@@ -383,6 +385,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				valueContext.setCurrentGroup( defaultSequenceMember );
 				boolean validationSuccessful = true;
 				for ( BeanMetaConstraint<? extends Annotation> metaConstraint : metaConstraints ) {
+					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
+					// time. An interface can define more than one constraint, we have to check the class we are validating.
+					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+					if ( declaringClass.isInterface() ) {
+						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
+						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
+							continue;
+						}
+						validatedInterfaces.put( declaringClass, clazz );
+					}
+
 					boolean tmp = validateConstraint(
 							validationContext, valueContext, metaConstraint
 					);
@@ -390,9 +403,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 						return;
 					}
 					validationSuccessful = validationSuccessful && tmp;
-					// reset the path
 					valueContext.setPropertyPath( currentPath );
-
 					validationContext.markProcessed(
 							valueContext.getCurrentBean(),
 							valueContext.getCurrentGroup(),
@@ -779,8 +790,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @return The number of constraint violations raised when validating the default group.
 	 */
 	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> constraintList) {
-		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		final int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
+		final BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
 		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
@@ -797,6 +809,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				boolean validationSuccessful = true;
 				valueContext.setCurrentGroup( groupClass );
 				for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
+					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
+					// time. An interface can define more than one constraint, we have to check the class we are validating.
+					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+					if ( declaringClass.isInterface() ) {
+						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
+						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
+							continue;
+						}
+						validatedInterfaces.put( declaringClass, clazz );
+					}
+
 					if ( constraintList.contains( metaConstraint )
 							&& isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 

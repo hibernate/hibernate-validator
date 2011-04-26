@@ -29,10 +29,13 @@ import javax.validation.metadata.BeanDescriptor;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.test.util.CountValidationCalls;
+import org.hibernate.validator.test.util.CountValidationCallsValidator;
 
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validator.test.util.TestUtil.getValidator;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -41,10 +44,7 @@ import static org.testng.Assert.assertTrue;
  */
 public class ValidatorTest {
 
-	/**
-	 * HV-429
-	 */
-	@Test
+	@Test(description = "HV-429")
 	public void testValidatePropertyWithRedefinedDefaultGroupOnMainEntity() {
 		Validator validator = getValidator();
 		A testInstance = new A();
@@ -55,7 +55,7 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "c.id" );
 	}
 
-	@Test
+	@Test(description = "HV-429")
 	public void testValidatePropertyWithRedefinedDefaultGroupOnSuperClass() {
 		Validator validator = getValidator();
 		A testInstance = new A();
@@ -66,7 +66,7 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "d.e" );
 	}
 
-	@Test
+	@Test(description = "HV-429")
 	public void testValidateValueWithRedefinedDefaultGroupOnMainEntity() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue( A.class, "c.id", "aaa" );
@@ -74,7 +74,7 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "c.id" );
 	}
 
-	@Test
+	@Test(description = "HV-429")
 	public void testValidateValueWithRedefinedDefaultGroupOnSuperClass() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue( A.class, "d.e", "aa" );
@@ -82,10 +82,7 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "d.e" );
 	}
 
-	/**
-	 * HV-376
-	 */
-	@Test
+	@Test(description = "HV-376")
 	public void testValidatePropertyWithCurrencySymbol() {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
@@ -93,7 +90,7 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	@Test
+	@Test(description = "HV-376")
 	public void testValidateValueWithCurrencySymbol() {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
@@ -103,10 +100,7 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	/**
-	 * HV-208
-	 */
-	@Test
+	@Test(description = "HV-208")
 	public void testPropertyPathDoesNotStartWithLeadingDot() {
 		Validator validator = getValidator();
 		A testInstance = new A();
@@ -115,14 +109,38 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "b" );
 	}
 
-	/**
-	 * HV-132 - supper hasBoolean format
-	 */
-	@Test
+	@Test(description = "HV-372")
 	public void testHasBoolean() {
 		Validator validator = getValidator();
 		BeanDescriptor beanDescr = validator.getConstraintsForClass( B.class );
 		assertTrue( beanDescr.isBeanConstrained() );
+	}
+
+	@Test(description = "HV-466")
+	public void testValidateInterfaceConstraintsAreValidatedOneTime() {
+		CountValidationCallsValidator.init();
+		Set<ConstraintViolation<H>> constraintViolations = getValidator().validate( new H() );
+
+		assertNumberOfViolations( constraintViolations, 0 );
+		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 2 );
+	}
+
+	@Test(description = "HV-466")
+	public void testValidatePropertyInterfaceConstraintsAreValidatedOneTime() {
+		CountValidationCallsValidator.init();
+		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateProperty( new H(), "foo" );
+
+		assertNumberOfViolations( constraintViolations, 0 );
+		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
+	}
+
+	@Test(description = "HV-466")
+	public void testValidateValueInterfaceConstraintsAreValidatedOneTime() {
+		CountValidationCallsValidator.init();
+		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateValue( H.class, "foo", null );
+
+		assertNumberOfViolations( constraintViolations, 0 );
+		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
 	}
 
 	class A {
@@ -187,5 +205,26 @@ public class ValidatorTest {
 	}
 
 	interface TestGroup {
+	}
+
+	interface F {
+		@CountValidationCalls
+		String getFoo();
+
+		@CountValidationCalls
+		String getBar();
+	}
+
+	class G implements F {
+		public String getFoo() {
+			return null;
+		}
+
+		public String getBar() {
+			return null;
+		}
+	}
+
+	class H extends G implements F {
 	}
 }
