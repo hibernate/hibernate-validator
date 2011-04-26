@@ -16,21 +16,15 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NotEmptyDef extends ConstraintDef<NotEmptyDef, NotEmpty> {
-	
-	public NotEmptyDef() {
-	}
 
-	public NotEmptyDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, NotEmpty.class, property, elementType, mapping );
+	public NotEmptyDef() {
+		super( NotEmpty.class );
 	}
 }

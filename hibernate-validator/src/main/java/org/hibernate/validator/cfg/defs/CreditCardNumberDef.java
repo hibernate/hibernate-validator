@@ -17,17 +17,15 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.CreditCardNumber;
 
 /**
  * @author Hardy Ferentschik
  */
 public class CreditCardNumberDef extends ConstraintDef<CreditCardNumberDef, CreditCardNumber> {
-	public CreditCardNumberDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, CreditCardNumber.class, property, elementType, mapping );
+
+	public CreditCardNumberDef() {
+		super( CreditCardNumber.class );
 	}
 }

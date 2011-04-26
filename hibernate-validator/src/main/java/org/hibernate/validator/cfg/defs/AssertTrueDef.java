@@ -16,21 +16,16 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.AssertTrue;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class AssertTrueDef extends ConstraintDef<AssertTrueDef, AssertTrue> {
-	
-	public AssertTrueDef() {
-	}
 
-	public AssertTrueDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertTrue.class, property, elementType, mapping );
+	public AssertTrueDef() {
+		super( AssertTrue.class );
 	}
 }

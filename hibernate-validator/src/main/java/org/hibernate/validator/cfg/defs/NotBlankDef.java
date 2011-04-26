@@ -16,17 +16,14 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NotBlankDef extends ConstraintDef<NotBlankDef, NotBlank> {
-	public NotBlankDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, NotBlank.class, property, elementType, mapping );
+	public NotBlankDef() {
+		super( NotBlank.class );
 	}
 }

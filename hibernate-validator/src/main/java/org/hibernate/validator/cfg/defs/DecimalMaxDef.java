@@ -17,22 +17,17 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.DecimalMax;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class DecimalMaxDef extends ConstraintDef<DecimalMaxDef, DecimalMax> {
-	
-	public DecimalMaxDef() {
-	}
 
-	public DecimalMaxDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, DecimalMax.class, property, elementType, mapping );
+	public DecimalMaxDef() {
+		super( DecimalMax.class );
 	}
 
 	public DecimalMaxDef value(String max) {

@@ -16,17 +16,16 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.Past;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class PastDef extends ConstraintDef<PastDef, Past> {
-	public PastDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Past.class, property, elementType, mapping );
+
+	public PastDef() {
+		super( Past.class );
 	}
 }

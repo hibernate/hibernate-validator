@@ -16,21 +16,16 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.Future;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class FutureDef extends ConstraintDef<FutureDef, Future> {
-	
-	public FutureDef() {
-	}
 
-	public FutureDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Future.class, property, elementType, mapping );
+	public FutureDef() {
+		super( Future.class );
 	}
 }
