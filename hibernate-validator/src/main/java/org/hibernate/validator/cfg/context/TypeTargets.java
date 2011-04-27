@@ -63,7 +63,6 @@ public interface TypeTargets {
 	 *
 	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
 	 */
-	ParameterTarget method(String name,
-						   Class<?>... parameterTypes);
+	MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes);
 
 }

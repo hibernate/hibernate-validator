@@ -20,6 +20,6 @@ package org.hibernate.validator.cfg.context;
  * @author Gunnar Morling
  *
  */
-public interface MethodReturnValueConstraintMappingCreationalContext {
+public interface MethodReturnValueConstraintMappingCreationalContext extends TypeTargets, ParameterTarget, Constrainable<MethodReturnValueConstraintMappingCreationalContext>, Cascadable<MethodReturnValueConstraintMappingCreationalContext> {
 
 }
