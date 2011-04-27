@@ -18,35 +18,24 @@
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * A {@link ConstraintDef} class which can be used to configure any constraint
  * type. For this purpose the class defines a generic method
  * {@link GenericConstraintDef#param(String, Object)} which allows to add
  * arbitrary constraint parameters.
- * 
+ *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
 public class GenericConstraintDef<A extends Annotation> extends ConstraintDef<GenericConstraintDef<A>, A> {
 
-	public GenericConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, constraintType, property, elementType, mapping );
+	public static <A extends Annotation> GenericConstraintDef<A> from(Class<A> constraintType) {
+		return new GenericConstraintDef<A>( constraintType );
 	}
 
-	public GenericConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
-		super( beanType, constraintType, property, elementType, mapping );
-	}
-	
-	public static <A extends Annotation> GenericConstraintDef<A> from(Class<A> constraintType) {
-		return new GenericConstraintDef<A>(constraintType);
-	}
 	public GenericConstraintDef(Class<A> constraintType) {
-		super(constraintType);
+		super( constraintType );
 	}
 
 	public GenericConstraintDef<A> param(String key, Object value) {

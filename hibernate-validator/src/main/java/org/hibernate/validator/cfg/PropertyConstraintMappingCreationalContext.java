@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 
 /**
@@ -42,24 +41,9 @@ public final class PropertyConstraintMappingCreationalContext extends Constraint
 
 	public PropertyConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		GenericConstraintDef<?> constraintDefinition = new GenericConstraintDef(
-				beanClass, definition.constraintType, property, elementType, definition.parameters, mapping
-		);
-
-		mapping.addConstraintConfig( constraintDefinition );
-
-		return this;
-	}
-
-	public <A extends Annotation> PropertyConstraintMappingCreationalContext constraint(GenericConstraintDef<A> definition) {
-		final GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
-				beanClass, definition.constraintType, property, elementType, mapping
-		);
-		constraintDefinition.parameters.putAll( definition.parameters );
-
-		mapping.addConstraintConfig( constraintDefinition );
-
+		mapping.addConstraintConfig( ConfiguredConstraint.forProperty(
+				definition, beanClass, property, elementType
+		) );
 		return this;
 	}
 
@@ -67,6 +51,5 @@ public final class PropertyConstraintMappingCreationalContext extends Constraint
 		mapping.addCascadeConfig( new CascadeDef( beanClass, property, elementType ) );
 		return this;
 	}
-
 }
 

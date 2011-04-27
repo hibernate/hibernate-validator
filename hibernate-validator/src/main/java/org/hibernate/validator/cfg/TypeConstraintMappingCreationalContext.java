@@ -21,8 +21,6 @@ import java.util.Arrays;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
-import static java.lang.annotation.ElementType.TYPE;
-
 /**
  * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
  *
@@ -33,31 +31,13 @@ import static java.lang.annotation.ElementType.TYPE;
 public final class TypeConstraintMappingCreationalContext extends ConstraintMappingCreationalContextImplBase
 		implements Constrainable<TypeConstraintMappingCreationalContext>, TypeTargets {
 
-	private static final String EMPTY_PROPERTY = "";
-
 	public TypeConstraintMappingCreationalContext(Class<?> beanClass, ConstraintMapping mapping) {
 		super( beanClass, mapping );
 	}
 
 	public TypeConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
 
-		@SuppressWarnings( { "rawtypes", "unchecked" })
-		ConstraintDef<?, ?> constraintDefinition = new GenericConstraintDef(
-				beanClass, definition.constraintType, EMPTY_PROPERTY, TYPE, definition.parameters, mapping
-		);
-		mapping.addConstraintConfig( constraintDefinition );
-
-		return this;
-	}
-
-	public <A extends Annotation> TypeConstraintMappingCreationalContext constraint(GenericConstraintDef<A> definition) {
-		final GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
-				beanClass, definition.constraintType, EMPTY_PROPERTY, TYPE, mapping
-		);
-		constraintDefinition.parameters.putAll( definition.parameters );
-
-		mapping.addConstraintConfig( constraintDefinition );
-
+		mapping.addConstraintConfig( getConfiguredConstraint( definition ) );
 		return this;
 	}
 
@@ -85,4 +65,9 @@ public final class TypeConstraintMappingCreationalContext extends ConstraintMapp
 		return this;
 	}
 
+	private <A extends Annotation> ConfiguredConstraint<A> getConfiguredConstraint(ConstraintDef<?, A> definition) {
+		return ConfiguredConstraint.forType(
+				definition, beanClass
+		);
+	}
 }

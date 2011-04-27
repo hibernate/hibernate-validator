@@ -19,13 +19,15 @@ package org.hibernate.validator.cfg;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Top level class for constraints configured via the programmatic API.
@@ -35,7 +37,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.om)
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConstraintDef<?, ?>>> constraintConfig;
+	private final Map<Class<?>, List<ConfiguredConstraint<?>>> constraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
@@ -43,12 +45,12 @@ public class ConstraintMapping {
 	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
 
 	public ConstraintMapping() {
-		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?, ?>>>();
-		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
-		this.methodCascadeConfig = new HashMap<Class<?>, List<MethodCascadeDef>>();
-		this.configuredClasses = new HashSet<Class<?>>();
-		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
-		this.defaultGroupSequenceProviders = new HashMap<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>>();
+		this.constraintConfig = newHashMap();
+		this.cascadeConfig = newHashMap();
+		this.methodCascadeConfig = newHashMap();
+		this.configuredClasses = newHashSet();
+		this.defaultGroupSequences = newHashMap();
+		this.defaultGroupSequenceProviders = newHashMap();
 	}
 
 	/**
@@ -70,22 +72,8 @@ public class ConstraintMapping {
 	 *         this map represents a bean type, for which the constraint
 	 *         definitions in the associated map value are configured.
 	 */
-	public final Map<Class<?>, List<ConstraintDefAccessor<?>>> getConstraintConfig() {
-
-		Map<Class<?>, List<ConstraintDefAccessor<?>>> newDefinitions = new HashMap<Class<?>, List<ConstraintDefAccessor<?>>>();
-
-		for ( Map.Entry<Class<?>, List<ConstraintDef<?, ?>>> entry : constraintConfig.entrySet() ) {
-
-			List<ConstraintDefAccessor<?>> newList = new ArrayList<ConstraintDefAccessor<?>>();
-
-			for ( ConstraintDef<?, ?> definition : entry.getValue() ) {
-				newList.add( ConstraintDefAccessor.getInstance( definition ) );
-			}
-
-			newDefinitions.put( entry.getKey(), newList );
-		}
-
-		return newDefinitions;
+	public final Map<Class<?>, List<ConfiguredConstraint<?>>> getConstraintConfig() {
+		return constraintConfig;
 	}
 
 	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
@@ -170,15 +158,15 @@ public class ConstraintMapping {
 		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
 	}
 
-	protected final void addConstraintConfig(ConstraintDef<?, ?> definition) {
-		Class<?> beanClass = definition.beanType;
+	protected final void addConstraintConfig(ConfiguredConstraint<?> constraint) {
+		Class<?> beanClass = constraint.getBeanType();
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {
-			constraintConfig.get( beanClass ).add( definition );
+			constraintConfig.get( beanClass ).add( constraint );
 		}
 		else {
-			List<ConstraintDef<?, ?>> definitionList = new ArrayList<ConstraintDef<?, ?>>();
-			definitionList.add( definition );
+			List<ConfiguredConstraint<?>> definitionList = newArrayList();
+			definitionList.add( constraint );
 			constraintConfig.put( beanClass, definitionList );
 		}
 	}

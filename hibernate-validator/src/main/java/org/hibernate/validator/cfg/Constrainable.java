@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.lang.annotation.Annotation;
 
 /**
  * Facet of a constraint mapping creational context which allows to place
@@ -35,7 +34,5 @@ public interface Constrainable<C extends Constrainable<C>> {
 	 * @return The current creational context following the method chaining pattern.
 	 */
 	C constraint(ConstraintDef<?, ?> definition);
-
-	<A extends Annotation> C constraint(GenericConstraintDef<A> definition);
 
 }

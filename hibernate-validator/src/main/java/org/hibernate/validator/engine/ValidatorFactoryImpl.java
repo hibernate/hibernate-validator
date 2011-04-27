@@ -37,7 +37,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.CascadeDef;
-import org.hibernate.validator.cfg.ConstraintDefAccessor;
+import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
@@ -156,7 +156,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
 
-		final Map<Class<?>, List<ConstraintDefAccessor<?>>> constraintsByType = mapping.getConstraintConfig();
+		final Map<Class<?>, List<ConfiguredConstraint<?>>> constraintsByType = mapping.getConstraintConfig();
 		final Map<Class<?>, List<CascadeDef>> cascadeConfigByType = mapping.getCascadeConfig();
 		final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfigByType = mapping.getMethodCascadeConfig();
 
@@ -175,7 +175,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			for ( Class<?> classInHierarchy : classes ) {
 
 				// if the programmatic config contains constraints for the class in the hierarchy create equivalent meta constraints
-				List<ConstraintDefAccessor<?>> constraintsOfType = constraintsByType.get( classInHierarchy );
+				List<ConfiguredConstraint<?>> constraintsOfType = constraintsByType.get( classInHierarchy );
 				if ( constraintsOfType != null ) {
 					addProgrammaticConfiguredConstraints(
 							constraintsOfType,
@@ -289,10 +289,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConstraintDefAccessor<?>> definitions,
+	private <T, A extends Annotation> void addProgrammaticConfiguredConstraints(List<ConfiguredConstraint<?>> definitions,
 																				Class<T> rootClass, Class<?> hierarchyClass,
 																				Map<Class<?>, List<BeanMetaConstraint<?>>> constraints) {
-		for ( ConstraintDefAccessor<?> config : definitions ) {
+		for ( ConfiguredConstraint<?> config : definitions ) {
 			A annotation = (A) createAnnotationProxy( config );
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
@@ -406,7 +406,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private <A extends Annotation> A createAnnotationProxy(ConstraintDefAccessor<A> config) {
+	private <A extends Annotation> A createAnnotationProxy(ConfiguredConstraint<A> config) {
 		Class<A> constraintType = config.getConstraintType();
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( constraintType );
 		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {

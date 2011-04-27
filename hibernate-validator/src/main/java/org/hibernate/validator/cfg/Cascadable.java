@@ -17,7 +17,7 @@
 package org.hibernate.validator.cfg;
 
 /**
- * Facet of a constraint mapping creational context which marks the underlying
+ * Facet of a constraint mapping creational context which allows to mark the underlying
  * element as to be validated in a cascaded way.
  *
  * @author Gunnar Morling

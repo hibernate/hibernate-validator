@@ -19,8 +19,6 @@ package org.hibernate.validator.cfg;
 import java.lang.annotation.ElementType;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.util.ReflectionHelper;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.util.ReflectionHelper.propertyExists;

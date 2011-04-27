@@ -16,19 +16,11 @@
  */
 package org.hibernate.validator.cfg;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.Map;
 import javax.validation.Payload;
-import javax.validation.ValidationException;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import org.hibernate.validator.util.ReflectionHelper;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a
@@ -46,95 +38,26 @@ import org.hibernate.validator.util.ReflectionHelper;
  */
 public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
 
-	// Note on visibility of members: In order to avoid the need for public
-	// getter methods for the fields of this class (which would pollute it's
-	// fluent API) they are protected instead of private. To get access to
-	// these fields outside of this class a ConstraintDefAccessor instance can
-	// be created from it, which offers public getter methods.
+	// Note on visibility of members: These members are intentionally made
+	// package-private instead of private. They are only referenced in this
+	// package and there shouldn't be public getters as they would pollute 
+	// the fluent definition API
 
 	/**
 	 * The constraint annotation type of this definition.
 	 */
-	protected final Class<A> constraintType;
+	final Class<A> constraintType;
 
 	/**
 	 * A map with the annotation parameters of this definition. Keys are
 	 * property names of this definition's annotation type, values are
 	 * annotation parameter values of the appropriate types.
 	 */
-	protected final Map<String, Object> parameters;
-
-	/**
-	 * The bean type of this definition.
-	 */
-	protected final Class<?> beanType;
-
-	/**
-	 * The element type of this definition.
-	 */
-	protected final ElementType elementType;
-
-	/**
-	 * The property name of this definition, if it represents a property level constraint.
-	 */
-	protected final String property;
-
-	/**
-	 * The constraint mapping owning this constraint definition.
-	 */
-	protected final ConstraintMapping mapping;
-
-	public ConstraintDef() {
-		
-		this.constraintType = null;
-		this.parameters = newHashMap();
-		this.beanType = null;
-		this.elementType = null;
-		this.property = null;
-		this.mapping = null;
-	}
-	
-	public ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
-		this( beanType, constraintType, property, elementType, new HashMap<String, Object>(), mapping );
-	}
-
-	protected ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
-		if ( beanType == null ) {
-			throw new ValidationException( "Null is not a valid bean type" );
-		}
-
-		if ( mapping == null ) {
-			throw new ValidationException( "ConstraintMapping cannot be null" );
-		}
-
-		if ( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) {
-			if ( property == null || property.length() == 0 ) {
-				throw new ValidationException( "A property level constraint cannot have a null or empty property name" );
-			}
-
-			if ( !ReflectionHelper.propertyExists( beanType, property, elementType ) ) {
-				throw new ValidationException(
-						"The class " + beanType + " does not have a property '"
-								+ property + "' with access " + elementType
-				);
-			}
-		}
-
-		this.beanType = beanType;
-		this.constraintType = constraintType;
-		this.parameters = parameters;
-		this.property = property;
-		this.elementType = elementType;
-		this.mapping = mapping;
-	}
+	final Map<String, Object> parameters;
 
 	public ConstraintDef(Class<A> constraintType) {
 		this.constraintType = constraintType;
 		this.parameters = newHashMap();
-		this.beanType = null;
-		this.elementType = null;
-		this.property = null;
-		this.mapping = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -166,11 +89,8 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( this.getClass().getName() );
-		sb.append( "{beanType=" ).append( beanType );
 		sb.append( ", constraintType=" ).append( constraintType );
 		sb.append( ", parameters=" ).append( parameters );
-		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", property='" ).append( property ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
 	}
