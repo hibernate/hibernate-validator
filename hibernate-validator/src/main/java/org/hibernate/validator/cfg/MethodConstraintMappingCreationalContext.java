@@ -17,44 +17,9 @@
 package org.hibernate.validator.cfg;
 
 /**
- * A constraint mapping creational context which allows to select the parameter or
- * return value to which the next operations shall apply.
- * 
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
+ *
  */
-public class MethodConstraintMappingCreationalContext implements ParameterTarget, ReturnValueTarget {
-
-	private final Class<?> beanClass;
-	private final String methodName;
-	private final Class<?>[] parameterTypes;
-	private final ConstraintMapping mapping;
-
-	/**
-	 * @param beanClass
-	 * @param name
-	 * @param parameterTypes
-	 * @param mapping
-	 */
-	public MethodConstraintMappingCreationalContext(Class<?> beanClass,
-													String methodName, Class<?>[] parameterTypes, ConstraintMapping mapping) {
-
-		this.beanClass = beanClass;
-		this.methodName = methodName;
-		this.parameterTypes = parameterTypes;
-		this.mapping = mapping;
-	}
-
-	public MethodParameterConstraintMappingCreationalContext parameter(int index) {
-		return new MethodParameterConstraintMappingCreationalContext(
-				beanClass, methodName, parameterTypes, index, mapping
-		);
-	}
-
-	public MethodReturnValueConstraintMappingCreationalContext returnValue() {
-		return new MethodReturnValueConstraintMappingCreationalContext(
-				beanClass, methodName, parameterTypes, mapping
-		);
-	}
+public interface MethodConstraintMappingCreationalContext extends ParameterTarget, ReturnValueTarget {
 
 }

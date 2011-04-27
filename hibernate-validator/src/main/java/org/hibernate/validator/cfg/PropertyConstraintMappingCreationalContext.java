@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,40 +16,10 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.lang.annotation.ElementType;
-
 /**
- * Constraint mapping creational context which allows to configure the constraints for one bean property.
- *
- * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ *
  */
-public final class PropertyConstraintMappingCreationalContext extends ConstraintMappingCreationalContextImplBase
-		implements Constrainable<PropertyConstraintMappingCreationalContext>, TypeTargets, Cascadable<PropertyConstraintMappingCreationalContext> {
+public interface PropertyConstraintMappingCreationalContext extends Constrainable<PropertyConstraintMappingCreationalContext>, TypeTargets, Cascadable<PropertyConstraintMappingCreationalContext> {
 
-	private final String property;
-	private final ElementType elementType;
-
-	public PropertyConstraintMappingCreationalContext(Class<?> beanClass, String property, ElementType elementType, ConstraintMapping mapping) {
-
-		super( beanClass, mapping );
-
-		this.property = property;
-		this.elementType = elementType;
-	}
-
-	public PropertyConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
-
-		mapping.addConstraintConfig( ConfiguredConstraint.forProperty(
-				definition, beanClass, property, elementType
-		) );
-		return this;
-	}
-
-	public PropertyConstraintMappingCreationalContext valid() {
-		mapping.addCascadeConfig( new CascadeDef( beanClass, property, elementType ) );
-		return this;
-	}
 }
-

@@ -14,9 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.impl;
 
 import java.lang.annotation.ElementType;
+
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.MethodConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.PropertyConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.TypeConstraintMappingCreationalContext;
 
 /**
  * Base class for implementations of constraint mapping creational context types.
@@ -35,15 +40,15 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 	}
 
 	public TypeConstraintMappingCreationalContext type(Class<?> type) {
-		return new TypeConstraintMappingCreationalContext( type, mapping );
+		return new TypeConstraintMappingCreationalContextImpl( type, mapping );
 	}
 
 	public PropertyConstraintMappingCreationalContext property(String property, ElementType type) {
-		return new PropertyConstraintMappingCreationalContext( beanClass, property, type, mapping );
+		return new PropertyConstraintMappingCreationalContextImpl( beanClass, property, type, mapping );
 	}
 
 	public MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes) {
-		return new MethodConstraintMappingCreationalContext( beanClass, name, parameterTypes, mapping );
+		return new MethodConstraintMappingCreationalContextImpl( beanClass, name, parameterTypes, mapping );
 	}
 
 }

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.cfg.impl.TypeConstraintMappingCreationalContextImpl;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -62,7 +63,7 @@ public class ConstraintMapping {
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
 	public final TypeConstraintMappingCreationalContext type(Class<?> beanClass) {
-		return new TypeConstraintMappingCreationalContext( beanClass, this );
+		return new TypeConstraintMappingCreationalContextImpl( beanClass, this );
 	}
 
 	/**
@@ -122,7 +123,7 @@ public class ConstraintMapping {
 		return sb.toString();
 	}
 
-	protected final void addCascadeConfig(CascadeDef cascade) {
+	public final void addCascadeConfig(CascadeDef cascade) {
 		Class<?> beanClass = cascade.getBeanType();
 		configuredClasses.add( beanClass );
 		if ( cascadeConfig.containsKey( beanClass ) ) {
@@ -135,7 +136,7 @@ public class ConstraintMapping {
 		}
 	}
 
-	protected final void addMethodCascadeConfig(MethodCascadeDef cascade) {
+	public final void addMethodCascadeConfig(MethodCascadeDef cascade) {
 		Class<?> beanClass = cascade.getBeanType();
 		configuredClasses.add( beanClass );
 		if ( methodCascadeConfig.containsKey( beanClass ) ) {
@@ -148,17 +149,17 @@ public class ConstraintMapping {
 		}
 	}
 
-	protected final void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
+	public final void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
 		configuredClasses.add( beanClass );
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
 	}
 
-	protected final <T extends DefaultGroupSequenceProvider<?>> void addDefaultGroupSequenceProvider(Class<?> beanClass, Class<T> defaultGroupSequenceProviderClass) {
+	public final <T extends DefaultGroupSequenceProvider<?>> void addDefaultGroupSequenceProvider(Class<?> beanClass, Class<T> defaultGroupSequenceProviderClass) {
 		configuredClasses.add( beanClass );
 		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
 	}
 
-	protected final void addConstraintConfig(ConfiguredConstraint<?> constraint) {
+	public final void addConstraintConfig(ConfiguredConstraint<?> constraint) {
 		Class<?> beanClass = constraint.getBeanType();
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {

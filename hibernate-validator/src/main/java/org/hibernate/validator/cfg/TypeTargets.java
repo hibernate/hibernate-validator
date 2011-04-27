@@ -34,7 +34,7 @@ public interface TypeTargets {
 	 *
 	 * @return Returns a new {@code ConstraintsForType} instance.
 	 */
-	ConstraintMappingCreationalContextImplBase type(Class<?> type);
+	TypeConstraintMappingCreationalContext type(Class<?> type);
 
 	/**
 	 * Changes the property for which added constraints apply.

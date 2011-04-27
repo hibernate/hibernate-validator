@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,30 +16,13 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**
- * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
- *
- * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ *
  */
-public final class TypeConstraintMappingCreationalContext extends ConstraintMappingCreationalContextImplBase
-		implements Constrainable<TypeConstraintMappingCreationalContext>, TypeTargets {
-
-	public TypeConstraintMappingCreationalContext(Class<?> beanClass, ConstraintMapping mapping) {
-		super( beanClass, mapping );
-	}
-
-	public TypeConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
-
-		mapping.addConstraintConfig( getConfiguredConstraint( definition ) );
-		return this;
-	}
+public interface TypeConstraintMappingCreationalContext extends Constrainable<TypeConstraintMappingCreationalContext>, TypeTargets {
 
 	/**
 	 * Defines the default groups sequence for the bean class of this instance.
@@ -48,10 +31,8 @@ public final class TypeConstraintMappingCreationalContext extends ConstraintMapp
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public TypeConstraintMappingCreationalContext defaultGroupSequence(Class<?>... defaultGroupSequence) {
-		mapping.addDefaultGroupSequence( beanClass, Arrays.asList( defaultGroupSequence ) );
-		return this;
-	}
+	TypeConstraintMappingCreationalContext defaultGroupSequence(
+			Class<?>... defaultGroupSequence);
 
 	/**
 	 * Defines the default group sequence provider for the bean class of this instance.
@@ -60,14 +41,7 @@ public final class TypeConstraintMappingCreationalContext extends ConstraintMapp
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public <T extends DefaultGroupSequenceProvider<?>> TypeConstraintMappingCreationalContext defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
-		mapping.addDefaultGroupSequenceProvider( beanClass, defaultGroupSequenceProviderClass );
-		return this;
-	}
+	<T extends DefaultGroupSequenceProvider<?>> TypeConstraintMappingCreationalContext defaultGroupSequenceProvider(
+			Class<T> defaultGroupSequenceProviderClass);
 
-	private <A extends Annotation> ConfiguredConstraint<A> getConfiguredConstraint(ConstraintDef<?, A> definition) {
-		return ConfiguredConstraint.forType(
-				definition, beanClass
-		);
-	}
 }
