@@ -14,24 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.context;
+
+import org.hibernate.validator.cfg.ConstraintDef;
+
 
 /**
- * Facet of a constraint mapping creational context which allows to the select a method
- * parameter to which the next operations shall apply.
+ * Facet of a constraint mapping creational context which allows to place
+ * constraints on the underlying element.
  *
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public interface ParameterTarget {
+public interface Constrainable<C extends Constrainable<C>> {
 
 	/**
-	 * Changes the parameter for which added constraints apply.
+	 * Adds a new constraint.
 	 *
-	 * @param index The parameter index.
+	 * @param definition The constraint to add.
 	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
+	 * @return The current creational context following the method chaining pattern.
 	 */
-	MethodParameterConstraintMappingCreationalContext parameter(int index);
+	C constraint(ConstraintDef<?, ?> definition);
 
 }

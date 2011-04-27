@@ -14,22 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.context;
 
 /**
- * Facet of a constraint mapping creational context which allows to the select the current method's
- * return value as target for the next operations.
- *
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
+ *
  */
-public interface ReturnValueTarget {
-
-	/**
-	 * Defines constraints on the return value of the current method.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
-	MethodReturnValueConstraintMappingCreationalContext returnValue();
+public interface MethodParameterConstraintMappingCreationalContext extends TypeTargets, ParameterTarget, ReturnValueTarget, Constrainable<MethodParameterConstraintMappingCreationalContext>, Cascadable<MethodParameterConstraintMappingCreationalContext> {
 
 }

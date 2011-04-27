@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg.impl;
+package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.annotation.ElementType;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.MethodConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.PropertyConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.TypeConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
 
 /**
  * Base class for implementations of constraint mapping creational context types.

@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg.impl;
+package org.hibernate.validator.cfg.context.impl;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.MethodConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.MethodParameterConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.MethodReturnValueConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.ParameterTarget;
-import org.hibernate.validator.cfg.ReturnValueTarget;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
 
 /**
  * A constraint mapping creational context which allows to select the parameter or

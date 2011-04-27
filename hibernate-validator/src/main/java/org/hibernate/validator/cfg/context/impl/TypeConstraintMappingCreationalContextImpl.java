@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg.impl;
+package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.TypeConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**

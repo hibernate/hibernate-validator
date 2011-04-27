@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.cfg.impl.TypeConstraintMappingCreationalContextImpl;
+import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.impl.TypeConstraintMappingCreationalContextImpl;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;

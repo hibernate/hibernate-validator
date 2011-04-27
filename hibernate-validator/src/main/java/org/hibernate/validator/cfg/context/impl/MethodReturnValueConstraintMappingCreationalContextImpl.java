@@ -14,22 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg.impl;
+package org.hibernate.validator.cfg.context.impl;
+
+import static java.lang.annotation.ElementType.METHOD;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.validator.cfg.Cascadable;
-import org.hibernate.validator.cfg.Constrainable;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.MethodCascadeDef;
-import org.hibernate.validator.cfg.MethodParameterConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.MethodReturnValueConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.ParameterTarget;
-import org.hibernate.validator.cfg.TypeTargets;
-
-import static java.lang.annotation.ElementType.METHOD;
+import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
