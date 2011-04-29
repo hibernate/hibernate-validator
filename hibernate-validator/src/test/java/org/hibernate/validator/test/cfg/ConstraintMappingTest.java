@@ -92,7 +92,7 @@ public class ConstraintMappingTest {
 				.property( "name", METHOD )
 				.constraint( GenericConstraintDef.from( NotNull.class ) )
 				.property( "numberOfHelpers", FIELD )
-				.constraint( GenericConstraintDef.from(Min.class ).param( "value", 1 ) );
+				.constraint( GenericConstraintDef.from( Min.class ).param( "value", 1 ) );
 
 		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
@@ -104,7 +104,7 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) )
-				.constraint( GenericConstraintDef.from(Min.class ).param( "value", 1 ) );
+				.constraint( GenericConstraintDef.from( Min.class ).param( "value", 1 ) );
 
 		assertTrue( mapping.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( mapping.getConstraintConfig().get( Marathon.class ).size() == 2 );
@@ -138,9 +138,10 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-				.constraint( new SizeDef()
-					.message( "too short" )
-					.min( 3 )
+				.constraint(
+						new SizeDef()
+								.message( "too short" )
+								.min( 3 )
 				);
 		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
 
@@ -155,12 +156,16 @@ public class ConstraintMappingTest {
 	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
-				.constraint( GenericConstraintDef.from( MarathonConstraint.class )
-					.param( "minRunner", 1 ) )
+				.constraint(
+						GenericConstraintDef.from( MarathonConstraint.class )
+								.param( "minRunner", 1 )
+				)
 				.property( "name", METHOD )
-				.constraint( new SizeDef()
-					.message( "name too short" )
-					.min( 3 ));
+				.constraint(
+						new SizeDef()
+								.message( "name too short" )
+								.min( 3 )
+				);
 		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
@@ -372,9 +377,11 @@ public class ConstraintMappingTest {
 	public void testCustomConstraintType() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
-				.constraint( GenericConstraintDef.from( MarathonConstraint.class )
-						.param( "minRunner", 100 )
-						.message( "Needs more runners" ) );
+				.constraint(
+						GenericConstraintDef.from( MarathonConstraint.class )
+								.param( "minRunner", 100 )
+								.message( "Needs more runners" )
+				);
 		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
 
 		Marathon marathon = new Marathon();
@@ -409,9 +416,11 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Runner.class )
 				.property( "age", METHOD )
-				.constraint( new RangeDef()
-					.min( 12 )
-					.max( 99 ));
+				.constraint(
+						new RangeDef()
+								.min( 12 )
+								.max( 99 )
+				);
 		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
 		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
 		assertNumberOfViolations( violations, 1 );
