@@ -169,7 +169,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 		boolean isCascading = isCascading() || otherMetaData.isCascading();
 
 		// 1 - aggregate return value constraints
-		List<BeanMetaConstraint<?, ? extends Annotation>> mergedReturnValueConstraints = newArrayList(
+		List<BeanMetaConstraint<? extends Annotation>> mergedReturnValueConstraints = newArrayList(
 				this, otherMetaData
 		);
 
