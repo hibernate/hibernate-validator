@@ -432,7 +432,7 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-				.constraint( new NotNullDef() )
+				.constraint( new NotNullDef().groups( Foo.class ) )
 				.property( "runners", METHOD )
 				.constraint( new NotEmptyDef() )
 				.type( ExtendedMarathon.class )
