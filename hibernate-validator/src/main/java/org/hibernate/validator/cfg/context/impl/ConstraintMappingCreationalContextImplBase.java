@@ -18,48 +18,62 @@ package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.annotation.ElementType;
 
+import javax.validation.ValidationException;
+
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
 import org.hibernate.validator.util.Contracts;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Base class for implementations of constraint mapping creational context types.
- * 
+ *
  * @author Gunnar Morling
  */
 public abstract class ConstraintMappingCreationalContextImplBase {
 
 	protected final Class<?> beanClass;
-	
+
 	protected final ConstraintMapping mapping;
 
 	public ConstraintMappingCreationalContextImplBase(Class<?> beanClass, ConstraintMapping mapping) {
-		
+
 		this.beanClass = beanClass;
 		this.mapping = mapping;
 	}
 
 	public TypeConstraintMappingCreationalContext type(Class<?> type) {
-		
-		Contracts.assertNotNull(beanClass, "The bean type must not be null when creating a constraint mapping.");
-		
+
+		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
+
 		return new TypeConstraintMappingCreationalContextImpl( type, mapping );
 	}
 
-	public PropertyConstraintMappingCreationalContext property(String property, ElementType type) {
-		
-		Contracts.assertNotNull(property, "The property name must not be null.");
-		Contracts.assertNotNull(type, "The element type must not be null.");
-		
-		return new PropertyConstraintMappingCreationalContextImpl( beanClass, property, type, mapping );
+	public PropertyConstraintMappingCreationalContext property(String property, ElementType elementType) {
+
+		Contracts.assertNotNull( property, "The property name must not be null." );
+		Contracts.assertNotNull( elementType, "The element type must not be null." );
+
+		if ( property.length() == 0 ) {
+			throw new IllegalArgumentException( "The property name must not be empty." );
+		}
+
+		if ( !ReflectionHelper.propertyExists( beanClass, property, elementType ) ) {
+			throw new ValidationException(
+					"The class " + beanClass + " does not have a property '"
+							+ property + "' with access " + elementType
+			);
+		}
+
+		return new PropertyConstraintMappingCreationalContextImpl( beanClass, property, elementType, mapping );
 	}
 
 	public MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes) {
-		
-		Contracts.assertNotNull(name, "The method name must not be null.");
-		
+
+		Contracts.assertNotNull( name, "The method name must not be null." );
+
 		return new MethodConstraintMappingCreationalContextImpl( beanClass, name, parameterTypes, mapping );
 	}
 

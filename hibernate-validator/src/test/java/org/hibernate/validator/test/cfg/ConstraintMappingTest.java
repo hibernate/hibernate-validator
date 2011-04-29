@@ -222,14 +222,9 @@ public class ConstraintMappingTest {
 	)
 	public void testSingleConstraintWrongAccessType() throws Throwable {
 		ConstraintMapping mapping = new ConstraintMapping();
-		try {
-			mapping.type( Marathon.class )
-					.property( "numberOfHelpers", METHOD )
-					.constraint( new NotNullDef() );
-		}
-		catch ( ValidationException e ) {
-			throw ( e.getCause().getCause() );
-		}
+		mapping.type( Marathon.class )
+				.property( "numberOfHelpers", METHOD )
+				.constraint( new NotNullDef() );
 	}
 
 	@Test
