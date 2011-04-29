@@ -26,6 +26,7 @@ import java.util.Set;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.impl.TypeConstraintMappingCreationalContextImpl;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.util.Contracts;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
@@ -64,6 +65,9 @@ public class ConstraintMapping {
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
 	public final TypeConstraintMappingCreationalContext type(Class<?> beanClass) {
+		
+		Contracts.assertNotNull(beanClass, "The bean type must not be null when creating a constraint mapping.");
+		
 		return new TypeConstraintMappingCreationalContextImpl( beanClass, this );
 	}
 

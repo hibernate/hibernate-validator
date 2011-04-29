@@ -397,8 +397,8 @@ public class ConstraintMappingTest {
 	}
 
 	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "Null is not a valid bean type"
+			expectedExceptions = IllegalArgumentException.class,
+			expectedExceptionsMessageRegExp = "The bean type must not be null when creating a constraint mapping."
 	)
 	public void testNullBean() {
 		ConstraintMapping mapping = new ConstraintMapping();

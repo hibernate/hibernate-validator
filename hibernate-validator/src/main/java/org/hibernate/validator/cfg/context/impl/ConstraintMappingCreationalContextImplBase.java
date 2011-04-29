@@ -22,6 +22,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
+import org.hibernate.validator.util.Contracts;
 
 /**
  * Base class for implementations of constraint mapping creational context types.
@@ -35,19 +36,30 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 	protected final ConstraintMapping mapping;
 
 	public ConstraintMappingCreationalContextImplBase(Class<?> beanClass, ConstraintMapping mapping) {
+		
 		this.beanClass = beanClass;
 		this.mapping = mapping;
 	}
 
 	public TypeConstraintMappingCreationalContext type(Class<?> type) {
+		
+		Contracts.assertNotNull(beanClass, "The bean type must not be null when creating a constraint mapping.");
+		
 		return new TypeConstraintMappingCreationalContextImpl( type, mapping );
 	}
 
 	public PropertyConstraintMappingCreationalContext property(String property, ElementType type) {
+		
+		Contracts.assertNotNull(property, "The property name must not be null.");
+		Contracts.assertNotNull(type, "The element type must not be null.");
+		
 		return new PropertyConstraintMappingCreationalContextImpl( beanClass, property, type, mapping );
 	}
 
 	public MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes) {
+		
+		Contracts.assertNotNull(name, "The method name must not be null.");
+		
 		return new MethodConstraintMappingCreationalContextImpl( beanClass, name, parameterTypes, mapping );
 	}
 
