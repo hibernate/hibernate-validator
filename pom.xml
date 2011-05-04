@@ -161,7 +161,7 @@
             <dependency>
                 <groupId>org.jboss.jbossas.as7-cdi-tck</groupId>
                 <artifactId>jbossas-container</artifactId>
-                <version>1.0.0.Alpha1-SNAPSHOT</version>
+                <version>1.0.0.Alpha1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
