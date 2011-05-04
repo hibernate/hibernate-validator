@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
@@ -56,6 +58,7 @@
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
+        <jsr303.tck.version>1.0.5.Beta1</jsr303.tck.version>
     </properties>
 
     <dependencyManagement>
@@ -101,6 +104,11 @@
                 <version>${slf4jVersion}</version>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4jVersion}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.googlecode.jtype</groupId>
                 <artifactId>jtype</artifactId>
                 <version>0.1.1</version>
@@ -133,12 +141,27 @@
             <dependency>
                 <groupId>org.hibernate.jsr303.tck</groupId>
                 <artifactId>jsr303-tck</artifactId>
-                <version>1.0.5.Beta1</version>
+                <version>${jsr303.tck.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.test-harness</groupId>
+                        <artifactId>jboss-test-harness</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.jboss.test-harness</groupId>
+                        <artifactId>jboss-test-harness-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.jboss.test-harness</groupId>
-                <artifactId>jboss-test-harness-jboss-as-60</artifactId>
-                <version>1.1.0-CR6</version>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-arquillian-container-managed</artifactId>
+                <version>7.0.0.Beta2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.jbossas.as7-cdi-tck</groupId>
+                <artifactId>jbossas-container</artifactId>
+                <version>1.0.0.Alpha1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -256,7 +279,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.1</version>
+                    <version>2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
