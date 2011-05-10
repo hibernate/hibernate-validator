@@ -721,12 +721,6 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     refactoring. It also means that groups can inherit from each other via
     class inheritance.</para>
 
-    <note>
-      <para>The Bean Validation specification does not enforce that groups
-      have to be interfaces. Non interface classes could be used as well, but
-      we recommend to stick to interfaces.</para>
-    </note>
-
     <example id="example-driver">
       <title>Driver</title>
 
