@@ -93,12 +93,12 @@ public class GroupChainGenerator {
 		else {
 			sequence = resolveSequence( clazz, new ArrayList<Class<?>>() );
 			// we expand the inherited groups only after we determined whether the sequence is expandable
-			sequence = expandInhertitedGroups( sequence );
+			sequence = expandInheritedGroups( sequence );
 		}
 		chain.insertSequence( sequence );
 	}
 
-	private List<Group> expandInhertitedGroups(List<Group> sequence) {
+	private List<Group> expandInheritedGroups(List<Group> sequence) {
 		List<Group> expandedGroup = new ArrayList<Group>();
 		for ( Group group : sequence ) {
 			expandedGroup.add( group );
