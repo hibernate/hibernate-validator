@@ -20,7 +20,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
@@ -71,7 +72,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * Step 1-3 of message interpolation can be cached. We do this in this map.
 	 */
-	private final Map<LocalisedMessage, String> resolvedMessages = new WeakHashMap<LocalisedMessage, String>();
+	private final ConcurrentMap<LocalisedMessage, String> resolvedMessages = new ConcurrentHashMap<LocalisedMessage, String>();
 
 	/**
 	 * Flag indicating whether this interpolator should chance some of the interpolation steps.
@@ -158,10 +159,15 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				// search the default bundle non recursive (step2)
 				resolvedMessage = replaceVariables( userBundleResolvedMessage, defaultResourceBundle, locale, false );
 				evaluatedDefaultBundleOnce = true;
-				if ( cacheMessages ) {
-					resolvedMessages.put( localisedMessage, resolvedMessage );
-				}
 			} while ( true );
+		}
+
+		// cache resolved message
+		if ( cacheMessages ) {
+			String cachedResolvedMessage = resolvedMessages.putIfAbsent( localisedMessage, resolvedMessage );
+			if ( cachedResolvedMessage != null ) {
+				resolvedMessage = cachedResolvedMessage;
+			}
 		}
 
 		// resolve annotation attributes (step 4)
@@ -256,7 +262,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				return false;
 			}
 
-			LocalisedMessage that = ( LocalisedMessage ) o;
+			LocalisedMessage that = (LocalisedMessage) o;
 
 			if ( locale != null ? !locale.equals( that.locale ) : that.locale != null ) {
 				return false;
