@@ -15,7 +15,7 @@ used when running
 You can also run the TCK test against JBoss AS7 (>Beta3). In this case the tests are bundled as war files and executed
 in a remote JBoss AS7 instance:
 
-    $ mvn clean test -D incontainer
+    $ mvn clean test -Dincontainer
 
 In this mode the tests will run against the Hibernate Validator version bundled with AS 7 (currently 4.1.0.Final) which
 will lead to test errors. You can place the latest Hibernate Validator instance into your AS 7 instance or you can
