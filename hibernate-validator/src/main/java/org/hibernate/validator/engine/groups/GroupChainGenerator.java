@@ -18,9 +18,9 @@ package org.hibernate.validator.engine.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
@@ -29,10 +29,11 @@ import javax.validation.ValidationException;
  * Helper class used to resolve groups and sequences into a single chain of groups which can then be validated.
  *
  * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class GroupChainGenerator {
 
-	private final Map<Class<?>, List<Group>> resolvedSequences = new HashMap<Class<?>, List<Group>>();
+	private final ConcurrentMap<Class<?>, List<Group>> resolvedSequences = new ConcurrentHashMap<Class<?>, List<Group>>();
 
 	/**
 	 * Generates a chain of groups to be validated given the specified validation groups.
@@ -86,14 +87,17 @@ public class GroupChainGenerator {
 	}
 
 	private void insertSequence(Class<?> clazz, GroupChain chain) {
-		List<Group> sequence;
-		if ( resolvedSequences.containsKey( clazz ) ) {
-			sequence = resolvedSequences.get( clazz );
-		}
-		else {
+		List<Group> sequence = resolvedSequences.get( clazz );
+		if ( sequence == null ) {
 			sequence = resolveSequence( clazz, new ArrayList<Class<?>>() );
 			// we expand the inherited groups only after we determined whether the sequence is expandable
 			sequence = expandInheritedGroups( sequence );
+
+			// cache already resolved sequences
+			final List<Group> cachedResolvedSequence = resolvedSequences.putIfAbsent( clazz, sequence );
+			if ( cachedResolvedSequence != null ) {
+				sequence = cachedResolvedSequence;
+			}
 		}
 		chain.insertSequence( sequence );
 	}
@@ -141,7 +145,6 @@ public class GroupChainGenerator {
 				addGroups( resolvedGroupSequence, list );
 			}
 		}
-		resolvedSequences.put( group, resolvedGroupSequence );
 		return resolvedGroupSequence;
 	}
 
