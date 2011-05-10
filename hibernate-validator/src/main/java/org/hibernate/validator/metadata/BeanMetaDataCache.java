@@ -16,20 +16,21 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Cache for created instances of <code>BeanMetaData</code>.
  *
  * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class BeanMetaDataCache {
 	/**
 	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
 	 * entity.
 	 */
-	private Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
+	private ConcurrentMap<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
 			10
 	);
 
@@ -38,10 +39,10 @@ public class BeanMetaDataCache {
 		if ( beanClass == null ) {
 			throw new IllegalArgumentException( "Class cannot be null" );
 		}
-		return ( BeanMetaDataImpl<T> ) metadataProviders.get( beanClass );
+		return (BeanMetaDataImpl<T>) metadataProviders.get( beanClass );
 	}
 
-	public <T> void addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
-		metadataProviders.put( beanClass, metaData );
+	public <T> BeanMetaDataImpl addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
+		return metadataProviders.putIfAbsent( beanClass, metaData );
 	}
 }

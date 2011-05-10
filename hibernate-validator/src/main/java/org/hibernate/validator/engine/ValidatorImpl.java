@@ -1213,7 +1213,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			beanMetaData = new BeanMetaDataImpl<U>(
 					beanClass, constraintHelper, beanMetaDataCache
 			);
-			beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
+			final BeanMetaDataImpl<U> cachedBeanMetaData = beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
+			if ( cachedBeanMetaData != null ) {
+				beanMetaData = cachedBeanMetaData;
+			}
 		}
 		return beanMetaData;
 	}
