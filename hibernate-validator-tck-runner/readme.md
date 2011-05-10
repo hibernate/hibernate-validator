@@ -1,7 +1,8 @@
 # Hibernate Validator TCK Runner
 
 This maven module allows to run the Bean Validation TCK against Hibernate Validator.
-There are several ways of doing this.
+There are several ways of doing this. In any case you will need to define the *JBOSS_HOME*
+environment variable referencing a AS 7 instance.
 
 ## Standalone
 
