@@ -19,6 +19,8 @@ package org.hibernate.validator.metadata;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static org.hibernate.validator.util.Contracts.assertNotNull;
+
 /**
  * Cache for created instances of <code>BeanMetaData</code>.
  *
@@ -36,13 +38,13 @@ public class BeanMetaDataCache {
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
-		if ( beanClass == null ) {
-			throw new IllegalArgumentException( "Class cannot be null" );
-		}
+		assertNotNull( beanClass, "Class cannot be null" );
+
 		return (BeanMetaDataImpl<T>) metadataProviders.get( beanClass );
 	}
 
-	public <T> BeanMetaDataImpl addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
-		return metadataProviders.putIfAbsent( beanClass, metaData );
+	@SuppressWarnings("unchecked")
+	public <T> BeanMetaDataImpl<T> addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
+		return (BeanMetaDataImpl<T>) metadataProviders.putIfAbsent( beanClass, metaData );
 	}
 }
