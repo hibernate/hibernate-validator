@@ -16,32 +16,38 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**
- * Cache for created instances of <code>BeanMetaData</code>.
+ * Cache for created instances of {@code BeanMetaData}.
  *
  * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class BeanMetaDataCache {
 	/**
 	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
 	 * entity.
 	 */
-	private Map<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
+	private final ConcurrentMap<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
 			10
 	);
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
-		if ( beanClass == null ) {
-			throw new IllegalArgumentException( "Class cannot be null" );
-		}
-		return ( BeanMetaDataImpl<T> ) metadataProviders.get( beanClass );
+		assertNotNull( beanClass, "Class cannot be null" );
+
+		return (BeanMetaDataImpl<T>) metadataProviders.get( beanClass );
 	}
 
-	public <T> void addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
-		metadataProviders.put( beanClass, metaData );
+	@SuppressWarnings("unchecked")
+	public <T> BeanMetaDataImpl<T> addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
+		assertNotNull( beanClass, "Class cannot be null" );
+		assertNotNull( metaData, "MetaData cannot be null" );
+
+		return (BeanMetaDataImpl<T>) metadataProviders.putIfAbsent( beanClass, metaData );
 	}
 }

@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentMap;
  * locator and caches values retrieved from that locator.
  *
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class CachingResourceBundleLocator extends DelegatingResourceBundleLocator {
 
@@ -41,15 +42,16 @@ public class CachingResourceBundleLocator extends DelegatingResourceBundleLocato
 	}
 
 	public ResourceBundle getResourceBundle(Locale locale) {
-
-		if ( bundleCache.containsKey( locale ) ) {
-			return bundleCache.get( locale );
+		ResourceBundle cachedResourceBundle = bundleCache.get( locale );
+		if ( cachedResourceBundle == null ) {
+			final ResourceBundle bundle = super.getResourceBundle( locale );
+			if ( bundle != null ) {
+				cachedResourceBundle = bundleCache.putIfAbsent( locale, bundle );
+				if ( cachedResourceBundle == null ) {
+					return bundle;
+				}
+			}
 		}
-
-		ResourceBundle bundle = super.getResourceBundle( locale );
-		if ( bundle != null ) {
-			bundleCache.put( locale, bundle );
-		}
-		return bundle;
+		return cachedResourceBundle;
 	}
 }
