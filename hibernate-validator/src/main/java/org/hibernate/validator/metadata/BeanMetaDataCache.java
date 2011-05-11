@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**
- * Cache for created instances of <code>BeanMetaData</code>.
+ * Cache for created instances of {@code BeanMetaData}.
  *
  * @author Hardy Ferentschik
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
@@ -32,7 +32,7 @@ public class BeanMetaDataCache {
 	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
 	 * entity.
 	 */
-	private ConcurrentMap<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
+	private final ConcurrentMap<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
 			10
 	);
 
@@ -45,6 +45,9 @@ public class BeanMetaDataCache {
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaDataImpl<T> addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
+		assertNotNull( beanClass, "Class cannot be null" );
+		assertNotNull( metaData, "MetaData cannot be null" );
+
 		return (BeanMetaDataImpl<T>) metadataProviders.putIfAbsent( beanClass, metaData );
 	}
 }
