@@ -29,8 +29,8 @@ import org.hibernate.validator.cfg.defs.DecimalMinDef;
 import org.hibernate.validator.test.util.TestUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Hardy Ferentschik

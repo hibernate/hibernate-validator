@@ -26,7 +26,7 @@ import org.hibernate.validator.test.util.TestUtil;
 import org.hibernate.validator.test.util.ValidationInvocationHandler;
 import org.hibernate.validator.util.LoggerFactory;
 
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
 import static org.testng.Assert.fail;
 

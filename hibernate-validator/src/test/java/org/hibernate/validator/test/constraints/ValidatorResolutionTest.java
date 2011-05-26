@@ -26,8 +26,9 @@ import javax.validation.Validator;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.TestUtil;
-import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Hardy Ferentschik

@@ -39,7 +39,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.testng.Assert.assertTrue;
 
 /**

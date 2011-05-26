@@ -29,8 +29,8 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.test.util.TestUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * Tests for correct message interpolation for messages from the default bundle.

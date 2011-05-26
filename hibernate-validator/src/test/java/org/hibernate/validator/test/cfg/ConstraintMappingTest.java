@@ -48,9 +48,9 @@ import org.hibernate.validator.test.util.TestUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.testng.Assert.assertTrue;
 
 /**

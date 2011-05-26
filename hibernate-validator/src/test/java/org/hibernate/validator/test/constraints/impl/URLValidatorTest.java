@@ -32,8 +32,8 @@ import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.test.util.TestUtil.getValidatorForMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

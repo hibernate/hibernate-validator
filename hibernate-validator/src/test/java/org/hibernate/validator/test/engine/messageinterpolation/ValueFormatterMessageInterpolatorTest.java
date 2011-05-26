@@ -38,8 +38,8 @@ import org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpo
 import org.hibernate.validator.test.util.TestUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * Test for {@link org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpolator}.

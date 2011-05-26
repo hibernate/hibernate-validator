@@ -41,9 +41,9 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.RepositoryBase;
 import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
-import static org.hibernate.validator.test.util.TestUtil.assertConstraintViolation;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.testng.Assert.assertEquals;
@@ -107,7 +107,12 @@ public class MethodLevelValidationTest {
 
 			MethodConstraintViolation<?> constraintViolation = constraintViolations.iterator().next();
 
-			assertConstraintViolation( constraintViolation, "may not be null", CustomerRepositoryImpl.class, null );
+			assertConstraintViolation(
+					constraintViolation,
+					"may not be null",
+					CustomerRepositoryImpl.class,
+					null
+			);
 			assertEquals(
 					constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), NotNull.class
 			);

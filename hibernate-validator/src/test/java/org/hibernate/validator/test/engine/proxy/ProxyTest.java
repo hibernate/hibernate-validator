@@ -27,7 +27,7 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.TestUtil;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * See HV-257
