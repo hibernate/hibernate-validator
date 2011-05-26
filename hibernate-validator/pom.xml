@@ -168,13 +168,19 @@
                             javax.validation.*;version="[1.0.0,2.0.0)",
                             javax.xml.*;version="0",
                             org.xml.sax.*;version="0",
-                            org.slf4j.*;version="[1.5.6,2.0.0)"
+                            org.slf4j.*;version="[1.5.6,2.0.0)",
+                            org.joda.time.*;version="[1.6.0,2.0.0)";resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             org.hibernate.validator;version="${project.version}",
                             org.hibernate.validator.constraints;version="${project.version}",
+                            org.hibernate.validator.cfg;version="${project.version}",
+                            org.hibernate.validator.cfg.defs;version="${project.version}",
+                            org.hibernate.validator.group;version="${project.version}",
                             org.hibernate.validator.messageinterpolation;version="${project.version}",
-                            org.hibernate.validator.resourceloading;version="${project.version}",
+                            org.hibernate.validator.method;version="${project.version}",
+                            org.hibernate.validator.method.metadata;version="${project.version}",
+                            org.hibernate.validator.resourceloading;version="${project.version}"
                         </Export-Package>
                     </instructions>
                 </configuration>
