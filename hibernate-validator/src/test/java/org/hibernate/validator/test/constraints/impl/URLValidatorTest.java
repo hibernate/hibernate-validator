@@ -34,7 +34,7 @@ import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.ValidatorUtil.getValidatorForMapping;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidatorForProgrammaticMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -142,7 +142,7 @@ public class URLValidatorTest {
 				.property( "url", METHOD )
 				.constraint( URLDef.class )
 				.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" );
-		validator = getValidatorForMapping( mapping );
+		validator = getValidatorForProgrammaticMapping( mapping );
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, true );
@@ -163,7 +163,7 @@ public class URLValidatorTest {
 				.constraint( URLDef.class )
 				.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
 				.flags( Flag.CASE_INSENSITIVE );
-		validator = getValidatorForMapping( mapping );
+		validator = getValidatorForProgrammaticMapping( mapping );
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, false );

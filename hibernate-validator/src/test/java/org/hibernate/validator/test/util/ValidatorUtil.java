@@ -59,7 +59,7 @@ public class ValidatorUtil {
 		return hibernateValidator;
 	}
 
-	public static Validator getValidatorForMapping(ConstraintMapping... mappings) {
+	public static Validator getValidatorForProgrammaticMapping(ConstraintMapping... mappings) {
 		assertNotNull( mappings );
 		HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
 		for ( ConstraintMapping mapping : mappings ) {

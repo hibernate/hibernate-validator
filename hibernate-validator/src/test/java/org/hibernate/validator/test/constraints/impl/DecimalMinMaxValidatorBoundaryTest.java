@@ -46,7 +46,7 @@ public class DecimalMinMaxValidatorBoundaryTest {
 				.property( "d", FIELD )
 				.constraint( DecimalMinDef.class )
 				.value( "0.100000000000000005" );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		this.d = 0.1;
 
@@ -64,7 +64,7 @@ public class DecimalMinMaxValidatorBoundaryTest {
 				.constraint( DecimalMaxDef.class )
 				.value( "0.1" );
 
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		this.d = 0.1;
 

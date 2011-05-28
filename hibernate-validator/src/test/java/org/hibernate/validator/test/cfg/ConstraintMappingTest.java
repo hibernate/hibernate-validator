@@ -125,7 +125,7 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( NotNullDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( new Marathon() );
 		assertNumberOfViolations( violations, 1 );
@@ -140,7 +140,7 @@ public class ConstraintMappingTest {
 				.constraint( SizeDef.class )
 				.message( "too short" )
 				.min( 3 );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -159,7 +159,7 @@ public class ConstraintMappingTest {
 				.constraint( SizeDef.class )
 				.message( "name too short" )
 				.min( 3 );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -178,7 +178,7 @@ public class ConstraintMappingTest {
 				.type( Tournament.class )
 				.property( "tournamentDate", METHOD )
 				.constraint( FutureDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -199,7 +199,7 @@ public class ConstraintMappingTest {
 				.type( Runner.class )
 				.property( "paidEntryFee", FIELD )
 				.constraint( AssertTrueDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -238,7 +238,7 @@ public class ConstraintMappingTest {
 				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
 				.constraint( NotEmptyDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 
@@ -261,7 +261,7 @@ public class ConstraintMappingTest {
 				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
 				.constraint( NotEmptyDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 
@@ -283,7 +283,7 @@ public class ConstraintMappingTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.defaultGroupSequenceProvider( BDefaultGroupSequenceProvider.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		validator.validate( new Marathon() );
 	}
 
@@ -300,7 +300,7 @@ public class ConstraintMappingTest {
 				.constraint( NotNullDef.class ).groups( Foo.class )
 				.property( "runners", METHOD )
 				.constraint( NotEmptyDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		validator.validate( new Marathon() );
 	}
 
@@ -314,7 +314,7 @@ public class ConstraintMappingTest {
 				.defaultGroupSequence( Foo.class, B.class )
 				.property( "b", FIELD )
 				.constraint( NotNullDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		validator.validate( new B() );
 	}
 
@@ -328,7 +328,7 @@ public class ConstraintMappingTest {
 				.defaultGroupSequenceProvider( ADefaultGroupSequenceProvider.class )
 				.property( "a", FIELD )
 				.constraint( NotNullDef.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		validator.validate( new A() );
 	}
 
@@ -339,7 +339,7 @@ public class ConstraintMappingTest {
 				.property( "name", METHOD )
 				.constraint( SizeDef.class ).min( 5 )
 				.constraint( SizeDef.class ).min( 10 );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Foo" );
@@ -377,7 +377,7 @@ public class ConstraintMappingTest {
 				.genericConstraint( MarathonConstraint.class )
 				.param( "minRunner", 100 )
 				.message( "Needs more runners" );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Stockholm Marathon" );
@@ -414,7 +414,7 @@ public class ConstraintMappingTest {
 				.constraint( RangeDef.class )
 				.min( 12 )
 				.max( 99 );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );
@@ -430,7 +430,7 @@ public class ConstraintMappingTest {
 				.constraint( NotEmptyDef.class )
 				.type( ExtendedMarathon.class )
 				.defaultGroupSequence( Foo.class, ExtendedMarathon.class );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		ExtendedMarathon extendedMarathon = new ExtendedMarathon();
 
