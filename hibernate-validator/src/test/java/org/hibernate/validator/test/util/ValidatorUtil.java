@@ -41,8 +41,15 @@ import static org.hibernate.validator.util.Contracts.assertNotNull;
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class ValidatorUtil {
-	private static Validator hibernateValidator;
+public final class ValidatorUtil {
+	private final static Validator hibernateValidator;
+
+	// configure instance of validator for validation provider Hibernate Validator.
+	static {
+		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();
+		configuration.traversableResolver( new DummyTraversableResolver() );
+		hibernateValidator = configuration.buildValidatorFactory().getValidator();
+	}
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -57,11 +64,6 @@ public class ValidatorUtil {
 	 * @return an instance of {@code Validator}.
 	 */
 	public static Validator getValidator() {
-		if ( hibernateValidator == null ) {
-			final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();
-			configuration.traversableResolver( new DummyTraversableResolver() );
-			hibernateValidator = configuration.buildValidatorFactory().getValidator();
-		}
 		return hibernateValidator;
 	}
 
@@ -194,7 +196,10 @@ public class ValidatorUtil {
 	 */
 	public static ParameterDescriptor getParameterDescriptor(Class<?> clazz, String methodName, Class<?>[] parameterTypes, int parameterIndex) {
 		final MethodDescriptor methodDescriptor = getMethodDescriptor( clazz, methodName, parameterTypes );
-		assertNotNull( methodDescriptor );
+		assertNotNull(
+				methodDescriptor,
+				"No method with the given signature is declared in " + clazz + " or its super class"
+		);
 		return methodDescriptor.getParameterConstraints().get( parameterIndex );
 	}
 
