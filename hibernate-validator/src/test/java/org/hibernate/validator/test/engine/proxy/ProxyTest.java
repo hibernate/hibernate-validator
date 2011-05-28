@@ -26,7 +26,7 @@ import javax.validation.Validator;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
@@ -42,7 +42,7 @@ public class ProxyTest {
 		A a = ( A ) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { A.class }, handler );
 		assertEquals( Integer.valueOf( 0 ), a.getInteger() );
 
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<A>> violations = validator.validate( a );
 		assertNumberOfViolations( violations, 2 );
 	}
@@ -54,7 +54,7 @@ public class ProxyTest {
 		B b = ( B ) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { B.class }, handler );
 		assertEquals( Integer.valueOf( 0 ), b.getInteger() );
 
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
 		assertNumberOfViolations( violations, 2 );
 	}

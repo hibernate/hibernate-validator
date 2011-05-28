@@ -28,7 +28,7 @@ import javax.validation.groups.Default;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik
@@ -41,7 +41,7 @@ public class XmlMappingTest {
 	 */
 	public void testConstraintInheritanceWithXmlConfiguration() {
 
-		final Configuration<?> configuration = TestUtil.getConfiguration();
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
@@ -58,7 +58,7 @@ public class XmlMappingTest {
 	 */
 	public void testListOfString() {
 
-		final Configuration<?> configuration = TestUtil.getConfiguration();
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "properties-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
@@ -82,7 +82,7 @@ public class XmlMappingTest {
 	 */
 	public void testInterfaceConfiguration() {
 
-		final Configuration<?> configuration = TestUtil.getConfiguration();
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
@@ -98,7 +98,7 @@ public class XmlMappingTest {
 	 */
 	public void testInterfaceImplementationConfiguration() {
 
-		final Configuration<?> configuration = TestUtil.getConfiguration();
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-impl-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
@@ -114,7 +114,7 @@ public class XmlMappingTest {
 	 */
 	public void testEmptyInterfaceConfiguration() {
 
-		final Configuration<?> configuration = TestUtil.getConfiguration();
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "empty-my-interface-mapping.xml" ) );
 
 		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();

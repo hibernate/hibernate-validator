@@ -37,7 +37,7 @@ import org.hibernate.validator.method.MethodValidator;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.TestUtil.getValidator;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)

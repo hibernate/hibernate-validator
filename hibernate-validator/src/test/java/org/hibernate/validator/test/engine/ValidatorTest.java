@@ -36,7 +36,7 @@ import org.hibernate.validator.test.util.CountValidationCallsValidator;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.TestUtil.getValidator;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 

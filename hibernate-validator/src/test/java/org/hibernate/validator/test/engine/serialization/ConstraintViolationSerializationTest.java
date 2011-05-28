@@ -28,7 +28,7 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
@@ -42,7 +42,7 @@ public class ConstraintViolationSerializationTest {
 	 */
 	@Test
 	public void testSuccessfulSerialization() throws Exception {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		SerializableClass testInstance = new SerializableClass();
 		Set<ConstraintViolation<SerializableClass>> constraintViolations = validator.validate( testInstance );
 
@@ -56,7 +56,7 @@ public class ConstraintViolationSerializationTest {
 	 */
 	@Test(expectedExceptions = NotSerializableException.class)
 	public void testUnSuccessfulSerialization() throws Exception {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		UnSerializableClass testInstance = new UnSerializableClass();
 		Set<ConstraintViolation<UnSerializableClass>> constraintViolations = validator.validate( testInstance );
 

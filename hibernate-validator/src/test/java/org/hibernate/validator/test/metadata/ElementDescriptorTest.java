@@ -26,9 +26,9 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.getValidator;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -43,14 +43,14 @@ public class ElementDescriptorTest {
 
 	@Test
 	public void testGetTypeForConstrainedBean() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
 		assertEquals( beanDescriptor.getElementClass(), Customer.class, "Wrong type." );
 	}
 
 	@Test
 	public void testGetTypeForConstrainedProperty() {
-		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
+		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		assertEquals( elementDescriptor.getElementClass(), Integer.class, "Wrong type." );
 	}
 
@@ -73,7 +73,7 @@ public class ElementDescriptorTest {
 	 */
 	@Test
 	public void testElementDescriptorForProperty() {
-		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
+		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
 		assertTrue( constraintDescriptors.size() == 1, "There should be a descriptor" );
 	}
@@ -83,7 +83,7 @@ public class ElementDescriptorTest {
 	 */
 	@Test
 	public void testElementDescriptorImmutable() {
-		ElementDescriptor elementDescriptor = TestUtil.getPropertyDescriptor( Order.class, "orderNumber" );
+		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
 
 		try {
@@ -106,7 +106,10 @@ public class ElementDescriptorTest {
 	@Test
 	public void testAtValidDefinedInHierarchyForPropertyDescriptor() {
 
-		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithoutAtValid.class, "order" );
+		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
+				ChildWithoutAtValid.class,
+				"order"
+		);
 		assertTrue(
 				propertyDescriptor.isCascaded(),
 				"@Valid defined on getter in super type should be reflected by PropertyDescriptor."
@@ -116,7 +119,7 @@ public class ElementDescriptorTest {
 	@Test
 	public void testAtValidDefinedLocallyForPropertyDescriptor() {
 
-		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithAtValid.class, "order" );
+		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor( ChildWithAtValid.class, "order" );
 		assertTrue(
 				propertyDescriptor.isCascaded(),
 				"@Valid defined on local getter in type hierarchy should be reflected by PropertyDescriptor."
@@ -126,7 +129,10 @@ public class ElementDescriptorTest {
 	@Test
 	public void testAtValidNotDefinedForPropertyDescriptor() {
 
-		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithoutAtValid2.class, "order" );
+		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
+				ChildWithoutAtValid2.class,
+				"order"
+		);
 		assertFalse(
 				propertyDescriptor.isCascaded(),
 				"@Valid given neither locally nor in hierarchy should be reflected by PropertyDescriptor."
@@ -136,7 +142,10 @@ public class ElementDescriptorTest {
 	@Test
 	public void testGetNameFromPropertyDescriptor() {
 
-		PropertyDescriptor propertyDescriptor = TestUtil.getPropertyDescriptor( ChildWithoutAtValid2.class, "order" );
+		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
+				ChildWithoutAtValid2.class,
+				"order"
+		);
 		assertEquals( propertyDescriptor.getPropertyName(), "order" );
 	}
 }

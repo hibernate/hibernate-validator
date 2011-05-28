@@ -27,14 +27,14 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.impl.URLValidator;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.TestUtil.getValidatorForMapping;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidatorForMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -132,7 +132,7 @@ public class URLValidatorTest {
 	@Test(description = "HV-406")
 	public void testRegExp() {
 		// first run the test with @URL configured via annotations
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		URLContainer container = new URLContainerAnnotated();
 		runUrlContainerValidation( validator, container, true );
 
@@ -152,7 +152,7 @@ public class URLValidatorTest {
 	public void testRegExpCaseInsensitive() {
 
 		// first run the test with @URL configured via annotations
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		URLContainer container = new CaseInsensitiveURLContainerAnnotated();
 		runUrlContainerValidation( validator, container, false );
 

@@ -29,8 +29,8 @@ import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.getMethodValidator;
-import static org.hibernate.validator.test.util.TestUtil.getValidator;
+import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidator;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
 
 /**
  * Integration test for {@link ValidatorImpl} and {@link BeanMetaDataImpl} which

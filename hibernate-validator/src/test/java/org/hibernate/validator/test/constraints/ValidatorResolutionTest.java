@@ -25,7 +25,7 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
@@ -37,7 +37,7 @@ public class ValidatorResolutionTest {
 
 	@Test
 	public void testResolutionOfMultipleSizeValidators() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		Suburb suburb = new Suburb();
 
@@ -120,7 +120,7 @@ public class ValidatorResolutionTest {
 	 */
 	@Test
 	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfObject() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		Foo testEntity = new Foo( new org.hibernate.validator.test.constraints.Object[] { }, new int[] { } );
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( testEntity );
@@ -132,7 +132,7 @@ public class ValidatorResolutionTest {
 	 */
 	@Test
 	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfClonable() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		Bar testEntity = new Bar( new org.hibernate.validator.test.constraints.Object[] { }, new int[] { } );
 		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( testEntity );
@@ -144,7 +144,7 @@ public class ValidatorResolutionTest {
 	 */
 	@Test
 	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfSerializable() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		Fubar testEntity = new Fubar( new org.hibernate.validator.test.constraints.Object[] { }, new int[] { } );
 		Set<ConstraintViolation<Fubar>> constraintViolations = validator.validate( testEntity );
@@ -156,7 +156,7 @@ public class ValidatorResolutionTest {
 	 */
 	@Test
 	public void testSubTypeArrayIsSubtypeOfSuperTypeArray() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		SubTypeEntity testEntity = new SubTypeEntity( new SubType[] { } );
 		Set<ConstraintViolation<SubTypeEntity>> constraintViolations = validator.validate( testEntity );

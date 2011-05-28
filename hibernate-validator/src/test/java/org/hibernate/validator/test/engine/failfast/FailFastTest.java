@@ -22,12 +22,12 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 import org.hibernate.validator.test.util.ValidationInvocationHandler;
 import org.hibernate.validator.util.LoggerFactory;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
+import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
 import static org.testng.Assert.fail;
 
 /**
@@ -43,7 +43,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastDefaultBehaviour() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
@@ -54,7 +54,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastMethodValidationDefaultBehaviour() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
@@ -74,7 +74,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastSetOnConfiguration() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
@@ -84,7 +84,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastMethodValidationOnConfiguration() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
@@ -104,7 +104,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastSetOnValidatorFactory() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
 		final Validator validator =
@@ -118,7 +118,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastMethodValidationSetOnValidatorFactory() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
 		final Validator validator =
@@ -143,7 +143,7 @@ public class FailFastTest {
 	@Test
 	public void testFailFastSetWithProperty() {
 		// with fail fast
-		HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		ValidatorFactory factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "true" )
 				.buildValidatorFactory();
 
@@ -153,7 +153,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 
 		// without fail fast
-		configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "false" )
 				.buildValidatorFactory();
 
@@ -164,7 +164,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastMethodValidationSetWithProperty() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "true" )
 				.buildValidatorFactory();
 
@@ -185,7 +185,7 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastSetWithInvalidProperty() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
 		//Default fail fast property value is false
 		final ValidatorFactory factory = configuration.addProperty(
@@ -200,7 +200,7 @@ public class FailFastTest {
 	@Test(expectedExceptions = ValidationException.class,
 			expectedExceptionsMessageRegExp = "Inconsistent fail fast configuration.*")
 	public void testFailFastSetWithInconsistentConfiguration() {
-		final HibernateValidatorConfiguration configuration = TestUtil.getConfiguration( HibernateValidator.class );
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
 		//Default fail fast property value is false
 		final ValidatorFactory factory = configuration.addProperty(
@@ -211,8 +211,8 @@ public class FailFastTest {
 	}
 
 	public void testFailSafePerf() {
-		final Validator regularValidator = TestUtil.getConfiguration().buildValidatorFactory().getValidator();
-		final Validator failFastValidator = TestUtil.getConfiguration()
+		final Validator regularValidator = ValidatorUtil.getConfiguration().buildValidatorFactory().getValidator();
+		final Validator failFastValidator = ValidatorUtil.getConfiguration()
 				.buildValidatorFactory()
 				.unwrap( HibernateValidatorFactory.class )
 				.usingContext()

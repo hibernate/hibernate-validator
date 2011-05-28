@@ -29,7 +29,7 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
@@ -46,7 +46,7 @@ public class ConstraintValidatorContextTest {
 
 	@BeforeMethod
 	public void setUp() {
-		validator = TestUtil.getValidator();
+		validator = ValidatorUtil.getValidator();
 	}
 
 	/**

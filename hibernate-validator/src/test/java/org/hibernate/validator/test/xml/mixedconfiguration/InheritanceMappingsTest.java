@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.DummyTraversableResolver;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 import org.hibernate.validator.test.xml.mixedconfiguration.annotation.Competition;
 import org.hibernate.validator.test.xml.mixedconfiguration.annotation.Fixture;
 import org.hibernate.validator.test.xml.mixedconfiguration.annotation.PersonCompetition;
@@ -48,7 +48,7 @@ public class InheritanceMappingsTest {
 	public void defaultConfigurationNoExplicitAnnotationDefinition1() {
 		validateAnnotatedFixture(
 				new PersonCompetition(),
-				TestUtil.getValidator()
+				ValidatorUtil.getValidator()
 		);
 	}
 
@@ -56,7 +56,7 @@ public class InheritanceMappingsTest {
 	public void defaultConfigurationNoExplicitAnnotationDefinition2() {
 		validateAnnotatedFixture(
 				new TeamCompetition(),
-				TestUtil.getValidator()
+				ValidatorUtil.getValidator()
 		);
 	}
 
@@ -93,7 +93,7 @@ public class InheritanceMappingsTest {
 	}
 
 	private Validator configure(String mappingsUrl) {
-		Configuration<?> configuration = TestUtil.getConfiguration();
+		Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.traversableResolver( new DummyTraversableResolver() );
 		configuration.addMapping( InheritanceMappingsTest.class.getResourceAsStream( mappingsUrl ) );
 

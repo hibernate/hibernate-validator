@@ -27,7 +27,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
@@ -56,7 +56,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testEmailAndRangeMessageEnglishLocale() {
-		Configuration<?> config = TestUtil.getConfiguration( Locale.ENGLISH );
+		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.ENGLISH );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -74,7 +74,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testEmailAndRangeMessageGermanLocale() {
-		Configuration<?> config = TestUtil.getConfiguration( Locale.GERMAN );
+		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.GERMAN );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -92,7 +92,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testEmailAndRangeMessageFrenchLocale() {
-		Configuration<?> config = TestUtil.getConfiguration( Locale.FRENCH );
+		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.FRENCH );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();
@@ -111,7 +111,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 */
 	@Test
 	public void testThatExplicitlySetEnglishLocaleHasPrecedenceOverDefaultLocale() {
-		Configuration<?> config = TestUtil.getConfiguration( Locale.FRENCH );
+		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.FRENCH );
 		config.messageInterpolator( new LocalizedMessageInterpolator( Locale.ENGLISH ) );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		User user = new User();

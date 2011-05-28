@@ -25,7 +25,7 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 
 /**
@@ -48,7 +48,7 @@ public class CustomConstraintSerializableTest {
 
 	@Test
 	public void testSerializeHibernateEmail() throws Exception {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		HibernateEmail invalidHibernateEmail = new HibernateEmail();
 		invalidHibernateEmail.email = "test@";
@@ -64,7 +64,7 @@ public class CustomConstraintSerializableTest {
 	 */
 	@Test
 	public void testSerializeCustomEmail() throws Exception {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		CustomEmail invalidCustomEmail = new CustomEmail();
 		invalidCustomEmail.email = "test@";

@@ -35,19 +35,19 @@ import org.hibernate.validator.method.metadata.TypeDescriptor;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**
- * A helper providing useful functions for testing Hibernate Validator, eg. get validator, descriptors
+ * A helper providing useful functions for setting up validators.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class TestUtil {
+public class ValidatorUtil {
 	private static Validator hibernateValidator;
 
 	/**
 	 * Private constructor in order to avoid instantiation.
 	 */
-	private TestUtil() {
+	private ValidatorUtil() {
 	}
 
 	public static Validator getValidator() {

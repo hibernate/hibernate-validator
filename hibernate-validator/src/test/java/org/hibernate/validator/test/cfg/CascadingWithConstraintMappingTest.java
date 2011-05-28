@@ -28,7 +28,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -46,7 +46,7 @@ public class CascadingWithConstraintMappingTest {
 				.constraint( NotNullDef.class )
 				.type( A.class )
 				.valid( "c", FIELD );
-		Validator validator = TestUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -66,7 +66,7 @@ public class CascadingWithConstraintMappingTest {
 				.constraint( NotNullDef.class )
 				.type( A.class )
 				.valid( "c", METHOD );
-		Validator validator = TestUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -86,7 +86,7 @@ public class CascadingWithConstraintMappingTest {
 				.constraint( NotNullDef.class )
 				.type( A.class )
 				.valid( "c", METHOD );
-		Validator validator = TestUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
 		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
 		B b = new B();
