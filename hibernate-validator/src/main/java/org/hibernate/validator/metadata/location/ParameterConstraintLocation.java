@@ -27,19 +27,19 @@ import org.hibernate.validator.util.ReflectionHelper;
  *
  * @author Gunnar Morling
  */
-public class MethodParameterConstraintLocation implements ConstraintLocation {
+public class ParameterConstraintLocation implements ConstraintLocation {
 
 	private final Method method;
 
 	private final int parameterIndex;
 
 	/**
-	 * Creates a new {@link MethodParameterConstraintLocation}.
+	 * Creates a new {@link ParameterConstraintLocation}.
 	 *
 	 * @param method The method of the location to be created.
 	 * @param parameterIndex The parameter index of the location to be created.
 	 */
-	public MethodParameterConstraintLocation(Method method, int parameterIndex) {
+	public ParameterConstraintLocation(Method method, int parameterIndex) {
 
 		Contracts.assertNotNull( method, "Method must not be null" );
 

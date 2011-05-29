@@ -19,7 +19,7 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.metadata.location.MethodParameterConstraintLocation;
+import org.hibernate.validator.metadata.location.ParameterConstraintLocation;
 
 /**
  * A {@link MetaConstraint} implementation that represents a method parameter constraint.
@@ -40,6 +40,6 @@ public class ParameterMetaConstraint<A extends Annotation> extends MetaConstrain
 			ConstraintDescriptorImpl<A> constraintDescriptor, Method method,
 			int parameterIndex) {
 
-		super( constraintDescriptor, new MethodParameterConstraintLocation( method, parameterIndex ) );
+		super( constraintDescriptor, new ParameterConstraintLocation( method, parameterIndex ) );
 	}
 }

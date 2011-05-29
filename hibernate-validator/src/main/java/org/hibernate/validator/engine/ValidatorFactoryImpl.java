@@ -55,7 +55,7 @@ import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaConstraint;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodParameterConstraintLocation;
+import org.hibernate.validator.metadata.location.ParameterConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -162,7 +162,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
 
 		final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByType = mapping.getConstraintConfig();
-		final Map<Class<?>, List<ConfiguredConstraint<?, MethodParameterConstraintLocation>>> methodConstraintsByType = mapping
+		final Map<Class<?>, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> methodConstraintsByType = mapping
 				.getMethodConstraintConfig();
 		final Map<Class<?>, List<CascadeDef>> cascadeConfigByType = mapping.getCascadeConfig();
 		final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfigByType = mapping.getMethodCascadeConfig();
@@ -195,7 +195,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				}
 
 				// retrieve the method constraints
-				List<ConfiguredConstraint<?, MethodParameterConstraintLocation>> methodConstraintsOfType = methodConstraintsByType
+				List<ConfiguredConstraint<?, ParameterConstraintLocation>> methodConstraintsOfType = methodConstraintsByType
 						.get( classInHierarchy );
 				if ( methodConstraintsOfType != null ) {
 					addProgrammaticConfiguredMethodConstraint(
@@ -357,8 +357,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private <T> void addProgrammaticConfiguredMethodConstraint(List<ConfiguredConstraint<?, MethodParameterConstraintLocation>> methodConstraints, Class<T> rootClass, Class<?> hierarchyClass, Set<AggregatedMethodMetaData.Builder> builders) {
-		for ( ConfiguredConstraint<?, MethodParameterConstraintLocation> oneConstraint : methodConstraints ) {
+	private <T> void addProgrammaticConfiguredMethodConstraint(List<ConfiguredConstraint<?, ParameterConstraintLocation>> methodConstraints, Class<T> rootClass, Class<?> hierarchyClass, Set<AggregatedMethodMetaData.Builder> builders) {
+		for ( ConfiguredConstraint<?, ParameterConstraintLocation> oneConstraint : methodConstraints ) {
 			MethodMetaData methodMetaData = createMethodMetaData( oneConstraint, rootClass, hierarchyClass );
 			addMetaDataToBuilder( methodMetaData, builders );
 		}
@@ -400,7 +400,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return new MethodMetaData( method, parameterMetaDatas, returnConstraints, isCascading );
 	}
 
-	private <A extends Annotation> MethodMetaData createMethodMetaData(ConfiguredConstraint<A, MethodParameterConstraintLocation> constraintDef, Class<?> rootClass, Class<?> hierarchyClass) {
+	private <A extends Annotation> MethodMetaData createMethodMetaData(ConfiguredConstraint<A, ParameterConstraintLocation> constraintDef, Class<?> rootClass, Class<?> hierarchyClass) {
 
 		Method method = constraintDef.getLocation().getMethod();
 		List<ParameterMetaData> parameterMetaDatas = newArrayList();
