@@ -42,4 +42,17 @@ public class ParameterMetaConstraint<A extends Annotation> extends MetaConstrain
 
 		super( constraintDescriptor, new ParameterConstraintLocation( method, parameterIndex ) );
 	}
+
+	/**
+	 * Creates a new {@link ParameterMetaConstraint} representing a method
+	 * parameter constraint.
+	 *
+	 * @param constraintDescriptor The descriptor for this constraint.
+	 * @param location The location of this constraint.
+	 */
+	public ParameterMetaConstraint(
+			ConstraintDescriptorImpl<A> constraintDescriptor, ParameterConstraintLocation location) {
+
+		super( constraintDescriptor, location );
+	}
 }

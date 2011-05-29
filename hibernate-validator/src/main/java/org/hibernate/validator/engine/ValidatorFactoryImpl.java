@@ -22,11 +22,11 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -64,9 +64,11 @@ import org.hibernate.validator.xml.XmlMappingParser;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
+import static org.hibernate.validator.util.CollectionHelper.Partitioner;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.util.CollectionHelper.partition;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
@@ -358,12 +360,26 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private <T> void addProgrammaticConfiguredMethodConstraint(List<ConfiguredConstraint<?, ParameterConstraintLocation>> methodConstraints, Class<T> rootClass, Class<?> hierarchyClass, Set<AggregatedMethodMetaData.Builder> builders) {
-		for ( ConfiguredConstraint<?, ParameterConstraintLocation> oneConstraint : methodConstraints ) {
-			MethodMetaData methodMetaData = createMethodMetaData( oneConstraint, rootClass, hierarchyClass );
+
+		Map<Method, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> constraintsByMethod =
+				partition(
+						methodConstraints,
+						new Partitioner<Method, ConfiguredConstraint<?, ParameterConstraintLocation>>() {
+
+							public Method getPartition(ConfiguredConstraint<?, ParameterConstraintLocation> v) {
+								return v.getLocation().getMethod();
+							}
+						}
+				);
+
+		for ( Entry<Method, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> oneMethod : constraintsByMethod.entrySet() ) {
+
+			MethodMetaData methodMetaData = createMethodMetaData(
+					oneMethod.getKey(), oneMethod.getValue(), rootClass, hierarchyClass
+			);
 			addMetaDataToBuilder( methodMetaData, builders );
 		}
 	}
-
 
 	private void addProgrammaticConfiguredMethodCascade(List<MethodCascadeDef> methodCascades, Set<AggregatedMethodMetaData.Builder> builders) {
 		for ( MethodCascadeDef cascadeDef : methodCascades ) {
@@ -400,35 +416,70 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return new MethodMetaData( method, parameterMetaDatas, returnConstraints, isCascading );
 	}
 
-	private <A extends Annotation> MethodMetaData createMethodMetaData(ConfiguredConstraint<A, ParameterConstraintLocation> constraintDef, Class<?> rootClass, Class<?> hierarchyClass) {
+	private MethodMetaData createMethodMetaData(Method method, List<ConfiguredConstraint<?, ParameterConstraintLocation>> constraints, Class<?> rootClass, Class<?> hierarchyClass) {
 
-		Method method = constraintDef.getLocation().getMethod();
-		List<ParameterMetaData> parameterMetaDatas = newArrayList();
-		List<BeanMetaConstraint<? extends Annotation>> returnConstraints = Collections.emptyList();
+		Map<Integer, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> constraintsByIndex = partition(
+				constraints, new Partitioner<Integer, ConfiguredConstraint<?, ParameterConstraintLocation>>() {
 
-		String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + constraintDef.getLocation().getParameterIndex();
+					public Integer getPartition(
+							ConfiguredConstraint<?, ParameterConstraintLocation> v) {
 
-		A annotation = createAnnotationProxy( constraintDef );
+						return v.getLocation().getParameterIndex();
+					}
+				}
+		);
+
+		List<ParameterMetaData> allParameterMetaData = newArrayList( method.getParameterTypes().length );
+
+		for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
+
+			allParameterMetaData.add(
+					new ParameterMetaData(
+							i,
+							method.getParameterTypes()[i],
+							DEFAULT_PARAMETER_NAME_PREFIX + i,
+							convertToParameterConstraints(
+									constraintsByIndex.get( i ), rootClass, hierarchyClass
+							),
+							false
+					)
+			);
+		}
+
+		return new MethodMetaData(
+				method, allParameterMetaData, Collections.<BeanMetaConstraint<? extends Annotation>>emptyList(), false
+		);
+	}
+
+	private List<ParameterMetaConstraint<?>> convertToParameterConstraints(
+			List<ConfiguredConstraint<?, ParameterConstraintLocation>> configuredConstraints,
+			Class<?> rootClass,
+			Class<?> hierarchyClass) {
+
+		if ( configuredConstraints == null ) {
+			configuredConstraints = Collections.emptyList();
+		}
+
+		List<ParameterMetaConstraint<?>> theValue = newArrayList();
+
+		for ( ConfiguredConstraint<?, ParameterConstraintLocation> oneConfiguredConstraint : configuredConstraints ) {
+			theValue.add( convertToParameterConstraint( oneConfiguredConstraint, rootClass, hierarchyClass ) );
+		}
+
+		return theValue;
+	}
+
+	private <A extends Annotation> ParameterMetaConstraint<A> convertToParameterConstraint(ConfiguredConstraint<A, ParameterConstraintLocation> configuredConstraint, Class<?> rootClass, Class<?> hierarchyClass) {
+
+		A annotation = createAnnotationProxy( configuredConstraint );
 		ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				annotation, constraintHelper, ElementType.PARAMETER, definedIn
 		);
 
-		ParameterMetaConstraint<A> parameterConstraint = new ParameterMetaConstraint<A>(
-				constraintDescriptor, method, constraintDef.getLocation().getParameterIndex()
+		return new ParameterMetaConstraint<A>(
+				constraintDescriptor, configuredConstraint.getLocation()
 		);
-
-		parameterMetaDatas.add(
-				new ParameterMetaData(
-						constraintDef.getLocation().getParameterIndex(),
-						method.getParameterTypes()[constraintDef.getLocation().getParameterIndex()],
-						parameterName,
-						Arrays.<ParameterMetaConstraint<?>>asList( parameterConstraint ),
-						false
-				)
-		);
-
-		return new MethodMetaData( method, parameterMetaDatas, returnConstraints, false );
 	}
 
 	private void addMetaDataToBuilder(MethodMetaData methodMetaData, Set<AggregatedMethodMetaData.Builder> builders) {

@@ -16,13 +16,13 @@
 */
 package org.hibernate.validator.metadata;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
@@ -54,11 +54,33 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 		this( method, Collections.<ParameterMetaData>emptyList(), constraints, isCascading );
 	}
 
+	/**
+	 * Creates a new method meta data object.
+	 *
+	 * @param method The method to represent.
+	 * @param parameterMetaData A list with parameter meta data. The length must correspond
+	 * with the number of parameters of the represented method. So
+	 * this list may be empty returned (in case of a parameterless
+	 * method), but never <code>null</code>.
+	 * @param constraints The return value constraints of the represented method, if
+	 * any.
+	 * @param isCascading Whether a cascaded validation of the represented method's
+	 * return value shall be performed or not.
+	 */
 	public MethodMetaData(
 			Method method,
 			List<ParameterMetaData> parameterMetaData,
 			List<BeanMetaConstraint<? extends Annotation>> constraints,
 			boolean isCascading) {
+
+		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
+			throw new IllegalArgumentException(
+					String.format(
+							"Method %s has %s parameters, but the passed list of parameter meta data has a size of %s.",
+							method, method.getParameterTypes().length, parameterMetaData.size()
+					)
+			);
+		}
 
 		this.method = method;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );

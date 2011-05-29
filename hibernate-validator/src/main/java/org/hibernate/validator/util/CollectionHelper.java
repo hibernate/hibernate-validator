@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,7 +62,7 @@ public class CollectionHelper {
 	public static <T> ArrayList<T> newArrayList(Iterable<T>... iterables) {
 		ArrayList<T> resultList = newArrayList();
 		for ( Iterable<T> oneIterable : iterables ) {
-			for (T oneElement : oneIterable) {
+			for ( T oneElement : oneIterable ) {
 				resultList.add( oneElement );
 			}
 		}
@@ -70,5 +71,41 @@ public class CollectionHelper {
 
 	public static <T> Set<T> asSet(T... ts) {
 		return new HashSet<T>( Arrays.asList( ts ) );
+	}
+
+	/**
+	 * Creates a map containing the given list's values partitioned by the given
+	 * partitioner.
+	 *
+	 * @param <K> The key type of the resulting map.
+	 * @param <V> The element type of the list to be partitioned.
+	 * @param list The list to be partitioned.
+	 * @param partitioner The partitioner to be used for determining the partitions.
+	 *
+	 * @return A map containing the given list's values partitioned by the given
+	 *         partitioner.
+	 */
+	public static <K, V> Map<K, List<V>> partition(List<V> list, Partitioner<K, V> partitioner) {
+
+		Map<K, List<V>> theValue = newHashMap();
+
+		for ( V v : list ) {
+			K key = partitioner.getPartition( v );
+
+			List<V> partition = theValue.get( key );
+			if ( partition == null ) {
+				partition = newArrayList();
+				theValue.put( key, partition );
+			}
+
+			partition.add( v );
+		}
+
+		return theValue;
+	}
+
+	public interface Partitioner<K, V> {
+
+		K getPartition(V v);
 	}
 }
