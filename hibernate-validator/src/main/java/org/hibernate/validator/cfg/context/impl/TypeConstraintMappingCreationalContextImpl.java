@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.cfg.context.impl;
 
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
 import org.hibernate.validator.cfg.ConfiguredConstraint;
@@ -41,7 +40,7 @@ public final class TypeConstraintMappingCreationalContextImpl extends Constraint
 
 	public TypeConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
 
-		mapping.addConstraintConfig( getConfiguredConstraint( definition ) );
+		mapping.addConstraintConfig( ConfiguredConstraint.forType( definition, beanClass ) );
 		return this;
 	}
 
@@ -67,11 +66,5 @@ public final class TypeConstraintMappingCreationalContextImpl extends Constraint
 	public <T extends DefaultGroupSequenceProvider<?>> TypeConstraintMappingCreationalContext defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
 		mapping.addDefaultGroupSequenceProvider( beanClass, defaultGroupSequenceProviderClass );
 		return this;
-	}
-
-	private <A extends Annotation> ConfiguredConstraint<A> getConfiguredConstraint(ConstraintDef<?, A> definition) {
-		return ConfiguredConstraint.forType(
-				definition, beanClass
-		);
 	}
 }

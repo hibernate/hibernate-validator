@@ -47,15 +47,27 @@ public class MethodParameterConstraintLocation implements ConstraintLocation {
 		this.parameterIndex = parameterIndex;
 	}
 
+	public Class<?> getBeanClass() {
+		return method.getDeclaringClass();
+	}
+
 	public Type typeOfAnnotatedElement() {
 		Type t = null;
 
 		t = ReflectionHelper.typeOf( method, parameterIndex );
-		if ( t instanceof Class && ( ( Class<?> ) t ).isPrimitive() ) {
+		if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
 			t = ReflectionHelper.boxedType( t );
 		}
 
 		return t;
+	}
+
+	public Method getMethod() {
+		return method;
+	}
+
+	public int getParameterIndex() {
+		return parameterIndex;
 	}
 
 	@Override

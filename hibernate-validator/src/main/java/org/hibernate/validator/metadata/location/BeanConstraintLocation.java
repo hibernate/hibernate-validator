@@ -16,7 +16,9 @@
 */
 package org.hibernate.validator.metadata.location;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.util.ReflectionHelper;
@@ -47,6 +49,15 @@ public class BeanConstraintLocation implements ConstraintLocation {
 	private final Class<?> beanClass;
 
 	/**
+	 * The type of element hosting this constraint. One of TYPE, FIELD or METHOD.
+	 */
+	private final ElementType elementType;
+
+	public BeanConstraintLocation(Class<?> beanClass) {
+		this( beanClass, null );
+	}
+
+	/**
 	 * @param beanClass The class in which the constraint is defined on
 	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
 	 */
@@ -56,9 +67,11 @@ public class BeanConstraintLocation implements ConstraintLocation {
 
 		if ( this.member != null ) {
 			this.propertyName = ReflectionHelper.getPropertyName( member );
+			this.elementType = ( member instanceof Method ) ? ElementType.METHOD : ElementType.FIELD;
 		}
 		else {
 			this.propertyName = null;
+			this.elementType = ElementType.TYPE;
 		}
 		this.beanClass = beanClass;
 	}
@@ -93,6 +106,10 @@ public class BeanConstraintLocation implements ConstraintLocation {
 		}
 
 		return t;
+	}
+
+	public ElementType getElementType() {
+		return elementType;
 	}
 
 	@Override

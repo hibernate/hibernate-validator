@@ -26,6 +26,8 @@ import java.util.Set;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.impl.TypeConstraintMappingCreationalContextImpl;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodParameterConstraintLocation;
 import org.hibernate.validator.util.Contracts;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -40,8 +42,8 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.om)
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConfiguredConstraint<?>>> constraintConfig;
-	private final Map<Class<?>, List<ConfiguredConstraint<?>>> methodConstraintConfig;
+	private final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintConfig;
+	private final Map<Class<?>, List<ConfiguredConstraint<?, MethodParameterConstraintLocation>>> methodConstraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
@@ -67,9 +69,9 @@ public class ConstraintMapping {
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
 	public final TypeConstraintMappingCreationalContext type(Class<?> beanClass) {
-		
-		Contracts.assertNotNull(beanClass, "The bean type must not be null when creating a constraint mapping.");
-		
+
+		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
+
 		return new TypeConstraintMappingCreationalContextImpl( beanClass, this );
 	}
 
@@ -80,14 +82,14 @@ public class ConstraintMapping {
 	 *         this map represents a bean type, for which the constraint
 	 *         definitions in the associated map value are configured.
 	 */
-	public final Map<Class<?>, List<ConfiguredConstraint<?>>> getConstraintConfig() {
+	public final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> getConstraintConfig() {
 		return constraintConfig;
 	}
 
-	public Map<Class<?>, List<ConfiguredConstraint<?>>> getMethodConstraintConfig() {
+	public Map<Class<?>, List<ConfiguredConstraint<?, MethodParameterConstraintLocation>>> getMethodConstraintConfig() {
 		return methodConstraintConfig;
 	}
-	
+
 	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
 		return cascadeConfig;
 	}
@@ -170,29 +172,29 @@ public class ConstraintMapping {
 		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
 	}
 
-	public final void addConstraintConfig(ConfiguredConstraint<?> constraint) {
-		Class<?> beanClass = constraint.getBeanType();
+	public final void addConstraintConfig(ConfiguredConstraint<?, BeanConstraintLocation> constraint) {
+		Class<?> beanClass = constraint.getLocation().getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( constraintConfig.containsKey( beanClass ) ) {
 			constraintConfig.get( beanClass ).add( constraint );
 		}
 		else {
-			List<ConfiguredConstraint<?>> definitionList = newArrayList();
+			List<ConfiguredConstraint<?, BeanConstraintLocation>> definitionList = newArrayList();
 			definitionList.add( constraint );
 			constraintConfig.put( beanClass, definitionList );
 		}
 	}
-	
-	public final void addMethodConstraintConfig(ConfiguredConstraint<?> constraint) {
-		Class<?> beanClass = constraint.getBeanType();
+
+	public final void addMethodConstraintConfig(ConfiguredConstraint<?, MethodParameterConstraintLocation> constraint) {
+		Class<?> beanClass = constraint.getLocation().getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( methodConstraintConfig.containsKey( beanClass ) ) {
 			methodConstraintConfig.get( beanClass ).add( constraint );
 		}
 		else {
-			List<ConfiguredConstraint<?>> definitionList = newArrayList();
+			List<ConfiguredConstraint<?, MethodParameterConstraintLocation>> definitionList = newArrayList();
 			definitionList.add( constraint );
 			methodConstraintConfig.put( beanClass, definitionList );
 		}
-	}	
+	}
 }

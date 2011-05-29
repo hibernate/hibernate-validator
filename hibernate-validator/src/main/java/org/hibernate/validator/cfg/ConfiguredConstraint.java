@@ -18,100 +18,67 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static java.lang.annotation.ElementType.TYPE;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodParameterConstraintLocation;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Represents a programmatically configured constraint and meta-data
  * related to its location (bean type etc.).
- * 
+ *
  * @author Gunnar Morling
  */
-public class ConfiguredConstraint<A extends Annotation> {
+public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLocation> {
 
-	private static final String EMPTY_PROPERTY = "";
-	
 	private final ConstraintDef<?, A> constraint;
-	private final Class<?> beanType;
-	private final String property;
-	private final ElementType elementType;
-	private final Class<A> constraintType;
-	private final Method method;
-	private final Integer parameterIndex;
+	private final L location;
 
-	private final Map<String, Object> parameters;
-
-	private ConfiguredConstraint(ConstraintDef<?, A> constraint, Class<?> beanType,
-								String property, ElementType elementType) {
+	private ConfiguredConstraint(ConstraintDef<?, A> constraint, L location) {
 
 		this.constraint = constraint;
-		this.beanType = beanType;
-		this.property = property;
-		this.elementType = elementType;
-		this.method = null;
-		this.parameterIndex = null;
-		
-		this.constraintType = constraint.constraintType;
-		this.parameters = constraint.parameters;
+		this.location = location;
 	}
 
-	private ConfiguredConstraint(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
-
-		this.constraint = constraint;
-		this.beanType = method.getDeclaringClass();
-		this.property = EMPTY_PROPERTY;
-		this.elementType = ElementType.PARAMETER;
-		this.method = method;
-		this.parameterIndex = parameterIndex;
-		
-		this.constraintType = constraint.constraintType;
-		this.parameters = constraint.parameters;
-	}
-	
-	public static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
-		return new ConfiguredConstraint<A>(constraint, beanType, EMPTY_PROPERTY, TYPE);
+	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
+		return new ConfiguredConstraint<A, BeanConstraintLocation>(
+				constraint, new BeanConstraintLocation( beanType )
+		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forProperty (ConstraintDef<?, A> constraint, Class<?> beanType, String property, ElementType elementType) {
-		return new ConfiguredConstraint<A>(constraint, beanType, property, elementType);
+	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Class<?> beanType, String property, ElementType elementType) {
+
+		Member member = ReflectionHelper.getMember( beanType, property, elementType );
+
+		return new ConfiguredConstraint<A, BeanConstraintLocation>(
+				constraint, new BeanConstraintLocation( beanType, member )
+		);
 	}
-	
-	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
-		return new ConfiguredConstraint<A>(constraint, method, parameterIndex);
+
+	public static <A extends Annotation> ConfiguredConstraint<A, MethodParameterConstraintLocation> forParameter(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
+		return new ConfiguredConstraint<A, MethodParameterConstraintLocation>(
+				constraint, new MethodParameterConstraintLocation( method, parameterIndex )
+		);
 	}
-	
+
 	public ConstraintDef<?, A> getConstraint() {
 		return constraint;
 	}
 
-	public Class<?> getBeanType() {
-		return beanType;
-	}
-
-	public Method getMethod() {
-		return method;
-	}
-	
-	public String getProperty() {
-		return property;
-	}
-
-	public ElementType getElementType() {
-		return elementType;
-	}
-	
-	public Integer getParameterIndex() {
-		return parameterIndex;
+	public L getLocation() {
+		return location;
 	}
 
 	public Class<A> getConstraintType() {
-		return constraintType;
+		return constraint.constraintType;
 	}
 
 	public Map<String, Object> getParameters() {
-		return parameters;
+		return constraint.parameters;
 	}
 
 }
