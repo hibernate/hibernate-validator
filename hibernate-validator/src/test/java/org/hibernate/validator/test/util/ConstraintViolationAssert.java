@@ -16,17 +16,20 @@
  */
 package org.hibernate.validator.test.util;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 
+import org.hibernate.validator.method.MethodConstraintViolationException;
+
 import static org.hibernate.validator.engine.PathImpl.createPathFromString;
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.FileAssert.fail;
 
 /**
  * This class provides useful functions to assert correctness of constraint violations raised
@@ -50,19 +53,22 @@ public final class ConstraintViolationAssert {
 	 * @param expectedMessages The expected constraint violation messages.
 	 */
 	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations, String... expectedMessages) {
-		final List<String> actualMessages = new ArrayList<String>();
+
+		List<String> expectedMessagesAsList = Arrays.asList( expectedMessages );
+
+		List<String> actualMessages = newArrayList();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualMessages.add( violation.getMessage() );
 		}
 
-		assertEquals( actualMessages.size(), expectedMessages.length, "Wrong number of error messages" );
+		Collections.sort( expectedMessagesAsList );
+		Collections.sort( actualMessages );
 
-		for ( String expectedMessage : expectedMessages ) {
-			assertTrue(
-					actualMessages.contains( expectedMessage ),
-					"The message '" + expectedMessage + "' should have been in the list of actual messages: " + actualMessages
-			);
-		}
+		assertEquals( actualMessages, expectedMessagesAsList );
+	}
+
+	public static void assertCorrectConstraintViolationMessages(MethodConstraintViolationException e, String... expectedMessages) {
+		assertCorrectConstraintViolationMessages( e.getConstraintViolations(), expectedMessages );
 	}
 
 	/**
@@ -72,24 +78,24 @@ public final class ConstraintViolationAssert {
 	 * @param violations The violation list to verify.
 	 * @param expectedConstraintTypes The expected constraint types.
 	 */
-	public static void assertCorrectConstraintTypes(Set<? extends ConstraintViolation<?>> violations, Class<?>... expectedConstraintTypes) {
-		final List<String> actualConstraintTypes = new ArrayList<String>();
+	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations, Class<?>... expectedConstraintTypes) {
+
+		List<String> expectedConstraintTypeNames = newArrayList();
+		for ( Class<?> oneExpectedConstraintType : expectedConstraintTypes ) {
+			expectedConstraintTypeNames.add( oneExpectedConstraintType.getName() );
+		}
+
+		List<String> actualConstraintTypeNames = newArrayList();
 		for ( ConstraintViolation<?> violation : violations ) {
-			actualConstraintTypes.add(
-					( violation.getConstraintDescriptor().getAnnotation() ).annotationType().getName()
+			actualConstraintTypeNames.add(
+					violation.getConstraintDescriptor().getAnnotation().annotationType().getName()
 			);
 		}
 
-		assertEquals(
-				actualConstraintTypes.size(), expectedConstraintTypes.length, "Wrong number of constraint types"
-		);
+		Collections.sort( expectedConstraintTypeNames );
+		Collections.sort( actualConstraintTypeNames );
 
-		for ( Class<?> expectedConstraintType : expectedConstraintTypes ) {
-			assertTrue(
-					actualConstraintTypes.contains( expectedConstraintType.getName() ),
-					"The constraint type " + expectedConstraintType.getName() + " should have been violated"
-			);
-		}
+		assertEquals( actualConstraintTypeNames, expectedConstraintTypeNames );
 	}
 
 	/**
@@ -99,28 +105,22 @@ public final class ConstraintViolationAssert {
 	 * @param expectedPropertyPaths The expected property paths.
 	 */
 	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations, String... expectedPropertyPaths) {
-		final List<Path> propertyPathsOfViolations = new ArrayList<Path>();
+
+		List<String> expectedPathsAsList = Arrays.asList( expectedPropertyPaths );
+
+		List<String> actualPaths = newArrayList();
 		for ( ConstraintViolation<?> violation : violations ) {
-			propertyPathsOfViolations.add( violation.getPropertyPath() );
+			actualPaths.add( violation.getPropertyPath().toString() );
 		}
 
-		assertEquals(
-				propertyPathsOfViolations.size(), expectedPropertyPaths.length, "Wrong number of property paths"
-		);
+		Collections.sort( expectedPathsAsList );
+		Collections.sort( actualPaths );
 
-		for ( String propertyPath : expectedPropertyPaths ) {
-			Path expectedPath = createPathFromString( propertyPath );
-			boolean containsPath = false;
-			for ( Path actualPath : propertyPathsOfViolations ) {
-				if ( pathsAreEqual( expectedPath, actualPath ) ) {
-					containsPath = true;
-					break;
-				}
-			}
-			if ( !containsPath ) {
-				fail( expectedPath + " is not in the list of path instances contained in the actual constraint violations [" + propertyPathsOfViolations + "]" );
-			}
-		}
+		assertEquals( actualPaths, expectedPathsAsList );
+	}
+
+	public static void assertCorrectPropertyPaths(MethodConstraintViolationException e, String... expectedPropertyPaths) {
+		assertCorrectPropertyPaths( e.getConstraintViolations(), expectedPropertyPaths );
 	}
 
 	/**
