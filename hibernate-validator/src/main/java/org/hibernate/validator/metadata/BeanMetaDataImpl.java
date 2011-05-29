@@ -719,8 +719,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new BeanMetaConstraint<A>( descriptor, declaringClass, m );
 	}
 
-	private <A extends Annotation> ParameterMetaConstraint<T, A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new ParameterMetaConstraint<T, A>( descriptor, method, parameterIndex );
+	private <A extends Annotation> ParameterMetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new ParameterMetaConstraint<A>( descriptor, method, parameterIndex );
 	}
 
 	/**
@@ -852,7 +852,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			boolean parameterIsCascading = false;
 			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-			List<MetaConstraint<? extends Annotation>> constraintsOfOneParameter = newArrayList();
+			List<ParameterMetaConstraint<? extends Annotation>> constraintsOfOneParameter = newArrayList();
 
 			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
 
