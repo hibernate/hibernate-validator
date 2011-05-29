@@ -24,6 +24,7 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.method.MethodConstraintViolation;
@@ -33,6 +34,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
@@ -43,11 +45,11 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", FIELD )
-				.constraint( new NotNullDef() )
+				.constraint( create( NotNullDef.class ) )
 				.type( A.class )
 				.property( "c", FIELD )
 				.valid();
-		Validator validator = TestUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -64,11 +66,11 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( new NotNullDef() )
+				.constraint( create( NotNullDef.class ) )
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();
-		Validator validator = TestUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -85,11 +87,11 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( new NotNullDef() )
+				.constraint( create( NotNullDef.class ) )
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();
-		Validator validator = TestUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
 		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
 		B b = new B();

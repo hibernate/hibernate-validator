@@ -457,11 +457,13 @@ public class ConstraintMappingTest {
 
 	@GroupSequence( { Foo.class, A.class })
 	private static class A {
+		@SuppressWarnings("unused")
 		String a;
 	}
 
 	@GroupSequenceProvider(BDefaultGroupSequenceProvider.class)
 	private static class B {
+		@SuppressWarnings("unused")
 		String b;
 	}
 
@@ -470,21 +472,19 @@ public class ConstraintMappingTest {
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
 		public List<Class<?>> getValidationGroups(Marathon object) {
-			return Arrays.asList( Foo.class, Marathon.class );
+			return Arrays.<Class<?>>asList( Foo.class, Marathon.class );
 		}
 	}
 
 	public static class BDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
 		public List<Class<?>> getValidationGroups(B object) {
-			return Arrays.asList( Foo.class, B.class );
+			return Arrays.<Class<?>>asList( Foo.class, B.class );
 		}
 	}
 
 	public static class ADefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
 		public List<Class<?>> getValidationGroups(A object) {
-			return Arrays.asList( Foo.class, A.class );
+			return Arrays.<Class<?>>asList( Foo.class, A.class );
 		}
 	}
 }
-
-
