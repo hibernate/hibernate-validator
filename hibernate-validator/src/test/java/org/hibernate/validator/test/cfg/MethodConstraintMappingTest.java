@@ -19,6 +19,7 @@ package org.hibernate.validator.test.cfg;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -31,6 +32,7 @@ import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
 import static org.hibernate.validator.cfg.ConstraintDef.create;
+import static org.hibernate.validator.cfg.ConstraintDef.createGeneric;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
@@ -178,6 +180,30 @@ public class MethodConstraintMappingTest {
 	}
 
 	@Test
+	public void testGenericParameterConstraint() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class )
+				.parameter( 0 )
+				.constraint( createGeneric( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.greet( "" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "size must be between 1 and 10"
+			);
+			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)" );
+		}
+	}
+
+	@Test
 	public void testMultipleParameterConstraintsAtSameParameter() {
 
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -228,6 +254,30 @@ public class MethodConstraintMappingTest {
 		}
 	}
 
+	@Test
+	public void testProgrammaticAndAnnotationConstraintsAddUp() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "sayHello", String.class )
+				.parameter( 0 )
+				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.sayHello( "" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "size must be between 1 and 10", "size must be between 2 and 10"
+			);
+			assertCorrectPropertyPaths( e, "GreetingService#sayHello(arg0)", "GreetingService#sayHello(arg0)" );
+		}
+	}
+
 	private <T> T getValidatingProxy(Object implementor, ConstraintMapping mapping) {
 
 		MethodValidator methodValidator = getMethodValidatorForMapping( mapping );
@@ -262,14 +312,18 @@ public class MethodConstraintMappingTest {
 	}
 
 	public interface GreetingService {
+
 		Message greet(User user);
 
 		Message greet(String string);
 
 		Message greet(String string1, String string2);
+
+		Message sayHello(@Size(min = 1, max = 10) String name);
 	}
 
 	public class GreetingServiceImpl implements GreetingService {
+
 		public Message greet(User user) {
 			return new Message( null );
 		}
@@ -279,6 +333,10 @@ public class MethodConstraintMappingTest {
 		}
 
 		public Message greet(String string1, String string2) {
+			return null;
+		}
+
+		public Message sayHello(String name) {
 			return null;
 		}
 	}

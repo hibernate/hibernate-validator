@@ -53,10 +53,6 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
-	public <A extends Annotation> MethodReturnValueConstraintMappingCreationalContext constraint(GenericConstraintDef<A> definition) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
-	}
-
 	/**
 	 * Marks the current property as cascadable.
 	 *

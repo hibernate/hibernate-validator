@@ -18,16 +18,16 @@ package org.hibernate.validator.cfg.context.impl;
 
 import static java.lang.annotation.ElementType.PARAMETER;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
+import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -54,6 +54,19 @@ public final class MethodParameterConstraintMappingCreationalContextImpl extends
 		this.parameterIndex = parameterIndex;
 		
 		this.method = ReflectionHelper.getDeclaredMethod(beanClass, methodName, parameterTypes);
+		
+		if(method == null) {
+			StringBuilder sb = new StringBuilder();
+			for (Class<?> oneParameterType : parameterTypes) {
+				sb.append(oneParameterType.getName() + ", ");
+			}
+			
+			String parameterTypesAsString = sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
+			
+			throw new IllegalArgumentException(
+				String.format("Type %s doesn't have a method %s(%s).", beanClass, methodName, parameterTypesAsString)
+			);
+		}
 	}
 
 	public MethodParameterConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
@@ -62,10 +75,6 @@ public final class MethodParameterConstraintMappingCreationalContextImpl extends
 				definition, method, parameterIndex
 		));
 		return this;
-	}
-
-	public <A extends Annotation> MethodParameterConstraintMappingCreationalContext constraint(GenericConstraintDef<A> definition) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	/**
