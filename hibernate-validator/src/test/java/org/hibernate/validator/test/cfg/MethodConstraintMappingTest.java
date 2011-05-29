@@ -26,7 +26,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.util.ValidationInvocationHandler;
@@ -34,10 +33,8 @@ import org.hibernate.validator.test.util.ValidationInvocationHandler;
 import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidatorForMapping;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 /**
@@ -62,21 +59,15 @@ public class MethodConstraintMappingTest {
 				.returnValue()
 				.valid();
 
-		MethodValidator methodValidator = getMethodValidatorForMapping( mapping );
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( wrappedObject, methodValidator );
-		GreetingService service = (GreetingService) getMethodValidationProxy( handler );
+		GreetingService service = getValidatingProxy( wrappedObject, mapping );
 
 		try {
-
 			service.greet( new User( "foo" ) );
-
+			fail( "Expected exception wasn't thrown." );
 		}
 		catch ( MethodConstraintViolationException e ) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
-			assertCorrectConstraintViolationMessages( e.getConstraintViolations(), "may not be null" );
-
-			MethodConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			assertEquals( violation.getPropertyPath().toString(), "GreetingService#greet().message" );
+			assertCorrectConstraintViolationMessages( e, "may not be null" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet().message" );
 		}
 	}
 
@@ -88,21 +79,15 @@ public class MethodConstraintMappingTest {
 				.parameter( 0 )
 				.valid();
 
-		MethodValidator methodValidator = getMethodValidatorForMapping( mapping );
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( wrappedObject, methodValidator );
-		GreetingService service = (GreetingService) getMethodValidationProxy( handler );
+		GreetingService service = getValidatingProxy( wrappedObject, mapping );
 
 		try {
-
 			service.greet( new User( null ) );
-
+			fail( "Expected exception wasn't thrown." );
 		}
 		catch ( MethodConstraintViolationException e ) {
-			assertNumberOfViolations( e.getConstraintViolations(), 1 );
-			assertCorrectConstraintViolationMessages( e.getConstraintViolations(), "may not be null" );
-
-			MethodConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			assertEquals( violation.getPropertyPath().toString(), "GreetingService#greet(arg0).name" );
+			assertCorrectConstraintViolationMessages( e, "may not be null" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0).name" );
 		}
 	}
 
@@ -149,9 +134,7 @@ public class MethodConstraintMappingTest {
 				.parameter( 0 )
 				.valid();
 
-		MethodValidator methodValidator = getMethodValidatorForMapping( mapping );
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( wrappedObject, methodValidator );
-		GreetingService service = (GreetingService) getMethodValidationProxy( handler );
+		GreetingService service = getValidatingProxy( wrappedObject, mapping );
 
 		service.greet( new User( null ) );
 	}
@@ -167,9 +150,7 @@ public class MethodConstraintMappingTest {
 				.parameter( 0 )
 				.valid();
 
-		MethodValidator methodValidator = getMethodValidatorForMapping( mapping );
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( wrappedObject, methodValidator );
-		GreetingService service = (GreetingService) getMethodValidationProxy( handler );
+		GreetingService service = getValidatingProxy( wrappedObject, mapping );
 
 		service.greet( new User( null ) );
 	}
@@ -259,6 +240,8 @@ public class MethodConstraintMappingTest {
 	}
 
 	public class User {
+
+		@SuppressWarnings("unused")
 		@NotNull
 		private String name;
 
@@ -268,6 +251,8 @@ public class MethodConstraintMappingTest {
 	}
 
 	public class Message {
+
+		@SuppressWarnings("unused")
 		@NotNull
 		private String message;
 
