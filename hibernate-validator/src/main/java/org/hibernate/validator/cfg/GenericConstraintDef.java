@@ -30,10 +30,6 @@ import java.lang.annotation.Annotation;
  */
 public class GenericConstraintDef<A extends Annotation> extends ConstraintDef<GenericConstraintDef<A>, A> {
 
-	public static <A extends Annotation> GenericConstraintDef<A> from(Class<A> constraintType) {
-		return new GenericConstraintDef<A>( constraintType );
-	}
-
 	public GenericConstraintDef(Class<A> constraintType) {
 		super( constraintType );
 	}
