@@ -19,13 +19,16 @@ package org.hibernate.validator.cfg.context.impl;
 import static java.lang.annotation.ElementType.PARAMETER;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
+import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -40,6 +43,7 @@ public final class MethodParameterConstraintMappingCreationalContextImpl extends
 	private final String methodName;
 	private final Class<?>[] parameterTypes;
 	private final int parameterIndex;
+	private final Method method;
 
 	public MethodParameterConstraintMappingCreationalContextImpl(Class<?> beanClass, String methodName, Class<?>[] parameterTypes, int parameterIndex, ConstraintMapping mapping) {
 
@@ -48,10 +52,16 @@ public final class MethodParameterConstraintMappingCreationalContextImpl extends
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
 		this.parameterIndex = parameterIndex;
+		
+		this.method = ReflectionHelper.getDeclaredMethod(beanClass, methodName, parameterTypes);
 	}
 
 	public MethodParameterConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	
+		mapping.addMethodConstraintConfig( ConfiguredConstraint.forParameter(
+				definition, method, parameterIndex
+		));
+		return this;
 	}
 
 	public <A extends Annotation> MethodParameterConstraintMappingCreationalContext constraint(GenericConstraintDef<A> definition) {

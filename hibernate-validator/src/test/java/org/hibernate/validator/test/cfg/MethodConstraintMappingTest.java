@@ -23,17 +23,21 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
+import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
 import static org.hibernate.validator.test.util.TestUtil.getMethodValidatorForMapping;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * Tests the definition of method constraints with the programmatic API.
@@ -168,7 +172,41 @@ public class MethodConstraintMappingTest {
 
 		service.greet( new User( null ) );
 	}
+	
+	@Test
+	public void testParameterConstraint() {
 
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", User.class )
+				.parameter( 0 )
+				.constraint( create(NotNullDef.class) );
+
+		try {
+			GreetingService service = getValidatingProxy(wrappedObject, mapping);
+			service.greet(null);
+			
+			fail("Expected exception wasn't thrown.");
+		}
+		catch ( MethodConstraintViolationException e ) {
+			
+			assertNumberOfViolations( e.getConstraintViolations(), 1 );
+			assertCorrectConstraintViolationMessages( e.getConstraintViolations(), "may not be null" );
+
+			MethodConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+			assertEquals( violation.getPropertyPath().toString(), "GreetingService#greet(arg0)" );
+		}
+	}
+
+	private <T> T getValidatingProxy(Object implementor, ConstraintMapping mapping) {
+		
+		MethodValidator methodValidator = getMethodValidatorForMapping( mapping );
+		ValidationInvocationHandler handler = new ValidationInvocationHandler( wrappedObject, methodValidator );
+		T service = (T) getMethodValidationProxy( handler );
+		
+		return service;
+	}
+	
 	public class User {
 		@NotNull
 		private String name;

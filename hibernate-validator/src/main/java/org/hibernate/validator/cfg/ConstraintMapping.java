@@ -41,6 +41,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class ConstraintMapping {
 	private final Map<Class<?>, List<ConfiguredConstraint<?>>> constraintConfig;
+	private final Map<Class<?>, List<ConfiguredConstraint<?>>> methodConstraintConfig;
 	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
 	private final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
@@ -49,6 +50,7 @@ public class ConstraintMapping {
 
 	public ConstraintMapping() {
 		this.constraintConfig = newHashMap();
+		this.methodConstraintConfig = newHashMap();
 		this.cascadeConfig = newHashMap();
 		this.methodCascadeConfig = newHashMap();
 		this.configuredClasses = newHashSet();
@@ -82,6 +84,10 @@ public class ConstraintMapping {
 		return constraintConfig;
 	}
 
+	public Map<Class<?>, List<ConfiguredConstraint<?>>> getMethodConstraintConfig() {
+		return methodConstraintConfig;
+	}
+	
 	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
 		return cascadeConfig;
 	}
@@ -176,4 +182,17 @@ public class ConstraintMapping {
 			constraintConfig.put( beanClass, definitionList );
 		}
 	}
+	
+	public final void addMethodConstraintConfig(ConfiguredConstraint<?> constraint) {
+		Class<?> beanClass = constraint.getBeanType();
+		configuredClasses.add( beanClass );
+		if ( methodConstraintConfig.containsKey( beanClass ) ) {
+			methodConstraintConfig.get( beanClass ).add( constraint );
+		}
+		else {
+			List<ConfiguredConstraint<?>> definitionList = newArrayList();
+			definitionList.add( constraint );
+			methodConstraintConfig.put( beanClass, definitionList );
+		}
+	}	
 }

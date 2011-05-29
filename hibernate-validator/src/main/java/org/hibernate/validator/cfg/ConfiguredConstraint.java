@@ -18,6 +18,7 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import static java.lang.annotation.ElementType.TYPE;
@@ -37,6 +38,9 @@ public class ConfiguredConstraint<A extends Annotation> {
 	private final String property;
 	private final ElementType elementType;
 	private final Class<A> constraintType;
+	private final Method method;
+	private final Integer parameterIndex;
+
 	private final Map<String, Object> parameters;
 
 	private ConfiguredConstraint(ConstraintDef<?, A> constraint, Class<?> beanType,
@@ -46,17 +50,36 @@ public class ConfiguredConstraint<A extends Annotation> {
 		this.beanType = beanType;
 		this.property = property;
 		this.elementType = elementType;
-
+		this.method = null;
+		this.parameterIndex = null;
+		
 		this.constraintType = constraint.constraintType;
 		this.parameters = constraint.parameters;
 	}
 
+	private ConfiguredConstraint(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
+
+		this.constraint = constraint;
+		this.beanType = method.getDeclaringClass();
+		this.property = EMPTY_PROPERTY;
+		this.elementType = ElementType.PARAMETER;
+		this.method = method;
+		this.parameterIndex = parameterIndex;
+		
+		this.constraintType = constraint.constraintType;
+		this.parameters = constraint.parameters;
+	}
+	
 	public static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
 		return new ConfiguredConstraint<A>(constraint, beanType, EMPTY_PROPERTY, TYPE);
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forProperty (ConstraintDef<?, A> constraint, Class<?> beanType, String property, ElementType elementType) {
 		return new ConfiguredConstraint<A>(constraint, beanType, property, elementType);
+	}
+	
+	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
+		return new ConfiguredConstraint<A>(constraint, method, parameterIndex);
 	}
 	
 	public ConstraintDef<?, A> getConstraint() {
@@ -67,12 +90,20 @@ public class ConfiguredConstraint<A extends Annotation> {
 		return beanType;
 	}
 
+	public Method getMethod() {
+		return method;
+	}
+	
 	public String getProperty() {
 		return property;
 	}
 
 	public ElementType getElementType() {
 		return elementType;
+	}
+	
+	public Integer getParameterIndex() {
+		return parameterIndex;
 	}
 
 	public Class<A> getConstraintType() {
