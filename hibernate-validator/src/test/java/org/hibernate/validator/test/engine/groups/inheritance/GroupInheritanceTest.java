@@ -22,10 +22,10 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Hardy Ferentschik
@@ -37,7 +37,7 @@ public class GroupInheritanceTest {
 	 */
 	@Test
 	public void testGroupInheritanceWithinGroupSequence() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		Try tryMe = new Try();
 		tryMe.field2 = "foo";
 		tryMe.field3 = "bar";
@@ -51,7 +51,7 @@ public class GroupInheritanceTest {
 	 */
 	@Test
 	public void testGroupInheritance() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		Try tryMe = new Try();
 		tryMe.field3 = "foo";
 

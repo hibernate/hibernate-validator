@@ -35,11 +35,11 @@ import org.hibernate.validator.cfg.defs.FutureDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.NullDef;
 import org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpolator;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * Test for {@link org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpolator}.
@@ -247,7 +247,7 @@ public class ValueFormatterMessageInterpolatorTest {
 	}
 
 	private Validator getValidatorUsingConstraintMapping(ConstraintMapping mapping) {
-		HibernateValidatorConfiguration config = (HibernateValidatorConfiguration) TestUtil.getConfiguration();
+		HibernateValidatorConfiguration config = (HibernateValidatorConfiguration) ValidatorUtil.getConfiguration();
 		config.messageInterpolator( new ValueFormatterMessageInterpolator() );
 
 		// use programmatic mapping

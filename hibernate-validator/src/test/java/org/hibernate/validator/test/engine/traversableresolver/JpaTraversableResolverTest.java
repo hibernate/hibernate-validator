@@ -25,7 +25,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.resolver.DefaultTraversableResolver;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static org.testng.Assert.assertTrue;
 
@@ -40,7 +40,7 @@ public class JpaTraversableResolverTest {
 
 	@BeforeTest
 	public void setUp() {
-		Configuration<?> configuration = TestUtil.getConfiguration();
+		Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.traversableResolver( new DefaultTraversableResolver() );
 		validator = configuration.buildValidatorFactory().getValidator();
 	}

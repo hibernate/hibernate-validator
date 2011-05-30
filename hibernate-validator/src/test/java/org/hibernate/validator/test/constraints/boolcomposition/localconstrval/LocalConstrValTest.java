@@ -24,11 +24,11 @@ import javax.validation.constraints.Pattern;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Federico Mancini
@@ -42,7 +42,7 @@ public class LocalConstrValTest {
 	 */
 	@Test
 	public void testCorrectBooleanEvaluation() {
-		Validator currentValidator = TestUtil.getValidator();
+		Validator currentValidator = ValidatorUtil.getValidator();
 
 		//nothing should fail, the pattern matches on name
 		Set<ConstraintViolation<Person>> constraintViolations = currentValidator.validate(

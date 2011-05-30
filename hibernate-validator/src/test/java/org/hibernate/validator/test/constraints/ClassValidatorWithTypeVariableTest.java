@@ -27,10 +27,10 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import org.hibernate.validator.test.util.ValidatorUtil;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * HV-250
@@ -41,7 +41,7 @@ public class ClassValidatorWithTypeVariableTest {
 
 	@BeforeClass
 	public void setUp() {
-		validator = TestUtil.getValidator();
+		validator = ValidatorUtil.getValidator();
 	}
 
 	@Test

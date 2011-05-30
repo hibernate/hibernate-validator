@@ -25,11 +25,11 @@ import javax.validation.constraints.Size;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Gerhard Petracek
@@ -43,7 +43,7 @@ public class CompositeConstraintTest {
 	@Test
 	public void testCorrectAnnotationTypeForWithReportAsSingleViolation() {
 
-		Validator currentValidator = TestUtil.getValidator();
+		Validator currentValidator = ValidatorUtil.getValidator();
 
 		for ( int i = 0; i < 100; i++ ) {
 			Set<ConstraintViolation<Person>> constraintViolations = currentValidator.validate(
@@ -73,7 +73,7 @@ public class CompositeConstraintTest {
 	@Test
 	public void testCorrectAnnotationTypeReportMultipleViolations() {
 
-		Validator currentValidator = TestUtil.getValidator();
+		Validator currentValidator = ValidatorUtil.getValidator();
 
 		for ( int i = 0; i < 100; i++ ) {
 			Set<ConstraintViolation<Person>> constraintViolations = currentValidator.validate(

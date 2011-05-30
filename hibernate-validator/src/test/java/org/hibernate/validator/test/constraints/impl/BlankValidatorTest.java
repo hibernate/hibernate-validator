@@ -26,8 +26,8 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.impl.NotBlankValidator;
 
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.TestUtil.getValidator;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

@@ -29,9 +29,9 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.PathImpl;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -159,7 +159,7 @@ public class PathImplTest {
 
 	@Test
 	public void testNonStringMapKey() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		Container container = new Container();
 		Key id = new Key();
 		container.addItem( id, new Item( null ) );

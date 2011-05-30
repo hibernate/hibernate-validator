@@ -26,11 +26,11 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.DecimalMaxDef;
 import org.hibernate.validator.cfg.defs.DecimalMinDef;
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Hardy Ferentschik
@@ -46,7 +46,7 @@ public class DecimalMinMaxValidatorBoundaryTest {
 				.property( "d", FIELD )
 				.constraint( DecimalMinDef.class )
 				.value( "0.100000000000000005" );
-		Validator validator = TestUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		this.d = 0.1;
 
@@ -64,7 +64,7 @@ public class DecimalMinMaxValidatorBoundaryTest {
 				.constraint( DecimalMaxDef.class )
 				.value( "0.1" );
 
-		Validator validator = TestUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		this.d = 0.1;
 

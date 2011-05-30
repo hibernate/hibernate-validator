@@ -23,7 +23,7 @@ import javax.validation.Validator;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik
@@ -35,7 +35,7 @@ public class FutureValidatorTest {
 	 */
 	@Test
 	public void testFutureAndPast() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 		DateHolder dateHolder = new DateHolder();
 		Set<ConstraintViolation<DateHolder>> constraintViolations = validator.validate( dateHolder );
 		assertEquals( constraintViolations.size(), 1, "Wrong number of constraints" );

@@ -24,10 +24,10 @@ import javax.validation.constraints.Min;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * Check correct behavior of {@link org.hibernate.validator.constraints.impl.MinValidatorForNumber} and
@@ -48,7 +48,7 @@ public class MinMaxValidatorBoundaryTest {
 
 	@Test
 	public void testMinBoundaryValue() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		this.min = 9223372036854775806l;
 		this.max = 0l;
@@ -61,7 +61,7 @@ public class MinMaxValidatorBoundaryTest {
 
 	@Test
 	public void testMaxBoundaryValue() {
-		Validator validator = TestUtil.getValidator();
+		Validator validator = ValidatorUtil.getValidator();
 
 		this.min = Long.MAX_VALUE;
 		this.max = 9223372036854775807l;

@@ -23,11 +23,11 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.TestUtil;
+import org.hibernate.validator.test.util.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.TestUtil.assertNumberOfViolations;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Federico Mancini
@@ -40,7 +40,7 @@ public class BoolCompositeConstraintTest {
 	 */
 	@Test
 	public void testCorrectAnnotationTypeWithBoolOr() {
-		Validator currentValidator = TestUtil.getValidator();
+		Validator currentValidator = ValidatorUtil.getValidator();
 
 		Set<ConstraintViolation<Person>> constraintViolations = currentValidator.validate(
 				new Person( "K", "G" )
@@ -65,7 +65,7 @@ public class BoolCompositeConstraintTest {
 	 */
 	@Test
 	public void testCorrectAnnotationTypeWithBoolAnd() {
-		Validator currentValidator = TestUtil.getValidator();
+		Validator currentValidator = ValidatorUtil.getValidator();
 
 		Set<ConstraintViolation<Person>> constraintViolations = currentValidator.validate(
 				new Person( "G", "K" )
@@ -97,7 +97,7 @@ public class BoolCompositeConstraintTest {
 	 */
 	@Test
 	public void testCorrectAnnotationTypeWithBoolAllFalse() {
-		Validator currentValidator = TestUtil.getValidator();
+		Validator currentValidator = ValidatorUtil.getValidator();
 		// Uses ALL_FALSE, OR, and AND. Checks that SSN works
 		Set<ConstraintViolation<Person>> constraintViolations = currentValidator.validate(
 				new Person( "NickName", "Name", "33333333333" )
