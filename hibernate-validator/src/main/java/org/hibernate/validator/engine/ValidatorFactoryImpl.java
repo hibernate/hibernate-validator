@@ -21,9 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -179,7 +177,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
 			Set<AggregatedMethodMetaData.Builder> builders = newHashSet();
-			Set<Member> cascadedMembers = new HashSet<Member>();
+			Set<Member> cascadedMembers = newHashSet();
 
 			for ( Class<?> classInHierarchy : classes ) {
 
@@ -254,7 +252,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass, true );
 			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
-			Set<Member> cascadedMembers = new HashSet<Member>();
+			Set<Member> cascadedMembers = newHashSet();
 			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
 			// some constraints might be configured in super classes or interfaces. The xml configuration does not
 			// imply any order so we have to check whether any of the super classes or interfaces of a given bean has
@@ -272,7 +270,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 					mappingParser.getDefaultSequenceForClass( beanClass ),
 					null,
 					constraints,
-					new HashSet<AggregatedMethodMetaData>(),
+					Collections.<AggregatedMethodMetaData>emptySet(),
 					cascadedMembers,
 					annotationIgnores,
 					beanMetaDataCache
@@ -333,7 +331,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		List<M> constraintList = constraints.get( hierarchyClass );
 
 		if ( constraintList == null ) {
-			constraintList = new ArrayList<M>();
+			constraintList = newArrayList();
 			constraints.put( hierarchyClass, constraintList );
 		}
 

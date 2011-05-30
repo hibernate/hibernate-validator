@@ -16,6 +16,10 @@
 */
 package org.hibernate.validator.xml;
 
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -24,11 +28,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +71,7 @@ public class XmlMappingParser {
 	private static final String PAYLOAD_PARAM = "payload";
 	private static final String PACKAGE_SEPARATOR = ".";
 
-	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
+	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
 	private final AnnotationIgnores annotationIgnores;
 	private final Map<Class<?>, List<MetaConstraint<?>>> constraintMap;
@@ -80,9 +81,9 @@ public class XmlMappingParser {
 	public XmlMappingParser(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
 		this.annotationIgnores = new AnnotationIgnores();
-		this.constraintMap = new HashMap<Class<?>, List<MetaConstraint<?>>>();
-		this.cascadedMembers = new HashMap<Class<?>, List<Member>>();
-		this.defaultSequences = new HashMap<Class<?>, List<Class<?>>>();
+		this.constraintMap = newHashMap();
+		this.cascadedMembers = newHashMap();
+		this.defaultSequences = newHashMap();
 	}
 
 	public final void parse(Set<InputStream> mappingStreams) {
@@ -113,7 +114,7 @@ public class XmlMappingParser {
 	}
 
 	public final <T> List<MetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
-		List<MetaConstraint<?>> list = new ArrayList<MetaConstraint<?>>();
+		List<MetaConstraint<?>> list = newArrayList();
 		if ( constraintMap.containsKey( beanClass ) ) {
 			for ( MetaConstraint<?> metaConstraint : constraintMap.get( beanClass ) ) {
 				@SuppressWarnings("unchecked") // safe cast since the list of meta constraints is always specific to the bean type
@@ -157,7 +158,7 @@ public class XmlMappingParser {
 			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
 			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
-			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
+			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = newArrayList();
 			if ( validatedByType.isIncludeExistingValidators() != null && validatedByType.isIncludeExistingValidators() ) {
 				constraintValidatorClasses.addAll( findConstraintValidatorClasses( annotationClass ) );
 			}
@@ -182,7 +183,7 @@ public class XmlMappingParser {
 	}
 
 	private List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> findConstraintValidatorClasses(Class<? extends Annotation> annotationType) {
-		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorDefinitionClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
+		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorDefinitionClasses = newArrayList();
 		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
 			constraintValidatorDefinitionClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
 		}
@@ -202,7 +203,7 @@ public class XmlMappingParser {
 	}
 
 	private void parseFieldLevelOverrides(List<FieldType> fields, Class<?> beanClass, String defaultPackage) {
-		List<String> fieldNames = new ArrayList<String>();
+		List<String> fieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
 			String fieldName = fieldType.getName();
 			if ( fieldNames.contains( fieldName ) ) {
@@ -239,7 +240,7 @@ public class XmlMappingParser {
 	}
 
 	private void parsePropertyLevelOverrides(List<GetterType> getters, Class<?> beanClass, String defaultPackage) {
-		List<String> getterNames = new ArrayList<String>();
+		List<String> getterNames = newArrayList();
 		for ( GetterType getterType : getters ) {
 			String getterName = getterType.getName();
 			if ( getterNames.contains( getterName ) ) {
@@ -303,7 +304,7 @@ public class XmlMappingParser {
 			constraintMap.get( beanClass ).add( metaConstraint );
 		}
 		else {
-			List<MetaConstraint<?>> constraintList = new ArrayList<MetaConstraint<?>>();
+			List<MetaConstraint<?>> constraintList = newArrayList();
 			constraintList.add( metaConstraint );
 			constraintMap.put( beanClass, constraintList );
 		}
@@ -314,14 +315,14 @@ public class XmlMappingParser {
 			cascadedMembers.get( beanClass ).add( member );
 		}
 		else {
-			List<Member> tmpList = new ArrayList<Member>();
+			List<Member> tmpList = newArrayList();
 			tmpList.add( member );
 			cascadedMembers.put( beanClass, tmpList );
 		}
 	}
 
 	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
-		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
+		List<Class<?>> groupSequence = newArrayList();
 		if ( groupSequenceType != null ) {
 			for ( String groupName : groupSequenceType.getValue() ) {
 				Class<?> group = getClass( groupName, defaultPackage );
@@ -396,7 +397,7 @@ public class XmlMappingParser {
 			return getSingleValue( elementType.getContent().get( 0 ), returnType );
 		}
 		else {
-			List<Object> values = new ArrayList<Object>();
+			List<Object> values = newArrayList();
 			for ( Serializable s : elementType.getContent() ) {
 				values.add( getSingleValue( s, returnType.getComponentType() ) );
 			}
@@ -405,7 +406,7 @@ public class XmlMappingParser {
 	}
 
 	private void removeEmptyContentElements(ElementType elementType) {
-		List<Serializable> contentToDelete = new ArrayList<Serializable>();
+		List<Serializable> contentToDelete = newArrayList();
 		for ( Serializable content : elementType.getContent() ) {
 			if ( content instanceof String && ( (String) content ).matches( "[\\n ].*" ) ) {
 				contentToDelete.add( content );
@@ -549,7 +550,7 @@ public class XmlMappingParser {
 			return new Class[] { };
 		}
 
-		List<Class<?>> groupList = new ArrayList<Class<?>>();
+		List<Class<?>> groupList = newArrayList();
 		for ( String groupClass : groupsType.getValue() ) {
 			groupList.add( getClass( groupClass, defaultPackage ) );
 		}
@@ -562,7 +563,7 @@ public class XmlMappingParser {
 			return new Class[] { };
 		}
 
-		List<Class<? extends Payload>> payloadList = new ArrayList<Class<? extends Payload>>();
+		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
 			Class<?> payload = getClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
