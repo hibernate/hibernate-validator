@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,7 +45,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? extends Annotation>> {
+public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 	private final Method method;
 
@@ -56,7 +55,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 
 	private final boolean isConstrained;
 
-	private final List<BeanMetaConstraint<? extends Annotation>> returnValueConstraints;
+	private final List<MethodMetaConstraint<?>> returnValueConstraints;
 
 	private final List<ParameterMetaData> parameterMetaData;
 
@@ -72,7 +71,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 
 	private AggregatedMethodMetaData(
 			Builder builder,
-			List<BeanMetaConstraint<? extends Annotation>> returnValueConstraints,
+			List<MethodMetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException) {
 
@@ -170,12 +169,12 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 		 *
 		 * @return A list with all return value constraints.
 		 */
-		private List<BeanMetaConstraint<? extends Annotation>> collectReturnValueConstraints() {
+		private List<MethodMetaConstraint<?>> collectReturnValueConstraints() {
 
-			List<BeanMetaConstraint<? extends Annotation>> theValue = newArrayList();
+			List<MethodMetaConstraint<?>> theValue = newArrayList();
 
 			for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
-				for ( BeanMetaConstraint<? extends Annotation> oneConstraint : oneMethodMetaData ) {
+				for ( MethodMetaConstraint<?> oneConstraint : oneMethodMetaData ) {
 					theValue.add( oneConstraint );
 				}
 			}
@@ -370,7 +369,7 @@ public class AggregatedMethodMetaData implements Iterable<BeanMetaConstraint<? e
 	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
-	public Iterator<BeanMetaConstraint<? extends Annotation>> iterator() {
+	public Iterator<MethodMetaConstraint<?>> iterator() {
 		return returnValueConstraints.iterator();
 	}
 

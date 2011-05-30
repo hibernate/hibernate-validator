@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 import org.hibernate.validator.method.metadata.MethodDescriptor;
@@ -37,7 +36,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		this.methodMetaData = methodMetaData;
 
 		//add the return value constraints of the represented method to the constraint descriptor list
-		for ( BeanMetaConstraint<? extends Annotation> oneConstraint : methodMetaData ) {
+		for ( MethodMetaConstraint<?> oneConstraint : methodMetaData ) {
 			addConstraintDescriptor( oneConstraint.getDescriptor() );
 		}
 	}

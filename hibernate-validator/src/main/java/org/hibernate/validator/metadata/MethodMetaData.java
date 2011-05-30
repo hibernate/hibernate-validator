@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,7 +30,7 @@ import static org.hibernate.validator.util.CollectionHelper.newArrayList;
  *
  * @author Gunnar Morling
  */
-public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Annotation>> {
+public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 	private final Method method;
 
@@ -40,7 +39,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 	 */
 	private final List<ParameterMetaData> parameterMetaData;
 
-	private final List<BeanMetaConstraint<? extends Annotation>> constraints;
+	private final List<MethodMetaConstraint<?>> returnValueConstraints;
 
 	private final boolean isCascading;
 
@@ -48,7 +47,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 
 	public MethodMetaData(
 			Method method,
-			List<BeanMetaConstraint<? extends Annotation>> constraints,
+			List<MethodMetaConstraint<?>> constraints,
 			boolean isCascading) {
 
 		this( method, Collections.<ParameterMetaData>emptyList(), constraints, isCascading );
@@ -62,7 +61,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 	 * with the number of parameters of the represented method. So
 	 * this list may be empty returned (in case of a parameterless
 	 * method), but never <code>null</code>.
-	 * @param constraints The return value constraints of the represented method, if
+	 * @param returnValueConstraints The return value constraints of the represented method, if
 	 * any.
 	 * @param isCascading Whether a cascaded validation of the represented method's
 	 * return value shall be performed or not.
@@ -70,7 +69,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 	public MethodMetaData(
 			Method method,
 			List<ParameterMetaData> parameterMetaData,
-			List<BeanMetaConstraint<? extends Annotation>> constraints,
+			List<MethodMetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
@@ -84,7 +83,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 
 		this.method = method;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
-		this.constraints = Collections.unmodifiableList( constraints );
+		this.returnValueConstraints = Collections.unmodifiableList( returnValueConstraints );
 		this.isCascading = isCascading;
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
 	}
@@ -145,8 +144,8 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
-	public Iterator<BeanMetaConstraint<? extends Annotation>> iterator() {
-		return constraints.iterator();
+	public Iterator<MethodMetaConstraint<?>> iterator() {
+		return returnValueConstraints.iterator();
 	}
 
 	/**
@@ -172,7 +171,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 	 */
 	public boolean isConstrained() {
 
-		return isCascading || !constraints.isEmpty() || hasParameterConstraints;
+		return isCascading || !returnValueConstraints.isEmpty() || hasParameterConstraints;
 	}
 
 	/**
@@ -191,7 +190,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 		boolean isCascading = isCascading() || otherMetaData.isCascading();
 
 		// 1 - aggregate return value constraints
-		List<BeanMetaConstraint<? extends Annotation>> mergedReturnValueConstraints = newArrayList(
+		List<MethodMetaConstraint<?>> mergedReturnValueConstraints = newArrayList(
 				this, otherMetaData
 		);
 
@@ -211,7 +210,7 @@ public class MethodMetaData implements Iterable<BeanMetaConstraint<? extends Ann
 	@Override
 	public String toString() {
 		return "MethodMetaData [method=" + method + ", parameterMetaData="
-				+ parameterMetaData + ", constraints=" + constraints
+				+ parameterMetaData + ", constraints=" + returnValueConstraints
 				+ ", isCascading=" + isCascading + ", hasParameterConstraints="
 				+ hasParameterConstraints + "]";
 	}
