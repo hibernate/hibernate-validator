@@ -56,6 +56,7 @@ import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -64,7 +65,6 @@ import org.hibernate.validator.xml.XmlMappingParser;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
-import static org.hibernate.validator.util.CollectionHelper.Partitioner;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
@@ -361,16 +361,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private <T> void addProgrammaticConfiguredMethodConstraint(List<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints, Class<T> rootClass, Class<?> hierarchyClass, Set<AggregatedMethodMetaData.Builder> builders) {
 
-		Map<Method, List<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByMethod =
-				partition(
-						methodConstraints,
-						new Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>>() {
-
-							public Method getPartition(ConfiguredConstraint<?, MethodConstraintLocation> v) {
-								return v.getLocation().getMethod();
-							}
-						}
-				);
+		Map<Method, List<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByMethod = partition(
+				methodConstraints,
+				byMethod()
+		);
 
 		for ( Entry<Method, List<ConfiguredConstraint<?, MethodConstraintLocation>>> oneMethod : constraintsByMethod.entrySet() ) {
 
@@ -419,14 +413,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private MethodMetaData createMethodMetaData(Method method, List<ConfiguredConstraint<?, MethodConstraintLocation>> constraints, Class<?> rootClass, Class<?> hierarchyClass) {
 
 		Map<Integer, List<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByIndex = partition(
-				constraints, new Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>>() {
-
-					public Integer getPartition(
-							ConfiguredConstraint<?, MethodConstraintLocation> v) {
-
-						return v.getLocation().getParameterIndex();
-					}
-				}
+				constraints, byParameterIndex()
 		);
 
 		List<ParameterMetaData> allParameterMetaData = newArrayList( method.getParameterTypes().length );
@@ -546,5 +533,25 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			failFast = tmpFailFast;
 		}
 		return failFast;
+	}
+
+	private Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>> byMethod() {
+
+		return new Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>>() {
+			public Method getPartition(ConfiguredConstraint<?, MethodConstraintLocation> v) {
+				return v.getLocation().getMethod();
+			}
+		};
+	}
+
+	private Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>> byParameterIndex() {
+		return new Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>>() {
+
+			public Integer getPartition(
+					ConfiguredConstraint<?, MethodConstraintLocation> v) {
+
+				return v.getLocation().getParameterIndex();
+			}
+		};
 	}
 }
