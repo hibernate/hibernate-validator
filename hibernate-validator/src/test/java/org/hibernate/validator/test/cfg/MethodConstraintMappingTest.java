@@ -94,8 +94,8 @@ public class MethodConstraintMappingTest {
 	}
 
 	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "The .* doesn't have a method 'greet' with parameter types \\[\\]"
+			expectedExceptions = IllegalArgumentException.class,
+			expectedExceptionsMessageRegExp = "Type .*GreetingService doesn't have a method greet().*"
 	)
 	public void testCascadingDefinitionOnMissingMethod() {
 		ConstraintMapping mapping = new ConstraintMapping();

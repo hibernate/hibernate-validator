@@ -16,6 +16,8 @@
  */
 package org.hibernate.validator.cfg.context.impl;
 
+import java.lang.reflect.Method;
+
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
@@ -24,41 +26,32 @@ import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCre
 /**
  * A constraint mapping creational context which allows to select the parameter or
  * return value to which the next operations shall apply.
- * 
+ *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
  */
 public class MethodConstraintMappingCreationalContextImpl implements MethodConstraintMappingCreationalContext {
 
 	private final Class<?> beanClass;
-	private final String methodName;
-	private final Class<?>[] parameterTypes;
+	private final Method method;
 	private final ConstraintMapping mapping;
 
-	/**
-	 * @param beanClass
-	 * @param name
-	 * @param parameterTypes
-	 * @param mapping
-	 */
-	public MethodConstraintMappingCreationalContextImpl(Class<?> beanClass,
-													String methodName, Class<?>[] parameterTypes, ConstraintMapping mapping) {
+	public MethodConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMapping mapping) {
 
 		this.beanClass = beanClass;
-		this.methodName = methodName;
-		this.parameterTypes = parameterTypes;
+		this.method = method;
 		this.mapping = mapping;
 	}
 
 	public MethodParameterConstraintMappingCreationalContext parameter(int index) {
 		return new MethodParameterConstraintMappingCreationalContextImpl(
-				beanClass, methodName, parameterTypes, index, mapping
+				beanClass, method, index, mapping
 		);
 	}
 
 	public MethodReturnValueConstraintMappingCreationalContext returnValue() {
 		return new MethodReturnValueConstraintMappingCreationalContextImpl(
-				beanClass, methodName, parameterTypes, mapping
+				beanClass, method, mapping
 		);
 	}
 

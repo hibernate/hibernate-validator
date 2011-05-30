@@ -17,7 +17,7 @@
 package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.annotation.ElementType;
-
+import java.lang.reflect.Method;
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -74,7 +74,22 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 
 		Contracts.assertNotNull( name, "The method name must not be null." );
 
-		return new MethodConstraintMappingCreationalContextImpl( beanClass, name, parameterTypes, mapping );
+		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
+
+		if ( method == null ) {
+			StringBuilder sb = new StringBuilder();
+			for ( Class<?> oneParameterType : parameterTypes ) {
+				sb.append( oneParameterType.getName() + ", " );
+			}
+
+			String parameterTypesAsString = sb.length() > 2 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
+
+			throw new IllegalArgumentException(
+					String.format( "Type %s doesn't have a method %s(%s).", beanClass, name, parameterTypesAsString )
+			);
+		}
+
+		return new MethodConstraintMappingCreationalContextImpl( beanClass, method, mapping );
 	}
 
 }

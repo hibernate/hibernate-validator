@@ -16,10 +16,7 @@
  */
 package org.hibernate.validator.cfg.context.impl;
 
-import static java.lang.annotation.ElementType.PARAMETER;
-
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -27,8 +24,8 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
-import org.hibernate.validator.util.Contracts;
-import org.hibernate.validator.util.ReflectionHelper;
+
+import static java.lang.annotation.ElementType.PARAMETER;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -37,43 +34,28 @@ import org.hibernate.validator.util.ReflectionHelper;
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public final class MethodParameterConstraintMappingCreationalContextImpl extends ConstraintMappingCreationalContextImplBase
+public final class MethodParameterConstraintMappingCreationalContextImpl
+		extends ConstraintMappingCreationalContextImplBase
 		implements MethodParameterConstraintMappingCreationalContext {
 
-	private final String methodName;
-	private final Class<?>[] parameterTypes;
-	private final int parameterIndex;
 	private final Method method;
+	private final int parameterIndex;
 
-	public MethodParameterConstraintMappingCreationalContextImpl(Class<?> beanClass, String methodName, Class<?>[] parameterTypes, int parameterIndex, ConstraintMapping mapping) {
+	public MethodParameterConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, int parameterIndex, ConstraintMapping mapping) {
 
 		super( beanClass, mapping );
 
-		this.methodName = methodName;
-		this.parameterTypes = parameterTypes;
+		this.method = method;
 		this.parameterIndex = parameterIndex;
-		
-		this.method = ReflectionHelper.getDeclaredMethod(beanClass, methodName, parameterTypes);
-		
-		if(method == null) {
-			StringBuilder sb = new StringBuilder();
-			for (Class<?> oneParameterType : parameterTypes) {
-				sb.append(oneParameterType.getName() + ", ");
-			}
-			
-			String parameterTypesAsString = sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
-			
-			throw new IllegalArgumentException(
-				String.format("Type %s doesn't have a method %s(%s).", beanClass, methodName, parameterTypesAsString)
-			);
-		}
 	}
 
 	public MethodParameterConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
-	
-		mapping.addMethodConstraintConfig( ConfiguredConstraint.forParameter(
-				definition, method, parameterIndex
-		));
+
+		mapping.addMethodConstraintConfig(
+				ConfiguredConstraint.forParameter(
+						definition, method, parameterIndex
+				)
+		);
 		return this;
 	}
 
@@ -85,7 +67,7 @@ public final class MethodParameterConstraintMappingCreationalContextImpl extends
 	public MethodParameterConstraintMappingCreationalContext valid() {
 		mapping.addMethodCascadeConfig(
 				new MethodCascadeDef(
-						beanClass, methodName, parameterTypes, parameterIndex, PARAMETER
+						beanClass, method, parameterIndex, PARAMETER
 				)
 		);
 		return this;
@@ -100,7 +82,7 @@ public final class MethodParameterConstraintMappingCreationalContextImpl extends
 	 */
 	public MethodParameterConstraintMappingCreationalContext parameter(int index) {
 		return new MethodParameterConstraintMappingCreationalContextImpl(
-				beanClass, methodName, parameterTypes, index, mapping
+				beanClass, method, index, mapping
 		);
 	}
 
@@ -111,7 +93,7 @@ public final class MethodParameterConstraintMappingCreationalContextImpl extends
 	 */
 	public MethodReturnValueConstraintMappingCreationalContext returnValue() {
 		return new MethodReturnValueConstraintMappingCreationalContextImpl(
-				beanClass, methodName, parameterTypes, mapping
+				beanClass, method, mapping
 		);
 	}
 

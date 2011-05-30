@@ -16,16 +16,16 @@
  */
 package org.hibernate.validator.cfg.context.impl;
 
-import static java.lang.annotation.ElementType.METHOD;
+import java.lang.reflect.Method;
 
-import java.lang.annotation.Annotation;
-
+import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
+
+import static java.lang.annotation.ElementType.METHOD;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
@@ -38,19 +38,22 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 		extends ConstraintMappingCreationalContextImplBase
 		implements MethodReturnValueConstraintMappingCreationalContext {
 
-	private final String methodName;
-	private final Class<?>[] parameterTypes;
+	private final Method method;
 
-	public MethodReturnValueConstraintMappingCreationalContextImpl(Class<?> beanClass, String methodName, Class<?>[] parameterTypes, ConstraintMapping mapping) {
+	public MethodReturnValueConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMapping mapping) {
 
 		super( beanClass, mapping );
 
-		this.methodName = methodName;
-		this.parameterTypes = parameterTypes;
+		this.method = method;
 	}
 
 	public MethodReturnValueConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		mapping.addMethodConstraintConfig(
+				ConfiguredConstraint.forReturnValue(
+						definition, method
+				)
+		);
+		return this;
 	}
 
 	/**
@@ -59,7 +62,7 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 	 * @return Returns itself for method chaining.
 	 */
 	public MethodReturnValueConstraintMappingCreationalContext valid() {
-		mapping.addMethodCascadeConfig( new MethodCascadeDef( beanClass, methodName, parameterTypes, 0, METHOD ) );
+		mapping.addMethodCascadeConfig( new MethodCascadeDef( beanClass, method, 0, METHOD ) );
 		return this;
 	}
 
@@ -72,7 +75,7 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 	 */
 	public MethodParameterConstraintMappingCreationalContext parameter(int index) {
 		return new MethodParameterConstraintMappingCreationalContextImpl(
-				beanClass, methodName, parameterTypes, index, mapping
+				beanClass, method, index, mapping
 		);
 	}
 

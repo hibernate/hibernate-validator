@@ -18,12 +18,9 @@ package org.hibernate.validator.cfg;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import javax.validation.ValidationException;
 
 import static java.lang.annotation.ElementType.PARAMETER;
-import static org.hibernate.validator.util.ReflectionHelper.getDeclaredMethod;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
@@ -34,29 +31,21 @@ public class MethodCascadeDef {
 	private final ElementType elementType;
 	private final int index;
 
-	public MethodCascadeDef(Class<?> beanType, String methodName, Class<?>[] parameterTypes, int index, ElementType elementType) {
+	public MethodCascadeDef(Class<?> beanType, Method method, int index, ElementType elementType) {
 		if ( beanType == null ) {
 			throw new ValidationException( "Null is not a valid bean type" );
 		}
 
-		if ( methodName == null || methodName.length() == 0 ) {
-			throw new ValidationException( "A valid method name has to be specified" );
+		if ( method == null ) {
+			throw new ValidationException( "A valid method has to be specified" );
 		}
 
-		if ( PARAMETER.equals( elementType ) && ( index < 0 || index >= parameterTypes.length ) ) {
-			throw new ValidationException( "A valid parameter index has to be specified for method '" + methodName + "'" );
-		}
-
-		Method clazzMethod = getDeclaredMethod( beanType, methodName, parameterTypes );
-		if ( clazzMethod == null || Modifier.isStatic( clazzMethod.getModifiers() ) || clazzMethod.isSynthetic() ) {
-			throw new ValidationException(
-					"The " + beanType + " doesn't have a method '" + methodName + "' with parameter types "
-							+ Arrays.toString( parameterTypes )
-			);
+		if ( PARAMETER.equals( elementType ) && ( index < 0 || index >= method.getParameterTypes().length ) ) {
+			throw new ValidationException( "A valid parameter index has to be specified for method '" + method.getName() + "'" );
 		}
 
 		this.beanType = beanType;
-		this.method = clazzMethod;
+		this.method = method;
 		this.elementType = elementType;
 		this.index = index;
 	}
