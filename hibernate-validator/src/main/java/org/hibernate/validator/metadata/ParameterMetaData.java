@@ -16,19 +16,18 @@
 */
 package org.hibernate.validator.metadata;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-
-import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
  *
  * @author Gunnar Morling
  */
-public class ParameterMetaData implements Iterable<ParameterMetaConstraint<? extends Annotation>> {
+public class ParameterMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 	private final Class<?> type;
 
@@ -36,11 +35,11 @@ public class ParameterMetaData implements Iterable<ParameterMetaConstraint<? ext
 
 	private final String name;
 
-	private final List<ParameterMetaConstraint<? extends Annotation>> constraints;
+	private final List<MethodMetaConstraint<?>> constraints;
 
 	private final boolean isCascading;
 
-	public ParameterMetaData(int index, Class<?> type, String name, List<ParameterMetaConstraint<? extends Annotation>> constraints, boolean isCascading) {
+	public ParameterMetaData(int index, Class<?> type, String name, List<MethodMetaConstraint<?>> constraints, boolean isCascading) {
 
 		this.index = index;
 		this.type = type;
@@ -78,7 +77,7 @@ public class ParameterMetaData implements Iterable<ParameterMetaConstraint<? ext
 		return isCascading || !constraints.isEmpty();
 	}
 
-	public Iterator<ParameterMetaConstraint<? extends Annotation>> iterator() {
+	public Iterator<MethodMetaConstraint<?>> iterator() {
 		return constraints.iterator();
 	}
 
@@ -99,7 +98,7 @@ public class ParameterMetaData implements Iterable<ParameterMetaConstraint<? ext
 		//display short annotation type names
 		StringBuilder sb = new StringBuilder();
 
-		for ( MetaConstraint<? extends Annotation> oneConstraint : constraints ) {
+		for ( MetaConstraint<?> oneConstraint : constraints ) {
 			sb.append( oneConstraint.getDescriptor().getAnnotation().annotationType().getSimpleName() );
 			sb.append( ", " );
 		}

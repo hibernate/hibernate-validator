@@ -19,39 +19,52 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.metadata.location.ParameterConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**
- * A {@link MetaConstraint} implementation that represents a method parameter constraint.
+ * A {@link MetaConstraint} implementation that represents a method parameter or return value constraint.
  *
  * @author Gunnar Morling
  */
-public class ParameterMetaConstraint<A extends Annotation> extends MetaConstraint<A> {
+public class MethodMetaConstraint<A extends Annotation> extends MetaConstraint<A> {
 
 	/**
-	 * Creates a new {@link ParameterMetaConstraint} representing a method
+	 * Creates a new {@link MethodMetaConstraint} representing a method
 	 * parameter constraint.
 	 *
 	 * @param constraintDescriptor The descriptor for this constraint.
 	 * @param method The method hosting this constraint.
 	 * @param parameterIndex The index of the parameter hosting this constraint.
 	 */
-	public ParameterMetaConstraint(
+	public MethodMetaConstraint(
 			ConstraintDescriptorImpl<A> constraintDescriptor, Method method,
 			int parameterIndex) {
 
-		super( constraintDescriptor, new ParameterConstraintLocation( method, parameterIndex ) );
+		super( constraintDescriptor, new MethodConstraintLocation( method, parameterIndex ) );
 	}
 
 	/**
-	 * Creates a new {@link ParameterMetaConstraint} representing a method
+	 * Creates a new {@link MethodMetaConstraint} representing a method
+	 * return value constraint.
+	 *
+	 * @param constraintDescriptor The descriptor for this constraint.
+	 * @param method The method hosting this constraint.
+	 */
+	public MethodMetaConstraint(
+			ConstraintDescriptorImpl<A> constraintDescriptor, Method method) {
+
+		super( constraintDescriptor, new MethodConstraintLocation( method ) );
+	}
+
+	/**
+	 * Creates a new {@link MethodMetaConstraint} representing a method
 	 * parameter constraint.
 	 *
 	 * @param constraintDescriptor The descriptor for this constraint.
 	 * @param location The location of this constraint.
 	 */
-	public ParameterMetaConstraint(
-			ConstraintDescriptorImpl<A> constraintDescriptor, ParameterConstraintLocation location) {
+	public MethodMetaConstraint(
+			ConstraintDescriptorImpl<A> constraintDescriptor, MethodConstraintLocation location) {
 
 		super( constraintDescriptor, location );
 	}

@@ -51,11 +51,11 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.MethodMetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
-import org.hibernate.validator.metadata.ParameterMetaConstraint;
 import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.ParameterConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -164,7 +164,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
 
 		final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByType = mapping.getConstraintConfig();
-		final Map<Class<?>, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> methodConstraintsByType = mapping
+		final Map<Class<?>, List<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintsByType = mapping
 				.getMethodConstraintConfig();
 		final Map<Class<?>, List<CascadeDef>> cascadeConfigByType = mapping.getCascadeConfig();
 		final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfigByType = mapping.getMethodCascadeConfig();
@@ -197,7 +197,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				}
 
 				// retrieve the method constraints
-				List<ConfiguredConstraint<?, ParameterConstraintLocation>> methodConstraintsOfType = methodConstraintsByType
+				List<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraintsOfType = methodConstraintsByType
 						.get( classInHierarchy );
 				if ( methodConstraintsOfType != null ) {
 					addProgrammaticConfiguredMethodConstraint(
@@ -359,20 +359,20 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private <T> void addProgrammaticConfiguredMethodConstraint(List<ConfiguredConstraint<?, ParameterConstraintLocation>> methodConstraints, Class<T> rootClass, Class<?> hierarchyClass, Set<AggregatedMethodMetaData.Builder> builders) {
+	private <T> void addProgrammaticConfiguredMethodConstraint(List<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints, Class<T> rootClass, Class<?> hierarchyClass, Set<AggregatedMethodMetaData.Builder> builders) {
 
-		Map<Method, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> constraintsByMethod =
+		Map<Method, List<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByMethod =
 				partition(
 						methodConstraints,
-						new Partitioner<Method, ConfiguredConstraint<?, ParameterConstraintLocation>>() {
+						new Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>>() {
 
-							public Method getPartition(ConfiguredConstraint<?, ParameterConstraintLocation> v) {
+							public Method getPartition(ConfiguredConstraint<?, MethodConstraintLocation> v) {
 								return v.getLocation().getMethod();
 							}
 						}
 				);
 
-		for ( Entry<Method, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> oneMethod : constraintsByMethod.entrySet() ) {
+		for ( Entry<Method, List<ConfiguredConstraint<?, MethodConstraintLocation>>> oneMethod : constraintsByMethod.entrySet() ) {
 
 			MethodMetaData methodMetaData = createMethodMetaData(
 					oneMethod.getKey(), oneMethod.getValue(), rootClass, hierarchyClass
@@ -391,8 +391,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private MethodMetaData createMethodMetaData(MethodCascadeDef cascadeDef) {
 		Method method = cascadeDef.getMethod();
 		List<ParameterMetaData> parameterMetaDatas = newArrayList();
-		List<ParameterMetaConstraint<? extends Annotation>> parameterConstraints = Collections.emptyList();
-		List<BeanMetaConstraint<? extends Annotation>> returnConstraints = Collections.emptyList();
+		List<MethodMetaConstraint<? extends Annotation>> parameterConstraints = Collections.emptyList();
+		List<MethodMetaConstraint<? extends Annotation>> returnConstraints = Collections.emptyList();
 
 		int i = 0;
 		for ( Class<?> parameterType : method.getParameterTypes() ) {
@@ -416,13 +416,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return new MethodMetaData( method, parameterMetaDatas, returnConstraints, isCascading );
 	}
 
-	private MethodMetaData createMethodMetaData(Method method, List<ConfiguredConstraint<?, ParameterConstraintLocation>> constraints, Class<?> rootClass, Class<?> hierarchyClass) {
+	private MethodMetaData createMethodMetaData(Method method, List<ConfiguredConstraint<?, MethodConstraintLocation>> constraints, Class<?> rootClass, Class<?> hierarchyClass) {
 
-		Map<Integer, List<ConfiguredConstraint<?, ParameterConstraintLocation>>> constraintsByIndex = partition(
-				constraints, new Partitioner<Integer, ConfiguredConstraint<?, ParameterConstraintLocation>>() {
+		Map<Integer, List<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByIndex = partition(
+				constraints, new Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>>() {
 
 					public Integer getPartition(
-							ConfiguredConstraint<?, ParameterConstraintLocation> v) {
+							ConfiguredConstraint<?, MethodConstraintLocation> v) {
 
 						return v.getLocation().getParameterIndex();
 					}
@@ -438,7 +438,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 							i,
 							method.getParameterTypes()[i],
 							DEFAULT_PARAMETER_NAME_PREFIX + i,
-							convertToParameterConstraints(
+							convertToMethodConstraints(
 									constraintsByIndex.get( i ), rootClass, hierarchyClass
 							),
 							false
@@ -446,13 +446,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 		}
 
+		List<MethodMetaConstraint<?>> returnValueConstraints = convertToMethodConstraints(
+				constraintsByIndex.get( null ), rootClass, hierarchyClass
+		);
+
 		return new MethodMetaData(
-				method, allParameterMetaData, Collections.<BeanMetaConstraint<? extends Annotation>>emptyList(), false
+				method, allParameterMetaData, returnValueConstraints, false
 		);
 	}
 
-	private List<ParameterMetaConstraint<?>> convertToParameterConstraints(
-			List<ConfiguredConstraint<?, ParameterConstraintLocation>> configuredConstraints,
+	private List<MethodMetaConstraint<?>> convertToMethodConstraints(
+			List<ConfiguredConstraint<?, MethodConstraintLocation>> configuredConstraints,
 			Class<?> rootClass,
 			Class<?> hierarchyClass) {
 
@@ -460,16 +464,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			configuredConstraints = Collections.emptyList();
 		}
 
-		List<ParameterMetaConstraint<?>> theValue = newArrayList();
+		List<MethodMetaConstraint<?>> theValue = newArrayList();
 
-		for ( ConfiguredConstraint<?, ParameterConstraintLocation> oneConfiguredConstraint : configuredConstraints ) {
-			theValue.add( convertToParameterConstraint( oneConfiguredConstraint, rootClass, hierarchyClass ) );
+		for ( ConfiguredConstraint<?, MethodConstraintLocation> oneConfiguredConstraint : configuredConstraints ) {
+			theValue.add( convertToMethodConstraint( oneConfiguredConstraint, rootClass, hierarchyClass ) );
 		}
 
 		return theValue;
 	}
 
-	private <A extends Annotation> ParameterMetaConstraint<A> convertToParameterConstraint(ConfiguredConstraint<A, ParameterConstraintLocation> configuredConstraint, Class<?> rootClass, Class<?> hierarchyClass) {
+	private <A extends Annotation> MethodMetaConstraint<A> convertToMethodConstraint(ConfiguredConstraint<A, MethodConstraintLocation> configuredConstraint, Class<?> rootClass, Class<?> hierarchyClass) {
 
 		A annotation = createAnnotationProxy( configuredConstraint );
 		ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
@@ -477,7 +481,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				annotation, constraintHelper, ElementType.PARAMETER, definedIn
 		);
 
-		return new ParameterMetaConstraint<A>(
+		return new MethodMetaConstraint<A>(
 				constraintDescriptor, configuredConstraint.getLocation()
 		);
 	}

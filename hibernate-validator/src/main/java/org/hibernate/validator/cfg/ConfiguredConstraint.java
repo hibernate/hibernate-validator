@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
-import org.hibernate.validator.metadata.location.ParameterConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -59,9 +59,15 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, ParameterConstraintLocation> forParameter(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
-		return new ConfiguredConstraint<A, ParameterConstraintLocation>(
-				constraint, new ParameterConstraintLocation( method, parameterIndex )
+	public static <A extends Annotation> ConfiguredConstraint<A, MethodConstraintLocation> forParameter(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
+		return new ConfiguredConstraint<A, MethodConstraintLocation>(
+				constraint, new MethodConstraintLocation( method, parameterIndex )
+		);
+	}
+
+	public static <A extends Annotation> ConfiguredConstraint<A, MethodConstraintLocation> forReturnValue(ConstraintDef<?, A> constraint, Method method) {
+		return new ConfiguredConstraint<A, MethodConstraintLocation>(
+				constraint, new MethodConstraintLocation( method )
 		);
 	}
 
