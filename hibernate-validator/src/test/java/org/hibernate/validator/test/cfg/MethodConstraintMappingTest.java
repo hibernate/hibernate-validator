@@ -255,7 +255,7 @@ public class MethodConstraintMappingTest {
 	}
 
 	@Test
-	public void testProgrammaticAndAnnotationConstraintsAddUp() {
+	public void testProgrammaticAndAnnotationParameterConstraintsAddUp() {
 
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( GreetingService.class )
@@ -275,6 +275,136 @@ public class MethodConstraintMappingTest {
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
 			assertCorrectPropertyPaths( e, "GreetingService#sayHello(arg0)", "GreetingService#sayHello(arg0)" );
+		}
+	}
+
+	@Test
+	public void testConstraintAtCascadedParameter() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", User.class )
+				.parameter( 0 )
+				.constraint( create( NotNullDef.class ) )
+				.valid();
+
+		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+
+		try {
+			service.greet( (User) null );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages( e, "may not be null" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)" );
+		}
+
+		try {
+			service.greet( new User( null ) );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages( e, "may not be null" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0).name" );
+		}
+	}
+
+	@Test
+	public void testReturnValueConstraint() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class )
+				.returnValue()
+				.constraint( create( SizeDef.class ).min( 1 ).max( 10 ) );
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.greet( "Hello" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages( e, "size must be between 1 and 10" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet()" );
+		}
+	}
+
+	@Test
+	public void testMultipleReturnValueConstraints() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class )
+				.returnValue()
+				.constraint( create( SizeDef.class ).min( 1 ).max( 10 ) )
+				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.greet( "Hello" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "size must be between 1 and 10", "size must be between 2 and 10"
+			);
+			assertCorrectPropertyPaths( e, "GreetingService#greet()", "GreetingService#greet()" );
+		}
+	}
+
+	@Test
+	public void testGenericReturnValueConstraint() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class )
+				.returnValue()
+				.constraint( createGeneric( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.greet( "" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "size must be between 1 and 10"
+			);
+			assertCorrectPropertyPaths( e, "GreetingService#greet()" );
+		}
+	}
+
+	@Test
+	public void testProgrammaticAndAnnotationReturnValueConstraintsAddUp() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class, String.class )
+				.returnValue()
+				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.greet( "Hello", "World" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "size must be between 1 and 10", "size must be between 2 and 10"
+			);
+			assertCorrectPropertyPaths( e, "GreetingService#greet()", "GreetingService#greet()" );
 		}
 	}
 
@@ -315,9 +445,10 @@ public class MethodConstraintMappingTest {
 
 		Message greet(User user);
 
-		Message greet(String string);
+		String greet(String string);
 
-		Message greet(String string1, String string2);
+		@Size(min = 1, max = 10)
+		String greet(String string1, String string2);
 
 		Message sayHello(@Size(min = 1, max = 10) String name);
 	}
@@ -328,12 +459,12 @@ public class MethodConstraintMappingTest {
 			return new Message( null );
 		}
 
-		public Message greet(String string) {
-			return null;
+		public String greet(String string) {
+			return "";
 		}
 
-		public Message greet(String string1, String string2) {
-			return null;
+		public String greet(String string1, String string2) {
+			return "";
 		}
 
 		public Message sayHello(String name) {
