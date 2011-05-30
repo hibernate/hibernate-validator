@@ -81,17 +81,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
 	 * (eg super class or interface) in which they are defined.
 	 */
-	private final Map<Class<?>, List<BeanMetaConstraint<? extends Annotation>>> metaConstraints = newHashMap();
+	private final Map<Class<?>, List<BeanMetaConstraint<?>>> metaConstraints = newHashMap();
 
 	/**
 	 * Set of all constraints for this bean type (defined on any implemented interfaces or super types)
 	 */
-	private final Set<BeanMetaConstraint<? extends Annotation>> allMetaConstraints;
+	private final Set<BeanMetaConstraint<?>> allMetaConstraints;
 
 	/**
 	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
 	 */
-	private final Set<BeanMetaConstraint<? extends Annotation>> directMetaConstraints;
+	private final Set<BeanMetaConstraint<?>> directMetaConstraints;
 
 	/**
 	 * The main element descriptor for {@link #beanClass}.
@@ -231,13 +231,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			Class<?> clazz = entry.getKey();
 
 			// will hold the method constraints (getter and non-getter) of the given class keyed by method
-			Map<Method, List<MethodMetaConstraint<? extends Annotation>>> constraintsByMethod = newHashMap();
+			Map<Method, List<MethodMetaConstraint<?>>> constraintsByMethod = newHashMap();
 
 			for ( BeanMetaConstraint<?> constraint : entry.getValue() ) {
 
 				if ( constraint.getDescriptor().getElementType() == ElementType.METHOD ) {
 
-					List<MethodMetaConstraint<? extends Annotation>> constraintsForMethod = constraintsByMethod.get(
+					List<MethodMetaConstraint<?>> constraintsForMethod = constraintsByMethod.get(
 							constraint.getLocation().getMember()
 					);
 					if ( constraintsForMethod == null ) {
@@ -306,15 +306,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableSet( cascadedMembers );
 	}
 
-	public Map<Class<?>, List<BeanMetaConstraint<? extends Annotation>>> getMetaConstraintsAsMap() {
+	public Map<Class<?>, List<BeanMetaConstraint<?>>> getMetaConstraintsAsMap() {
 		return Collections.unmodifiableMap( metaConstraints );
 	}
 
-	public Set<BeanMetaConstraint<? extends Annotation>> getMetaConstraints() {
+	public Set<BeanMetaConstraint<?>> getMetaConstraints() {
 		return allMetaConstraints;
 	}
 
-	public Set<BeanMetaConstraint<? extends Annotation>> getDirectMetaConstraints() {
+	public Set<BeanMetaConstraint<?>> getDirectMetaConstraints() {
 		return directMetaConstraints;
 	}
 
@@ -355,16 +355,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
 	}
 
-	private Set<BeanMetaConstraint<? extends Annotation>> buildAllConstraintSets() {
-		Set<BeanMetaConstraint<? extends Annotation>> constraints = newHashSet();
-		for ( List<BeanMetaConstraint<? extends Annotation>> list : metaConstraints.values() ) {
+	private Set<BeanMetaConstraint<?>> buildAllConstraintSets() {
+		Set<BeanMetaConstraint<?>> constraints = newHashSet();
+		for ( List<BeanMetaConstraint<?>> list : metaConstraints.values() ) {
 			constraints.addAll( list );
 		}
 		return Collections.unmodifiableSet( constraints );
 	}
 
-	private Set<BeanMetaConstraint<? extends Annotation>> buildDirectConstraintSets() {
-		Set<BeanMetaConstraint<? extends Annotation>> constraints = newHashSet();
+	private Set<BeanMetaConstraint<?>> buildDirectConstraintSets() {
+		Set<BeanMetaConstraint<?>> constraints = newHashSet();
 		// collect all constraints directly defined in this bean
 		if ( metaConstraints.get( beanClass ) != null ) {
 			constraints.addAll( metaConstraints.get( beanClass ) );
@@ -436,11 +436,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return validDefaultGroupSequence;
 	}
 
-	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<? extends Annotation> metaConstraint) {
+	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<?> metaConstraint) {
 		// first we add the meta constraint to our meta constraint map
-		List<BeanMetaConstraint<? extends Annotation>> constraintList;
+		List<BeanMetaConstraint<?>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
-			constraintList = new ArrayList<BeanMetaConstraint<? extends Annotation>>();
+			constraintList = new ArrayList<BeanMetaConstraint<?>>();
 			metaConstraints.put( clazz, constraintList );
 		}
 		else {
@@ -858,7 +858,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			boolean parameterIsCascading = false;
 			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-			List<MethodMetaConstraint<? extends Annotation>> constraintsOfOneParameter = newArrayList();
+			List<MethodMetaConstraint<?>> constraintsOfOneParameter = newArrayList();
 
 			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
 

@@ -73,14 +73,14 @@ public class XmlMappingParser {
 	private final Set<Class<?>> processedClasses = new HashSet<Class<?>>();
 	private final ConstraintHelper constraintHelper;
 	private final AnnotationIgnores annotationIgnores;
-	private final Map<Class<?>, List<MetaConstraint<? extends Annotation>>> constraintMap;
+	private final Map<Class<?>, List<MetaConstraint<?>>> constraintMap;
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	public XmlMappingParser(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
 		this.annotationIgnores = new AnnotationIgnores();
-		this.constraintMap = new HashMap<Class<?>, List<MetaConstraint<? extends Annotation>>>();
+		this.constraintMap = new HashMap<Class<?>, List<MetaConstraint<?>>>();
 		this.cascadedMembers = new HashMap<Class<?>, List<Member>>();
 		this.defaultSequences = new HashMap<Class<?>, List<Class<?>>>();
 	}
@@ -112,12 +112,12 @@ public class XmlMappingParser {
 		return annotationIgnores;
 	}
 
-	public final <T> List<MetaConstraint<? extends Annotation>> getConstraintsForClass(Class<T> beanClass) {
-		List<MetaConstraint<? extends Annotation>> list = new ArrayList<MetaConstraint<? extends Annotation>>();
+	public final <T> List<MetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
+		List<MetaConstraint<?>> list = new ArrayList<MetaConstraint<?>>();
 		if ( constraintMap.containsKey( beanClass ) ) {
-			for ( MetaConstraint<? extends Annotation> metaConstraint : constraintMap.get( beanClass ) ) {
+			for ( MetaConstraint<?> metaConstraint : constraintMap.get( beanClass ) ) {
 				@SuppressWarnings("unchecked") // safe cast since the list of meta constraints is always specific to the bean type
-						MetaConstraint<? extends Annotation> boundMetaConstraint = metaConstraint;
+						MetaConstraint<?> boundMetaConstraint = metaConstraint;
 				list.add( boundMetaConstraint );
 			}
 			return list;
@@ -303,7 +303,7 @@ public class XmlMappingParser {
 			constraintMap.get( beanClass ).add( metaConstraint );
 		}
 		else {
-			List<MetaConstraint<? extends Annotation>> constraintList = new ArrayList<MetaConstraint<? extends Annotation>>();
+			List<MetaConstraint<?>> constraintList = new ArrayList<MetaConstraint<?>>();
 			constraintList.add( metaConstraint );
 			constraintMap.put( beanClass, constraintList );
 		}

@@ -286,7 +286,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser,
 																	   Class<T> rootClass,
 																	   Class<?> hierarchyClass, Map<Class<?>, List<BeanMetaConstraint<?>>> constraints) {
-		for ( MetaConstraint<? extends Annotation> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
+		for ( MetaConstraint<?> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
 
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
@@ -297,7 +297,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 
 			//TODO GM: avoid this cast
-			BeanMetaConstraint<? extends Annotation> asBeanMetaConstraint = (BeanMetaConstraint<? extends Annotation>) constraint;
+			BeanMetaConstraint<?> asBeanMetaConstraint = (BeanMetaConstraint<?>) constraint;
 			BeanMetaConstraint<A> newMetaConstraint = new BeanMetaConstraint<A>(
 					descriptor,
 					asBeanMetaConstraint.getLocation().getBeanClass(),
@@ -328,7 +328,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private <M extends MetaConstraint<? extends Annotation>> void addConstraintToMap(Class<?> hierarchyClass, M constraint, Map<Class<?>, List<M>> constraints) {
+	private <M extends MetaConstraint<?>> void addConstraintToMap(Class<?> hierarchyClass, M constraint, Map<Class<?>, List<M>> constraints) {
 
 		List<M> constraintList = constraints.get( hierarchyClass );
 
@@ -385,8 +385,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private MethodMetaData createMethodMetaData(MethodCascadeDef cascadeDef) {
 		Method method = cascadeDef.getMethod();
 		List<ParameterMetaData> parameterMetaDatas = newArrayList();
-		List<MethodMetaConstraint<? extends Annotation>> parameterConstraints = Collections.emptyList();
-		List<MethodMetaConstraint<? extends Annotation>> returnConstraints = Collections.emptyList();
+		List<MethodMetaConstraint<?>> parameterConstraints = Collections.emptyList();
+		List<MethodMetaConstraint<?>> returnConstraints = Collections.emptyList();
 
 		int i = 0;
 		for ( Class<?> parameterType : method.getParameterTypes() ) {
