@@ -108,7 +108,7 @@ public class MethodConstraintMappingTest {
 	}
 
 	@Test(
-			expectedExceptions = ValidationException.class,
+			expectedExceptions = IllegalArgumentException.class,
 			expectedExceptionsMessageRegExp = "A valid parameter index has to be specified for method 'greet'"
 	)
 	public void testCascadingDefinitionOnInvalidMethodParameter() {

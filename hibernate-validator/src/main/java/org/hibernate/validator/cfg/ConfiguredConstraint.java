@@ -17,7 +17,6 @@
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -25,7 +24,6 @@ import java.util.Map;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
-import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -50,9 +48,7 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Class<?> beanType, String property, ElementType elementType) {
-
-		Member member = ReflectionHelper.getMember( beanType, property, elementType );
+	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Class<?> beanType, Member member) {
 
 		return new ConfiguredConstraint<A, BeanConstraintLocation>(
 				constraint, new BeanConstraintLocation( beanType, member )

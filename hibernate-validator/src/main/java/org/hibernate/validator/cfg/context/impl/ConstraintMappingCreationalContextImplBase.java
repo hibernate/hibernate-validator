@@ -17,6 +17,7 @@
 package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import javax.validation.ValidationException;
 
@@ -60,14 +61,18 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 			throw new IllegalArgumentException( "The property name must not be empty." );
 		}
 
-		if ( !ReflectionHelper.propertyExists( beanClass, property, elementType ) ) {
+		Member member = ReflectionHelper.getMember(
+				beanClass, property, elementType
+		);
+
+		if ( member == null ) {
 			throw new ValidationException(
 					"The class " + beanClass + " does not have a property '"
 							+ property + "' with access " + elementType
 			);
 		}
 
-		return new PropertyConstraintMappingCreationalContextImpl( beanClass, property, elementType, mapping );
+		return new PropertyConstraintMappingCreationalContextImpl( beanClass, member, mapping );
 	}
 
 	public MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes) {

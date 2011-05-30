@@ -16,13 +16,14 @@
  */
 package org.hibernate.validator.cfg.context.impl;
 
-import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
 
 import org.hibernate.validator.cfg.CascadeDef;
 import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -34,27 +35,27 @@ import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalCo
 public final class PropertyConstraintMappingCreationalContextImpl extends ConstraintMappingCreationalContextImplBase
 		implements PropertyConstraintMappingCreationalContext {
 
-	private final String property;
-	private final ElementType elementType;
+	private final Member member;
 
-	public PropertyConstraintMappingCreationalContextImpl(Class<?> beanClass, String property, ElementType elementType, ConstraintMapping mapping) {
+	public PropertyConstraintMappingCreationalContextImpl(Class<?> beanClass, Member member, ConstraintMapping mapping) {
 
 		super( beanClass, mapping );
 
-		this.property = property;
-		this.elementType = elementType;
+		this.member = member;
 	}
 
 	public PropertyConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
 
-		mapping.addConstraintConfig( ConfiguredConstraint.forProperty(
-				definition, beanClass, property, elementType
-		) );
+		mapping.addConstraintConfig(
+				ConfiguredConstraint.forProperty(
+						definition, beanClass, member
+				)
+		);
 		return this;
 	}
 
 	public PropertyConstraintMappingCreationalContext valid() {
-		mapping.addCascadeConfig( new CascadeDef( beanClass, property, elementType ) );
+		mapping.addCascadeConfig( new CascadeDef( new BeanConstraintLocation( beanClass, member ) ) );
 		return this;
 	}
 }

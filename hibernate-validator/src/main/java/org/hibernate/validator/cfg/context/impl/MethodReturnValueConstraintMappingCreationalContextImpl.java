@@ -24,8 +24,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
-
-import static java.lang.annotation.ElementType.METHOD;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
@@ -62,7 +61,7 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 	 * @return Returns itself for method chaining.
 	 */
 	public MethodReturnValueConstraintMappingCreationalContext valid() {
-		mapping.addMethodCascadeConfig( new MethodCascadeDef( beanClass, method, 0, METHOD ) );
+		mapping.addMethodCascadeConfig( new MethodCascadeDef( new MethodConstraintLocation( method ) ) );
 		return this;
 	}
 

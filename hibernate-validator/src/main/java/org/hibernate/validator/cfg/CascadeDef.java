@@ -16,64 +16,26 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.lang.annotation.ElementType;
-import javax.validation.ValidationException;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.util.ReflectionHelper.propertyExists;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 
 /**
  * @author Hardy Ferentschik
  */
 public class CascadeDef {
-	private final Class<?> beanType;
-	private final ElementType elementType;
-	private final String property;
 
-	public CascadeDef(Class<?> beanType, String property, ElementType elementType) {
-		if ( beanType == null ) {
-			throw new ValidationException( "Null is not a valid bean type" );
-		}
+	private final BeanConstraintLocation location;
 
-		if ( FIELD.equals( elementType ) || METHOD.equals( elementType ) ) {
-			if ( property == null || property.length() == 0 ) {
-				throw new ValidationException( "A valid property name has to be specified" );
-			}
-
-			if ( !propertyExists( beanType, property, elementType ) ) {
-				throw new ValidationException(
-						"The " + beanType + " does not have a property '"
-								+ property + "' with access " + elementType
-				);
-			}
-		}
-
-		this.beanType = beanType;
-		this.property = property;
-		this.elementType = elementType;
+	public CascadeDef(BeanConstraintLocation location) {
+		this.location = location;
 	}
 
-	public ElementType getElementType() {
-		return elementType;
-	}
-
-	public Class<?> getBeanType() {
-		return beanType;
-	}
-
-	public String getProperty() {
-		return property;
+	public BeanConstraintLocation getLocation() {
+		return location;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "CascadeDefinition" );
-		sb.append( "{beanType=" ).append( beanType );
-		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", property='" ).append( property ).append( '\'' );
-		sb.append( '}' );
-		return sb.toString();
+		return "CascadeDef [location=" + location + "]";
 	}
+
 }

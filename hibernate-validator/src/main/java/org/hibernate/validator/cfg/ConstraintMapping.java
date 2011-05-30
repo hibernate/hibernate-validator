@@ -137,7 +137,7 @@ public class ConstraintMapping {
 	}
 
 	public final void addCascadeConfig(CascadeDef cascade) {
-		Class<?> beanClass = cascade.getBeanType();
+		Class<?> beanClass = cascade.getLocation().getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( cascadeConfig.containsKey( beanClass ) ) {
 			cascadeConfig.get( beanClass ).add( cascade );
@@ -150,7 +150,7 @@ public class ConstraintMapping {
 	}
 
 	public final void addMethodCascadeConfig(MethodCascadeDef cascade) {
-		Class<?> beanClass = cascade.getBeanType();
+		Class<?> beanClass = cascade.getLocation().getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( methodCascadeConfig.containsKey( beanClass ) ) {
 			methodCascadeConfig.get( beanClass ).add( cascade );

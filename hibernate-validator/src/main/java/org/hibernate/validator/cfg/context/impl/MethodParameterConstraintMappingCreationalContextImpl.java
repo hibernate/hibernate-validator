@@ -24,8 +24,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
-
-import static java.lang.annotation.ElementType.PARAMETER;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -44,6 +43,10 @@ public final class MethodParameterConstraintMappingCreationalContextImpl
 	public MethodParameterConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, int parameterIndex, ConstraintMapping mapping) {
 
 		super( beanClass, mapping );
+
+		if ( parameterIndex < 0 || parameterIndex >= method.getParameterTypes().length ) {
+			throw new IllegalArgumentException( "A valid parameter index has to be specified for method '" + method.getName() + "'" );
+		}
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;
@@ -67,7 +70,9 @@ public final class MethodParameterConstraintMappingCreationalContextImpl
 	public MethodParameterConstraintMappingCreationalContext valid() {
 		mapping.addMethodCascadeConfig(
 				new MethodCascadeDef(
-						beanClass, method, parameterIndex, PARAMETER
+						new MethodConstraintLocation(
+								method, parameterIndex
+						)
 				)
 		);
 		return this;
