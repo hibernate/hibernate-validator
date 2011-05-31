@@ -71,6 +71,10 @@
             <source>../readme.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
+       <file>
+            <source>../changelog.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
         <file>
             <source>../license.txt</source>
             <outputDirectory>/</outputDirectory>
