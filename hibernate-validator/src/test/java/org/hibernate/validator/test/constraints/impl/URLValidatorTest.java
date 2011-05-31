@@ -27,14 +27,14 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.impl.URLValidator;
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.ValidatorUtil.getValidatorForProgrammaticMapping;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.test.testutil.ValidatorUtil.getValidatorForProgrammaticMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

@@ -32,14 +32,14 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.engine.MessageInterpolatorContext;
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.testng.Assert.assertTrue;
 
 /**

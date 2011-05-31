@@ -25,10 +25,10 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Hardy Ferentschik

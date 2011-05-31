@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.hibernate.validator.test.util;
+package org.hibernate.validator.test.testutil;
 
 import java.io.InputStream;
 import java.util.Properties;

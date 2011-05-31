@@ -30,11 +30,11 @@ import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositor
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
-import org.hibernate.validator.test.util.ValidationInvocationHandler;
+import org.hibernate.validator.test.testutil.ValidationInvocationHandler;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.testutil.ValidatorUtil.getMethodValidationProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 

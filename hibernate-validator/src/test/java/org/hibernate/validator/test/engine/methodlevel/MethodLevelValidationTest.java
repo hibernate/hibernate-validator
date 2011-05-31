@@ -39,12 +39,12 @@ import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.engine.methodlevel.service.RepositoryBase;
-import org.hibernate.validator.test.util.ValidationInvocationHandler;
+import org.hibernate.validator.test.testutil.ValidationInvocationHandler;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.test.testutil.ValidatorUtil.getMethodValidationProxy;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;

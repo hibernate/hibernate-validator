@@ -29,7 +29,7 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 
-import static org.hibernate.validator.test.util.ValidatorUtil.getTypeDescriptor;
+import static org.hibernate.validator.test.testutil.ValidatorUtil.getTypeDescriptor;
 import static org.hibernate.validator.util.CollectionHelper.asSet;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.Contracts.assertNotNull;

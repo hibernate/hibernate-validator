@@ -24,7 +24,7 @@ import org.hibernate.validator.engine.ConstraintValidatorContextImpl;
 import org.hibernate.validator.engine.MessageAndPath;
 import org.hibernate.validator.engine.PathImpl;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.pathsAreEqual;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.pathsAreEqual;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 

@@ -27,10 +27,11 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
+
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * HV-250
