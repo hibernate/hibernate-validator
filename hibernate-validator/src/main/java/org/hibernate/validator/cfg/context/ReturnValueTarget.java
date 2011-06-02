@@ -26,9 +26,9 @@ package org.hibernate.validator.cfg.context;
 public interface ReturnValueTarget {
 
 	/**
-	 * Defines constraints on the return value of the current method.
+	 * Selects the current method's return value as the target for the next operations.
 	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
+	 * @return A creational context representing the current method's return value.
 	 */
 	MethodReturnValueConstraintMappingCreationalContext returnValue();
 

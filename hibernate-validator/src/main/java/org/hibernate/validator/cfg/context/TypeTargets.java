@@ -28,16 +28,16 @@ import java.lang.annotation.ElementType;
 public interface TypeTargets {
 
 	/**
-	 * Creates a new {@code ConstraintsForType} in order to define constraints on a new bean type.
+	 * Selects the type to which the next operations shall apply.
 	 *
-	 * @param type The bean type.
+	 * @param type The type to select.
 	 *
-	 * @return Returns a new {@code ConstraintsForType} instance.
+	 * @return A creational context representing the selected type.
 	 */
 	TypeConstraintMappingCreationalContext type(Class<?> type);
 
 	/**
-	 * Changes the property for which added constraints apply.
+	 * Selects a property to which the next operations shall apply.
 	 * <p>
 	 * Until this method is called constraints apply on class level. After calling this method constraints
 	 * apply on the specified property with the given access type.
@@ -46,13 +46,13 @@ public interface TypeTargets {
 	 * @param property The property on which to apply the following constraints (Java Bean notation).
 	 * @param type The access type (field/property).
 	 *
-	 * @return Returns a new {@code ConstraintsForProperty} instance allowing method chaining.
+	 * @return A creational context representing the selected property.
 	 */
 	PropertyConstraintMappingCreationalContext property(String property,
 														ElementType type);
 
 	/**
-	 * Changes the method for which added constraints apply.
+	 * Selects a method to which the next operations shall apply.
 	 * <p>
 	 * Until this method is called constraints apply on class level. After calling this method constraints
 	 * apply to the specified method.
@@ -61,7 +61,7 @@ public interface TypeTargets {
 	 * @param name The method name.
 	 * @param parameterTypes The method parameter types.
 	 *
-	 * @return Returns a new {@code ConstraintsForMethod} instance allowing method chaining.
+	 * @return A creational context representing the selected method.
 	 */
 	MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes);
 

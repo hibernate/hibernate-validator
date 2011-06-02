@@ -17,9 +17,13 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * @author Gunnar Morling
+ * Constraint mapping creational context representing a method parameter. Allows
+ * to place constraints on the parameter, mark the parameter as cascadable and to
+ * navigate to other constraint targets.
  *
+ * @author Gunnar Morling
  */
-public interface MethodParameterConstraintMappingCreationalContext extends TypeTargets, ParameterTarget, ReturnValueTarget, Constrainable<MethodParameterConstraintMappingCreationalContext>, Cascadable<MethodParameterConstraintMappingCreationalContext> {
+public interface MethodParameterConstraintMappingCreationalContext
+		extends TypeTargets, ParameterTarget, ReturnValueTarget, Constrainable<MethodParameterConstraintMappingCreationalContext>, Cascadable<MethodParameterConstraintMappingCreationalContext> {
 
 }

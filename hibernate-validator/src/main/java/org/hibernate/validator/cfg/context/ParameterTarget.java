@@ -30,7 +30,7 @@ public interface ParameterTarget {
 	 *
 	 * @param index The parameter index.
 	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
+	 * @return A creational context representing the selected parameter.
 	 */
 	MethodParameterConstraintMappingCreationalContext parameter(int index);
 

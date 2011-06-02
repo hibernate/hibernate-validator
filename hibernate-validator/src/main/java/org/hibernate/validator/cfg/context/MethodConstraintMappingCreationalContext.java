@@ -17,8 +17,10 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * @author Gunnar Morling
+ * Constraint mapping creational context representing a method. Allows to
+ * navigate to the method's parameters and return value.
  *
+ * @author Gunnar Morling
  */
 public interface MethodConstraintMappingCreationalContext extends ParameterTarget, ReturnValueTarget {
 

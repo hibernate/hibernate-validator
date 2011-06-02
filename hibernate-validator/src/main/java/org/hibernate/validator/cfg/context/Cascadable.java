@@ -28,7 +28,7 @@ public interface Cascadable<C extends Cascadable<C>> {
 	/**
 	 * Marks the current element (property, parameter etc.) as cascadable.
 	 *
-	 * @return Returns itself for method chaining.
+	 * @return The current creational context following the method chaining pattern.
 	 */
 	C valid();
 

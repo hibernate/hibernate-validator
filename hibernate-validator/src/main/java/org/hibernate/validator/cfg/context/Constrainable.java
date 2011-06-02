@@ -18,7 +18,6 @@ package org.hibernate.validator.cfg.context;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 
-
 /**
  * Facet of a constraint mapping creational context which allows to place
  * constraints on the underlying element.

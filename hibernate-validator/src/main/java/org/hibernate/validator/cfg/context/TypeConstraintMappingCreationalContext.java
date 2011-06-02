@@ -19,27 +19,32 @@ package org.hibernate.validator.cfg.context;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**
- * @author Gunnar Morling
+ * Constraint mapping creational context representing a type. Allows place
+ * class-level constraints on that type, define its default group sequence (and provider)
+ * and to navigate to other constraint targets.
  *
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Gunnar Morling
  */
-public interface TypeConstraintMappingCreationalContext extends Constrainable<TypeConstraintMappingCreationalContext>, TypeTargets {
+public interface TypeConstraintMappingCreationalContext
+		extends Constrainable<TypeConstraintMappingCreationalContext>, TypeTargets {
 
 	/**
-	 * Defines the default groups sequence for the bean class of this instance.
+	 * Defines the default group sequence for current type.
 	 *
 	 * @param defaultGroupSequence the default group sequence.
 	 *
-	 * @return Returns itself for method chaining.
+	 * @return The current creational context following the method chaining pattern.
 	 */
 	TypeConstraintMappingCreationalContext defaultGroupSequence(
 			Class<?>... defaultGroupSequence);
 
 	/**
-	 * Defines the default group sequence provider for the bean class of this instance.
+	 * Defines the default group sequence provider for the current type.
 	 *
 	 * @param defaultGroupSequenceProviderClass The default group sequence provider class.
 	 *
-	 * @return Returns itself for method chaining.
+	 * @return The current creational context following the method chaining pattern.
 	 */
 	<T extends DefaultGroupSequenceProvider<?>> TypeConstraintMappingCreationalContext defaultGroupSequenceProvider(
 			Class<T> defaultGroupSequenceProviderClass);

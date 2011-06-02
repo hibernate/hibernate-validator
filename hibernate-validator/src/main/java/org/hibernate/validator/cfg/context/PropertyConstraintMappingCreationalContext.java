@@ -17,9 +17,13 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * @author Gunnar Morling
+ * Constraint mapping creational context representing a property of a bean. Allows
+ * to place constraints on the property, mark the property as cascadable and to
+ * navigate to other constraint targets.
  *
+ * @author Gunnar Morling
  */
-public interface PropertyConstraintMappingCreationalContext extends Constrainable<PropertyConstraintMappingCreationalContext>, TypeTargets, Cascadable<PropertyConstraintMappingCreationalContext> {
+public interface PropertyConstraintMappingCreationalContext
+		extends Constrainable<PropertyConstraintMappingCreationalContext>, TypeTargets, Cascadable<PropertyConstraintMappingCreationalContext> {
 
 }
