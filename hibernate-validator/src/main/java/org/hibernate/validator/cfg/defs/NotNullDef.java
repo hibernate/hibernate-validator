@@ -16,11 +16,9 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik

@@ -32,6 +32,7 @@ import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
 import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.test.util.ValidatorUtil.getValidatorForProgrammaticMapping;
@@ -140,8 +141,9 @@ public class URLValidatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( URLContainerNoAnnotations.class )
 				.property( "url", METHOD )
-				.constraint( new URLDef()
-					.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
+				.constraint(
+						create( URLDef.class )
+								.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
 				);
 		validator = getValidatorForProgrammaticMapping( mapping );
 
@@ -161,9 +163,10 @@ public class URLValidatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( URLContainerNoAnnotations.class )
 				.property( "url", METHOD )
-				.constraint( new URLDef()
-					.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
-					.flags( Flag.CASE_INSENSITIVE )
+				.constraint(
+						create( URLDef.class )
+								.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
+								.flags( Flag.CASE_INSENSITIVE )
 				);
 		validator = getValidatorForProgrammaticMapping( mapping );
 
