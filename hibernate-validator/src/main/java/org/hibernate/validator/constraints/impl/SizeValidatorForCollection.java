@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection> {
+public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection<?>> {
 	private int min;
 	private int max;
 
@@ -46,7 +46,7 @@ public class SizeValidatorForCollection implements ConstraintValidator<Size, Col
 	 *         <code>collection</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean isValid(Collection collection, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Collection<?> collection, ConstraintValidatorContext constraintValidatorContext) {
 		if ( collection == null ) {
 			return true;
 		}

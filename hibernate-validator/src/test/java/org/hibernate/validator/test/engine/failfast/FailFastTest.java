@@ -207,7 +207,7 @@ public class FailFastTest {
 				HibernateValidatorConfiguration.FAIL_FAST, "false"
 		).failFast( true ).buildValidatorFactory();
 
-		final Validator validator = factory.getValidator();
+		factory.getValidator();
 	}
 
 	public void testFailSafePerf() {

@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
  *
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
+public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>> {
 	private int min;
 	private int max;
 
@@ -46,7 +46,7 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map> {
 	 *         is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean isValid(Map map, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Map<?, ?> map, ConstraintValidatorContext constraintValidatorContext) {
 		if ( map == null ) {
 			return true;
 		}

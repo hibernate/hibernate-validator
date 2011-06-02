@@ -46,13 +46,12 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
-
-import static org.hibernate.validator.constraints.CompositionType.AND;
-
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+
+import static org.hibernate.validator.constraints.CompositionType.AND;
 
 /**
  * Describe a single constraint (including it's composing constraints).
@@ -285,7 +284,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			return false;
 		}
 
-		ConstraintDescriptorImpl that = (ConstraintDescriptorImpl) o;
+		ConstraintDescriptorImpl<?> that = (ConstraintDescriptorImpl<?>) o;
 
 		if ( annotation != null ? !annotation.equals( that.annotation ) : that.annotation != null ) {
 			return false;

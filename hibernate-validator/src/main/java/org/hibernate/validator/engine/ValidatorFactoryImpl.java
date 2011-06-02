@@ -280,7 +280,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser,
 																	   Class<T> rootClass,
 																	   Class<?> hierarchyClass, Map<Class<?>, List<BeanMetaConstraint<?>>> constraints) {
-		for ( MetaConstraint<?> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
+		for ( BeanMetaConstraint<?> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
 
 			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
 			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
@@ -290,12 +290,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 					definedIn
 			);
 
-			//TODO GM: avoid this cast
-			BeanMetaConstraint<?> asBeanMetaConstraint = (BeanMetaConstraint<?>) constraint;
 			BeanMetaConstraint<A> newMetaConstraint = new BeanMetaConstraint<A>(
 					descriptor,
-					asBeanMetaConstraint.getLocation().getBeanClass(),
-					asBeanMetaConstraint.getLocation().getMember()
+					constraint.getLocation().getBeanClass(),
+					constraint.getLocation().getMember()
 			);
 
 			addConstraintToMap( hierarchyClass, newMetaConstraint, constraints );
