@@ -96,7 +96,7 @@ public final class ValidatorUtil {
 	}
 
 	public static MethodValidator getMethodValidatorForMapping(ConstraintMapping... mappings) {
-		return getValidatorForMapping( mappings ).unwrap( MethodValidator.class );
+		return getValidatorForProgrammaticMapping( mappings ).unwrap( MethodValidator.class );
 	}
 
 	/**

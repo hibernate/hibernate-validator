@@ -127,7 +127,7 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( create( NotNullDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( new Marathon() );
 		assertNumberOfViolations( violations, 1 );
@@ -144,7 +144,7 @@ public class ConstraintMappingTest {
 								.message( "too short" )
 								.min( 3 )
 				);
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -167,7 +167,7 @@ public class ConstraintMappingTest {
 								.message( "name too short" )
 								.min( 3 )
 				);
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -186,7 +186,7 @@ public class ConstraintMappingTest {
 				.type( Tournament.class )
 				.property( "tournamentDate", METHOD )
 				.constraint( create( FutureDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -208,7 +208,7 @@ public class ConstraintMappingTest {
 				.type( Runner.class )
 				.property( "paidEntryFee", FIELD )
 				.constraint( create( AssertTrueDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -242,7 +242,7 @@ public class ConstraintMappingTest {
 				.constraint( create( NotNullDef.class ).groups( Foo.class ) )
 				.property( "runners", METHOD )
 				.constraint( create( NotEmptyDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 
@@ -265,7 +265,7 @@ public class ConstraintMappingTest {
 				.constraint( create( NotNullDef.class ).groups( Foo.class ) )
 				.property( "runners", METHOD )
 				.constraint( create( NotEmptyDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 
@@ -304,7 +304,7 @@ public class ConstraintMappingTest {
 				.constraint( create( NotNullDef.class ).groups( Foo.class ) )
 				.property( "runners", METHOD )
 				.constraint( create( NotEmptyDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		validator.validate( new Marathon() );
 	}
 
@@ -318,7 +318,7 @@ public class ConstraintMappingTest {
 				.defaultGroupSequence( Foo.class, B.class )
 				.property( "b", FIELD )
 				.constraint( create( NotNullDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		validator.validate( new B() );
 	}
 
@@ -332,7 +332,7 @@ public class ConstraintMappingTest {
 				.defaultGroupSequenceProvider( ADefaultGroupSequenceProvider.class )
 				.property( "a", FIELD )
 				.constraint( create( NotNullDef.class ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		validator.validate( new A() );
 	}
 
@@ -343,7 +343,7 @@ public class ConstraintMappingTest {
 				.property( "name", METHOD )
 				.constraint( create( SizeDef.class ).min( 5 ) )
 				.constraint( create( SizeDef.class ).min( 10 ) );
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Foo" );
@@ -383,7 +383,7 @@ public class ConstraintMappingTest {
 								.param( "minRunner", 100 )
 								.message( "Needs more runners" )
 				);
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Stockholm Marathon" );
@@ -422,7 +422,7 @@ public class ConstraintMappingTest {
 								.min( 12 )
 								.max( 99 )
 				);
-		Validator validator = ValidatorUtil.getValidatorForMapping( mapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
 		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );

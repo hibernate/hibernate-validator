@@ -143,7 +143,7 @@ public class URLValidatorTest {
 				.constraint( new URLDef()
 					.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
 				);
-		validator = getValidatorForMapping( mapping );
+		validator = getValidatorForProgrammaticMapping( mapping );
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, true );
@@ -165,7 +165,7 @@ public class URLValidatorTest {
 					.regexp( "^http://\\S+[\\.htm|\\.html]{1}$" )
 					.flags( Flag.CASE_INSENSITIVE )
 				);
-		validator = getValidatorForMapping( mapping );
+		validator = getValidatorForProgrammaticMapping( mapping );
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, false );

@@ -17,7 +17,6 @@
 package org.hibernate.validator.test.cfg;
 
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -33,10 +32,10 @@ import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
 import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.cfg.ConstraintDef.createGeneric;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.TestUtil.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.TestUtil.getMethodValidationProxy;
-import static org.hibernate.validator.test.util.TestUtil.getMethodValidatorForMapping;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
+import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidatorForMapping;
 import static org.testng.Assert.fail;
 
 /**

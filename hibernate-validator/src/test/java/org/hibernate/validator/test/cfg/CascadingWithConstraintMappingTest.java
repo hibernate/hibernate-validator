@@ -49,7 +49,7 @@ public class CascadingWithConstraintMappingTest {
 				.type( A.class )
 				.property( "c", FIELD )
 				.valid();
-		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -70,7 +70,7 @@ public class CascadingWithConstraintMappingTest {
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();
-		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
 
 		B b = new B();
 		b.c = new C();
@@ -91,7 +91,7 @@ public class CascadingWithConstraintMappingTest {
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();
-		Validator validator = ValidatorUtil.getValidatorForMapping( newMapping );
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
 		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
 		B b = new B();
