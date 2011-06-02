@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,8 +43,8 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 public class ConstraintMapping {
 	private final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintConfig;
 	private final Map<Class<?>, List<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintConfig;
-	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
-	private final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfig;
+	private final Map<Class<?>, List<BeanConstraintLocation>> cascadeConfig;
+	private final Map<Class<?>, List<MethodConstraintLocation>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
@@ -90,11 +89,11 @@ public class ConstraintMapping {
 		return methodConstraintConfig;
 	}
 
-	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
+	public final Map<Class<?>, List<BeanConstraintLocation>> getCascadeConfig() {
 		return cascadeConfig;
 	}
 
-	public final Map<Class<?>, List<MethodCascadeDef>> getMethodCascadeConfig() {
+	public final Map<Class<?>, List<MethodConstraintLocation>> getMethodCascadeConfig() {
 		return methodCascadeConfig;
 	}
 
@@ -136,27 +135,27 @@ public class ConstraintMapping {
 		return sb.toString();
 	}
 
-	public final void addCascadeConfig(CascadeDef cascade) {
-		Class<?> beanClass = cascade.getLocation().getBeanClass();
+	public final void addCascadeConfig(BeanConstraintLocation cascade) {
+		Class<?> beanClass = cascade.getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( cascadeConfig.containsKey( beanClass ) ) {
 			cascadeConfig.get( beanClass ).add( cascade );
 		}
 		else {
-			List<CascadeDef> cascadeList = new ArrayList<CascadeDef>();
+			List<BeanConstraintLocation> cascadeList = newArrayList();
 			cascadeList.add( cascade );
 			cascadeConfig.put( beanClass, cascadeList );
 		}
 	}
 
-	public final void addMethodCascadeConfig(MethodCascadeDef cascade) {
-		Class<?> beanClass = cascade.getLocation().getBeanClass();
+	public final void addMethodCascadeConfig(MethodConstraintLocation cascade) {
+		Class<?> beanClass = cascade.getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( methodCascadeConfig.containsKey( beanClass ) ) {
 			methodCascadeConfig.get( beanClass ).add( cascade );
 		}
 		else {
-			List<MethodCascadeDef> cascadeList = new ArrayList<MethodCascadeDef>();
+			List<MethodConstraintLocation> cascadeList = newArrayList();
 			cascadeList.add( cascade );
 			methodCascadeConfig.put( beanClass, cascadeList );
 		}

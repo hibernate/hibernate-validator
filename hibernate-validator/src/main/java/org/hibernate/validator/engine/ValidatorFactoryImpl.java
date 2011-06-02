@@ -16,12 +16,6 @@
 */
 package org.hibernate.validator.engine;
 
-import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.util.CollectionHelper.partition;
-
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
@@ -32,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -43,10 +36,8 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.cfg.CascadeDef;
 import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
@@ -66,6 +57,12 @@ import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.xml.XmlMappingParser;
+
+import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.util.CollectionHelper.partition;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
@@ -163,8 +160,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByType = mapping.getConstraintConfig();
 		final Map<Class<?>, List<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintsByType = mapping
 				.getMethodConstraintConfig();
-		final Map<Class<?>, List<CascadeDef>> cascadeConfigByType = mapping.getCascadeConfig();
-		final Map<Class<?>, List<MethodCascadeDef>> methodCascadeConfigByType = mapping.getMethodCascadeConfig();
+		final Map<Class<?>, List<BeanConstraintLocation>> cascadeConfigByType = mapping.getCascadeConfig();
+		final Map<Class<?>, List<MethodConstraintLocation>> methodCascadeConfigByType = mapping.getMethodCascadeConfig();
 
 		for ( Class<?> clazz : mapping.getConfiguredClasses() ) {
 			@SuppressWarnings("unchecked")
@@ -203,13 +200,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				}
 
 				// retrieve the cascading members of the current class if applicable
-				List<CascadeDef> cascadesOfType = cascadeConfigByType.get( classInHierarchy );
+				List<BeanConstraintLocation> cascadesOfType = cascadeConfigByType.get( classInHierarchy );
 				if ( cascadesOfType != null ) {
 					addProgrammaticConfiguredCascade( cascadesOfType, cascadedMembers );
 				}
 
 				// retrieve the cascading method return value and method parameter
-				List<MethodCascadeDef> methodCascadesOfType = methodCascadeConfigByType.get( classInHierarchy );
+				List<MethodConstraintLocation> methodCascadesOfType = methodCascadeConfigByType.get( classInHierarchy );
 				if ( methodCascadesOfType != null ) {
 					addProgrammaticConfiguredMethodCascade( methodCascadesOfType, builders );
 				}
@@ -345,11 +342,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private void addProgrammaticConfiguredCascade(List<CascadeDef> cascades,
+	private void addProgrammaticConfiguredCascade(List<BeanConstraintLocation> cascades,
 												  Set<Member> cascadedMembers) {
 
-		for ( CascadeDef cascade : cascades ) {
-			cascadedMembers.add( cascade.getLocation().getMember() );
+		for ( BeanConstraintLocation cascade : cascades ) {
+			cascadedMembers.add( cascade.getMember() );
 		}
 	}
 
@@ -369,15 +366,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private void addProgrammaticConfiguredMethodCascade(List<MethodCascadeDef> methodCascades, Set<AggregatedMethodMetaData.Builder> builders) {
-		for ( MethodCascadeDef cascadeDef : methodCascades ) {
+	private void addProgrammaticConfiguredMethodCascade(List<MethodConstraintLocation> methodCascades, Set<AggregatedMethodMetaData.Builder> builders) {
+		for ( MethodConstraintLocation cascadeDef : methodCascades ) {
 			MethodMetaData methodMetaData = createMethodMetaData( cascadeDef );
 			addMetaDataToBuilder( methodMetaData, builders );
 		}
 	}
 
-	private MethodMetaData createMethodMetaData(MethodCascadeDef cascadeDef) {
-		Method method = cascadeDef.getLocation().getMethod();
+	private MethodMetaData createMethodMetaData(MethodConstraintLocation cascadeDef) {
+		Method method = cascadeDef.getMethod();
 		List<ParameterMetaData> parameterMetaDatas = newArrayList();
 		List<MethodMetaConstraint<?>> parameterConstraints = Collections.emptyList();
 		List<MethodMetaConstraint<?>> returnConstraints = Collections.emptyList();
@@ -385,7 +382,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		int i = 0;
 		for ( Class<?> parameterType : method.getParameterTypes() ) {
 			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-			boolean isCascading = Integer.valueOf(i).equals(cascadeDef.getLocation().getParameterIndex());
+			boolean isCascading = Integer.valueOf( i ).equals( cascadeDef.getParameterIndex() );
 
 			parameterMetaDatas.add(
 					new ParameterMetaData(
@@ -400,7 +397,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			i++;
 		}
 
-		boolean isCascading = cascadeDef.getLocation().getParameterIndex() == null;
+		boolean isCascading = cascadeDef.getParameterIndex() == null;
 		return new MethodMetaData( method, parameterMetaDatas, returnConstraints, isCascading );
 	}
 

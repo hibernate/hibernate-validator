@@ -18,7 +18,6 @@ package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.reflect.Member;
 
-import org.hibernate.validator.cfg.CascadeDef;
 import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -55,7 +54,7 @@ public final class PropertyConstraintMappingCreationalContextImpl extends Constr
 	}
 
 	public PropertyConstraintMappingCreationalContext valid() {
-		mapping.addCascadeConfig( new CascadeDef( new BeanConstraintLocation( beanClass, member ) ) );
+		mapping.addCascadeConfig( new BeanConstraintLocation( beanClass, member ) );
 		return this;
 	}
 }

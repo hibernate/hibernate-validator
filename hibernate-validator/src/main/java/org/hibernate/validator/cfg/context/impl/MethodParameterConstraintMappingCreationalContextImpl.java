@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.MethodCascadeDef;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
@@ -69,10 +68,8 @@ public final class MethodParameterConstraintMappingCreationalContextImpl
 	 */
 	public MethodParameterConstraintMappingCreationalContext valid() {
 		mapping.addMethodCascadeConfig(
-				new MethodCascadeDef(
-						new MethodConstraintLocation(
-								method, parameterIndex
-						)
+				new MethodConstraintLocation(
+						method, parameterIndex
 				)
 		);
 		return this;
