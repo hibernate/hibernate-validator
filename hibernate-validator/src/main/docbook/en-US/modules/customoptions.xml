@@ -97,7 +97,8 @@
             sequence. This feature allow you to dynamically compose the default group
             sequence in function of the validated object state. This package contains
             all classes needed to use this feature (<classname>GroupSequenceProvider</classname>
-            annotation and <classname>DefaultGroupSequenceProvider</classname> contract).</entry>
+            annotation and <classname>DefaultGroupSequenceProvider</classname> contract).
+            For more details see <xref linkend="section-default-group-class" />.</entry>
           </row>
 
           <row>
