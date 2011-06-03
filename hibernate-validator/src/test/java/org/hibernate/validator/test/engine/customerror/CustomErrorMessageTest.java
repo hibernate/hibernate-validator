@@ -23,8 +23,8 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.testutil.ValidatorUtil.getValidator;
 
 /**
  * @author Hardy Ferentschik

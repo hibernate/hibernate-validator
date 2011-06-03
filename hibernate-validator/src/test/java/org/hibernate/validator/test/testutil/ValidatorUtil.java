@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.util;
+package org.hibernate.validator.test.testutil;
 
 import java.lang.reflect.Proxy;
 import java.util.Locale;

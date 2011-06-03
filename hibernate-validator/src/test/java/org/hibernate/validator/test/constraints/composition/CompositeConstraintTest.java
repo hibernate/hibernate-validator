@@ -25,11 +25,11 @@ import javax.validation.constraints.Size;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * @author Gerhard Petracek

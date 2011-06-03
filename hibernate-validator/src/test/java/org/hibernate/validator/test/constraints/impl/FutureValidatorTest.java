@@ -23,7 +23,7 @@ import javax.validation.Validator;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik

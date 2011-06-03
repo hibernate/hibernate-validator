@@ -27,10 +27,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.test.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * Tests for correct message interpolation for messages from the default bundle.

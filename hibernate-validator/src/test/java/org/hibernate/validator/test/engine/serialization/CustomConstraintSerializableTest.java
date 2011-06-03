@@ -25,7 +25,7 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 
 
 /**

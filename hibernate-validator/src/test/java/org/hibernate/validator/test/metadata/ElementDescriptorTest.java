@@ -26,9 +26,9 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.test.testutil.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
+import static org.hibernate.validator.test.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
