@@ -27,15 +27,13 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.method.MethodConstraintViolationException;
-import org.hibernate.validator.method.MethodValidator;
-import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
 import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.cfg.ConstraintDef.createGeneric;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
 import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidatorForMapping;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.fail;
 
 /**
@@ -405,17 +403,6 @@ public class MethodConstraintMappingTest {
 			);
 			assertCorrectPropertyPaths( e, "GreetingService#greet()", "GreetingService#greet()" );
 		}
-	}
-
-	private <T> T getValidatingProxy(Object implementor, ConstraintMapping mapping) {
-
-		MethodValidator methodValidator = getMethodValidatorForMapping( mapping );
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( wrappedObject, methodValidator );
-
-		@SuppressWarnings("unchecked")
-		T service = (T) getMethodValidationProxy( handler );
-
-		return service;
 	}
 
 	public class User {

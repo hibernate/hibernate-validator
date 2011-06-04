@@ -28,23 +28,20 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodConstraintViolation.Kind;
 import org.hibernate.validator.method.MethodConstraintViolationException;
-import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.engine.methodlevel.model.Address;
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.engine.methodlevel.service.RepositoryBase;
-import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidatingProxy;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -66,18 +63,9 @@ public class MethodLevelValidationTest {
 	}
 
 	private void setUpValidator(Integer parameterIndex, Class<?>... groups) {
-
-		MethodValidator validator = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.buildValidatorFactory()
-				.getValidator()
-				.unwrap( MethodValidator.class );
-
-		ValidationInvocationHandler handler = new ValidationInvocationHandler(
-				new CustomerRepositoryImpl(), validator, parameterIndex, groups
+		repositoryBase = customerRepository = getValidatingProxy(
+				new CustomerRepositoryImpl(), parameterIndex, groups
 		);
-
-		repositoryBase = customerRepository = (CustomerRepository) getMethodValidationProxy( handler );
 	}
 
 	private void setUpValidator(Class<?>... groups) {
