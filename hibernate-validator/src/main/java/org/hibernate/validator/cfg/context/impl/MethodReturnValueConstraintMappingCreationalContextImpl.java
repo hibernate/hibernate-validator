@@ -18,9 +18,7 @@ package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
@@ -38,7 +36,7 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 
 	private final Method method;
 
-	public MethodReturnValueConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMapping mapping) {
+	public MethodReturnValueConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
 
 		super( beanClass, mapping );
 

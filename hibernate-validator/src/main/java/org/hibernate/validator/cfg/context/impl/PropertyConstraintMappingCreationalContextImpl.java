@@ -18,9 +18,7 @@ package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.reflect.Member;
 
-import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 
@@ -36,7 +34,7 @@ public final class PropertyConstraintMappingCreationalContextImpl extends Constr
 
 	private final Member member;
 
-	public PropertyConstraintMappingCreationalContextImpl(Class<?> beanClass, Member member, ConstraintMapping mapping) {
+	public PropertyConstraintMappingCreationalContextImpl(Class<?> beanClass, Member member, ConstraintMappingContext mapping) {
 
 		super( beanClass, mapping );
 

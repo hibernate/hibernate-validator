@@ -14,13 +14,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.cfg;
+package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
@@ -33,12 +34,12 @@ import org.hibernate.validator.metadata.location.MethodConstraintLocation;
  */
 public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLocation> {
 
-	private final ConstraintDef<?, A> constraint;
+	private final ConstraintDefAccessor<A> constraint;
 	private final L location;
 
 	private ConfiguredConstraint(ConstraintDef<?, A> constraint, L location) {
 
-		this.constraint = constraint;
+		this.constraint = new ConstraintDefAccessor<A>( constraint );
 		this.location = location;
 	}
 
@@ -76,11 +77,30 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 	}
 
 	public Class<A> getConstraintType() {
-		return constraint.constraintType;
+		return constraint.getConstraintType();
 	}
 
 	public Map<String, Object> getParameters() {
-		return constraint.parameters;
+		return constraint.getParameters();
+	}
+
+	/**
+	 * Provides access to the members of a {@link ConstraintDef}.
+	 */
+	private static class ConstraintDefAccessor<A extends Annotation>
+			extends ConstraintDef<ConstraintDefAccessor<A>, A> {
+
+		private ConstraintDefAccessor(ConstraintDef<?, A> original) {
+			super( original );
+		}
+
+		private Class<A> getConstraintType() {
+			return constraintType;
+		}
+
+		private Map<String, Object> getParameters() {
+			return parameters;
+		}
 	}
 
 }

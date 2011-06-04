@@ -36,8 +36,9 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
+import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
@@ -156,14 +157,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * @param mapping The constraint configuration created via the programmatic API.
 	 */
 	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
-
-		final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByType = mapping.getConstraintConfig();
-		final Map<Class<?>, List<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintsByType = mapping
+		
+		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping(mapping);
+		
+		final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByType = context.getConstraintConfig();
+		final Map<Class<?>, List<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintsByType = context
 				.getMethodConstraintConfig();
-		final Map<Class<?>, List<BeanConstraintLocation>> cascadeConfigByType = mapping.getCascadeConfig();
-		final Map<Class<?>, List<MethodConstraintLocation>> methodCascadeConfigByType = mapping.getMethodCascadeConfig();
+		final Map<Class<?>, List<BeanConstraintLocation>> cascadeConfigByType = context.getCascadeConfig();
+		final Map<Class<?>, List<MethodConstraintLocation>> methodCascadeConfigByType = context.getMethodCascadeConfig();
 
-		for ( Class<?> clazz : mapping.getConfiguredClasses() ) {
+		for ( Class<?> clazz : context.getConfiguredClasses() ) {
 			@SuppressWarnings("unchecked")
 			Class<T> beanClass = (Class<T>) clazz;
 
@@ -222,8 +225,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
 					beanClass,
 					constraintHelper,
-					mapping.getDefaultSequence( beanClass ),
-					mapping.getDefaultGroupSequenceProvider( beanClass ),
+					context.getDefaultSequence( beanClass ),
+					context.getDefaultGroupSequenceProvider( beanClass ),
 					constraints,
 					methodMetaDataMap,
 					cascadedMembers,

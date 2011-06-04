@@ -41,25 +41,29 @@ import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
 
 	// Note on visibility of members: These members are intentionally made
-	// package-private instead of private. They are only referenced in this
-	// package and there shouldn't be public getters as they would pollute 
-	// the fluent definition API
+	// protected and published by a sub-class for internal use. There aren't
+	// public getters as they would pollute the fluent definition API.
 
 	/**
 	 * The constraint annotation type of this definition.
 	 */
-	final Class<A> constraintType;
+	protected final Class<A> constraintType;
 
 	/**
 	 * A map with the annotation parameters of this definition. Keys are
 	 * property names of this definition's annotation type, values are
 	 * annotation parameter values of the appropriate types.
 	 */
-	final Map<String, Object> parameters;
+	protected final Map<String, Object> parameters;
 
 	protected ConstraintDef(Class<A> constraintType) {
 		this.constraintType = constraintType;
 		this.parameters = newHashMap();
+	}
+
+	protected ConstraintDef(ConstraintDef<?, A> original) {
+		this.constraintType = original.constraintType;
+		this.parameters = original.parameters;
 	}
 
 	/**

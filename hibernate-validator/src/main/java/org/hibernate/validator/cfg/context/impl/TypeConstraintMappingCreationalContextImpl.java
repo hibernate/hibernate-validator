@@ -18,9 +18,7 @@ package org.hibernate.validator.cfg.context.impl;
 
 import java.util.Arrays;
 
-import org.hibernate.validator.cfg.ConfiguredConstraint;
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
@@ -34,7 +32,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 public final class TypeConstraintMappingCreationalContextImpl extends ConstraintMappingCreationalContextImplBase
 		implements TypeConstraintMappingCreationalContext {
 
-	public TypeConstraintMappingCreationalContextImpl(Class<?> beanClass, ConstraintMapping mapping) {
+	public TypeConstraintMappingCreationalContextImpl(Class<?> beanClass, ConstraintMappingContext mapping) {
 		super( beanClass, mapping );
 	}
 

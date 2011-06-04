@@ -21,7 +21,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
@@ -37,9 +36,9 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 
 	protected final Class<?> beanClass;
 
-	protected final ConstraintMapping mapping;
+	protected final ConstraintMappingContext mapping;
 
-	public ConstraintMappingCreationalContextImplBase(Class<?> beanClass, ConstraintMapping mapping) {
+	public ConstraintMappingCreationalContextImplBase(Class<?> beanClass, ConstraintMappingContext mapping) {
 
 		this.beanClass = beanClass;
 		this.mapping = mapping;

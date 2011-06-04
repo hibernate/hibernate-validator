@@ -18,7 +18,6 @@ package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
 import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
@@ -34,9 +33,9 @@ public class MethodConstraintMappingCreationalContextImpl implements MethodConst
 
 	private final Class<?> beanClass;
 	private final Method method;
-	private final ConstraintMapping mapping;
+	private final ConstraintMappingContext mapping;
 
-	public MethodConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMapping mapping) {
+	public MethodConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
 
 		this.beanClass = beanClass;
 		this.method = method;
