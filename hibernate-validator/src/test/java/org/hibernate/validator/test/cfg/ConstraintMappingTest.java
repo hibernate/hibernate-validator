@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -29,6 +30,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.testng.annotations.Test;
 
@@ -452,6 +454,40 @@ public class ConstraintMappingTest {
 		assertConstraintViolation( violations.iterator().next(), "may not be empty" );
 	}
 
+	@Test
+	public void testProgrammaticAndAnnotationFieldConstraintsAddUp() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( User.class )
+				.property( "firstName", ElementType.FIELD )
+				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		Set<ConstraintViolation<User>> violations = validator.validateProperty( new User( "", "" ), "firstName" );
+
+		assertCorrectConstraintViolationMessages(
+				violations,
+				"size must be between 1 and 10", "size must be between 2 and 10"
+		);
+	}
+
+	@Test
+	public void testProgrammaticAndAnnotationPropertyConstraintsAddUp() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( User.class )
+				.property( "lastName", ElementType.METHOD )
+				.constraint( create( SizeDef.class ).min( 4 ).max( 10 ) );
+
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		Set<ConstraintViolation<User>> violations = validator.validateProperty( new User( "", "" ), "lastName" );
+
+		assertCorrectConstraintViolationMessages(
+				violations,
+				"size must be between 3 and 10", "size must be between 4 and 10"
+		);
+	}
+
 	private interface Foo {
 	}
 
@@ -468,6 +504,26 @@ public class ConstraintMappingTest {
 	}
 
 	private static class ExtendedMarathon extends Marathon {
+	}
+
+	@SuppressWarnings("unused")
+	private static class User {
+
+		@Size(min = 1, max = 10)
+		private String firstName;
+
+		private String lastName;
+
+		private User(String firstName, String lastName) {
+			this.firstName = firstName;
+			this.lastName = lastName;
+		}
+
+		@Size(min = 3, max = 10)
+		public String getLastName() {
+			return lastName;
+		}
+
 	}
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
