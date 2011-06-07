@@ -43,16 +43,17 @@ public class ConstraintMapping {
 	/**
 	 * Starts defining constraints on the specified bean class.
 	 *
+	 * @param <C> The type to be configured.
 	 * @param beanClass The bean class on which to define constraints. All constraints defined after calling this method
 	 * are added to the bean of the type {@code beanClass} until the next call of {@code type}.
 	 *
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
-	public final TypeConstraintMappingCreationalContext type(Class<?> beanClass) {
+	public final <C> TypeConstraintMappingCreationalContext<C> type(Class<C> beanClass) {
 
 		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
 
-		return new TypeConstraintMappingCreationalContextImpl( beanClass, context );
+		return new TypeConstraintMappingCreationalContextImpl<C>( beanClass, context );
 	}
 
 }

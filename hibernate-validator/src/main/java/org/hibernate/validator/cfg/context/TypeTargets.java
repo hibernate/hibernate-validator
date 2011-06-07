@@ -30,11 +30,12 @@ public interface TypeTargets {
 	/**
 	 * Selects the type to which the next operations shall apply.
 	 *
+	 * @param <C> The type to select.
 	 * @param type The type to select.
 	 *
 	 * @return A creational context representing the selected type.
 	 */
-	TypeConstraintMappingCreationalContext type(Class<?> type);
+	<C> TypeConstraintMappingCreationalContext<C> type(Class<C> type);
 
 	/**
 	 * Selects a property to which the next operations shall apply.

@@ -25,18 +25,20 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 /**
  * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
  *
+ * @param <C> The type represented by this creational context.
+ *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public final class TypeConstraintMappingCreationalContextImpl extends ConstraintMappingCreationalContextImplBase
-		implements TypeConstraintMappingCreationalContext {
+public final class TypeConstraintMappingCreationalContextImpl<C> extends ConstraintMappingCreationalContextImplBase
+		implements TypeConstraintMappingCreationalContext<C> {
 
 	public TypeConstraintMappingCreationalContextImpl(Class<?> beanClass, ConstraintMappingContext mapping) {
 		super( beanClass, mapping );
 	}
 
-	public TypeConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
+	public TypeConstraintMappingCreationalContext<C> constraint(ConstraintDef<?, ?> definition) {
 
 		mapping.addConstraintConfig( ConfiguredConstraint.forType( definition, beanClass ) );
 		return this;
@@ -49,7 +51,7 @@ public final class TypeConstraintMappingCreationalContextImpl extends Constraint
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public TypeConstraintMappingCreationalContext defaultGroupSequence(Class<?>... defaultGroupSequence) {
+	public TypeConstraintMappingCreationalContext<C> defaultGroupSequence(Class<?>... defaultGroupSequence) {
 		mapping.addDefaultGroupSequence( beanClass, Arrays.asList( defaultGroupSequence ) );
 		return this;
 	}
@@ -61,7 +63,7 @@ public final class TypeConstraintMappingCreationalContextImpl extends Constraint
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public <T extends DefaultGroupSequenceProvider<?>> TypeConstraintMappingCreationalContext defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
+	public <T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingCreationalContext<C> defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
 		mapping.addDefaultGroupSequenceProvider( beanClass, defaultGroupSequenceProviderClass );
 		return this;
 	}

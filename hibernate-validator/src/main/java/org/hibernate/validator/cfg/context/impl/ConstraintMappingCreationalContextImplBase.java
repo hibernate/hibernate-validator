@@ -44,11 +44,11 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 		this.mapping = mapping;
 	}
 
-	public TypeConstraintMappingCreationalContext type(Class<?> type) {
+	public <C> TypeConstraintMappingCreationalContext<C> type(Class<C> type) {
 
 		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
 
-		return new TypeConstraintMappingCreationalContextImpl( type, mapping );
+		return new TypeConstraintMappingCreationalContextImpl<C>( type, mapping );
 	}
 
 	public PropertyConstraintMappingCreationalContext property(String property, ElementType elementType) {

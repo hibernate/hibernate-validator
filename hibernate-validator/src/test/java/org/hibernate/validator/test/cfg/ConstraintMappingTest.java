@@ -290,18 +290,6 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* has the wrong type"
-	)
-	public void testDefaultGroupSequenceProviderDefinedWithWrongType() {
-		ConstraintMapping mapping = new ConstraintMapping();
-		mapping.type( Marathon.class )
-				.defaultGroupSequenceProvider( BDefaultGroupSequenceProvider.class );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
-		validator.validate( new Marathon() );
-	}
-
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
 			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
