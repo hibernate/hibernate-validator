@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.test.util;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Locale;
 import javax.validation.Configuration;
@@ -93,6 +94,10 @@ public final class ValidatorUtil {
 	 */
 	public static MethodValidator getMethodValidator() {
 		return getValidator().unwrap( MethodValidator.class );
+	}
+
+	public static MethodValidator getMethodValidatorForMapping(ConstraintMapping... mappings) {
+		return getValidatorForProgrammaticMapping( mappings ).unwrap( MethodValidator.class );
 	}
 
 	/**
@@ -203,20 +208,48 @@ public final class ValidatorUtil {
 		return methodDescriptor.getParameterConstraints().get( parameterIndex );
 	}
 
+	public static <T, I extends T> T getValidatingProxy(I implementor) {
+		return getValidatingProxy( implementor, getMethodValidatorForMapping() );
+	}
+
+	public static <T, I extends T> T getValidatingProxy(I implementor, Class<?>... validationGroups) {
+		return getValidatingProxy( implementor, getMethodValidatorForMapping(), validationGroups );
+	}
+
+	public static <T, I extends T> T getValidatingProxy(I implementor, Integer parameterIndex, Class<?>... validationGroups) {
+		return getValidatingProxy( implementor, getMethodValidatorForMapping(), parameterIndex, validationGroups );
+	}
+
+	public static <T, I extends T> T getValidatingProxy(I implementor, ConstraintMapping... mappings) {
+		return getValidatingProxy( implementor, getMethodValidatorForMapping( mappings ) );
+	}
+
+	public static <T, I extends T> T getValidatingProxy(I implementor, MethodValidator methodValidator, Class<?>... validationGroups) {
+		return getValidatingProxy( implementor, methodValidator, null, validationGroups );
+	}
+
 	/**
-	 * Returns an instance of proxy which dispatches method invocation to the given validation invocation handler.
+	 * Creates a proxy for the given object which performs a validation of the given object's method constraints upon method invocation.
 	 *
-	 * @param handler The validation invocation handler.
+	 * @param <T> The type to which the proxy shall be casted. Must be an interface.
+	 * @param <I> The type of the object to be proxied.
+	 * @param implementor The object to be proxied.
+	 * @param methodValidator The validator to use for method validation.
+	 * @param parameterIndex Optionally the index of the parameter to which validation shall apply.
+	 * @param validationGroups Optionally the groups which shall be evaluated.
 	 *
-	 * @return a proxy instance configured with the given handler.
-	 *
-	 * @see ValidationInvocationHandler
+	 * @return A proxy performing an automatic method validation.
 	 */
-	public static Object getMethodValidationProxy(ValidationInvocationHandler handler) {
-		final Class<?> wrappedObjectClass = handler.getWrapped().getClass();
-		return Proxy.newProxyInstance(
-				wrappedObjectClass.getClassLoader(),
-				wrappedObjectClass.getInterfaces(),
+	@SuppressWarnings("unchecked")
+	private static <T, I extends T> T getValidatingProxy(I implementor, MethodValidator methodValidator, Integer parameterIndex, Class<?>... validationGroups) {
+
+		InvocationHandler handler = new ValidationInvocationHandler(
+				implementor, methodValidator, parameterIndex, validationGroups
+		);
+
+		return (T) Proxy.newProxyInstance(
+				implementor.getClass().getClassLoader(),
+				implementor.getClass().getInterfaces(),
 				handler
 		);
 	}

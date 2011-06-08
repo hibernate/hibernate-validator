@@ -16,17 +16,16 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.AssertFalse;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class AssertFalseDef extends ConstraintDef<AssertFalseDef, AssertFalse> {
-	public AssertFalseDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, AssertFalse.class, property, elementType, mapping );
+
+	public AssertFalseDef() {
+		super( AssertFalse.class );
 	}
 }

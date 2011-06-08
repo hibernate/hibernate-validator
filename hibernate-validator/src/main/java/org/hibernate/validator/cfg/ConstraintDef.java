@@ -17,14 +17,12 @@
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.Map;
 import javax.validation.Payload;
-import javax.validation.ValidationException;
 
 import org.hibernate.validator.util.ReflectionHelper;
+
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a
@@ -42,11 +40,9 @@ import org.hibernate.validator.util.ReflectionHelper;
  */
 public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
 
-	// Note on visibility of members: In order to avoid the need for public
-	// getter methods for the fields of this class (which would pollute it's
-	// fluent API) they are protected instead of private. To get access to
-	// these fields outside of this class a ConstraintDefAccessor instance can
-	// be created from it, which offers public getter methods.
+	// Note on visibility of members: These members are intentionally made
+	// protected and published by a sub-class for internal use. There aren't
+	// public getters as they would pollute the fluent definition API.
 
 	/**
 	 * The constraint annotation type of this definition.
@@ -60,58 +56,41 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	 */
 	protected final Map<String, Object> parameters;
 
-	/**
-	 * The bean type of this definition.
-	 */
-	protected final Class<?> beanType;
-
-	/**
-	 * The element type of this definition.
-	 */
-	protected final ElementType elementType;
-
-	/**
-	 * The property name of this definition, if it represents a property level constraint.
-	 */
-	protected final String property;
-
-	/**
-	 * The constraint mapping owning this constraint definition.
-	 */
-	protected final ConstraintMapping mapping;
-
-	public ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, ConstraintMapping mapping) {
-		this( beanType, constraintType, property, elementType, new HashMap<String, Object>(), mapping );
+	protected ConstraintDef(Class<A> constraintType) {
+		this.constraintType = constraintType;
+		this.parameters = newHashMap();
 	}
 
-	protected ConstraintDef(Class<?> beanType, Class<A> constraintType, String property, ElementType elementType, Map<String, Object> parameters, ConstraintMapping mapping) {
-		if ( beanType == null ) {
-			throw new ValidationException( "Null is not a valid bean type" );
-		}
+	protected ConstraintDef(ConstraintDef<?, A> original) {
+		this.constraintType = original.constraintType;
+		this.parameters = original.parameters;
+	}
 
-		if ( mapping == null ) {
-			throw new ValidationException( "ConstraintMapping cannot be null" );
-		}
+	/**
+	 * Creates a new constraint definition.
+	 *
+	 * @param <C> The type of the definition to be instantiated.
+	 * @param clazz The class representing the definition to be instantiated.
+	 *
+	 * @return A new instance of the given constraint definition type.
+	 */
+	public static <C extends ConstraintDef<C, ?>> C create(Class<C> clazz) {
+		return ReflectionHelper.newInstance( clazz, "constraint definition" );
+	}
 
-		if ( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) {
-			if ( property == null || property.length() == 0 ) {
-				throw new ValidationException( "A property level constraint cannot have a null or empty property name" );
-			}
-
-			if ( !ReflectionHelper.propertyExists( beanType, property, elementType ) ) {
-				throw new ValidationException(
-						"The class " + beanType + " does not have a property '"
-								+ property + "' with access " + elementType
-				);
-			}
-		}
-
-		this.beanType = beanType;
-		this.constraintType = constraintType;
-		this.parameters = parameters;
-		this.property = property;
-		this.elementType = elementType;
-		this.mapping = mapping;
+	/**
+	 * Creates a new generic constraint definition.
+	 *
+	 * @param <A> The constraint annotation type of the generic definition to be
+	 * created.
+	 * @param clazz The class representing the annotation type of the definition
+	 * to be instantiated.
+	 *
+	 * @return A new generic constraint definition for the given constraint
+	 *         annotation type.
+	 */
+	public static <A extends Annotation> GenericConstraintDef<A> createGeneric(Class<A> clazz) {
+		return new GenericConstraintDef<A>( clazz );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -139,53 +118,13 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		return getThis();
 	}
 
-	public <B extends Annotation, D extends ConstraintDef<D, B>> D constraint(Class<D> definition) {
-		final Constructor<D> constructor = ReflectionHelper.getConstructor(
-				definition, Class.class, String.class, ElementType.class, ConstraintMapping.class
-		);
-
-		final D constraintDefinition = ReflectionHelper.newConstructorInstance(
-				constructor, beanType, property, elementType, mapping
-		);
-
-		mapping.addConstraintConfig( constraintDefinition );
-		return constraintDefinition;
-	}
-
-	public <A extends Annotation> GenericConstraintDef<A> genericConstraint(Class<A> definition) {
-
-		GenericConstraintDef<A> constraintDefinition = new GenericConstraintDef<A>(
-				beanType, definition, property, elementType, mapping
-		);
-
-		mapping.addConstraintConfig( constraintDefinition );
-		return constraintDefinition;
-	}
-
-	public ConstraintsForType property(String property, ElementType type) {
-		return new ConstraintsForType( beanType, property, type, mapping );
-	}
-
-	public ConstraintsForType type(Class<?> type) {
-		return new ConstraintsForType( type, mapping );
-	}
-
-	public ConstraintsForType valid(String property, ElementType type) {
-		mapping.addCascadeConfig( new CascadeDef( beanType, property, type ) );
-		return new ConstraintsForType( beanType, mapping );
-	}
-
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( this.getClass().getName() );
-		sb.append( "{beanType=" ).append( beanType );
 		sb.append( ", constraintType=" ).append( constraintType );
 		sb.append( ", parameters=" ).append( parameters );
-		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", property='" ).append( property ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
 	}
-
 }

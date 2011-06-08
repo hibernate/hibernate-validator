@@ -34,7 +34,7 @@ public class ValidationBootstrapParameters {
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
-	private ValidationProvider provider;
+	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = new HashMap<String, String>();
 	private final Set<InputStream> mappings = new HashSet<InputStream>();
@@ -55,11 +55,11 @@ public class ValidationBootstrapParameters {
 		this.messageInterpolator = messageInterpolator;
 	}
 
-	public final ValidationProvider getProvider() {
+	public final ValidationProvider<?> getProvider() {
 		return provider;
 	}
 
-	public final void setProvider(ValidationProvider provider) {
+	public final void setProvider(ValidationProvider<?> provider) {
 		this.provider = provider;
 	}
 

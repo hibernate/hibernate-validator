@@ -16,17 +16,16 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.Null;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NullDef extends ConstraintDef<NullDef, Null> {
-	public NullDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Null.class, property, elementType, mapping );
+
+	public NullDef() {
+		super( Null.class );
 	}
 }

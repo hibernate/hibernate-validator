@@ -38,6 +38,7 @@ import org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpo
 import org.hibernate.validator.test.util.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
@@ -52,7 +53,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
-				.constraint( FutureDef.class ).message( "${validatedValue}" );
+				.constraint( create( FutureDef.class ).message( "${validatedValue}" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -68,7 +69,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
-				.constraint( FutureDef.class ).message( "${validatedValue} ${validatedValue}" );
+				.constraint( create( FutureDef.class ).message( "${validatedValue} ${validatedValue}" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -84,7 +85,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
-				.constraint( FutureDef.class ).message( "\\{${validatedValue}\\}" );
+				.constraint( create( FutureDef.class ).message( "\\{${validatedValue}\\}" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -100,7 +101,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
-				.constraint( FutureDef.class ).message( "${validatedValue:%1$ty}" );
+				.constraint( create( FutureDef.class ).message( "${validatedValue:%1$ty}" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -116,7 +117,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
-				.constraint( NotNullDef.class ).message( "${validatedValue}" );
+				.constraint( create( NotNullDef.class ).message( "${validatedValue}" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -131,7 +132,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
-				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: '%1$5f' }" );
+				.constraint( create( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: '%1$5f' }" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -146,7 +147,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
-				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: {%1$5f} }" );
+				.constraint( create( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: {%1$5f} }" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -161,7 +162,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
-				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue::%1$5f:}" );
+				.constraint( create( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue::%1$5f:}" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -176,7 +177,9 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
-				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: '%1$5f' } ${foo}" );
+				.constraint(
+						create( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue: '%1$5f' } ${foo}" )
+				);
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -191,7 +194,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
-				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue{" );
+				.constraint( create( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue{" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -209,7 +212,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
-				.constraint( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue:}" );
+				.constraint( create( DecimalMinDef.class ).value( "1.0" ).message( "${validatedValue:}" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 		validator.validate( new TestClass( 0.1 ) );
@@ -220,7 +223,7 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "greeter", FIELD )
-				.constraint( NullDef.class ).message( "${validatedValue: '%1$s' }" );
+				.constraint( create( NullDef.class ).message( "${validatedValue: '%1$s' }" ) );
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 
@@ -238,9 +241,11 @@ public class ValueFormatterMessageInterpolatorTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
-				.constraint( DecimalMinDef.class )
-				.value( "1.0" )
-				.message( "${validatedValue:%1$z}" );  // z is an unknown format
+				.constraint(
+						create( DecimalMinDef.class )
+								.value( "1.0" )
+								.message( "${validatedValue:%1$z}" )
+				);  // z is an unknown format
 
 		Validator validator = getValidatorUsingConstraintMapping( mapping );
 		validator.validate( new TestClass( 0.1 ) );

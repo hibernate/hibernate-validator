@@ -95,19 +95,18 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     <title>Programmatic constraint definition</title>
 
     <para>Another addition to the Bean Validation specification is the ability
-    to configure constraints via a fluent API.This API can be used exclusively
-    or in combination with annotations and xml. If used in combination
-    programmatic constraints are additive to constraints configured via the
-    standard configuration capabilties.</para>
+    to configure constraints via a fluent API. This API can be used
+    exclusively or in combination with annotations and xml. If used in
+    combination programmatic constraints are additive to constraints
+    configured via the standard configuration capabilities.</para>
 
-    <para>The programmatic API is centered around the
+    <para>The API is centered around the
     <classname>ConstraintMapping</classname> class which can be found together
     with its supporting classes in the
-    <package>org.hibernate.validator.cfg</package> package.
-    <classname>ConstraintMapping</classname> is the entry point to a fluent
-    API allowing the definition of constraints. <xref lang=""
-    linkend="example-constraint-mapping" /> shows how the API can be
-    used.</para>
+    <package>org.hibernate.validator.cfg</package> package. Starting with the
+    instantiation of a new <classname>ConstraintMapping</classname>,
+    constraints can be defined in a fluent manner as shown in <xref lang=""
+    linkend="example-constraint-mapping" />.</para>
 
     <para><example id="example-constraint-mapping">
         <title>Programmatic constraint definition</title>
@@ -115,73 +114,134 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "manufacturer", FIELD )
-        .constraint( NotNullDef.class )
+        .constraint( 
+            create( NotNullDef.class ) )
     .property( "licensePlate", FIELD )
-        .constraint( NotNullDef.class )
-        .constraint( SizeDef.class )
-            .min( 2 )
-            .max( 14 )
+        .constraint(
+            create( NotNullDef.class ) )
+        .constraint( 
+            create( SizeDef.class )
+                .min( 2 )
+                .max( 14 ) )
     .property( "seatCount", FIELD )
-        .constraint( MinDef.class )
-            .value ( 2 )
+        .constraint( 
+            create( MinDef.class )
+                .value ( 2 ) )
 .type( RentalCar.class )
-    .property( "rentalStation", METHOD)
-        .constraint( NotNullDef.class );      </programlisting>
+    .property( "rentalStation", METHOD )
+        .constraint( 
+            create( NotNullDef.class ) );      </programlisting>
       </example></para>
 
-    <para>As you can see you can configure constraints on multiple classes and
+    <para>As you can see constraints can be configured on multiple classes and
     properties using method chaining. The constraint definition classes
     <classname>NotNullDef</classname>, <classname>SizeDef</classname> and
     <classname>MinDef</classname> are helper classes which allow to configure
-    constraint parameters in a type-safe fashion. Definition classes exists
-    for all built-in constraints in the
-    <classname>org.hibernate.validator.cfg.defs</classname> package. For a
-    custom constraint you can either create your own definition class
-    extending <classname>ConstraintDef</classname> or you can use the
-    <classname>genericConstraint</classname> method as seen in <xref
+    constraint parameters in a type-safe fashion. Definition classes exist for
+    all built-in constraints in the
+    <classname>org.hibernate.validator.cfg.defs</classname> package. </para>
+
+    <tip>
+      <para>The <methodname>create()</methodname> method (as well as
+      <methodname>createGeneric()</methodname> introduced in the following) is
+      a static method defined on
+      <classname>org.hibernate.validator.cfg.ConstraintDef</classname>. It is
+      recommended to import this method statically which allows to use it as
+      shown in <xref lang="" linkend="example-constraint-mapping" />.</para>
+    </tip>
+
+    <para>For custom constraints you can either create your own definition
+    classes extending <classname>ConstraintDef</classname> or you can use the
+    <classname>createGeneric()</classname> method as seen in <xref
     linkend="example-generic-constraint-mapping" />.</para>
 
     <para><example id="example-generic-constraint-mapping">
         <title>Programmatic constraint definition using
-        <classname>GenericConstraintDef</classname></title>
+        <methodname>createGeneric()</methodname></title>
 
         <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "licensePlate", FIELD )
-        .genericConstraint( CheckCase.class )
-            .param( "value", CaseMode.UPPER );   </programlisting>
+        .constraint( 
+            createGeneric( CheckCase.class )
+                .param( "value", CaseMode.UPPER ) );   </programlisting>
       </example></para>
 
-    <para>Last but not least, you can also define cascading constraints as
-    well as the default group sequence or the default group sequence provider
-    of an entity.</para>
+    <para>Not only standard class- and property-level constraints but also
+    method constraints can be configured using the API. As shown in <xref
+    lang="" linkend="example-method-constraint-mapping" /> methods are
+    identified by their name and their parameters (if there are any). Having
+    selected a method, constraints can be placed on the method's parameters
+    and/or return value.</para>
 
-    <para><example>
-        <title>Cascading constraints and default group redefinition</title>
+    <example id="example-method-constraint-mapping">
+      <title>Programmatic definition of method constraints</title>
+
+      <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
+mapping.type( Car.class )
+    .method( "drive", String.class, Integer.class )
+        .parameter( 0 )
+            .constraint( 
+                create( NotNullDef.class ) )
+            .constraint( 
+                create( MinDef.class )
+                    .value ( 1 ) )
+        .parameter( 1 )
+            .constraint( 
+                create( NotNullDef.class ) )
+        .returnValue()
+            .constraint( 
+                create( NotNullDef.class ) )
+    .method( "check" )
+        .returnValue()
+            .constraint( 
+                create( NotNullDef.class ) );      </programlisting>
+    </example>
+
+    <para>Using the API it's also possible to mark properties, method
+    parameters and method return values as cascading (equivalent to annotating
+    them with <classname>@Valid</classname>). An example can be found in <xref
+    lang="" linkend="example-cascading-constraints" />.</para>
+
+    <para><example id="example-cascading-constraints">
+        <title>Marking constraints for cascaded validation</title>
 
         <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
-    .valid( "driver", FIELD )
-.type( RentalCar.class)
-    .defaultGroupSequence( RentalCar.class, CarChecks.class ); </programlisting>
+    .property( "manufacturer", FIELD )
+        .valid()
+    .property( "licensePlate", METHOD )
+        .valid()
+    .method( "drive", String.class, Integer.class )
+        .parameter( 0 )
+            .valid()
+        .parameter( 1 )
+            .valid()
+        .returnValue()
+            .valid()
+.type( RentalCar.class )
+    .property( "rentalStation", METHOD )
+        .valid();</programlisting>
       </example></para>
 
-    <para><example>
-        <title>Cascading constraints and dynamic default group
-        redefinition</title>
+    <para>Last but not least you can configure the default group sequence or
+    the default group sequence provider of a type as shown in <xref lang=""
+    linkend="example-sequences" />.<example id="example-sequences">
+        <title>Configuration of default group sequence and default group
+        sequence provider</title>
 
         <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
-    .valid( "driver", FIELD )
-.type( RentalCar.class)
+    .defaultGroupSequence( Car.class, CarChecks.class )
+.type( RentalCar.class )
     .defaultGroupSequenceProvider( RentalCarGroupSequenceProvider.class ); </programlisting>
       </example></para>
 
-    <para>Once you have your <classname>ConstraintMapping</classname> you will
-    have to pass it to the configuration. Since the programmatic configuration
-    is not part of the official Bean Validation specification you will have to
-    get hold of the Hibernate Validator specific configuration instance. See
-    <xref linkend="example-hibernate-specific-config" />.</para>
+    <para>Once a <classname>ConstraintMapping</classname> is set up it has to
+    be passed to the configuration. Since the programmatic API is not part of
+    the official Bean Validation specification you need to get hold of a
+    <classname>HibernateValidatorConfiguration</classname> instance as shown
+    in <xref linkend="example-hibernate-specific-config" />.</para>
 
     <para><example id="example-hibernate-specific-config">
         <title>Creating a Hibernate Validator specific configuration</title>

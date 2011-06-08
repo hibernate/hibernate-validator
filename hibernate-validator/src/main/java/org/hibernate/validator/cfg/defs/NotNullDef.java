@@ -16,17 +16,17 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NotNullDef extends ConstraintDef<NotNullDef, NotNull> {
-	public NotNullDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, NotNull.class, property, elementType, mapping );
+
+	public NotNullDef() {
+		super( NotNull.class );
 	}
+
 }

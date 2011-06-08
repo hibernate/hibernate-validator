@@ -26,6 +26,8 @@ import java.lang.reflect.Type;
  */
 public interface ConstraintLocation {
 
+	public Class<?> getBeanClass();
+
 	/**
 	 * Returns the type of the element at this constraint location. Depending
 	 * on the concrete implementation this might be the type of an annotated bean, method parameter etc.

@@ -22,7 +22,6 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.util.ValidatorUtil;

@@ -17,10 +17,7 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.Length;
 
 
@@ -29,8 +26,8 @@ import org.hibernate.validator.constraints.Length;
  */
 public class LengthDef extends ConstraintDef<LengthDef, Length> {
 
-	public LengthDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Length.class, property, elementType, mapping );
+	public LengthDef() {
+		super( Length.class );
 	}
 
 	public LengthDef min(int min) {

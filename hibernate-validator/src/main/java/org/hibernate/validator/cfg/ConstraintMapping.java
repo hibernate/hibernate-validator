@@ -16,16 +16,10 @@
  */
 package org.hibernate.validator.cfg;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
+import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
+import org.hibernate.validator.cfg.context.impl.TypeConstraintMappingContextImpl;
+import org.hibernate.validator.util.Contracts;
 
 /**
  * Top level class for constraints configured via the programmatic API.
@@ -35,133 +29,31 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.om)
  */
 public class ConstraintMapping {
-	private final Map<Class<?>, List<ConstraintDef<?, ?>>> constraintConfig;
-	private final Map<Class<?>, List<CascadeDef>> cascadeConfig;
-	private final Set<Class<?>> configuredClasses;
-	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
-	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
+
+	protected ConstraintMappingContext context;
 
 	public ConstraintMapping() {
-		this.constraintConfig = new HashMap<Class<?>, List<ConstraintDef<?, ?>>>();
-		this.cascadeConfig = new HashMap<Class<?>, List<CascadeDef>>();
-		this.configuredClasses = new HashSet<Class<?>>();
-		this.defaultGroupSequences = new HashMap<Class<?>, List<Class<?>>>();
-		this.defaultGroupSequenceProviders = new HashMap<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>>();
+		context = new ConstraintMappingContext();
+	}
+
+	protected ConstraintMapping(ConstraintMapping original) {
+		this.context = original.context;
 	}
 
 	/**
 	 * Starts defining constraints on the specified bean class.
 	 *
+	 * @param <C> The type to be configured.
 	 * @param beanClass The bean class on which to define constraints. All constraints defined after calling this method
 	 * are added to the bean of the type {@code beanClass} until the next call of {@code type}.
 	 *
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
-	public final ConstraintsForType type(Class<?> beanClass) {
-		return new ConstraintsForType( beanClass, this );
+	public final <C> TypeConstraintMappingContext<C> type(Class<C> beanClass) {
+
+		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
+
+		return new TypeConstraintMappingContextImpl<C>( beanClass, context );
 	}
 
-	/**
-	 * Returns all constraint definitions registered with this mapping.
-	 *
-	 * @return A map with this mapping's constraint definitions. Each key in
-	 *         this map represents a bean type, for which the constraint
-	 *         definitions in the associated map value are configured.
-	 */
-	public final Map<Class<?>, List<ConstraintDefAccessor<?>>> getConstraintConfig() {
-
-		Map<Class<?>, List<ConstraintDefAccessor<?>>> newDefinitions = new HashMap<Class<?>, List<ConstraintDefAccessor<?>>>();
-
-		for ( Map.Entry<Class<?>, List<ConstraintDef<?, ?>>> entry : constraintConfig.entrySet() ) {
-
-			List<ConstraintDefAccessor<?>> newList = new ArrayList<ConstraintDefAccessor<?>>();
-
-			for ( ConstraintDef<?, ?> definition : entry.getValue() ) {
-				newList.add( ConstraintDefAccessor.getInstance( definition ) );
-			}
-
-			newDefinitions.put( entry.getKey(), newList );
-		}
-
-		return newDefinitions;
-	}
-
-	public final Map<Class<?>, List<CascadeDef>> getCascadeConfig() {
-		return cascadeConfig;
-	}
-
-	public final Collection<Class<?>> getConfiguredClasses() {
-		return configuredClasses;
-	}
-
-	public final List<Class<?>> getDefaultSequence(Class<?> beanType) {
-		if ( defaultGroupSequences.containsKey( beanType ) ) {
-			return defaultGroupSequences.get( beanType );
-		}
-		else {
-			return Collections.emptyList();
-		}
-	}
-
-	/**
-	 * Returns the class of the default group sequence provider defined
-	 * for the given bean type.
-	 *
-	 * @param beanType The bean type.
-	 *
-	 * @return The default group sequence provider defined class or {@code null} if none.
-	 */
-	public final Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProvider(Class<?> beanType) {
-		return defaultGroupSequenceProviders.get( beanType );
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "ConstraintMapping" );
-		sb.append( "{cascadeConfig=" ).append( cascadeConfig );
-		sb.append( ", constraintConfig=" ).append( constraintConfig );
-		sb.append( ", configuredClasses=" ).append( configuredClasses );
-		sb.append( ", defaultGroupSequences=" ).append( defaultGroupSequences );
-		sb.append( '}' );
-		return sb.toString();
-	}
-
-	protected final void addCascadeConfig(CascadeDef cascade) {
-		Class<?> beanClass = cascade.getBeanType();
-		configuredClasses.add( beanClass );
-		if ( cascadeConfig.containsKey( beanClass ) ) {
-			cascadeConfig.get( beanClass ).add( cascade );
-		}
-		else {
-			List<CascadeDef> cascadeList = new ArrayList<CascadeDef>();
-			cascadeList.add( cascade );
-			cascadeConfig.put( beanClass, cascadeList );
-		}
-	}
-
-	protected final void addDefaultGroupSequence(Class<?> beanClass, List<Class<?>> defaultGroupSequence) {
-		configuredClasses.add( beanClass );
-		defaultGroupSequences.put( beanClass, defaultGroupSequence );
-	}
-
-	protected final <T extends DefaultGroupSequenceProvider<?>> void addDefaultGroupSequenceProvider(Class<?> beanClass, Class<T> defaultGroupSequenceProviderClass) {
-		configuredClasses.add( beanClass );
-		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
-	}
-
-	protected final void addConstraintConfig(ConstraintDef<?, ?> definition) {
-		Class<?> beanClass = definition.beanType;
-		configuredClasses.add( beanClass );
-		if ( constraintConfig.containsKey( beanClass ) ) {
-			constraintConfig.get( beanClass ).add( definition );
-		}
-		else {
-			List<ConstraintDef<?, ?>> definitionList = new ArrayList<ConstraintDef<?, ?>>();
-			definitionList.add( definition );
-			constraintConfig.put( beanClass, definitionList );
-		}
-	}
 }
-
-

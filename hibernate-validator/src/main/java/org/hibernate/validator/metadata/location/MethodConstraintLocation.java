@@ -23,23 +23,32 @@ import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
- * A {@link ConstraintLocation} implementation that represents a method parameter.
+ * A {@link ConstraintLocation} implementation that represents a method
+ * parameter or return value.
  *
  * @author Gunnar Morling
  */
-public class MethodParameterConstraintLocation implements ConstraintLocation {
+public class MethodConstraintLocation implements ConstraintLocation {
 
 	private final Method method;
 
-	private final int parameterIndex;
+	private final Integer parameterIndex;
+
+	public MethodConstraintLocation(Method method) {
+
+		Contracts.assertNotNull( method, "Method must not be null" );
+
+		this.method = method;
+		this.parameterIndex = null;
+	}
 
 	/**
-	 * Creates a new {@link MethodParameterConstraintLocation}.
+	 * Creates a new {@link MethodConstraintLocation}.
 	 *
 	 * @param method The method of the location to be created.
 	 * @param parameterIndex The parameter index of the location to be created.
 	 */
-	public MethodParameterConstraintLocation(Method method, int parameterIndex) {
+	public MethodConstraintLocation(Method method, int parameterIndex) {
 
 		Contracts.assertNotNull( method, "Method must not be null" );
 
@@ -47,21 +56,43 @@ public class MethodParameterConstraintLocation implements ConstraintLocation {
 		this.parameterIndex = parameterIndex;
 	}
 
+	public Class<?> getBeanClass() {
+		return method.getDeclaringClass();
+	}
+
 	public Type typeOfAnnotatedElement() {
 		Type t = null;
 
-		t = ReflectionHelper.typeOf( method, parameterIndex );
-		if ( t instanceof Class && ( ( Class<?> ) t ).isPrimitive() ) {
+		if ( parameterIndex == null ) {
+			t = ReflectionHelper.typeOf( method );
+		}
+		else {
+			t = ReflectionHelper.typeOf( method, parameterIndex );
+		}
+
+		if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
 			t = ReflectionHelper.boxedType( t );
 		}
 
 		return t;
 	}
 
+	public Method getMethod() {
+		return method;
+	}
+
+	/**
+	 * The parameter index of this constraint location or <code>null</code> if
+	 * this location represents a method return value.
+	 */
+	public Integer getParameterIndex() {
+		return parameterIndex;
+	}
+
 	@Override
 	public String toString() {
-		return "MethodConstraintLocation [method=" + method + ", parameterIndex="
-				+ parameterIndex + "]";
+		return "MethodConstraintLocation [method=" + method
+				+ ", parameterIndex=" + parameterIndex + "]";
 	}
 
 }

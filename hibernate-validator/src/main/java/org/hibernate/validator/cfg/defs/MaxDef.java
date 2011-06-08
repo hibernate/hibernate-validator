@@ -16,20 +16,17 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
-
 import javax.validation.constraints.Max;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 /**
  * @author Hardy Ferentschik
  */
 public class MaxDef extends ConstraintDef<MaxDef, Max> {
 
-	public MaxDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Max.class, property, elementType, mapping );
+	public MaxDef() {
+		super( Max.class );
 	}
 
 	public MaxDef value(long max) {

@@ -16,13 +16,11 @@
 */
 package org.hibernate.validator.engine;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -373,7 +371,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-			Set<BeanMetaConstraint<? extends Annotation>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+			Set<BeanMetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 
 			// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
 			if ( defaultGroupSequenceIsRedefined ) {
@@ -384,7 +382,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 				valueContext.setCurrentGroup( defaultSequenceMember );
 				boolean validationSuccessful = true;
-				for ( BeanMetaConstraint<? extends Annotation> metaConstraint : metaConstraints ) {
+				for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
 					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 					// time. An interface can define more than one constraint, we have to check the class we are validating.
 					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
@@ -425,7 +423,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V> void validateConstraintsForNonDefaultGroup(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
 		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
 		PathImpl currentPath = valueContext.getPropertyPath();
-		for ( BeanMetaConstraint<? extends Annotation> metaConstraint : beanMetaData.getMetaConstraints() ) {
+		for ( BeanMetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
 			validateConstraint( validationContext, valueContext, metaConstraint );
 			if ( validationContext.shouldFailFast() ) {
 				return;
@@ -545,7 +543,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else {
-			List<Object> list = new ArrayList<Object>();
+			List<Object> list = newArrayList();
 			list.add( value );
 			iter = list.iterator();
 		}
@@ -798,7 +796,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
-			Set<BeanMetaConstraint<? extends Annotation>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+			Set<BeanMetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
 
 			if ( defaultGroupSequenceIsRedefined ) {
@@ -993,7 +991,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		for ( MetaConstraint<? extends Annotation> metaConstraint : parameterMetaData ) {
+		for ( MetaConstraint<?> metaConstraint : parameterMetaData ) {
 
 			//ignore constraints not part of the evaluated group
 			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
@@ -1114,7 +1112,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		for ( MetaConstraint<? extends Annotation> metaConstraint : methodMetaData ) {
+		for ( MetaConstraint<?> metaConstraint : methodMetaData ) {
 
 			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 				continue;
@@ -1158,7 +1156,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		if ( !propertyIter.hasNext() ) {
 			for ( Class<?> hierarchyClass : metaData.getClassHierarchy() ) {
 				metaData = getBeanMetaData( hierarchyClass );
-				for ( BeanMetaConstraint<? extends Annotation> constraint : metaData.getDirectMetaConstraints() ) {
+				for ( BeanMetaConstraint<?> constraint : metaData.getDirectMetaConstraints() ) {
 					if ( elem.getName() != null && elem.getName()
 							.equals( constraint.getLocation().getPropertyName() ) ) {
 						metaConstraintsList.add( constraint );

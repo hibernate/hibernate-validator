@@ -16,10 +16,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import java.lang.annotation.ElementType;
-
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.Range;
 
 /**
@@ -27,8 +24,8 @@ import org.hibernate.validator.constraints.Range;
  */
 public class RangeDef extends ConstraintDef<RangeDef, Range> {
 
-	public RangeDef(Class<?> beanType, String property, ElementType elementType, ConstraintMapping mapping) {
-		super( beanType, Range.class, property, elementType, mapping );
+	public RangeDef() {
+		super( Range.class );
 	}
 
 	public RangeDef min(long min) {

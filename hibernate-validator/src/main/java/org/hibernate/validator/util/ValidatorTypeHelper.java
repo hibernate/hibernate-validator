@@ -84,7 +84,7 @@ public final class ValidatorTypeHelper {
 			return null;
 		}
 		else if ( type instanceof Class ) {
-			Class clazz = (Class) type;
+			Class<?> clazz = (Class<?>) type;
 			final Type returnedType = resolveTypeForClassAndHierarchy( resolvedTypes, clazz );
 			if ( returnedType != null ) {
 				return returnedType;

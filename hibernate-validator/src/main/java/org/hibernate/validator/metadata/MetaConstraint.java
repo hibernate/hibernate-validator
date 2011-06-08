@@ -101,7 +101,7 @@ public abstract class MetaConstraint<A extends Annotation> {
 			return false;
 		}
 
-		MetaConstraint that = (MetaConstraint) o;
+		MetaConstraint<?> that = (MetaConstraint<?>) o;
 
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;
@@ -123,7 +123,7 @@ public abstract class MetaConstraint<A extends Annotation> {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "MetaConstraint");
+		sb.append( "MetaConstraint" );
 		sb.append( "{constraintType=" ).append( constraintDescriptor.getAnnotation().annotationType().getName() );
 		sb.append( ", location=" ).append( location );
 		sb.append( "}" );

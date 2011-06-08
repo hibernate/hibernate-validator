@@ -70,7 +70,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
-	private static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
+	public static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
 
 	/**
 	 * The root bean class for this meta data.
@@ -81,17 +81,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
 	 * (eg super class or interface) in which they are defined.
 	 */
-	private final Map<Class<?>, List<BeanMetaConstraint<? extends Annotation>>> metaConstraints = newHashMap();
+	private final Map<Class<?>, List<BeanMetaConstraint<?>>> metaConstraints = newHashMap();
 
 	/**
 	 * Set of all constraints for this bean type (defined on any implemented interfaces or super types)
 	 */
-	private final Set<BeanMetaConstraint<? extends Annotation>> allMetaConstraints;
+	private final Set<BeanMetaConstraint<?>> allMetaConstraints;
 
 	/**
 	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
 	 */
-	private final Set<BeanMetaConstraint<? extends Annotation>> directMetaConstraints;
+	private final Set<BeanMetaConstraint<?>> directMetaConstraints;
 
 	/**
 	 * The main element descriptor for {@link #beanClass}.
@@ -166,6 +166,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				new ArrayList<Class<?>>(),
 				null,
 				new HashMap<Class<?>, List<BeanMetaConstraint<?>>>(),
+				new HashSet<AggregatedMethodMetaData>(),
 				new HashSet<Member>(),
 				new AnnotationIgnores(),
 				beanMetaDataCache
@@ -181,6 +182,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param defaultGroupSequence programmatic/xml configured default group sequence (overrides annotations)
 	 * @param defaultGroupSequenceProvider programmatic configured default group sequence provider class (overrides annotations)
 	 * @param constraints programmatic/xml configured constraints
+	 * @param methodMetaDatas programmatic configured method constraints
 	 * @param cascadedMembers programmatic/xml configured cascaded members
 	 * @param annotationIgnores in xml configured ignores for annotations
 	 * @param beanMetaDataCache the cache of already configured meta data instances
@@ -190,6 +192,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
 							Map<Class<?>, List<BeanMetaConstraint<?>>> constraints,
+							Set<AggregatedMethodMetaData> methodMetaDatas,
 							Set<Member> cascadedMembers,
 							AnnotationIgnores annotationIgnores,
 							BeanMetaDataCache beanMetaDataCache) {
@@ -228,13 +231,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			Class<?> clazz = entry.getKey();
 
 			// will hold the method constraints (getter and non-getter) of the given class keyed by method
-			Map<Method, List<BeanMetaConstraint<? extends Annotation>>> constraintsByMethod = newHashMap();
+			Map<Method, List<MethodMetaConstraint<?>>> constraintsByMethod = newHashMap();
 
 			for ( BeanMetaConstraint<?> constraint : entry.getValue() ) {
 
 				if ( constraint.getDescriptor().getElementType() == ElementType.METHOD ) {
 
-					List<BeanMetaConstraint<? extends Annotation>> constraintsForMethod = constraintsByMethod.get(
+					List<MethodMetaConstraint<?>> constraintsForMethod = constraintsByMethod.get(
 							constraint.getLocation().getMember()
 					);
 					if ( constraintsForMethod == null ) {
@@ -243,7 +246,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 								(Method) constraint.getLocation().getMember(), constraintsForMethod
 						);
 					}
-					constraintsForMethod.add( constraint );
+
+					constraintsForMethod.add( getAsMethodMetaConstraint( constraint ) );
 				}
 				//register non-method constraints
 				else {
@@ -252,7 +256,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			// register the constraints for each method in methodMetaConstraints. Constraints at getters will also registered in metaConstraints
-			for ( Entry<Method, List<BeanMetaConstraint<? extends Annotation>>> methodAndConstraints : constraintsByMethod
+			for ( Entry<Method, List<MethodMetaConstraint<?>>> methodAndConstraints : constraintsByMethod
 					.entrySet() ) {
 
 				MethodMetaData methodMetaData = new MethodMetaData(
@@ -262,15 +266,27 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				);
 				addMethodMetaConstraint( clazz, methodMetaData );
 			}
+
 		}
 
 		allMetaConstraints = buildAllConstraintSets();
 		directMetaConstraints = buildDirectConstraintSets();
 
-		methodMetaData = Collections.unmodifiableMap( buildMethodMetaData() );
+		// add the explicitly configured method constraints, here we need to merge the programmatic and discovered
+		// metadata built with the "automatic" discovering.
+		if ( !methodMetaDatas.isEmpty() ) {
+			for ( AggregatedMethodMetaData aggregatedMethodMetaData : methodMetaDatas ) {
+				for ( MethodMetaData methodMetaData : aggregatedMethodMetaData.getAllMethodMetaData() ) {
+					Method method = methodMetaData.getMethod();
+					addMethodMetaConstraint( method.getDeclaringClass(), methodMetaData );
+				}
+			}
+		}
+
+		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData() );
 
 		// reset class members we don't need any longer
-		methodMetaDataBuilders = null;
+		this.methodMetaDataBuilders = null;
 		this.constraintHelper = null;
 	}
 
@@ -290,15 +306,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableSet( cascadedMembers );
 	}
 
-	public Map<Class<?>, List<BeanMetaConstraint<? extends Annotation>>> getMetaConstraintsAsMap() {
+	public Map<Class<?>, List<BeanMetaConstraint<?>>> getMetaConstraintsAsMap() {
 		return Collections.unmodifiableMap( metaConstraints );
 	}
 
-	public Set<BeanMetaConstraint<? extends Annotation>> getMetaConstraints() {
+	public Set<BeanMetaConstraint<?>> getMetaConstraints() {
 		return allMetaConstraints;
 	}
 
-	public Set<BeanMetaConstraint<? extends Annotation>> getDirectMetaConstraints() {
+	public Set<BeanMetaConstraint<?>> getDirectMetaConstraints() {
 		return directMetaConstraints;
 	}
 
@@ -339,16 +355,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
 	}
 
-	private Set<BeanMetaConstraint<? extends Annotation>> buildAllConstraintSets() {
-		Set<BeanMetaConstraint<? extends Annotation>> constraints = newHashSet();
-		for ( List<BeanMetaConstraint<? extends Annotation>> list : metaConstraints.values() ) {
+	private Set<BeanMetaConstraint<?>> buildAllConstraintSets() {
+		Set<BeanMetaConstraint<?>> constraints = newHashSet();
+		for ( List<BeanMetaConstraint<?>> list : metaConstraints.values() ) {
 			constraints.addAll( list );
 		}
 		return Collections.unmodifiableSet( constraints );
 	}
 
-	private Set<BeanMetaConstraint<? extends Annotation>> buildDirectConstraintSets() {
-		Set<BeanMetaConstraint<? extends Annotation>> constraints = newHashSet();
+	private Set<BeanMetaConstraint<?>> buildDirectConstraintSets() {
+		Set<BeanMetaConstraint<?>> constraints = newHashSet();
 		// collect all constraints directly defined in this bean
 		if ( metaConstraints.get( beanClass ) != null ) {
 			constraints.addAll( metaConstraints.get( beanClass ) );
@@ -420,11 +436,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return validDefaultGroupSequence;
 	}
 
-	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<? extends Annotation> metaConstraint) {
+	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<?> metaConstraint) {
 		// first we add the meta constraint to our meta constraint map
-		List<BeanMetaConstraint<? extends Annotation>> constraintList;
+		List<BeanMetaConstraint<?>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
-			constraintList = new ArrayList<BeanMetaConstraint<? extends Annotation>>();
+			constraintList = new ArrayList<BeanMetaConstraint<?>>();
 			metaConstraints.put( clazz, constraintList );
 		}
 		else {
@@ -457,8 +473,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			addToPropertyNameList( methodMetaData.getMethod() );
 			ReflectionHelper.setAccessibility( methodMetaData.getMethod() );
 
-			for ( BeanMetaConstraint<? extends Annotation> metaConstraint : methodMetaData ) {
-				addMetaConstraint( clazz, metaConstraint );
+			for ( MethodMetaConstraint<?> metaConstraint : methodMetaData ) {
+
+				addMetaConstraint( clazz, getAsBeanMetaConstraint( metaConstraint, methodMetaData.getMethod() ) );
 			}
 
 			if ( methodMetaData.isCascading() ) {
@@ -704,8 +721,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new BeanMetaConstraint<A>( descriptor, declaringClass, m );
 	}
 
-	private <A extends Annotation> ParameterMetaConstraint<T, A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new ParameterMetaConstraint<T, A>( descriptor, method, parameterIndex );
+	private <A extends Annotation> MethodMetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MethodMetaConstraint<A>( descriptor, method, parameterIndex );
+	}
+
+	private <A extends Annotation> MethodMetaConstraint<A> createReturnValueMetaConstraint(Method method, ConstraintDescriptorImpl<A> descriptor) {
+		return new MethodMetaConstraint<A>( descriptor, method );
 	}
 
 	/**
@@ -802,18 +823,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		List<ParameterMetaData> parameterConstraints = getParameterMetaData( method );
 		boolean isCascading = isValidAnnotationPresent( method ) || cascadedMembers.contains( method );
-		List<BeanMetaConstraint<? extends Annotation>> constraints =
+		List<MethodMetaConstraint<?>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
 
 		return new MethodMetaData( method, parameterConstraints, constraints, isCascading );
 	}
 
-	private List<BeanMetaConstraint<? extends Annotation>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
+	private List<MethodMetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
 
-		List<BeanMetaConstraint<? extends Annotation>> constraints = new ArrayList<BeanMetaConstraint<? extends Annotation>>();
+		List<MethodMetaConstraint<?>> constraints = newArrayList();
 
 		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
-			constraints.add( createBeanMetaConstraint( method.getDeclaringClass(), method, oneDescriptor ) );
+			constraints.add( createReturnValueMetaConstraint( method, oneDescriptor ) );
 		}
 
 		return constraints;
@@ -837,7 +858,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			boolean parameterIsCascading = false;
 			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-			List<MetaConstraint<? extends Annotation>> constraintsOfOneParameter = newArrayList();
+			List<MethodMetaConstraint<?>> constraintsOfOneParameter = newArrayList();
 
 			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
 
@@ -868,6 +889,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		return metaData;
+	}
+
+	private <A extends Annotation> MethodMetaConstraint<A> getAsMethodMetaConstraint(BeanMetaConstraint<A> beanMetaConstraint) {
+		return new MethodMetaConstraint<A>(
+				beanMetaConstraint.getDescriptor(), (Method) beanMetaConstraint.getLocation().getMember()
+		);
+	}
+
+	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint, Method method) {
+		return new BeanMetaConstraint<A>(
+				methodMetaConstraint.getDescriptor(), methodMetaConstraint.getLocation().getBeanClass(), method
+		);
 	}
 
 	private ConstraintOrigin determineOrigin(Class<?> clazz) {

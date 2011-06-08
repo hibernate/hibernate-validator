@@ -23,11 +23,10 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.util.ValidatorUtil;
-import org.hibernate.validator.test.util.ValidationInvocationHandler;
 import org.hibernate.validator.util.LoggerFactory;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.fail;
 
 /**
@@ -54,14 +53,8 @@ public class FailFastTest {
 
 	@Test
 	public void testFailFastMethodValidationDefaultBehaviour() {
-		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
-		final ValidatorFactory factory = configuration.buildValidatorFactory();
 
-		final Validator validator = factory.getValidator();
-		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
-
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-		TestService service = (TestService) getMethodValidationProxy( handler );
+		TestService service = getValidatingProxy( new TestServiceImpl() );
 
 		try {
 			service.testMethod( " ", null );
@@ -88,10 +81,9 @@ public class FailFastTest {
 		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
-		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
+		final MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-		TestService service = (TestService) getMethodValidationProxy( handler );
+		TestService service = getValidatingProxy( new TestServiceImpl(), methodValidator );
 
 		try {
 			service.testMethod( "a", null );
@@ -126,10 +118,9 @@ public class FailFastTest {
 						.usingContext()
 						.failFast( true )
 						.getValidator();
-		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
+		final MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-		TestService service = (TestService) getMethodValidationProxy( handler );
+		TestService service = getValidatingProxy( new TestServiceImpl(), methodValidator );
 
 		try {
 			service.testMethod( " ", null );
@@ -169,10 +160,9 @@ public class FailFastTest {
 				.buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
-		final MethodValidator methodvalidator = validator.unwrap( MethodValidator.class );
+		final MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
-		ValidationInvocationHandler handler = new ValidationInvocationHandler( new TestServiceImpl(), methodvalidator );
-		TestService service = (TestService) getMethodValidationProxy( handler );
+		TestService service = getValidatingProxy( new TestServiceImpl(), methodValidator );
 
 		try {
 			service.testMethod( " ", null );
@@ -207,7 +197,7 @@ public class FailFastTest {
 				HibernateValidatorConfiguration.FAIL_FAST, "false"
 		).failFast( true ).buildValidatorFactory();
 
-		final Validator validator = factory.getValidator();
+		factory.getValidator();
 	}
 
 	public void testFailSafePerf() {

@@ -46,6 +46,7 @@ import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.util.privilegedactions.GetConstructor;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.util.privilegedactions.GetMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
@@ -141,7 +142,6 @@ public final class ReflectionHelper {
 		return instance;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
 		T result;
 		GetAnnotationParameter<T> action = GetAnnotationParameter.action( annotation, parameterName, type );
@@ -385,7 +385,7 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is a iterable type, <code>false</code> otherwise.
 	 */
 	public static boolean isIterable(Type type) {
-		if ( type instanceof Class && Iterable.class.isAssignableFrom( (Class) type ) ) {
+		if ( type instanceof Class && Iterable.class.isAssignableFrom( (Class<?>) type ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -404,7 +404,7 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>Map</code>, <code>false</code> otherwise.
 	 */
 	public static boolean isMap(Type type) {
-		if ( type instanceof Class && Map.class.isAssignableFrom( (Class) type ) ) {
+		if ( type instanceof Class && Map.class.isAssignableFrom( (Class<?>) type ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -423,7 +423,7 @@ public final class ReflectionHelper {
 	 * @return Returns <code>true</code> if <code>type</code> is implementing <code>List</code>, <code>false</code> otherwise.
 	 */
 	public static boolean isList(Type type) {
-		if ( type instanceof Class && List.class.isAssignableFrom( (Class) type ) ) {
+		if ( type instanceof Class && List.class.isAssignableFrom( (Class<?>) type ) ) {
 			return true;
 		}
 		if ( type instanceof ParameterizedType ) {
@@ -586,11 +586,33 @@ public final class ReflectionHelper {
 	 * @param clazz The class to check.
 	 * @param methodName The method name.
 	 *
-	 * @return Returns the method with the specified property or {@code null}if it does not exist.
+	 * @return Returns the method with the specified property or {@code null} if it does not exist.
 	 */
 	public static Method getMethod(Class<?> clazz, String methodName) {
 		Method method;
 		GetMethod action = GetMethod.action( clazz, methodName );
+		if ( System.getSecurityManager() != null ) {
+			method = AccessController.doPrivileged( action );
+		}
+		else {
+			method = action.run();
+		}
+		return method;
+	}
+
+	/**
+	 * Returns the declared method with the specified name and parameter types or {@code null} if
+	 * it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param methodName The method name.
+	 * @param parameterTypes The method parameter types.
+	 *
+	 * @return Returns the declared method with the specified name or {@code null} if it does not exist.
+	 */
+	public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		Method method;
+		GetDeclaredMethod action = GetDeclaredMethod.action( clazz, methodName, parameterTypes );
 		if ( System.getSecurityManager() != null ) {
 			method = AccessController.doPrivileged( action );
 		}
@@ -668,7 +690,7 @@ public final class ReflectionHelper {
 	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not represent a primitive type.
 	 */
 	public static Class<?> boxedType(Type primitiveType) {
-		if ( !( primitiveType instanceof Class ) && !( (Class) primitiveType ).isPrimitive() ) {
+		if ( !( primitiveType instanceof Class ) && !( (Class<?>) primitiveType ).isPrimitive() ) {
 			throw new IllegalArgumentException( primitiveType.getClass() + "has to be a primitive type" );
 		}
 

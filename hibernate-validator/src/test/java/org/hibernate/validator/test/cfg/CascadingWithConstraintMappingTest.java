@@ -33,6 +33,7 @@ import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
 
@@ -43,9 +44,10 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", FIELD )
-				.constraint( NotNullDef.class )
+				.constraint( create( NotNullDef.class ) )
 				.type( A.class )
-				.valid( "c", FIELD );
+				.property( "c", FIELD )
+				.valid();
 		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
 
 		B b = new B();
@@ -63,9 +65,10 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( NotNullDef.class )
+				.constraint( create( NotNullDef.class ) )
 				.type( A.class )
-				.valid( "c", METHOD );
+				.property( "c", METHOD )
+				.valid();
 		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
 
 		B b = new B();
@@ -83,9 +86,10 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( NotNullDef.class )
+				.constraint( create( NotNullDef.class ) )
 				.type( A.class )
-				.valid( "c", METHOD );
+				.property( "c", METHOD )
+				.valid();
 		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
 		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 

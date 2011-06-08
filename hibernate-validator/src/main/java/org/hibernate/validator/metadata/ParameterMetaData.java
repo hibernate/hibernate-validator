@@ -16,17 +16,18 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
  *
  * @author Gunnar Morling
  */
-public class ParameterMetaData implements Iterable<MetaConstraint<? extends Annotation>> {
+public class ParameterMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 	private final Class<?> type;
 
@@ -34,11 +35,11 @@ public class ParameterMetaData implements Iterable<MetaConstraint<? extends Anno
 
 	private final String name;
 
-	private final List<MetaConstraint<? extends Annotation>> constraints;
+	private final List<MethodMetaConstraint<?>> constraints;
 
 	private final boolean isCascading;
 
-	public ParameterMetaData(int index, Class<?> type, String name, List<MetaConstraint<? extends Annotation>> constraints, boolean isCascading) {
+	public ParameterMetaData(int index, Class<?> type, String name, List<MethodMetaConstraint<?>> constraints, boolean isCascading) {
 
 		this.index = index;
 		this.type = type;
@@ -76,8 +77,19 @@ public class ParameterMetaData implements Iterable<MetaConstraint<? extends Anno
 		return isCascading || !constraints.isEmpty();
 	}
 
-	public Iterator<MetaConstraint<? extends Annotation>> iterator() {
+	public Iterator<MethodMetaConstraint<?>> iterator() {
 		return constraints.iterator();
+	}
+
+	public ParameterMetaData merge(ParameterMetaData otherMetaData) {
+
+		return new ParameterMetaData(
+				index,
+				type,
+				name,
+				newArrayList( this, otherMetaData ),
+				isCascading() || otherMetaData.isCascading()
+		);
 	}
 
 	@Override
@@ -86,7 +98,7 @@ public class ParameterMetaData implements Iterable<MetaConstraint<? extends Anno
 		//display short annotation type names
 		StringBuilder sb = new StringBuilder();
 
-		for ( MetaConstraint<? extends Annotation> oneConstraint : constraints ) {
+		for ( MetaConstraint<?> oneConstraint : constraints ) {
 			sb.append( oneConstraint.getDescriptor().getAnnotation().annotationType().getSimpleName() );
 			sb.append( ", " );
 		}

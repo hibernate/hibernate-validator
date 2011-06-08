@@ -16,25 +16,20 @@
  */
 package org.hibernate.validator.test.engine.methodlevel;
 
-import javax.validation.Validation;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodConstraintViolationException;
-import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
-import org.hibernate.validator.test.util.ValidationInvocationHandler;
 
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidationProxy;
+import static org.hibernate.validator.test.util.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -53,18 +48,9 @@ public class MethodLevelValidationGroupSequenceTest {
 	}
 
 	private void setUpValidatorForGroups(Class<?>... groups) {
-
-		MethodValidator validator = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.buildValidatorFactory()
-				.getValidator()
-				.unwrap( MethodValidator.class );
-
-		ValidationInvocationHandler handler = new ValidationInvocationHandler(
-				new CustomerRepositoryWithRedefinedDefaultGroupImpl(), validator, groups
+		customerRepository = getValidatingProxy(
+				new CustomerRepositoryWithRedefinedDefaultGroupImpl(), groups
 		);
-
-		customerRepository = (CustomerRepositoryWithRedefinedDefaultGroup) getMethodValidationProxy( handler );
 	}
 
 	@Test
