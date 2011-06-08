@@ -28,8 +28,8 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
  */
-public interface TypeConstraintMappingCreationalContext<C>
-		extends Constrainable<TypeConstraintMappingCreationalContext<C>>, TypeTargets {
+public interface TypeConstraintMappingContext<C>
+		extends Constrainable<TypeConstraintMappingContext<C>>, TypeTargets {
 
 	/**
 	 * Defines the default group sequence for current type.
@@ -38,7 +38,7 @@ public interface TypeConstraintMappingCreationalContext<C>
 	 *
 	 * @return The current creational context following the method chaining pattern.
 	 */
-	TypeConstraintMappingCreationalContext<C> defaultGroupSequence(
+	TypeConstraintMappingContext<C> defaultGroupSequence(
 			Class<?>... defaultGroupSequence);
 
 	/**
@@ -48,7 +48,7 @@ public interface TypeConstraintMappingCreationalContext<C>
 	 *
 	 * @return The current creational context following the method chaining pattern.
 	 */
-	<T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingCreationalContext<C> defaultGroupSequenceProvider(
+	<T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingContext<C> defaultGroupSequenceProvider(
 			Class<T> defaultGroupSequenceProviderClass);
 
 }

@@ -21,9 +21,9 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
+import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
+import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -32,26 +32,26 @@ import org.hibernate.validator.util.ReflectionHelper;
  *
  * @author Gunnar Morling
  */
-public abstract class ConstraintMappingCreationalContextImplBase {
+public abstract class ConstraintMappingContextImplBase {
 
 	protected final Class<?> beanClass;
 
 	protected final ConstraintMappingContext mapping;
 
-	public ConstraintMappingCreationalContextImplBase(Class<?> beanClass, ConstraintMappingContext mapping) {
+	public ConstraintMappingContextImplBase(Class<?> beanClass, ConstraintMappingContext mapping) {
 
 		this.beanClass = beanClass;
 		this.mapping = mapping;
 	}
 
-	public <C> TypeConstraintMappingCreationalContext<C> type(Class<C> type) {
+	public <C> TypeConstraintMappingContext<C> type(Class<C> type) {
 
 		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
 
-		return new TypeConstraintMappingCreationalContextImpl<C>( type, mapping );
+		return new TypeConstraintMappingContextImpl<C>( type, mapping );
 	}
 
-	public PropertyConstraintMappingCreationalContext property(String property, ElementType elementType) {
+	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 
 		Contracts.assertNotNull( property, "The property name must not be null." );
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
@@ -71,10 +71,10 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 			);
 		}
 
-		return new PropertyConstraintMappingCreationalContextImpl( beanClass, member, mapping );
+		return new PropertyConstraintMappingContextImpl( beanClass, member, mapping );
 	}
 
-	public MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes) {
+	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
 
 		Contracts.assertNotNull( name, "The method name must not be null." );
 
@@ -93,7 +93,7 @@ public abstract class ConstraintMappingCreationalContextImplBase {
 			);
 		}
 
-		return new MethodConstraintMappingCreationalContextImpl( beanClass, method, mapping );
+		return new MethodConstraintMappingContextImpl( beanClass, method, mapping );
 	}
 
 }

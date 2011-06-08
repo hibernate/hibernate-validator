@@ -16,9 +16,9 @@
  */
 package org.hibernate.validator.cfg;
 
-import org.hibernate.validator.cfg.context.TypeConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
-import org.hibernate.validator.cfg.context.impl.TypeConstraintMappingCreationalContextImpl;
+import org.hibernate.validator.cfg.context.impl.TypeConstraintMappingContextImpl;
 import org.hibernate.validator.util.Contracts;
 
 /**
@@ -49,11 +49,11 @@ public class ConstraintMapping {
 	 *
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
-	public final <C> TypeConstraintMappingCreationalContext<C> type(Class<C> beanClass) {
+	public final <C> TypeConstraintMappingContext<C> type(Class<C> beanClass) {
 
 		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
 
-		return new TypeConstraintMappingCreationalContextImpl<C>( beanClass, context );
+		return new TypeConstraintMappingContextImpl<C>( beanClass, context );
 	}
 
 }

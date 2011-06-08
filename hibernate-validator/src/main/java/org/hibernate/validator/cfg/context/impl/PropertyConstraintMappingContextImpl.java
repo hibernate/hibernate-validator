@@ -19,7 +19,7 @@ package org.hibernate.validator.cfg.context.impl;
 import java.lang.reflect.Member;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.context.PropertyConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 
 /**
@@ -29,19 +29,19 @@ import org.hibernate.validator.metadata.location.BeanConstraintLocation;
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public final class PropertyConstraintMappingCreationalContextImpl extends ConstraintMappingCreationalContextImplBase
-		implements PropertyConstraintMappingCreationalContext {
+public final class PropertyConstraintMappingContextImpl extends ConstraintMappingContextImplBase
+		implements PropertyConstraintMappingContext {
 
 	private final Member member;
 
-	public PropertyConstraintMappingCreationalContextImpl(Class<?> beanClass, Member member, ConstraintMappingContext mapping) {
+	public PropertyConstraintMappingContextImpl(Class<?> beanClass, Member member, ConstraintMappingContext mapping) {
 
 		super( beanClass, mapping );
 
 		this.member = member;
 	}
 
-	public PropertyConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
+	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
 
 		mapping.addConstraintConfig(
 				ConfiguredConstraint.forProperty(
@@ -51,7 +51,7 @@ public final class PropertyConstraintMappingCreationalContextImpl extends Constr
 		return this;
 	}
 
-	public PropertyConstraintMappingCreationalContext valid() {
+	public PropertyConstraintMappingContext valid() {
 		mapping.addCascadeConfig( new BeanConstraintLocation( beanClass, member ) );
 		return this;
 	}

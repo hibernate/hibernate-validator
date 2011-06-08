@@ -32,6 +32,6 @@ public interface ParameterTarget {
 	 *
 	 * @return A creational context representing the selected parameter.
 	 */
-	MethodParameterConstraintMappingCreationalContext parameter(int index);
+	ParameterConstraintMappingContext parameter(int index);
 
 }

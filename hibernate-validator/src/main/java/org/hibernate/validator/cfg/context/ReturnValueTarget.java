@@ -30,6 +30,6 @@ public interface ReturnValueTarget {
 	 *
 	 * @return A creational context representing the current method's return value.
 	 */
-	MethodReturnValueConstraintMappingCreationalContext returnValue();
+	ReturnValueConstraintMappingContext returnValue();
 
 }

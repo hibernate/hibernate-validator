@@ -19,8 +19,8 @@ package org.hibernate.validator.cfg.context.impl;
 import java.lang.reflect.Method;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**
@@ -30,20 +30,20 @@ import org.hibernate.validator.metadata.location.MethodConstraintLocation;
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public final class MethodReturnValueConstraintMappingCreationalContextImpl
-		extends ConstraintMappingCreationalContextImplBase
-		implements MethodReturnValueConstraintMappingCreationalContext {
+public final class ReturnValueConstraintMappingContextImpl
+		extends ConstraintMappingContextImplBase
+		implements ReturnValueConstraintMappingContext {
 
 	private final Method method;
 
-	public MethodReturnValueConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
+	public ReturnValueConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
 
 		super( beanClass, mapping );
 
 		this.method = method;
 	}
 
-	public MethodReturnValueConstraintMappingCreationalContext constraint(ConstraintDef<?, ?> definition) {
+	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
 		mapping.addMethodConstraintConfig(
 				ConfiguredConstraint.forReturnValue(
 						definition, method
@@ -57,7 +57,7 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 	 *
 	 * @return Returns itself for method chaining.
 	 */
-	public MethodReturnValueConstraintMappingCreationalContext valid() {
+	public ReturnValueConstraintMappingContext valid() {
 		mapping.addMethodCascadeConfig( new MethodConstraintLocation( method ) );
 		return this;
 	}
@@ -69,8 +69,8 @@ public final class MethodReturnValueConstraintMappingCreationalContextImpl
 	 *
 	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
 	 */
-	public MethodParameterConstraintMappingCreationalContext parameter(int index) {
-		return new MethodParameterConstraintMappingCreationalContextImpl(
+	public ParameterConstraintMappingContext parameter(int index) {
+		return new ParameterConstraintMappingContextImpl(
 				beanClass, method, index, mapping
 		);
 	}

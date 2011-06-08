@@ -35,7 +35,7 @@ public interface TypeTargets {
 	 *
 	 * @return A creational context representing the selected type.
 	 */
-	<C> TypeConstraintMappingCreationalContext<C> type(Class<C> type);
+	<C> TypeConstraintMappingContext<C> type(Class<C> type);
 
 	/**
 	 * Selects a property to which the next operations shall apply.
@@ -49,7 +49,7 @@ public interface TypeTargets {
 	 *
 	 * @return A creational context representing the selected property.
 	 */
-	PropertyConstraintMappingCreationalContext property(String property,
+	PropertyConstraintMappingContext property(String property,
 														ElementType type);
 
 	/**
@@ -64,6 +64,6 @@ public interface TypeTargets {
 	 *
 	 * @return A creational context representing the selected method.
 	 */
-	MethodConstraintMappingCreationalContext method(String name, Class<?>... parameterTypes);
+	MethodConstraintMappingContext method(String name, Class<?>... parameterTypes);
 
 }

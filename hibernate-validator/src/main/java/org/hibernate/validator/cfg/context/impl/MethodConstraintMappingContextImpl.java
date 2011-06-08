@@ -18,9 +18,9 @@ package org.hibernate.validator.cfg.context.impl;
 
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.cfg.context.MethodConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.context.MethodParameterConstraintMappingCreationalContext;
-import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCreationalContext;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 
 /**
  * A constraint mapping creational context which allows to select the parameter or
@@ -29,27 +29,27 @@ import org.hibernate.validator.cfg.context.MethodReturnValueConstraintMappingCre
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
  */
-public class MethodConstraintMappingCreationalContextImpl implements MethodConstraintMappingCreationalContext {
+public class MethodConstraintMappingContextImpl implements MethodConstraintMappingContext {
 
 	private final Class<?> beanClass;
 	private final Method method;
 	private final ConstraintMappingContext mapping;
 
-	public MethodConstraintMappingCreationalContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
+	public MethodConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
 
 		this.beanClass = beanClass;
 		this.method = method;
 		this.mapping = mapping;
 	}
 
-	public MethodParameterConstraintMappingCreationalContext parameter(int index) {
-		return new MethodParameterConstraintMappingCreationalContextImpl(
+	public ParameterConstraintMappingContext parameter(int index) {
+		return new ParameterConstraintMappingContextImpl(
 				beanClass, method, index, mapping
 		);
 	}
 
-	public MethodReturnValueConstraintMappingCreationalContext returnValue() {
-		return new MethodReturnValueConstraintMappingCreationalContextImpl(
+	public ReturnValueConstraintMappingContext returnValue() {
+		return new ReturnValueConstraintMappingContextImpl(
 				beanClass, method, mapping
 		);
 	}
