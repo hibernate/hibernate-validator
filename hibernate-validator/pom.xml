@@ -175,6 +175,7 @@
                             org.hibernate.validator;version="${project.version}",
                             org.hibernate.validator.constraints;version="${project.version}",
                             org.hibernate.validator.cfg;version="${project.version}",
+                            org.hibernate.validator.cfg.context;version="${project.version}",
                             org.hibernate.validator.cfg.defs;version="${project.version}",
                             org.hibernate.validator.group;version="${project.version}",
                             org.hibernate.validator.messageinterpolation;version="${project.version}",
