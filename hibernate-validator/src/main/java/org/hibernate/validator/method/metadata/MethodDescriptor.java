@@ -37,6 +37,20 @@ public interface MethodDescriptor extends ElementDescriptor {
 
 	/**
 	 * <p>
+	 * Returns a list containing this method's parameter types.
+	 * </p>
+	 * <p>
+	 * The size of this list corresponds with the number of this method's
+	 * parameters.
+	 * </p>
+	 *
+	 * @return A list containing this method's parameter types. An empty
+	 *         list will be returned if this method has no parameters.
+	 */
+	List<Class<?>> getParameterTypes();
+
+	/**
+	 * <p>
 	 * Returns a list with descriptors for this method's parameters.
 	 * </p>
 	 * <p>

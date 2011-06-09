@@ -45,6 +45,16 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		return methodMetaData.getMethod().getName();
 	}
 
+	public List<Class<?>> getParameterTypes() {
+		List<Class<?>> theValue = newArrayList();
+
+		for ( ParameterMetaData oneParameter : methodMetaData.getAllParameterMetaData() ) {
+			theValue.add( oneParameter.getType() );
+		}
+
+		return theValue;
+	}
+
 	public List<ParameterDescriptor> getParameterDescriptors() {
 
 		List<ParameterDescriptor> theValue = newArrayList();
