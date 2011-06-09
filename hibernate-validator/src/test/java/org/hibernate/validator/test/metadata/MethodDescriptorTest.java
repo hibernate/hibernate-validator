@@ -132,7 +132,7 @@ public class MethodDescriptorTest {
 				CustomerRepositoryExt.class, "createCustomer", CharSequence.class, String.class
 		);
 
-		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();
+		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterDescriptors();
 		assertNotNull( parameterConstraints );
 		assertEquals( parameterConstraints.size(), 2 );
 
@@ -150,7 +150,7 @@ public class MethodDescriptorTest {
 
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 
-		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterConstraints();
+		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterDescriptors();
 		assertNotNull( parameterConstraints );
 		assertEquals( parameterConstraints.size(), 0 );
 	}

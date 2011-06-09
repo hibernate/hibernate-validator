@@ -45,7 +45,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		return methodMetaData.getMethod().getName();
 	}
 
-	public List<ParameterDescriptor> getParameterConstraints() {
+	public List<ParameterDescriptor> getParameterDescriptors() {
 
 		List<ParameterDescriptor> theValue = newArrayList();
 

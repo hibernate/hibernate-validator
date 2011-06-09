@@ -205,7 +205,7 @@ public final class ValidatorUtil {
 				methodDescriptor,
 				"No method with the given signature is declared in " + clazz + " or its super class"
 		);
-		return methodDescriptor.getParameterConstraints().get( parameterIndex );
+		return methodDescriptor.getParameterDescriptors().get( parameterIndex );
 	}
 
 	public static <T, I extends T> T getValidatingProxy(I implementor) {

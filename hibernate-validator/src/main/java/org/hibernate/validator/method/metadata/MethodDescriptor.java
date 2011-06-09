@@ -24,6 +24,7 @@ import javax.validation.metadata.ElementDescriptor;
  * Describes a method and the constraints associated with it.
  *
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface MethodDescriptor extends ElementDescriptor {
 
@@ -46,7 +47,7 @@ public interface MethodDescriptor extends ElementDescriptor {
 	 * @return A list with descriptors for this method's parameters. An empty
 	 *         list will be returned if this method has no parameters.
 	 */
-	List<ParameterDescriptor> getParameterConstraints();
+	List<ParameterDescriptor> getParameterDescriptors();
 
 	/**
 	 * Whether a cascaded validation for this method's return value shall be
