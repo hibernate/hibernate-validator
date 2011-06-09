@@ -24,12 +24,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 
-import static org.hibernate.validator.cfg.ConstraintDef.create;
-import static org.hibernate.validator.cfg.ConstraintDef.createGeneric;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodValidatorForMapping;
@@ -156,12 +155,11 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testParameterConstraint() {
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.parameter( 0 )
-				.constraint( create( NotNullDef.class ) );
+				.constraint( new NotNullDef() );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -178,12 +176,11 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testGenericParameterConstraint() {
-
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.parameter( 0 )
-				.constraint( createGeneric( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -207,8 +204,8 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.parameter( 0 )
-				.constraint( create( SizeDef.class ).min( 1 ).max( 10 ) )
-				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+				.constraint( new SizeDef().min( 1 ).max( 10 ) )
+				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -232,9 +229,9 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class, String.class )
 				.parameter( 0 )
-				.constraint( create( SizeDef.class ).min( 1 ).max( 10 ) )
+				.constraint( new SizeDef().min( 1 ).max( 10 ) )
 				.parameter( 1 )
-				.constraint( create( SizeDef.class ).min( 1 ).max( 10 ) );
+				.constraint( new SizeDef().min( 1 ).max( 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -258,7 +255,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "sayHello", String.class )
 				.parameter( 0 )
-				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -282,7 +279,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.parameter( 0 )
-				.constraint( create( NotNullDef.class ) )
+				.constraint( new NotNullDef() )
 				.valid();
 
 		GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -317,7 +314,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
-				.constraint( create( SizeDef.class ).min( 1 ).max( 10 ) );
+				.constraint( new SizeDef().min( 1 ).max( 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -339,8 +336,8 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
-				.constraint( create( SizeDef.class ).min( 1 ).max( 10 ) )
-				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+				.constraint( new SizeDef().min( 1 ).max( 10 ) )
+				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -364,7 +361,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
-				.constraint( createGeneric( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
@@ -388,7 +385,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class, String.class )
 				.returnValue()
-				.constraint( create( SizeDef.class ).min( 2 ).max( 10 ) );
+				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 
 		try {
 			GreetingService service = getValidatingProxy( wrappedObject, mapping );
