@@ -71,6 +71,7 @@
 
           <row>
             <entry><package>org.hibernate.validator.cfg</package>,
+            <package>org.hibernate.validator.cfg.context</package>,
             <package>org.hibernate.validator.cfg.defs</package></entry>
 
             <entry>With Hibernate Validator you can define constraints via a fluent
