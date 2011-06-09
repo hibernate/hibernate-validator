@@ -39,7 +39,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.testng.Assert.assertTrue;
 
@@ -56,11 +55,7 @@ public class MessageInterpolatorContextTest {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Test.class )
 				.property( "test", FIELD )
-				.constraint(
-						create( MinDef.class )
-								.value( 10 )
-								.message( "{foo}" )
-				);
+				.constraint( new MinDef().value( 10 ).message( "{foo}" ) );
 
 		// use a easy mock message interpolator to verify the right for verifying that the right MessageInterpolatorContext
 		// will be passed
@@ -93,7 +88,6 @@ public class MessageInterpolatorContextTest {
 		// verify that the right validatedValue was passed
 		verify( mock );
 	}
-
 
 	public static class Test {
 		private String test;

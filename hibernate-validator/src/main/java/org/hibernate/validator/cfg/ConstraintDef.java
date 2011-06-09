@@ -66,33 +66,6 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		this.parameters = original.parameters;
 	}
 
-	/**
-	 * Creates a new constraint definition.
-	 *
-	 * @param <C> The type of the definition to be instantiated.
-	 * @param clazz The class representing the definition to be instantiated.
-	 *
-	 * @return A new instance of the given constraint definition type.
-	 */
-	public static <C extends ConstraintDef<C, ?>> C create(Class<C> clazz) {
-		return ReflectionHelper.newInstance( clazz, "constraint definition" );
-	}
-
-	/**
-	 * Creates a new generic constraint definition.
-	 *
-	 * @param <A> The constraint annotation type of the generic definition to be
-	 * created.
-	 * @param clazz The class representing the annotation type of the definition
-	 * to be instantiated.
-	 *
-	 * @return A new generic constraint definition for the given constraint
-	 *         annotation type.
-	 */
-	public static <A extends Annotation> GenericConstraintDef<A> createGeneric(Class<A> clazz) {
-		return new GenericConstraintDef<A>( clazz );
-	}
-
 	@SuppressWarnings("unchecked")
 	private C getThis() {
 		return (C) this;

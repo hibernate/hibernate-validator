@@ -33,7 +33,6 @@ import org.hibernate.validator.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
@@ -44,7 +43,7 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", FIELD )
-				.constraint( create( NotNullDef.class ) )
+				.constraint( new NotNullDef() )
 				.type( A.class )
 				.property( "c", FIELD )
 				.valid();
@@ -65,7 +64,7 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( create( NotNullDef.class ) )
+				.constraint( new NotNullDef() )
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();
@@ -86,7 +85,7 @@ public class CascadingWithConstraintMappingTest {
 		newMapping
 				.type( C.class )
 				.property( "string", METHOD )
-				.constraint( create( NotNullDef.class ) )
+				.constraint( new NotNullDef() )
 				.type( A.class )
 				.property( "c", METHOD )
 				.valid();
