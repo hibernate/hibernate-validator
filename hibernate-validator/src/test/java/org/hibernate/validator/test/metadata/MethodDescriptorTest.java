@@ -154,4 +154,32 @@ public class MethodDescriptorTest {
 		assertNotNull( parameterConstraints );
 		assertEquals( parameterConstraints.size(), 0 );
 	}
+
+	@Test
+	public void testGetParameterTypes() {
+
+		MethodDescriptor methodDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class, "createCustomer", CharSequence.class, String.class
+		);
+
+		List<Class<?>> parameterTypes = methodDescriptor.getParameterTypes();
+		assertNotNull( parameterTypes );
+		assertEquals( parameterTypes.size(), 2 );
+
+		Class<?> parameterType1 = parameterTypes.get( 0 );
+		assertEquals( parameterType1, CharSequence.class );
+
+		Class<?> parameterType2 = parameterTypes.get( 1 );
+		assertEquals( parameterType2, String.class );
+	}
+
+	@Test
+	public void testGetParameterTypesForParameterlessMethod() {
+
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
+
+		List<Class<?>> parameterTypes = methodDescriptor.getParameterTypes();
+		assertNotNull( parameterTypes );
+		assertEquals( parameterTypes.size(), 0 );
+	}
 }
