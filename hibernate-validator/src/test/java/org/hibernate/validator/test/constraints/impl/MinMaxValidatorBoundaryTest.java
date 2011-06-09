@@ -24,10 +24,10 @@ import javax.validation.constraints.Min;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * Check correct behavior of {@link org.hibernate.validator.constraints.impl.MinValidatorForNumber} and

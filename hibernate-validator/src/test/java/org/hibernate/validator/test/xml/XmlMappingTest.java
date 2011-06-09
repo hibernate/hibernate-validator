@@ -28,7 +28,7 @@ import javax.validation.groups.Default;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik

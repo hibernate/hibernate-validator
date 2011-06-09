@@ -35,12 +35,12 @@ import org.hibernate.validator.cfg.defs.FutureDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.NullDef;
 import org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpolator;
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.cfg.ConstraintDef.create;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 /**
  * Test for {@link org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpolator}.

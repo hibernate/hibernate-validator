@@ -14,27 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.util;
+package org.hibernate.validator.testutil;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
-import javax.validation.Payload;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-@Target( { METHOD, FIELD })
-@Retention(RUNTIME)
-@Constraint(validatedBy = CountValidationCallsValidator.class)
-public @interface CountValidationCalls {
-	String message() default "";
+public class CountValidationCallsValidator implements ConstraintValidator<CountValidationCalls, Object> {
+	private static final ThreadLocal<Integer> NUMBER_OF_VALIDATION_CALLS = new ThreadLocal<Integer>() {
+		@Override
+		protected Integer initialValue() {
+			return 0;
+		}
+	};
 
-	Class<?>[] groups() default { };
+	public static void init() {
+		NUMBER_OF_VALIDATION_CALLS.set( 0 );
+	}
 
-	Class<? extends Payload>[] payload() default { };
+	public static int getNumberOfValidationCall() {
+		return NUMBER_OF_VALIDATION_CALLS.get();
+	}
+
+	public void initialize(CountValidationCalls constraintAnnotation) {
+	}
+
+	public boolean isValid(Object value, ConstraintValidatorContext context) {
+		NUMBER_OF_VALIDATION_CALLS.set( NUMBER_OF_VALIDATION_CALLS.get() + 1 );
+		return true;
+	}
 }

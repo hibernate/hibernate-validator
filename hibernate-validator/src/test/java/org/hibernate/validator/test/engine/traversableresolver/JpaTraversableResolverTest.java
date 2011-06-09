@@ -25,7 +25,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.resolver.DefaultTraversableResolver;
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.testng.Assert.assertTrue;
 

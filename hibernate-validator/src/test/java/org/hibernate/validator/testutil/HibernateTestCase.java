@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.hibernate.validator.test.util;
+package org.hibernate.validator.testutil;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -65,10 +65,10 @@ public abstract class HibernateTestCase {
 				cfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 			}
 			for ( String aPackage : packages ) {
-				( ( AnnotationConfiguration ) getCfg() ).addPackage( aPackage );
+				( (AnnotationConfiguration) getCfg() ).addPackage( aPackage );
 			}
 			for ( Class<?> aClass : classes ) {
-				( ( AnnotationConfiguration ) getCfg() ).addAnnotatedClass( aClass );
+				( (AnnotationConfiguration) getCfg() ).addAnnotatedClass( aClass );
 			}
 			for ( String xmlFile : xmlFiles ) {
 				InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );

@@ -31,12 +31,12 @@ import javax.validation.metadata.BeanDescriptor;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.test.util.CountValidationCalls;
-import org.hibernate.validator.test.util.CountValidationCallsValidator;
+import org.hibernate.validator.testutil.CountValidationCalls;
+import org.hibernate.validator.testutil.CountValidationCallsValidator;
 
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.test.util.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 

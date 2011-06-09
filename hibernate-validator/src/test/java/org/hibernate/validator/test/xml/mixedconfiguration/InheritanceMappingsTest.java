@@ -26,8 +26,8 @@ import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.util.DummyTraversableResolver;
-import org.hibernate.validator.test.util.ValidatorUtil;
+import org.hibernate.validator.testutil.DummyTraversableResolver;
+import org.hibernate.validator.testutil.ValidatorUtil;
 import org.hibernate.validator.test.xml.mixedconfiguration.annotation.Competition;
 import org.hibernate.validator.test.xml.mixedconfiguration.annotation.Fixture;
 import org.hibernate.validator.test.xml.mixedconfiguration.annotation.PersonCompetition;

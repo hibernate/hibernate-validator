@@ -30,10 +30,10 @@ import org.hibernate.validator.method.MethodConstraintViolationException;
 
 import static org.hibernate.validator.cfg.ConstraintDef.create;
 import static org.hibernate.validator.cfg.ConstraintDef.createGeneric;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.test.util.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.test.util.ValidatorUtil.getMethodValidatorForMapping;
-import static org.hibernate.validator.test.util.ValidatorUtil.getValidatingProxy;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ValidatorUtil.getMethodValidatorForMapping;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.fail;
 
 /**

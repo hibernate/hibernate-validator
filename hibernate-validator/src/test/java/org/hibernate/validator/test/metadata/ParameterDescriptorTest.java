@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
-import static org.hibernate.validator.test.util.ValidatorUtil.getParameterDescriptor;
+import static org.hibernate.validator.testutil.ValidatorUtil.getParameterDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
