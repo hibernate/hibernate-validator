@@ -1,7 +1,7 @@
 
   Hibernate Validator
   ==================================================
-  Version: 4.2.0.Beta2, 07.03.2011
+  Version: 4.2.0.CR1, 09.06.2011
 
 
   What is it?
@@ -29,7 +29,7 @@
   -------------
 
   The full list of changes for this release can be found at
-  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11180
+  http://opensource.atlassian.com/projects/hibernate/secure/ReleaseNote.jspa?projectId=10060&version=11181
 
   System Requirements
   -------------------
@@ -54,7 +54,7 @@
     <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
-        <version>4.2.0.Beta2</version>
+        <version>4.2.0.CR1</version>
     </dependency>
 
     Hibernate Validator can be found in the JBoss Maven repository:

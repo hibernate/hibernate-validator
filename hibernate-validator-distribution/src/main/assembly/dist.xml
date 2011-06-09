@@ -94,6 +94,7 @@
                 <exclude>.gitignore</exclude>
                 <exclude>**/target/**</exclude>
                 <exclude>**/.idea/**</exclude>
+                <exclude>.sonar-ide.properties</exclude>
                 <exclude>**/*.iml</exclude>
             </excludes>
         </fileSet>

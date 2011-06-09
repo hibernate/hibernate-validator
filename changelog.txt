@@ -1,6 +1,47 @@
 Hibernate Validator Changelog
 ==========================
 
+4.2.0.CR1 (09.06.2011)
+----------------------
+
+** Bug
+    * [HV-406] - URL Validator not effective
+    * [HV-437] - Improve the javadocs of the URL constraints
+    * [HV-447] - Create documentation for boolean composition of composing constraints
+    * [HV-452] - Incorrect Paths when using fluent API to add constraints to a context
+    * [HV-458] - Wrong behaviour determining default group constraints in conjunction with @GroupSequence
+    * [HV-459] - Run TCK against AS 7
+    * [HV-466] - Avoid repeated validation of constraints in certain type hierarchies
+    * [HV-468] - Determine whether a property is indexed based on the runtime not static type
+    * [HV-470] - resolvedMessages in ResourceBundleMessageInterpolator needs to be synchronized
+
+** Improvement
+    * [HV-407] - Update "Presentation layer validation" section
+    * [HV-417] - Add section on public API and it's changes to the reference guide
+    * [HV-434] - ValidatorImpl#shouldFailFast() and ValidationContext#shouldFailFast() seem redundant
+    * [HV-442] - Make clear in the documentation which types are supported for built-in constraints
+    * [HV-446] - The annotation processor should allow constraint annotations at non-getter methods
+    * [HV-449] - Remove interface check in BeanMetaDataImpl#newGroupSequenceProviderInstance()
+    * [HV-453] - Add an example of default group sequence provider configuration with the programmatic API
+    * [HV-454] - Fix a mistake in the reference guide about custom properties supported by Hibernate Validator
+    * [HV-461] - Refactor TestUtil class
+    * [HV-475] - Add required and public packages to the OSGi manifest
+    * [HV-488] - Rename MethodDescriptor#getParameterConstraints() method
+
+** New Feature
+    * [HV-436] - The annotation processor should check @GroupSequenceProvider
+
+** Patch
+    * [HV-483] - ValidationMessages translation to Spanish
+
+** Task
+    * [HV-400] - Align the configuration of the archetype plugin with the configuration in search
+    * [HV-431] - Extend programmatic API to allow the definition of method level constraints
+    * [HV-464] - Remove obsolete type parameter from ParameterMetaConstraint
+    * [HV-471] - Group has to be an interface - Documentation or code bug
+    * [HV-474] - Get Hibernate Validator a proper changelog file
+    * [HV-487] - Settle on an approach for instantiating constraint definitions
+
 4.2.0.Beta2 (09.02.2011)
 ------------------------
 
