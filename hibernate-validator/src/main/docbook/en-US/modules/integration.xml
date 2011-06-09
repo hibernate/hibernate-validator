@@ -55,6 +55,9 @@
             <para><package>org.hibernate.validator.cfg</package></para>
         </listitem>
         <listitem>
+            <para><package>org.hibernate.validator.cfg.context</package></para>
+        </listitem>
+        <listitem>
             <para><package>org.hibernate.validator.cfg.defs</package></para>
         </listitem>
         <listitem>
