@@ -101,9 +101,8 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     configured via the standard configuration capabilities.</para>
 
     <para>The API is centered around the
-    <classname>ConstraintMapping</classname> class which can be found together
-    with its supporting classes in the
-    <package>org.hibernate.validator.cfg</package> package. Starting with the
+    <classname>ConstraintMapping</classname> class which can be found in the
+    package<package> org.hibernate.validator.cfg</package>. Starting with the
     instantiation of a new <classname>ConstraintMapping</classname>,
     constraints can be defined in a fluent manner as shown in <xref lang=""
     linkend="example-constraint-mapping" />.</para>
@@ -114,23 +113,15 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "manufacturer", FIELD )
-        .constraint( 
-            create( NotNullDef.class ) )
+        .constraint( new NotNullDef() )
     .property( "licensePlate", FIELD )
-        .constraint(
-            create( NotNullDef.class ) )
-        .constraint( 
-            create( SizeDef.class )
-                .min( 2 )
-                .max( 14 ) )
+        .constraint( new NotNullDef() )
+        .constraint( new SizeDef().min( 2 ).max( 14 ) )
     .property( "seatCount", FIELD )
-        .constraint( 
-            create( MinDef.class )
-                .value ( 2 ) )
+        .constraint( new MinDef()value ( 2 ) )
 .type( RentalCar.class )
     .property( "rentalStation", METHOD )
-        .constraint( 
-            create( NotNullDef.class ) );      </programlisting>
+        .constraint( new NotNullDef() );      </programlisting>
       </example></para>
 
     <para>As you can see constraints can be configured on multiple classes and
@@ -139,20 +130,11 @@ mapping.type( Car.class )
     <classname>MinDef</classname> are helper classes which allow to configure
     constraint parameters in a type-safe fashion. Definition classes exist for
     all built-in constraints in the
-    <classname>org.hibernate.validator.cfg.defs</classname> package. </para>
-
-    <tip>
-      <para>The <methodname>create()</methodname> method (as well as
-      <methodname>createGeneric()</methodname> introduced in the following) is
-      a static method defined on
-      <classname>org.hibernate.validator.cfg.ConstraintDef</classname>. It is
-      recommended to import this method statically which allows to use it as
-      shown in <xref lang="" linkend="example-constraint-mapping" />.</para>
-    </tip>
+    <classname>org.hibernate.validator.cfg.defs</classname> package.</para>
 
     <para>For custom constraints you can either create your own definition
-    classes extending <classname>ConstraintDef</classname> or you can use the
-    <classname>createGeneric()</classname> method as seen in <xref
+    classes extending <classname>ConstraintDef</classname> or you can use
+    <classname>GenericConstraintDef</classname> as seen in <xref
     linkend="example-generic-constraint-mapping" />.</para>
 
     <para><example id="example-generic-constraint-mapping">
@@ -162,9 +144,7 @@ mapping.type( Car.class )
         <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "licensePlate", FIELD )
-        .constraint( 
-            createGeneric( CheckCase.class )
-                .param( "value", CaseMode.UPPER ) );   </programlisting>
+        .constraint( new GenericConstraintDef&lt;CheckCase.class&gt;( CheckCase.class ).param( "value", CaseMode.UPPER ) );   </programlisting>
       </example></para>
 
     <para>Not only standard class- and property-level constraints but also
@@ -181,21 +161,15 @@ mapping.type( Car.class )
 mapping.type( Car.class )
     .method( "drive", String.class, Integer.class )
         .parameter( 0 )
-            .constraint( 
-                create( NotNullDef.class ) )
-            .constraint( 
-                create( MinDef.class )
-                    .value ( 1 ) )
+            .constraint( new NotNullDef() )
+            .constraint( new MinDef().value ( 1 ) )
         .parameter( 1 )
-            .constraint( 
-                create( NotNullDef.class ) )
+            .constraint( new NotNullDef() )
         .returnValue()
-            .constraint( 
-                create( NotNullDef.class ) )
+            .constraint( new NotNullDef() )
     .method( "check" )
         .returnValue()
-            .constraint( 
-                create( NotNullDef.class ) );      </programlisting>
+            .constraint( new NotNullDef() );      </programlisting>
     </example>
 
     <para>Using the API it's also possible to mark properties, method
