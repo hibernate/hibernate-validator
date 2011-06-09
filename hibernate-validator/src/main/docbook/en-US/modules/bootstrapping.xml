@@ -153,7 +153,7 @@ Validator validator = factory.getValidator();
     </example>
   </section>
 
-  <section>
+  <section id="section-message-interpolator">
     <title><classname>MessageInterpolator</classname></title>
 
     <para><xref linkend="section-message-interpolation" /> already discussed
@@ -203,7 +203,7 @@ Validator validator = factory.getValidator();
       <methodname>Configuration.getDefaultMessageInterpolator()</methodname>.</para>
     </tip>
 
-    <section id="section-resource-bundle-locator" label="">
+    <section id="section-resource-bundle-locator">
       <title>ResourceBundleLocator</title>
 
       <para>A common use case is the ability to specify your own resource

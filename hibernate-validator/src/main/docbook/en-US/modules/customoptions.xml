@@ -20,18 +20,122 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="validator-extensions">
-  <title>Hibernate Validator extensions</title>
+<chapter id="validator-specifics">
+  <title>Hibernate Validator Specifics</title>
+
+  <para>In the following sections we are having a closer look at some of the
+  Hibernate Validator specific features. This includes the fail fast mode, the
+  programmatic constraint configuration API and boolean composition of
+  composing constraints.</para>
 
   <note>
     <para>The features described in the following sections are not portable
     between Bean Validation providers/implementations.</para>
   </note>
 
-  <para>In the following sections we are having a closer look at some of the
-  Hibernate Validator specific features. This includes the fail fast mode, the
-  programmatic constraint configuration API and boolean composition of
-  composing constraints.</para>
+  <section>
+    <title>Public API</title>
+
+    <para>Hibernate Validator provides extensions for Bean Validation specification.
+    To allow the use of these specific features Hibernate Validator has a public API
+    composed of several packages. The following table, <xref linkend="validator-public-api"/>,
+    lists all packages belonging to this public API.</para>
+
+    <note>
+      <para>In the following table, when a package is public its not necessarily true
+      for its nested packages. When a nested package is public, it is listed in the
+      first column of the table.</para>
+    </note>
+
+    <table id="validator-public-api">
+      <title>Public packages</title>
+
+      <tgroup cols="2">
+
+        <thead>
+          <row>
+            <entry>Packages</entry>
+
+            <entry>Description</entry>
+          </row>
+        </thead>
+
+        <tbody valign="top">
+          <row>
+            <entry><package>org.hibernate.validator</package></entry>
+
+            <entry>This package contains the classes used by the Bean Validation
+            bootstrap mechanism (eg. validation provider, configuration class).
+            For more details see <xref linkend="validator-bootstrapping"/></entry>
+          </row>
+
+          <row>
+            <entry><package>org.hibernate.validator.cfg</package>,
+            <package>org.hibernate.validator.cfg.context</package>,
+            <package>org.hibernate.validator.cfg.defs</package></entry>
+
+            <entry>With Hibernate Validator you can define constraints via a fluent
+            API. These packages contain all classes needed to use this feature.
+            In the package <package>org.hibernate.validator.cfg</package> you will
+            find the <classname>ConstraintMapping</classname> class and in package
+            <package>org.hibernate.validator.cfg.defs</package> all constraint
+            definitions. For more details see <xref linkend="programmaticapi"/>.</entry>
+          </row>
+
+          <row>
+            <entry><package>org.hibernate.validator.constraints</package></entry>
+
+            <entry>In addition to Bean Validation constraints, Hibernate Validator
+            provides some useful custom constraints. This package contains all
+            custom annotation classes. For more details see
+            <xref linkend="validator-defineconstraints-hv-constraints" />.</entry>
+          </row>
+
+          <row>
+            <entry><package>org.hibernate.validator.group</package></entry>
+
+            <entry>With Hibernate Validator you can define dynamic default group
+            sequence. This feature allow you to dynamically compose the default group
+            sequence in function of the validated object state. This package contains
+            all classes needed to use this feature (<classname>GroupSequenceProvider</classname>
+            annotation and <classname>DefaultGroupSequenceProvider</classname> contract).
+            For more details see <xref linkend="section-default-group-class" />.</entry>
+          </row>
+
+          <row>
+            <entry><package>org.hibernate.validator.messageinterpolation</package>,
+            <package>org.hibernate.validator.resourceloading</package></entry>
+
+            <entry>These packages contain the classes related to constraint message
+            interpolation. The first package contains two implementations of
+            <classname>MessageInterpolator</classname>. The first one,
+            <classname>ValueFormatterMessageInterpolator</classname> allows to
+            interpolate the validated value into the constraint message, see
+            <xref linkend="section-message-interpolator" />. The second implementation
+            named <classname>ResourceBundleMessageInterpolator</classname> is the
+            implementation used by default by Hibernate Validator. This implementation
+            relies on a <classname>ResourceBundleLocator</classname>, see
+            <xref linkend="section-resource-bundle-locator" />. Hibernate Validator
+            provides different <classname>ResourceBundleLocator</classname> implementations
+            located in the package <package>org.hibernate.validator.resourceloading</package>.</entry>
+          </row>
+
+          <row>
+            <entry><package>org.hibernate.validator.method</package>,
+            <package>org.hibernate.validator.method.metadata</package></entry>
+
+            <entry>Hibernate Validator implements the appendix C of Bean
+            Validation specification (method level validation). The first
+            package contains the <classname>MethodValidator</classname>
+            implementation allowing you to validate method return value and
+            parameters. The second package contains metadata for constraints
+            hosted on parameters and methods which can be retrieved via the
+            <classname>MethodValidator</classname>.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
 
   <section>
     <title>Fail fast mode</title>
