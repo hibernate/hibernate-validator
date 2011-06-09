@@ -113,7 +113,7 @@ Validator validator = factory.getValidator();</programlisting>
       </tip></para>
   </section>
 
-  <section>
+  <section id="section-validation-provider-resolver">
     <title><classname>ValidationProviderResolver</classname></title>
 
     <para>In the case that the Java Service Provider mechanism does not work
