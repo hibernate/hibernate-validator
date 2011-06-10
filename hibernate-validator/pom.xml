@@ -35,7 +35,11 @@
             <groupId>com.googlecode.jtype</groupId>
             <artifactId>jtype</artifactId>
         </dependency>
-
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+		</dependency>
+		
         <!--
         Provided dependencies.
         JAXB is needed when running on Java5. In this environment these dependencies have to be added (unless
