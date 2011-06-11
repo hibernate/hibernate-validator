@@ -22,8 +22,9 @@ package org.hibernate.validator.cfg.context;
  * navigate to other constraint targets.
  *
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface ReturnValueConstraintMappingContext
-		extends TypeTarget, ParameterTarget, Constrainable<ReturnValueConstraintMappingContext>, Cascadable<ReturnValueConstraintMappingContext> {
+		extends TypeTarget, ParameterTarget, MethodTarget, Constrainable<ReturnValueConstraintMappingContext>, Cascadable<ReturnValueConstraintMappingContext> {
 
 }

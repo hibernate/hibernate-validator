@@ -22,8 +22,9 @@ package org.hibernate.validator.cfg.context;
  * navigate to other constraint targets.
  *
  * @author Gunnar Morling
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface PropertyConstraintMappingContext
-		extends Constrainable<PropertyConstraintMappingContext>, TypeTarget, Cascadable<PropertyConstraintMappingContext> {
+		extends Constrainable<PropertyConstraintMappingContext>, TypeTarget, PropertyTarget, MethodTarget, Cascadable<PropertyConstraintMappingContext> {
 
 }
