@@ -29,7 +29,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Gunnar Morling
  */
 public interface TypeConstraintMappingContext<C>
-		extends Constrainable<TypeConstraintMappingContext<C>>, TypeTargets {
+		extends Constrainable<TypeConstraintMappingContext<C>>, TypeTarget {
 
 	/**
 	 * Defines the default group sequence for current type.

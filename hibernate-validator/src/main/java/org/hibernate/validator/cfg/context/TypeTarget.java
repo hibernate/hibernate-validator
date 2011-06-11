@@ -23,7 +23,7 @@ package org.hibernate.validator.cfg.context;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
  */
-public interface TypeTargets {
+public interface TypeTarget {
 	/**
 	 * Selects the type to which the next operations shall apply.
 	 *
