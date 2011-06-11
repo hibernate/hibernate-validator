@@ -20,8 +20,6 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import javax.validation.Payload;
 
-import org.hibernate.validator.util.ReflectionHelper;
-
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
