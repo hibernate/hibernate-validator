@@ -16,21 +16,27 @@
  */
 package org.hibernate.validator.cfg.context;
 
+import java.lang.annotation.ElementType;
+
 /**
  * Facet of a constraint mapping creational context which allows to the select the bean
- * type to which the next operations shall apply.
+ * property to which the next operations shall apply.
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
  */
-public interface TypeTargets {
+public interface PropertyTarget {
 	/**
-	 * Selects the type to which the next operations shall apply.
+	 * Selects a property to which the next operations shall apply.
+	 * <p>
+	 * Until this method is called constraints apply on class level. After calling this method constraints
+	 * apply on the specified property with the given access type.
+	 * </p>
 	 *
-	 * @param <C> The type to select.
-	 * @param type The type to select.
+	 * @param property The property on which to apply the following constraints (Java Bean notation).
+	 * @param type The access type (field/property).
 	 *
-	 * @return A creational context representing the selected type.
+	 * @return A creational context representing the selected property.
 	 */
-	<C> TypeConstraintMappingContext<C> type(Class<C> type);
+	PropertyConstraintMappingContext property(String property, ElementType type);
 }

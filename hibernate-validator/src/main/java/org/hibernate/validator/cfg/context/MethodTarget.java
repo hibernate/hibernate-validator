@@ -18,19 +18,23 @@ package org.hibernate.validator.cfg.context;
 
 /**
  * Facet of a constraint mapping creational context which allows to the select the bean
- * type to which the next operations shall apply.
+ * method to which the next operations shall apply.
  *
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
  */
-public interface TypeTargets {
+public interface MethodTarget {
 	/**
-	 * Selects the type to which the next operations shall apply.
+	 * Selects a method to which the next operations shall apply.
+	 * <p>
+	 * Until this method is called constraints apply on class level. After calling this method constraints
+	 * apply to the specified method.
+	 * </p>
 	 *
-	 * @param <C> The type to select.
-	 * @param type The type to select.
+	 * @param name The method name.
+	 * @param parameterTypes The method parameter types.
 	 *
-	 * @return A creational context representing the selected type.
+	 * @return A creational context representing the selected method.
 	 */
-	<C> TypeConstraintMappingContext<C> type(Class<C> type);
+	MethodConstraintMappingContext method(String name, Class<?>... parameterTypes);
 }
