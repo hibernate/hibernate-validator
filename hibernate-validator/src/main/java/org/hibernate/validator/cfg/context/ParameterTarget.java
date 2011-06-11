@@ -24,7 +24,6 @@ package org.hibernate.validator.cfg.context;
  * @author Gunnar Morling
  */
 public interface ParameterTarget {
-
 	/**
 	 * Changes the parameter for which added constraints apply.
 	 *
@@ -33,5 +32,4 @@ public interface ParameterTarget {
 	 * @return A creational context representing the selected parameter.
 	 */
 	ParameterConstraintMappingContext parameter(int index);
-
 }

@@ -50,5 +50,4 @@ public interface TypeConstraintMappingContext<C>
 	 */
 	<T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingContext<C> defaultGroupSequenceProvider(
 			Class<T> defaultGroupSequenceProviderClass);
-
 }

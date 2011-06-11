@@ -26,7 +26,6 @@ import org.hibernate.validator.cfg.ConstraintDef;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface Constrainable<C extends Constrainable<C>> {
-
 	/**
 	 * Adds a new constraint.
 	 *
@@ -35,5 +34,4 @@ public interface Constrainable<C extends Constrainable<C>> {
 	 * @return The current creational context following the method chaining pattern.
 	 */
 	C constraint(ConstraintDef<?, ?> definition);
-
 }
