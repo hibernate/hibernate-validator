@@ -43,6 +43,13 @@
         </developer>
     </developers>
 
+    <contributors>
+        <contributor>
+            <name>George Gastaldi</name>
+            <email>gegastaldi@gmail.com</email>
+        </contributor>
+    </contributors>
+
     <mailingLists>
         <mailingList>
             <name>hibernate-dev</name>
@@ -64,6 +71,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
         <jsr303.tck.version>1.0.5.Beta1</jsr303.tck.version>
+        <jsoup.version>1.5.2</jsoup.version>
     </properties>
 
     <dependencyManagement>
@@ -157,6 +165,12 @@
                         <artifactId>jboss-test-harness-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <!-- jsoup HTML parser library @ http://jsoup.org/ -->
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
