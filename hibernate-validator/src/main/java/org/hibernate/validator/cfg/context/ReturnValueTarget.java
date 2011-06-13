@@ -24,12 +24,10 @@ package org.hibernate.validator.cfg.context;
  * @author Gunnar Morling
  */
 public interface ReturnValueTarget {
-
 	/**
 	 * Selects the current method's return value as the target for the next operations.
 	 *
 	 * @return A creational context representing the current method's return value.
 	 */
 	ReturnValueConstraintMappingContext returnValue();
-
 }

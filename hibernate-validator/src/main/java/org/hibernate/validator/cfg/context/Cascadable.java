@@ -24,12 +24,10 @@ package org.hibernate.validator.cfg.context;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public interface Cascadable<C extends Cascadable<C>> {
-
 	/**
 	 * Marks the current element (property, parameter etc.) as cascadable.
 	 *
 	 * @return The current creational context following the method chaining pattern.
 	 */
 	C valid();
-
 }

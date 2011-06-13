@@ -16,15 +16,27 @@
  */
 package org.hibernate.validator.cfg.context;
 
-/**
- * Constraint mapping creational context representing a method return value. Allows
- * to place constraints on the return value, mark it as cascadable and to
- * navigate to other constraint targets.
- *
- * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
- */
-public interface ReturnValueConstraintMappingContext
-		extends TypeTarget, ParameterTarget, MethodTarget, Constrainable<ReturnValueConstraintMappingContext>, Cascadable<ReturnValueConstraintMappingContext> {
+import java.lang.annotation.ElementType;
 
+/**
+ * Facet of a constraint mapping creational context which allows to the select the bean
+ * property to which the next operations shall apply.
+ *
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Gunnar Morling
+ */
+public interface PropertyTarget {
+	/**
+	 * Selects a property to which the next operations shall apply.
+	 * <p>
+	 * Until this method is called constraints apply on class level. After calling this method constraints
+	 * apply on the specified property with the given access type.
+	 * </p>
+	 *
+	 * @param property The property on which to apply the following constraints (Java Bean notation).
+	 * @param type The access type (field/property).
+	 *
+	 * @return A creational context representing the selected property.
+	 */
+	PropertyConstraintMappingContext property(String property, ElementType type);
 }

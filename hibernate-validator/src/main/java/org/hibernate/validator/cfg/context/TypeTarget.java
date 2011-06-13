@@ -17,14 +17,20 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Constraint mapping creational context representing a method return value. Allows
- * to place constraints on the return value, mark it as cascadable and to
- * navigate to other constraint targets.
+ * Facet of a constraint mapping creational context which allows to the select the bean
+ * type to which the next operations shall apply.
  *
- * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Gunnar Morling
  */
-public interface ReturnValueConstraintMappingContext
-		extends TypeTarget, ParameterTarget, MethodTarget, Constrainable<ReturnValueConstraintMappingContext>, Cascadable<ReturnValueConstraintMappingContext> {
-
+public interface TypeTarget {
+	/**
+	 * Selects the type to which the next operations shall apply.
+	 *
+	 * @param <C> The type to select.
+	 * @param type The type to select.
+	 *
+	 * @return A creational context representing the selected type.
+	 */
+	<C> TypeConstraintMappingContext<C> type(Class<C> type);
 }
