@@ -19,7 +19,7 @@ package org.hibernate.validator.constraints.impl;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.constraints.WebSafe;
+import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
@@ -31,11 +31,11 @@ import org.jsoup.safety.Whitelist;
  * 
  * @author George Gastaldi
  */
-public class WebSafeValidator implements ConstraintValidator<WebSafe, CharSequence> {
+public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequence> {
 
 	private Whitelist whitelist;
 
-	public void initialize(WebSafe constraintAnn) {
+	public void initialize(SafeHtml constraintAnn) {
 		Class<? extends Whitelist> whiteListClass = constraintAnn.whiteListClass();
 		if ( whiteListClass != Whitelist.class ) {
 			whitelist = ReflectionHelper.newInstance( whiteListClass, whiteListClass.getName() );

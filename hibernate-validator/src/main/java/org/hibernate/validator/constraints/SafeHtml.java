@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import org.hibernate.validator.constraints.impl.WebSafeValidator;
+import org.hibernate.validator.constraints.impl.SafeHtmlValidator;
 import org.jsoup.safety.Whitelist;
 
 /**
@@ -44,10 +44,10 @@ import org.jsoup.safety.Whitelist;
  * 
  */
 @Documented
-@Constraint(validatedBy = WebSafeValidator.class)
+@Constraint(validatedBy = SafeHtmlValidator.class)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface WebSafe {
+public @interface SafeHtml {
 
 	String message() default "{org.hibernate.validator.constraints.WebSafe.message}";
 
@@ -76,7 +76,7 @@ public @interface WebSafe {
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {
-		WebSafe[] value();
+		SafeHtml[] value();
 	}
 
 	/**
