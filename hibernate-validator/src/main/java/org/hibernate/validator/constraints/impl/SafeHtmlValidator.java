@@ -19,38 +19,38 @@ package org.hibernate.validator.constraints.impl;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.constraints.SafeHtml;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
+import org.hibernate.validator.constraints.SafeHtml;
+
 /**
  * Validate that the string does not contain malicious code.
- * 
- * It uses JSoup (http://www.jsoup.org) as the underlying parser/sanitizer library.
- * 
+ *
+ * It uses <a href="http://www.jsoup.org">JSoup</a> as the underlying parser/sanitizer library.
+ *
  * @author George Gastaldi
  */
 public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequence> {
-
 	private Whitelist whitelist;
 
 	public void initialize(SafeHtml constraintAnn) {
 		switch ( constraintAnn.value() ) {
-		case BASIC:
-			whitelist = Whitelist.basic();
-			break;
-		case BASIC_WITH_IMAGES:
-			whitelist = Whitelist.basicWithImages();
-			break;
-		case NONE:
-			whitelist = Whitelist.none();
-			break;
-		case RELAXED:
-			whitelist = Whitelist.relaxed();
-			break;
-		case SIMPLE_TEXT:
-			whitelist = Whitelist.simpleText();
-			break;
+			case BASIC:
+				whitelist = Whitelist.basic();
+				break;
+			case BASIC_WITH_IMAGES:
+				whitelist = Whitelist.basicWithImages();
+				break;
+			case NONE:
+				whitelist = Whitelist.none();
+				break;
+			case RELAXED:
+				whitelist = Whitelist.relaxed();
+				break;
+			case SIMPLE_TEXT:
+				whitelist = Whitelist.simpleText();
+				break;
 		}
 		whitelist.addTags( constraintAnn.additionalTags() );
 	}
@@ -61,5 +61,4 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 		}
 		return Jsoup.isValid( value.toString(), whitelist );
 	}
-
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
@@ -71,7 +73,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
         <jsr303.tck.version>1.0.5.Beta1</jsr303.tck.version>
-        <jsoup.version>1.5.2</jsoup.version>
     </properties>
 
     <dependencyManagement>
@@ -167,10 +168,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <!-- jsoup HTML parser library @ http://jsoup.org/ -->
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>${jsoup.version}</version>
+                <version>1.5.2</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>

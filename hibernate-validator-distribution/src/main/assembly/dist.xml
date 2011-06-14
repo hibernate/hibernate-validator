@@ -62,6 +62,7 @@
                 <include>log4j:log4j</include>
                 <include>joda-time:joda-time</include>
                 <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
+                <include>org.jsoup:jsoup</include>
             </includes>
         </dependencySet>
     </dependencySets>

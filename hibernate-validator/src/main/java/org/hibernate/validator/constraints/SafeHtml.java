@@ -16,6 +16,14 @@
  */
 package org.hibernate.validator.constraints;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+
+import org.hibernate.validator.constraints.impl.SafeHtmlValidator;
+
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -23,50 +31,39 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.validation.Constraint;
-import javax.validation.Payload;
-
-import org.hibernate.validator.constraints.impl.SafeHtmlValidator;
-
 /**
  * Validate a rich text value provided by the user to ensure that it contains no malicious code, such as embedded
  * <script>
  * elements.
- * 
+ *
  * @author George Gastaldi
- * 
  */
 @Documented
 @Constraint(validatedBy = SafeHtmlValidator.class)
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Target( { METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface SafeHtml {
 
 	String message() default "{org.hibernate.validator.constraints.SafeHtml.message}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default { };
 
-	Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * The built-in types for this validator
-	 * 
+	 * @return The built-in types for this validator
 	 */
 	WhiteListType value() default WhiteListType.RELAXED;
 
 	/**
-	 * Additional whitelist tags if the current types are not sufficient.
+	 * @return Additional whitelist tags if the current types are not sufficient.
 	 */
-	String[] additionalTags() default {};
+	String[] additionalTags() default { };
 
 	/**
 	 * Defines several {@code @WebSafe} annotations on the same element.
 	 */
-	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Target( { METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {
@@ -81,11 +78,13 @@ public @interface SafeHtml {
 		 * This whitelist allows only text nodes: all HTML will be stripped.
 		 */
 		NONE,
+
 		/**
 		 * This whitelist allows only simple text formatting: <code>b, em, i, strong, u</code>. All other HTML (tags and
 		 * attributes) will be removed.
 		 */
 		SIMPLE_TEXT,
+
 		/**
 		 * This whitelist allows a fuller range of text nodes:
 		 * <code>a, b, blockquote, br, cite, code, dd, dl, dt, em, i, li, ol, p, pre, q, small, strike, strong, sub, sup, u, ul</code>
@@ -97,6 +96,7 @@ public @interface SafeHtml {
 		 * Does not allow images.
 		 */
 		BASIC,
+
 		/**
 		 * This whitelist allows the same text tags as {@link WhiteListType#BASIC}, and also allows <code>img</code>
 		 * tags,
@@ -104,13 +104,14 @@ public @interface SafeHtml {
 		 * appropriate attributes, with <code>src</code> pointing to <code>http</code> or <code>https</code>.
 		 */
 		BASIC_WITH_IMAGES,
+
 		/**
 		 * This whitelist allows a full range of text and structural body HTML:
 		 * <code>a, b, blockquote, br, caption, cite, code, col, colgroup, dd, dl, dt, em, h1, h2, h3, h4, h5, h6, i, img, li,
-		 *  ol, p, pre, q, small, strike, strong, sub, sup, table, tbody, td, tfoot, th, thead, tr, u, ul</code>
+		 * ol, p, pre, q, small, strike, strong, sub, sup, table, tbody, td, tfoot, th, thead, tr, u, ul</code>
 		 * <p/>
 		 * Links do not have an enforced <code>rel=nofollow</code> attribute, but you can add that if desired.
 		 */
-		RELAXED;
+		RELAXED
 	}
 }

@@ -16,19 +16,20 @@
  */
 package org.hibernate.validator.test.constraints.impl;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 import org.hibernate.validator.constraints.impl.SafeHtmlValidator;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
-import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for {@link SafeHtmlValidator}.
- * 
+ *
  * @author George Gastaldi
  */
 public class SafeHtmlValidatorTest {
@@ -52,7 +53,6 @@ public class SafeHtmlValidatorTest {
 
 		SafeHtmlValidator validator = new SafeHtmlValidator();
 		validator.initialize( p );
-
 		assertFalse( validator.isValid( "Hello<script>alert('Doh')</script>World !", null ) );
 	}
 
@@ -70,8 +70,9 @@ public class SafeHtmlValidatorTest {
 	@Test
 	public void testAdditionalTags() throws Exception {
 		AnnotationDescriptor<SafeHtml> descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
-		descriptor.setValue( "additionalTags", new String[]{"script"} );
+		descriptor.setValue( "additionalTags", new String[] { "script" } );
 		SafeHtml p = AnnotationFactory.create( descriptor );
+
 		SafeHtmlValidator validator = new SafeHtmlValidator();
 		validator.initialize( p );
 		assertTrue( validator.isValid( "Hello<script>alert('Doh')</script>World !", null ) );
