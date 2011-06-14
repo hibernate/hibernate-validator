@@ -20,7 +20,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.SafeHtml;
-import org.hibernate.validator.util.ReflectionHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
@@ -36,13 +35,24 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 	private Whitelist whitelist;
 
 	public void initialize(SafeHtml constraintAnn) {
-		Class<? extends Whitelist> whiteListClass = constraintAnn.whiteListClass();
-		if ( whiteListClass != Whitelist.class ) {
-			whitelist = ReflectionHelper.newInstance( whiteListClass, whiteListClass.getName() );
+		switch ( constraintAnn.value() ) {
+		case BASIC:
+			whitelist = Whitelist.basic();
+			break;
+		case BASIC_WITH_IMAGES:
+			whitelist = Whitelist.basicWithImages();
+			break;
+		case NONE:
+			whitelist = Whitelist.none();
+			break;
+		case RELAXED:
+			whitelist = Whitelist.relaxed();
+			break;
+		case SIMPLE_TEXT:
+			whitelist = Whitelist.simpleText();
+			break;
 		}
-		else {
-			whitelist = constraintAnn.value().getWhitelist();
-		}
+		whitelist.addTags( constraintAnn.additionalTags() );
 	}
 
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
@@ -51,4 +61,5 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 		}
 		return Jsoup.isValid( value.toString(), whitelist );
 	}
+
 }
