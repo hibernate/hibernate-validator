@@ -24,7 +24,6 @@ import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 import org.hibernate.validator.constraints.impl.SafeHtmlValidator;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
-import org.jsoup.safety.Whitelist;
 import org.testng.annotations.Test;
 
 /**
@@ -69,19 +68,12 @@ public class SafeHtmlValidatorTest {
 	}
 
 	@Test
-	public void testCustomWhitelist() throws Exception {
+	public void testAdditionalTags() throws Exception {
 		AnnotationDescriptor<SafeHtml> descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
-		descriptor.setValue( "whiteListClass", TestWhitelist.class );
+		descriptor.setValue( "additionalTags", new String[]{"script"} );
 		SafeHtml p = AnnotationFactory.create( descriptor );
 		SafeHtmlValidator validator = new SafeHtmlValidator();
 		validator.initialize( p );
 		assertTrue( validator.isValid( "Hello<script>alert('Doh')</script>World !", null ) );
-	}
-
-	public static class TestWhitelist extends Whitelist {
-		public TestWhitelist() {
-			super();
-			addTags( "script" );
-		}
 	}
 }
