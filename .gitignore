@@ -30,6 +30,8 @@ atlassian-ide-plugin.xml
 .project
 .settings
 .factorypath
+.externalToolBuilders
+maven-eclipse.xml
 
 # NetBeans specific files/directories
 .nbattrs
