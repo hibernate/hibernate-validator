@@ -1447,10 +1447,9 @@ public class RentalCar extends Car {
               library must be part of the class path. With the
               <parameter>value</parameter> attribute one of jsoup's <ulink
               url="http://jsoup.org/apidocs/org/jsoup/safety/Whitelist.html">whitelist</ulink>
-              implementations can be chosen for the check. Alternatively the
-              class name of an arbitrary whitelist implementation can be
-              specified using the <parameter>whiteListClass</parameter>
-              attribute.</entry>
+              implementations can be chosen for the check. Alternatively you
+              may specify additional tags to be used in the white list with the
+              <parameter>additionalTags</parameter> attribute.</entry>
 
               <entry>none</entry>
             </row>
