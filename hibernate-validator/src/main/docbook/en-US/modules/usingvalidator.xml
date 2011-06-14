@@ -1436,6 +1436,25 @@ public class RentalCar extends Car {
             </row>
 
             <row>
+              <entry>@SafeHtml(value=, whiteListClass=)</entry>
+
+              <entry><classname>CharSequence</classname></entry>
+
+              <entry>Checks whether the annotated value doesn't contain any
+              potentially malicious fragments such as
+              <code>&lt;script&gt;</code> elements. In order to use this
+              constraint, the <ulink url="http://jsoup.org/">jsoup</ulink>
+              library must be part of the class path. With the
+              <parameter>value</parameter> attribute one of jsoup's <ulink
+              url="http://jsoup.org/apidocs/org/jsoup/safety/Whitelist.html">whitelist</ulink>
+              implementations can be chosen for the check. Alternatively you
+              may specify additional tags to be used in the white list with the
+              <parameter>additionalTags</parameter> attribute.</entry>
+
+              <entry>none</entry>
+            </row>
+
+            <row>
               <entry>@ScriptAssert(lang=, script=, alias=)</entry>
 
               <entry>Any type</entry>
