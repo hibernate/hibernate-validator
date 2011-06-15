@@ -26,7 +26,6 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, String> 
 		this.rangeStart = constraintAnnotation.rangeStart();
 		this.rangeEnd = constraintAnnotation.rangeEnd();
 		this.checkDigitIndex = constraintAnnotation.checkDigitIndex();
-		// TODO
 	}
 
 	@Override
@@ -39,8 +38,12 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, String> 
 				break;
 			case MOD11:
 				String input = value.replaceAll( NUMBERS_ONLY_REGEXP, "" );
-				int modResult = mod11( input.substring( this.rangeStart, this.rangeEnd ), this.multiplier );
-				ret = modResult == Character.digit( input.charAt( checkDigitIndex ), DEC_RADIX );
+				if (checkDigitIndex >= input.length()) {
+					ret = false;
+				} else {
+					int modResult = mod11( input.substring( this.rangeStart, this.rangeEnd ), this.multiplier );
+					ret = modResult == Character.digit( input.charAt( checkDigitIndex ), DEC_RADIX );
+				}
 				break;
 			}
 		}

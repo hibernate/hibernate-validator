@@ -18,7 +18,7 @@ public class CPFValidatorTest {
 	@Test
 	public void testCorrectFormattedCPFWithReportAsSingleViolation() {
 		Set<ConstraintViolation<Person>> violations = ValidatorUtil.getValidator().validate(
-				new Person( "008.168.699-44" ) );
+				new Person( "134.241.313-00" ) );
 		assertNumberOfViolations( violations, 0 );
 	}
 

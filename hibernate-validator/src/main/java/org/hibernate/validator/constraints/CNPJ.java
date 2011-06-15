@@ -20,24 +20,24 @@ import org.hibernate.validator.constraints.ModCheck.List;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 
 /**
- * Validates a CPF (Cadastro de Pessoa Física)
+ * Validates a CNPJ (Cadastro de Pessoa Jurídica)
  * 
  * @author George Gastaldi
  * 
  */
-@Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})")
+@Pattern(regexp = "([0-9]{2}[.]?[0-9]{3}[.]?[0-9]{3}[/]?[0-9]{4}[-]?[0-9]{2})")
 @List({ 
-	@ModCheck(value = ModType.MOD11, checkDigitIndex = 9, multiplier = 10, rangeEnd = 9),
-	@ModCheck(value = ModType.MOD11, checkDigitIndex = 10, multiplier = 11, rangeEnd = 9) 
+	@ModCheck(value = ModType.MOD11, checkDigitIndex = 12, multiplier = 9, rangeEnd = 12),
+	@ModCheck(value = ModType.MOD11, checkDigitIndex = 13, multiplier = 9, rangeEnd = 13) 
 })
 @ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = {})
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface CPF {
+public @interface CNPJ {
 
-	String message() default "{org.hibernate.validator.constraints.CPF.message}";
+	String message() default "{org.hibernate.validator.constraints.CNPJ.message}";
 
 	Class<?>[] groups() default {};
 
