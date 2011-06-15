@@ -72,7 +72,7 @@
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
-        <jsr303.tck.version>1.0.5.Beta1</jsr303.tck.version>
+        <jsr303.tck.version>1.0.5.GA</jsr303.tck.version>
     </properties>
 
     <dependencyManagement>
@@ -156,16 +156,6 @@
                 <groupId>org.hibernate.jsr303.tck</groupId>
                 <artifactId>jsr303-tck</artifactId>
                 <version>${jsr303.tck.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.test-harness</groupId>
-                        <artifactId>jboss-test-harness</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.test-harness</groupId>
-                        <artifactId>jboss-test-harness-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jsoup</groupId>
