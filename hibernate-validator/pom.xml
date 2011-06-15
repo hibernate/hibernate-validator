@@ -245,7 +245,8 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <docfilessubdirs>true</docfilessubdirs>
-                    <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+                    <javadocDirectory>${basedir}/../src/main/javadoc</javadocDirectory>
+                    <stylesheetfile>stylesheet.css</stylesheetfile>
                     <links>
                         <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
