@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -42,52 +42,52 @@ import org.hibernate.validator.constraints.impl.ModCheckValidator;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface ModCheck {
-	String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
+    String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
 
-	/**
-	 * @return The modulus algorithm to be used
-	 */
-	ModType value();
+    /**
+     * @return The modulus algorithm to be used
+     */
+    ModType value();
 
-	/**
-	 * @return Index in input to be checked (After removing all non-numeric characters)
-	 */
-	int checkDigitIndex();
+    /**
+     * @return The position of the Check Digit in input (After removing all non-numeric characters)
+     */
+    int checkDigitPosition() default 0;
 
-	/**
-	 * @return The multiplier to be used by the chosen mod algorithm
-	 */
-	int multiplier();
+    /**
+     * @return The multiplier to be used by the chosen mod algorithm
+     */
+    int multiplier();
 
-	/**
-	 * @return
-	 */
-	int rangeStart() default 0;
+    /**
+     * @return
+     */
+    int rangeStart() default 0;
 
-	int rangeEnd() default Integer.MAX_VALUE;
+    int rangeEnd() default Integer.MAX_VALUE;
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
-	/**
-	 * Defines several {@code @ModCheck} annotations on the same element.
-	 */
-	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
-	@Retention(RUNTIME)
-	@Documented
-	public @interface List {
-		ModCheck[] value();
-	}
+    /**
+     * Defines several {@code @ModCheck} annotations on the same element.
+     */
+    @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+    @Retention(RUNTIME)
+    @Documented
+    public @interface List {
+        ModCheck[] value();
+    }
 
-	public enum ModType {
-		/**
-		 * Represents a MOD10 algorithm (Also known as Luhn algorithm)
-		 */
-		MOD10,
-		/**
-		 * Represents a MOD11 algorithm
-		 */
-		MOD11
-	}
+    public enum ModType {
+        /**
+         * Represents a MOD10 algorithm (Also known as Luhn algorithm)
+         */
+        MOD10,
+        /**
+         * Represents a MOD11 algorithm
+         */
+        MOD11
+    }
 }

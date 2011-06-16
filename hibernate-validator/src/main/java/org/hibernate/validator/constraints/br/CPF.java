@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.constraints;
+package org.hibernate.validator.constraints.br;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -32,6 +32,7 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ModCheck.List;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 
@@ -42,8 +43,8 @@ import org.hibernate.validator.constraints.ModCheck.ModType;
  * 
  */
 @Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})")
-@List({ @ModCheck(value = ModType.MOD11, checkDigitIndex = 9, multiplier = 10, rangeEnd = 9),
-		@ModCheck(value = ModType.MOD11, checkDigitIndex = 10, multiplier = 11, rangeEnd = 9) })
+@List({ @ModCheck(value = ModType.MOD11, checkDigitPosition = 9, multiplier = 10, rangeEnd = 9),
+        @ModCheck(value = ModType.MOD11, checkDigitPosition = 10, multiplier = 11, rangeEnd = 9) })
 @ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = {})
@@ -51,10 +52,10 @@ import org.hibernate.validator.constraints.ModCheck.ModType;
 @Retention(RUNTIME)
 public @interface CPF {
 
-	String message() default "{org.hibernate.validator.constraints.CPF.message}";
+    String message() default "{org.hibernate.validator.constraints.CPF.message}";
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }

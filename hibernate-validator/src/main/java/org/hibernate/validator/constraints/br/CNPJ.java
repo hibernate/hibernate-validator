@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.constraints;
+package org.hibernate.validator.constraints.br;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -32,29 +32,30 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ModCheck.List;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 
 /**
- * Validates a Titulo de Eleitor
+ * Validates a CNPJ (Cadastro de Pessoa Jurídica)
  * 
  * @author George Gastaldi
  * 
  */
-@Pattern(regexp = "[0-9]{12}")
-@List({ @ModCheck(value = ModType.MOD11, checkDigitIndex = 10, multiplier = 9, rangeEnd = 8),
-		@ModCheck(value = ModType.MOD11, checkDigitIndex = 11, multiplier = 9, rangeStart = 8, rangeEnd = 10) })
+@Pattern(regexp = "([0-9]{2}[.]?[0-9]{3}[.]?[0-9]{3}[/]?[0-9]{4}[-]?[0-9]{2})")
+@List({ @ModCheck(value = ModType.MOD11, checkDigitPosition = 12, multiplier = 9, rangeEnd = 12),
+        @ModCheck(value = ModType.MOD11, checkDigitPosition = 13, multiplier = 9, rangeEnd = 13) })
 @ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = {})
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface TituloEleitor {
+public @interface CNPJ {
 
-	String message() default "{org.hibernate.validator.constraints.TituloEleitor.message}";
+    String message() default "{org.hibernate.validator.constraints.CNPJ.message}";
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }
