@@ -6,11 +6,11 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
-import org.hibernate.validator.constraints.CPF;
+import org.hibernate.validator.constraints.TituloEleitor;
 import org.hibernate.validator.testutil.ValidatorUtil;
 import org.testng.annotations.Test;
 
-public class CPFValidatorTest {
+public class TituloEleitorValidatorTest {
 
 	/**
 	 * HV-491
@@ -18,7 +18,7 @@ public class CPFValidatorTest {
 	@Test
 	public void testCorrectFormattedCPFWithReportAsSingleViolation() {
 		Set<ConstraintViolation<Person>> violations = ValidatorUtil.getValidator().validate(
-				new Person( "134.241.313-00" ) );
+				new Person( "038763000914" ) );
 		assertNumberOfViolations( violations, 0 );
 	}
 
@@ -33,15 +33,15 @@ public class CPFValidatorTest {
 	}
 
 	public static class Person {
-		@CPF
-		private String cpf;
+		@TituloEleitor
+		private String tituloEleitor;
 
 		public Person(String cpf) {
-			this.cpf = cpf;
+			this.tituloEleitor = cpf;
 		}
 
-		public String getCpf() {
-			return cpf;
+		public String getTituloEleitor() {
+			return tituloEleitor;
 		}
 	}
 }
