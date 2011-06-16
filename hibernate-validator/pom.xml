@@ -245,9 +245,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <docfilessubdirs>true</docfilessubdirs>
-                    <javadocDirectory>${basedir}/../src/main/javadoc</javadocDirectory>
-                    <stylesheetfile>stylesheet.css</stylesheetfile>
                     <links>
                         <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
@@ -255,8 +252,6 @@
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
                     <windowtitle>Hibernate Validator ${project.version}</windowtitle>
-                    <bottom>
-                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
                 </configuration>
                 <executions>
                     <execution>
