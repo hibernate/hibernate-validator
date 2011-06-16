@@ -36,22 +36,22 @@ import org.hibernate.validator.constraints.ModCheck.List;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 
 /**
- * Validates a CNPJ (Cadastro de Pessoa Jurídica)
+ * Validates a Titulo de Eleitor
  * 
  * @author George Gastaldi
  * 
  */
-@Pattern(regexp = "([0-9]{2}[.]?[0-9]{3}[.]?[0-9]{3}[/]?[0-9]{4}[-]?[0-9]{2})")
-@List({ @ModCheck(value = ModType.MOD11, checkDigitIndex = 12, multiplier = 9, rangeEnd = 12),
-		@ModCheck(value = ModType.MOD11, checkDigitIndex = 13, multiplier = 9, rangeEnd = 13) })
+@Pattern(regexp = "[0-9]{12}")
+@List({ @ModCheck(value = ModType.MOD11, checkDigitIndex = 10, multiplier = 9, rangeEnd = 8),
+		@ModCheck(value = ModType.MOD11, checkDigitIndex = 11, multiplier = 9, rangeStart = 8, rangeEnd = 10) })
 @ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = {})
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface CNPJ {
+public @interface TituloEleitor {
 
-	String message() default "{org.hibernate.validator.constraints.CNPJ.message}";
+	String message() default "{org.hibernate.validator.constraints.TituloEleitor.message}";
 
 	Class<?>[] groups() default {};
 

@@ -41,8 +41,10 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, String> 
 				if (checkDigitIndex >= input.length()) {
 					ret = false;
 				} else {
-					int modResult = mod11( input.substring( this.rangeStart, this.rangeEnd ), this.multiplier );
-					ret = modResult == Character.digit( input.charAt( checkDigitIndex ), DEC_RADIX );
+					String substring = input.substring( this.rangeStart, this.rangeEnd );
+					int modResult = mod11( substring, this.multiplier );
+					int digit = Character.digit( input.charAt( checkDigitIndex ), DEC_RADIX );
+					ret = (modResult == digit);
 				}
 				break;
 			}
