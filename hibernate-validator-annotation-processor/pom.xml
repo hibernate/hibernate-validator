@@ -29,6 +29,7 @@
                 <configuration>
                     <links>
                         <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
+                        <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
                     </links>
                     <packagesheader>Hibernate Validator Annotation Processor Packages</packagesheader>
                     <doctitle>Hibernate Validator Annotation Processor ${project.version}</doctitle>
