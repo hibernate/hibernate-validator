@@ -1,4 +1,4 @@
-package org.hibernate.validator.test.constraints.impl;
+package org.hibernate.validator.test.constraints.br;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
-import org.hibernate.validator.constraints.CNPJ;
+import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.testutil.ValidatorUtil;
 import org.testng.annotations.Test;
 
