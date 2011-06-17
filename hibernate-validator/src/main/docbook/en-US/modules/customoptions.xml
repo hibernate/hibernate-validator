@@ -225,15 +225,6 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
       </listitem>
     </itemizedlist>
 
-    <note>
-      <para>Method validation was also considered to be included in the Bean
-      Validation API as defined by JSR 303, but it didn't become part of the
-      1.0 version. A basic draft is outlined in appendix C of the
-      specifcation, and the implementation in Hibernate Validator is largely
-      influenced by this draft. The feature is considered again for inclusion
-      in BV 1.1</para>
-    </note>
-
     <para>This approach has several advantages over traditional ways of
     parameter or return value checking:</para>
 
@@ -253,6 +244,15 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
       </listitem>
     </itemizedlist>
 
+    <note>
+      <para>Method validation was also considered to be included in the Bean
+      Validation API as defined by JSR 303, but it didn't become part of the
+      1.0 version. A basic draft is outlined in appendix C of the
+      specifcation, and the implementation in Hibernate Validator is largely
+      influenced by this draft. The feature is considered again for inclusion
+      in BV 1.1</para>
+    </note>
+
     <section>
       <title>Defining method-level constraints</title>
 
@@ -271,7 +271,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         </example></para>
 
       <para>Here the following pre- and postconditions for the
-      <methodname>rentCar()</methodname> method are declared: </para>
+      <methodname>rentCar()</methodname> method are declared:</para>
 
       <itemizedlist>
         <listitem>
@@ -295,13 +295,9 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
       <para>Using the @Valid annotation it's also possible to define that a
       cascaded validation of parameter or return value objects shall be
       performed. An example can be found in <xref lang=""
-      linkend="example-cascaded-method-constraints" />. Here all the
-      constraints declared at the <classname>Customer</classname> type will be
-      evaluated when validating the method parameter and all constraints
-      declared at the returned <classname>Rental</classname> objects will be
-      evaluated when validating the method's return value.</para>
+      linkend="example-cascaded-method-constraints" />.</para>
 
-      <example id="example-method-constraints">
+      <example id="example-cascaded-method-constraints">
         <title>Cascaded validation of method-level constraints</title>
 
         <programlisting language="" role="">public class RentalStation {
@@ -312,6 +308,66 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     }
 }</programlisting>
       </example>
+
+      <para>Here all the constraints declared at the
+      <classname>Customer</classname> type will be evaluated when validating
+      the method parameter and all constraints declared at the returned
+      <classname>Rental</classname> objects will be evaluated when validating
+      the method's return value.</para>
+
+      <para>Special care must be taken when defining parameter constraints in
+      inheritance hierarchies. When a method is overridden in sub-types only
+      at the base method parameter constraints may be declared. The reason for
+      this restriction is that the preconditions to be fulfilled by a type's
+      client must not be strengthened in sub-types (which maybe are not even
+      known to the base type's client).</para>
+
+      <para>Note that also if the base method doesn't declare any parameter
+      constraints at all, no parameter constraints may be added in overriding
+      methods. The same applies to interface methods: no parameter constraints
+      may be defined at the implementing method (or the same method declared
+      in sub-interfaces).</para>
+
+      <para>If a violation of this rule is detected by the validation engine a
+      <classname>javax.validation.ConstraintDeclarationException</classname>
+      will be thrown. In <xref lang=""
+      linkend="example-illegal-method-constraints" /> some examples for
+      illegal parameter constraints declarations are shown.</para>
+
+      <example id="example-illegal-method-constraints">
+        <title>Illegal parameter constraint declarations</title>
+
+        <programlisting>public class Car {
+
+    void drive(Person driver) { ... }
+
+}
+
+public class RentalCar {
+
+    //not allowed, parameter constraint added in overriding method
+    void drive(@NotNull Person driver) { ... }
+
+}
+
+public interface Car {
+
+    void drive(Person driver);
+
+}
+
+public class CarImpl {
+
+    //not allowed, parameter constraint added in implementation of interface method
+    void drive(@NotNull Person driver) { ... }
+
+}</programlisting>
+      </example>
+
+      <para>This rule only applies to parameter constraints, return value
+      constraints may be added in sub-types without any restrictions as it is
+      alright to strengthen the postconditions guaranteed to a type's
+      client.</para>
     </section>
 
     <section>
@@ -345,7 +401,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
       unwrap it to <classname>MethodValidator</classname> as shown in <xref
       lang="" linkend="example-retrieving-methodvalidator" />.</para>
 
-      <example id="example-methodvalidator">
+      <example id="example-retrieving-methodvalidator">
         <title>Retrieving a <classname>MethodValidator</classname>
         instance</title>
 
@@ -360,8 +416,10 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
       <classname>Set&lt;MethodConstraintViolation&gt;</classname>. The type
       <classname>MethodConstraintViolation</classname> (see <xref lang=""
       linkend="example-methodconstraintviolation" />) extends
-      <classname>javax.validation.ConstraintViolation</classname> and
-      describes in detail the occurred method validation error.</para>
+      <classname>javax.validation.ConstraintViolation</classname> and provides
+      additional method level validation specific information such as the
+      method and index of the parameter which caused the constraint violation.
+      </para>
 
       <example id="example-methodconstraintviolation">
         <title>The <classname>MethodConstraintViolation</classname>
@@ -399,7 +457,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
       integration layer typically will throw a
       <classname>MethodConstraintViolationException</classname> which similar
       to <classname>javax.validation.ConstraintViolationException</classname>
-      describes the occurred constraint violations.</para>
+      wraps the occurred constraint violations.</para>
 
       <tip>
         <para>If you are using CDI you might be interested in the <ulink
@@ -411,9 +469,49 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     </section>
 
     <section>
-      <title>Extensions to the meta-data API</title>
+      <title>Retrieving meta-data for method-level constraints</title>
 
-      <para></para>
+      <para>The Bean Validation API provides rich capabilities for retrieving
+      constraint related meta data. Hibernate Validator extends this API and
+      allows to retrieve constraint meta-data also for method-level
+      constraints. </para>
+
+      <para><xref lang="" linkend="example-method-level-meta-data" /> shows
+      how to use this extended PI to retrieve constraint meta-data for the
+      <methodname>rentCar()</methodname> method from the
+      <classname>RentalStation</classname> type.</para>
+
+      <example id="example-method-level-meta-data">
+        <title>Retrieving meta-data for method-level constraints</title>
+
+        <programlisting language="" role="">TypeDescriptor typeDescriptor = methodValidator.getConstraintsForType(RentalStation.class)
+
+//retrieve a descriptor for the rentCar() method
+MethodDescriptor rentCarMethod = typeDescriptor.getConstraintsForMethod("rentCar", Customer.class, Date.class, int.class);
+assertEquals(rentCarMethod.getMethodName(), "rentCar");
+assertTrue(rentCarMethod.hasConstraints());
+assertFalse(rentCarMethod.isCascaded());
+
+//retrieve constraints from the return value
+Set&lt;ConstraintDescriptor&lt;?&gt;&gt; returnValueConstraints = rentCarMethod.findConstraints().getConstraintDescriptors();
+assertEquals(returnValueConstraints.size(), 1);
+assertEquals(returnValueConstraints.iterator().next().getAnnotation().annotationType(), NotNull.class);
+
+List&lt;ParameterDescriptor&gt; allParameters = rentCarMethod.getParameterDescriptors();
+assertEquals(allParameters.size(), 3);
+
+//retrieve a descriptor for the startDate parameter
+ParameterDescriptor startDateParameter = allParameters.get(1);
+assertEquals(startDateParameter.getIndex(), 1);
+assertFalse(startDateParameter.isCascaded());
+assertEquals(startDateParameter.findConstraints().getConstraintDescriptors().size(), 2);</programlisting>
+      </example>
+
+      <para>Refer to the <ulink
+      url="http://docs.jboss.org/hibernate/validator/4.2/api/index.html?org/hibernate/validator/method/metadata/package-summary.html">JavaDoc</ulink>
+      of the package
+      <classname>org.hibernate.validator.method.metadata</classname> for more
+      details on the extended meta-data API.</para>
     </section>
   </section>
 
