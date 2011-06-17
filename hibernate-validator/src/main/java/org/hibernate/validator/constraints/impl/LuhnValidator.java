@@ -20,8 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implement the Luhn algorithm (with Luhn key on the last digit). See also {@link http://en.wikipedia.org/wiki/Luhn_algorithm}
- * and {@link http://www.merriampark.com/anatomycc.htm}.
+ * Implement the Luhn algorithm (with Luhn key on the last digit). See also
+ * <a href="http://en.wikipedia.org/wiki/Luhn_algorithm">http://en.wikipedia.org/wiki/Luhn_algorithm</a> and
+ * <a href="http://www.merriampark.com/anatomycc.htm">http://www.merriampark.com/anatomycc.htm</a>.
  *
  * @author Hardy Ferentschik
  */
