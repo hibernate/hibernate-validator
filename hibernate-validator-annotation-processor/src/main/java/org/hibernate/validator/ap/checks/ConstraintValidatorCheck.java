@@ -28,7 +28,7 @@ import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
  * Checks, that for each constraint annotation type, which is not a composed constraint,
- * a validator implementation is specified using {@link Constraint#validatedBy()}.
+ * a validator implementation is specified using {@link Constraint} annotation.
  *
  * @author Gunnar Morling
  */
