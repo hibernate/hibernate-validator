@@ -147,11 +147,15 @@ public class Car {
 
       <para>When using property level constraints property access strategy is
       used to access the value to be validated. This means the bean validation
-      provider accesses the state via the property accessor method.</para>
+      provider accesses the state via the property accessor method. One
+      advantage of annotating properties instead of fields is that the
+      constraints become part of the constrained type's API that way and users
+      are aware of the existing constraints without having to examine the
+      type's implementation.</para>
 
       <tip>
         <para>It is recommended to stick either to field
-        <emphasis>or</emphasis> property annotation within one class. It is
+        <emphasis>or</emphasis> property annotations within one class. It is
         not recommended to annotate a field <emphasis>and</emphasis> the
         accompanying getter method as this would cause the field to be
         validated twice.</para>
@@ -938,7 +942,7 @@ public void testOrderedChecks() {
         defined groups in the annotation express the sequence of groups that
         substitute <classname>Default</classname> for this class. <xref
         linkend="example-rental-car" /> introduces a new class
-        <classname>RentalCar</classname> with a redfined default group. With
+        <classname>RentalCar</classname> with a redefined default group. With
         this definition the check for all three groups can be rewritten as
         seen in <xref
         linkend="example-testOrderedChecksWithRedefinedDefault" />.</para>
