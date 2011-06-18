@@ -39,7 +39,7 @@
 
     <para>Let's start, however, with a look at the public API of Hibernate
     Validator. <xref linkend="validator-public-api" /> lists all packages
-    belonging to this API and describes their purpose. </para>
+    belonging to this API and describes their purpose.</para>
 
     <para>Any packages not listed in that table are internal packages of
     Hibernate Validator and are not intended to be accessed by clients. The
@@ -327,15 +327,15 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         <title>Using method constraints in type hierarchies</title>
 
         <para>Special care must be taken when defining parameter constraints
-        in inheritance hierarchies. </para>
+        in inheritance hierarchies.</para>
 
-        <para>When a method is overridden in sub-types only at the base method
-        parameter constraints may be declared. The reason for this restriction
-        is that the preconditions to be fulfilled by a type's client must not
-        be strengthened in sub-types (which may not even be known to the base
-        type's client). Note that also if the base method doesn't declare any
-        parameter constraints at all, no parameter constraints may be added in
-        overriding methods. </para>
+        <para>When a method is overridden in sub-types method parameter
+        constraints can only be declared at the base type. The reason for this
+        restriction is that the preconditions to be fulfilled by a type's
+        client must not be strengthened in sub-types (which may not even be
+        known to the base type's client). Note that also if the base method
+        doesn't declare any parameter constraints at all, no parameter
+        constraints may be added in overriding methods.</para>
 
         <para>The same restriction applies to interface methods: no parameter
         constraints may be defined at the implementing method (or the same
@@ -390,8 +390,7 @@ public class CarImpl implements ICar {
 
       <para>To validate method-level constraints Hibernate Validator provides
       the interface
-      <classname>org.hibernate.validator.method.MethodValidator</classname>.
-      </para>
+      <classname>org.hibernate.validator.method.MethodValidator</classname>.</para>
 
       <para>As shown in <xref lang="" linkend="example-methodvalidator" />
       this interface defines methods for the evaluation of parameter as well
@@ -470,7 +469,7 @@ public class CarImpl implements ICar {
       method interception facilities such as the JDK's
       <classname>java.lang.reflect.Proxy</classname> API or CDI ("JSR 299:
       Contexts and Dependency Injection for the
-      Java<superscript>TM</superscript> EE platform"). </para>
+      Java<superscript>TM</superscript> EE platform").</para>
 
       <para>If a parameter or return value constraint can't be validated
       sucessfully such an integration layer typically will throw a
