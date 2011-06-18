@@ -293,10 +293,10 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         </listitem>
       </itemizedlist>
 
-      <para>Using the @Valid annotation it's also possible to define that a
-      cascaded validation of parameter or return value objects shall be
-      performed. An example can be found in <xref lang=""
-      linkend="example-cascaded-method-constraints" />.</para>
+      <para>Using the <classname>@Valid</classname> annotation it's also
+      possible to define that a cascaded validation of parameter or return
+      value objects shall be performed. An example can be found in <xref
+      lang="" linkend="example-cascaded-method-constraints" />.</para>
 
       <example id="example-cascaded-method-constraints">
         <title>Cascaded validation of method-level constraints</title>
@@ -320,17 +320,19 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         <title>Using method constraints in type hierarchies</title>
 
         <para>Special care must be taken when defining parameter constraints
-        in inheritance hierarchies. When a method is overridden in sub-types
-        only at the base method parameter constraints may be declared. The
-        reason for this restriction is that the preconditions to be fulfilled
-        by a type's client must not be strengthened in sub-types (which maybe
-        are not even known to the base type's client).</para>
+        in inheritance hierarchies. </para>
 
-        <para>Note that also if the base method doesn't declare any parameter
-        constraints at all, no parameter constraints may be added in
-        overriding methods. The same applies to interface methods: no
-        parameter constraints may be defined at the implementing method (or
-        the same method declared in sub-interfaces).</para>
+        <para>When a method is overridden in sub-types only at the base method
+        parameter constraints may be declared. The reason for this restriction
+        is that the preconditions to be fulfilled by a type's client must not
+        be strengthened in sub-types (which may not even be known to the base
+        type's client). Note that also if the base method doesn't declare any
+        parameter constraints at all, no parameter constraints may be added in
+        overriding methods. </para>
+
+        <para>The same restriction applies to interface methods: no parameter
+        constraints may be defined at the implementing method (or the same
+        method declared in sub-interfaces).</para>
 
         <para>If a violation of this rule is detected by the validation engine
         a
@@ -387,7 +389,7 @@ public class CarImpl implements ICar {
       <para>As shown in <xref lang="" linkend="example-methodvalidator" />
       this interface defines methods for the evaluation of parameter as well
       as return value constraints and for retrieving an extended type
-      descriptor providing method constraint related meta-data.</para>
+      descriptor providing method constraint related meta data.</para>
 
       <example id="example-methodvalidator">
         <title>The <classname>MethodValidator</classname> interface</title>
@@ -420,7 +422,8 @@ public class CarImpl implements ICar {
     .unwrap( MethodValidator.class ); </programlisting>
       </example>
 
-      <para>The validation methods defined on MethodValidator each return a
+      <para>The validation methods defined on
+      <classname>MethodValidator</classname> each return a
       <classname>Set&lt;MethodConstraintViolation&gt;</classname>. The type
       <classname>MethodConstraintViolation</classname> (see <xref lang=""
       linkend="example-methodconstraintviolation" />) extends
@@ -458,9 +461,9 @@ public class CarImpl implements ICar {
       invoked manually but automatically upon method invocation by an
       integration layer using AOP (aspect-oriented programming) or similar
       method interception facilities such as the JDK's
-      <classname>java.lang.reflect.Proxy</classname> API or CDI ( "JSR 299:
+      <classname>java.lang.reflect.Proxy</classname> API or CDI ("JSR 299:
       Contexts and Dependency Injection for the
-      Java<superscript>TM</superscript> EE platform" ). </para>
+      Java<superscript>TM</superscript> EE platform"). </para>
 
       <para>If a parameter or return value constraint can't be validated
       sucessfully such an integration layer typically will throw a
