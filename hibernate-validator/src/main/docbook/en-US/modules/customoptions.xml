@@ -39,7 +39,13 @@
 
     <para>Let's start, however, with a look at the public API of Hibernate
     Validator. <xref linkend="validator-public-api" /> lists all packages
-    belonging to this API and describes their purpose.</para>
+    belonging to this API and describes their purpose. </para>
+
+    <para>Any packages not listed in that table are internal packages of
+    Hibernate Validator and are not intended to be accessed by clients. The
+    contents of these internal packages can change from release to release
+    without notice, thus possibly breaking any client code relying on
+    it.</para>
 
     <note>
       <para>In the following table, when a package is public its not
@@ -65,7 +71,7 @@
             <entry>This package contains the classes used by the Bean
             Validation bootstrap mechanism (eg. validation provider,
             configuration class). For more details see <xref
-            linkend="validator-bootstrapping" /></entry>
+            linkend="validator-bootstrapping" />.</entry>
           </row>
 
           <row>
@@ -130,12 +136,13 @@
             <entry><package>org.hibernate.validator.method</package>,
             <package>org.hibernate.validator.method.metadata</package></entry>
 
-            <entry>Hibernate Validator implements the appendix C of Bean
-            Validation specification (method level validation). The first
-            package contains the <classname>MethodValidator</classname>
-            implementation allowing you to validate method return value and
-            parameters. The second package contains metadata for constraints
-            hosted on parameters and methods which can be retrieved via the
+            <entry>Hibernate Validator provides support for method-level
+            constraints based on appendix C of the Bean Validation
+            specification. The first package contains the
+            <classname>MethodValidator</classname> interface allowing you to
+            validate method return values and parameters. The second package
+            contains metavdata for constraints hosted on parameters and
+            methods which can be retrieved via the
             <classname>MethodValidator</classname>.</entry>
           </row>
         </tbody>
@@ -201,7 +208,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     </example>
   </section>
 
-  <section>
+  <section id="validator-customoptions-methodvalidation">
     <title>Method validation</title>
 
     <para>The Bean Validation API allows to specify constraints for fields,
@@ -256,8 +263,8 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     <section>
       <title>Defining method-level constraints</title>
 
-      <para>Listing <xref lang="" linkend="example-method-constraints" />
-      demonstrates the definition of method-level constraints.<example
+      <para><xref lang="" linkend="example-method-constraints" /> demonstrates
+      the definition of method-level constraints.<example
           id="example-method-constraints">
           <title>Using method-level constraints</title>
 
@@ -334,8 +341,8 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         constraints may be defined at the implementing method (or the same
         method declared in sub-interfaces).</para>
 
-        <para>If a violation of this rule is detected by the validation engine
-        a
+        <para>If a violation of this rule is detected by the validation
+        engine, a
         <classname>javax.validation.ConstraintDeclarationException</classname>
         will be thrown. In <xref lang=""
         linkend="example-illegal-method-constraints" /> some examples for
