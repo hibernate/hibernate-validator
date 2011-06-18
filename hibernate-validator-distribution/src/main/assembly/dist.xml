@@ -102,7 +102,7 @@
 
         <!-- Include documentation -->
         <fileSet>
-            <directory>../hibernate-validator/target/apidocs</directory>
+            <directory>target/site/apidocs</directory>
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>
         <fileSet>

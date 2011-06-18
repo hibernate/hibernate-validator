@@ -30,6 +30,11 @@
         Builds the distribution bundles
     </description>
 
+    <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <!-- The modules to include in the distribution. Any non-optional dependencies will
                      automatically be included as well -->
@@ -68,14 +73,51 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
         </dependency>
+
+        <!-- Dependency needed for aggregated javadoc generation -->
+        <dependency>
+            <groupId>com.googlecode.jtype</groupId>
+            <artifactId>jtype</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
+                    <sourcepath>
+                        ${basedir}/../hibernate-validator/src/main/java;
+                        ${basedir}/../hibernate-validator/target/generated-sources;
+                        ${basedir}/../hibernate-validator-annotation-processor/src/main/java
+                    </sourcepath>
+                    <links>
+                        <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
+                        <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
+                    </links>
+                    <packagesheader>Hibernate Validator Packages</packagesheader>
+                    <doctitle>Hibernate Validator ${project.version}</doctitle>
+                    <windowtitle>Hibernate Validator ${project.version}</windowtitle>
+                    <groups>
+                        <group>
+                            <title>Validator Packages</title>
+                            <packages>org.hibernate.validator*</packages>
+                        </group>
+                        <group>
+                            <title>Annotation Processor Packages</title>
+                            <packages>org.hibernate.validator.ap*</packages>
+                        </group>
+                    </groups>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>aggregate-javadoc</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

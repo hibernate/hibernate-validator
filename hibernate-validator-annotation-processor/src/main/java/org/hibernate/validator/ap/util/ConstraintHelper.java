@@ -106,10 +106,9 @@ public class ConstraintHelper {
 		/**
 		 * Given annotation is a multi-valued annotation (e.g.
 		 * <code>
-		 *
-		 * @List({
-		 * @Min(10),
-		 * @Min(value=20, groups= Special.class})
+		 * &#64;List({
+		 * &#64;Min(10),
+		 * &#64;Min(value=20, groups= Special.class})
 		 * })
 		 * </code>.
 		 */
