@@ -141,7 +141,7 @@
             specification. The first package contains the
             <classname>MethodValidator</classname> interface allowing you to
             validate method return values and parameters. The second package
-            contains metavdata for constraints hosted on parameters and
+            contains meta data for constraints hosted on parameters and
             methods which can be retrieved via the
             <classname>MethodValidator</classname>.</entry>
           </row>
