@@ -39,11 +39,17 @@
 
     <para>Let's start, however, with a look at the public API of Hibernate
     Validator. <xref linkend="validator-public-api" /> lists all packages
-    belonging to this API and describes their purpose.</para>
+    belonging to this API and describes their purpose. </para>
+
+    <para>Any packages not listed in that table are internal packages of
+    Hibernate Validator and are not intended to be accessed by clients. The
+    contents of these internal packages can change from release to release
+    without notice, thus possibly breaking any client code relying on
+    it.</para>
 
     <note>
       <para>In the following table, when a package is public its not
-      necessarily true for its nested packages. </para>
+      necessarily true for its nested packages.</para>
     </note>
 
     <table id="validator-public-api">
@@ -65,7 +71,7 @@
             <entry>This package contains the classes used by the Bean
             Validation bootstrap mechanism (eg. validation provider,
             configuration class). For more details see <xref
-            linkend="validator-bootstrapping" /></entry>
+            linkend="validator-bootstrapping" />.</entry>
           </row>
 
           <row>
@@ -130,12 +136,13 @@
             <entry><package>org.hibernate.validator.method</package>,
             <package>org.hibernate.validator.method.metadata</package></entry>
 
-            <entry>Hibernate Validator implements the appendix C of Bean
-            Validation specification (method level validation). The first
-            package contains the <classname>MethodValidator</classname>
-            implementation allowing you to validate method return value and
-            parameters. The second package contains metadata for constraints
-            hosted on parameters and methods which can be retrieved via the
+            <entry>Hibernate Validator provides support for method-level
+            constraints based on appendix C of the Bean Validation
+            specification. The first package contains the
+            <classname>MethodValidator</classname> interface allowing you to
+            validate method return values and parameters. The second package
+            contains metavdata for constraints hosted on parameters and
+            methods which can be retrieved via the
             <classname>MethodValidator</classname>.</entry>
           </row>
         </tbody>
@@ -199,6 +206,332 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
 // do fail fast validation
 ...</programlisting>
     </example>
+  </section>
+
+  <section id="validator-customoptions-methodvalidation">
+    <title>Method validation</title>
+
+    <para>The Bean Validation API allows to specify constraints for fields,
+    properties and types. Hibernate Validator goes one step further and allows
+    to place contraint annotations also on method parameters and method return
+    values, thus enabling a programming style known as "Programming by
+    Contract".</para>
+
+    <para>More specifically this means that Bean Validation constraints can be
+    used to specify</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>the preconditions that must be met before a method invocation
+        (by annotating method parameters with constraints) and</para>
+      </listitem>
+
+      <listitem>
+        <para>the postconditions that are guaranteed after a method invocation
+        (by annotating methods)</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>This approach has several advantages over traditional ways of
+    parameter and return value checking:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>The checks don't have to be performed manually (e.g. by throwing
+        <classname>IllegalArgumentExceptions</classname> or similar),
+        resulting in less code to write and maintain.</para>
+      </listitem>
+
+      <listitem>
+        <para>A method's pre- and postconditions don't have to be expressed
+        again in the method's JavaDoc, since the constraint annotations will
+        automatically be included in the generated JavaDoc. This avoids
+        redundancy and reduces the chance of inconsistencies between
+        implementation and documentation.</para>
+      </listitem>
+    </itemizedlist>
+
+    <note>
+      <para>Method validation was also considered to be included in the Bean
+      Validation API as defined by JSR 303, but it didn't become part of the
+      1.0 version. A basic draft is outlined in appendix C of the
+      specification, and the implementation in Hibernate Validator is largely
+      influenced by this draft. The feature is considered again for inclusion
+      in BV 1.1.</para>
+    </note>
+
+    <section>
+      <title>Defining method-level constraints</title>
+
+      <para><xref lang="" linkend="example-method-constraints" /> demonstrates
+      the definition of method-level constraints.<example
+          id="example-method-constraints">
+          <title>Using method-level constraints</title>
+
+          <programlisting language="" role="">public class RentalStation {
+
+    @NotNull 
+    public Car rentCar(@NotNull Customer customer, @NotNull @Future Date startDate, @Min(1) int durationInDays) { 
+        //...
+    }
+}</programlisting>
+        </example></para>
+
+      <para>Here the following pre- and postconditions for the
+      <methodname>rentCar()</methodname> method are declared:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The renting customer may not be null</para>
+        </listitem>
+
+        <listitem>
+          <para>The rental's start date must not be null and must be in the
+          future</para>
+        </listitem>
+
+        <listitem>
+          <para>The rental duration must be at least one day</para>
+        </listitem>
+
+        <listitem>
+          <para>The returned <classname>Car</classname> instance may not be
+          null</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Using the <classname>@Valid</classname> annotation it's also
+      possible to define that a cascaded validation of parameter or return
+      value objects shall be performed. An example can be found in <xref
+      lang="" linkend="example-cascaded-method-constraints" />.</para>
+
+      <example id="example-cascaded-method-constraints">
+        <title>Cascaded validation of method-level constraints</title>
+
+        <programlisting language="" role="">public class RentalStation {
+
+    @Valid
+    public Set&lt;Rental&gt; getRentalsByCustomer(@Valid Customer customer) { 
+        //...
+    }
+}</programlisting>
+      </example>
+
+      <para>Here all the constraints declared at the
+      <classname>Customer</classname> type will be evaluated when validating
+      the method parameter and all constraints declared at the returned
+      <classname>Rental</classname> objects will be evaluated when validating
+      the method's return value.</para>
+
+      <section>
+        <title>Using method constraints in type hierarchies</title>
+
+        <para>Special care must be taken when defining parameter constraints
+        in inheritance hierarchies. </para>
+
+        <para>When a method is overridden in sub-types only at the base method
+        parameter constraints may be declared. The reason for this restriction
+        is that the preconditions to be fulfilled by a type's client must not
+        be strengthened in sub-types (which may not even be known to the base
+        type's client). Note that also if the base method doesn't declare any
+        parameter constraints at all, no parameter constraints may be added in
+        overriding methods. </para>
+
+        <para>The same restriction applies to interface methods: no parameter
+        constraints may be defined at the implementing method (or the same
+        method declared in sub-interfaces).</para>
+
+        <para>If a violation of this rule is detected by the validation
+        engine, a
+        <classname>javax.validation.ConstraintDeclarationException</classname>
+        will be thrown. In <xref lang=""
+        linkend="example-illegal-method-constraints" /> some examples for
+        illegal parameter constraints declarations are shown.</para>
+
+        <example id="example-illegal-method-constraints">
+          <title>Illegal parameter constraint declarations</title>
+
+          <programlisting>public class Car {
+
+    public void drive(Person driver) { ... }
+
+}
+
+public class RentalCar extends Car {
+
+    //not allowed, parameter constraint added in overriding method
+    public void drive(@NotNull Person driver) { ... }
+
+}
+
+public interface ICar {
+
+    void drive(Person driver);
+
+}
+
+public class CarImpl implements ICar {
+
+    //not allowed, parameter constraint added in implementation of interface method
+    public void drive(@NotNull Person driver) { ... }
+
+}</programlisting>
+        </example>
+
+        <para>This rule only applies to parameter constraints, return value
+        constraints may be added in sub-types without any restrictions as it
+        is alright to strengthen the postconditions guaranteed to a type's
+        client.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Evaluating method-level constraints</title>
+
+      <para>To validate method-level constraints Hibernate Validator provides
+      the interface
+      <classname>org.hibernate.validator.method.MethodValidator</classname>.
+      </para>
+
+      <para>As shown in <xref lang="" linkend="example-methodvalidator" />
+      this interface defines methods for the evaluation of parameter as well
+      as return value constraints and for retrieving an extended type
+      descriptor providing method constraint related meta data.</para>
+
+      <example id="example-methodvalidator">
+        <title>The <classname>MethodValidator</classname> interface</title>
+
+        <programlisting language="" role="">public interface MethodValidator {
+
+    &lt;T&gt; Set&lt;MethodConstraintViolation&lt;T&gt;&gt; validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class&lt;?&gt;... groups);
+    
+    &lt;T&gt; Set&lt;MethodConstraintViolation&lt;T&gt;&gt; validateAllParameters(T object, Method method, Object[] parameterValues, Class&lt;?&gt;... groups);
+    
+    &lt;T&gt; Set&lt;MethodConstraintViolation&lt;T&gt;&gt; validateReturnValue(T object, Method method, Object returnValue, Class&lt;?&gt;... groups);
+ 
+    TypeDescriptor getConstraintsForType(Class&lt;?&gt; clazz);
+}    </programlisting>
+      </example>
+
+      <para>To retrieve a method validator get hold of an instance of HV's
+      <classname>javax.validation.Validator</classname> implementation and
+      unwrap it to <classname>MethodValidator</classname> as shown in <xref
+      lang="" linkend="example-retrieving-methodvalidator" />.</para>
+
+      <example id="example-retrieving-methodvalidator">
+        <title>Retrieving a <classname>MethodValidator</classname>
+        instance</title>
+
+        <programlisting language="" role="">MethodValidator methodValidator = Validation.byProvider( HibernateValidator.class )
+    .configure()
+    .buildValidatorFactory()
+    .getValidator()
+    .unwrap( MethodValidator.class ); </programlisting>
+      </example>
+
+      <para>The validation methods defined on
+      <classname>MethodValidator</classname> each return a
+      <classname>Set&lt;MethodConstraintViolation&gt;</classname>. The type
+      <classname>MethodConstraintViolation</classname> (see <xref lang=""
+      linkend="example-methodconstraintviolation" />) extends
+      <classname>javax.validation.ConstraintViolation</classname> and provides
+      additional method level validation specific information such as the
+      method and index of the parameter which caused the constraint
+      violation.</para>
+
+      <example id="example-methodconstraintviolation">
+        <title>The <classname>MethodConstraintViolation</classname>
+        type</title>
+
+        <programlisting language="" role="">public interface MethodConstraintViolation&lt;T&gt; extends ConstraintViolation&lt;T&gt; {
+    
+    public static enum Kind { PARAMETER, RETURN_VALUE }
+
+    Method getMethod();
+
+    Integer getParameterIndex();
+
+    String getParameterName();
+
+    Kind getKind();
+}</programlisting>
+      </example>
+
+      <note>
+        <para>The method <methodname>getParameterName()</methodname> currently
+        returns synthetic parameter identifiers such as "arg0", "arg1" etc. In
+        a future version of Hibernate Validator support for specifying
+        parameter identifiers might be added.</para>
+      </note>
+
+      <para>Typically the validation of method-level constraints is not
+      invoked manually but automatically upon method invocation by an
+      integration layer using AOP (aspect-oriented programming) or similar
+      method interception facilities such as the JDK's
+      <classname>java.lang.reflect.Proxy</classname> API or CDI ("JSR 299:
+      Contexts and Dependency Injection for the
+      Java<superscript>TM</superscript> EE platform"). </para>
+
+      <para>If a parameter or return value constraint can't be validated
+      sucessfully such an integration layer typically will throw a
+      <classname>MethodConstraintViolationException</classname> which similar
+      to <classname>javax.validation.ConstraintViolationException</classname>
+      contains a set with the occurred constraint violations.</para>
+
+      <tip>
+        <para>If you are using CDI you might be interested in the <ulink
+        url="http://seamframework.org/Seam3/ValidationModule">Seam
+        Validation</ulink> project. This Seam module provides an interceptor
+        which integrates the method validation functionality with CDI.</para>
+      </tip>
+    </section>
+
+    <section>
+      <title>Retrieving method-level constraint meta data</title>
+
+      <para>As outlined in <xref lang="" linkend="validator-metadata-api" />
+      the Bean Validation API provides rich capabilities for retrieving
+      constraint related meta data. Hibernate Validator extends this API and
+      allows to retrieve constraint meta data also for method-level
+      constraints.</para>
+
+      <para><xref lang="" linkend="example-method-level-meta-data" /> shows
+      how to use this extended API to retrieve constraint meta data for the
+      <methodname>rentCar()</methodname> method from the
+      <classname>RentalStation</classname> type.</para>
+
+      <example id="example-method-level-meta-data">
+        <title>Retrieving meta data for method-level constraints</title>
+
+        <programlisting language="" role="">TypeDescriptor typeDescriptor = methodValidator.getConstraintsForType(RentalStation.class)
+
+//retrieve a descriptor for the rentCar() method
+MethodDescriptor rentCarMethod = typeDescriptor.getConstraintsForMethod("rentCar", Customer.class, Date.class, int.class);
+assertEquals(rentCarMethod.getMethodName(), "rentCar");
+assertTrue(rentCarMethod.hasConstraints());
+assertFalse(rentCarMethod.isCascaded());
+
+//retrieve constraints from the return value
+Set&lt;ConstraintDescriptor&lt;?&gt;&gt; returnValueConstraints = rentCarMethod.findConstraints().getConstraintDescriptors();
+assertEquals(returnValueConstraints.size(), 1);
+assertEquals(returnValueConstraints.iterator().next().getAnnotation().annotationType(), NotNull.class);
+
+List&lt;ParameterDescriptor&gt; allParameters = rentCarMethod.getParameterDescriptors();
+assertEquals(allParameters.size(), 3);
+
+//retrieve a descriptor for the startDate parameter
+ParameterDescriptor startDateParameter = allParameters.get(1);
+assertEquals(startDateParameter.getIndex(), 1);
+assertFalse(startDateParameter.isCascaded());
+assertEquals(startDateParameter.findConstraints().getConstraintDescriptors().size(), 2);</programlisting>
+      </example>
+
+      <para>Refer to the <ulink
+      url="http://docs.jboss.org/hibernate/validator/4.2/api/index.html?org/hibernate/validator/method/metadata/package-summary.html">JavaDoc</ulink>
+      of the package
+      <classname>org.hibernate.validator.method.metadata</classname> for more
+      details on the extended meta data API.</para>
+    </section>
   </section>
 
   <section id="programmaticapi">

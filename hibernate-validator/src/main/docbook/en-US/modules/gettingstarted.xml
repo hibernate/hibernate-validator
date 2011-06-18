@@ -69,7 +69,7 @@
     <para>Hibernate Validator uses JAXB for XML parsing. JAXB is part of the
     Java Class Library since Java 6 which means that if you run Hibernate
     Validator with Java 5 you will have to add additional JAXB dependencies.
-    Using maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;
+    Using Maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;
     &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;
     &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;
     &lt;version&gt;2.2&lt;/version&gt;

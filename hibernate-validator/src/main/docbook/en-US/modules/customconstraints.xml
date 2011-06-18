@@ -199,6 +199,18 @@ public class ContactDetails {
           annotated with it</para>
         </listitem>
       </itemizedlist>
+
+      <tip>
+        <para>Hibernate Validator provides support for the validation of
+        method parameters using constraint annotations (see <xref
+        linkend="validator-customoptions-methodvalidation" />).</para>
+
+        <para>In order to use a custom constraint for parameter validation the
+        <classname>ElementType.PARAMETER</classname> must be specified within
+        the <classname>@Target</classname> annotation. This is already the
+        case for all constraints defined by the Bean Validation API and also
+        the custom constraints provided by Hibernate Validator.</para>
+      </tip>
     </section>
 
     <section id="validator-customconstraints-validator">
@@ -207,8 +219,8 @@ public class ContactDetails {
 
       <para>Next, we need to implement a constraint validator, that's able to
       validate elements with a <classname>@CheckCase</classname> annotation.
-      To do so, we implement the interface ConstraintValidator as shown
-      below:</para>
+      To do so, we implement the interface
+      <classname>ConstraintValidator</classname> as shown below:</para>
 
       <example id="example-constraint-validator">
         <title>Implementing a constraint validator for the constraint
