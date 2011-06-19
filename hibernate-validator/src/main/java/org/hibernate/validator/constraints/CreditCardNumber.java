@@ -44,11 +44,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface CreditCardNumber {
-	public abstract String message() default "{org.hibernate.validator.constraints.CreditCardNumber.message}";
+	String message() default "{org.hibernate.validator.constraints.CreditCardNumber.message}";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
 	/**
 	 * Defines several {@code @CreditCardNumber} annotations on the same element.

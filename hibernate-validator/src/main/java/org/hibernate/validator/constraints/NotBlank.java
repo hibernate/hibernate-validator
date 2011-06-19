@@ -47,11 +47,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ReportAsSingleViolation
 @NotNull
 public @interface NotBlank {
-	public abstract String message() default "{org.hibernate.validator.constraints.NotBlank.message}";
+	String message() default "{org.hibernate.validator.constraints.NotBlank.message}";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
 	/**
 	 * Defines several {@code @NotBlank} annotations on the same element.
