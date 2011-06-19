@@ -97,6 +97,9 @@
         <listitem>
             <para><package>org.joda.time.*</package>, [1.6.0,2.0.0), optional</para>
         </listitem>
+        <listitem>
+            <para><package>org.jsoup.*</package>, [1.5.2,2.0.0), optional</para>
+        </listitem>
     </itemizedlist>
   </section>
 
