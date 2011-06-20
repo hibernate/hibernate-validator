@@ -33,8 +33,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Validate a rich text value provided by the user to ensure that it contains no malicious code, such as embedded
- * <script>
- * elements.
+ * &lt;script&gt; elements.
  *
  * @author George Gastaldi
  */
@@ -51,12 +50,13 @@ public @interface SafeHtml {
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * @return The built-in types for this validator
+	 * @return The built-in whitelist type which will be applied to the rich text value
 	 */
-	WhiteListType value() default WhiteListType.RELAXED;
+	WhiteListType whitelistType() default WhiteListType.RELAXED;
 
 	/**
-	 * @return Additional whitelist tags if the current types are not sufficient.
+	 * @return Additional whitelist tags which are allowed on top of the tags specified by the
+	 * {@link #whitelistType()}.
 	 */
 	String[] additionalTags() default { };
 

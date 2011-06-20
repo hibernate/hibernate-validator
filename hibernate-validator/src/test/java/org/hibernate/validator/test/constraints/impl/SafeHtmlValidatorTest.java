@@ -37,7 +37,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	public void testNullValue() throws Exception {
 		AnnotationDescriptor<SafeHtml> descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
-		descriptor.setValue( "value", WhiteListType.BASIC );
+		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
 		SafeHtml p = AnnotationFactory.create( descriptor );
 
 		SafeHtmlValidator validator = new SafeHtmlValidator();
@@ -48,7 +48,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	public void testInvalidScriptTagIncluded() throws Exception {
 		AnnotationDescriptor<SafeHtml> descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
-		descriptor.setValue( "value", WhiteListType.BASIC );
+		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
 		SafeHtml p = AnnotationFactory.create( descriptor );
 
 		SafeHtmlValidator validator = new SafeHtmlValidator();
@@ -59,7 +59,7 @@ public class SafeHtmlValidatorTest {
 	@Test
 	public void testValid() throws Exception {
 		AnnotationDescriptor<SafeHtml> descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
-		descriptor.setValue( "value", WhiteListType.BASIC );
+		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
 		SafeHtml p = AnnotationFactory.create( descriptor );
 
 		SafeHtmlValidator validator = new SafeHtmlValidator();

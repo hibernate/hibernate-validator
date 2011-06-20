@@ -35,7 +35,7 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 	private Whitelist whitelist;
 
 	public void initialize(SafeHtml constraintAnn) {
-		switch ( constraintAnn.value() ) {
+		switch ( constraintAnn.whitelistType() ) {
 			case BASIC:
 				whitelist = Whitelist.basic();
 				break;

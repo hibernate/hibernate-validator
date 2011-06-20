@@ -1440,7 +1440,7 @@ public class RentalCar extends Car {
             </row>
 
             <row>
-              <entry>@SafeHtml(value=, additionalTags=)</entry>
+              <entry>@SafeHtml(whitelistType=, additionalTags=)</entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -1448,9 +1448,9 @@ public class RentalCar extends Car {
               malicious fragments such as <code>&lt;script/&gt;</code>. In
               order to use this constraint, the <ulink
               url="http://jsoup.org/">jsoup</ulink> library must be part of
-              the class path. With the <parameter>value</parameter> attribute
-              predefined whitelist types can be chosen. You can also specify
-              additional html tags for the whitelist with the
+              the class path. With the <parameter>whitelistType</parameter>
+              attribute predefined whitelist types can be chosen. You can also
+              specify additional html tags for the whitelist with the
               <parameter>additionalTags</parameter> attribute.</entry>
 
               <entry>none</entry>
