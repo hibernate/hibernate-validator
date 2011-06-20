@@ -1,6 +1,24 @@
 Hibernate Validator Changelog
 ==========================
 
+4.2.0.Final (20.06.2011)
+----------------------
+
+** Improvement
+    * [HV-315] - Create package-level JavaDoc for the AP
+    * [HV-485] - Determine an order for the constraint mapping fluent API
+    * [HV-486] - Remove getMethod() from MethodConstraintViolation
+    * [HV-490] - Create @SafeHtml annotation
+    * [HV-493] - Add support for Brazilian Portuguese for ValidationMessages
+
+** New Feature
+    * [HV-372] - Add section to method-level validation to the HV reference guide
+
+** Task
+    * [HV-489] - Upgrade dependency to BV TCK to 1.0.5.GA
+    * [HV-494] - upgrade to hibernate-jpa-2.0-api-1.0.1.Final
+    * [HV-497] - Create aggregated javadocs for the distribution and deployment on docs server
+
 4.2.0.CR1 (09.06.2011)
 ----------------------
 
