@@ -14,25 +14,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.metadata;
+package org.hibernate.validator.metadata.provider;
 
 import java.io.InputStream;
 import java.lang.reflect.Member;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.AnnotationIgnores;
+import org.hibernate.validator.metadata.BeanConfiguration;
+import org.hibernate.validator.metadata.BeanMetaConstraint;
+import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.xml.XmlMappingParser;
-
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 
 /**
  * @author Gunnar Morling
  */
-public class XmlConfigurationMetaDataProvider implements MetaDataProvider {
-
-	private final Map<Class<?>, BeanConfiguration<?>> configuredBeans;
+public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 
 	private final AnnotationIgnores annotationIgnores;
 
@@ -41,7 +39,7 @@ public class XmlConfigurationMetaDataProvider implements MetaDataProvider {
 	 */
 	public XmlConfigurationMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
 
-		configuredBeans = newHashMap();
+		super( constraintHelper );
 
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
 		mappingParser.parse( mappingStreams );
@@ -62,26 +60,12 @@ public class XmlConfigurationMetaDataProvider implements MetaDataProvider {
 		annotationIgnores = mappingParser.getAnnotationIgnores();
 	}
 
-	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
-
-		@SuppressWarnings("unchecked")
-		BeanConfiguration<T> configuration = (BeanConfiguration<T>) configuredBeans.get( beanClass );
-		return configuration;
-	}
-
 	public Set<BeanConfiguration<?>> getAllBeanConfigurations() {
 		return new HashSet<BeanConfiguration<?>>( configuredBeans.values() );
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
 		return annotationIgnores;
-	}
-
-	private <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass,
-															 Set<BeanMetaConstraint<?>> constraints,
-															 Set<Member> cascadedMembers, List<Class<?>> defaultGroupSequence) {
-
-		return new BeanConfiguration<T>( beanClass, constraints, cascadedMembers, defaultGroupSequence );
 	}
 
 }

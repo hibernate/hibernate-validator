@@ -14,22 +14,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.metadata;
+package org.hibernate.validator.metadata.provider;
 
 import java.util.Set;
 
+import org.hibernate.validator.metadata.AnnotationIgnores;
+import org.hibernate.validator.metadata.BeanConfiguration;
+
 /**
+ * <p>
  * A provider for constraint related meta data such as constraints, default
- * group sequences etc. Implementations are based one different meta data
- * sources such as XML, programmatic mappings and annotations.
+ * group sequences etc.
+ * </p>
+ * <p>
+ * Implementations are based one different meta data sources such as XML,
+ * programmatic mappings and annotations. Meta data providers only return meta
+ * data directly configured for one class, they don't deal with merging meta
+ * data from super-classes or implemented interfaces.
+ * </p>
  *
  * @author Gunnar Morling
  */
 public interface MetaDataProvider {
 
 	Set<BeanConfiguration<?>> getAllBeanConfigurations();
-
-	<T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass);
 
 	AnnotationIgnores getAnnotationIgnores();
 

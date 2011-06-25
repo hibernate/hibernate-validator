@@ -18,11 +18,11 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -103,6 +103,7 @@ public class BeanMetaDataBuilder {
 
 		Set<Member> allCascadedMembers = newHashSet();
 		Map<Class<?>, List<BeanMetaConstraint<?>>> allConstraints = newHashMap();
+		Set<AggregatedMethodMetaData.Builder> builders = newHashSet();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 
@@ -112,6 +113,10 @@ public class BeanMetaDataBuilder {
 				continue;
 			}
 
+			for ( MethodMetaData oneMethodMetaData : configurationForHierarchyClass.getMethodMetaData() ) {
+				addMetaDataToBuilder( oneMethodMetaData, builders );
+
+			}
 			List<BeanMetaConstraint<?>> adaptedConstraints = newArrayList();
 			for ( BeanMetaConstraint<?> beanMetaConstraint : configurationForHierarchyClass.getConstraints() ) {
 				adaptedConstraints.add( adaptOrigin( beanMetaConstraint, beanClass ) );
@@ -121,17 +126,33 @@ public class BeanMetaDataBuilder {
 			allCascadedMembers.addAll( configurationForHierarchyClass.getCascadedMembers() );
 		}
 
+		Set<AggregatedMethodMetaData> allMethodMetaData = newHashSet();
+		for ( Builder oneBuilder : builders ) {
+			allMethodMetaData.add( oneBuilder.build() );
+		}
+
 		return new BeanMetaDataImpl<T>(
 				beanClass,
 				constraintHelper,
 				rootConfiguration.getDefaultGroupSequence(),
 				null,
 				allConstraints,
-				Collections.<AggregatedMethodMetaData>emptySet(),
+				allMethodMetaData,
 				allCascadedMembers,
-				annotationIgnores,
+				annotationIgnores != null ? annotationIgnores : new AnnotationIgnores(),
 				beanMetaDataCache
 		);
+	}
+
+	private void addMetaDataToBuilder(MethodMetaData methodMetaData, Set<AggregatedMethodMetaData.Builder> builders) {
+		for ( AggregatedMethodMetaData.Builder OneBuilder : builders ) {
+			if ( OneBuilder.accepts( methodMetaData ) ) {
+				OneBuilder.addMetaData( methodMetaData );
+				return;
+			}
+		}
+		AggregatedMethodMetaData.Builder builder = new AggregatedMethodMetaData.Builder( methodMetaData );
+		builders.add( builder );
 	}
 
 	private <A extends Annotation> BeanMetaConstraint<A> adaptOrigin(BeanMetaConstraint<A> constraint, Class<?> beanClass) {

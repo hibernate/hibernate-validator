@@ -18,6 +18,7 @@ package org.hibernate.validator.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -86,6 +87,10 @@ public class CollectionHelper {
 	 *         partitioner.
 	 */
 	public static <K, V> Map<K, List<V>> partition(List<V> list, Partitioner<K, V> partitioner) {
+
+		if ( list == null ) {
+			return Collections.emptyMap();
+		}
 
 		Map<K, List<V>> theValue = newHashMap();
 
