@@ -22,6 +22,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,6 +43,7 @@ import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
+import org.hibernate.validator.metadata.BeanMetaDataBuilder;
 import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
@@ -99,7 +101,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
-			initXmlConfiguration( configurationState.getMappingStreams() );
+//			initXmlConfiguration( configurationState.getMappingStreams() );
+
+			BeanMetaDataBuilder builder = new BeanMetaDataBuilder( constraintHelper, beanMetaDataCache );
+			initXmlConfiguration( configurationState.getMappingStreams(), builder );
 		}
 
 		if ( configurationState instanceof ConfigurationImpl ) {
@@ -157,9 +162,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * @param mapping The constraint configuration created via the programmatic API.
 	 */
 	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
-		
-		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping(mapping);
-		
+
+		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
+
 		final Map<Class<?>, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByType = context.getConstraintConfig();
 		final Map<Class<?>, List<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintsByType = context
 				.getMethodConstraintConfig();
@@ -238,69 +243,34 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private <T> void initXmlConfiguration(Set<InputStream> mappingStreams) {
+	private void initXmlConfiguration(Set<InputStream> mappingStreams, BeanMetaDataBuilder builder) {
 
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
 		mappingParser.parse( mappingStreams );
 
 		Set<Class<?>> xmlConfiguredClasses = mappingParser.getXmlConfiguredClasses();
-		AnnotationIgnores annotationIgnores = mappingParser.getAnnotationIgnores();
+		builder.setAnnotationIgnores( mappingParser.getAnnotationIgnores() );
+
 		for ( Class<?> clazz : xmlConfiguredClasses ) {
-			@SuppressWarnings("unchecked")
-			Class<T> beanClass = (Class<T>) clazz;
 
-			List<Class<?>> classes = ReflectionHelper.computeClassHierarchy( beanClass, true );
-			Map<Class<?>, List<BeanMetaConstraint<?>>> constraints = newHashMap();
-			Set<Member> cascadedMembers = newHashSet();
-			// we need to collect all constraints which apply for a single class. Due to constraint inheritance
-			// some constraints might be configured in super classes or interfaces. The xml configuration does not
-			// imply any order so we have to check whether any of the super classes or interfaces of a given bean has
-			// as well been configured via xml
-			for ( Class<?> classInHierarchy : classes ) {
-				if ( xmlConfiguredClasses.contains( classInHierarchy ) ) {
-					addXmlConfiguredConstraints( mappingParser, beanClass, classInHierarchy, constraints );
-					addXmlCascadedMember( mappingParser, classInHierarchy, cascadedMembers );
-				}
-			}
-
-			BeanMetaDataImpl<T> metaData = new BeanMetaDataImpl<T>(
-					beanClass,
-					constraintHelper,
-					mappingParser.getDefaultSequenceForClass( beanClass ),
-					null,
-					constraints,
-					Collections.<AggregatedMethodMetaData>emptySet(),
-					cascadedMembers,
-					annotationIgnores,
-					beanMetaDataCache
+			builder.addBeanConfiguration(
+					clazz,
+					new HashSet<BeanMetaConstraint<?>>( mappingParser.getConstraintsForClass( clazz ) ),
+					new HashSet<Member>( mappingParser.getCascadedMembersForClass( clazz ) ),
+					mappingParser.getDefaultSequenceForClass( clazz )
 			);
-
-			beanMetaDataCache.addBeanMetaData( beanClass, metaData );
 		}
+
+		List<BeanMetaDataImpl<?>> allMetaData = builder.getBeanMetaData();
+
+		for ( BeanMetaDataImpl<?> oneBeanMetaData : allMetaData ) {
+			registerWithCache( oneBeanMetaData );
+		}
+
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T, A extends Annotation> void addXmlConfiguredConstraints(XmlMappingParser mappingParser,
-																	   Class<T> rootClass,
-																	   Class<?> hierarchyClass, Map<Class<?>, List<BeanMetaConstraint<?>>> constraints) {
-		for ( BeanMetaConstraint<?> constraint : mappingParser.getConstraintsForClass( hierarchyClass ) ) {
-
-			ConstraintOrigin definedIn = definedIn( rootClass, hierarchyClass );
-			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
-					(A) constraint.getDescriptor().getAnnotation(),
-					constraintHelper,
-					constraint.getElementType(),
-					definedIn
-			);
-
-			BeanMetaConstraint<A> newMetaConstraint = new BeanMetaConstraint<A>(
-					descriptor,
-					constraint.getLocation().getBeanClass(),
-					constraint.getLocation().getMember()
-			);
-
-			addConstraintToMap( hierarchyClass, newMetaConstraint, constraints );
-		}
+	private <T> void registerWithCache(BeanMetaDataImpl<T> metaData) {
+		beanMetaDataCache.addBeanMetaData( metaData.getBeanClass(), metaData );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -333,14 +303,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		constraintList.add( constraint );
-	}
-
-	private void addXmlCascadedMember(XmlMappingParser mappingParser,
-									  Class<?> hierarchyClass,
-									  Set<Member> cascadedMembers) {
-		for ( Member m : mappingParser.getCascadedMembersForClass( hierarchyClass ) ) {
-			cascadedMembers.add( m );
-		}
 	}
 
 	private void addProgrammaticConfiguredCascade(List<BeanConstraintLocation> cascades,
