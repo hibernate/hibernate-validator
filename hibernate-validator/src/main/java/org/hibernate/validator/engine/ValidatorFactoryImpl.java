@@ -16,13 +16,11 @@
 */
 package org.hibernate.validator.engine;
 
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,22 +48,25 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.MetaDataProvider;
 import org.hibernate.validator.metadata.MethodMetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.XmlConfigurationMetaDataProvider;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validator.xml.XmlMappingParser;
 
 import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.CollectionHelper.partition;
+
+//import org.hibernate.validator.xml.XmlMappingParser;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
@@ -99,12 +100,22 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		boolean tmpFailFast = false;
 
+		BeanMetaDataBuilder builder = new BeanMetaDataBuilder( constraintHelper, beanMetaDataCache );
+
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
-//			initXmlConfiguration( configurationState.getMappingStreams() );
 
-			BeanMetaDataBuilder builder = new BeanMetaDataBuilder( constraintHelper, beanMetaDataCache );
-			initXmlConfiguration( configurationState.getMappingStreams(), builder );
+			MetaDataProvider xmlConfigurationProvider = new XmlConfigurationMetaDataProvider(
+					constraintHelper, configurationState.getMappingStreams()
+			);
+			builder.addAll( xmlConfigurationProvider.getAllBeanConfigurations() );
+			builder.setAnnotationIgnores( xmlConfigurationProvider.getAnnotationIgnores() );
+
+			List<BeanMetaDataImpl<?>> allMetaData = builder.getBeanMetaData();
+
+			for ( BeanMetaDataImpl<?> oneBeanMetaData : allMetaData ) {
+				registerWithCache( oneBeanMetaData );
+			}
 		}
 
 		if ( configurationState instanceof ConfigurationImpl ) {
@@ -241,32 +252,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			beanMetaDataCache.addBeanMetaData( beanClass, metaData );
 		}
-	}
-
-	private void initXmlConfiguration(Set<InputStream> mappingStreams, BeanMetaDataBuilder builder) {
-
-		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
-		mappingParser.parse( mappingStreams );
-
-		Set<Class<?>> xmlConfiguredClasses = mappingParser.getXmlConfiguredClasses();
-		builder.setAnnotationIgnores( mappingParser.getAnnotationIgnores() );
-
-		for ( Class<?> clazz : xmlConfiguredClasses ) {
-
-			builder.addBeanConfiguration(
-					clazz,
-					new HashSet<BeanMetaConstraint<?>>( mappingParser.getConstraintsForClass( clazz ) ),
-					new HashSet<Member>( mappingParser.getCascadedMembersForClass( clazz ) ),
-					mappingParser.getDefaultSequenceForClass( clazz )
-			);
-		}
-
-		List<BeanMetaDataImpl<?>> allMetaData = builder.getBeanMetaData();
-
-		for ( BeanMetaDataImpl<?> oneBeanMetaData : allMetaData ) {
-			registerWithCache( oneBeanMetaData );
-		}
-
 	}
 
 	private <T> void registerWithCache(BeanMetaDataImpl<T> metaData) {

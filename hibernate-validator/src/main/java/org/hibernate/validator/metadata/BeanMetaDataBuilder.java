@@ -55,31 +55,26 @@ public class BeanMetaDataBuilder {
 		configurationsByClass = newHashMap();
 	}
 
-	/**
-	 * @param clazz
-	 * @param constraints
-	 * @param cascadedMembers
-	 * @param defaultSequence
-	 */
-	public <T> void addBeanConfiguration(
-			Class<T> clazz,
-			Set<BeanMetaConstraint<?>> constraints,
-			Set<Member> cascadedMembers,
-			List<Class<?>> defaultSequence) {
+	public <T> void add(BeanConfiguration<T> beanConfiguration) {
 
-		BeanConfiguration<T> configurationForClass = getConfigurationForClass( clazz );
+		BeanConfiguration<T> existingConfiguration = getConfigurationForClass( beanConfiguration.getBeanClass() );
 
-		if ( configurationForClass == null ) {
+		if ( existingConfiguration == null ) {
 			configurationsByClass.put(
-					clazz, new BeanConfiguration<T>( clazz, constraints, cascadedMembers, defaultSequence )
+					beanConfiguration.getBeanClass(), beanConfiguration
 			);
 		}
 		else {
-			configurationForClass.merge(
-					new BeanConfiguration<T>(
-							clazz, constraints, cascadedMembers, defaultSequence
-					)
-			);
+			existingConfiguration.merge( beanConfiguration );
+		}
+	}
+
+	/**
+	 * @param allBeanConfigurations
+	 */
+	public void addAll(Iterable<? extends BeanConfiguration<?>> allBeanConfigurations) {
+		for ( BeanConfiguration<?> oneBeanConfiguration : allBeanConfigurations ) {
+			add( oneBeanConfiguration );
 		}
 	}
 
@@ -183,4 +178,5 @@ public class BeanMetaDataBuilder {
 	public void setAnnotationIgnores(AnnotationIgnores annotationIgnores) {
 		this.annotationIgnores = annotationIgnores;
 	}
+
 }

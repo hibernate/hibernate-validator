@@ -74,13 +74,6 @@ public class BeanConfiguration<T> {
 
 	public void merge(BeanConfiguration<T> other) {
 
-		if ( !other.getBeanClass().equals( beanClass ) ) {
-			throw new IllegalArgumentException(
-					"Can only merge configurations for same bean class. This bean class is " + beanClass + ", other bean class is " + other
-							.getBeanClass()
-			);
-		}
-
 		constraints.addAll( other.getConstraints() );
 		cascadedMembers.addAll( other.getCascadedMembers() );
 
