@@ -540,58 +540,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void initClass(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		initClassConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
-		initFieldConstraints( clazz, annotationIgnores, beanMetaDataCache );
 	}
 
-	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		final Field[] fields = ReflectionHelper.getDeclaredFields( clazz );
-		for ( Field field : fields ) {
-			addToPropertyNameList( field );
-
-			// HV-172
-			if ( Modifier.isStatic( field.getModifiers() ) ) {
-				continue;
-			}
-
-			if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
-				continue;
-			}
-
-			// HV-262
-			BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
-			boolean metaDataCached = cachedMetaData != null;
-			List<ConstraintDescriptorImpl<?>> fieldMetaData;
-			if ( metaDataCached && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
-				fieldMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-				for ( BeanMetaConstraint<?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap()
-						.get( clazz ) ) {
-					ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
-					if ( descriptor.getElementType() == ElementType.FIELD
-							&& metaConstraint.getLocation()
-							.getPropertyName()
-							.equals( ReflectionHelper.getPropertyName( field ) ) ) {
-						fieldMetaData.add( descriptor );
-					}
-				}
-			}
-			else {
-				fieldMetaData = findConstraints( field, ElementType.FIELD );
-			}
-
-			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetaData ) {
-				ReflectionHelper.setAccessibility( field );
-				BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( clazz, field, constraintDescription );
-				addMetaConstraint( clazz, metaConstraint );
-			}
-
-			// HV-433 Make sure the field is marked as cascaded in case it was configured via xml/programmatic API or
-			// it hosts the @Valid annotation
-			boolean isCascadedField = metaDataCached && cachedMetaData.getCascadedMembers().contains( field );
-			if ( isCascadedField || field.isAnnotationPresent( Valid.class ) ) {
-				addCascadedMember( field );
-			}
-		}
-	}
 
 	private void addToPropertyNameList(Member member) {
 		String name = ReflectionHelper.getPropertyName( member );
@@ -639,6 +589,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member, boolean isCascaded) {
 		String name = ReflectionHelper.getPropertyName( member );
+		addToPropertyNameList( member );
 		PropertyDescriptorImpl propertyDescriptor = (PropertyDescriptorImpl) propertyDescriptors.get(
 				name
 		);

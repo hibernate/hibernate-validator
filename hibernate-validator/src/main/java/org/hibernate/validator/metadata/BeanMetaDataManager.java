@@ -80,6 +80,10 @@ public class BeanMetaDataManager {
 			}
 		}
 
+		if ( annotationIgnores == null ) {
+			annotationIgnores = new AnnotationIgnores();
+		}
+
 		//load annotation meta data for eagerly configured types and their hierarchy
 
 		Set<BeanConfiguration<?>> annotationConfigurations = newHashSet();
@@ -88,7 +92,7 @@ public class BeanMetaDataManager {
 		for ( Class<?> oneConfiguredClass : configurationsByClass.keySet() ) {
 			for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( oneConfiguredClass, true ) ) {
 				MetaDataProvider annotationMetaDataProvider = new AnnotationMetaDataProvider(
-						constraintHelper, oneHierarchyClass
+						constraintHelper, oneHierarchyClass, annotationIgnores
 				);
 				for ( BeanConfiguration<?> oneConfiguration : annotationMetaDataProvider.getAllBeanConfigurations() ) {
 					annotationConfigurations.add( oneConfiguration );
@@ -113,7 +117,7 @@ public class BeanMetaDataManager {
 		if ( beanMetaData == null ) {
 			for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 				MetaDataProvider annotationMetaDataProvider = new AnnotationMetaDataProvider(
-						constraintHelper, oneHierarchyClass
+						constraintHelper, oneHierarchyClass, annotationIgnores
 				);
 				for ( BeanConfiguration<?> oneConfiguration : annotationMetaDataProvider.getAllBeanConfigurations() ) {
 					addOrMerge( oneConfiguration );
