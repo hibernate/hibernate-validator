@@ -27,13 +27,13 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.metadata.BeanMetaDataBuilder;
-import org.hibernate.validator.metadata.BeanMetaDataCache;
-import org.hibernate.validator.metadata.BeanMetaDataImpl;
+import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.metadata.provider.ProgrammaticMappingMetaDataProvider;
 import org.hibernate.validator.metadata.provider.XmlConfigurationMetaDataProvider;
+
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
@@ -50,12 +50,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final ConstraintHelper constraintHelper;
+	private final BeanMetaDataManager metaDataManager;
 	private final boolean failFast;
-
-	/**
-	 * Used to cache the constraint meta data for validated entities
-	 */
-	private final BeanMetaDataCache beanMetaDataCache;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 
@@ -63,32 +59,31 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.constraintHelper = new ConstraintHelper();
-		this.beanMetaDataCache = new BeanMetaDataCache();
 
 		boolean tmpFailFast = false;
 
-		BeanMetaDataBuilder builder = new BeanMetaDataBuilder( constraintHelper, beanMetaDataCache );
+		List<MetaDataProvider> metaDataProviders = newArrayList();
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
 
-			MetaDataProvider xmlConfigurationProvider = new XmlConfigurationMetaDataProvider(
-					constraintHelper, configurationState.getMappingStreams()
+			metaDataProviders.add(
+					new XmlConfigurationMetaDataProvider(
+							constraintHelper, configurationState.getMappingStreams()
+					)
 			);
-			builder.addAll( xmlConfigurationProvider.getAllBeanConfigurations() );
-			builder.setAnnotationIgnores( xmlConfigurationProvider.getAnnotationIgnores() );
-
 		}
 
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
 			if ( hibernateSpecificConfig.getMapping() != null ) {
-				MetaDataProvider programmaticConfigurationProvider = new ProgrammaticMappingMetaDataProvider(
-						constraintHelper,
-						hibernateSpecificConfig.getMapping()
+				metaDataProviders.add(
+						new ProgrammaticMappingMetaDataProvider(
+								constraintHelper,
+								hibernateSpecificConfig.getMapping()
+						)
 				);
-				builder.addAll( programmaticConfigurationProvider.getAllBeanConfigurations() );
 			}
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
@@ -99,11 +94,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		this.failFast = tmpFailFast;
 
-		List<BeanMetaDataImpl<?>> allMetaData = builder.getBeanMetaData();
-
-		for ( BeanMetaDataImpl<?> oneBeanMetaData : allMetaData ) {
-			registerWithCache( oneBeanMetaData );
-		}
+		metaDataManager = new BeanMetaDataManager( constraintHelper, metaDataProviders );
 	}
 
 	public Validator getValidator() {
@@ -135,13 +126,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				messageInterpolator,
 				traversableResolver,
 				constraintHelper,
-				beanMetaDataCache,
+				metaDataManager,
 				failFast
 		);
-	}
-
-	private <T> void registerWithCache(BeanMetaDataImpl<T> metaData) {
-		beanMetaDataCache.addBeanMetaData( metaData.getBeanClass(), metaData );
 	}
 
 	private boolean checkPropertiesForFailFast(ConfigurationState configurationState, boolean programmaticConfiguredFailFast) {

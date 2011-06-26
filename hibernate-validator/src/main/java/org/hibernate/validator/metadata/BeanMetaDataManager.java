@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
+import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
+import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -32,30 +34,107 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 /**
  * @author Gunnar Morling
  */
-public class BeanMetaDataBuilder {
+public class BeanMetaDataManager {
 
-	private final Map<Class<?>, BeanConfiguration<?>> configurationsByClass;
+	private final List<MetaDataProvider> eagerMetaDataProviders;
 
 	private final ConstraintHelper constraintHelper;
 
+	/**
+	 * Used to cache the constraint meta data for validated entities
+	 */
 	private final BeanMetaDataCache beanMetaDataCache;
 
 	private AnnotationIgnores annotationIgnores;
 
+	//TODO GM: can this be merged with cache?
+	private Map<Class<?>, BeanConfiguration<?>> configurationsByClass;
+
 	/**
 	 * @param constraintHelper
 	 * @param beanMetaDataCache
+	 * @param mappingStreams
+	 * @param mapping
 	 */
-	public BeanMetaDataBuilder(ConstraintHelper constraintHelper,
-							   BeanMetaDataCache beanMetaDataCache) {
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> eagerMetaDataProviders) {
 
 		this.constraintHelper = constraintHelper;
-		this.beanMetaDataCache = beanMetaDataCache;
+		this.eagerMetaDataProviders = eagerMetaDataProviders;
 
 		configurationsByClass = newHashMap();
+		beanMetaDataCache = new BeanMetaDataCache();
+
+		cacheMetaDataFromEagerProviders();
 	}
 
-	private <T> void add(BeanConfiguration<T> beanConfiguration) {
+	private void cacheMetaDataFromEagerProviders() {
+
+		//load meta data from eager providers
+		for ( MetaDataProvider oneProvider : eagerMetaDataProviders ) {
+			//TODO GM: merge, if also programmatic provider has this option
+			if ( oneProvider.getAnnotationIgnores() != null ) {
+				annotationIgnores = oneProvider.getAnnotationIgnores();
+			}
+			for ( BeanConfiguration<?> oneConfiguration : oneProvider.getAllBeanConfigurations() ) {
+				addOrMerge( oneConfiguration );
+			}
+		}
+
+		//load annotation meta data for eagerly configured types and their hierarchy
+
+		Set<BeanConfiguration<?>> annotationConfigurations = newHashSet();
+
+		//TODO GM: don't retrieve annotation meta data several times per type
+		for ( Class<?> oneConfiguredClass : configurationsByClass.keySet() ) {
+			for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( oneConfiguredClass, true ) ) {
+				MetaDataProvider annotationMetaDataProvider = new AnnotationMetaDataProvider(
+						constraintHelper, oneHierarchyClass
+				);
+				for ( BeanConfiguration<?> oneConfiguration : annotationMetaDataProvider.getAllBeanConfigurations() ) {
+					annotationConfigurations.add( oneConfiguration );
+				}
+			}
+		}
+
+		for ( BeanConfiguration<?> beanConfiguration : annotationConfigurations ) {
+			addOrMerge( beanConfiguration );
+		}
+
+		//store eagerly loaded meta data in cache
+		List<BeanMetaDataImpl<?>> allMetaData = configurationAsBeanMetaData();
+
+		for ( BeanMetaDataImpl<?> oneBeanMetaData : allMetaData ) {
+			registerWithCache( oneBeanMetaData );
+		}
+	}
+
+	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
+		BeanMetaDataImpl<T> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
+		if ( beanMetaData == null ) {
+			for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+				MetaDataProvider annotationMetaDataProvider = new AnnotationMetaDataProvider(
+						constraintHelper, oneHierarchyClass
+				);
+				for ( BeanConfiguration<?> oneConfiguration : annotationMetaDataProvider.getAllBeanConfigurations() ) {
+					addOrMerge( oneConfiguration );
+				}
+			}
+
+			beanMetaData = mergeWithMetaDataFromHierarchy( getConfigurationForClass( beanClass ) );
+
+			final BeanMetaDataImpl<T> cachedBeanMetaData = beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
+			if ( cachedBeanMetaData != null ) {
+				beanMetaData = cachedBeanMetaData;
+			}
+		}
+		return beanMetaData;
+	}
+
+	private <T> void registerWithCache(BeanMetaDataImpl<T> metaData) {
+		beanMetaDataCache.addBeanMetaData( metaData.getBeanClass(), metaData );
+	}
+
+	private <T> void addOrMerge(BeanConfiguration<T> beanConfiguration) {
 
 		BeanConfiguration<T> existingConfiguration = getConfigurationForClass( beanConfiguration.getBeanClass() );
 
@@ -69,15 +148,6 @@ public class BeanMetaDataBuilder {
 		}
 	}
 
-	/**
-	 * @param allBeanConfigurations
-	 */
-	public void addAll(Iterable<? extends BeanConfiguration<?>> allBeanConfigurations) {
-		for ( BeanConfiguration<?> oneBeanConfiguration : allBeanConfigurations ) {
-			add( oneBeanConfiguration );
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	private <T> BeanConfiguration<T> getConfigurationForClass(Class<T> clazz) {
 		return (BeanConfiguration<T>) configurationsByClass.get( clazz );
@@ -86,7 +156,8 @@ public class BeanMetaDataBuilder {
 	/**
 	 * @return
 	 */
-	public List<BeanMetaDataImpl<?>> getBeanMetaData() {
+	private List<BeanMetaDataImpl<?>> configurationAsBeanMetaData() {
+
 
 		List<BeanMetaDataImpl<?>> theValue = newArrayList();
 
@@ -191,13 +262,6 @@ public class BeanMetaDataBuilder {
 		else {
 			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
 		}
-	}
-
-	/**
-	 * @param annotationIgnores
-	 */
-	public void setAnnotationIgnores(AnnotationIgnores annotationIgnores) {
-		this.annotationIgnores = annotationIgnores;
 	}
 
 }

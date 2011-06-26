@@ -59,7 +59,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
-		return new AnnotationIgnores();
+		return null;
 	}
 
 	/**

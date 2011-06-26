@@ -90,7 +90,7 @@ public class BeanConfiguration<T> {
 		cascadedMembers.addAll( other.getCascadedMembers() );
 
 		// TODO GM: Determine which default sequence should be taken
-		if ( defaultGroupSequence == null
+		if ( (defaultGroupSequence == null || defaultGroupSequence.isEmpty()) 
 				&& other.getDefaultGroupSequence() != null ) {
 			defaultGroupSequence = other.getDefaultGroupSequence();
 		}

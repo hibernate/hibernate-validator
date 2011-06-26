@@ -24,7 +24,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
-import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
@@ -42,7 +40,6 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
@@ -209,7 +206,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		createMetaData( annotationIgnores, beanMetaDataCache );
 
 		// set the default explicitly specified default group sequence after the discovery process is complete
-		if ( !defaultGroupSequence.isEmpty() ) {
+		if ( defaultGroupSequence != null && !defaultGroupSequence.isEmpty() ) {
 			setDefaultGroupSequence( defaultGroupSequence );
 		}
 
@@ -535,7 +532,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private void createMetaData(AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
-		initDefaultGroupSequence();
 		for ( Class<?> current : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 			initClass( current, annotationIgnores, beanMetaDataCache );
 		}
@@ -545,34 +541,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		initClassConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initFieldConstraints( clazz, annotationIgnores, beanMetaDataCache );
-	}
-
-	/**
-	 * Checks whether there is a default group sequence defined for this class.
-	 * See HV-113.
-	 */
-	private void initDefaultGroupSequence() {
-		List<Class<?>> groupSequence = new ArrayList<Class<?>>();
-		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
-		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
-
-		if ( groupSequenceAnnotation != null && groupSequenceProviderAnnotation != null ) {
-			throw new GroupDefinitionException(
-					"GroupSequence and GroupSequenceProvider annotations cannot be used at the same time"
-			);
-		}
-
-		if ( groupSequenceProviderAnnotation != null ) {
-			defaultGroupSequenceProvider = newGroupSequenceProviderInstance( groupSequenceProviderAnnotation.value() );
-		}
-		else if ( groupSequenceAnnotation != null ) {
-			groupSequence.addAll( Arrays.asList( groupSequenceAnnotation.value() ) );
-			setDefaultGroupSequence( groupSequence );
-		}
-		else {
-			groupSequence.add( beanClass );
-			setDefaultGroupSequence( groupSequence );
-		}
 	}
 
 	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {

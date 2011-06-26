@@ -46,8 +46,7 @@ import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableReso
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaData;
-import org.hibernate.validator.metadata.BeanMetaDataCache;
-import org.hibernate.validator.metadata.BeanMetaDataImpl;
+import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ParameterMetaData;
@@ -105,19 +104,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * Used to get access to the bean meta data. Used to avoid to parsing the constraint configuration for each call
 	 * of a given entity.
 	 */
-	private final BeanMetaDataCache beanMetaDataCache;
+	private final BeanMetaDataManager beanMetaDataManager;
 
 	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
 	private final boolean failFast;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache, boolean failFast) {
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataManager beanMetaDataManager, boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.constraintHelper = constraintHelper;
-		this.beanMetaDataCache = beanMetaDataCache;
+		this.beanMetaDataManager = beanMetaDataManager;
 		this.failFast = failFast;
 
 		groupChainGenerator = new GroupChainGenerator();
@@ -248,11 +247,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
-		return getBeanMetaData( clazz ).getBeanDescriptor();
+		return beanMetaDataManager.getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
 	public final TypeDescriptor getConstraintsForType(Class<?> clazz) {
-		return getBeanMetaData( clazz ).getTypeDescriptor();
+		return beanMetaDataManager.getBeanMetaData( clazz ).getTypeDescriptor();
 	}
 
 	public final <T> T unwrap(Class<T> type) {
@@ -299,7 +298,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return Collections.emptySet();
 		}
 
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
 		}
@@ -363,12 +362,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V, E extends ConstraintViolation<T>> void validateConstraintsForDefaultGroup(ValidationContext<T, E> validationContext, ValueContext<U, V> valueContext) {
-		final BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
-			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
+			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
 			Set<BeanMetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
@@ -421,7 +420,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V> void validateConstraintsForNonDefaultGroup(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( BeanMetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
 			validateConstraint( validationContext, valueContext, metaConstraint );
@@ -463,7 +462,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @param valueContext Collected information for single validation
 	 */
 	private <T, U, V> void validateCascadedConstraints(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
-		Set<Member> cascadedMembers = getBeanMetaData( valueContext.getCurrentBeanType() ).getCascadedMembers();
+		Set<Member> cascadedMembers = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
+				.getCascadedMembers();
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( Member member : cascadedMembers ) {
 			String newNode = ReflectionHelper.getPropertyName( member );
@@ -638,7 +638,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return context.getFailingConstraints();
 		}
 
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
 		}
@@ -686,7 +686,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return context.getFailingConstraints();
 		}
 
-		BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
 		}
@@ -789,12 +789,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> constraintList) {
 		final int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
-		final BeanMetaData<U> beanMetaData = getBeanMetaData( valueContext.getCurrentBeanType() );
+		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
 		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
-			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) getBeanMetaData( clazz );
+			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			Set<BeanMetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
@@ -848,7 +848,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, GroupChain groupChain) {
 
-		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
+		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 
 		//assert that there are no illegal method parameter constraints
 		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getMethod() );
@@ -891,7 +891,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		Method method = validationContext.getMethod();
 
-		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
+		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
@@ -1009,7 +1009,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, V value, GroupChain groupChain) {
 
-		BeanMetaData<T> beanMetaData = getBeanMetaData( context.getRootBeanClass() );
+		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( context.getRootBeanClass() );
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( bean ) );
@@ -1050,7 +1050,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		Method method = validationContext.getMethod();
 
-		BeanMetaData<T> beanMetaData = getBeanMetaData( validationContext.getRootBeanClass() );
+		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
@@ -1144,7 +1144,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Path.Node elem = propertyIter.next();
 		Object newValue = value;
 
-		BeanMetaData<?> metaData = getBeanMetaData( clazz );
+		BeanMetaData<?> metaData = beanMetaDataManager.getBeanMetaData( clazz );
 		//use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( !metaData.isPropertyPresent( elem.getName() ) ) {
 			throw new IllegalArgumentException(
@@ -1155,7 +1155,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		if ( !propertyIter.hasNext() ) {
 			for ( Class<?> hierarchyClass : metaData.getClassHierarchy() ) {
-				metaData = getBeanMetaData( hierarchyClass );
+				metaData = beanMetaDataManager.getBeanMetaData( hierarchyClass );
 				for ( BeanMetaConstraint<?> constraint : metaData.getDirectMetaConstraints() ) {
 					if ( elem.getName() != null && elem.getName()
 							.equals( constraint.getLocation().getPropertyName() ) ) {
@@ -1203,20 +1203,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return ValueContext.getLocalExecutionContext( (Class<U>) clazz, propertyPath );
 		}
 		return ValueContext.getLocalExecutionContext( (U) value, propertyPath );
-	}
-
-	private <U> BeanMetaData<U> getBeanMetaData(Class<U> beanClass) {
-		BeanMetaDataImpl<U> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
-		if ( beanMetaData == null ) {
-			beanMetaData = new BeanMetaDataImpl<U>(
-					beanClass, constraintHelper, beanMetaDataCache
-			);
-			final BeanMetaDataImpl<U> cachedBeanMetaData = beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
-			if ( cachedBeanMetaData != null ) {
-				beanMetaData = cachedBeanMetaData;
-			}
-		}
-		return beanMetaData;
 	}
 
 	/**

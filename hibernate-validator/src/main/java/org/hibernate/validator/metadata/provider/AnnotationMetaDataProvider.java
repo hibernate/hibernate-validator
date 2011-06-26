@@ -16,29 +16,70 @@
 */
 package org.hibernate.validator.metadata.provider;
 
-import java.util.Set;
+import java.lang.reflect.Member;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import javax.validation.GroupDefinitionException;
+import javax.validation.GroupSequence;
 
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanConfiguration;
+import org.hibernate.validator.metadata.BeanMetaConstraint;
+import org.hibernate.validator.metadata.ConstraintHelper;
 
 /**
  * @author Gunnar Morling
  */
-public class AnnotationMetaDataProvider implements MetaDataProvider {
+public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
-	/* (non-Javadoc)
-	 * @see org.hibernate.validator.metadata.provider.MetaDataProvider#getAllBeanConfigurations()
-	 */
-	public Set<BeanConfiguration<?>> getAllBeanConfigurations() {
-		// TODO Auto-generated method stub
-		return null;
+	private final Class<?> beanClass;
+
+	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, Class<?> beanClass) {
+
+		super( constraintHelper );
+
+		this.beanClass = beanClass;
+
+		initDefaultGroupSequence();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.hibernate.validator.metadata.provider.MetaDataProvider#getAnnotationIgnores()
-	 */
 	public AnnotationIgnores getAnnotationIgnores() {
 		return new AnnotationIgnores();
 	}
 
+	/**
+	 * Checks whether there is a default group sequence defined for this class.
+	 * See HV-113.
+	 */
+	private void initDefaultGroupSequence() {
+		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
+		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
+
+		if ( groupSequenceAnnotation != null && groupSequenceProviderAnnotation != null ) {
+			throw new GroupDefinitionException(
+					"GroupSequence and GroupSequenceProvider annotations cannot be used at the same time"
+			);
+		}
+
+		List<Class<?>> defaultGroupSequence = groupSequenceAnnotation != null ? Arrays.asList( groupSequenceAnnotation.value() ) : null;
+		Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider = groupSequenceProviderAnnotation != null ? groupSequenceProviderAnnotation
+				.value() : null;
+
+		if ( defaultGroupSequence == null && defaultGroupSequenceProvider == null ) {
+			defaultGroupSequence = Arrays.<Class<?>>asList( beanClass );
+		}
+
+		configuredBeans.put(
+				beanClass,
+				createBeanConfiguration(
+						beanClass,
+						Collections.<BeanMetaConstraint<?>>emptySet(),
+						Collections.<Member>emptySet(),
+						defaultGroupSequence,
+						defaultGroupSequenceProvider
+				)
+		);
+	}
 }
