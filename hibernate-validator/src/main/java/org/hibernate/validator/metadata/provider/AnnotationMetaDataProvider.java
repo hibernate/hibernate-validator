@@ -47,17 +47,17 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
-	private final Class<?> beanClass;
 	private final AnnotationIgnores annotationIgnores;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, Class<?> beanClass, AnnotationIgnores annotationIgnores) {
 
 		super( constraintHelper );
 
-		this.beanClass = beanClass;
 		this.annotationIgnores = annotationIgnores;
 
-		initDefaultGroupSequence();
+		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+			retrieveBeanMetaData( oneHierarchyClass );
+		}
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
@@ -68,7 +68,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 * Checks whether there is a default group sequence defined for this class.
 	 * See HV-113.
 	 */
-	private void initDefaultGroupSequence() {
+	private void retrieveBeanMetaData(Class<?> beanClass) {
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
 		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
 
@@ -103,7 +103,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : findConstraints( field, ElementType.FIELD ) ) {
 				ReflectionHelper.setAccessibility( field );
-				beanConstraints.add( createBeanMetaConstraint( field, constraintDescription ) );
+				beanConstraints.add( createBeanMetaConstraint( field, beanClass, constraintDescription ) );
 			}
 
 			// HV-433 Make sure the field is marked as cascaded in case it was configured via xml/programmatic API or
@@ -125,7 +125,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		);
 	}
 
-	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Member m, ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Member m, Class<?> beanClass, ConstraintDescriptorImpl<A> descriptor) {
 		return new BeanMetaConstraint<A>( descriptor, beanClass, m );
 	}
 
@@ -184,7 +184,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
 		ConstraintDescriptorImpl<A> constraintDescriptor;
 		ConstraintOrigin definedIn = ConstraintOrigin.DEFINED_LOCALLY;
-		if ( clazz.isInterface() && !clazz.equals( beanClass ) ) {
+		if ( clazz.isInterface() ) {
 			constraintDescriptor = new ConstraintDescriptorImpl<A>(
 					annotation, constraintHelper, clazz, type, definedIn
 			);
