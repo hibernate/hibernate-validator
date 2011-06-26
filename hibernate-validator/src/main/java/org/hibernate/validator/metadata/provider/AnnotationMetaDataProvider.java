@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
@@ -113,6 +114,8 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			}
 		}
 
+		beanConstraints.addAll( getClassLevelConstraints( beanClass, annotationIgnores ) );
+
 		configuredBeans.put(
 				beanClass,
 				createBeanConfiguration(
@@ -123,6 +126,27 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 						defaultGroupSequenceProvider
 				)
 		);
+	}
+
+	private Set<BeanMetaConstraint<?>> getClassLevelConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
+		if ( annotationIgnores.isIgnoreAnnotations( clazz ) ) {
+			return Collections.emptySet();
+		}
+
+		Set<BeanMetaConstraint<?>> classLevelConstraints = newHashSet();
+
+		// HV-262
+		List<ConstraintDescriptorImpl<?>> classMetaData = findClassLevelConstraints( clazz );
+
+		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
+			classLevelConstraints.add( createBeanMetaConstraint( clazz, null, constraintDescription ) );
+		}
+
+		return classLevelConstraints;
+	}
+
+	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Class<?> declaringClass, Member m, ConstraintDescriptorImpl<A> descriptor) {
+		return new BeanMetaConstraint<A>( descriptor, declaringClass, m );
 	}
 
 	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Member m, Class<?> beanClass, ConstraintDescriptorImpl<A> descriptor) {
@@ -146,6 +170,22 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			metaData.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation, type ) );
 		}
 
+		return metaData;
+	}
+
+	/**
+	 * Finds all constraint annotations defined for the given class and returns them in a list of
+	 * constraint descriptors.
+	 *
+	 * @param beanClass The class to check for constraints annotations.
+	 *
+	 * @return A list of constraint descriptors for all constraint specified on the given class.
+	 */
+	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
+		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
+		for ( Annotation annotation : beanClass.getAnnotations() ) {
+			metaData.addAll( findConstraintAnnotations( beanClass, annotation, ElementType.TYPE ) );
+		}
 		return metaData;
 	}
 

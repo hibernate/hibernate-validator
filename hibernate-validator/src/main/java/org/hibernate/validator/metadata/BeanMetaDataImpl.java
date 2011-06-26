@@ -538,10 +538,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initClass(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		initClassConstraints( clazz, annotationIgnores, beanMetaDataCache );
 		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
 	}
-
 
 	private void addToPropertyNameList(Member member) {
 		String name = ReflectionHelper.getPropertyName( member );
@@ -609,37 +607,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return ( (AnnotatedElement) member ).isAnnotationPresent( Valid.class );
 	}
 
-	private void initClassConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		if ( annotationIgnores.isIgnoreAnnotations( clazz ) ) {
-			return;
-		}
-
-		// HV-262
-		BeanMetaDataImpl<?> cachedMetaData = beanMetaDataCache.getBeanMetaData( clazz );
-		List<ConstraintDescriptorImpl<?>> classMetaData;
-		if ( cachedMetaData != null && cachedMetaData.getMetaConstraintsAsMap().get( clazz ) != null ) {
-			classMetaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-			for ( MetaConstraint<?> metaConstraint : cachedMetaData.getMetaConstraintsAsMap().get( clazz ) ) {
-				ConstraintDescriptorImpl<?> descriptor = metaConstraint.getDescriptor();
-				if ( descriptor.getElementType() == ElementType.TYPE ) {
-					classMetaData.add( descriptor );
-				}
-			}
-		}
-		else {
-			classMetaData = findClassLevelConstraints( clazz );
-		}
-
-		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
-			BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( clazz, null, constraintDescription );
-			addMetaConstraint( clazz, metaConstraint );
-		}
-	}
-
-	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Class<?> declaringClass, Member m, ConstraintDescriptorImpl<A> descriptor) {
-		return new BeanMetaConstraint<A>( descriptor, declaringClass, m );
-	}
-
 	private <A extends Annotation> MethodMetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
 		return new MethodMetaConstraint<A>( descriptor, method, parameterIndex );
 	}
@@ -692,22 +659,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			constraintDescriptor = new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, definedIn );
 		}
 		return constraintDescriptor;
-	}
-
-	/**
-	 * Finds all constraint annotations defined for the given class and returns them in a list of
-	 * constraint descriptors.
-	 *
-	 * @param beanClass The class to check for constraints annotations.
-	 *
-	 * @return A list of constraint descriptors for all constraint specified on the given class.
-	 */
-	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
-		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-		for ( Annotation annotation : beanClass.getAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( beanClass, annotation, ElementType.TYPE ) );
-		}
-		return metaData;
 	}
 
 	/**
