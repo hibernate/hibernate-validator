@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
@@ -41,8 +40,6 @@ import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
 import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -165,7 +162,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	private <A extends Annotation> BeanMetaConstraint<A> asBeanMetaConstraint(ConfiguredConstraint<A, BeanConstraintLocation> config) {
 
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				createAnnotationProxy( config ),
+				config.createAnnotationProxy(),
 				constraintHelper,
 				config.getLocation().getElementType(),
 				ConstraintOrigin.DEFINED_LOCALLY
@@ -195,7 +192,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	private <A extends Annotation> MethodMetaConstraint<A> asMethodMetaConstraint(ConfiguredConstraint<A, MethodConstraintLocation> config) {
 
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				createAnnotationProxy( config ), constraintHelper, ElementType.METHOD, ConstraintOrigin.DEFINED_LOCALLY
+				config.createAnnotationProxy(), constraintHelper, ElementType.METHOD, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		return new MethodMetaConstraint<A>( constraintDescriptor, config.getLocation() );
@@ -214,23 +211,6 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		}
 
 		return theValue;
-	}
-
-	private <A extends Annotation> A createAnnotationProxy(ConfiguredConstraint<A, ?> config) {
-
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( config.getConstraintType() );
-		for ( Map.Entry<String, Object> parameter : config.getParameters().entrySet() ) {
-			annotationDescriptor.setValue( parameter.getKey(), parameter.getValue() );
-		}
-
-		try {
-			return AnnotationFactory.create( annotationDescriptor );
-		}
-		catch ( RuntimeException e ) {
-			throw new ValidationException(
-					"Unable to create annotation for configured constraint: " + e.getMessage(), e
-			);
-		}
 	}
 
 	private Partitioner<Method, MethodConstraintLocation> cascadesByMethod() {

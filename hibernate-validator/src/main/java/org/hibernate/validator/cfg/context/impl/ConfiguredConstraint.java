@@ -21,10 +21,14 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import javax.validation.ValidationException;
+
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -82,6 +86,23 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 
 	public Map<String, Object> getParameters() {
 		return constraint.getParameters();
+	}
+	
+	public A createAnnotationProxy() {
+
+		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( getConstraintType() );
+		for ( Map.Entry<String, Object> parameter : getParameters().entrySet() ) {
+			annotationDescriptor.setValue( parameter.getKey(), parameter.getValue() );
+		}
+
+		try {
+			return AnnotationFactory.create( annotationDescriptor );
+		}
+		catch ( RuntimeException e ) {
+			throw new ValidationException(
+					"Unable to create annotation for configured constraint: " + e.getMessage(), e
+			);
+		}
 	}
 
 	/**
