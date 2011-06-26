@@ -55,7 +55,7 @@ public class BeanMetaDataBuilder {
 		configurationsByClass = newHashMap();
 	}
 
-	public <T> void add(BeanConfiguration<T> beanConfiguration) {
+	private <T> void add(BeanConfiguration<T> beanConfiguration) {
 
 		BeanConfiguration<T> existingConfiguration = getConfigurationForClass( beanConfiguration.getBeanClass() );
 
@@ -135,7 +135,7 @@ public class BeanMetaDataBuilder {
 				beanClass,
 				constraintHelper,
 				rootConfiguration.getDefaultGroupSequence(),
-				null,
+				rootConfiguration.getDefaultGroupSequenceProvider(),
 				allConstraints,
 				allMethodMetaData,
 				allCascadedMembers,

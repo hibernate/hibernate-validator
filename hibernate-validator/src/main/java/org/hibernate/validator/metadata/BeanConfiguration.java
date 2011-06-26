@@ -20,6 +20,8 @@ import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+
 /**
  * @author Gunnar Morling
  */
@@ -35,6 +37,8 @@ public class BeanConfiguration<T> {
 
 	private List<Class<?>> defaultGroupSequence;
 
+	private Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
+
 	/**
 	 * @param beanClass
 	 * @param constraints
@@ -45,13 +49,15 @@ public class BeanConfiguration<T> {
 							 Set<BeanMetaConstraint<?>> constraints,
 							 Set<Member> cascadedMembers,
 							 Set<MethodMetaData> methodMetaData,
-							 List<Class<?>> defaultGroupSequence) {
+							 List<Class<?>> defaultGroupSequence,
+							 Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		this.beanClass = beanClass;
 		this.constraints = constraints;
 		this.cascadedMembers = cascadedMembers;
 		this.methodMetaData = methodMetaData;
 		this.defaultGroupSequence = defaultGroupSequence;
+		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
 	}
 
 	public Class<T> getBeanClass() {
@@ -74,6 +80,10 @@ public class BeanConfiguration<T> {
 		return defaultGroupSequence;
 	}
 
+	public Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProvider() {
+		return defaultGroupSequenceProvider;
+	}
+
 	public void merge(BeanConfiguration<T> other) {
 
 		constraints.addAll( other.getConstraints() );
@@ -84,13 +94,22 @@ public class BeanConfiguration<T> {
 				&& other.getDefaultGroupSequence() != null ) {
 			defaultGroupSequence = other.getDefaultGroupSequence();
 		}
+
+		// TODO GM: Determine which default sequence provider should be taken
+		if ( defaultGroupSequenceProvider == null
+				&& other.getDefaultGroupSequenceProvider() != null ) {
+			defaultGroupSequenceProvider = other.getDefaultGroupSequenceProvider();
+		}
 	}
 
 	@Override
 	public String toString() {
 		return "BeanConfiguration [beanClass=" + beanClass + ", constraints="
 				+ constraints + ", cascadedMembers=" + cascadedMembers
-				+ ", defaultGroupSequence=" + defaultGroupSequence + "]";
+				+ ", methodMetaData=" + methodMetaData
+				+ ", defaultGroupSequence=" + defaultGroupSequence
+				+ ", defaultGroupSequenceProvider="
+				+ defaultGroupSequenceProvider + "]";
 	}
 
 }

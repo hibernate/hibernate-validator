@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.BeanConfiguration;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.ConstraintHelper;
@@ -51,18 +52,28 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 	}
 
 	protected <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass, Set<BeanMetaConstraint<?>> constraints,
-															   Set<Member> cascadedMembers, List<Class<?>> defaultGroupSequence) {
+															   Set<Member> cascadedMembers, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		return new BeanConfiguration<T>(
-				beanClass, constraints, cascadedMembers, Collections.<MethodMetaData>emptySet(), defaultGroupSequence
+				beanClass,
+				constraints,
+				cascadedMembers,
+				Collections.<MethodMetaData>emptySet(),
+				defaultGroupSequence,
+				defaultGroupSequenceProvider
 		);
 	}
 
 	protected <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass, Set<BeanMetaConstraint<?>> constraints,
-															   Set<Member> cascadedMembers, Set<MethodMetaData> methodMetaData, List<Class<?>> defaultGroupSequence) {
+															   Set<Member> cascadedMembers, Set<MethodMetaData> methodMetaData, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		return new BeanConfiguration<T>(
-				beanClass, constraints, cascadedMembers, methodMetaData, defaultGroupSequence
+				beanClass,
+				constraints,
+				cascadedMembers,
+				methodMetaData,
+				defaultGroupSequence,
+				defaultGroupSequenceProvider
 		);
 	}
 }

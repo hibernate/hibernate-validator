@@ -138,7 +138,8 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 							asBeanMetaConstraints( constraints ),
 							getMembers( cascades ),
 							allMethodMetaData,
-							context.getDefaultSequence( clazz )
+							context.getDefaultSequence( clazz ),
+							context.getDefaultGroupSequenceProvider( clazz )
 					)
 			);
 		}

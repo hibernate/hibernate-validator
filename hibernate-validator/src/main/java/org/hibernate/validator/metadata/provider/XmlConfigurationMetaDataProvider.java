@@ -52,7 +52,8 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 							clazz,
 							new HashSet<BeanMetaConstraint<?>>( mappingParser.getConstraintsForClass( clazz ) ),
 							new HashSet<Member>( mappingParser.getCascadedMembersForClass( clazz ) ),
-							mappingParser.getDefaultSequenceForClass( clazz )
+							mappingParser.getDefaultSequenceForClass( clazz ),
+							null
 					)
 			);
 		}
