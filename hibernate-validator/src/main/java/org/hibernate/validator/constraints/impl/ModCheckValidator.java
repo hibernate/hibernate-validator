@@ -44,7 +44,6 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, String> 
     private int checkDigitIndex;
     private ModType modType;
 
-    @Override
     public void initialize(ModCheck constraintAnnotation) {
         this.modType = constraintAnnotation.value();
         this.multiplier = constraintAnnotation.multiplier();
@@ -57,7 +56,6 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, String> 
         }
     }
 
-    @Override
     public boolean isValid(final String value, final ConstraintValidatorContext context) {
         if ( value == null ) {
             return true;
