@@ -43,14 +43,6 @@ import static org.hibernate.validator.util.Contracts.assertNotNull;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public final class ValidatorUtil {
-	private final static Validator hibernateValidator;
-
-	// configure instance of validator for validation provider Hibernate Validator.
-	static {
-		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();
-		configuration.traversableResolver( new DummyTraversableResolver() );
-		hibernateValidator = configuration.buildValidatorFactory().getValidator();
-	}
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -65,7 +57,11 @@ public final class ValidatorUtil {
 	 * @return an instance of {@code Validator}.
 	 */
 	public static Validator getValidator() {
-		return hibernateValidator;
+		
+		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();
+		configuration.traversableResolver( new DummyTraversableResolver() );
+		
+		return configuration.buildValidatorFactory().getValidator();
 	}
 
 	/**
