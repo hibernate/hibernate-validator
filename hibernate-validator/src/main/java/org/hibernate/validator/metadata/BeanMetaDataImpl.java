@@ -136,11 +136,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private List<Class<?>> classHierarchyWithoutInterfaces;
 
 	/**
-	 * Object used to determine whether a given annotation is a constraint. Only used during initialization.
-	 */
-	private ConstraintHelper constraintHelper;
-
-	/**
 	 * A list of all property names in the class (constrained and un-constrained).
 	 */
 	// Used to avoid ReflectionHelper#containsMember which is slow
@@ -151,7 +146,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * additional metadata (the already configured constraints, cascaded members, etc) are passed as well.
 	 *
 	 * @param beanClass The bean type for which to create the meta data
-	 * @param constraintHelper constraint helper
 	 * @param defaultGroupSequence programmatic/xml configured default group sequence (overrides annotations)
 	 * @param defaultGroupSequenceProvider programmatic configured default group sequence provider class (overrides annotations)
 	 * @param constraints programmatic/xml configured constraints
@@ -161,7 +155,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param beanMetaDataCache the cache of already configured meta data instances
 	 */
 	public BeanMetaDataImpl(Class<T> beanClass,
-							ConstraintHelper constraintHelper,
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
 							Map<Class<?>, List<BeanMetaConstraint<?>>> constraints,
@@ -170,7 +163,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							AnnotationIgnores annotationIgnores,
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
-		this.constraintHelper = constraintHelper;
 		this.defaultGroupSequenceProvider = null;
 		for ( Member member : cascadedMembers ) {
 			addCascadedMember( member );
@@ -271,7 +263,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		// reset class members we don't need any longer
 		this.methodMetaDataBuilders = null;
-		this.constraintHelper = null;
 	}
 
 	public Class<T> getBeanClass() {

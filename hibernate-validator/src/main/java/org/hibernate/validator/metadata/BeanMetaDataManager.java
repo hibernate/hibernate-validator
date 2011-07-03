@@ -205,7 +205,6 @@ public class BeanMetaDataManager {
 
 		return new BeanMetaDataImpl<T>(
 				beanClass,
-				constraintHelper,
 				rootConfiguration.getDefaultGroupSequence(),
 				rootConfiguration.getDefaultGroupSequenceProvider(),
 				allConstraints,
