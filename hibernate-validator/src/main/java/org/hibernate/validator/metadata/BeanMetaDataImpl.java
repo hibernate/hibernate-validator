@@ -19,13 +19,10 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -150,27 +147,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<String> propertyNames = newHashSet( 30 );
 
 	/**
-	 * Constructor used for creating the bean meta data using annotations only
-	 *
-	 * @param beanClass The bean type for which to create the meta data
-	 * @param constraintHelper constraint helper
-	 * @param beanMetaDataCache the cache of already configured meta data instances
-	 */
-	public BeanMetaDataImpl(Class<T> beanClass, ConstraintHelper constraintHelper, BeanMetaDataCache beanMetaDataCache) {
-		this(
-				beanClass,
-				constraintHelper,
-				new ArrayList<Class<?>>(),
-				null,
-				new HashMap<Class<?>, List<BeanMetaConstraint<?>>>(),
-				new HashSet<AggregatedMethodMetaData>(),
-				new HashSet<Member>(),
-				new AnnotationIgnores(),
-				beanMetaDataCache
-		);
-	}
-
-	/**
 	 * Constructor used when creating a bean meta data instance via the xml or programmatic API. In this case
 	 * additional metadata (the already configured constraints, cascaded members, etc) are passed as well.
 	 *
@@ -264,6 +240,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				addMethodMetaConstraint( clazz, methodMetaData );
 			}
 
+		}
+
+		for ( Member oneCascadedMember : cascadedMembers ) {
+			if ( oneCascadedMember instanceof Method ) {
+				MethodMetaData methodMetaData = new MethodMetaData(
+						(Method) oneCascadedMember,
+						Collections.<MethodMetaConstraint<?>>emptyList(),
+						true
+				);
+				addMethodMetaConstraint( oneCascadedMember.getDeclaringClass(), methodMetaData );
+			}
 		}
 
 		allMetaConstraints = buildAllConstraintSets();
@@ -532,13 +519,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private void createMetaData(AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
-		for ( Class<?> current : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
-			initClass( current, annotationIgnores, beanMetaDataCache );
-		}
-	}
-
-	private void initClass(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		initMethodConstraints( clazz, annotationIgnores, beanMetaDataCache );
 	}
 
 	private void addToPropertyNameList(Member member) {
@@ -546,43 +526,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( name != null ) {
 			propertyNames.add( name );
 		}
-	}
-
-	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( clazz );
-
-		for ( Method method : declaredMethods ) {
-
-			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
-			// anyway and possibly hide the actual method with the same signature in the built meta model
-			if ( Modifier.isStatic( method.getModifiers() ) || annotationIgnores.isIgnoreAnnotations( method ) || method
-					.isSynthetic() ) {
-				continue;
-			}
-
-			// try to get meta data from cache, otherwise retrieve it from the class
-			MethodMetaData methodMetaData = getFromCache( clazz, method, beanMetaDataCache );
-
-			if ( methodMetaData == null ) {
-				methodMetaData = findMethodMetaData( method );
-			}
-
-			addMethodMetaConstraint( clazz, methodMetaData );
-		}
-	}
-
-	private MethodMetaData getFromCache(Class<?> clazz, Method method, BeanMetaDataCache beanMetaDataCache) {
-		BeanMetaDataImpl<?> cachedBeanMetaData = beanMetaDataCache.getBeanMetaData( clazz );
-
-		if ( cachedBeanMetaData != null ) {
-			AggregatedMethodMetaData cachedMethodMetaData = cachedBeanMetaData.getMetaDataFor( method );
-
-			if ( cachedMethodMetaData != null ) {
-				return cachedMethodMetaData.getSingleMetaDataFor( method );
-			}
-		}
-
-		return null;
 	}
 
 	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member, boolean isCascaded) {
@@ -607,160 +550,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return ( (AnnotatedElement) member ).isAnnotationPresent( Valid.class );
 	}
 
-	private <A extends Annotation> MethodMetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MethodMetaConstraint<A>( descriptor, method, parameterIndex );
-	}
-
-	private <A extends Annotation> MethodMetaConstraint<A> createReturnValueMetaConstraint(Method method, ConstraintDescriptorImpl<A> descriptor) {
-		return new MethodMetaConstraint<A>( descriptor, method );
-	}
-
-	/**
-	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
-	 *
-	 * @param clazz the class we are currently processing
-	 * @param annotation The annotation to examine
-	 * @param type the element type on which the annotation/constraint is placed on
-	 *
-	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
-	 *         single nor multi-valued annotation.
-	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Class<?> clazz, A annotation, ElementType type) {
-		List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
-
-		List<Annotation> constraints = new ArrayList<Annotation>();
-		Class<? extends Annotation> annotationType = annotation.annotationType();
-		if ( constraintHelper.isConstraintAnnotation( annotationType )
-				|| constraintHelper.isBuiltinConstraint( annotationType ) ) {
-			constraints.add( annotation );
-		}
-		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
-			constraints.addAll( constraintHelper.getMultiValueConstraints( annotation ) );
-		}
-
-		for ( Annotation constraint : constraints ) {
-			final ConstraintDescriptorImpl<?> constraintDescriptor = buildConstraintDescriptor(
-					clazz, constraint, type
-			);
-			constraintDescriptors.add( constraintDescriptor );
-		}
-		return constraintDescriptors;
-	}
-
-	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
-		ConstraintDescriptorImpl<A> constraintDescriptor;
-		ConstraintOrigin definedIn = determineOrigin( clazz );
-		if ( clazz.isInterface() && !clazz.equals( beanClass ) ) {
-			constraintDescriptor = new ConstraintDescriptorImpl<A>(
-					annotation, constraintHelper, clazz, type, definedIn
-			);
-		}
-		else {
-			constraintDescriptor = new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, definedIn );
-		}
-		return constraintDescriptor;
-	}
-
-	/**
-	 * Finds all constraint annotations defined for the given field/method and returns them in a list of
-	 * constraint descriptors.
-	 *
-	 * @param member The fields or method to check for constraints annotations.
-	 * @param type The element type the constraint/annotation is placed on.
-	 *
-	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
-	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
-		assert member instanceof Field || member instanceof Method;
-
-		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-		for ( Annotation annotation : ( (AnnotatedElement) member ).getAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation, type ) );
-		}
-
-		return metaData;
-	}
-
-	/**
-	 * Finds all constraint annotations defined for the given method.
-	 *
-	 * @param method The method to check for constraints annotations.
-	 *
-	 * @return A meta data object describing the constraints specified for the
-	 *         given method.
-	 */
-	private MethodMetaData findMethodMetaData(Method method) {
-
-		List<ParameterMetaData> parameterConstraints = getParameterMetaData( method );
-		boolean isCascading = isValidAnnotationPresent( method ) || cascadedMembers.contains( method );
-		List<MethodMetaConstraint<?>> constraints =
-				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
-
-		return new MethodMetaData( method, parameterConstraints, constraints, isCascading );
-	}
-
-	private List<MethodMetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
-
-		List<MethodMetaConstraint<?>> constraints = newArrayList();
-
-		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
-			constraints.add( createReturnValueMetaConstraint( method, oneDescriptor ) );
-		}
-
-		return constraints;
-	}
-
-	/**
-	 * Retrieves constraint related meta data for the parameters of the given
-	 * method.
-	 *
-	 * @param method The method of interest.
-	 *
-	 * @return A list with parameter meta data for the given method.
-	 */
-	private List<ParameterMetaData> getParameterMetaData(Method method) {
-		List<ParameterMetaData> metaData = newArrayList();
-
-		int i = 0;
-		Class<?>[] parameterTypes = method.getParameterTypes();
-
-		for ( Annotation[] annotationsOfOneParameter : method.getParameterAnnotations() ) {
-
-			boolean parameterIsCascading = false;
-			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-			List<MethodMetaConstraint<?>> constraintsOfOneParameter = newArrayList();
-
-			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
-
-				//1. collect constraints if this annotation is a constraint annotation
-				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						method.getDeclaringClass(), oneAnnotation, ElementType.PARAMETER
-				);
-				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
-					constraintsOfOneParameter.add(
-							createParameterMetaConstraint(
-									method, i, constraintDescriptorImpl
-							)
-					);
-				}
-
-				//2. mark parameter as cascading if this annotation is the @Valid annotation
-				if ( oneAnnotation.annotationType().equals( Valid.class ) ) {
-					parameterIsCascading = true;
-				}
-			}
-
-			metaData.add(
-					new ParameterMetaData(
-							i, parameterTypes[i], parameterName, constraintsOfOneParameter, parameterIsCascading
-					)
-			);
-			i++;
-		}
-
-		return metaData;
-	}
-
 	private <A extends Annotation> MethodMetaConstraint<A> getAsMethodMetaConstraint(BeanMetaConstraint<A> beanMetaConstraint) {
 		return new MethodMetaConstraint<A>(
 				beanMetaConstraint.getDescriptor(), (Method) beanMetaConstraint.getLocation().getMember()
@@ -771,15 +560,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new BeanMetaConstraint<A>(
 				methodMetaConstraint.getDescriptor(), methodMetaConstraint.getLocation().getBeanClass(), method
 		);
-	}
-
-	private ConstraintOrigin determineOrigin(Class<?> clazz) {
-		if ( clazz.equals( beanClass ) ) {
-			return ConstraintOrigin.DEFINED_LOCALLY;
-		}
-		else {
-			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
-		}
 	}
 
 	@SuppressWarnings("unchecked")

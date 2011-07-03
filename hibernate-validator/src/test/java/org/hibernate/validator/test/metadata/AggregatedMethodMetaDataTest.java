@@ -24,8 +24,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
-import org.hibernate.validator.metadata.BeanMetaDataCache;
+import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
+import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ParameterMetaData;
 
@@ -41,14 +42,12 @@ import static org.testng.Assert.assertTrue;
  */
 public class AggregatedMethodMetaDataTest {
 
-	private BeanMetaDataImpl<CustomerRepositoryExt> beanMetaData;
+	private BeanMetaData<CustomerRepositoryExt> beanMetaData;
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
 
-		beanMetaData = new BeanMetaDataImpl<CustomerRepositoryExt>(
-				CustomerRepositoryExt.class, new ConstraintHelper(), new BeanMetaDataCache()
-		);
+		beanMetaData = new BeanMetaDataManager( new ConstraintHelper() ).getBeanMetaData( CustomerRepositoryExt.class );
 	}
 
 	@Test

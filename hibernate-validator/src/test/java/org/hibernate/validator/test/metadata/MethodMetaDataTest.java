@@ -23,8 +23,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.metadata.BeanMetaData;
-import org.hibernate.validator.metadata.BeanMetaDataCache;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
+import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MethodMetaData;
 
@@ -45,9 +45,7 @@ public class MethodMetaDataTest {
 	@BeforeMethod
 	public void setupBeanMetaData() {
 
-		beanMetaData = new BeanMetaDataImpl<CustomerRepository>(
-				CustomerRepository.class, new ConstraintHelper(), new BeanMetaDataCache()
-		);
+		beanMetaData = new BeanMetaDataManager( new ConstraintHelper() ).getBeanMetaData( CustomerRepository.class );
 	}
 
 	@Test

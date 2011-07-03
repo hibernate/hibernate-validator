@@ -18,6 +18,7 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,10 @@ public class BeanMetaDataManager {
 
 	//TODO GM: can this be merged with cache?
 	private Map<Class<?>, BeanConfiguration<?>> configurationsByClass;
+
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, MetaDataProvider... eagerMetaDataProviders) {
+		this( constraintHelper, Arrays.asList( eagerMetaDataProviders ) );
+	}
 
 	/**
 	 * @param constraintHelper

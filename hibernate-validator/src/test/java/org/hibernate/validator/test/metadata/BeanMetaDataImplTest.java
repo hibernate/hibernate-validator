@@ -24,8 +24,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaData;
-import org.hibernate.validator.metadata.BeanMetaDataCache;
-import org.hibernate.validator.metadata.BeanMetaDataImpl;
+import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
@@ -95,8 +94,8 @@ public class BeanMetaDataImplTest {
 		assertIterableSize( methodMetaData, 0 );
 	}
 
-	private <T> BeanMetaDataImpl<T> setupBeanMetaData(Class<T> clazz) {
-		return new BeanMetaDataImpl<T>( clazz, new ConstraintHelper(), new BeanMetaDataCache() );
+	private <T> BeanMetaData<T> setupBeanMetaData(Class<T> clazz) {
+		return new BeanMetaDataManager( new ConstraintHelper() ).getBeanMetaData( clazz );
 	}
 
 }

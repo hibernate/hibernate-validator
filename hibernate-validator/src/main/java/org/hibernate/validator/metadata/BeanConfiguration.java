@@ -88,9 +88,10 @@ public class BeanConfiguration<T> {
 
 		constraints.addAll( other.getConstraints() );
 		cascadedMembers.addAll( other.getCascadedMembers() );
+		methodMetaData.addAll( other.getMethodMetaData() );
 
 		// TODO GM: Determine which default sequence should be taken
-		if ( (defaultGroupSequence == null || defaultGroupSequence.isEmpty()) 
+		if ( ( defaultGroupSequence == null || defaultGroupSequence.isEmpty() )
 				&& other.getDefaultGroupSequence() != null ) {
 			defaultGroupSequence = other.getDefaultGroupSequence();
 		}

@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata.provider;
 
 import java.lang.reflect.Member;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 				beanClass,
 				constraints,
 				cascadedMembers,
-				Collections.<MethodMetaData>emptySet(),
+				new HashSet<MethodMetaData>(),
 				defaultGroupSequence,
 				defaultGroupSequenceProvider
 		);

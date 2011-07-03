@@ -215,24 +215,24 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 				+ hasParameterConstraints + "]";
 	}
 
-	/**
-	 * It is expected that there is exactly one instance of this type for a
-	 * given method in a type system. This method is therefore only based on the
-	 * hash code defined by the represented {@link Method}.
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ( hasParameterConstraints ? 1231 : 1237 );
+		result = prime * result + ( isCascading ? 1231 : 1237 );
 		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
+		result = prime
+				* result
+				+ ( ( parameterMetaData == null ) ? 0 : parameterMetaData
+				.hashCode() );
+		result = prime
+				* result
+				+ ( ( returnValueConstraints == null ) ? 0
+				: returnValueConstraints.hashCode() );
 		return result;
 	}
 
-	/**
-	 * It is expected that there is exactly one instance of this type for a
-	 * given method in a type system. This method is therefore only based on
-	 * the equality as defined by the represented {@link Method}.
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if ( this == obj ) {
@@ -245,6 +245,12 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 			return false;
 		}
 		MethodMetaData other = (MethodMetaData) obj;
+		if ( hasParameterConstraints != other.hasParameterConstraints ) {
+			return false;
+		}
+		if ( isCascading != other.isCascading ) {
+			return false;
+		}
 		if ( method == null ) {
 			if ( other.method != null ) {
 				return false;
@@ -253,6 +259,23 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 		else if ( !method.equals( other.method ) ) {
 			return false;
 		}
+		if ( parameterMetaData == null ) {
+			if ( other.parameterMetaData != null ) {
+				return false;
+			}
+		}
+		else if ( !parameterMetaData.equals( other.parameterMetaData ) ) {
+			return false;
+		}
+		if ( returnValueConstraints == null ) {
+			if ( other.returnValueConstraints != null ) {
+				return false;
+			}
+		}
+		else if ( !returnValueConstraints.equals( other.returnValueConstraints ) ) {
+			return false;
+		}
 		return true;
 	}
+
 }

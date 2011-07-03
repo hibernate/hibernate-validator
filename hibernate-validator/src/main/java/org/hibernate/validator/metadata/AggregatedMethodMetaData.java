@@ -93,7 +93,7 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 	 */
 	public static class Builder {
 
-		private final Method method;
+		private Method method;
 
 		private final Map<Class<?>, MethodMetaData> metaDataByDefiningType = newHashMap();
 
@@ -144,6 +144,11 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 
 			if ( existingMetaData != null ) {
 				metaData = existingMetaData.merge( metaData );
+			}
+
+			//use the lowest method found in the hierarchy for this aggregration
+			if ( method.getDeclaringClass().isAssignableFrom( metaData.getMethod().getDeclaringClass() ) ) {
+				method = metaData.getMethod();
 			}
 
 			metaDataByDefiningType.put( metaData.getMethod().getDeclaringClass(), metaData );
