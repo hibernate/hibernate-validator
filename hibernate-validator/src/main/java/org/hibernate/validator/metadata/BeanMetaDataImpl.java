@@ -143,17 +143,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param constraints programmatic/xml configured constraints
 	 * @param methodMetaDatas programmatic configured method constraints
 	 * @param cascadedMembers programmatic/xml configured cascaded members
-	 * @param annotationIgnores in xml configured ignores for annotations
-	 * @param beanMetaDataCache the cache of already configured meta data instances
 	 */
 	public BeanMetaDataImpl(Class<T> beanClass,
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
 							Map<Class<?>, List<BeanMetaConstraint<?>>> constraints,
 							Set<AggregatedMethodMetaData> methodMetaDatas,
-							Set<Member> cascadedMembers,
-							AnnotationIgnores annotationIgnores,
-							BeanMetaDataCache beanMetaDataCache) {
+							Set<Member> cascadedMembers) {
 		this.beanClass = beanClass;
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 
@@ -174,12 +170,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		for (AggregatedMethodMetaData oneMethod : methodMetaDatas) {
-			if(ReflectionHelper.isGetterMethod(oneMethod.getMethod())) {
-				addToPropertyNameList(oneMethod.getMethod());
+		for ( AggregatedMethodMetaData oneMethod : methodMetaDatas ) {
+			if ( ReflectionHelper.isGetterMethod( oneMethod.getMethod() ) ) {
+				addToPropertyNameList( oneMethod.getMethod() );
 			}
 		}
-		
+
 		allMetaConstraints = buildAllConstraintSets();
 		directMetaConstraints = buildDirectConstraintSets();
 

@@ -254,9 +254,7 @@ public class BeanMetaDataManager {
 				rootConfiguration.getDefaultGroupSequenceProvider(),
 				allConstraints,
 				allMethodMetaData,
-				allCascadedMembers,
-				annotationIgnores != null ? annotationIgnores : new AnnotationIgnores(),
-				beanMetaDataCache
+				allCascadedMembers
 		);
 	}
 
