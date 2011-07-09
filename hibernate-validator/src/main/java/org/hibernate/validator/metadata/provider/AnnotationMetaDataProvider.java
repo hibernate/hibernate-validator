@@ -41,6 +41,7 @@ import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MethodMetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -96,7 +97,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : findConstraints( field, ElementType.FIELD ) ) {
 				ReflectionHelper.setAccessibility( field );
-				beanConstraints.add( createBeanMetaConstraint( field, beanClass, constraintDescription ) );
+				beanConstraints.add( createBeanMetaConstraint( beanClass, field, constraintDescription ) );
 			}
 
 			// HV-433 Make sure the field is marked as cascaded in case it was configured via xml/programmatic API or
@@ -150,7 +151,8 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint, Method method) {
 		return new BeanMetaConstraint<A>(
-				methodMetaConstraint.getDescriptor(), methodMetaConstraint.getLocation().getBeanClass(), method
+				methodMetaConstraint.getDescriptor(),
+				new BeanConstraintLocation( methodMetaConstraint.getLocation().getBeanClass(), method )
 		);
 	}
 
@@ -193,11 +195,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Class<?> declaringClass, Member m, ConstraintDescriptorImpl<A> descriptor) {
-		return new BeanMetaConstraint<A>( descriptor, declaringClass, m );
-	}
-
-	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Member m, Class<?> beanClass, ConstraintDescriptorImpl<A> descriptor) {
-		return new BeanMetaConstraint<A>( descriptor, beanClass, m );
+		return new BeanMetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass, m ) );
 	}
 
 	private <A extends Annotation> MethodMetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {

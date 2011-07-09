@@ -262,8 +262,7 @@ public class BeanMetaDataManager {
 
 		return new BeanMetaConstraint<A>(
 				descriptor,
-				constraint.getLocation().getBeanClass(),
-				constraint.getLocation().getMember()
+				constraint.getLocation()
 		);
 	}
 

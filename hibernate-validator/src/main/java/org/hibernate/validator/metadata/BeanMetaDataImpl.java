@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -552,7 +553,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint, Method method) {
 		return new BeanMetaConstraint<A>(
-				methodMetaConstraint.getDescriptor(), methodMetaConstraint.getLocation().getBeanClass(), method
+				methodMetaConstraint.getDescriptor(),
+				new BeanConstraintLocation( methodMetaConstraint.getLocation().getBeanClass(), method )
 		);
 	}
 

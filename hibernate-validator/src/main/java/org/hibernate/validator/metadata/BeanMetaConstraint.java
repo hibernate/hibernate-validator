@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Member;
 
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -35,12 +34,10 @@ public class BeanMetaConstraint<A extends Annotation> extends MetaConstraint<A> 
 	 * Creates a new {@link BeanMetaConstraint}.
 	 *
 	 * @param constraintDescriptor The descriptor for this constraint.
-	 * @param beanClass The type hosting this constraint.
-	 * @param member The field or getter method hosting this constraint if this is
-	 * not a class-level constraint, otherwise null.
+	 * @param location The location of this constraint.
 	 */
-	public BeanMetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, Class<?> beanClass, Member member) {
-		super( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
+	public BeanMetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, BeanConstraintLocation location) {
+		super( constraintDescriptor, location );
 	}
 
 	/**

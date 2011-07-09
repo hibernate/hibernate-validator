@@ -49,6 +49,7 @@ import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
@@ -361,7 +362,7 @@ public class XmlMappingParser {
 				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new BeanMetaConstraint<A>( constraintDescriptor, beanClass, member );
+		return new BeanMetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {

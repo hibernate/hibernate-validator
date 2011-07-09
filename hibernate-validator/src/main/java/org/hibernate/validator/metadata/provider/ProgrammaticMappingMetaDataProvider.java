@@ -169,9 +169,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 				ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new BeanMetaConstraint<A>(
-				constraintDescriptor, config.getLocation().getBeanClass(), config.getLocation().getMember()
-		);
+		return new BeanMetaConstraint<A>( constraintDescriptor, config.getLocation() );
 	}
 
 	//TODO GM: use set
