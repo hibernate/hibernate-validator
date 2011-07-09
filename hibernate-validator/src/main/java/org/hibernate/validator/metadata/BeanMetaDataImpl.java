@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
@@ -27,7 +26,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.Valid;
@@ -38,8 +36,6 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -103,12 +99,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<Method, AggregatedMethodMetaData> methodMetaData;
 
 	/**
-	 * Builders used for gathering method meta data. Used only at construction
-	 * time.
-	 */
-	private Set<AggregatedMethodMetaData.Builder> methodMetaDataBuilders = newHashSet();
-
-	/**
 	 * List of cascaded members.
 	 */
 	private Set<Member> cascadedMembers = newHashSet();
@@ -165,14 +155,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							AnnotationIgnores annotationIgnores,
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
+		beanDescriptor = new BeanDescriptorImpl<T>( this );
+
 		for ( Member member : cascadedMembers ) {
 			addCascadedMember( member );
 		}
 
 		classHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy( beanClass, false );
-
-		// start the annotation discovery phase (look for annotations in the whole class hierarchy)
-		createMetaData( annotationIgnores, beanMetaDataCache );
 
 		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider );
 
@@ -180,74 +169,21 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<?>>> entry : constraints.entrySet() ) {
 			Class<?> clazz = entry.getKey();
 
-			// will hold the method constraints (getter and non-getter) of the given class keyed by method
-			Map<Method, List<MethodMetaConstraint<?>>> constraintsByMethod = newHashMap();
-
 			for ( BeanMetaConstraint<?> constraint : entry.getValue() ) {
-
-				if ( constraint.getDescriptor().getElementType() == ElementType.METHOD ) {
-
-					List<MethodMetaConstraint<?>> constraintsForMethod = constraintsByMethod.get(
-							constraint.getLocation().getMember()
-					);
-					if ( constraintsForMethod == null ) {
-						constraintsForMethod = newArrayList();
-						constraintsByMethod.put(
-								(Method) constraint.getLocation().getMember(), constraintsForMethod
-						);
-					}
-
-					constraintsForMethod.add( getAsMethodMetaConstraint( constraint ) );
-				}
-				//register non-method constraints
-				else {
-					addMetaConstraint( clazz, constraint );
-				}
-			}
-
-			// register the constraints for each method in methodMetaConstraints. Constraints at getters will also registered in metaConstraints
-			for ( Entry<Method, List<MethodMetaConstraint<?>>> methodAndConstraints : constraintsByMethod
-					.entrySet() ) {
-
-				MethodMetaData methodMetaData = new MethodMetaData(
-						methodAndConstraints.getKey(),
-						methodAndConstraints.getValue(),
-						cascadedMembers.contains( methodAndConstraints.getKey() )
-				);
-				addMethodMetaConstraint( clazz, methodMetaData );
-			}
-
-		}
-
-		for ( Member oneCascadedMember : cascadedMembers ) {
-			if ( oneCascadedMember instanceof Method ) {
-				MethodMetaData methodMetaData = new MethodMetaData(
-						(Method) oneCascadedMember,
-						Collections.<MethodMetaConstraint<?>>emptyList(),
-						true
-				);
-				addMethodMetaConstraint( oneCascadedMember.getDeclaringClass(), methodMetaData );
+				addMetaConstraint( clazz, constraint );
 			}
 		}
 
+		for (AggregatedMethodMetaData oneMethod : methodMetaDatas) {
+			if(ReflectionHelper.isGetterMethod(oneMethod.getMethod())) {
+				addToPropertyNameList(oneMethod.getMethod());
+			}
+		}
+		
 		allMetaConstraints = buildAllConstraintSets();
 		directMetaConstraints = buildDirectConstraintSets();
 
-		// add the explicitly configured method constraints, here we need to merge the programmatic and discovered
-		// metadata built with the "automatic" discovering.
-		if ( !methodMetaDatas.isEmpty() ) {
-			for ( AggregatedMethodMetaData aggregatedMethodMetaData : methodMetaDatas ) {
-				for ( MethodMetaData methodMetaData : aggregatedMethodMetaData.getAllMethodMetaData() ) {
-					Method method = methodMetaData.getMethod();
-					addMethodMetaConstraint( method.getDeclaringClass(), methodMetaData );
-				}
-			}
-		}
-
-		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData() );
-
-		// reset class members we don't need any longer
-		this.methodMetaDataBuilders = null;
+		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDatas ) );
 	}
 
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
@@ -361,18 +297,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Builds up the method meta data for this type by invoking each builder in
 	 * {@link #methodMetaDataBuilders}.
 	 */
-	private Map<Method, AggregatedMethodMetaData> buildMethodMetaData() {
+	private Map<Method, AggregatedMethodMetaData> buildMethodMetaData(Set<AggregatedMethodMetaData> allMethodMetaData) {
 
 		Map<Method, AggregatedMethodMetaData> theValue = newHashMap();
 
-		for ( AggregatedMethodMetaData.Builder oneBuilder : methodMetaDataBuilders ) {
-
-			AggregatedMethodMetaData aggregatedMethodMetaData = oneBuilder.build();
+		for ( AggregatedMethodMetaData oneAggregatedMethodMetaData : allMethodMetaData ) {
 
 			//register the aggregated meta data for each underlying method for a quick
 			//read access
-			for ( MethodMetaData oneMethodMetaData : aggregatedMethodMetaData.getAllMethodMetaData() ) {
-				theValue.put( oneMethodMetaData.getMethod(), aggregatedMethodMetaData );
+			for ( MethodMetaData oneMethodMetaData : oneAggregatedMethodMetaData.getAllMethodMetaData() ) {
+				theValue.put( oneMethodMetaData.getMethod(), oneAggregatedMethodMetaData );
 			}
 		}
 
@@ -416,6 +350,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<?> metaConstraint) {
+
+		if ( metaConstraint.getLocation().getMember() != null ) {
+			ReflectionHelper.setAccessibility( metaConstraint.getLocation().getMember() );
+		}
+
 		// first we add the meta constraint to our meta constraint map
 		List<BeanMetaConstraint<?>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
@@ -443,58 +382,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 	}
 
-	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
-
-		addToBuilder( methodMetaData );
-
-		if ( ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) ) {
-
-			addToPropertyNameList( methodMetaData.getMethod() );
-			ReflectionHelper.setAccessibility( methodMetaData.getMethod() );
-
-			for ( MethodMetaConstraint<?> metaConstraint : methodMetaData ) {
-
-				addMetaConstraint( clazz, getAsBeanMetaConstraint( metaConstraint, methodMetaData.getMethod() ) );
-			}
-
-			if ( methodMetaData.isCascading() ) {
-				addCascadedMember( methodMetaData.getMethod() );
-			}
-		}
-	}
-
-	/**
-	 * <p>
-	 * Adds the given method meta data to the aggregated method meta data
-	 * builder for this method signature. In case no aggregation builder exists
-	 * yet for this method signature, one will be created with the given method
-	 * meta data as base entry.
-	 * </p>
-	 * <p>
-	 * As the type hierarchy is traversed bottom-up when building the bean meta
-	 * data for a given type, it is ensured that for each method the aggregated
-	 * method meta data is based on the lowest implementation of this method in
-	 * the hierarchy.
-	 * </p>
-	 *
-	 * @param metaData The method meta data to add.
-	 */
-	private void addToBuilder(MethodMetaData metaData) {
-
-		// add the given meta data to an existing aggregation builder ...
-		for ( Builder oneBuilder : methodMetaDataBuilders ) {
-
-			if ( oneBuilder.accepts( metaData ) ) {
-				oneBuilder.addMetaData( metaData );
-				return;
-			}
-		}
-
-		// ... or create a new builder
-		Builder newBuilder = new AggregatedMethodMetaData.Builder( metaData );
-		methodMetaDataBuilders.add( newBuilder );
-	}
-
 	private void addCascadedMember(Member member) {
 		ReflectionHelper.setAccessibility( member );
 		cascadedMembers.add( member );
@@ -503,17 +390,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public List<Class<?>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
-	}
-
-	/**
-	 * Create bean descriptor, find all classes/subclasses/interfaces which have to be taken in consideration
-	 * for this validator and create meta data.
-	 *
-	 * @param annotationIgnores Data structure keeping track on which annotation should be ignored
-	 * @param beanMetaDataCache The bean meta data cache
-	 */
-	private void createMetaData(AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		beanDescriptor = new BeanDescriptorImpl<T>( this );
 	}
 
 	private void addToPropertyNameList(Member member) {
@@ -543,19 +419,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private boolean isValidAnnotationPresent(Member member) {
 		return ( (AnnotatedElement) member ).isAnnotationPresent( Valid.class );
-	}
-
-	private <A extends Annotation> MethodMetaConstraint<A> getAsMethodMetaConstraint(BeanMetaConstraint<A> beanMetaConstraint) {
-		return new MethodMetaConstraint<A>(
-				beanMetaConstraint.getDescriptor(), (Method) beanMetaConstraint.getLocation().getMember()
-		);
-	}
-
-	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint, Method method) {
-		return new BeanMetaConstraint<A>(
-				methodMetaConstraint.getDescriptor(),
-				new BeanConstraintLocation( methodMetaConstraint.getLocation().getBeanClass(), method )
-		);
 	}
 
 	@SuppressWarnings("unchecked")

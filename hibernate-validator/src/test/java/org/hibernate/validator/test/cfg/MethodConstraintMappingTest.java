@@ -16,7 +16,11 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import java.lang.annotation.ElementType;
+import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -28,11 +32,13 @@ import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.method.MethodConstraintViolationException;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodValidatorForMapping;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
 /**
@@ -402,14 +408,121 @@ public class MethodConstraintMappingTest {
 		}
 	}
 
+	@Test
+	public void constraintConfiguredOnPropertyIsEvaluatedByMethodValidation() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.property( "hello", ElementType.METHOD )
+				.constraint( new NotNullDef() );
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.getHello();
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "may not be null"
+			);
+			assertCorrectPropertyPaths( e, "GreetingService#getHello()" );
+		}
+	}
+
+	@Test
+	public void cascadeConfiguredOnPropertyIsEvaluatedByMethodValidation() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.property( "user", ElementType.METHOD )
+				.valid();
+
+		try {
+			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			service.getUser();
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( MethodConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "may not be null"
+			);
+			assertCorrectPropertyPaths( e, "GreetingService#getUser().name" );
+		}
+	}
+
+	@Test
+	public void constraintConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingServiceImpl.class )
+				.property( "hello", ElementType.FIELD )
+				.constraint( new NotNullDef() );
+
+		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		assertNull( service.getHello() );
+	}
+
+	@Test
+	public void cascadeConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingServiceImpl.class )
+				.property( "user", ElementType.FIELD )
+				.valid();
+
+		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		assertNull( service.getUser().getName() );
+	}
+
+	@Test
+	public void constraintConfiguredOnMethodIsEvaluatedByPropertyValidation() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "getHello" )
+				.returnValue()
+				.constraint( new NotNullDef() );
+
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		Set<ConstraintViolation<GreetingServiceImpl>> violations = validator.validateProperty(
+				new GreetingServiceImpl(), "hello"
+		);
+
+		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertCorrectPropertyPaths( violations, "hello" );
+	}
+
+	@Test
+	public void cascadeConfiguredOnMethodIsEvaluatedByPropertyValidation() {
+
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "getUser" )
+				.returnValue()
+				.valid();
+
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		Set<ConstraintViolation<GreetingServiceImpl>> violations = validator.validate( new GreetingServiceImpl() );
+
+		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertCorrectPropertyPaths( violations, "user.name" );
+	}
+
 	public class User {
 
-		@SuppressWarnings("unused")
 		@NotNull
 		private String name;
 
 		public User(String name) {
 			this.name = name;
+		}
+
+		public String getName() {
+			return name;
 		}
 	}
 
@@ -434,9 +547,20 @@ public class MethodConstraintMappingTest {
 		String greet(String string1, String string2);
 
 		Message sayHello(@Size(min = 1, max = 10) String name);
+
+		Message getHello();
+
+		User getUser();
+
 	}
 
 	public class GreetingServiceImpl implements GreetingService {
+
+		@SuppressWarnings("unused")
+		private Message hello;
+
+		@SuppressWarnings("unused")
+		private User user;
 
 		public Message greet(User user) {
 			return new Message( null );
@@ -452,6 +576,14 @@ public class MethodConstraintMappingTest {
 
 		public Message sayHello(String name) {
 			return null;
+		}
+
+		public Message getHello() {
+			return null;
+		}
+
+		public User getUser() {
+			return new User( null );
 		}
 	}
 }

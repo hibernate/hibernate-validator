@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.validator.util.ReflectionHelper;
+
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 
 /**
@@ -183,6 +185,16 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 	 */
 	public boolean hasParameterConstraints() {
 		return hasParameterConstraints;
+	}
+
+	/**
+	 * Whether the represented method is a JavaBeans getter method or not.
+	 *
+	 * @return <code>True</code>, if this method is a getter method,
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean isGetterMethod() {
+		return ReflectionHelper.isGetterMethod( method );
 	}
 
 	public MethodMetaData merge(MethodMetaData otherMetaData) {

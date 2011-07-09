@@ -147,11 +147,11 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 	private Set<BeanMetaConstraint<?>> asBeanMetaConstraints(List<ConfiguredConstraint<?, BeanConstraintLocation>> constraints) {
 
-		if ( constraints == null ) {
-			return Collections.emptySet();
-		}
-
 		Set<BeanMetaConstraint<?>> theValue = newHashSet();
+
+		if ( constraints == null ) {
+			return theValue;
+		}
 
 		for ( ConfiguredConstraint<?, BeanConstraintLocation> oneConfiguredConstraint : constraints ) {
 			theValue.add( asBeanMetaConstraint( oneConfiguredConstraint ) );

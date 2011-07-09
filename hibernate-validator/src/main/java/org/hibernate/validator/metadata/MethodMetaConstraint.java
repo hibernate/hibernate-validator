@@ -68,4 +68,11 @@ public class MethodMetaConstraint<A extends Annotation> extends MetaConstraint<A
 
 		super( constraintDescriptor, location );
 	}
+
+	@Override
+	public MethodConstraintLocation getLocation() {
+		return (MethodConstraintLocation) super.getLocation();
+	}
+
+
 }

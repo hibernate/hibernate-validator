@@ -18,13 +18,17 @@ package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -185,13 +189,54 @@ public class BeanMetaDataManager {
 				continue;
 			}
 
+			//add constraints for getter methods configured via property
+			for ( Member oneCascadedMember : configurationForHierarchyClass.getCascadedMembers() ) {
+				if ( oneCascadedMember instanceof Method ) {
+					MethodMetaData methodMetaData = new MethodMetaData(
+							(Method) oneCascadedMember, Collections.<MethodMetaConstraint<?>>emptyList(), true
+					);
+					addMetaDataToBuilder( methodMetaData, builders );
+				}
+			}
+
+			Set<BeanMetaConstraint<?>> beanConstraints = configurationForHierarchyClass.getConstraints();
+
 			for ( MethodMetaData oneMethodMetaData : configurationForHierarchyClass.getMethodMetaData() ) {
 				addMetaDataToBuilder( oneMethodMetaData, builders );
 
+				if ( oneMethodMetaData.isGetterMethod() ) {
+
+					//add cascaded members configured via method
+					if ( oneMethodMetaData.isCascading() ) {
+						allCascadedMembers.add( oneMethodMetaData.getMethod() );
+					}
+
+					//add constraints configured via method
+					for ( MethodMetaConstraint<?> oneReturnValueConstraint : oneMethodMetaData ) {
+						beanConstraints.add( getAsBeanMetaConstraint( oneReturnValueConstraint ) );
+					}
+				}
+
 			}
+
+
 			List<BeanMetaConstraint<?>> adaptedConstraints = newArrayList();
-			for ( BeanMetaConstraint<?> beanMetaConstraint : configurationForHierarchyClass.getConstraints() ) {
+			for ( BeanMetaConstraint<?> beanMetaConstraint : beanConstraints ) {
 				adaptedConstraints.add( adaptOriginAndImplicitGroup( beanClass, beanMetaConstraint ) );
+			}
+
+			//add constraints configured via property to methods
+			//TODO GM: avoid adding constraints originating from methods in the first place
+			for ( BeanMetaConstraint<?> oneConstraint : adaptedConstraints ) {
+				Member member = oneConstraint.getLocation().getMember();
+				if ( member instanceof Method ) {
+					MethodMetaData methodMetaData = new MethodMetaData(
+							(Method) member,
+							Arrays.<MethodMetaConstraint<?>>asList( getAsMethodMetaConstraint( oneConstraint ) ),
+							false
+					);
+					addMetaDataToBuilder( methodMetaData, builders );
+				}
 			}
 
 			allConstraints.put( oneHierarchyClass, adaptedConstraints );
@@ -280,6 +325,23 @@ public class BeanMetaDataManager {
 		else {
 			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
 		}
+	}
+
+	private <A extends Annotation> MethodMetaConstraint<A> getAsMethodMetaConstraint(BeanMetaConstraint<A> beanMetaConstraint) {
+		return new MethodMetaConstraint<A>(
+				beanMetaConstraint.getDescriptor(),
+				new MethodConstraintLocation( (Method) beanMetaConstraint.getLocation().getMember() )
+		);
+	}
+
+	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint) {
+		return new BeanMetaConstraint<A>(
+				methodMetaConstraint.getDescriptor(),
+				new BeanConstraintLocation(
+						methodMetaConstraint.getLocation().getBeanClass(),
+						methodMetaConstraint.getLocation().getMethod()
+				)
+		);
 	}
 
 }
