@@ -282,7 +282,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
+			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -299,7 +299,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
+			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -313,7 +313,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time"
+			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
 		ConstraintMapping mapping = new ConstraintMapping();

@@ -22,6 +22,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -163,7 +164,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							AnnotationIgnores annotationIgnores,
 							BeanMetaDataCache beanMetaDataCache) {
 		this.beanClass = beanClass;
-		this.defaultGroupSequenceProvider = null;
 		for ( Member member : cascadedMembers ) {
 			addCascadedMember( member );
 		}
@@ -173,23 +173,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		// start the annotation discovery phase (look for annotations in the whole class hierarchy)
 		createMetaData( annotationIgnores, beanMetaDataCache );
 
-		// set the default explicitly specified default group sequence after the discovery process is complete
-		if ( defaultGroupSequence != null && !defaultGroupSequence.isEmpty() ) {
-			setDefaultGroupSequence( defaultGroupSequence );
-		}
-
-		// set the default explicitly specified default group sequence provider after the discovery process is complete
-		if ( defaultGroupSequenceProvider != null ) {
-			this.defaultGroupSequenceProvider = newGroupSequenceProviderInstance( defaultGroupSequenceProvider );
-		}
-
-		// validates that programmatic/xml definition of default group sequence or default group sequence provider
-		// doesn't introduce illegal default group sequence definition.
-		if ( hasDefaultGroupSequenceProvider() && this.defaultGroupSequence.size() > 1 ) {
-			throw new GroupDefinitionException(
-					"Default group sequence and default group sequence provider cannot be defined at the same time"
-			);
-		}
+		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider );
 
 		// add the explicitly configured constraints
 		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<?>>> entry : constraints.entrySet() ) {
@@ -263,6 +247,25 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		// reset class members we don't need any longer
 		this.methodMetaDataBuilders = null;
+	}
+
+	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
+
+		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
+			throw new GroupDefinitionException(
+					"Default group sequence and default group sequence provider cannot be defined at the same time."
+			);
+		}
+
+		if ( defaultGroupSequenceProvider != null ) {
+			this.defaultGroupSequenceProvider = newGroupSequenceProviderInstance( defaultGroupSequenceProvider );
+		}
+		else if ( defaultGroupSequence != null && !defaultGroupSequence.isEmpty() ) {
+			setDefaultGroupSequence( defaultGroupSequence );
+		}
+		else {
+			setDefaultGroupSequence( Arrays.<Class<?>>asList( beanClass ) );
+		}
 	}
 
 	public Class<T> getBeanClass() {

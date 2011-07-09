@@ -233,7 +233,7 @@ public class BeanMetaDataManager {
 	 * in the hierarchy (interface or super class) a new constraint will be
 	 * returned with an origin of {@link ConstraintOrigin#DEFINED_IN_HIERARCHY}.
 	 * If the constraint is defined on an interface, the interface type will
-	 * additionally be part of the constraint's groups (impliciting grouping).
+	 * additionally be part of the constraint's groups (implicit grouping).
 	 *
 	 * @param <A> The type of the constraint's annotation.
 	 * @param beanClass The bean type to which the constraint shall be adapted.

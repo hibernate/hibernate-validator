@@ -129,12 +129,7 @@ public class XmlMappingParser {
 	}
 
 	public final List<Class<?>> getDefaultSequenceForClass(Class<?> beanClass) {
-		if ( defaultSequences.containsKey( beanClass ) ) {
-			return defaultSequences.get( beanClass );
-		}
-		else {
-			return Collections.emptyList();
-		}
+		return defaultSequences.get( beanClass );
 	}
 
 	@SuppressWarnings("unchecked")

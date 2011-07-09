@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 
@@ -79,22 +78,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 * See HV-113.
 	 */
 	private void retrieveBeanMetaData(Class<?> beanClass) {
-		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
-		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
-
-		if ( groupSequenceAnnotation != null && groupSequenceProviderAnnotation != null ) {
-			throw new GroupDefinitionException(
-					"GroupSequence and GroupSequenceProvider annotations cannot be used at the same time"
-			);
-		}
-
-		List<Class<?>> defaultGroupSequence = groupSequenceAnnotation != null ? Arrays.asList( groupSequenceAnnotation.value() ) : null;
-		Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider = groupSequenceProviderAnnotation != null ? groupSequenceProviderAnnotation
-				.value() : null;
-
-		if ( defaultGroupSequence == null && defaultGroupSequenceProvider == null ) {
-			defaultGroupSequence = Arrays.<Class<?>>asList( beanClass );
-		}
 
 		Set<Member> cascadedMembers = newHashSet();
 		Set<BeanMetaConstraint<?>> beanConstraints = newHashSet();
@@ -147,10 +130,22 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 						beanConstraints,
 						cascadedMembers,
 						getMethodConstraints( beanClass, annotationIgnores ),
-						defaultGroupSequence,
-						defaultGroupSequenceProvider
+						getDefaultGroupSequence( beanClass ),
+						getDefaultGroupSequenceProviderClass( beanClass )
 				)
 		);
+	}
+
+	private List<Class<?>> getDefaultGroupSequence(Class<?> beanClass) {
+
+		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
+		return groupSequenceAnnotation != null ? Arrays.asList( groupSequenceAnnotation.value() ) : null;
+	}
+
+	private Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProviderClass(Class<?> beanClass) {
+
+		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
+		return groupSequenceProviderAnnotation != null ? groupSequenceProviderAnnotation.value() : null;
 	}
 
 	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint, Method method) {
@@ -224,7 +219,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	private MethodMetaData findMethodMetaData(Method method) {
 
 		List<ParameterMetaData> parameterConstraints = getParameterMetaData( method );
-		boolean isCascading = isValidAnnotationPresent( method );
+		boolean isCascading = method.isAnnotationPresent( Valid.class );
 		List<MethodMetaConstraint<?>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
 
@@ -240,10 +235,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		}
 
 		return constraints;
-	}
-
-	private boolean isValidAnnotationPresent(Member member) {
-		return ( (AnnotatedElement) member ).isAnnotationPresent( Valid.class );
 	}
 
 	/**

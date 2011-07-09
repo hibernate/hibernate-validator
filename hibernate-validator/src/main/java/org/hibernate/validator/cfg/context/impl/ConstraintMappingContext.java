@@ -17,7 +17,6 @@
 package org.hibernate.validator.cfg.context.impl;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,12 +91,7 @@ public class ConstraintMappingContext {
 	}
 
 	public final List<Class<?>> getDefaultSequence(Class<?> beanType) {
-		if ( defaultGroupSequences.containsKey( beanType ) ) {
-			return defaultGroupSequences.get( beanType );
-		}
-		else {
-			return Collections.emptyList();
-		}
+		return defaultGroupSequences.get( beanType );
 	}
 
 	/**
