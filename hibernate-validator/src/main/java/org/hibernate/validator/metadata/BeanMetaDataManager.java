@@ -191,7 +191,7 @@ public class BeanMetaDataManager {
 			}
 			List<BeanMetaConstraint<?>> adaptedConstraints = newArrayList();
 			for ( BeanMetaConstraint<?> beanMetaConstraint : configurationForHierarchyClass.getConstraints() ) {
-				adaptedConstraints.add( adaptOrigin( beanMetaConstraint, beanClass ) );
+				adaptedConstraints.add( adaptOriginAndImplicitGroup( beanClass, beanMetaConstraint ) );
 			}
 
 			allConstraints.put( oneHierarchyClass, adaptedConstraints );
@@ -226,7 +226,23 @@ public class BeanMetaDataManager {
 		builders.add( builder );
 	}
 
-	private <A extends Annotation> BeanMetaConstraint<A> adaptOrigin(BeanMetaConstraint<A> constraint, Class<?> beanClass) {
+	/**
+	 * Adapts the given constraint to the given bean type. In case the
+	 * constraint is defined locally at the bean class the original constraint
+	 * will be returned without any modifications. If the constraint is defined
+	 * in the hierarchy (interface or super class) a new constraint will be
+	 * returned with an origin of {@link ConstraintOrigin#DEFINED_IN_HIERARCHY}.
+	 * If the constraint is defined on an interface, the interface type will
+	 * additionally be part of the constraint's groups (impliciting grouping).
+	 *
+	 * @param <A> The type of the constraint's annotation.
+	 * @param beanClass The bean type to which the constraint shall be adapted.
+	 * @param constraint The constraint that shall be adapted. This constraint itself
+	 * will not be altered.
+	 *
+	 * @return A constraint adapted to the given bean type.
+	 */
+	private <A extends Annotation> BeanMetaConstraint<A> adaptOriginAndImplicitGroup(Class<?> beanClass, BeanMetaConstraint<A> constraint) {
 
 		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
 
@@ -234,9 +250,12 @@ public class BeanMetaDataManager {
 			return constraint;
 		}
 
+		Class<?> constraintClass = constraint.getLocation().getBeanClass();
+
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
 				(A) constraint.getDescriptor().getAnnotation(),
 				constraintHelper,
+				constraintClass.isInterface() ? constraintClass : null,
 				constraint.getElementType(),
 				definedIn
 		);

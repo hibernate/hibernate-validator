@@ -366,16 +366,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
-		ConstraintDescriptorImpl<A> constraintDescriptor;
-		ConstraintOrigin definedIn = ConstraintOrigin.DEFINED_LOCALLY;
-		if ( clazz.isInterface() ) {
-			constraintDescriptor = new ConstraintDescriptorImpl<A>(
-					annotation, constraintHelper, clazz, type, definedIn
-			);
-		}
-		else {
-			constraintDescriptor = new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, definedIn );
-		}
-		return constraintDescriptor;
+		return new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY );
 	}
 }
