@@ -52,11 +52,6 @@ import static org.hibernate.validator.util.CollectionHelper.partition;
  */
 public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBase {
 
-	/**
-	 * Used as prefix for parameter names, if no explicit names are given.
-	 */
-	public static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
-
 	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, ConstraintMapping mapping) {
 
 		super( constraintHelper );
@@ -79,96 +74,31 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
 
-			List<BeanConstraintLocation> cascades = context.getCascadeConfig().get( clazz );
-			if ( cascades == null ) {
-				cascades = Collections.emptyList();
-			}
-			Map<BeanConstraintLocation, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByLocation = partition(
-					context.getConstraintConfig()
-							.get( clazz ), constraintsByLocation()
-			);
-
-			Set<BeanConstraintLocation> allConfiguredProperties = new HashSet<BeanConstraintLocation>( cascades );
-			allConfiguredProperties.addAll( constraintsByLocation.keySet() );
-
-			List<MethodConstraintLocation> methodCascades = context.getMethodCascadeConfig().get( clazz );
-			List<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints = context.getMethodConstraintConfig()
-					.get( clazz );
-
-			Map<Method, List<MethodConstraintLocation>> cascadesByMethod = partition(
-					methodCascades, cascadesByMethod()
-			);
-			Map<Method, List<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByMethod = partition(
-					methodConstraints, constraintsByMethod()
-			);
-
-			Set<Method> allConfiguredMethods = new HashSet<Method>( cascadesByMethod.keySet() );
-			allConfiguredMethods.addAll( constraintsByMethod.keySet() );
-			Set<MethodMetaData> allMethodMetaData = newHashSet();
-
-			for ( Method oneMethod : allConfiguredMethods ) {
-
-				Map<Integer, List<MethodConstraintLocation>> cascadesByParameter = partition(
-						cascadesByMethod.get(
-								oneMethod
-						), cascadesByParameterIndex()
-				);
-				Map<Integer, List<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByParameter = partition(
-						constraintsByMethod.get( oneMethod ), constraintsByParameterIndex()
-				);
-				List<ParameterMetaData> parameterMetaDatas = newArrayList();
-
-				int i = 0;
-				for ( Class<?> parameterType : oneMethod.getParameterTypes() ) {
-					String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-					boolean isCascading = cascadesByParameter.containsKey( i );
-
-					parameterMetaDatas.add(
-							new ParameterMetaData(
-									i,
-									parameterType,
-									parameterName,
-									asMethodMetaConstraints( constraintsByParameter.get( i ) ),
-									isCascading
-							)
+			Set<PropertyMetaData> propertyMetaData =
+					retrievePropertyMetaData(
+							context.getConstraintConfig().get( clazz ),
+							context.getCascadeConfig().get( clazz )
 					);
 
-					i++;
-				}
+			Set<MethodMetaData> methodMetaData =
+					retrieveMethodMetaData(
+							context.getMethodCascadeConfig().get( clazz ),
+							context.getMethodConstraintConfig().get( clazz )
+					);
 
+			//copy getter meta data from methods to properties and vice versa
+			Set<MethodMetaData> propertyGettersAsMethodMetaData = getGettersAsMethodMetaData( propertyMetaData );
+			Set<PropertyMetaData> methodGettersAsPropertyMetaData = getGettersAsPropertyMetaData( methodMetaData );
 
-				MethodMetaData methodMetaData = new MethodMetaData(
-						oneMethod,
-						parameterMetaDatas,
-						asMethodMetaConstraints( constraintsByParameter.get( null ) ),
-						cascadesByParameter.containsKey( null )
-				);
-				allMethodMetaData.add( methodMetaData );
-			}
-
-			Set<PropertyMetaData> allPropertyMetaData = newHashSet();
-			for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
-				allPropertyMetaData.add(
-						new PropertyMetaData(
-								asBeanMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
-								oneConfiguredProperty,
-								cascades.contains( oneConfiguredProperty )
-						)
-				);
-			}
-
-			Set<MethodMetaData> propertyGettersAsMethodMetaData = getGettersAsMethodMetaData( allPropertyMetaData );
-			Set<PropertyMetaData> methodGettersAsPropertyMetaData = getGettersAsPropertyMetaData( allMethodMetaData );
-
-			allMethodMetaData.addAll( propertyGettersAsMethodMetaData );
-			allPropertyMetaData.addAll( methodGettersAsPropertyMetaData );
+			methodMetaData.addAll( propertyGettersAsMethodMetaData );
+			propertyMetaData.addAll( methodGettersAsPropertyMetaData );
 
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
 							clazz,
-							allPropertyMetaData,
-							allMethodMetaData,
+							propertyMetaData,
+							methodMetaData,
 							context.getDefaultSequence( clazz ),
 							context.getDefaultGroupSequenceProvider( clazz )
 					)
@@ -176,13 +106,96 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		}
 	}
 
-	private Set<BeanMetaConstraint<?>> asBeanMetaConstraints(List<ConfiguredConstraint<?, BeanConstraintLocation>> constraints) {
+	private Set<PropertyMetaData> retrievePropertyMetaData(
+			Set<ConfiguredConstraint<?, BeanConstraintLocation>> constraints,
+			Set<BeanConstraintLocation> cascades) {
+
+		Map<BeanConstraintLocation, Set<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByLocation = partition(
+				constraints,
+				constraintsByLocation()
+		);
+
+		if ( cascades == null ) {
+			cascades = Collections.emptySet();
+		}
+
+		Set<BeanConstraintLocation> allConfiguredProperties = new HashSet<BeanConstraintLocation>( cascades );
+		allConfiguredProperties.addAll( constraintsByLocation.keySet() );
+
+		Set<PropertyMetaData> allPropertyMetaData = newHashSet();
+		for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
+			allPropertyMetaData.add(
+					new PropertyMetaData(
+							asBeanMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
+							oneConfiguredProperty,
+							cascades.contains( oneConfiguredProperty )
+					)
+			);
+		}
+		return allPropertyMetaData;
+	}
+
+	private Set<MethodMetaData> retrieveMethodMetaData(Set<MethodConstraintLocation> methodCascades, Set<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints) {
+
+		Map<Method, Set<MethodConstraintLocation>> cascadesByMethod = partition(
+				methodCascades, cascadesByMethod()
+		);
+		Map<Method, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByMethod = partition(
+				methodConstraints, constraintsByMethod()
+		);
+
+		Set<Method> allConfiguredMethods = new HashSet<Method>( cascadesByMethod.keySet() );
+		allConfiguredMethods.addAll( constraintsByMethod.keySet() );
+		Set<MethodMetaData> allMethodMetaData = newHashSet();
+
+		for ( Method oneMethod : allConfiguredMethods ) {
+
+			Map<Integer, Set<MethodConstraintLocation>> cascadesByParameter = partition(
+					cascadesByMethod.get(
+							oneMethod
+					), cascadesByParameterIndex()
+			);
+			Map<Integer, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByParameter = partition(
+					constraintsByMethod.get( oneMethod ), constraintsByParameterIndex()
+			);
+			List<ParameterMetaData> parameterMetaDatas = newArrayList();
+
+			int i = 0;
+			for ( Class<?> parameterType : oneMethod.getParameterTypes() ) {
+				String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
+				boolean isCascading = cascadesByParameter.containsKey( i );
+
+				parameterMetaDatas.add(
+						new ParameterMetaData(
+								i,
+								parameterType,
+								parameterName,
+								asMethodMetaConstraints( constraintsByParameter.get( i ) ),
+								isCascading
+						)
+				);
+
+				i++;
+			}
+
+			MethodMetaData methodMetaData = new MethodMetaData(
+					oneMethod,
+					parameterMetaDatas,
+					asMethodMetaConstraints( constraintsByParameter.get( null ) ),
+					cascadesByParameter.containsKey( null )
+			);
+			allMethodMetaData.add( methodMetaData );
+		}
+		return allMethodMetaData;
+	}
+
+	private Set<BeanMetaConstraint<?>> asBeanMetaConstraints(Set<ConfiguredConstraint<?, BeanConstraintLocation>> constraints) {
+		
+		if ( constraints == null ) {
+			return Collections.emptySet();
+		}
 
 		Set<BeanMetaConstraint<?>> theValue = newHashSet();
-
-		if ( constraints == null ) {
-			return theValue;
-		}
 
 		for ( ConfiguredConstraint<?, BeanConstraintLocation> oneConfiguredConstraint : constraints ) {
 			theValue.add( asBeanMetaConstraint( oneConfiguredConstraint ) );
@@ -203,8 +216,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		return new BeanMetaConstraint<A>( constraintDescriptor, config.getLocation() );
 	}
 
-	//TODO GM: use set
-	private Set<MethodMetaConstraint<?>> asMethodMetaConstraints(List<ConfiguredConstraint<?, MethodConstraintLocation>> constraints) {
+	private Set<MethodMetaConstraint<?>> asMethodMetaConstraints(Set<ConfiguredConstraint<?, MethodConstraintLocation>> constraints) {
 
 		if ( constraints == null ) {
 			return Collections.emptySet();

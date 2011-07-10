@@ -362,7 +362,7 @@ public class XmlMappingParser {
 				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new BeanMetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( member ) );
+		return new BeanMetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {

@@ -53,11 +53,6 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
-	/**
-	 * Used as prefix for parameter names, if no explicit names are given.
-	 */
-	public static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
-
 	private final AnnotationIgnores annotationIgnores;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, Class<?> beanClass, AnnotationIgnores annotationIgnores) {

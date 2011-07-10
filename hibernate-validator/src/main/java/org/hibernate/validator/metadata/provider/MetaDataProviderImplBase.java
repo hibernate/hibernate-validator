@@ -44,6 +44,11 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 
+	/**
+	 * Used as prefix for parameter names, if no explicit names are given.
+	 */
+	protected static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
+	
 	protected final Map<Class<?>, BeanConfiguration<?>> configuredBeans;
 
 	protected final ConstraintHelper constraintHelper;
