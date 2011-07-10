@@ -47,7 +47,7 @@ public class PropertyMetaData implements Iterable<BeanMetaConstraint<?>> {
 		this.isCascading = isCascading;
 
 		Member member = location.getMember();
-		if ( member != null ) {
+		if ( member != null && isConstrained() ) {
 			ReflectionHelper.setAccessibility( member );
 		}
 	}
@@ -66,6 +66,10 @@ public class PropertyMetaData implements Iterable<BeanMetaConstraint<?>> {
 
 	public boolean isCascading() {
 		return isCascading;
+	}
+
+	private boolean isConstrained() {
+		return isCascading || !constraints.isEmpty();
 	}
 
 	@Override

@@ -140,7 +140,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			Set<BeanMetaConstraint<?>> constraints = newHashSet();
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : findConstraints( field, ElementType.FIELD ) ) {
-				ReflectionHelper.setAccessibility( field );
 				constraints.add( createBeanMetaConstraint( beanClass, field, constraintDescription ) );
 			}
 

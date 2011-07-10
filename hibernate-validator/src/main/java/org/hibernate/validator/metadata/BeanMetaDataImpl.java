@@ -350,10 +350,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<?> metaConstraint) {
 
-		if ( metaConstraint.getLocation().getMember() != null ) {
-			ReflectionHelper.setAccessibility( metaConstraint.getLocation().getMember() );
-		}
-
 		// first we add the meta constraint to our meta constraint map
 		List<BeanMetaConstraint<?>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
