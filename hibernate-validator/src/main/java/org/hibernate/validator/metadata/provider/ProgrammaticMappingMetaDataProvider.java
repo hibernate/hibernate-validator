@@ -18,7 +18,6 @@ package org.hibernate.validator.metadata.provider;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,6 +36,7 @@ import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MethodMetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.PropertyMetaData;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
@@ -80,8 +80,17 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
 
 			List<BeanConstraintLocation> cascades = context.getCascadeConfig().get( clazz );
-			List<ConfiguredConstraint<?, BeanConstraintLocation>> constraints = context.getConstraintConfig()
-					.get( clazz );
+			if ( cascades == null ) {
+				cascades = Collections.emptyList();
+			}
+			Map<BeanConstraintLocation, List<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByLocation = partition(
+					context.getConstraintConfig()
+							.get( clazz ), constraintsByLocation()
+			);
+
+			Set<BeanConstraintLocation> allConfiguredProperties = new HashSet<BeanConstraintLocation>( cascades );
+			allConfiguredProperties.addAll( constraintsByLocation.keySet() );
+
 			List<MethodConstraintLocation> methodCascades = context.getMethodCascadeConfig().get( clazz );
 			List<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints = context.getMethodConstraintConfig()
 					.get( clazz );
@@ -137,12 +146,28 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 				allMethodMetaData.add( methodMetaData );
 			}
 
+			Set<PropertyMetaData> allPropertyMetaData = newHashSet();
+			for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
+				allPropertyMetaData.add(
+						new PropertyMetaData(
+								asBeanMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
+								oneConfiguredProperty,
+								cascades.contains( oneConfiguredProperty )
+						)
+				);
+			}
+
+			Set<MethodMetaData> propertyGettersAsMethodMetaData = getGettersAsMethodMetaData( allPropertyMetaData );
+			Set<PropertyMetaData> methodGettersAsPropertyMetaData = getGettersAsPropertyMetaData( allMethodMetaData );
+
+			allMethodMetaData.addAll( propertyGettersAsMethodMetaData );
+			allPropertyMetaData.addAll( methodGettersAsPropertyMetaData );
+
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
 							clazz,
-							asBeanMetaConstraints( constraints ),
-							getMembers( cascades ),
+							allPropertyMetaData,
 							allMethodMetaData,
 							context.getDefaultSequence( clazz ),
 							context.getDefaultGroupSequenceProvider( clazz )
@@ -201,21 +226,6 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		);
 
 		return new MethodMetaConstraint<A>( constraintDescriptor, config.getLocation() );
-	}
-
-	private Set<Member> getMembers(List<BeanConstraintLocation> beanConstraintLocations) {
-
-		if ( beanConstraintLocations == null ) {
-			return Collections.emptySet();
-		}
-
-		Set<Member> theValue = newHashSet();
-
-		for ( BeanConstraintLocation oneLocation : beanConstraintLocations ) {
-			theValue.add( oneLocation.getMember() );
-		}
-
-		return theValue;
 	}
 
 	private Partitioner<Method, MethodConstraintLocation> cascadesByMethod() {

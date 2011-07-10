@@ -41,6 +41,7 @@ import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MethodMetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.PropertyMetaData;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -80,8 +81,45 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 */
 	private void retrieveBeanMetaData(Class<?> beanClass) {
 
-		Set<Member> cascadedMembers = newHashSet();
-		Set<BeanMetaConstraint<?>> beanConstraints = newHashSet();
+//		if(beanClass.equals(Object.class)) {
+//			return;
+//		}
+
+		Set<PropertyMetaData> propertyMetaData = getFieldConstraints( beanClass );
+
+		Set<MethodMetaData> methodMetaData = getMethodConstraints( beanClass, annotationIgnores );
+		propertyMetaData.addAll( getGettersAsPropertyMetaData( methodMetaData ) );
+
+		Set<BeanMetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( beanClass, annotationIgnores );
+		if ( !classLevelConstraints.isEmpty() ) {
+			PropertyMetaData classLevelMetaData =
+					new PropertyMetaData(
+							classLevelConstraints,
+							new BeanConstraintLocation( beanClass ),
+							false
+					);
+			propertyMetaData.add( classLevelMetaData );
+		}
+
+		configuredBeans.put(
+				beanClass,
+				createBeanConfiguration(
+						beanClass,
+						propertyMetaData,
+						methodMetaData,
+						getDefaultGroupSequence( beanClass ),
+						getDefaultGroupSequenceProviderClass( beanClass )
+				)
+		);
+	}
+
+	/**
+	 * @param beanClass
+	 *
+	 * @return
+	 */
+	private Set<PropertyMetaData> getFieldConstraints(Class<?> beanClass) {
+		Set<PropertyMetaData> propertyMetaData = newHashSet();
 
 		final Field[] fields = ReflectionHelper.getDeclaredFields( beanClass );
 		for ( Field field : fields ) {
@@ -95,46 +133,28 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 				continue;
 			}
 
+			if ( field.isSynthetic() ) {
+				continue;
+			}
+
+			Set<BeanMetaConstraint<?>> constraints = newHashSet();
+
 			for ( ConstraintDescriptorImpl<?> constraintDescription : findConstraints( field, ElementType.FIELD ) ) {
 				ReflectionHelper.setAccessibility( field );
-				beanConstraints.add( createBeanMetaConstraint( beanClass, field, constraintDescription ) );
+				constraints.add( createBeanMetaConstraint( beanClass, field, constraintDescription ) );
 			}
 
-			// HV-433 Make sure the field is marked as cascaded in case it was configured via xml/programmatic API or
-			// it hosts the @Valid annotation
-			if ( field.isAnnotationPresent( Valid.class ) ) {
-				cascadedMembers.add( field );
-			}
+			boolean isCascading = field.isAnnotationPresent( Valid.class );
+
+			propertyMetaData.add(
+					new PropertyMetaData(
+							constraints,
+							new BeanConstraintLocation( beanClass, field ),
+							isCascading
+					)
+			);
 		}
-
-		beanConstraints.addAll( getClassLevelConstraints( beanClass, annotationIgnores ) );
-
-		Set<MethodMetaData> methodMetaData = getMethodConstraints( beanClass, annotationIgnores );
-		for ( MethodMetaData oneMethodMetaData : methodMetaData ) {
-			if ( ReflectionHelper.isGetterMethod( oneMethodMetaData.getMethod() ) ) {
-				for ( MethodMetaConstraint<?> oneReturnValueConstraint : oneMethodMetaData ) {
-					beanConstraints.add(
-							getAsBeanMetaConstraint(
-									oneReturnValueConstraint, oneMethodMetaData.getMethod()
-							)
-					);
-				}
-				if ( oneMethodMetaData.isCascading() ) {
-					cascadedMembers.add( oneMethodMetaData.getMethod() );
-				}
-			}
-		}
-		configuredBeans.put(
-				beanClass,
-				createBeanConfiguration(
-						beanClass,
-						beanConstraints,
-						cascadedMembers,
-						getMethodConstraints( beanClass, annotationIgnores ),
-						getDefaultGroupSequence( beanClass ),
-						getDefaultGroupSequenceProviderClass( beanClass )
-				)
-		);
+		return propertyMetaData;
 	}
 
 	private List<Class<?>> getDefaultGroupSequence(Class<?> beanClass) {
@@ -147,13 +167,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
 		return groupSequenceProviderAnnotation != null ? groupSequenceProviderAnnotation.value() : null;
-	}
-
-	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint, Method method) {
-		return new BeanMetaConstraint<A>(
-				methodMetaConstraint.getDescriptor(),
-				new BeanConstraintLocation( methodMetaConstraint.getLocation().getBeanClass(), method )
-		);
 	}
 
 	private Set<BeanMetaConstraint<?>> getClassLevelConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
@@ -357,4 +370,5 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
 		return new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY );
 	}
+
 }

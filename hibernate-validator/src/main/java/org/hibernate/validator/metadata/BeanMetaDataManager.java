@@ -16,19 +16,13 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -177,9 +171,8 @@ public class BeanMetaDataManager {
 
 		Class<T> beanClass = rootConfiguration.getBeanClass();
 
-		Set<Member> allCascadedMembers = newHashSet();
-		Map<Class<?>, List<BeanMetaConstraint<?>>> allConstraints = newHashMap();
 		Set<AggregatedMethodMetaData.Builder> builders = newHashSet();
+		Set<AggregatedPropertyMetaData.Builder> propertyBuilders = newHashSet();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 
@@ -189,58 +182,13 @@ public class BeanMetaDataManager {
 				continue;
 			}
 
-			//add constraints for getter methods configured via property
-			for ( Member oneCascadedMember : configurationForHierarchyClass.getCascadedMembers() ) {
-				if ( oneCascadedMember instanceof Method ) {
-					MethodMetaData methodMetaData = new MethodMetaData(
-							(Method) oneCascadedMember, Collections.<MethodMetaConstraint<?>>emptyList(), true
-					);
-					addMetaDataToBuilder( methodMetaData, builders );
-				}
+			for ( PropertyMetaData oneProperty : configurationForHierarchyClass.getPropertyMetaData() ) {
+				addMetaDataToBuilder( oneProperty, propertyBuilders );
 			}
-
-			Set<BeanMetaConstraint<?>> beanConstraints = configurationForHierarchyClass.getConstraints();
 
 			for ( MethodMetaData oneMethodMetaData : configurationForHierarchyClass.getMethodMetaData() ) {
 				addMetaDataToBuilder( oneMethodMetaData, builders );
-
-				if ( oneMethodMetaData.isGetterMethod() ) {
-
-					//add cascaded members configured via method
-					if ( oneMethodMetaData.isCascading() ) {
-						allCascadedMembers.add( oneMethodMetaData.getMethod() );
-					}
-
-					//add constraints configured via method
-					for ( MethodMetaConstraint<?> oneReturnValueConstraint : oneMethodMetaData ) {
-						beanConstraints.add( getAsBeanMetaConstraint( oneReturnValueConstraint ) );
-					}
-				}
-
 			}
-
-
-			List<BeanMetaConstraint<?>> adaptedConstraints = newArrayList();
-			for ( BeanMetaConstraint<?> beanMetaConstraint : beanConstraints ) {
-				adaptedConstraints.add( adaptOriginAndImplicitGroup( beanClass, beanMetaConstraint ) );
-			}
-
-			//add constraints configured via property to methods
-			//TODO GM: avoid adding constraints originating from methods in the first place
-			for ( BeanMetaConstraint<?> oneConstraint : adaptedConstraints ) {
-				Member member = oneConstraint.getLocation().getMember();
-				if ( member instanceof Method ) {
-					MethodMetaData methodMetaData = new MethodMetaData(
-							(Method) member,
-							Arrays.<MethodMetaConstraint<?>>asList( getAsMethodMetaConstraint( oneConstraint ) ),
-							false
-					);
-					addMetaDataToBuilder( methodMetaData, builders );
-				}
-			}
-
-			allConstraints.put( oneHierarchyClass, adaptedConstraints );
-			allCascadedMembers.addAll( configurationForHierarchyClass.getCascadedMembers() );
 		}
 
 		Set<AggregatedMethodMetaData> allMethodMetaData = newHashSet();
@@ -248,20 +196,24 @@ public class BeanMetaDataManager {
 			allMethodMetaData.add( oneBuilder.build() );
 		}
 
+		Set<AggregatedPropertyMetaData> allPropertyMetaData = newHashSet();
+		for ( AggregatedPropertyMetaData.Builder oneBuilder : propertyBuilders ) {
+			allPropertyMetaData.add( oneBuilder.build() );
+		}
+
 		return new BeanMetaDataImpl<T>(
 				beanClass,
 				rootConfiguration.getDefaultGroupSequence(),
 				rootConfiguration.getDefaultGroupSequenceProvider(),
-				allConstraints,
-				allMethodMetaData,
-				allCascadedMembers
+				allPropertyMetaData,
+				allMethodMetaData
 		);
 	}
 
 	private void addMetaDataToBuilder(MethodMetaData methodMetaData, Set<AggregatedMethodMetaData.Builder> builders) {
-		for ( AggregatedMethodMetaData.Builder OneBuilder : builders ) {
-			if ( OneBuilder.accepts( methodMetaData ) ) {
-				OneBuilder.addMetaData( methodMetaData );
+		for ( AggregatedMethodMetaData.Builder oneBuilder : builders ) {
+			if ( oneBuilder.accepts( methodMetaData ) ) {
+				oneBuilder.addMetaData( methodMetaData );
 				return;
 			}
 		}
@@ -269,77 +221,17 @@ public class BeanMetaDataManager {
 		builders.add( builder );
 	}
 
-	/**
-	 * Adapts the given constraint to the given bean type. In case the
-	 * constraint is defined locally at the bean class the original constraint
-	 * will be returned without any modifications. If the constraint is defined
-	 * in the hierarchy (interface or super class) a new constraint will be
-	 * returned with an origin of {@link ConstraintOrigin#DEFINED_IN_HIERARCHY}.
-	 * If the constraint is defined on an interface, the interface type will
-	 * additionally be part of the constraint's groups (implicit grouping).
-	 *
-	 * @param <A> The type of the constraint's annotation.
-	 * @param beanClass The bean type to which the constraint shall be adapted.
-	 * @param constraint The constraint that shall be adapted. This constraint itself
-	 * will not be altered.
-	 *
-	 * @return A constraint adapted to the given bean type.
-	 */
-	private <A extends Annotation> BeanMetaConstraint<A> adaptOriginAndImplicitGroup(Class<?> beanClass, BeanMetaConstraint<A> constraint) {
-
-		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
-
-		if ( definedIn == ConstraintOrigin.DEFINED_LOCALLY ) {
-			return constraint;
+	private void addMetaDataToBuilder(PropertyMetaData propertyMetaData, Set<AggregatedPropertyMetaData.Builder> builders) {
+		for ( AggregatedPropertyMetaData.Builder oneBuilder : builders ) {
+			if ( oneBuilder.accepts( propertyMetaData ) ) {
+				oneBuilder.add( propertyMetaData );
+				return;
+			}
 		}
-
-		Class<?> constraintClass = constraint.getLocation().getBeanClass();
-
-		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
-				(A) constraint.getDescriptor().getAnnotation(),
-				constraintHelper,
-				constraintClass.isInterface() ? constraintClass : null,
-				constraint.getElementType(),
-				definedIn
+		AggregatedPropertyMetaData.Builder builder = new AggregatedPropertyMetaData.Builder(
+				constraintHelper, propertyMetaData
 		);
-
-		return new BeanMetaConstraint<A>(
-				descriptor,
-				constraint.getLocation()
-		);
-	}
-
-	/**
-	 * @param rootClass The root class. That is the class for which we currently create a  {@code BeanMetaData}
-	 * @param hierarchyClass The class on which the current constraint is defined on
-	 *
-	 * @return Returns {@code ConstraintOrigin.DEFINED_LOCALLY} if the constraint was defined on the root bean,
-	 *         {@code ConstraintOrigin.DEFINED_IN_HIERARCHY} otherwise.
-	 */
-	private ConstraintOrigin definedIn(Class<?> rootClass, Class<?> hierarchyClass) {
-		if ( hierarchyClass.equals( rootClass ) ) {
-			return ConstraintOrigin.DEFINED_LOCALLY;
-		}
-		else {
-			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
-		}
-	}
-
-	private <A extends Annotation> MethodMetaConstraint<A> getAsMethodMetaConstraint(BeanMetaConstraint<A> beanMetaConstraint) {
-		return new MethodMetaConstraint<A>(
-				beanMetaConstraint.getDescriptor(),
-				new MethodConstraintLocation( (Method) beanMetaConstraint.getLocation().getMember() )
-		);
-	}
-
-	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint) {
-		return new BeanMetaConstraint<A>(
-				methodMetaConstraint.getDescriptor(),
-				new BeanConstraintLocation(
-						methodMetaConstraint.getLocation().getBeanClass(),
-						methodMetaConstraint.getLocation().getMethod()
-				)
-		);
+		builders.add( builder );
 	}
 
 }

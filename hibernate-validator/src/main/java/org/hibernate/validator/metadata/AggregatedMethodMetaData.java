@@ -146,7 +146,7 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 				metaData = existingMetaData.merge( metaData );
 			}
 
-			//use the lowest method found in the hierarchy for this aggregration
+			//use the lowest method found in the hierarchy for this aggregation
 			if ( method.getDeclaringClass().isAssignableFrom( metaData.getMethod().getDeclaringClass() ) ) {
 				method = metaData.getMethod();
 			}

@@ -142,32 +142,29 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public BeanMetaDataImpl(Class<T> beanClass,
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
-							Map<Class<?>, List<BeanMetaConstraint<?>>> constraints,
-							Set<AggregatedMethodMetaData> methodMetaDatas,
-							Set<Member> cascadedMembers) {
+							Set<AggregatedPropertyMetaData> propertyMetaDatas,
+							Set<AggregatedMethodMetaData> methodMetaDatas) {
 		this.beanClass = beanClass;
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 
-		for ( Member member : cascadedMembers ) {
-			addCascadedMember( member );
+		Set<Member> cascadedMembers = newHashSet();
+
+		for ( AggregatedPropertyMetaData oneProperty : propertyMetaDatas ) {
+			if ( oneProperty.isCascading() ) {
+				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
+				addToPropertyNameList( oneProperty.getRoot().getLocation().getMember() );
+			}
 		}
+		this.cascadedMembers = Collections.unmodifiableSet( cascadedMembers );
 
 		classHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy( beanClass, false );
 
 		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider );
 
 		// add the explicitly configured constraints
-		for ( Map.Entry<Class<?>, List<BeanMetaConstraint<?>>> entry : constraints.entrySet() ) {
-			Class<?> clazz = entry.getKey();
-
-			for ( BeanMetaConstraint<?> constraint : entry.getValue() ) {
-				addMetaConstraint( clazz, constraint );
-			}
-		}
-
-		for ( AggregatedMethodMetaData oneMethod : methodMetaDatas ) {
-			if ( ReflectionHelper.isGetterMethod( oneMethod.getMethod() ) ) {
-				addToPropertyNameList( oneMethod.getMethod() );
+		for ( AggregatedPropertyMetaData onePropertyMetaData : propertyMetaDatas ) {
+			for ( BeanMetaConstraint<?> constraint : onePropertyMetaData ) {
+				addMetaConstraint( constraint.getLocation().getBeanClass(), constraint );
 			}
 		}
 
@@ -209,7 +206,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public Set<Member> getCascadedMembers() {
-		return Collections.unmodifiableSet( cascadedMembers );
+		return cascadedMembers;
 	}
 
 	public Map<Class<?>, List<BeanMetaConstraint<?>>> getMetaConstraintsAsMap() {
@@ -371,12 +368,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 			propertyDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
 		}
-	}
-
-	private void addCascadedMember(Member member) {
-		ReflectionHelper.setAccessibility( member );
-		cascadedMembers.add( member );
-		addPropertyDescriptorForMember( member, true );
 	}
 
 	public List<Class<?>> getClassHierarchy() {

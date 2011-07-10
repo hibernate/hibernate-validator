@@ -17,9 +17,11 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -47,6 +49,20 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 	private final boolean hasParameterConstraints;
 
+	public MethodMetaData(
+			Method method,
+			Set<MethodMetaConstraint<?>> returnValueConstraints,
+			boolean isCascading) {
+
+		this(
+				method,
+				Collections.<ParameterMetaData>emptyList(),
+				new ArrayList<MethodMetaConstraint<?>>( returnValueConstraints ),
+				isCascading
+		);
+	}
+
+	@Deprecated
 	public MethodMetaData(
 			Method method,
 			List<MethodMetaConstraint<?>> constraints,

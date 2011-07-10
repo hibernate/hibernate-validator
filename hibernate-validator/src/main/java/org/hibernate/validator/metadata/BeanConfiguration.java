@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.metadata;
 
-import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Set;
 
@@ -29,9 +28,7 @@ public class BeanConfiguration<T> {
 
 	private final Class<T> beanClass;
 
-	private final Set<BeanMetaConstraint<?>> constraints;
-
-	private final Set<Member> cascadedMembers;
+	private final Set<PropertyMetaData> propertyMetaData;
 
 	private final Set<MethodMetaData> methodMetaData;
 
@@ -46,15 +43,13 @@ public class BeanConfiguration<T> {
 	 * @param defaultGroupSequence
 	 */
 	public BeanConfiguration(Class<T> beanClass,
-							 Set<BeanMetaConstraint<?>> constraints,
-							 Set<Member> cascadedMembers,
+							 Set<PropertyMetaData> propertyMetaData,
 							 Set<MethodMetaData> methodMetaData,
 							 List<Class<?>> defaultGroupSequence,
 							 Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		this.beanClass = beanClass;
-		this.constraints = constraints;
-		this.cascadedMembers = cascadedMembers;
+		this.propertyMetaData = propertyMetaData;
 		this.methodMetaData = methodMetaData;
 		this.defaultGroupSequence = defaultGroupSequence;
 		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
@@ -64,12 +59,8 @@ public class BeanConfiguration<T> {
 		return beanClass;
 	}
 
-	public Set<BeanMetaConstraint<?>> getConstraints() {
-		return constraints;
-	}
-
-	public Set<Member> getCascadedMembers() {
-		return cascadedMembers;
+	public Set<PropertyMetaData> getPropertyMetaData() {
+		return propertyMetaData;
 	}
 
 	public Set<MethodMetaData> getMethodMetaData() {
@@ -86,8 +77,7 @@ public class BeanConfiguration<T> {
 
 	public void merge(BeanConfiguration<T> other) {
 
-		constraints.addAll( other.getConstraints() );
-		cascadedMembers.addAll( other.getCascadedMembers() );
+		propertyMetaData.addAll( other.getPropertyMetaData() );
 		methodMetaData.addAll( other.getMethodMetaData() );
 
 		// TODO GM: Determine which default sequence should be taken
@@ -105,8 +95,8 @@ public class BeanConfiguration<T> {
 
 	@Override
 	public String toString() {
-		return "BeanConfiguration [beanClass=" + beanClass + ", constraints="
-				+ constraints + ", cascadedMembers=" + cascadedMembers
+		return "BeanConfiguration [beanClass=" + beanClass
+				+ ", propertyMetaData=" + propertyMetaData
 				+ ", methodMetaData=" + methodMetaData
 				+ ", defaultGroupSequence=" + defaultGroupSequence
 				+ ", defaultGroupSequenceProvider="
