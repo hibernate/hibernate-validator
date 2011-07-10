@@ -204,13 +204,13 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	}
 
 	//TODO GM: use set
-	private List<MethodMetaConstraint<?>> asMethodMetaConstraints(List<ConfiguredConstraint<?, MethodConstraintLocation>> constraints) {
+	private Set<MethodMetaConstraint<?>> asMethodMetaConstraints(List<ConfiguredConstraint<?, MethodConstraintLocation>> constraints) {
 
 		if ( constraints == null ) {
-			return Collections.emptyList();
+			return Collections.emptySet();
 		}
 
-		List<MethodMetaConstraint<?>> theValue = newArrayList();
+		Set<MethodMetaConstraint<?>> theValue = newHashSet();
 
 		for ( ConfiguredConstraint<?, MethodConstraintLocation> oneConfiguredConstraint : constraints ) {
 			theValue.add( asMethodMetaConstraint( oneConfiguredConstraint ) );

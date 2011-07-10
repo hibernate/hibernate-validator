@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.Set;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
@@ -43,7 +43,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 	 */
 	private final List<ParameterMetaData> parameterMetaData;
 
-	private final List<MethodMetaConstraint<?>> returnValueConstraints;
+	private final Set<MethodMetaConstraint<?>> returnValueConstraints;
 
 	private final boolean isCascading;
 
@@ -57,18 +57,9 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 		this(
 				method,
 				Collections.<ParameterMetaData>emptyList(),
-				new ArrayList<MethodMetaConstraint<?>>( returnValueConstraints ),
+				returnValueConstraints,
 				isCascading
 		);
-	}
-
-	@Deprecated
-	public MethodMetaData(
-			Method method,
-			List<MethodMetaConstraint<?>> constraints,
-			boolean isCascading) {
-
-		this( method, Collections.<ParameterMetaData>emptyList(), constraints, isCascading );
 	}
 
 	/**
@@ -87,7 +78,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 	public MethodMetaData(
 			Method method,
 			List<ParameterMetaData> parameterMetaData,
-			List<MethodMetaConstraint<?>> returnValueConstraints,
+			Set<MethodMetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
@@ -101,7 +92,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 		this.method = method;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
-		this.returnValueConstraints = Collections.unmodifiableList( returnValueConstraints );
+		this.returnValueConstraints = Collections.unmodifiableSet( returnValueConstraints );
 		this.isCascading = isCascading;
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
 	}
@@ -218,8 +209,8 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 		boolean isCascading = isCascading() || otherMetaData.isCascading();
 
 		// 1 - aggregate return value constraints
-		List<MethodMetaConstraint<?>> mergedReturnValueConstraints = newArrayList(
-				this, otherMetaData
+		Set<MethodMetaConstraint<?>> mergedReturnValueConstraints = newHashSet(
+				this.returnValueConstraints, otherMetaData.returnValueConstraints
 		);
 
 		// 2 - aggregate parameter metaData. The two method MetaData have the same signature, consequently they

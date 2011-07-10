@@ -18,6 +18,7 @@ package org.hibernate.validator.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +51,16 @@ public class CollectionHelper {
 
 	public static <T> HashSet<T> newHashSet(int size) {
 		return new HashSet<T>( size );
+	}
+
+	public static <T> HashSet<T> newHashSet(Collection<? extends T> c) {
+		return new HashSet<T>( c );
+	}
+
+	public static <T> HashSet<T> newHashSet(Collection<? extends T> s1, Collection<? extends T> s2) {
+		HashSet<T> set = newHashSet( s1 );
+		set.addAll( s2 );
+		return set;
 	}
 
 	public static <T> ArrayList<T> newArrayList() {

@@ -220,15 +220,15 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		List<ParameterMetaData> parameterConstraints = getParameterMetaData( method );
 		boolean isCascading = method.isAnnotationPresent( Valid.class );
-		List<MethodMetaConstraint<?>> constraints =
+		Set<MethodMetaConstraint<?>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
 
 		return new MethodMetaData( method, parameterConstraints, constraints, isCascading );
 	}
 
-	private List<MethodMetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
+	private Set<MethodMetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
 
-		List<MethodMetaConstraint<?>> constraints = newArrayList();
+		Set<MethodMetaConstraint<?>> constraints = newHashSet();
 
 		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
 			constraints.add( createReturnValueMetaConstraint( method, oneDescriptor ) );
@@ -255,7 +255,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 			boolean parameterIsCascading = false;
 			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-			List<MethodMetaConstraint<?>> constraintsOfOneParameter = newArrayList();
+			Set<MethodMetaConstraint<?>> constraintsOfOneParameter = newHashSet();
 
 			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
 

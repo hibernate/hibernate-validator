@@ -18,9 +18,9 @@ package org.hibernate.validator.metadata;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -35,16 +35,16 @@ public class ParameterMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 	private final String name;
 
-	private final List<MethodMetaConstraint<?>> constraints;
+	private final Set<MethodMetaConstraint<?>> constraints;
 
 	private final boolean isCascading;
 
-	public ParameterMetaData(int index, Class<?> type, String name, List<MethodMetaConstraint<?>> constraints, boolean isCascading) {
+	public ParameterMetaData(int index, Class<?> type, String name, Set<MethodMetaConstraint<?>> constraints, boolean isCascading) {
 
 		this.index = index;
 		this.type = type;
 		this.name = name;
-		this.constraints = Collections.unmodifiableList( constraints );
+		this.constraints = Collections.unmodifiableSet( constraints );
 		this.isCascading = isCascading;
 	}
 
@@ -87,7 +87,7 @@ public class ParameterMetaData implements Iterable<MethodMetaConstraint<?>> {
 				index,
 				type,
 				name,
-				newArrayList( this, otherMetaData ),
+				newHashSet( this.constraints, otherMetaData.constraints ),
 				isCascading() || otherMetaData.isCascading()
 		);
 	}
