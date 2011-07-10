@@ -41,15 +41,21 @@ import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 
-import static org.hibernate.validator.metadata.BeanMetaDataImpl.DEFAULT_PARAMETER_NAME_PREFIX;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.CollectionHelper.partition;
 
 /**
+ * A {@link MetaDataProvider} based on the programmatic constraint API.
+ *
  * @author Gunnar Morling
  */
 public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBase {
+
+	/**
+	 * Used as prefix for parameter names, if no explicit names are given.
+	 */
+	public static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
 
 	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, ConstraintMapping mapping) {
 

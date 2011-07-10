@@ -60,11 +60,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private static final Logger log = LoggerFactory.make();
 
 	/**
-	 * Used as prefix for parameter names, if no explicit names are given.
-	 */
-	public static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
-
-	/**
 	 * The root bean class for this meta data.
 	 */
 	private final Class<T> beanClass;
