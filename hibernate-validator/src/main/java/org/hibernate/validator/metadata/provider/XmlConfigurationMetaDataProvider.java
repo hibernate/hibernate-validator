@@ -106,7 +106,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		Set<BeanConstraintLocation> theValue = newHashSet();
 
 		for ( Member member : mappingParser.getCascadedMembersForClass( clazz ) ) {
-			theValue.add( new BeanConstraintLocation( member.getDeclaringClass(), member ) );
+			theValue.add( new BeanConstraintLocation( member ) );
 		}
 
 		return theValue;

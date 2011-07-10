@@ -20,7 +20,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
-
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -53,10 +52,10 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Class<?> beanType, Member member) {
+	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Member member) {
 
 		return new ConfiguredConstraint<A, BeanConstraintLocation>(
-				constraint, new BeanConstraintLocation( beanType, member )
+				constraint, new BeanConstraintLocation( member )
 		);
 	}
 
@@ -87,7 +86,7 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 	public Map<String, Object> getParameters() {
 		return constraint.getParameters();
 	}
-	
+
 	public A createAnnotationProxy() {
 
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( getConstraintType() );

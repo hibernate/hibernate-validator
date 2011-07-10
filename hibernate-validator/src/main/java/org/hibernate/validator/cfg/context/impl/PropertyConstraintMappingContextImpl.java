@@ -45,14 +45,14 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 
 		mapping.addConstraintConfig(
 				ConfiguredConstraint.forProperty(
-						definition, beanClass, member
+						definition, member
 				)
 		);
 		return this;
 	}
 
 	public PropertyConstraintMappingContext valid() {
-		mapping.addCascadeConfig( new BeanConstraintLocation( beanClass, member ) );
+		mapping.addCascadeConfig( new BeanConstraintLocation( member ) );
 		return this;
 	}
 }

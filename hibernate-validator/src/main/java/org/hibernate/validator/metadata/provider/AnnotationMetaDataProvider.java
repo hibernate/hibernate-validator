@@ -76,8 +76,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	/**
-	 * Checks whether there is a default group sequence defined for this class.
-	 * See HV-113.
+	 * Retrieves constraint related meta data from the annotations of the given type.
 	 */
 	private void retrieveBeanMetaData(Class<?> beanClass) {
 
@@ -85,12 +84,14 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 //			return;
 //		}
 
-		Set<PropertyMetaData> propertyMetaData = getFieldConstraints( beanClass );
+		Set<PropertyMetaData> propertyMetaData = getPropertyMetaData( beanClass );
 
-		Set<MethodMetaData> methodMetaData = getMethodConstraints( beanClass, annotationIgnores );
+		Set<MethodMetaData> methodMetaData = getMethodMetaData( beanClass );
 		propertyMetaData.addAll( getGettersAsPropertyMetaData( methodMetaData ) );
 
-		Set<BeanMetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( beanClass, annotationIgnores );
+		//TODO GM: currently class level constraints are represented by a PropertyMetaData. This
+		//works but seems somewhat unnatural
+		Set<BeanMetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( beanClass );
 		if ( !classLevelConstraints.isEmpty() ) {
 			PropertyMetaData classLevelMetaData =
 					new PropertyMetaData(
@@ -113,49 +114,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		);
 	}
 
-	/**
-	 * @param beanClass
-	 *
-	 * @return
-	 */
-	private Set<PropertyMetaData> getFieldConstraints(Class<?> beanClass) {
-		Set<PropertyMetaData> propertyMetaData = newHashSet();
-
-		final Field[] fields = ReflectionHelper.getDeclaredFields( beanClass );
-		for ( Field field : fields ) {
-
-			// HV-172
-			if ( Modifier.isStatic( field.getModifiers() ) ) {
-				continue;
-			}
-
-			if ( annotationIgnores.isIgnoreAnnotations( field ) ) {
-				continue;
-			}
-
-			if ( field.isSynthetic() ) {
-				continue;
-			}
-
-			Set<BeanMetaConstraint<?>> constraints = newHashSet();
-
-			for ( ConstraintDescriptorImpl<?> constraintDescription : findConstraints( field, ElementType.FIELD ) ) {
-				constraints.add( createBeanMetaConstraint( beanClass, field, constraintDescription ) );
-			}
-
-			boolean isCascading = field.isAnnotationPresent( Valid.class );
-
-			propertyMetaData.add(
-					new PropertyMetaData(
-							constraints,
-							new BeanConstraintLocation( beanClass, field ),
-							isCascading
-					)
-			);
-		}
-		return propertyMetaData;
-	}
-
 	private List<Class<?>> getDefaultGroupSequence(Class<?> beanClass) {
 
 		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
@@ -168,7 +126,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		return groupSequenceProviderAnnotation != null ? groupSequenceProviderAnnotation.value() : null;
 	}
 
-	private Set<BeanMetaConstraint<?>> getClassLevelConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
+	private Set<BeanMetaConstraint<?>> getClassLevelConstraints(Class<?> clazz) {
 		if ( annotationIgnores.isIgnoreAnnotations( clazz ) ) {
 			return Collections.emptySet();
 		}
@@ -179,13 +137,57 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		List<ConstraintDescriptorImpl<?>> classMetaData = findClassLevelConstraints( clazz );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
-			classLevelConstraints.add( createBeanMetaConstraint( clazz, null, constraintDescription ) );
+			classLevelConstraints.add( createBeanMetaConstraint( clazz, constraintDescription ) );
 		}
 
 		return classLevelConstraints;
 	}
 
-	private Set<MethodMetaData> getMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores) {
+	private Set<PropertyMetaData> getPropertyMetaData(Class<?> beanClass) {
+		Set<PropertyMetaData> propertyMetaData = newHashSet();
+
+		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
+
+			// HV-172
+			if ( Modifier.isStatic( field.getModifiers() ) ||
+					annotationIgnores.isIgnoreAnnotations( field ) ||
+					field.isSynthetic() ) {
+
+				continue;
+			}
+
+			propertyMetaData.add( findPropertyMetaData( field ) );
+		}
+		return propertyMetaData;
+	}
+
+	private PropertyMetaData findPropertyMetaData(Field field) {
+
+		Set<BeanMetaConstraint<?>> constraints = convertToMetaConstraints(
+				findConstraints( field, ElementType.FIELD ),
+				field
+		);
+
+		boolean isCascading = field.isAnnotationPresent( Valid.class );
+
+		return
+				new PropertyMetaData(
+						constraints,
+						new BeanConstraintLocation( field ),
+						isCascading
+				);
+	}
+
+	private Set<BeanMetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
+		Set<BeanMetaConstraint<?>> constraints = newHashSet();
+
+		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
+			constraints.add( createBeanMetaConstraint( field, constraintDescription ) );
+		}
+		return constraints;
+	}
+
+	private Set<MethodMetaData> getMethodMetaData(Class<?> clazz) {
 
 		Set<MethodMetaData> methodMetaData = newHashSet();
 
@@ -204,18 +206,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		}
 
 		return methodMetaData;
-	}
-
-	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Class<?> declaringClass, Member m, ConstraintDescriptorImpl<A> descriptor) {
-		return new BeanMetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass, m ) );
-	}
-
-	private <A extends Annotation> MethodMetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MethodMetaConstraint<A>( descriptor, method, parameterIndex );
-	}
-
-	private <A extends Annotation> MethodMetaConstraint<A> createReturnValueMetaConstraint(Method method, ConstraintDescriptorImpl<A> descriptor) {
-		return new MethodMetaConstraint<A>( descriptor, method );
 	}
 
 	/**
@@ -364,6 +354,22 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
+	}
+
+	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Class<?> declaringClass, ConstraintDescriptorImpl<A> descriptor) {
+		return new BeanMetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass ) );
+	}
+
+	private <A extends Annotation> BeanMetaConstraint<?> createBeanMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
+		return new BeanMetaConstraint<A>( descriptor, new BeanConstraintLocation( member ) );
+	}
+
+	private <A extends Annotation> MethodMetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MethodMetaConstraint<A>( descriptor, method, parameterIndex );
+	}
+
+	private <A extends Annotation> MethodMetaConstraint<A> createReturnValueMetaConstraint(Method method, ConstraintDescriptorImpl<A> descriptor) {
+		return new MethodMetaConstraint<A>( descriptor, method );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {

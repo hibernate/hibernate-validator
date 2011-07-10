@@ -88,9 +88,7 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 				theValue.add(
 						new PropertyMetaData(
 								getAsBeanMetaConstraints( oneMethodMetaData ),
-								new BeanConstraintLocation(
-										oneMethodMetaData.getMethod().getDeclaringClass(), oneMethodMetaData.getMethod()
-								),
+								new BeanConstraintLocation( oneMethodMetaData.getMethod() ),
 								oneMethodMetaData.isCascading()
 						)
 				);
@@ -135,7 +133,6 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 		return new BeanMetaConstraint<A>(
 				methodMetaConstraint.getDescriptor(),
 				new BeanConstraintLocation(
-						methodMetaConstraint.getLocation().getBeanClass(),
 						methodMetaConstraint.getLocation().getMethod()
 				)
 		);
