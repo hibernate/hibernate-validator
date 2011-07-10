@@ -74,7 +74,7 @@ public class XmlMappingParser {
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
 	private final AnnotationIgnores annotationIgnores;
-	private final Map<Class<?>, List<BeanMetaConstraint<?>>> constraintMap;
+	private final Map<Class<?>, Set<BeanMetaConstraint<?>>> constraintMap;
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
@@ -113,11 +113,11 @@ public class XmlMappingParser {
 		return annotationIgnores;
 	}
 
-	public final <T> List<BeanMetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
+	public final <T> Set<BeanMetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
 
-		List<BeanMetaConstraint<?>> theValue = constraintMap.get( beanClass );
+		Set<BeanMetaConstraint<?>> theValue = constraintMap.get( beanClass );
 
-		return theValue != null ? theValue : Collections.<BeanMetaConstraint<?>>emptyList();
+		return theValue != null ? theValue : Collections.<BeanMetaConstraint<?>>emptySet();
 	}
 
 	public final List<Member> getCascadedMembersForClass(Class<?> beanClass) {
@@ -291,7 +291,7 @@ public class XmlMappingParser {
 			constraintMap.get( beanClass ).add( metaConstraint );
 		}
 		else {
-			List<BeanMetaConstraint<?>> constraintList = newArrayList();
+			Set<BeanMetaConstraint<?>> constraintList = newHashSet();
 			constraintList.add( metaConstraint );
 			constraintMap.put( beanClass, constraintList );
 		}

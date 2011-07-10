@@ -120,6 +120,41 @@ public class CollectionHelper {
 		return theValue;
 	}
 
+	/**
+	 * Creates a map containing the given set's values partitioned by the given
+	 * partitioner.
+	 *
+	 * @param <K> The key type of the resulting map.
+	 * @param <V> The element type of the set to be partitioned.
+	 * @param set The set to be partitioned.
+	 * @param partitioner The partitioner to be used for determining the partitions.
+	 *
+	 * @return A map containing the given set's values partitioned by the given
+	 *         partitioner.
+	 */
+	public static <K, V> Map<K, Set<V>> partition(Set<V> set, Partitioner<K, V> partitioner) {
+
+		if ( set == null ) {
+			return Collections.emptyMap();
+		}
+
+		Map<K, Set<V>> theValue = newHashMap();
+
+		for ( V v : set ) {
+			K key = partitioner.getPartition( v );
+
+			Set<V> partition = theValue.get( key );
+			if ( partition == null ) {
+				partition = newHashSet();
+				theValue.put( key, partition );
+			}
+
+			partition.add( v );
+		}
+
+		return theValue;
+	}
+
 	public interface Partitioner<K, V> {
 
 		K getPartition(V v);

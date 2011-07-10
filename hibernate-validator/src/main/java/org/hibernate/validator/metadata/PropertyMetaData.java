@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Member;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ public class PropertyMetaData implements Iterable<BeanMetaConstraint<?>> {
 	public PropertyMetaData(Set<BeanMetaConstraint<?>> constraints,
 							BeanConstraintLocation location, boolean isCascading) {
 
-		this.constraints = constraints;
+		this.constraints = constraints != null ? constraints : Collections.<BeanMetaConstraint<?>>emptySet();
 		this.location = location;
 		this.isCascading = isCascading;
 

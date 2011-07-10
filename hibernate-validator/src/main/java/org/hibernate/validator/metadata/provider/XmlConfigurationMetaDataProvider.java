@@ -19,15 +19,12 @@ package org.hibernate.validator.metadata.provider;
 import java.io.InputStream;
 import java.lang.reflect.Member;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanConfiguration;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.PropertyMetaData;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
@@ -37,6 +34,9 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.CollectionHelper.partition;
 
 /**
+ * A {@link MetaDataProvider} providing constraint related meta data based on
+ * XML descriptors as defined by the Bean Validation API.
+ *
  * @author Gunnar Morling
  */
 public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
@@ -55,37 +55,19 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 
 		for ( Class<?> clazz : mappingParser.getXmlConfiguredClasses() ) {
 
-			Map<BeanConstraintLocation, List<BeanMetaConstraint<?>>> constraintsByLocation = partition(
-					mappingParser.getConstraintsForClass(
-							clazz
-					), byLocation()
+			Map<BeanConstraintLocation, Set<BeanMetaConstraint<?>>> constraintsByLocation = partition(
+					mappingParser.getConstraintsForClass( clazz ), byLocation()
 			);
 			Set<BeanConstraintLocation> cascades = getCascades( mappingParser, clazz );
 
-			Set<BeanConstraintLocation> allConfiguredProperties = new HashSet<BeanConstraintLocation>( cascades );
-			allConfiguredProperties.addAll( constraintsByLocation.keySet() );
-
-			Set<PropertyMetaData> propertyMetaData = newHashSet();
-			for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
-				propertyMetaData.add(
-						new PropertyMetaData(
-								constraintsByLocation.containsKey( oneConfiguredProperty ) ? new HashSet<BeanMetaConstraint<?>>(
-										constraintsByLocation.get( oneConfiguredProperty )
-								) : new HashSet<BeanMetaConstraint<?>>(),
-								oneConfiguredProperty,
-								cascades.contains( oneConfiguredProperty )
-						)
-				);
-			}
-
-			Set<MethodMetaData> methodMetaData = getGettersAsMethodMetaData( propertyMetaData );
+			Set<PropertyMetaData> propertyMetaData = retrievePropertyMetaData( constraintsByLocation, cascades );
 
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
 							clazz,
 							propertyMetaData,
-							methodMetaData,
+							getGettersAsMethodMetaData( propertyMetaData ),
 							mappingParser.getDefaultSequenceForClass( clazz ),
 							null
 					)
@@ -93,6 +75,27 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		}
 
 		annotationIgnores = mappingParser.getAnnotationIgnores();
+	}
+
+	private Set<PropertyMetaData> retrievePropertyMetaData(Map<BeanConstraintLocation, Set<BeanMetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
+
+		Set<BeanConstraintLocation> allConfiguredProperties = new HashSet<BeanConstraintLocation>( cascades );
+		allConfiguredProperties.addAll( constraintsByLocation.keySet() );
+
+		Set<PropertyMetaData> propertyMetaData = newHashSet();
+
+		for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
+
+			propertyMetaData.add(
+					new PropertyMetaData(
+							constraintsByLocation.get( oneConfiguredProperty ),
+							oneConfiguredProperty,
+							cascades.contains( oneConfiguredProperty )
+					)
+			);
+		}
+
+		return propertyMetaData;
 	}
 
 	/**
@@ -110,10 +113,6 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		}
 
 		return theValue;
-	}
-
-	public Set<BeanConfiguration<?>> getAllBeanConfigurations() {
-		return new HashSet<BeanConfiguration<?>>( configuredBeans.values() );
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
