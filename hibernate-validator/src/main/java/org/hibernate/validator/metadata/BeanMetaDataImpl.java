@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
-import javax.validation.Valid;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -93,15 +91,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private Map<Method, AggregatedMethodMetaData> methodMetaData;
 
+	private final Map<String, AggregatedPropertyMetaData> propertyMetaData;
+
 	/**
 	 * List of cascaded members.
 	 */
 	private Set<Member> cascadedMembers = newHashSet();
-
-	/**
-	 * Maps field and method names to their {@code ElementDescriptorImpl}.
-	 */
-	private Map<String, PropertyDescriptor> propertyDescriptors = newHashMap();
 
 	/**
 	 * The default groups sequence for this bean class.
@@ -147,13 +142,19 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.beanClass = beanClass;
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 
+		this.propertyMetaData = newHashMap();
+
+		for ( AggregatedPropertyMetaData oneProperty : propertyMetaDatas ) {
+			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
+		}
+
 		Set<Member> cascadedMembers = newHashSet();
 
 		for ( AggregatedPropertyMetaData oneProperty : propertyMetaDatas ) {
 			if ( oneProperty.isCascading() ) {
 				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
-				addToPropertyNameList( oneProperty.getRoot().getLocation().getMember() );
 			}
+			propertyNames.add( oneProperty.getPropertyName() );
 		}
 		this.cascadedMembers = Collections.unmodifiableSet( cascadedMembers );
 
@@ -229,8 +230,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new HashSet<AggregatedMethodMetaData>( methodMetaData.values() );
 	}
 
-	public PropertyDescriptor getPropertyDescriptor(String property) {
-		return propertyDescriptors.get( property );
+	public PropertyDescriptor getPropertyDescriptor(String propertyName) {
+		AggregatedPropertyMetaData property = propertyMetaData.get( propertyName );
+		return property != null ? property.getPropertyDescriptor() : null;
 	}
 
 	public boolean isPropertyPresent(String name) {
@@ -255,7 +257,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public Set<PropertyDescriptor> getConstrainedProperties() {
-		return Collections.unmodifiableSet( new HashSet<PropertyDescriptor>( propertyDescriptors.values() ) );
+
+		Set<PropertyDescriptor> theValue = newHashSet();
+
+		for ( AggregatedPropertyMetaData oneProperty : propertyMetaData.values() ) {
+			if ( oneProperty.isConstrained() ) {
+				theValue.add( oneProperty.getPropertyDescriptor() );
+			}
+		}
+
+		return Collections.unmodifiableSet( theValue );
 	}
 
 	private Set<BeanMetaConstraint<?>> buildAllConstraintSets() {
@@ -358,49 +369,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( metaConstraint.getElementType() == ElementType.TYPE ) {
 			beanDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
 		}
-		else {
-			PropertyDescriptorImpl propertyDescriptor = (PropertyDescriptorImpl) propertyDescriptors.get(
-					metaConstraint.getLocation().getPropertyName()
-			);
-			if ( propertyDescriptor == null ) {
-				Member member = metaConstraint.getLocation().getMember();
-				propertyDescriptor = addPropertyDescriptorForMember( member, isValidAnnotationPresent( member ) );
-			}
-			propertyDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
-		}
 	}
 
 	public List<Class<?>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
-	}
-
-	private void addToPropertyNameList(Member member) {
-		String name = ReflectionHelper.getPropertyName( member );
-		if ( name != null ) {
-			propertyNames.add( name );
-		}
-	}
-
-	private PropertyDescriptorImpl addPropertyDescriptorForMember(Member member, boolean isCascaded) {
-		String name = ReflectionHelper.getPropertyName( member );
-		addToPropertyNameList( member );
-		PropertyDescriptorImpl propertyDescriptor = (PropertyDescriptorImpl) propertyDescriptors.get(
-				name
-		);
-		if ( propertyDescriptor == null ) {
-			propertyDescriptor = new PropertyDescriptorImpl(
-					ReflectionHelper.getType( member ),
-					isCascaded,
-					name,
-					this
-			);
-			propertyDescriptors.put( name, propertyDescriptor );
-		}
-		return propertyDescriptor;
-	}
-
-	private boolean isValidAnnotationPresent(Member member) {
-		return ( (AnnotatedElement) member ).isAnnotationPresent( Valid.class );
 	}
 
 	@SuppressWarnings("unchecked")

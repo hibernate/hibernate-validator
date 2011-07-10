@@ -17,9 +17,12 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Set;
+import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -30,20 +33,26 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?>> {
 
-	private final PropertyMetaData root;
+	private final Class<?> type;
+
+	private final String propertyName;
 
 	private final Set<BeanMetaConstraint<?>> constraints;
 
 	private final Set<Member> cascadingMembers;
 
-	private AggregatedPropertyMetaData(PropertyMetaData root, Set<BeanMetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
-		this.root = root;
+	private final boolean isConstrained;
+
+	private AggregatedPropertyMetaData(Class<?> type, String propertyName, Set<BeanMetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
+		this.type = type;
+		this.propertyName = propertyName;
 		this.constraints = constraints;
 		this.cascadingMembers = cascadingMembers;
+		this.isConstrained = !cascadingMembers.isEmpty() || !constraints.isEmpty();
 	}
 
-	public PropertyMetaData getRoot() {
-		return root;
+	public String getPropertyName() {
+		return propertyName;
 	}
 
 	public boolean isCascading() {
@@ -58,6 +67,25 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 		return constraints.iterator();
 	}
 
+	public boolean isConstrained() {
+		return isConstrained;
+	}
+
+	public PropertyDescriptor getPropertyDescriptor() {
+
+		if ( !isConstrained ) {
+			return null;
+		}
+
+		PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
+				type, isCascading(), getPropertyName(), null
+		);
+		for ( BeanMetaConstraint<?> oneConstraint : constraints ) {
+			propertyDescriptor.addConstraintDescriptor( oneConstraint.getDescriptor() );
+		}
+		return propertyDescriptor;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -67,7 +95,8 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 				+ ( ( cascadingMembers == null ) ? 0 : cascadingMembers.hashCode() );
 		result = prime * result
 				+ ( ( constraints == null ) ? 0 : constraints.hashCode() );
-		result = prime * result + ( ( root == null ) ? 0 : root.hashCode() );
+		result = prime * result
+				+ ( ( propertyName == null ) ? 0 : propertyName.hashCode() );
 		return result;
 	}
 
@@ -99,12 +128,12 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 		else if ( !constraints.equals( other.constraints ) ) {
 			return false;
 		}
-		if ( root == null ) {
-			if ( other.root != null ) {
+		if ( propertyName == null ) {
+			if ( other.propertyName != null ) {
 				return false;
 			}
 		}
-		else if ( !root.equals( other.root ) ) {
+		else if ( !propertyName.equals( other.propertyName ) ) {
 			return false;
 		}
 		return true;
@@ -112,8 +141,9 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 
 	@Override
 	public String toString() {
-		return "AggregatedPropertyMetaData [root=" + root + ", constraints="
-				+ constraints + ", cascadingMembers=" + cascadingMembers + "]";
+		return "AggregatedPropertyMetaData [propertyName=" + propertyName
+				+ ", constraints=" + constraints + ", cascadingMembers="
+				+ cascadingMembers + "]";
 	}
 
 	public static class Builder {
@@ -167,7 +197,13 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 				);
 			}
 
-			return new AggregatedPropertyMetaData( root, adaptedConstraints, cascadingMembers );
+			Member member = root.getLocation().getMember();
+			return new AggregatedPropertyMetaData(
+					member != null ? member instanceof Field ? ( (Field) member ).getType() : ( (Method) member ).getReturnType() : null,
+					member != null ? ReflectionHelper.getPropertyName( member ) : null,
+					adaptedConstraints,
+					cascadingMembers
+			);
 		}
 
 		/**
