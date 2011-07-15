@@ -58,8 +58,8 @@
             <artifactId>jboss-as-arquillian-container-managed</artifactId>
         </dependency>
         <dependency>
-                <groupId>org.jboss.arquillian.container</groupId>
-                <artifactId>arquillian-container-impl-base</artifactId>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-impl-base</artifactId>
         </dependency>
     </dependencies>
 
@@ -163,6 +163,8 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager</argLine>
+                            <forkMode>once</forkMode>
                             <suiteXmlFiles>
                                 <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-suite.xml</suiteXmlFile>
                             </suiteXmlFiles>
@@ -193,7 +195,7 @@
                                 </property>
                                 <property>
                                     <name>jboss.options</name>
-                                    <value>-Xms128m -Xmx512m -XX:MaxPermSize=512m -enableassertions
+                                    <value>-Xmx1024m -XX:MaxPermSize=512m -enableassertions
                                         -Dvalidation.provider=${validation.provider} ${remote.debug}
                                     </value>
                                 </property>
