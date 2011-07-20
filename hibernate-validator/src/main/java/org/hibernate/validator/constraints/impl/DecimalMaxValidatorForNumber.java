@@ -56,7 +56,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 			return ( new BigDecimal( ( BigInteger ) value ) ).compareTo( maxValue ) != 1;
 		}
 		else {
-			return ( BigDecimal.valueOf( value.longValue() ).compareTo( maxValue ) ) != 1;
+			return ( BigDecimal.valueOf( value.doubleValue() ).compareTo( maxValue ) ) != 1;
 		}
 	}
 }

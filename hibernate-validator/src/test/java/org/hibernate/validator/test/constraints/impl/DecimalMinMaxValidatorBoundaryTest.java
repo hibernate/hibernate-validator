@@ -36,11 +36,10 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  * @author Hardy Ferentschik
  */
 public class DecimalMinMaxValidatorBoundaryTest {
-	public double d;
+	public Double d;
 
 	@Test
 	public void testDecimalMinValue() {
-		// use programmatic mapping api to configure constraint
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
 				.property( "d", FIELD )
@@ -56,7 +55,6 @@ public class DecimalMinMaxValidatorBoundaryTest {
 
 	@Test
 	public void testDecimalMaxValue() {
-		// use programmatic mapping api to configure constraint
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
 				.property( "d", FIELD )
@@ -68,5 +66,48 @@ public class DecimalMinMaxValidatorBoundaryTest {
 
 		Set<ConstraintViolation<DecimalMinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
 		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+
+	@Test	  // see HV-508
+	public void testDoubleTrouble() {
+		ConstraintMapping mapping = new ConstraintMapping();
+		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
+				.property( "d", FIELD )
+				.constraint( new DecimalMaxDef().value( "1.2" ) );
+
+		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+
+		this.d = 1.0;
+		Set<ConstraintViolation<DecimalMinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		this.d = 1.1;
+		constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		this.d = 1.19;
+		constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		this.d = 1.20;
+		constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		this.d = 1.3;
+		constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		this.d = 1.51;
+		constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		this.d = 1.9;
+		constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		this.d = 2.000000001;
+		constraintViolations = validator.validate( this );
+		assertNumberOfViolations( constraintViolations, 1 );
 	}
 }

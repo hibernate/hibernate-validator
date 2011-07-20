@@ -57,7 +57,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 			return ( new BigDecimal( ( BigInteger ) value ) ).compareTo( minValue ) != -1;
 		}
 		else {
-			return ( BigDecimal.valueOf( value.longValue() ).compareTo( minValue ) ) != -1;
+			return ( BigDecimal.valueOf( value.doubleValue() ).compareTo( minValue ) ) != -1;
 		}
 	}
 }
