@@ -51,10 +51,13 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		}
 
 		if ( value instanceof BigDecimal ) {
-			return ( ( BigDecimal ) value ).compareTo( minValue ) != -1;
+			return ( (BigDecimal) value ).compareTo( minValue ) != -1;
 		}
 		else if ( value instanceof BigInteger ) {
-			return ( new BigDecimal( ( BigInteger ) value ) ).compareTo( minValue ) != -1;
+			return ( new BigDecimal( (BigInteger) value ) ).compareTo( minValue ) != -1;
+		}
+		if ( value instanceof Long ) {
+			return ( BigDecimal.valueOf( value.longValue() ).compareTo( minValue ) ) != -1;
 		}
 		else {
 			return ( BigDecimal.valueOf( value.doubleValue() ).compareTo( minValue ) ) != -1;

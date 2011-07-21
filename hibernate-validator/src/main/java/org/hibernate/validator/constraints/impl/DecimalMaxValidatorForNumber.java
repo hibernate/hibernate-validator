@@ -50,10 +50,13 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 		}
 
 		if ( value instanceof BigDecimal ) {
-			return ( ( BigDecimal ) value ).compareTo( maxValue ) != 1;
+			return ( (BigDecimal) value ).compareTo( maxValue ) != 1;
 		}
 		else if ( value instanceof BigInteger ) {
-			return ( new BigDecimal( ( BigInteger ) value ) ).compareTo( maxValue ) != 1;
+			return ( new BigDecimal( (BigInteger) value ) ).compareTo( maxValue ) != 1;
+		}
+		else if ( value instanceof Long ) {
+			return ( BigDecimal.valueOf( value.longValue() ).compareTo( maxValue ) ) != 1;
 		}
 		else {
 			return ( BigDecimal.valueOf( value.doubleValue() ).compareTo( maxValue ) ) != 1;
