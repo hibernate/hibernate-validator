@@ -72,7 +72,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
         <slf4jVersion>1.6.1</slf4jVersion>
-        <jsr303.tck.version>1.0.5.GA</jsr303.tck.version>
+        <jsr303.tck.version>1.0.6.GA</jsr303.tck.version>
         <arquillian.version>1.0.0.CR1</arquillian.version>
         <jbossas.version>7.0.0.CR1</jbossas.version>
     </properties>
