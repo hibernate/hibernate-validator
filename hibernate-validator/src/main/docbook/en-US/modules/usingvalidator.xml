@@ -177,7 +177,7 @@ public class Car {
       <classname>Car</classname>. We also add the constraint
       <classname>PassengerCount</classname> on the class level. We will later
       see how we can actually create this custom constraint (see <xref
-      linkend="validator-customconstraints" />). For now we it is enough to
+      linkend="validator-customconstraints" />). For now it is enough to
       know that <classname>PassengerCount</classname> will ensure that there
       cannot be more passengers in a car than there are seats.</para>
 
