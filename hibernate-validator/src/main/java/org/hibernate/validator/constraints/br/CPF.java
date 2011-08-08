@@ -44,7 +44,7 @@ import org.hibernate.validator.constraints.ModCheck.ModType;
  */
 @Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})")
 @List({ @ModCheck(value = ModType.MOD11, checkDigitPosition = 9, multiplier = 10, rangeEnd = 9),
-        @ModCheck(value = ModType.MOD11, checkDigitPosition = 10, multiplier = 11, rangeEnd = 9) })
+        @ModCheck(value = ModType.MOD11, checkDigitPosition = 10, multiplier = 11, rangeEnd = 10) })
 @ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = {})
