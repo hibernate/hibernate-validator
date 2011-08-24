@@ -22,13 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
-import org.hibernate.validator.metadata.MethodMetaData.Builder;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.asSet;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;

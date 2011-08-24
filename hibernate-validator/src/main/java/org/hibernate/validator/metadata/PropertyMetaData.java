@@ -16,21 +16,21 @@
 */
 package org.hibernate.validator.metadata;
 
+import static org.hibernate.validator.util.CollectionHelper.asSet;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
+import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.util.ReflectionHelper;
-
-import static org.hibernate.validator.util.CollectionHelper.asSet;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * @author Gunnar Morling
@@ -46,7 +46,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	private final boolean isConstrained;
 
 	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
-		super(constraints, ConstrainedElementKind.PROPERTY);
+		super(constraints, ConstraintMetaDataKind.PROPERTY);
 		this.type = type;
 		this.propertyName = propertyName;
 		this.cascadingMembers = cascadingMembers;

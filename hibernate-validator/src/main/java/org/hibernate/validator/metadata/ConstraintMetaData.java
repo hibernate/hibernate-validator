@@ -22,10 +22,10 @@ package org.hibernate.validator.metadata;
  */
 public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 
-	public static enum ConstrainedElementKind {
-		TYPE, FIELD, METHOD, PARAMETER, PROPERTY;
+	public static enum ConstraintMetaDataKind {
+		METHOD, PROPERTY;
 	}
 	
-	ConstrainedElementKind getConstrainedElementKind();
+	ConstraintMetaDataKind getConstrainedMetaDataKind();
 	
 }

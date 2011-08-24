@@ -35,7 +35,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
+import org.hibernate.validator.metadata.ConstraintMetaData.ConstraintMetaDataKind;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -150,7 +150,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		
 		for ( ConstraintMetaData oneElement : constrainableElements ) {
 	
-			if( oneElement.getConstrainedElementKind() == ConstrainedElementKind.PROPERTY ) {
+			if( oneElement.getConstrainedMetaDataKind() == ConstraintMetaDataKind.PROPERTY ) {
 				propertyMetaDatas.add((PropertyMetaData)oneElement);
 			}
 			else {

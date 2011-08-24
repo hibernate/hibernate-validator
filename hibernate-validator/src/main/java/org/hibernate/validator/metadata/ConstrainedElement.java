@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
@@ -25,6 +24,10 @@ import org.hibernate.validator.metadata.location.ConstraintLocation;
  */
 public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 
+	public static enum ConstrainedElementKind {
+		TYPE, FIELD, METHOD, PARAMETER;
+	}
+	
 	ConstrainedElementKind getConstrainedElementKind();
 	
 	ConstraintLocation getLocation();

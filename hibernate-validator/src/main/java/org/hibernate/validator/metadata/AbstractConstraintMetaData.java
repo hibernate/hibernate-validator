@@ -28,31 +28,31 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	protected final Set<MetaConstraint<?>> constraints;
 	
-	private final ConstrainedElementKind constrainedElementKind;
+	private final ConstraintMetaDataKind constrainedMetaDataKind;
 	
 	/**
 	 * @param constraints
-	 * @param constrainedElementKind
+	 * @param constrainedMetaDataKind
 	 */
-	public AbstractConstraintMetaData( Set<MetaConstraint<?>> constraints, ConstrainedElementKind constrainedElementKind) {
+	public AbstractConstraintMetaData( Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind) {
 
 		this.constraints = Collections.unmodifiableSet( constraints );
-		this.constrainedElementKind = constrainedElementKind;
+		this.constrainedMetaDataKind = constrainedMetaDataKind;
 	}
 
 	public Iterator<MetaConstraint<?>> iterator() {
 		return constraints.iterator();
 	}
 
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return constrainedElementKind;
+	public ConstraintMetaDataKind getConstrainedMetaDataKind() {
+		return constrainedMetaDataKind;
 	}
 
 	@Override
 	public String toString() {
-		return "AbstractAggregatedConstrainedElement [constraints="
-				+ constraints + ", constrainedElementKind="
-				+ constrainedElementKind + "]";
+		return "AbstractConstraintMetaData [constraints="
+				+ constraints + ", constrainedMetaDataKind="
+				+ constrainedMetaDataKind + "]";
 	}
 
 	@Override
@@ -61,8 +61,8 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 		int result = 1;
 		result = prime
 				* result
-				+ ((constrainedElementKind == null) ? 0
-						: constrainedElementKind.hashCode());
+				+ ((constrainedMetaDataKind == null) ? 0
+						: constrainedMetaDataKind.hashCode());
 		result = prime * result
 				+ ((constraints == null) ? 0 : constraints.hashCode());
 		return result;
@@ -77,7 +77,7 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractConstraintMetaData other = (AbstractConstraintMetaData) obj;
-		if (constrainedElementKind != other.constrainedElementKind)
+		if (constrainedMetaDataKind != other.constrainedMetaDataKind)
 			return false;
 		if (constraints == null) {
 			if (other.constraints != null)

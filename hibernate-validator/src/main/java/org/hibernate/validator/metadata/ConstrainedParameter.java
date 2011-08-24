@@ -20,7 +20,6 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 import java.util.Set;
 
-import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**

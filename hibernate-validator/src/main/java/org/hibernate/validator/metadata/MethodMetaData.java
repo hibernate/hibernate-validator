@@ -16,23 +16,22 @@
 */
 package org.hibernate.validator.metadata;
 
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 
-import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
-
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * <p>
@@ -75,7 +74,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			List<ConstrainedParameter> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException) {
 
-		super(returnValueConstraints, ConstrainedElementKind.METHOD);
+		super(returnValueConstraints, ConstraintMetaDataKind.METHOD);
 		
 		location = builder.location;
 		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
@@ -274,10 +273,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			return theValue;
 		}
 
-	}
-
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return ConstrainedElementKind.METHOD;
 	}
 	
 	/**
