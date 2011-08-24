@@ -28,9 +28,9 @@ import static org.hibernate.validator.util.CollectionHelper.newArrayList;
  */
 public class MethodDescriptorImpl extends ElementDescriptorImpl implements MethodDescriptor {
 
-	private final AggregatedMethodMetaData methodMetaData;
+	private final MethodMetaData methodMetaData;
 
-	public MethodDescriptorImpl(BeanMetaData<?> metaDataBean, AggregatedMethodMetaData methodMetaData) {
+	public MethodDescriptorImpl(BeanMetaData<?> metaDataBean, MethodMetaData methodMetaData) {
 		super( methodMetaData.getLocation().getMethod().getReturnType(), metaDataBean );
 
 		this.methodMetaData = methodMetaData;
@@ -49,7 +49,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 
 		List<ParameterDescriptor> theValue = newArrayList();
 
-		for ( ParameterMetaData oneParameter : methodMetaData.getAllParameterMetaData() ) {
+		for ( ConstrainedParameter oneParameter : methodMetaData.getAllParameterMetaData() ) {
 			theValue.add( new ParameterDescriptorImpl( getMetaDataBean(), oneParameter ) );
 		}
 

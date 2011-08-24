@@ -29,13 +29,13 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.ConstrainableElement;
+import org.hibernate.validator.metadata.ConstrainedElement;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
-import org.hibernate.validator.metadata.MethodMetaData;
-import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.ConstrainedMethod;
+import org.hibernate.validator.metadata.ConstrainedParameter;
 import org.hibernate.validator.metadata.ConstrainedField;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
@@ -75,13 +75,13 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
 
-			Set<ConstrainableElement> constrainedElements =
+			Set<ConstrainedElement> constrainedElements =
 					retrievePropertyMetaData(
 							context.getConstraintConfig().get( clazz ),
 							context.getCascadeConfig().get( clazz )
 					);
 
-			Set<ConstrainableElement> methodMetaData =
+			Set<ConstrainedElement> methodMetaData =
 					retrieveMethodMetaData(
 							context.getMethodCascadeConfig().get( clazz ),
 							context.getMethodConstraintConfig().get( clazz )
@@ -101,7 +101,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		}
 	}
 
-	private Set<ConstrainableElement> retrievePropertyMetaData(
+	private Set<ConstrainedElement> retrievePropertyMetaData(
 			Set<ConfiguredConstraint<?, BeanConstraintLocation>> constraints,
 			Set<BeanConstraintLocation> cascades) {
 
@@ -117,7 +117,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		Set<BeanConstraintLocation> allConfiguredProperties = new HashSet<BeanConstraintLocation>( cascades );
 		allConfiguredProperties.addAll( constraintsByLocation.keySet() );
 
-		Set<ConstrainableElement> allPropertyMetaData = newHashSet();
+		Set<ConstrainedElement> allPropertyMetaData = newHashSet();
 		for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
 			allPropertyMetaData.add(
 					new ConstrainedField(
@@ -130,7 +130,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		return allPropertyMetaData;
 	}
 
-	private Set<ConstrainableElement> retrieveMethodMetaData(Set<MethodConstraintLocation> methodCascades, Set<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints) {
+	private Set<ConstrainedElement> retrieveMethodMetaData(Set<MethodConstraintLocation> methodCascades, Set<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints) {
 
 		Map<Method, Set<MethodConstraintLocation>> cascadesByMethod = partition(
 				methodCascades, cascadesByMethod()
@@ -141,7 +141,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 		Set<Method> allConfiguredMethods = new HashSet<Method>( cascadesByMethod.keySet() );
 		allConfiguredMethods.addAll( constraintsByMethod.keySet() );
-		Set<ConstrainableElement> allMethodMetaData = newHashSet();
+		Set<ConstrainedElement> allMethodMetaData = newHashSet();
 
 		for ( Method oneMethod : allConfiguredMethods ) {
 
@@ -153,7 +153,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			Map<Integer, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByParameter = partition(
 					constraintsByMethod.get( oneMethod ), constraintsByParameterIndex()
 			);
-			List<ParameterMetaData> parameterMetaDatas = newArrayList();
+			List<ConstrainedParameter> parameterMetaDatas = newArrayList();
 
 			int i = 0;
 			for ( Class<?> parameterType : oneMethod.getParameterTypes() ) {
@@ -161,7 +161,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 				boolean isCascading = cascadesByParameter.containsKey( i );
 
 				parameterMetaDatas.add(
-						new ParameterMetaData(
+						new ConstrainedParameter(
 								new MethodConstraintLocation(oneMethod, i),
 								parameterName,
 								asMetaConstraints( constraintsByParameter.get( i ) ),
@@ -172,7 +172,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 				i++;
 			}
 
-			MethodMetaData methodMetaData = new MethodMetaData(
+			ConstrainedMethod methodMetaData = new ConstrainedMethod(
 					oneMethod,
 					parameterMetaDatas,
 					asMetaConstraints( constraintsByParameter.get( null ) ),

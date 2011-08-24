@@ -23,12 +23,12 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.metadata.AggregatedMethodMetaData;
+import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.ConstrainedParameter;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
 import static org.testng.Assert.assertEquals;
@@ -36,7 +36,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests creation of {@link AggregatedMethodMetaData} in {@link BeanMetaDataImpl}.
+ * Tests creation of {@link MethodMetaData} in {@link BeanMetaDataImpl}.
  *
  * @author Gunnar Morling
  */
@@ -54,14 +54,14 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithConstrainedParameter() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
 
-		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		List<ConstrainedParameter> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 2 );
 
 		assertFalse( parameterMetaData.get( 0 ).isConstrained() );
@@ -83,14 +83,14 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithCascadedParameter() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "saveCustomer", Customer.class );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
 
-		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		List<ConstrainedParameter> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 1 );
 
 		assertTrue( parameterMetaData.get( 0 ).isConstrained() );
@@ -104,7 +104,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithConstrainedReturnValue() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -114,7 +114,7 @@ public class AggregatedMethodMetaDataTest {
 				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
 
-		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		List<ConstrainedParameter> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 0 );
 	}
 
@@ -122,7 +122,7 @@ public class AggregatedMethodMetaDataTest {
 	public void returnValueConstraintsAddUpInHierarchy() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -134,7 +134,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithCascadedReturnValue() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );
@@ -146,7 +146,7 @@ public class AggregatedMethodMetaDataTest {
 	public void unconstrainedMethod() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "updateCustomer", Customer.class );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );

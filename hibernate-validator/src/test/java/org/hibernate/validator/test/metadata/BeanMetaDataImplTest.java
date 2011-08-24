@@ -22,7 +22,7 @@ import javax.validation.constraints.Min;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.metadata.AggregatedMethodMetaData;
+import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
@@ -51,7 +51,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "baz" );
-		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
@@ -68,7 +68,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepositoryImpl> metaData = setupBeanMetaData( CustomerRepositoryImpl.class );
 
 		Method method = CustomerRepositoryImpl.class.getMethod( "baz" );
-		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertIterableSize( methodMetaData, 1 );
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
@@ -87,7 +87,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
-		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );

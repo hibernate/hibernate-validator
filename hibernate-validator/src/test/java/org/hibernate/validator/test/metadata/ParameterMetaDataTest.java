@@ -26,8 +26,8 @@ import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.MethodMetaData;
-import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.ConstrainedMethod;
+import org.hibernate.validator.metadata.ConstrainedParameter;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
 import static org.testng.Assert.assertEquals;
@@ -35,7 +35,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests creation of {@link ParameterMetaData} in {@link BeanMetaDataImpl}.
+ * Tests creation of {@link ConstrainedParameter} in {@link BeanMetaDataImpl}.
  *
  * @author Gunnar Morling
  */
@@ -53,9 +53,9 @@ public class ParameterMetaDataTest {
 	public void constrainedParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 1 );
+		ConstrainedParameter parameterMetaData = methodMetaData.getParameterMetaData( 1 );
 
 		assertFalse( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
@@ -71,9 +71,9 @@ public class ParameterMetaDataTest {
 	public void cascadingParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
+		ConstrainedParameter parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
 		assertTrue( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
@@ -86,9 +86,9 @@ public class ParameterMetaDataTest {
 	public void unconstrainedParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
+		ConstrainedParameter parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
 		assertFalse( parameterMetaData.isCascading() );
 		assertFalse( parameterMetaData.isConstrained() );
@@ -99,7 +99,7 @@ public class ParameterMetaDataTest {
 	public void illegalParameterIndexCausesException() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "foo" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
 		methodMetaData.getParameterMetaData( 0 );
 	}

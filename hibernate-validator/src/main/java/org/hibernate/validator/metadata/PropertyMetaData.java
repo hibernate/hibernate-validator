@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.asSet;
@@ -35,7 +35,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 /**
  * @author Gunnar Morling
  */
-public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedElement {
+public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	private final Class<?> type;
 
@@ -45,7 +45,7 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 
 	private final boolean isConstrained;
 
-	private AggregatedPropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
+	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
 		super(constraints, ConstrainedElementKind.PROPERTY);
 		this.type = type;
 		this.propertyName = propertyName;
@@ -106,7 +106,7 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AggregatedPropertyMetaData other = (AggregatedPropertyMetaData) obj;
+		PropertyMetaData other = (PropertyMetaData) obj;
 		if (cascadingMembers == null) {
 			if (other.cascadingMembers != null)
 				return false;
@@ -138,7 +138,7 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 
 		private final ConstraintHelper constraintHelper;
 
-		private final ConstrainableElement root;
+		private final ConstrainedElement root;
 
 		private final Set<MetaConstraint<?>> constraints;
 
@@ -158,14 +158,14 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 			this.cascadingMembers = Collections.<Member>emptySet();
 		}
 
-		public Builder( MethodMetaData constrainedMethod, ConstraintHelper constraintHelper) {
+		public Builder( ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
 			this.constraintHelper = constraintHelper;
 			this.root = constrainedMethod;
 			this.constraints = newHashSet(constrainedMethod);
 			this.cascadingMembers = constrainedMethod.isCascading() ? asSet((Member)constrainedMethod.getLocation().getMethod()) : new HashSet<Member>();
 		}
 
-		public boolean accepts(ConstrainableElement constrainedElement) {
+		public boolean accepts(ConstrainedElement constrainedElement) {
 
 			if( constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.TYPE &&
 				constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.FIELD &&
@@ -174,7 +174,7 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 			}
 			
 			if( constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
-					!((MethodMetaData)constrainedElement).isGetterMethod()) {
+					!((ConstrainedMethod)constrainedElement).isGetterMethod()) {
 				return false;
 			}
 			
@@ -187,7 +187,7 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 							propertyName1 == null && propertyName2 == null );
 		}
 
-		public void add(ConstrainableElement constrainedElement) {
+		public void add(ConstrainedElement constrainedElement) {
 			
 			for(MetaConstraint<?> oneConstraint : constrainedElement) {
 				constraints.add(oneConstraint);
@@ -198,7 +198,7 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 			}
 		}
 
-		public AggregatedPropertyMetaData build() {
+		public PropertyMetaData build() {
 
 			Set<MetaConstraint<?>> adaptedConstraints = newHashSet();
 
@@ -211,7 +211,7 @@ public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedEle
 			}
 
 			Member member = root.getLocation().getMember();
-			return new AggregatedPropertyMetaData(
+			return new PropertyMetaData(
 					member != null ? member instanceof Field ? ( (Field) member ).getType() : ( (Method) member ).getReturnType() : null,
 					member != null ? ReflectionHelper.getPropertyName( member ) : null,
 					adaptedConstraints,

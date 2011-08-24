@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * @author Gunnar Morling
  */
-public abstract class AbstractConstrainedElement implements ConstrainableElement {
+public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
 	private final Set<MetaConstraint<?>> constraints;
 

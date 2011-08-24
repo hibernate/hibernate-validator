@@ -43,13 +43,13 @@ import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableResolver;
-import org.hibernate.validator.metadata.AggregatedMethodMetaData;
+import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.ConstrainedParameter;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
@@ -852,7 +852,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 
 		//assert that there are no illegal method parameter constraints
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getMethod() );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getMethod() );
 		methodMetaData.assertCorrectnessOfMethodParameterConstraints();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
@@ -893,7 +893,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -955,7 +955,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 
 			Object value = parameterValues[i];
-			ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( i );
+			ConstrainedParameter parameterMetaData = methodMetaData.getParameterMetaData( i );
 			String parameterName = parameterMetaData.getParameterName();
 
 			if ( parameterMetaData.isCascading() && value != null ) {
@@ -988,7 +988,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @return The number of constraint violations occurred during validation of
 	 *         the specified constraints.
 	 */
-	private <T, U, V> int validateParameterForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext, ParameterMetaData parameterMetaData) {
+	private <T, U, V> int validateParameterForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext, ConstrainedParameter parameterMetaData) {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
@@ -1052,7 +1052,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Method method = validationContext.getMethod();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		AggregatedMethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1109,7 +1109,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext,
-												   ValueContext<T, V> valueContext, AggregatedMethodMetaData methodMetaData) {
+												   ValueContext<T, V> valueContext, MethodMetaData methodMetaData) {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 

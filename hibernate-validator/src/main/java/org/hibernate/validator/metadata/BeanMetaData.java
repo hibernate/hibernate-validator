@@ -95,7 +95,7 @@ public interface BeanMetaData<T> {
 	 *         given method all the methods from super-types which it overrides
 	 *         or implements.
 	 */
-	AggregatedMethodMetaData getMetaDataFor(Method method);
+	MethodMetaData getMetaDataFor(Method method);
 
 	/**
 	 * Returns the constraint-related meta data for all the methods of the type
@@ -104,7 +104,7 @@ public interface BeanMetaData<T> {
 	 * @return A set with constraint-related method meta data. May be empty, but
 	 *         will never be null.
 	 */
-	Set<AggregatedMethodMetaData> getAllMethodMetaData();
+	Set<MethodMetaData> getAllMethodMetaData();
 
 	/**
 	 * Return {@code PropertyDescriptor} for the given property.

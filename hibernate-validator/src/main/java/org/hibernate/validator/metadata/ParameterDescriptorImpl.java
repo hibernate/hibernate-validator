@@ -23,9 +23,9 @@ import org.hibernate.validator.method.metadata.ParameterDescriptor;
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
 
-	private ParameterMetaData parameterMetaData;
+	private ConstrainedParameter parameterMetaData;
 
-	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ParameterMetaData parameterMetaData) {
+	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ConstrainedParameter parameterMetaData) {
 		super( parameterMetaData.getLocation().getBeanClass(), metaDataBean );
 
 		this.parameterMetaData = parameterMetaData;

@@ -35,7 +35,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -91,9 +91,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * aggregated view on each method together with all the methods from the
 	 * inheritance hierarchy with the same signature.
 	 */
-	private Map<Method, AggregatedMethodMetaData> methodMetaData;
+	private Map<Method, MethodMetaData> methodMetaData;
 
-	private final Map<String, AggregatedPropertyMetaData> propertyMetaData;
+	private final Map<String, PropertyMetaData> propertyMetaData;
 
 	/**
 	 * List of cascaded members.
@@ -139,32 +139,32 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public BeanMetaDataImpl(Class<T> beanClass,
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
-							Set<AggregatedConstrainedElement> constrainableElements) {
+							Set<ConstraintMetaData> constrainableElements) {
 		this.beanClass = beanClass;
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 
 		this.propertyMetaData = newHashMap();
 
-		Set<AggregatedPropertyMetaData> propertyMetaDatas = newHashSet();
-		Set<AggregatedMethodMetaData> methodMetaDatas = newHashSet();
+		Set<PropertyMetaData> propertyMetaDatas = newHashSet();
+		Set<MethodMetaData> methodMetaDatas = newHashSet();
 		
-		for ( AggregatedConstrainedElement oneElement : constrainableElements ) {
+		for ( ConstraintMetaData oneElement : constrainableElements ) {
 	
 			if( oneElement.getConstrainedElementKind() == ConstrainedElementKind.PROPERTY ) {
-				propertyMetaDatas.add((AggregatedPropertyMetaData)oneElement);
+				propertyMetaDatas.add((PropertyMetaData)oneElement);
 			}
 			else {
-				methodMetaDatas.add((AggregatedMethodMetaData)oneElement);
+				methodMetaDatas.add((MethodMetaData)oneElement);
 			}
 		}
 		
-		for ( AggregatedPropertyMetaData oneProperty : propertyMetaDatas) {
+		for ( PropertyMetaData oneProperty : propertyMetaDatas) {
 			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
 		}
 
 		Set<Member> cascadedMembers = newHashSet();
 
-		for ( AggregatedPropertyMetaData oneProperty : propertyMetaDatas ) {
+		for ( PropertyMetaData oneProperty : propertyMetaDatas ) {
 			if ( oneProperty.isCascading() ) {
 				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
 			}
@@ -177,7 +177,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider );
 
 		// add the explicitly configured constraints
-		for ( AggregatedPropertyMetaData onePropertyMetaData : propertyMetaDatas ) {
+		for ( PropertyMetaData onePropertyMetaData : propertyMetaDatas ) {
 			for ( MetaConstraint<?> constraint : onePropertyMetaData ) {
 				addMetaConstraint( constraint.getLocation().getBeanClass(), constraint );
 			}
@@ -236,8 +236,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return directMetaConstraints;
 	}
 
-	public AggregatedMethodMetaData getMetaDataFor(Method method) {
-		for(Entry<Method, AggregatedMethodMetaData> oneMethod :methodMetaData.entrySet()) {
+	public MethodMetaData getMetaDataFor(Method method) {
+		for(Entry<Method, MethodMetaData> oneMethod :methodMetaData.entrySet()) {
 			if(ReflectionHelper.haveSameSignature(method, oneMethod.getKey())) {
 				return oneMethod.getValue();
 			}
@@ -247,12 +247,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 //		return methodMetaData.get( method );
 	}
 
-	public Set<AggregatedMethodMetaData> getAllMethodMetaData() {
-		return new HashSet<AggregatedMethodMetaData>( methodMetaData.values() );
+	public Set<MethodMetaData> getAllMethodMetaData() {
+		return new HashSet<MethodMetaData>( methodMetaData.values() );
 	}
 
 	public PropertyDescriptor getPropertyDescriptor(String propertyName) {
-		AggregatedPropertyMetaData property = propertyMetaData.get( propertyName );
+		PropertyMetaData property = propertyMetaData.get( propertyName );
 		return property != null ? property.getPropertyDescriptor() : null;
 	}
 
@@ -281,7 +281,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Set<PropertyDescriptor> theValue = newHashSet();
 
-		for ( AggregatedPropertyMetaData oneProperty : propertyMetaData.values() ) {
+		for ( PropertyMetaData oneProperty : propertyMetaData.values() ) {
 			if ( oneProperty.isConstrained() ) {
 				theValue.add( oneProperty.getPropertyDescriptor() );
 			}
@@ -317,11 +317,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Builds up the method meta data for this type by invoking each builder in
 	 * {@link #methodMetaDataBuilders}.
 	 */
-	private Map<Method, AggregatedMethodMetaData> buildMethodMetaData(Set<AggregatedMethodMetaData> allMethodMetaData) {
+	private Map<Method, MethodMetaData> buildMethodMetaData(Set<MethodMetaData> allMethodMetaData) {
 
-		Map<Method, AggregatedMethodMetaData> theValue = newHashMap();
+		Map<Method, MethodMetaData> theValue = newHashMap();
 
-		for ( AggregatedMethodMetaData oneAggregatedMethodMetaData : allMethodMetaData ) {
+		for ( MethodMetaData oneAggregatedMethodMetaData : allMethodMetaData ) {
 			theValue.put( oneAggregatedMethodMetaData.getLocation().getMethod(), oneAggregatedMethodMetaData );
 //			//register the aggregated meta data for each underlying method for a quick
 //			//read access

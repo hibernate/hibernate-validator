@@ -20,7 +20,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 import java.util.Set;
 
-import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**
@@ -28,13 +28,13 @@ import org.hibernate.validator.metadata.location.MethodConstraintLocation;
  *
  * @author Gunnar Morling
  */
-public class ParameterMetaData extends AbstractConstrainedElement {
+public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	private final MethodConstraintLocation location;
 
 	private final String name;
 
-	public ParameterMetaData(MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	public ConstrainedParameter(MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
 		super(constraints, isCascading);
 		
@@ -54,9 +54,9 @@ public class ParameterMetaData extends AbstractConstrainedElement {
 		return name;
 	}
 
-	public ParameterMetaData merge(ParameterMetaData otherMetaData) {
+	public ConstrainedParameter merge(ConstrainedParameter otherMetaData) {
 
-		return new ParameterMetaData(
+		return new ConstrainedParameter(
 				location,
 				name,
 				newHashSet( this.getConstraints(), otherMetaData.getConstraints() ),

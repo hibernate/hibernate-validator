@@ -24,7 +24,7 @@ import java.util.Set;
  * @author Gunnar Morling
  *
  */
-public class AbstractAggregatedConstrainedElement implements AggregatedConstrainedElement {
+public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	protected final Set<MetaConstraint<?>> constraints;
 	
@@ -34,7 +34,7 @@ public class AbstractAggregatedConstrainedElement implements AggregatedConstrain
 	 * @param constraints
 	 * @param constrainedElementKind
 	 */
-	public AbstractAggregatedConstrainedElement( Set<MetaConstraint<?>> constraints, ConstrainedElementKind constrainedElementKind) {
+	public AbstractConstraintMetaData( Set<MetaConstraint<?>> constraints, ConstrainedElementKind constrainedElementKind) {
 
 		this.constraints = Collections.unmodifiableSet( constraints );
 		this.constrainedElementKind = constrainedElementKind;
@@ -76,7 +76,7 @@ public class AbstractAggregatedConstrainedElement implements AggregatedConstrain
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractAggregatedConstrainedElement other = (AbstractAggregatedConstrainedElement) obj;
+		AbstractConstraintMetaData other = (AbstractConstraintMetaData) obj;
 		if (constrainedElementKind != other.constrainedElementKind)
 			return false;
 		if (constraints == null) {

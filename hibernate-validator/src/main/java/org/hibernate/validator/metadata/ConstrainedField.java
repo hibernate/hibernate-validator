@@ -19,7 +19,7 @@ package org.hibernate.validator.metadata;
 import java.lang.reflect.Member;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 

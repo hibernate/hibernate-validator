@@ -30,7 +30,7 @@ public class BeanConfiguration<T> {
 
 	private final Class<T> beanClass;
 
-	private final Set<ConstrainableElement> constrainableElements;
+	private final Set<ConstrainedElement> constrainableElements;
 
 	private List<Class<?>> defaultGroupSequence;
 
@@ -43,7 +43,7 @@ public class BeanConfiguration<T> {
 	 * @param defaultGroupSequence
 	 */
 	public BeanConfiguration(Class<T> beanClass,
-							 Set<? extends ConstrainableElement> constrainableElements,
+							 Set<? extends ConstrainedElement> constrainableElements,
 							 List<Class<?>> defaultGroupSequence,
 							 Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
@@ -57,7 +57,7 @@ public class BeanConfiguration<T> {
 		return beanClass;
 	}
 
-	public Set<ConstrainableElement> getConstrainableElements() {
+	public Set<ConstrainedElement> getConstrainableElements() {
 		return constrainableElements;
 	}
 

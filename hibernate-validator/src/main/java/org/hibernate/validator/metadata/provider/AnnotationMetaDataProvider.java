@@ -34,15 +34,15 @@ import javax.validation.Valid;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.ConstrainableElement;
+import org.hibernate.validator.metadata.ConstrainedElement;
 import org.hibernate.validator.metadata.ConstrainedType;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.MethodMetaData;
-import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.ConstrainedMethod;
+import org.hibernate.validator.metadata.ConstrainedParameter;
 import org.hibernate.validator.metadata.ConstrainedField;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
@@ -82,7 +82,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 //			return;
 //		}
 
-		Set<ConstrainableElement> propertyMetaData = getPropertyMetaData( beanClass );
+		Set<ConstrainedElement> propertyMetaData = getPropertyMetaData( beanClass );
 		propertyMetaData.addAll( getMethodMetaData( beanClass ) );
 
 		//TODO GM: currently class level constraints are represented by a PropertyMetaData. This
@@ -137,8 +137,8 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		return classLevelConstraints;
 	}
 
-	private Set<ConstrainableElement> getPropertyMetaData(Class<?> beanClass) {
-		Set<ConstrainableElement> propertyMetaData = newHashSet();
+	private Set<ConstrainedElement> getPropertyMetaData(Class<?> beanClass) {
+		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
 		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
 
@@ -181,9 +181,9 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		return constraints;
 	}
 
-	private Set<MethodMetaData> getMethodMetaData(Class<?> clazz) {
+	private Set<ConstrainedMethod> getMethodMetaData(Class<?> clazz) {
 
-		Set<MethodMetaData> methodMetaData = newHashSet();
+		Set<ConstrainedMethod> methodMetaData = newHashSet();
 
 		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( clazz );
 
@@ -210,14 +210,14 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 * @return A meta data object describing the constraints specified for the
 	 *         given method.
 	 */
-	private MethodMetaData findMethodMetaData(Method method) {
+	private ConstrainedMethod findMethodMetaData(Method method) {
 
-		List<ParameterMetaData> parameterConstraints = getParameterMetaData( method );
+		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( method );
 		boolean isCascading = method.isAnnotationPresent( Valid.class );
 		Set<MetaConstraint<?>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
 
-		return new MethodMetaData( method, parameterConstraints, constraints, isCascading );
+		return new ConstrainedMethod( method, parameterConstraints, constraints, isCascading );
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
@@ -239,8 +239,8 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 *
 	 * @return A list with parameter meta data for the given method.
 	 */
-	private List<ParameterMetaData> getParameterMetaData(Method method) {
-		List<ParameterMetaData> metaData = newArrayList();
+	private List<ConstrainedParameter> getParameterMetaData(Method method) {
+		List<ConstrainedParameter> metaData = newArrayList();
 
 		int i = 0;
 
@@ -271,7 +271,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			}
 
 			metaData.add(
-					new ParameterMetaData(
+					new ConstrainedParameter(
 							new MethodConstraintLocation(method, i), parameterName, constraintsOfOneParameter, parameterIsCascading
 					)
 			);

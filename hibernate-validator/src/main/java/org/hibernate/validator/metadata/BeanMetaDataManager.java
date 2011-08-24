@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
-import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
+import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
+import org.hibernate.validator.metadata.MethodMetaData.Builder;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -183,12 +183,12 @@ public class BeanMetaDataManager {
 				continue;
 			}
 
-			for ( ConstrainableElement oneConstrainedElement : configurationForHierarchyClass.getConstrainableElements() ) {
+			for ( ConstrainedElement oneConstrainedElement : configurationForHierarchyClass.getConstrainableElements() ) {
 				addMetaDataToBuilder( oneConstrainedElement, builders );
 			}
 		}
 
-		Set<AggregatedConstrainedElement> aggregatedElements = newHashSet();
+		Set<ConstraintMetaData> aggregatedElements = newHashSet();
 		for ( Builder oneBuilder : builders ) {
 			aggregatedElements.add( oneBuilder.build() );
 		}
@@ -201,7 +201,7 @@ public class BeanMetaDataManager {
 		);
 	}
 
-	private void addMetaDataToBuilder(ConstrainableElement constrainableElement, Set<Builder> builders) {
+	private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<Builder> builders) {
 		for ( Builder oneBuilder : builders ) {
 			if ( oneBuilder.accepts( constrainableElement ) ) {
 				oneBuilder.add( constrainableElement );
@@ -215,29 +215,29 @@ public class BeanMetaDataManager {
 
 	public static abstract class Builder {
 		
-		public abstract boolean accepts(ConstrainableElement constrainableElement);
+		public abstract boolean accepts(ConstrainedElement constrainableElement);
 		
-		public abstract void add(ConstrainableElement constrainableElement);
+		public abstract void add(ConstrainedElement constrainableElement);
 		
-		public abstract AggregatedConstrainedElement build();
+		public abstract ConstraintMetaData build();
 		
-		public static Set<Builder> getInstance(ConstrainableElement constrainableElement, ConstraintHelper constraintHelper) {
+		public static Set<Builder> getInstance(ConstrainedElement constrainableElement, ConstraintHelper constraintHelper) {
 			
 			Set<Builder> builders = newHashSet();
 
 			switch(constrainableElement.getConstrainedElementKind()) {
 				case FIELD: 
-					builders.add(new AggregatedPropertyMetaData.Builder((ConstrainedField) constrainableElement, constraintHelper));
+					builders.add(new PropertyMetaData.Builder((ConstrainedField) constrainableElement, constraintHelper));
 					break;
 				case METHOD:
-					builders.add( new AggregatedMethodMetaData.Builder((MethodMetaData)constrainableElement) );
-					if(((MethodMetaData)constrainableElement).isGetterMethod()) {
-						builders.add( new AggregatedPropertyMetaData.Builder( (MethodMetaData)constrainableElement, constraintHelper ));
+					builders.add( new MethodMetaData.Builder((ConstrainedMethod)constrainableElement) );
+					if(((ConstrainedMethod)constrainableElement).isGetterMethod()) {
+						builders.add( new PropertyMetaData.Builder( (ConstrainedMethod)constrainableElement, constraintHelper ));
 					}
 					break;
 					
 				case TYPE:
-					builders.add( new AggregatedPropertyMetaData.Builder((ConstrainedType) constrainableElement, constraintHelper) );
+					builders.add( new PropertyMetaData.Builder((ConstrainedType) constrainableElement, constraintHelper) );
 					break;
 				default: 
 					throw new IllegalArgumentException();

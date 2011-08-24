@@ -16,16 +16,19 @@
 */
 package org.hibernate.validator.metadata;
 
+import org.hibernate.validator.metadata.ConstraintMetaData.ConstrainedElementKind;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
+
 /**
  * @author Gunnar Morling
  *
  */
-public interface AggregatedConstrainedElement extends Iterable<MetaConstraint<?>> {
+public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 
-	public static enum ConstrainedElementKind {
-		TYPE, FIELD, METHOD, PARAMETER, PROPERTY;
-	}
-	
 	ConstrainedElementKind getConstrainedElementKind();
+	
+	ConstraintLocation getLocation();
+	
+	boolean isCascading();
 	
 }

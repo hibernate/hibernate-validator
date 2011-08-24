@@ -65,7 +65,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		}
 
 		//are there any method-level constraints?
-		for ( AggregatedMethodMetaData oneMethodMetaData : getMetaDataBean().getAllMethodMetaData() ) {
+		for ( MethodMetaData oneMethodMetaData : getMetaDataBean().getAllMethodMetaData() ) {
 
 			if ( oneMethodMetaData.isConstrained() ) {
 				return true;
@@ -81,7 +81,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 
 		Set<MethodDescriptor> theValue = newHashSet();
 
-		for ( AggregatedMethodMetaData oneMethodMetaData : beanMetaData.getAllMethodMetaData() ) {
+		for ( MethodMetaData oneMethodMetaData : beanMetaData.getAllMethodMetaData() ) {
 			if ( oneMethodMetaData.isConstrained() ) {
 				theValue.add( new MethodDescriptorImpl( beanMetaData, oneMethodMetaData ) );
 			}
