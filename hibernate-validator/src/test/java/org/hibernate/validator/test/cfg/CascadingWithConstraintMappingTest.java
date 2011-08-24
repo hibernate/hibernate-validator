@@ -115,7 +115,7 @@ public class CascadingWithConstraintMappingTest {
 	private static class B extends A {
 	}
 
-	private static class C {
+	public static class C {
 		private String string;
 
 		public String getString() {

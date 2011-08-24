@@ -31,18 +31,18 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	private final AggregatedMethodMetaData methodMetaData;
 
 	public MethodDescriptorImpl(BeanMetaData<?> metaDataBean, AggregatedMethodMetaData methodMetaData) {
-		super( methodMetaData.getMethod().getReturnType(), metaDataBean );
+		super( methodMetaData.getLocation().getMethod().getReturnType(), metaDataBean );
 
 		this.methodMetaData = methodMetaData;
 
 		//add the return value constraints of the represented method to the constraint descriptor list
-		for ( MethodMetaConstraint<?> oneConstraint : methodMetaData ) {
+		for ( MetaConstraint<?> oneConstraint : methodMetaData ) {
 			addConstraintDescriptor( oneConstraint.getDescriptor() );
 		}
 	}
 
 	public String getMethodName() {
-		return methodMetaData.getMethod().getName();
+		return methodMetaData.getLocation().getMethod().getName();
 	}
 
 	public List<ParameterDescriptor> getParameterDescriptors() {

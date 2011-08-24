@@ -26,6 +26,8 @@ import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 
+import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -45,17 +47,15 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?>> {
+public class AggregatedMethodMetaData extends AbstractAggregatedConstrainedElement {
 
-	private final Method method;
+	private final MethodConstraintLocation location;
 
 	private final Map<Class<?>, MethodMetaData> metaDataByDefiningType;
 
 	private final boolean isCascading;
 
 	private final boolean isConstrained;
-
-	private final List<MethodMetaConstraint<?>> returnValueConstraints;
 
 	private final List<ParameterMetaData> parameterMetaData;
 
@@ -71,16 +71,17 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 
 	private AggregatedMethodMetaData(
 			Builder builder,
-			List<MethodMetaConstraint<?>> returnValueConstraints,
+			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException) {
 
-		method = builder.method;
+		super(returnValueConstraints, ConstrainedElementKind.METHOD);
+		
+		location = builder.location;
 		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
 		isCascading = builder.isCascading;
 		isConstrained = builder.isConstrained;
 
-		this.returnValueConstraints = Collections.unmodifiableList( returnValueConstraints );
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
 	}
@@ -91,9 +92,9 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 	 * @author Gunnar Morling
 	 * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
 	 */
-	public static class Builder {
+	public static class Builder extends BeanMetaDataManager.Builder {
 
-		private Method method;
+		private MethodConstraintLocation location;
 
 		private final Map<Class<?>, MethodMetaData> metaDataByDefiningType = newHashMap();
 
@@ -109,8 +110,8 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 		 */
 		public Builder(MethodMetaData metaData) {
 
-			method = metaData.getMethod();
-			metaDataByDefiningType.put( method.getDeclaringClass(), metaData );
+			location = metaData.getLocation();
+			metaDataByDefiningType.put( location.getMethod().getDeclaringClass(), metaData );
 			isCascading = metaData.isCascading();
 			isConstrained = metaData.isConstrained();
 		}
@@ -126,8 +127,10 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 		 * @return <code>True</code>, if the given method can be added to this
 		 *         builder, <code>false</code> otherwise.
 		 */
-		public boolean accepts(MethodMetaData metaData) {
-			return ReflectionHelper.haveSameSignature( method, metaData.getMethod() );
+		public boolean accepts(ConstrainableElement metaData) {
+			return 
+				metaData.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+				ReflectionHelper.haveSameSignature( location.getMethod(), ((MethodMetaData)metaData).getLocation().getMethod() );
 		}
 
 		/**
@@ -137,21 +140,23 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 		 *
 		 * @param metaData The meta data to add.
 		 */
-		public void addMetaData(MethodMetaData metaData) {
+		public void add(ConstrainableElement constrainedElement) {
 
+			MethodMetaData metaData = (MethodMetaData)constrainedElement;
+			
 			MethodMetaData existingMetaData =
-					metaDataByDefiningType.get( metaData.getMethod().getDeclaringClass() );
+					metaDataByDefiningType.get( metaData.getLocation().getMethod().getDeclaringClass() );
 
 			if ( existingMetaData != null ) {
 				metaData = existingMetaData.merge( metaData );
 			}
 
 			//use the lowest method found in the hierarchy for this aggregation
-			if ( method.getDeclaringClass().isAssignableFrom( metaData.getMethod().getDeclaringClass() ) ) {
-				method = metaData.getMethod();
+			if ( location.getMethod().getDeclaringClass().isAssignableFrom( metaData.getLocation().getMethod().getDeclaringClass() ) ) {
+				location = metaData.getLocation();
 			}
 
-			metaDataByDefiningType.put( metaData.getMethod().getDeclaringClass(), metaData );
+			metaDataByDefiningType.put( metaData.getLocation().getMethod().getDeclaringClass(), metaData );
 			isCascading = isCascading || metaData.isCascading();
 			isConstrained = isConstrained || metaData.isConstrained();
 		}
@@ -174,12 +179,12 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 		 *
 		 * @return A list with all return value constraints.
 		 */
-		private List<MethodMetaConstraint<?>> collectReturnValueConstraints() {
+		private Set<MetaConstraint<?>> collectReturnValueConstraints() {
 
-			List<MethodMetaConstraint<?>> theValue = newArrayList();
+			Set<MetaConstraint<?>> theValue = newHashSet();
 
 			for ( MethodMetaData oneMethodMetaData : metaDataByDefiningType.values() ) {
-				for ( MethodMetaConstraint<?> oneConstraint : oneMethodMetaData ) {
+				for ( MetaConstraint<?> oneConstraint : oneMethodMetaData ) {
 					theValue.add( oneConstraint );
 				}
 			}
@@ -203,7 +208,7 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 				}
 			}
 
-			return metaDataByDefiningType.get( method.getDeclaringClass() ).getAllParameterMetaData();
+			return metaDataByDefiningType.get( location.getBeanClass() ).getAllParameterMetaData();
 		}
 
 		/**
@@ -235,13 +240,12 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 
 			for ( MethodMetaData oneMethod : allMethods ) {
 
-				if ( !constrainedMethod.getMethod()
-						.getDeclaringClass()
-						.isAssignableFrom( oneMethod.getMethod().getDeclaringClass() ) ) {
+				if ( !constrainedMethod.getLocation().getBeanClass()
+						.isAssignableFrom( oneMethod.getLocation().getBeanClass() ) ) {
 					return new ConstraintDeclarationException(
 							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
 									"The following method itself has no parameter constraints but it is not defined on a sub-type of " +
-									constrainedMethod.getMethod().getDeclaringClass() + ": " + oneMethod
+									constrainedMethod.getLocation().getBeanClass() + ": " + oneMethod
 					);
 				}
 			}
@@ -272,6 +276,10 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 
 	}
 
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return ConstrainedElementKind.METHOD;
+	}
+	
 	/**
 	 * <p>
 	 * Checks the parameter constraints of this method for correctness.
@@ -300,10 +308,6 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 		if ( parameterConstraintDeclarationException != null ) {
 			throw parameterConstraintDeclarationException;
 		}
-	}
-
-	public Method getMethod() {
-		return method;
 	}
 
 	/**
@@ -371,16 +375,13 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 		return metaDataByDefiningType.values();
 	}
 
-	/**
-	 * An iterator with the return value constraints of the represented method.
-	 */
-	public Iterator<MethodMetaConstraint<?>> iterator() {
-		return returnValueConstraints.iterator();
+	public MethodConstraintLocation getLocation() {
+		return location;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "AggregatedMethodMetaData [method=" + method
+		return "AggregatedMethodMetaData [location=" + location
 				+ ", isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
@@ -389,7 +390,7 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
+		result = prime * result + ( ( location == null ) ? 0 : location.hashCode() );
 		return result;
 	}
 
@@ -405,12 +406,12 @@ public class AggregatedMethodMetaData implements Iterable<MethodMetaConstraint<?
 			return false;
 		}
 		AggregatedMethodMetaData other = (AggregatedMethodMetaData) obj;
-		if ( method == null ) {
-			if ( other.method != null ) {
+		if ( location == null ) {
+			if ( other.location != null ) {
 				return false;
 			}
 		}
-		else if ( !method.equals( other.method ) ) {
+		else if ( !location.equals( other.location ) ) {
 			return false;
 		}
 		return true;

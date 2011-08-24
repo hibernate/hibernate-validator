@@ -22,6 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -34,16 +37,16 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
+public class MethodMetaData implements ConstrainableElement {
 
-	private final Method method;
+	private final MethodConstraintLocation location;
 
 	/**
 	 * Constrained-related meta data for this method's parameters.
 	 */
 	private final List<ParameterMetaData> parameterMetaData;
 
-	private final Set<MethodMetaConstraint<?>> returnValueConstraints;
+	private final Set<MetaConstraint<?>> returnValueConstraints;
 
 	private final boolean isCascading;
 
@@ -51,7 +54,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 
 	public MethodMetaData(
 			Method method,
-			Set<MethodMetaConstraint<?>> returnValueConstraints,
+			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
 		this(
@@ -78,7 +81,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 	public MethodMetaData(
 			Method method,
 			List<ParameterMetaData> parameterMetaData,
-			Set<MethodMetaConstraint<?>> returnValueConstraints,
+			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
@@ -90,7 +93,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 			);
 		}
 
-		this.method = method;
+		this.location = new MethodConstraintLocation(method);
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.returnValueConstraints = Collections.unmodifiableSet( returnValueConstraints );
 		this.isCascading = isCascading;
@@ -108,13 +111,12 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 		return false;
 	}
 
-	/**
-	 * The method represented by this meta data object.
-	 *
-	 * @return The method represented by this meta data object.
-	 */
-	public Method getMethod() {
-		return method;
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return ConstrainedElementKind.METHOD;
+	}
+	
+	public MethodConstraintLocation getLocation() {
+		return location;
 	}
 
 	/**
@@ -132,7 +134,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw new IllegalArgumentException( "Method " + method + " doesn't have a parameter with index " + parameterIndex );
+			throw new IllegalArgumentException( "Method " + location.getMethod() + " doesn't have a parameter with index " + parameterIndex );
 		}
 
 		return parameterMetaData.get( parameterIndex );
@@ -153,7 +155,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 	/**
 	 * An iterator with the return value constraints of the represented method.
 	 */
-	public Iterator<MethodMetaConstraint<?>> iterator() {
+	public Iterator<MetaConstraint<?>> iterator() {
 		return returnValueConstraints.iterator();
 	}
 
@@ -201,7 +203,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return ReflectionHelper.isGetterMethod( method );
+		return ReflectionHelper.isGetterMethod( location.getMethod() );
 	}
 
 	public MethodMetaData merge(MethodMetaData otherMetaData) {
@@ -209,7 +211,7 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 		boolean isCascading = isCascading() || otherMetaData.isCascading();
 
 		// 1 - aggregate return value constraints
-		Set<MethodMetaConstraint<?>> mergedReturnValueConstraints = newHashSet(
+		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet(
 				this.returnValueConstraints, otherMetaData.returnValueConstraints
 		);
 
@@ -219,81 +221,68 @@ public class MethodMetaData implements Iterable<MethodMetaConstraint<?>> {
 		for ( ParameterMetaData oneParameterMetaData : getAllParameterMetaData() ) {
 			mergedParameterMetaData.add(
 					oneParameterMetaData.merge(
-							otherMetaData.getParameterMetaData( oneParameterMetaData.getIndex() )
+							otherMetaData.getParameterMetaData( oneParameterMetaData.getLocation().getParameterIndex() )
 					)
 			);
 		}
-		return new MethodMetaData( method, mergedParameterMetaData, mergedReturnValueConstraints, isCascading );
+		return new MethodMetaData( location.getMethod(), mergedParameterMetaData, mergedReturnValueConstraints, isCascading );
 	}
 
 	@Override
 	public String toString() {
-		return "MethodMetaData [method=" + method + ", parameterMetaData="
-				+ parameterMetaData + ", constraints=" + returnValueConstraints
-				+ ", isCascading=" + isCascading + ", hasParameterConstraints="
-				+ hasParameterConstraints + "]";
+		return "MethodMetaData [location=" + location + ", parameterMetaData="
+				+ parameterMetaData + ", returnValueConstraints="
+				+ returnValueConstraints + ", isCascading=" + isCascading
+				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( hasParameterConstraints ? 1231 : 1237 );
-		result = prime * result + ( isCascading ? 1231 : 1237 );
-		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
+		result = prime * result + (hasParameterConstraints ? 1231 : 1237);
+		result = prime * result + (isCascading ? 1231 : 1237);
+		result = prime * result
+				+ ((location == null) ? 0 : location.hashCode());
 		result = prime
 				* result
-				+ ( ( parameterMetaData == null ) ? 0 : parameterMetaData
-				.hashCode() );
+				+ ((parameterMetaData == null) ? 0 : parameterMetaData
+						.hashCode());
 		result = prime
 				* result
-				+ ( ( returnValueConstraints == null ) ? 0
-				: returnValueConstraints.hashCode() );
+				+ ((returnValueConstraints == null) ? 0
+						: returnValueConstraints.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( this == obj ) {
+		if (this == obj)
 			return true;
-		}
-		if ( obj == null ) {
+		if (obj == null)
 			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
 		MethodMetaData other = (MethodMetaData) obj;
-		if ( hasParameterConstraints != other.hasParameterConstraints ) {
+		if (hasParameterConstraints != other.hasParameterConstraints)
 			return false;
-		}
-		if ( isCascading != other.isCascading ) {
+		if (isCascading != other.isCascading)
 			return false;
-		}
-		if ( method == null ) {
-			if ( other.method != null ) {
+		if (location == null) {
+			if (other.location != null)
 				return false;
-			}
-		}
-		else if ( !method.equals( other.method ) ) {
+		} else if (!location.equals(other.location))
 			return false;
-		}
-		if ( parameterMetaData == null ) {
-			if ( other.parameterMetaData != null ) {
+		if (parameterMetaData == null) {
+			if (other.parameterMetaData != null)
 				return false;
-			}
-		}
-		else if ( !parameterMetaData.equals( other.parameterMetaData ) ) {
+		} else if (!parameterMetaData.equals(other.parameterMetaData))
 			return false;
-		}
-		if ( returnValueConstraints == null ) {
-			if ( other.returnValueConstraints != null ) {
+		if (returnValueConstraints == null) {
+			if (other.returnValueConstraints != null)
 				return false;
-			}
-		}
-		else if ( !returnValueConstraints.equals( other.returnValueConstraints ) ) {
+		} else if (!returnValueConstraints.equals(other.returnValueConstraints))
 			return false;
-		}
 		return true;
 	}
 

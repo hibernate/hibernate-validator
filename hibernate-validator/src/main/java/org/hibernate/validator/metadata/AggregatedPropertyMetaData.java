@@ -20,33 +20,35 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.util.ReflectionHelper;
 
+import static org.hibernate.validator.util.CollectionHelper.asSet;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * @author Gunnar Morling
  */
-public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?>> {
+public class AggregatedPropertyMetaData extends AbstractAggregatedConstrainedElement {
 
 	private final Class<?> type;
 
 	private final String propertyName;
 
-	private final Set<BeanMetaConstraint<?>> constraints;
-
 	private final Set<Member> cascadingMembers;
 
 	private final boolean isConstrained;
 
-	private AggregatedPropertyMetaData(Class<?> type, String propertyName, Set<BeanMetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
+	private AggregatedPropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
+		super(constraints, ConstrainedElementKind.PROPERTY);
 		this.type = type;
 		this.propertyName = propertyName;
-		this.constraints = constraints;
 		this.cascadingMembers = cascadingMembers;
 		this.isConstrained = !cascadingMembers.isEmpty() || !constraints.isEmpty();
 	}
@@ -63,10 +65,6 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 		return cascadingMembers;
 	}
 
-	public Iterator<BeanMetaConstraint<?>> iterator() {
-		return constraints.iterator();
-	}
-
 	public boolean isConstrained() {
 		return isConstrained;
 	}
@@ -80,7 +78,7 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 		PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
 				type, isCascading(), getPropertyName(), null
 		);
-		for ( BeanMetaConstraint<?> oneConstraint : constraints ) {
+		for ( MetaConstraint<?> oneConstraint : constraints ) {
 			propertyDescriptor.addConstraintDescriptor( oneConstraint.getDescriptor() );
 		}
 		return propertyDescriptor;
@@ -89,107 +87,122 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime
 				* result
-				+ ( ( cascadingMembers == null ) ? 0 : cascadingMembers.hashCode() );
+				+ ((cascadingMembers == null) ? 0 : cascadingMembers.hashCode());
+		result = prime * result + (isConstrained ? 1231 : 1237);
 		result = prime * result
-				+ ( ( constraints == null ) ? 0 : constraints.hashCode() );
-		result = prime * result
-				+ ( ( propertyName == null ) ? 0 : propertyName.hashCode() );
+				+ ((propertyName == null) ? 0 : propertyName.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( this == obj ) {
+		if (this == obj)
 			return true;
-		}
-		if ( obj == null ) {
+		if (!super.equals(obj))
 			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
 		AggregatedPropertyMetaData other = (AggregatedPropertyMetaData) obj;
-		if ( cascadingMembers == null ) {
-			if ( other.cascadingMembers != null ) {
+		if (cascadingMembers == null) {
+			if (other.cascadingMembers != null)
 				return false;
-			}
-		}
-		else if ( !cascadingMembers.equals( other.cascadingMembers ) ) {
+		} else if (!cascadingMembers.equals(other.cascadingMembers))
 			return false;
-		}
-		if ( constraints == null ) {
-			if ( other.constraints != null ) {
+		if (isConstrained != other.isConstrained)
+			return false;
+		if (propertyName == null) {
+			if (other.propertyName != null)
 				return false;
-			}
-		}
-		else if ( !constraints.equals( other.constraints ) ) {
+		} else if (!propertyName.equals(other.propertyName))
 			return false;
-		}
-		if ( propertyName == null ) {
-			if ( other.propertyName != null ) {
+		if (type == null) {
+			if (other.type != null)
 				return false;
-			}
-		}
-		else if ( !propertyName.equals( other.propertyName ) ) {
+		} else if (!type.equals(other.type))
 			return false;
-		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "AggregatedPropertyMetaData [propertyName=" + propertyName
-				+ ", constraints=" + constraints + ", cascadingMembers="
-				+ cascadingMembers + "]";
+		return "AggregatedPropertyMetaData [type=" + type + ", propertyName="
+				+ propertyName + ", cascadingMembers=" + cascadingMembers
+				+ ", isConstrained=" + isConstrained + "]";
 	}
 
-	public static class Builder {
+	public static class Builder extends BeanMetaDataManager.Builder {
 
 		private final ConstraintHelper constraintHelper;
 
-		private final PropertyMetaData root;
+		private final ConstrainableElement root;
 
-		private final Set<BeanMetaConstraint<?>> constraints;
+		private final Set<MetaConstraint<?>> constraints;
 
-		private Set<Member> cascadingMembers;
+		private final Set<Member> cascadingMembers;
 
-		public Builder(ConstraintHelper constraintHelper, PropertyMetaData propertyMetaData) {
+		public Builder( ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			this.constraintHelper = constraintHelper;
-			this.root = propertyMetaData;
-			constraints = newHashSet();
-			constraints.addAll( propertyMetaData.getConstraints() );
-			cascadingMembers = newHashSet();
-			if ( propertyMetaData.isCascading() ) {
-				cascadingMembers.add( propertyMetaData.getLocation().getMember() );
-			}
+			this.root = constrainedField;
+			this.constraints = newHashSet(constrainedField);
+			this.cascadingMembers = constrainedField.isCascading() ? asSet(constrainedField.getLocation().getMember()) : new HashSet<Member>();
 		}
 
-		public boolean accepts(PropertyMetaData propertyMetaData) {
+		public Builder( ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
+			this.constraintHelper = constraintHelper;
+			this.root = constrainedType;
+			this.constraints = newHashSet(constrainedType);
+			this.cascadingMembers = Collections.<Member>emptySet();
+		}
 
-			String propertyName1 = ReflectionHelper.getPropertyName( propertyMetaData.getLocation().getMember() );
+		public Builder( MethodMetaData constrainedMethod, ConstraintHelper constraintHelper) {
+			this.constraintHelper = constraintHelper;
+			this.root = constrainedMethod;
+			this.constraints = newHashSet(constrainedMethod);
+			this.cascadingMembers = constrainedMethod.isCascading() ? asSet((Member)constrainedMethod.getLocation().getMethod()) : new HashSet<Member>();
+		}
+
+		public boolean accepts(ConstrainableElement constrainedElement) {
+
+			if( constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.TYPE &&
+				constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.FIELD &&
+				constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.METHOD ) {
+				return false;
+			}
+			
+			if( constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+					!((MethodMetaData)constrainedElement).isGetterMethod()) {
+				return false;
+			}
+			
+			String propertyName1 = ReflectionHelper.getPropertyName( constrainedElement.getLocation().getMember() );
 			String propertyName2 = ReflectionHelper.getPropertyName( root.getLocation().getMember() );
 
 			return
-					propertyMetaData.getLocation().getBeanClass().isAssignableFrom( root.getLocation().getBeanClass() )
+				constrainedElement.getLocation().getBeanClass().isAssignableFrom( root.getLocation().getBeanClass() )
 							&& ( ( propertyName1 != null && propertyName1.equals( propertyName2 ) ) ||
 							propertyName1 == null && propertyName2 == null );
 		}
 
-		public void add(PropertyMetaData propertyMetaData) {
-			constraints.addAll( propertyMetaData.getConstraints() );
-			if ( propertyMetaData.isCascading() ) {
-				cascadingMembers.add( propertyMetaData.getLocation().getMember() );
+		public void add(ConstrainableElement constrainedElement) {
+			
+			for(MetaConstraint<?> oneConstraint : constrainedElement) {
+				constraints.add(oneConstraint);
+			}
+			
+			if ( constrainedElement.isCascading() ) {
+				cascadingMembers.add( constrainedElement.getLocation().getMember() );
 			}
 		}
 
 		public AggregatedPropertyMetaData build() {
 
-			Set<BeanMetaConstraint<?>> adaptedConstraints = newHashSet();
+			Set<MetaConstraint<?>> adaptedConstraints = newHashSet();
 
-			for ( BeanMetaConstraint<?> oneConstraint : constraints ) {
+			for ( MetaConstraint<?> oneConstraint : constraints ) {
 				adaptedConstraints.add(
 						adaptOriginAndImplicitGroup(
 								root.getLocation().getBeanClass(), oneConstraint
@@ -222,7 +235,7 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 		 *
 		 * @return A constraint adapted to the given bean type.
 		 */
-		private <A extends Annotation> BeanMetaConstraint<A> adaptOriginAndImplicitGroup(Class<?> beanClass, BeanMetaConstraint<A> constraint) {
+		private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(Class<?> beanClass, MetaConstraint<A> constraint) {
 
 			ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
 
@@ -240,7 +253,7 @@ public class AggregatedPropertyMetaData implements Iterable<BeanMetaConstraint<?
 					definedIn
 			);
 
-			return new BeanMetaConstraint<A>(
+			return new MetaConstraint<A>(
 					descriptor,
 					constraint.getLocation()
 			);

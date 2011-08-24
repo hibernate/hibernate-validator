@@ -16,32 +16,35 @@
 */
 package org.hibernate.validator.metadata;
 
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
+import java.util.Set;
+
+import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 
 /**
  * @author Gunnar Morling
+ *
  */
-public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
+public class ConstrainedType extends AbstractConstrainedElement {
 
-	private ParameterMetaData parameterMetaData;
+	private final BeanConstraintLocation location;
 
-	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ParameterMetaData parameterMetaData) {
-		super( parameterMetaData.getLocation().getBeanClass(), metaDataBean );
+	/**
+	 * @param location
+	 * @param constraints
+	 */
+	public ConstrainedType(BeanConstraintLocation location, Set<MetaConstraint<?>> constraints) {
 
-		this.parameterMetaData = parameterMetaData;
-
-		//add constraints of the represented parameter to the constraint descriptor list
-		for ( MetaConstraint<?> oneConstraint : parameterMetaData ) {
-			addConstraintDescriptor( oneConstraint.getDescriptor() );
-		}
+		super(constraints, false);
+		this.location = location;
+	}
+	
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return ConstrainedElementKind.TYPE;
 	}
 
-	public boolean isCascaded() {
-		return parameterMetaData.isCascading();
-	}
-
-	public int getIndex() {
-		return parameterMetaData.getLocation().getParameterIndex();
+	public BeanConstraintLocation getLocation() {
+		return location;
 	}
 
 }

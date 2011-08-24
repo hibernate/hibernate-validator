@@ -16,6 +16,8 @@
  */
 package org.hibernate.validator.metadata;
 
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+
 import java.util.List;
 import java.util.Set;
 
@@ -28,9 +30,7 @@ public class BeanConfiguration<T> {
 
 	private final Class<T> beanClass;
 
-	private final Set<PropertyMetaData> propertyMetaData;
-
-	private final Set<MethodMetaData> methodMetaData;
+	private final Set<ConstrainableElement> constrainableElements;
 
 	private List<Class<?>> defaultGroupSequence;
 
@@ -43,14 +43,12 @@ public class BeanConfiguration<T> {
 	 * @param defaultGroupSequence
 	 */
 	public BeanConfiguration(Class<T> beanClass,
-							 Set<PropertyMetaData> propertyMetaData,
-							 Set<MethodMetaData> methodMetaData,
+							 Set<? extends ConstrainableElement> constrainableElements,
 							 List<Class<?>> defaultGroupSequence,
 							 Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		this.beanClass = beanClass;
-		this.propertyMetaData = propertyMetaData;
-		this.methodMetaData = methodMetaData;
+		this.constrainableElements = newHashSet( constrainableElements );
 		this.defaultGroupSequence = defaultGroupSequence;
 		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
 	}
@@ -59,12 +57,8 @@ public class BeanConfiguration<T> {
 		return beanClass;
 	}
 
-	public Set<PropertyMetaData> getPropertyMetaData() {
-		return propertyMetaData;
-	}
-
-	public Set<MethodMetaData> getMethodMetaData() {
-		return methodMetaData;
+	public Set<ConstrainableElement> getConstrainableElements() {
+		return constrainableElements;
 	}
 
 	public List<Class<?>> getDefaultGroupSequence() {
@@ -77,8 +71,7 @@ public class BeanConfiguration<T> {
 
 	public void merge(BeanConfiguration<T> other) {
 
-		propertyMetaData.addAll( other.getPropertyMetaData() );
-		methodMetaData.addAll( other.getMethodMetaData() );
+		constrainableElements.addAll( other.getConstrainableElements() );
 
 		// TODO GM: Determine which default sequence should be taken
 		if ( ( defaultGroupSequence == null || defaultGroupSequence.isEmpty() )
@@ -96,8 +89,7 @@ public class BeanConfiguration<T> {
 	@Override
 	public String toString() {
 		return "BeanConfiguration [beanClass=" + beanClass
-				+ ", propertyMetaData=" + propertyMetaData
-				+ ", methodMetaData=" + methodMetaData
+				+ ", constrainableElements=" + constrainableElements
 				+ ", defaultGroupSequence=" + defaultGroupSequence
 				+ ", defaultGroupSequenceProvider="
 				+ defaultGroupSequenceProvider + "]";

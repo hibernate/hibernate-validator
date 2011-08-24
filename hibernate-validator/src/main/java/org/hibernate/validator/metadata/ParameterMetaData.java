@@ -16,78 +16,50 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.util.Collections;
-import java.util.Iterator;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+
 import java.util.Set;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
  *
  * @author Gunnar Morling
  */
-public class ParameterMetaData implements Iterable<MethodMetaConstraint<?>> {
+public class ParameterMetaData extends AbstractConstrainedElement {
 
-	private final Class<?> type;
-
-	private final int index;
+	private final MethodConstraintLocation location;
 
 	private final String name;
 
-	private final Set<MethodMetaConstraint<?>> constraints;
+	public ParameterMetaData(MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
-	private final boolean isCascading;
-
-	public ParameterMetaData(int index, Class<?> type, String name, Set<MethodMetaConstraint<?>> constraints, boolean isCascading) {
-
-		this.index = index;
-		this.type = type;
+		super(constraints, isCascading);
+		
+		this.location = location;
 		this.name = name;
-		this.constraints = Collections.unmodifiableSet( constraints );
-		this.isCascading = isCascading;
 	}
 
-	public Class<?> getType() {
-		return type;
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return ConstrainedElementKind.PARAMETER;
 	}
-
-	public int getIndex() {
-		return index;
+	
+	public MethodConstraintLocation getLocation() {
+		return location;
 	}
 
 	public String getParameterName() {
 		return name;
 	}
 
-	public boolean isCascading() {
-		return isCascading;
-	}
-
-	/**
-	 * Whether this parameter is constrained or not. This is the case, if this
-	 * parameter has at least one constraint or a cascaded validation shall be
-	 * performed for it.
-	 *
-	 * @return <code>True</code>, if this parameter is constrained,
-	 *         <code>false</code> otherwise.
-	 */
-	public boolean isConstrained() {
-
-		return isCascading || !constraints.isEmpty();
-	}
-
-	public Iterator<MethodMetaConstraint<?>> iterator() {
-		return constraints.iterator();
-	}
-
 	public ParameterMetaData merge(ParameterMetaData otherMetaData) {
 
 		return new ParameterMetaData(
-				index,
-				type,
+				location,
 				name,
-				newHashSet( this.constraints, otherMetaData.constraints ),
+				newHashSet( this.getConstraints(), otherMetaData.getConstraints() ),
 				isCascading() || otherMetaData.isCascading()
 		);
 	}
@@ -98,14 +70,14 @@ public class ParameterMetaData implements Iterable<MethodMetaConstraint<?>> {
 		//display short annotation type names
 		StringBuilder sb = new StringBuilder();
 
-		for ( MetaConstraint<?> oneConstraint : constraints ) {
+		for ( MetaConstraint<?> oneConstraint : getConstraints() ) {
 			sb.append( oneConstraint.getDescriptor().getAnnotation().annotationType().getSimpleName() );
 			sb.append( ", " );
 		}
 
 		String constraintsAsString = sb.length() > 0 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-		return "ParameterMetaData [type=" + type + "], [index=" + index + "], name=" + name + "], constraints=["
-				+ constraintsAsString + "], isCascading=" + isCascading + "]";
+		return "ParameterMetaData [location=" + location + "], name=" + name + "], constraints=["
+				+ constraintsAsString + "], isCascading=" + isCascading() + "]";
 	}
 }

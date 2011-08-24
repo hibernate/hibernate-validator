@@ -53,7 +53,7 @@ public class BeanMetaDataImplTest {
 		Method method = CustomerRepository.class.getMethod( "baz" );
 		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
 				.next()
@@ -71,7 +71,7 @@ public class BeanMetaDataImplTest {
 		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertIterableSize( methodMetaData, 1 );
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 
 		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
@@ -89,7 +89,7 @@ public class BeanMetaDataImplTest {
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
 		AggregatedMethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );
 		assertIterableSize( methodMetaData, 0 );
 	}

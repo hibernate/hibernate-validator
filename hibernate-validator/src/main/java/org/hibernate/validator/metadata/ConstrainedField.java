@@ -17,35 +17,29 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Member;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * @author Gunnar Morling
  */
-public class PropertyMetaData implements Iterable<BeanMetaConstraint<?>> {
-
-	private final Set<BeanMetaConstraint<?>> constraints;
+public class ConstrainedField extends AbstractConstrainedElement {
 
 	private final BeanConstraintLocation location;
-
-	private final boolean isCascading;
 
 	/**
 	 * @param constraints
 	 * @param location
 	 * @param isCascading
 	 */
-	public PropertyMetaData(Set<BeanMetaConstraint<?>> constraints,
+	public ConstrainedField(Set<MetaConstraint<?>> constraints,
 							BeanConstraintLocation location, boolean isCascading) {
 
-		this.constraints = constraints != null ? constraints : Collections.<BeanMetaConstraint<?>>emptySet();
+		super(constraints, isCascading);
 		this.location = location;
-		this.isCascading = isCascading;
 
 		Member member = location.getMember();
 		if ( member != null && isConstrained() ) {
@@ -53,76 +47,46 @@ public class PropertyMetaData implements Iterable<BeanMetaConstraint<?>> {
 		}
 	}
 
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return ConstrainedElementKind.FIELD;
+	}
+	
 	public BeanConstraintLocation getLocation() {
 		return location;
 	}
 
-	public Iterator<BeanMetaConstraint<?>> iterator() {
-		return constraints.iterator();
-	}
-
-	public Set<BeanMetaConstraint<?>> getConstraints() {
-		return constraints;
-	}
-
-	public boolean isCascading() {
-		return isCascading;
-	}
-
-	private boolean isConstrained() {
-		return isCascading || !constraints.isEmpty();
+	@Override
+	public String toString() {
+		return "ConstrainedField [location=" + location
+				+ ", getConstrainedElementKind()="
+				+ getConstrainedElementKind() + ", getLocation()="
+				+ getLocation() + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result
-				+ ( ( constraints == null ) ? 0 : constraints.hashCode() );
-		result = prime * result + ( isCascading ? 1231 : 1237 );
-		result = prime * result
-				+ ( ( location == null ) ? 0 : location.hashCode() );
+				+ ((location == null) ? 0 : location.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( this == obj ) {
+		if (this == obj)
 			return true;
-		}
-		if ( obj == null ) {
+		if (!super.equals(obj))
 			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		PropertyMetaData other = (PropertyMetaData) obj;
-		if ( constraints == null ) {
-			if ( other.constraints != null ) {
+		ConstrainedField other = (ConstrainedField) obj;
+		if (location == null) {
+			if (other.location != null)
 				return false;
-			}
-		}
-		else if ( !constraints.equals( other.constraints ) ) {
+		} else if (!location.equals(other.location))
 			return false;
-		}
-		if ( isCascading != other.isCascading ) {
-			return false;
-		}
-		if ( location == null ) {
-			if ( other.location != null ) {
-				return false;
-			}
-		}
-		else if ( !location.equals( other.location ) ) {
-			return false;
-		}
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "PropertyMetaData [constraints=" + constraints + ", location="
-				+ location + ", isCascading=" + isCascading + "]";
 	}
 
 }

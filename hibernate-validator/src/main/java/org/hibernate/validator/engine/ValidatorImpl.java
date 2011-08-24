@@ -44,12 +44,13 @@ import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
-import org.hibernate.validator.metadata.BeanMetaConstraint;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ParameterMetaData;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
@@ -370,7 +371,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
-			Set<BeanMetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 
 			// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
 			if ( defaultGroupSequenceIsRedefined ) {
@@ -381,7 +382,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
 				valueContext.setCurrentGroup( defaultSequenceMember );
 				boolean validationSuccessful = true;
-				for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
+				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 					// time. An interface can define more than one constraint, we have to check the class we are validating.
 					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
@@ -422,7 +423,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V> void validateConstraintsForNonDefaultGroup(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
 		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		PathImpl currentPath = valueContext.getPropertyPath();
-		for ( BeanMetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
+		for ( MetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
 			validateConstraint( validationContext, valueContext, metaConstraint );
 			if ( validationContext.shouldFailFast() ) {
 				return;
@@ -437,11 +438,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 	}
 
-	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext, BeanMetaConstraint<?> metaConstraint) {
+	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext, MetaConstraint<?> metaConstraint) {
 		boolean validationSuccessful = true;
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
-			valueContext.appendNode( metaConstraint.getLocation().getPropertyName() );
+			valueContext.appendNode( ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() ) );
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
@@ -620,7 +621,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T, ConstraintViolation<T>> context, PathImpl propertyPath, GroupChain groupChain) {
-		List<BeanMetaConstraint<?>> metaConstraints = newArrayList();
+		List<MetaConstraint<?>> metaConstraints = newArrayList();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
 		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
 				context.getRootBeanClass(),
@@ -676,7 +677,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	private <T, U, V> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T, ConstraintViolation<T>> context, V value, PathImpl propertyPath, GroupChain groupChain) {
-		List<BeanMetaConstraint<?>> metaConstraints = newArrayList();
+		List<MetaConstraint<?>> metaConstraints = newArrayList();
 		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
 				context.getRootBeanClass(), null, propertyPath.iterator(), propertyPath, metaConstraints
 		);
@@ -732,7 +733,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private <T, U, V> int validatePropertyForCurrentGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> metaConstraints) {
+	private <T, U, V> int validatePropertyForCurrentGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<MetaConstraint<?>> metaConstraints) {
 		// we do not validate the default group, nothing special to do
 		if ( !valueContext.validatingDefault() ) {
 			return validatePropertyForNonDefaultGroup( valueContext, validationContext, metaConstraints );
@@ -754,10 +755,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private <T, U, V> int validatePropertyForNonDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> metaConstraints) {
+	private <T, U, V> int validatePropertyForNonDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<MetaConstraint<?>> metaConstraints) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 
-		for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
+		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 				if ( valueContext.getCurrentBean() != null ) {
 					@SuppressWarnings("unchecked")
@@ -787,7 +788,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @return The number of constraint violations raised when validating the default group.
 	 */
-	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<BeanMetaConstraint<?>> constraintList) {
+	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<MetaConstraint<?>> constraintList) {
 		final int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
@@ -796,7 +797,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
-			Set<BeanMetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
 
 			if ( defaultGroupSequenceIsRedefined ) {
@@ -806,7 +807,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			for ( Class<?> groupClass : defaultGroupSequence ) {
 				boolean validationSuccessful = true;
 				valueContext.setCurrentGroup( groupClass );
-				for ( BeanMetaConstraint<?> metaConstraint : metaConstraints ) {
+				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 					// time. An interface can define more than one constraint, we have to check the class we are validating.
 					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
@@ -1140,7 +1141,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
 	 */
-	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, List<BeanMetaConstraint<?>> metaConstraintsList) {
+	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, List<MetaConstraint<?>> metaConstraintsList) {
 		Path.Node elem = propertyIter.next();
 		Object newValue = value;
 
@@ -1156,9 +1157,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		if ( !propertyIter.hasNext() ) {
 			for ( Class<?> hierarchyClass : metaData.getClassHierarchy() ) {
 				metaData = beanMetaDataManager.getBeanMetaData( hierarchyClass );
-				for ( BeanMetaConstraint<?> constraint : metaData.getDirectMetaConstraints() ) {
+				for ( MetaConstraint<?> constraint : metaData.getDirectMetaConstraints() ) {
 					if ( elem.getName() != null && elem.getName()
-							.equals( constraint.getLocation().getPropertyName() ) ) {
+							.equals( ReflectionHelper.getPropertyName( constraint.getLocation().getMember() ) ) ) {
 						metaConstraintsList.add( constraint );
 					}
 				}

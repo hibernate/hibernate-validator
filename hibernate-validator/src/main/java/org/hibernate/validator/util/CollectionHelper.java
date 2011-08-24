@@ -63,6 +63,14 @@ public class CollectionHelper {
 		return set;
 	}
 
+	public static <T> HashSet<T> newHashSet(Iterable<? extends T> iterable) {
+		HashSet<T> set = newHashSet();
+		for(T t : iterable) {
+			set.add(t);
+		}
+		return set;
+	}
+	
 	public static <T> ArrayList<T> newArrayList() {
 		return new ArrayList<T>();
 	}

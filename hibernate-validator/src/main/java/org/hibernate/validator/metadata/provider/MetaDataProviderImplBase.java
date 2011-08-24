@@ -27,11 +27,12 @@ import java.util.Set;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.BeanConfiguration;
-import org.hibernate.validator.metadata.BeanMetaConstraint;
+import org.hibernate.validator.metadata.ConstrainableElement;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.MethodMetaConstraint;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.MethodMetaData;
-import org.hibernate.validator.metadata.PropertyMetaData;
+import org.hibernate.validator.metadata.ConstrainedField;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
@@ -64,12 +65,11 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 		return new HashSet<BeanConfiguration<?>>( configuredBeans.values() );
 	}
 
-	protected <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass, Set<PropertyMetaData> propertyMetaData, Set<MethodMetaData> methodMetaData, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
+	protected <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass, Set<? extends ConstrainableElement> constrainableElements, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		return new BeanConfiguration<T>(
 				beanClass,
-				propertyMetaData,
-				methodMetaData,
+				constrainableElements,
 				defaultGroupSequence,
 				defaultGroupSequenceProvider
 		);
@@ -81,84 +81,6 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 				return constraint.getLocation();
 			}
 		};
-	}
-
-	protected Set<PropertyMetaData> getGettersAsPropertyMetaData(Iterable<MethodMetaData> methodMetaData) {
-
-		Set<PropertyMetaData> theValue = newHashSet();
-
-		for ( MethodMetaData oneMethodMetaData : methodMetaData ) {
-
-			if ( oneMethodMetaData.isGetterMethod() ) {
-				theValue.add(
-						new PropertyMetaData(
-								getAsBeanMetaConstraints( oneMethodMetaData ),
-								new BeanConstraintLocation( oneMethodMetaData.getMethod() ),
-								oneMethodMetaData.isCascading()
-						)
-				);
-			}
-		}
-
-		return theValue;
-	}
-
-	protected Set<MethodMetaData> getGettersAsMethodMetaData(Iterable<PropertyMetaData> propertyMetaData) {
-
-		Set<MethodMetaData> theValue = newHashSet();
-
-		for ( PropertyMetaData oneProperty : propertyMetaData ) {
-
-			if ( oneProperty.getLocation().getElementType() == ElementType.METHOD ) {
-				theValue.add(
-						new MethodMetaData(
-								(Method) oneProperty.getLocation().getMember(),
-								getAsMethodMetaConstraints( oneProperty ),
-								oneProperty.isCascading()
-						)
-				);
-			}
-		}
-
-		return theValue;
-	}
-
-	private Set<BeanMetaConstraint<?>> getAsBeanMetaConstraints(Iterable<MethodMetaConstraint<?>> constraints) {
-
-		Set<BeanMetaConstraint<?>> theValue = newHashSet();
-
-		for ( MethodMetaConstraint<?> oneConstraint : constraints ) {
-			theValue.add( getAsBeanMetaConstraint( oneConstraint ) );
-		}
-
-		return theValue;
-	}
-
-	private <A extends Annotation> BeanMetaConstraint<A> getAsBeanMetaConstraint(MethodMetaConstraint<A> methodMetaConstraint) {
-		return new BeanMetaConstraint<A>(
-				methodMetaConstraint.getDescriptor(),
-				new BeanConstraintLocation(
-						methodMetaConstraint.getLocation().getMethod()
-				)
-		);
-	}
-
-	private Set<MethodMetaConstraint<?>> getAsMethodMetaConstraints(Iterable<BeanMetaConstraint<?>> constraints) {
-
-		Set<MethodMetaConstraint<?>> theValue = newHashSet();
-
-		for ( BeanMetaConstraint<?> oneConstraint : constraints ) {
-			theValue.add( getAsMethodMetaConstraint( oneConstraint ) );
-		}
-
-		return theValue;
-	}
-
-	private <A extends Annotation> MethodMetaConstraint<A> getAsMethodMetaConstraint(BeanMetaConstraint<A> beanMetaConstraint) {
-		return new MethodMetaConstraint<A>(
-				beanMetaConstraint.getDescriptor(),
-				new MethodConstraintLocation( (Method) beanMetaConstraint.getLocation().getMember() )
-		);
 	}
 
 }

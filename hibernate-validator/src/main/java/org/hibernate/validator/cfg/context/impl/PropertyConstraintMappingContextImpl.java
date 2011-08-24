@@ -16,7 +16,9 @@
  */
 package org.hibernate.validator.cfg.context.impl;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
@@ -43,11 +45,21 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 
 	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
 
-		mapping.addConstraintConfig(
-				ConfiguredConstraint.forProperty(
-						definition, member
-				)
-		);
+		if(member instanceof Field) { 
+		
+			mapping.addConstraintConfig(
+					ConfiguredConstraint.forProperty(
+							definition, member
+					)
+			);
+		}
+		else {
+			mapping.addMethodConstraintConfig(
+					ConfiguredConstraint.forReturnValue(
+							definition, (Method)member
+					)
+			);
+		}
 		return this;
 	}
 

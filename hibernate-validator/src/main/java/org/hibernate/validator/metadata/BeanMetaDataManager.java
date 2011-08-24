@@ -22,11 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
 
+import static org.hibernate.validator.util.CollectionHelper.asSet;
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
@@ -171,8 +173,7 @@ public class BeanMetaDataManager {
 
 		Class<T> beanClass = rootConfiguration.getBeanClass();
 
-		Set<AggregatedMethodMetaData.Builder> builders = newHashSet();
-		Set<AggregatedPropertyMetaData.Builder> propertyBuilders = newHashSet();
+		Set<Builder> builders = newHashSet();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 
@@ -182,56 +183,70 @@ public class BeanMetaDataManager {
 				continue;
 			}
 
-			for ( PropertyMetaData oneProperty : configurationForHierarchyClass.getPropertyMetaData() ) {
-				addMetaDataToBuilder( oneProperty, propertyBuilders );
-			}
-
-			for ( MethodMetaData oneMethodMetaData : configurationForHierarchyClass.getMethodMetaData() ) {
-				addMetaDataToBuilder( oneMethodMetaData, builders );
+			for ( ConstrainableElement oneConstrainedElement : configurationForHierarchyClass.getConstrainableElements() ) {
+				addMetaDataToBuilder( oneConstrainedElement, builders );
 			}
 		}
 
-		Set<AggregatedMethodMetaData> allMethodMetaData = newHashSet();
+		Set<AggregatedConstrainedElement> aggregatedElements = newHashSet();
 		for ( Builder oneBuilder : builders ) {
-			allMethodMetaData.add( oneBuilder.build() );
-		}
-
-		Set<AggregatedPropertyMetaData> allPropertyMetaData = newHashSet();
-		for ( AggregatedPropertyMetaData.Builder oneBuilder : propertyBuilders ) {
-			allPropertyMetaData.add( oneBuilder.build() );
+			aggregatedElements.add( oneBuilder.build() );
 		}
 
 		return new BeanMetaDataImpl<T>(
 				beanClass,
 				rootConfiguration.getDefaultGroupSequence(),
 				rootConfiguration.getDefaultGroupSequenceProvider(),
-				allPropertyMetaData,
-				allMethodMetaData
+				aggregatedElements
 		);
 	}
 
-	private void addMetaDataToBuilder(MethodMetaData methodMetaData, Set<AggregatedMethodMetaData.Builder> builders) {
-		for ( AggregatedMethodMetaData.Builder oneBuilder : builders ) {
-			if ( oneBuilder.accepts( methodMetaData ) ) {
-				oneBuilder.addMetaData( methodMetaData );
+	private void addMetaDataToBuilder(ConstrainableElement constrainableElement, Set<Builder> builders) {
+		for ( Builder oneBuilder : builders ) {
+			if ( oneBuilder.accepts( constrainableElement ) ) {
+				oneBuilder.add( constrainableElement );
 				return;
 			}
 		}
-		AggregatedMethodMetaData.Builder builder = new AggregatedMethodMetaData.Builder( methodMetaData );
-		builders.add( builder );
+		
+		Set<Builder> builder = Builder.getInstance( constrainableElement, constraintHelper );
+		builders.addAll( builder );
 	}
 
-	private void addMetaDataToBuilder(PropertyMetaData propertyMetaData, Set<AggregatedPropertyMetaData.Builder> builders) {
-		for ( AggregatedPropertyMetaData.Builder oneBuilder : builders ) {
-			if ( oneBuilder.accepts( propertyMetaData ) ) {
-				oneBuilder.add( propertyMetaData );
-				return;
+	public static abstract class Builder {
+		
+		public abstract boolean accepts(ConstrainableElement constrainableElement);
+		
+		public abstract void add(ConstrainableElement constrainableElement);
+		
+		public abstract AggregatedConstrainedElement build();
+		
+		public static Set<Builder> getInstance(ConstrainableElement constrainableElement, ConstraintHelper constraintHelper) {
+			
+			Set<Builder> builders = newHashSet();
+
+			switch(constrainableElement.getConstrainedElementKind()) {
+				case FIELD: 
+					builders.add(new AggregatedPropertyMetaData.Builder((ConstrainedField) constrainableElement, constraintHelper));
+					break;
+				case METHOD:
+					builders.add( new AggregatedMethodMetaData.Builder((MethodMetaData)constrainableElement) );
+					if(((MethodMetaData)constrainableElement).isGetterMethod()) {
+						builders.add( new AggregatedPropertyMetaData.Builder( (MethodMetaData)constrainableElement, constraintHelper ));
+					}
+					break;
+					
+				case TYPE:
+					builders.add( new AggregatedPropertyMetaData.Builder((ConstrainedType) constrainableElement, constraintHelper) );
+					break;
+				default: 
+					throw new IllegalArgumentException();
 			}
+			
+			return builders;
 		}
-		AggregatedPropertyMetaData.Builder builder = new AggregatedPropertyMetaData.Builder(
-				constraintHelper, propertyMetaData
-		);
-		builders.add( builder );
+
 	}
+	
 
 }

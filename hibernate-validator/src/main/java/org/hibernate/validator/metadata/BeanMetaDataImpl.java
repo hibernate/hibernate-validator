@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
@@ -34,6 +35,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.metadata.AggregatedConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -66,17 +68,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
 	 * (eg super class or interface) in which they are defined.
 	 */
-	private final Map<Class<?>, List<BeanMetaConstraint<?>>> metaConstraints = newHashMap();
+	private final Map<Class<?>, List<MetaConstraint<?>>> metaConstraints = newHashMap();
 
 	/**
 	 * Set of all constraints for this bean type (defined on any implemented interfaces or super types)
 	 */
-	private final Set<BeanMetaConstraint<?>> allMetaConstraints;
+	private final Set<MetaConstraint<?>> allMetaConstraints;
 
 	/**
 	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
 	 */
-	private final Set<BeanMetaConstraint<?>> directMetaConstraints;
+	private final Set<MetaConstraint<?>> directMetaConstraints;
 
 	/**
 	 * The main element descriptor for {@link #beanClass}.
@@ -137,14 +139,26 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public BeanMetaDataImpl(Class<T> beanClass,
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
-							Set<AggregatedPropertyMetaData> propertyMetaDatas,
-							Set<AggregatedMethodMetaData> methodMetaDatas) {
+							Set<AggregatedConstrainedElement> constrainableElements) {
 		this.beanClass = beanClass;
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 
 		this.propertyMetaData = newHashMap();
 
-		for ( AggregatedPropertyMetaData oneProperty : propertyMetaDatas ) {
+		Set<AggregatedPropertyMetaData> propertyMetaDatas = newHashSet();
+		Set<AggregatedMethodMetaData> methodMetaDatas = newHashSet();
+		
+		for ( AggregatedConstrainedElement oneElement : constrainableElements ) {
+	
+			if( oneElement.getConstrainedElementKind() == ConstrainedElementKind.PROPERTY ) {
+				propertyMetaDatas.add((AggregatedPropertyMetaData)oneElement);
+			}
+			else {
+				methodMetaDatas.add((AggregatedMethodMetaData)oneElement);
+			}
+		}
+		
+		for ( AggregatedPropertyMetaData oneProperty : propertyMetaDatas) {
 			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
 		}
 
@@ -164,7 +178,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		// add the explicitly configured constraints
 		for ( AggregatedPropertyMetaData onePropertyMetaData : propertyMetaDatas ) {
-			for ( BeanMetaConstraint<?> constraint : onePropertyMetaData ) {
+			for ( MetaConstraint<?> constraint : onePropertyMetaData ) {
 				addMetaConstraint( constraint.getLocation().getBeanClass(), constraint );
 			}
 		}
@@ -210,20 +224,27 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return cascadedMembers;
 	}
 
-	public Map<Class<?>, List<BeanMetaConstraint<?>>> getMetaConstraintsAsMap() {
+	public Map<Class<?>, List<MetaConstraint<?>>> getMetaConstraintsAsMap() {
 		return Collections.unmodifiableMap( metaConstraints );
 	}
 
-	public Set<BeanMetaConstraint<?>> getMetaConstraints() {
+	public Set<MetaConstraint<?>> getMetaConstraints() {
 		return allMetaConstraints;
 	}
 
-	public Set<BeanMetaConstraint<?>> getDirectMetaConstraints() {
+	public Set<MetaConstraint<?>> getDirectMetaConstraints() {
 		return directMetaConstraints;
 	}
 
 	public AggregatedMethodMetaData getMetaDataFor(Method method) {
-		return methodMetaData.get( method );
+		for(Entry<Method, AggregatedMethodMetaData> oneMethod :methodMetaData.entrySet()) {
+			if(ReflectionHelper.haveSameSignature(method, oneMethod.getKey())) {
+				return oneMethod.getValue();
+			}
+		}
+		
+		return null;
+//		return methodMetaData.get( method );
 	}
 
 	public Set<AggregatedMethodMetaData> getAllMethodMetaData() {
@@ -269,16 +290,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableSet( theValue );
 	}
 
-	private Set<BeanMetaConstraint<?>> buildAllConstraintSets() {
-		Set<BeanMetaConstraint<?>> constraints = newHashSet();
-		for ( List<BeanMetaConstraint<?>> list : metaConstraints.values() ) {
+	private Set<MetaConstraint<?>> buildAllConstraintSets() {
+		Set<MetaConstraint<?>> constraints = newHashSet();
+		for ( List<MetaConstraint<?>> list : metaConstraints.values() ) {
 			constraints.addAll( list );
 		}
 		return Collections.unmodifiableSet( constraints );
 	}
 
-	private Set<BeanMetaConstraint<?>> buildDirectConstraintSets() {
-		Set<BeanMetaConstraint<?>> constraints = newHashSet();
+	private Set<MetaConstraint<?>> buildDirectConstraintSets() {
+		Set<MetaConstraint<?>> constraints = newHashSet();
 		// collect all constraints directly defined in this bean
 		if ( metaConstraints.get( beanClass ) != null ) {
 			constraints.addAll( metaConstraints.get( beanClass ) );
@@ -301,12 +322,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<Method, AggregatedMethodMetaData> theValue = newHashMap();
 
 		for ( AggregatedMethodMetaData oneAggregatedMethodMetaData : allMethodMetaData ) {
-
-			//register the aggregated meta data for each underlying method for a quick
-			//read access
-			for ( MethodMetaData oneMethodMetaData : oneAggregatedMethodMetaData.getAllMethodMetaData() ) {
-				theValue.put( oneMethodMetaData.getMethod(), oneAggregatedMethodMetaData );
-			}
+			theValue.put( oneAggregatedMethodMetaData.getLocation().getMethod(), oneAggregatedMethodMetaData );
+//			//register the aggregated meta data for each underlying method for a quick
+//			//read access
+//			for(Class<?> oneClass : ReflectionHelper.computeClassHierarchy( oneAggregatedMethodMetaData.getLocation().getBeanClass(),true ) ) {
+//				for(Method oneMethod : oneClass.getMethods()) {
+//					if(ReflectionHelper.haveSameSignature( oneAggregatedMethodMetaData.getLocation().getMethod(), oneMethod )) {
+//						theValue.put( oneMethod, oneAggregatedMethodMetaData );
+//					}
+//				}
+//			}
 		}
 
 		return theValue;
@@ -348,12 +373,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return validDefaultGroupSequence;
 	}
 
-	private void addMetaConstraint(Class<?> clazz, BeanMetaConstraint<?> metaConstraint) {
+	private void addMetaConstraint(Class<?> clazz, MetaConstraint<?> metaConstraint) {
 
 		// first we add the meta constraint to our meta constraint map
-		List<BeanMetaConstraint<?>> constraintList;
+		List<MetaConstraint<?>> constraintList;
 		if ( !metaConstraints.containsKey( clazz ) ) {
-			constraintList = new ArrayList<BeanMetaConstraint<?>>();
+			constraintList = new ArrayList<MetaConstraint<?>>();
 			metaConstraints.put( clazz, constraintList );
 		}
 		else {

@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.metadata.location;
 
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
 /**
@@ -26,7 +28,7 @@ import java.lang.reflect.Type;
  */
 public interface ConstraintLocation {
 
-	public Class<?> getBeanClass();
+	Class<?> getBeanClass();
 
 	/**
 	 * Returns the type of the element at this constraint location. Depending
@@ -36,4 +38,8 @@ public interface ConstraintLocation {
 	 */
 	Type typeOfAnnotatedElement();
 
+	ElementType getElementType();
+	
+	Member getMember();
+	
 }

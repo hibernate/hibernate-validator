@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.metadata.location;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -77,8 +78,16 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		return t;
 	}
 
+	public Method getMember() {
+		return method;
+	}
+	
 	public Method getMethod() {
 		return method;
+	}
+	
+	public ElementType getElementType() {
+		return parameterIndex != null ? ElementType.PARAMETER : ElementType.METHOD;
 	}
 
 	/**

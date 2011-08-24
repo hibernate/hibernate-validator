@@ -24,7 +24,9 @@ import java.util.Set;
 import org.hibernate.validator.engine.ConstraintTree;
 import org.hibernate.validator.engine.ValidationContext;
 import org.hibernate.validator.engine.ValueContext;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.util.ReflectionHelper;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
@@ -33,7 +35,7 @@ import org.hibernate.validator.metadata.location.ConstraintLocation;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public abstract class MetaConstraint<A extends Annotation> {
+public class MetaConstraint<A extends Annotation> {
 
 	/**
 	 * The constraint tree created from the constraint annotation.
@@ -48,7 +50,7 @@ public abstract class MetaConstraint<A extends Annotation> {
 	/**
 	 * The location at which this constraint is defined.
 	 */
-	protected final ConstraintLocation location;
+	private final ConstraintLocation location;
 
 	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
@@ -90,6 +92,21 @@ public abstract class MetaConstraint<A extends Annotation> {
 
 	protected final Type typeOfAnnotatedElement() {
 		return location.typeOfAnnotatedElement();
+	}
+	
+	/**
+	 * @param o the object from which to retrieve the value.
+	 *
+	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
+	 *         is returned of method or field access is used to access the value.
+	 */
+	public Object getValue(Object o) {
+		if ( location.getMember() == null ) {
+			return o;
+		}
+		else {
+			return ReflectionHelper.getValue( location.getMember(), o );
+		}
 	}
 
 	@Override

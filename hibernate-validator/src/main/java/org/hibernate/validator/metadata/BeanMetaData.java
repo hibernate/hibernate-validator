@@ -76,14 +76,14 @@ public interface BeanMetaData<T> {
 	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 *         defined on the bean. This collection includes constraints from super classes as well
 	 */
-	Set<BeanMetaConstraint<?>> getMetaConstraints();
+	Set<MetaConstraint<?>> getMetaConstraints();
 
 	/**
 	 * @return A set of {@code MetaConstraint} instances encapsulating the information of all the constraints
 	 *         defined on the bean directly (including constraints defined on implemented interfaces). It does not
 	 *         contain constraints from super classes or interfaces implemented by super classes
 	 */
-	Set<BeanMetaConstraint<?>> getDirectMetaConstraints();
+	Set<MetaConstraint<?>> getDirectMetaConstraints();
 
 	/**
 	 * Returns the constraint-related meta data for the given method of the

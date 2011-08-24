@@ -54,7 +54,7 @@ public class MethodMetaDataTest {
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
@@ -67,7 +67,7 @@ public class MethodMetaDataTest {
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
 		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
@@ -80,7 +80,7 @@ public class MethodMetaDataTest {
 		Method method = CustomerRepository.class.getMethod( "bar" );
 		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 1 );
@@ -96,7 +96,7 @@ public class MethodMetaDataTest {
 		Method method = CustomerRepository.class.getMethod( "foo" );
 		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
@@ -109,7 +109,7 @@ public class MethodMetaDataTest {
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
 		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
 
-		assertEquals( methodMetaData.getMethod(), method );
+		assertEquals( methodMetaData.getLocation().getMethod(), method );
 		assertFalse( methodMetaData.isCascading() );
 		assertFalse( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );

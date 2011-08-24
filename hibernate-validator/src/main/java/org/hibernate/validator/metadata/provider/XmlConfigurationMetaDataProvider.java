@@ -23,10 +23,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanMetaConstraint;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.PropertyMetaData;
+import org.hibernate.validator.metadata.ConstrainedField;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.xml.XmlMappingParser;
 
@@ -55,19 +56,18 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 
 		for ( Class<?> clazz : mappingParser.getXmlConfiguredClasses() ) {
 
-			Map<BeanConstraintLocation, Set<BeanMetaConstraint<?>>> constraintsByLocation = partition(
+			Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation = partition(
 					mappingParser.getConstraintsForClass( clazz ), byLocation()
 			);
 			Set<BeanConstraintLocation> cascades = getCascades( mappingParser, clazz );
 
-			Set<PropertyMetaData> propertyMetaData = retrievePropertyMetaData( constraintsByLocation, cascades );
+			Set<ConstrainedField> propertyMetaData = retrievePropertyMetaData( constraintsByLocation, cascades );
 
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
 							clazz,
 							propertyMetaData,
-							getGettersAsMethodMetaData( propertyMetaData ),
 							mappingParser.getDefaultSequenceForClass( clazz ),
 							null
 					)
@@ -77,19 +77,19 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		annotationIgnores = mappingParser.getAnnotationIgnores();
 	}
 
-	private Set<PropertyMetaData> retrievePropertyMetaData(Map<BeanConstraintLocation, Set<BeanMetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
+	private Set<ConstrainedField> retrievePropertyMetaData(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
 
-		Set<BeanConstraintLocation> allConfiguredProperties = new HashSet<BeanConstraintLocation>( cascades );
+		Set<ConstraintLocation> allConfiguredProperties = new HashSet<ConstraintLocation>( cascades );
 		allConfiguredProperties.addAll( constraintsByLocation.keySet() );
 
-		Set<PropertyMetaData> propertyMetaData = newHashSet();
+		Set<ConstrainedField> propertyMetaData = newHashSet();
 
-		for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
+		for ( ConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
 
 			propertyMetaData.add(
-					new PropertyMetaData(
+					new ConstrainedField(
 							constraintsByLocation.get( oneConfiguredProperty ),
-							oneConfiguredProperty,
+							(BeanConstraintLocation) oneConfiguredProperty,
 							cascades.contains( oneConfiguredProperty )
 					)
 			);
@@ -119,9 +119,9 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		return annotationIgnores;
 	}
 
-	protected Partitioner<BeanConstraintLocation, BeanMetaConstraint<?>> byLocation() {
-		return new Partitioner<BeanConstraintLocation, BeanMetaConstraint<?>>() {
-			public BeanConstraintLocation getPartition(BeanMetaConstraint<?> constraint) {
+	protected Partitioner<ConstraintLocation, MetaConstraint<?>> byLocation() {
+		return new Partitioner<ConstraintLocation, MetaConstraint<?>>() {
+			public ConstraintLocation getPartition(MetaConstraint<?> constraint) {
 				return constraint.getLocation();
 			}
 		};

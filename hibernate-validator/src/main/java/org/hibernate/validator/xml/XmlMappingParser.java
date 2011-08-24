@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanMetaConstraint;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
@@ -74,7 +74,7 @@ public class XmlMappingParser {
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
 	private final AnnotationIgnores annotationIgnores;
-	private final Map<Class<?>, Set<BeanMetaConstraint<?>>> constraintMap;
+	private final Map<Class<?>, Set<MetaConstraint<?>>> constraintMap;
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
@@ -113,11 +113,11 @@ public class XmlMappingParser {
 		return annotationIgnores;
 	}
 
-	public final <T> Set<BeanMetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
+	public final <T> Set<MetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
 
-		Set<BeanMetaConstraint<?>> theValue = constraintMap.get( beanClass );
+		Set<MetaConstraint<?>> theValue = constraintMap.get( beanClass );
 
-		return theValue != null ? theValue : Collections.<BeanMetaConstraint<?>>emptySet();
+		return theValue != null ? theValue : Collections.<MetaConstraint<?>>emptySet();
 	}
 
 	public final List<Member> getCascadedMembersForClass(Class<?> beanClass) {
@@ -218,7 +218,7 @@ public class XmlMappingParser {
 
 			// constraints
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
-				BeanMetaConstraint<?> metaConstraint = createMetaConstraint(
+				MetaConstraint<?> metaConstraint = createMetaConstraint(
 						constraint, beanClass, field, defaultPackage
 				);
 				addMetaConstraint( beanClass, metaConstraint );
@@ -255,7 +255,7 @@ public class XmlMappingParser {
 
 			// constraints
 			for ( ConstraintType constraint : getterType.getConstraint() ) {
-				BeanMetaConstraint<?> metaConstraint = createMetaConstraint(
+				MetaConstraint<?> metaConstraint = createMetaConstraint(
 						constraint, beanClass, method, defaultPackage
 				);
 				addMetaConstraint( beanClass, metaConstraint );
@@ -281,17 +281,17 @@ public class XmlMappingParser {
 
 		// constraints
 		for ( ConstraintType constraint : classType.getConstraint() ) {
-			BeanMetaConstraint<?> metaConstraint = createMetaConstraint( constraint, beanClass, null, defaultPackage );
+			MetaConstraint<?> metaConstraint = createMetaConstraint( constraint, beanClass, null, defaultPackage );
 			addMetaConstraint( beanClass, metaConstraint );
 		}
 	}
 
-	private void addMetaConstraint(Class<?> beanClass, BeanMetaConstraint<?> metaConstraint) {
+	private void addMetaConstraint(Class<?> beanClass, MetaConstraint<?> metaConstraint) {
 		if ( constraintMap.containsKey( beanClass ) ) {
 			constraintMap.get( beanClass ).add( metaConstraint );
 		}
 		else {
-			Set<BeanMetaConstraint<?>> constraintList = newHashSet();
+			Set<MetaConstraint<?>> constraintList = newHashSet();
 			constraintList.add( metaConstraint );
 			constraintMap.put( beanClass, constraintList );
 		}
@@ -319,7 +319,7 @@ public class XmlMappingParser {
 		return groupSequence;
 	}
 
-	private <A extends Annotation, T> BeanMetaConstraint<?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, Member member, String defaultPackage) {
+	private <A extends Annotation, T> MetaConstraint<?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, Member member, String defaultPackage) {
 		@SuppressWarnings("unchecked")
 		Class<A> annotationClass = (Class<A>) getClass( constraint.getAnnotation(), defaultPackage );
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
@@ -362,7 +362,7 @@ public class XmlMappingParser {
 				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new BeanMetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
+		return new MetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
