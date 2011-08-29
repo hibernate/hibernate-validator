@@ -16,9 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import static org.hibernate.validator.util.CollectionHelper.asSet;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -26,11 +23,13 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.util.ReflectionHelper;
+
+import static org.hibernate.validator.util.CollectionHelper.asSet;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * @author Gunnar Morling
@@ -46,7 +45,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	private final boolean isConstrained;
 
 	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
-		super(constraints, ConstraintMetaDataKind.PROPERTY);
+		super( constraints, ConstraintMetaDataKind.PROPERTY );
 		this.type = type;
 		this.propertyName = propertyName;
 		this.cascadingMembers = cascadingMembers;
@@ -90,48 +89,73 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		int result = super.hashCode();
 		result = prime
 				* result
-				+ ((cascadingMembers == null) ? 0 : cascadingMembers.hashCode());
-		result = prime * result + (isConstrained ? 1231 : 1237);
+				+ ( ( cascadingMembers == null ) ? 0 : cascadingMembers.hashCode() );
+		result = prime * result + ( isConstrained ? 1231 : 1237 );
 		result = prime * result
-				+ ((propertyName == null) ? 0 : propertyName.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+				+ ( ( propertyName == null ) ? 0 : propertyName.hashCode() );
+		result = prime * result + ( ( type == null ) ? 0 : type.hashCode() );
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if ( this == obj ) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if ( !super.equals( obj ) ) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		PropertyMetaData other = (PropertyMetaData) obj;
-		if (cascadingMembers == null) {
-			if (other.cascadingMembers != null)
+		if ( cascadingMembers == null ) {
+			if ( other.cascadingMembers != null ) {
 				return false;
-		} else if (!cascadingMembers.equals(other.cascadingMembers))
+			}
+		}
+		else if ( !cascadingMembers.equals( other.cascadingMembers ) ) {
 			return false;
-		if (isConstrained != other.isConstrained)
+		}
+		if ( isConstrained != other.isConstrained ) {
 			return false;
-		if (propertyName == null) {
-			if (other.propertyName != null)
+		}
+		if ( propertyName == null ) {
+			if ( other.propertyName != null ) {
 				return false;
-		} else if (!propertyName.equals(other.propertyName))
+			}
+		}
+		else if ( !propertyName.equals( other.propertyName ) ) {
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		}
+		if ( type == null ) {
+			if ( other.type != null ) {
 				return false;
-		} else if (!type.equals(other.type))
+			}
+		}
+		else if ( !type.equals( other.type ) ) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "AggregatedPropertyMetaData [type=" + type + ", propertyName="
-				+ propertyName + ", cascadingMembers=" + cascadingMembers
-				+ ", isConstrained=" + isConstrained + "]";
+
+		StringBuilder cascadingMembers = new StringBuilder();
+
+		for ( Member oneCascadingMember : this.cascadingMembers ) {
+			cascadingMembers.append( oneCascadingMember.getName() );
+			cascadingMembers.append( ", " );
+		}
+
+		if ( cascadingMembers.length() > 0 ) {
+			cascadingMembers.subSequence( 0, cascadingMembers.length() - 2 );
+		}
+
+		return "PropertyMetaData [type=" + type.getSimpleName() + ", propertyName="
+				+ propertyName + ", cascadingMembers=[" + cascadingMembers
+				+ "], isConstrained=" + isConstrained + "]";
 	}
 
 	public static class Builder extends BeanMetaDataManager.Builder {
@@ -144,55 +168,63 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		private final Set<Member> cascadingMembers;
 
-		public Builder( ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
+		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			this.constraintHelper = constraintHelper;
 			this.root = constrainedField;
-			this.constraints = newHashSet(constrainedField);
-			this.cascadingMembers = constrainedField.isCascading() ? asSet(constrainedField.getLocation().getMember()) : new HashSet<Member>();
+			this.constraints = newHashSet( constrainedField );
+			this.cascadingMembers = constrainedField.isCascading() ? asSet(
+					constrainedField.getLocation()
+							.getMember()
+			) : new HashSet<Member>();
 		}
 
-		public Builder( ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
+		public Builder(ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
 			this.constraintHelper = constraintHelper;
 			this.root = constrainedType;
-			this.constraints = newHashSet(constrainedType);
+			this.constraints = newHashSet( constrainedType );
 			this.cascadingMembers = Collections.<Member>emptySet();
 		}
 
-		public Builder( ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
+		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
 			this.constraintHelper = constraintHelper;
 			this.root = constrainedMethod;
-			this.constraints = newHashSet(constrainedMethod);
-			this.cascadingMembers = constrainedMethod.isCascading() ? asSet((Member)constrainedMethod.getLocation().getMethod()) : new HashSet<Member>();
+			this.constraints = newHashSet( constrainedMethod );
+			this.cascadingMembers = constrainedMethod.isCascading() ? asSet(
+					(Member) constrainedMethod.getLocation()
+							.getMethod()
+			) : new HashSet<Member>();
 		}
 
 		public boolean accepts(ConstrainedElement constrainedElement) {
 
-			if( constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.TYPE &&
-				constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.FIELD &&
-				constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.METHOD ) {
+			if ( constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.TYPE &&
+					constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.FIELD &&
+					constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.METHOD ) {
 				return false;
 			}
-			
-			if( constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
-					!((ConstrainedMethod)constrainedElement).isGetterMethod()) {
+
+			if ( constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+					!( (ConstrainedMethod) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}
-			
+
 			String propertyName1 = ReflectionHelper.getPropertyName( constrainedElement.getLocation().getMember() );
 			String propertyName2 = ReflectionHelper.getPropertyName( root.getLocation().getMember() );
 
 			return
-				constrainedElement.getLocation().getBeanClass().isAssignableFrom( root.getLocation().getBeanClass() )
+					constrainedElement.getLocation()
+							.getBeanClass()
+							.isAssignableFrom( root.getLocation().getBeanClass() )
 							&& ( ( propertyName1 != null && propertyName1.equals( propertyName2 ) ) ||
 							propertyName1 == null && propertyName2 == null );
 		}
 
 		public void add(ConstrainedElement constrainedElement) {
-			
-			for(MetaConstraint<?> oneConstraint : constrainedElement) {
-				constraints.add(oneConstraint);
+
+			for ( MetaConstraint<?> oneConstraint : constrainedElement ) {
+				constraints.add( oneConstraint );
 			}
-			
+
 			if ( constrainedElement.isCascading() ) {
 				cascadingMembers.add( constrainedElement.getLocation().getMember() );
 			}

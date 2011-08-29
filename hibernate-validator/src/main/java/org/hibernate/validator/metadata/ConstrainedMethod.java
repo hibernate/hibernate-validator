@@ -16,13 +16,13 @@
 */
 package org.hibernate.validator.metadata;
 
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -92,11 +92,16 @@ public class ConstrainedMethod implements ConstrainedElement {
 			);
 		}
 
-		this.location = new MethodConstraintLocation(method);
+		this.location = new MethodConstraintLocation( method );
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.returnValueConstraints = Collections.unmodifiableSet( returnValueConstraints );
 		this.isCascading = isCascading;
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
+
+		Member member = location.getMember();
+		if ( isConstrained() ) {
+			ReflectionHelper.setAccessibility( member );
+		}
 	}
 
 	private boolean hasParameterConstraints(List<ConstrainedParameter> parameterMetaData) {
@@ -113,7 +118,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 	public ConstrainedElementKind getConstrainedElementKind() {
 		return ConstrainedElementKind.METHOD;
 	}
-	
+
 	public MethodConstraintLocation getLocation() {
 		return location;
 	}
@@ -224,12 +229,17 @@ public class ConstrainedMethod implements ConstrainedElement {
 					)
 			);
 		}
-		return new ConstrainedMethod( location.getMethod(), mergedParameterMetaData, mergedReturnValueConstraints, isCascading );
+		return new ConstrainedMethod(
+				location.getMethod(),
+				mergedParameterMetaData,
+				mergedReturnValueConstraints,
+				isCascading
+		);
 	}
 
 	@Override
 	public String toString() {
-		return "MethodMetaData [location=" + location + ", parameterMetaData="
+		return "ConstrainedMethod [location=" + location + ", parameterMetaData="
 				+ parameterMetaData + ", returnValueConstraints="
 				+ returnValueConstraints + ", isCascading=" + isCascading
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
@@ -239,49 +249,63 @@ public class ConstrainedMethod implements ConstrainedElement {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (hasParameterConstraints ? 1231 : 1237);
-		result = prime * result + (isCascading ? 1231 : 1237);
+		result = prime * result + ( hasParameterConstraints ? 1231 : 1237 );
+		result = prime * result + ( isCascading ? 1231 : 1237 );
 		result = prime * result
-				+ ((location == null) ? 0 : location.hashCode());
+				+ ( ( location == null ) ? 0 : location.hashCode() );
 		result = prime
 				* result
-				+ ((parameterMetaData == null) ? 0 : parameterMetaData
-						.hashCode());
+				+ ( ( parameterMetaData == null ) ? 0 : parameterMetaData
+				.hashCode() );
 		result = prime
 				* result
-				+ ((returnValueConstraints == null) ? 0
-						: returnValueConstraints.hashCode());
+				+ ( ( returnValueConstraints == null ) ? 0
+				: returnValueConstraints.hashCode() );
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if ( this == obj ) {
 			return true;
-		if (obj == null)
+		}
+		if ( obj == null ) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		ConstrainedMethod other = (ConstrainedMethod) obj;
-		if (hasParameterConstraints != other.hasParameterConstraints)
+		if ( hasParameterConstraints != other.hasParameterConstraints ) {
 			return false;
-		if (isCascading != other.isCascading)
+		}
+		if ( isCascading != other.isCascading ) {
 			return false;
-		if (location == null) {
-			if (other.location != null)
+		}
+		if ( location == null ) {
+			if ( other.location != null ) {
 				return false;
-		} else if (!location.equals(other.location))
+			}
+		}
+		else if ( !location.equals( other.location ) ) {
 			return false;
-		if (parameterMetaData == null) {
-			if (other.parameterMetaData != null)
+		}
+		if ( parameterMetaData == null ) {
+			if ( other.parameterMetaData != null ) {
 				return false;
-		} else if (!parameterMetaData.equals(other.parameterMetaData))
+			}
+		}
+		else if ( !parameterMetaData.equals( other.parameterMetaData ) ) {
 			return false;
-		if (returnValueConstraints == null) {
-			if (other.returnValueConstraints != null)
+		}
+		if ( returnValueConstraints == null ) {
+			if ( other.returnValueConstraints != null ) {
 				return false;
-		} else if (!returnValueConstraints.equals(other.returnValueConstraints))
+			}
+		}
+		else if ( !returnValueConstraints.equals( other.returnValueConstraints ) ) {
 			return false;
+		}
 		return true;
 	}
 

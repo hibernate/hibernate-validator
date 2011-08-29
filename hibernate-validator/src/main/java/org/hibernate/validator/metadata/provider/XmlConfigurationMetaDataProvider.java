@@ -23,9 +23,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstrainedField;
+import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
@@ -49,7 +50,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 	 */
 	public XmlConfigurationMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
 
-		super( constraintHelper );
+		super( ConfigurationSource.XML, constraintHelper );
 
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
 		mappingParser.parse( mappingStreams );

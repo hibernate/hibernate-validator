@@ -34,16 +34,16 @@ import javax.validation.Valid;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.AnnotationIgnores;
+import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstrainedElement;
+import org.hibernate.validator.metadata.ConstrainedField;
+import org.hibernate.validator.metadata.ConstrainedMethod;
+import org.hibernate.validator.metadata.ConstrainedParameter;
 import org.hibernate.validator.metadata.ConstrainedType;
-import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.ConstrainedMethod;
-import org.hibernate.validator.metadata.ConstrainedParameter;
-import org.hibernate.validator.metadata.ConstrainedField;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -60,7 +60,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, Class<?> beanClass, AnnotationIgnores annotationIgnores) {
 
-		super( constraintHelper );
+		super( ConfigurationSource.ANNOTATION, constraintHelper );
 
 		this.annotationIgnores = annotationIgnores;
 
@@ -77,10 +77,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 * Retrieves constraint related meta data from the annotations of the given type.
 	 */
 	private void retrieveBeanMetaData(Class<?> beanClass) {
-
-//		if(beanClass.equals(Object.class)) {
-//			return;
-//		}
 
 		Set<ConstrainedElement> propertyMetaData = getPropertyMetaData( beanClass );
 		propertyMetaData.addAll( getMethodMetaData( beanClass ) );
@@ -272,7 +268,10 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 			metaData.add(
 					new ConstrainedParameter(
-							new MethodConstraintLocation(method, i), parameterName, constraintsOfOneParameter, parameterIsCascading
+							new MethodConstraintLocation( method, i ),
+							parameterName,
+							constraintsOfOneParameter,
+							parameterIsCascading
 					)
 			);
 			i++;

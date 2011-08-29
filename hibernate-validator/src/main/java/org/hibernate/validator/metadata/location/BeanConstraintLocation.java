@@ -150,12 +150,7 @@ public class BeanConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "BeanConstraintLocation" );
-		sb.append( "{beanClass=" ).append( beanClass.getSimpleName() );
-		sb.append( ", propertyName='" ).append( propertyName ).append( '\'' );
-		sb.append( '}' );
-		return sb.toString();
+		return "BeanConstraintLocation [" + beanClass.getSimpleName() + "#" + propertyName + " (" + elementType + ")]";
 	}
 
 }

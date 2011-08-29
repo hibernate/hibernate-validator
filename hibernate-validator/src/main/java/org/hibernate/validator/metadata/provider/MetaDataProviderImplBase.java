@@ -16,9 +16,6 @@
  */
 package org.hibernate.validator.metadata.provider;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,18 +24,13 @@ import java.util.Set;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.BeanConfiguration;
+import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstrainedElement;
-import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.ConstrainedMethod;
-import org.hibernate.validator.metadata.ConstrainedField;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * @author Gunnar Morling
@@ -49,16 +41,19 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
 	protected static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
-	
+
 	protected final Map<Class<?>, BeanConfiguration<?>> configuredBeans;
 
 	protected final ConstraintHelper constraintHelper;
 
-	public MetaDataProviderImplBase(ConstraintHelper constraintHelper) {
+	private final ConfigurationSource configurationSource;
+
+	public MetaDataProviderImplBase(ConfigurationSource configurationSource, ConstraintHelper constraintHelper) {
+
+		this.configurationSource = configurationSource;
+		this.constraintHelper = constraintHelper;
 
 		configuredBeans = newHashMap();
-
-		this.constraintHelper = constraintHelper;
 	}
 
 	public Set<BeanConfiguration<?>> getAllBeanConfigurations() {
@@ -68,6 +63,7 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 	protected <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass, Set<? extends ConstrainedElement> constrainableElements, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		return new BeanConfiguration<T>(
+				configurationSource,
 				beanClass,
 				constrainableElements,
 				defaultGroupSequence,

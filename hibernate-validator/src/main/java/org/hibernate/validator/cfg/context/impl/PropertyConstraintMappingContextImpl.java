@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -45,8 +46,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 
 	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
 
-		if(member instanceof Field) { 
-		
+		if ( member instanceof Field ) {
 			mapping.addConstraintConfig(
 					ConfiguredConstraint.forProperty(
 							definition, member
@@ -56,7 +56,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 		else {
 			mapping.addMethodConstraintConfig(
 					ConfiguredConstraint.forReturnValue(
-							definition, (Method)member
+							definition, (Method) member
 					)
 			);
 		}
@@ -64,7 +64,14 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 	}
 
 	public PropertyConstraintMappingContext valid() {
-		mapping.addCascadeConfig( new BeanConstraintLocation( member ) );
+
+		if ( member instanceof Field ) {
+			mapping.addCascadeConfig( new BeanConstraintLocation( member ) );
+		}
+		else {
+			mapping.addMethodCascadeConfig( new MethodConstraintLocation( (Method) member ) );
+		}
+
 		return this;
 	}
 }

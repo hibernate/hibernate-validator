@@ -187,7 +187,10 @@ public class BeanMetaDataManager {
 
 		Set<ConstraintMetaData> aggregatedElements = newHashSet();
 		for ( Builder oneBuilder : builders ) {
-			aggregatedElements.add( oneBuilder.build() );
+			ConstraintMetaData metaData = oneBuilder.build();
+			if ( metaData != null ) {
+				aggregatedElements.add( metaData );
+			}
 		}
 
 		return new BeanMetaDataImpl<T>(
@@ -199,51 +202,79 @@ public class BeanMetaDataManager {
 	}
 
 	private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<Builder> builders) {
+
+		boolean foundBuilder = false;
+
 		for ( Builder oneBuilder : builders ) {
 			if ( oneBuilder.accepts( constrainableElement ) ) {
 				oneBuilder.add( constrainableElement );
-				return;
+				foundBuilder = true;
 			}
 		}
-		
+
+		if ( foundBuilder ) {
+			return;
+		}
+
 		Set<Builder> builder = Builder.getInstance( constrainableElement, constraintHelper );
 		builders.addAll( builder );
 	}
 
 	public static abstract class Builder {
-		
+
 		public abstract boolean accepts(ConstrainedElement constrainableElement);
-		
+
 		public abstract void add(ConstrainedElement constrainableElement);
-		
+
 		public abstract ConstraintMetaData build();
-		
+
 		public static Set<Builder> getInstance(ConstrainedElement constrainableElement, ConstraintHelper constraintHelper) {
-			
+
 			Set<Builder> builders = newHashSet();
 
-			switch(constrainableElement.getConstrainedElementKind()) {
-				case FIELD: 
-					builders.add(new PropertyMetaData.Builder((ConstrainedField) constrainableElement, constraintHelper));
+			switch ( constrainableElement.getConstrainedElementKind() ) {
+				case FIELD:
+					builders.add(
+							new PropertyMetaData.Builder(
+									(ConstrainedField) constrainableElement,
+									constraintHelper
+							)
+					);
+					builders.add(
+							new MethodMetaData.Builder(
+									( (ConstrainedField) constrainableElement ).getLocation()
+											.getPropertyName()
+							)
+					);
 					break;
 				case METHOD:
-					builders.add( new MethodMetaData.Builder((ConstrainedMethod)constrainableElement) );
-					if(((ConstrainedMethod)constrainableElement).isGetterMethod()) {
-						builders.add( new PropertyMetaData.Builder( (ConstrainedMethod)constrainableElement, constraintHelper ));
+					builders.add( new MethodMetaData.Builder( (ConstrainedMethod) constrainableElement ) );
+					if ( ( (ConstrainedMethod) constrainableElement ).isGetterMethod() ) {
+						builders.add(
+								new PropertyMetaData.Builder(
+										(ConstrainedMethod) constrainableElement,
+										constraintHelper
+								)
+						);
 					}
 					break;
-					
+
 				case TYPE:
-					builders.add( new PropertyMetaData.Builder((ConstrainedType) constrainableElement, constraintHelper) );
+					builders.add(
+							new PropertyMetaData.Builder(
+									(ConstrainedType) constrainableElement,
+									constraintHelper
+							)
+					);
 					break;
-				default: 
+				default:
 					throw new IllegalArgumentException();
 			}
-			
+
 			return builders;
 		}
 
 	}
-	
+
 
 }

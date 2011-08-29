@@ -18,6 +18,7 @@ package org.hibernate.validator.metadata;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +28,12 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Gunnar Morling
  */
 public class BeanConfiguration<T> {
+
+	public static enum ConfigurationSource {
+		ANNOTATION, XML, API
+	}
+
+	private final EnumSet<ConfigurationSource> configurationSources;
 
 	private final Class<T> beanClass;
 
@@ -42,11 +49,13 @@ public class BeanConfiguration<T> {
 	 * @param cascadedMembers
 	 * @param defaultGroupSequence
 	 */
-	public BeanConfiguration(Class<T> beanClass,
+	public BeanConfiguration(ConfigurationSource configurationSource,
+							 Class<T> beanClass,
 							 Set<? extends ConstrainedElement> constrainableElements,
 							 List<Class<?>> defaultGroupSequence,
 							 Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
+		this.configurationSources = EnumSet.of( configurationSource );
 		this.beanClass = beanClass;
 		this.constrainableElements = newHashSet( constrainableElements );
 		this.defaultGroupSequence = defaultGroupSequence;
@@ -71,6 +80,7 @@ public class BeanConfiguration<T> {
 
 	public void merge(BeanConfiguration<T> other) {
 
+		configurationSources.addAll( other.configurationSources );
 		constrainableElements.addAll( other.getConstrainableElements() );
 
 		// TODO GM: Determine which default sequence should be taken
@@ -88,7 +98,7 @@ public class BeanConfiguration<T> {
 
 	@Override
 	public String toString() {
-		return "BeanConfiguration [beanClass=" + beanClass
+		return "BeanConfiguration [configurationSources=" + configurationSources + ", beanClass=" + beanClass.getSimpleName()
 				+ ", constrainableElements=" + constrainableElements
 				+ ", defaultGroupSequence=" + defaultGroupSequence
 				+ ", defaultGroupSequenceProvider="

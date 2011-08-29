@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata.provider;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,14 +28,15 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
 import org.hibernate.validator.metadata.AnnotationIgnores;
+import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstrainedElement;
-import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.ConstrainedField;
+import org.hibernate.validator.metadata.ConstrainedMethod;
+import org.hibernate.validator.metadata.ConstrainedParameter;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
-import org.hibernate.validator.metadata.ConstrainedMethod;
-import org.hibernate.validator.metadata.ConstrainedParameter;
-import org.hibernate.validator.metadata.ConstrainedField;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
@@ -55,7 +55,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, ConstraintMapping mapping) {
 
-		super( constraintHelper );
+		super( ConfigurationSource.API, constraintHelper );
 
 		initProgrammaticConfiguration( mapping );
 	}
@@ -87,8 +87,8 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 							context.getMethodConstraintConfig().get( clazz )
 					);
 
-			constrainedElements.addAll(methodMetaData);
-			
+			constrainedElements.addAll( methodMetaData );
+
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
@@ -162,7 +162,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 				parameterMetaDatas.add(
 						new ConstrainedParameter(
-								new MethodConstraintLocation(oneMethod, i),
+								new MethodConstraintLocation( oneMethod, i ),
 								parameterName,
 								asMetaConstraints( constraintsByParameter.get( i ) ),
 								isCascading
@@ -184,7 +184,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	}
 
 	private Set<MetaConstraint<?>> asMetaConstraints(Set<? extends ConfiguredConstraint<?, ?>> constraints) {
-		
+
 		if ( constraints == null ) {
 			return Collections.emptySet();
 		}

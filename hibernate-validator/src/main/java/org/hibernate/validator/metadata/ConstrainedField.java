@@ -37,7 +37,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public ConstrainedField(Set<MetaConstraint<?>> constraints,
 							BeanConstraintLocation location, boolean isCascading) {
 
-		super(constraints, isCascading);
+		super( constraints, isCascading );
 		this.location = location;
 
 		Member member = location.getMember();
@@ -49,17 +49,14 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public ConstrainedElementKind getConstrainedElementKind() {
 		return ConstrainedElementKind.FIELD;
 	}
-	
+
 	public BeanConstraintLocation getLocation() {
 		return location;
 	}
 
 	@Override
 	public String toString() {
-		return "ConstrainedField [location=" + location
-				+ ", getConstrainedElementKind()="
-				+ getConstrainedElementKind() + ", getLocation()="
-				+ getLocation() + "]";
+		return "ConstrainedField [location=" + location + ", constraints=" + getConstraints() + ", isCascading=" + isCascading() + "]";
 	}
 
 	@Override
@@ -67,24 +64,30 @@ public class ConstrainedField extends AbstractConstrainedElement {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
-				+ ((location == null) ? 0 : location.hashCode());
+				+ ( ( location == null ) ? 0 : location.hashCode() );
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if ( this == obj ) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if ( !super.equals( obj ) ) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		ConstrainedField other = (ConstrainedField) obj;
-		if (location == null) {
-			if (other.location != null)
+		if ( location == null ) {
+			if ( other.location != null ) {
 				return false;
-		} else if (!location.equals(other.location))
+			}
+		}
+		else if ( !location.equals( other.location ) ) {
 			return false;
+		}
 		return true;
 	}
 

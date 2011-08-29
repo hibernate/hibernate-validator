@@ -16,22 +16,21 @@
 */
 package org.hibernate.validator.metadata;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 
 import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
+
+import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * <p>
@@ -74,8 +73,8 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			List<ConstrainedParameter> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException) {
 
-		super(returnValueConstraints, ConstraintMetaDataKind.METHOD);
-		
+		super( returnValueConstraints, ConstraintMetaDataKind.METHOD );
+
 		location = builder.location;
 		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
 		isCascading = builder.isCascading;
@@ -101,6 +100,8 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 		private boolean isConstrained;
 
+		private final String propertyName;
+
 		/**
 		 * Creates a new builder based on the given method meta data.
 		 *
@@ -113,6 +114,16 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			metaDataByDefiningType.put( location.getMethod().getDeclaringClass(), metaData );
 			isCascading = metaData.isCascading();
 			isConstrained = metaData.isConstrained();
+			if ( metaData.isGetterMethod() ) {
+				propertyName = ReflectionHelper.getPropertyName( metaData.getLocation().getMember() );
+			}
+			else {
+				propertyName = null;
+			}
+		}
+
+		public Builder(String propertyName) {
+			this.propertyName = propertyName;
 		}
 
 		/**
@@ -127,9 +138,19 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 *         builder, <code>false</code> otherwise.
 		 */
 		public boolean accepts(ConstrainedElement metaData) {
-			return 
-				metaData.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
-				ReflectionHelper.haveSameSignature( location.getMethod(), ((ConstrainedMethod)metaData).getLocation().getMethod() );
+
+			if ( metaData.getConstrainedElementKind() != ConstrainedElementKind.METHOD ) {
+				return false;
+			}
+
+			if ( propertyName != null ) {
+				return propertyName.equals( ReflectionHelper.getPropertyName( metaData.getLocation().getMember() ) );
+			}
+
+			return ReflectionHelper.haveSameSignature(
+					location.getMethod(),
+					( (ConstrainedMethod) metaData ).getLocation().getMethod()
+			);
 		}
 
 		/**
@@ -141,8 +162,8 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 */
 		public void add(ConstrainedElement constrainedElement) {
 
-			ConstrainedMethod metaData = (ConstrainedMethod)constrainedElement;
-			
+			ConstrainedMethod metaData = (ConstrainedMethod) constrainedElement;
+
 			ConstrainedMethod existingMetaData =
 					metaDataByDefiningType.get( metaData.getLocation().getMethod().getDeclaringClass() );
 
@@ -151,7 +172,10 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			}
 
 			//use the lowest method found in the hierarchy for this aggregation
-			if ( location.getMethod().getDeclaringClass().isAssignableFrom( metaData.getLocation().getMethod().getDeclaringClass() ) ) {
+			if ( location == null ||
+					location.getMethod()
+							.getDeclaringClass()
+							.isAssignableFrom( metaData.getLocation().getMethod().getDeclaringClass() ) ) {
 				location = metaData.getLocation();
 			}
 
@@ -167,9 +191,15 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * @return An {@code AggregatedMethodMetaData} object
 		 */
 		public MethodMetaData build() {
-			return new MethodMetaData(
-					this, collectReturnValueConstraints(), findParameterMetaData(), checkParameterConstraints()
-			);
+			return
+					location != null ?
+							new MethodMetaData(
+									this,
+									collectReturnValueConstraints(),
+									findParameterMetaData(),
+									checkParameterConstraints()
+							)
+							: null;
 		}
 
 		/**
@@ -274,7 +304,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		}
 
 	}
-	
+
 	/**
 	 * <p>
 	 * Checks the parameter constraints of this method for correctness.
@@ -373,10 +403,10 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	public MethodConstraintLocation getLocation() {
 		return location;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "AggregatedMethodMetaData [location=" + location
+		return "MethodMetaData [location=" + location
 				+ ", isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
@@ -384,8 +414,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ( ( location == null ) ? 0 : location.hashCode() );
+		int result = super.hashCode();
+		result = prime * result
+				+ ( ( location == null ) ? 0 : location.hashCode() );
 		return result;
 	}
 
@@ -394,7 +425,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj == null ) {
+		if ( !super.equals( obj ) ) {
 			return false;
 		}
 		if ( getClass() != obj.getClass() ) {
