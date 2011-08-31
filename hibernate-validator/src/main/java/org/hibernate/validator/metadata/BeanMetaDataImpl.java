@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
@@ -91,7 +90,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * aggregated view on each method together with all the methods from the
 	 * inheritance hierarchy with the same signature.
 	 */
-	private Map<Method, MethodMetaData> methodMetaData;
+	private Map<String, MethodMetaData> methodMetaData;
 
 	private final Map<String, PropertyMetaData> propertyMetaData;
 
@@ -147,18 +146,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Set<PropertyMetaData> propertyMetaDatas = newHashSet();
 		Set<MethodMetaData> methodMetaDatas = newHashSet();
-		
+
 		for ( ConstraintMetaData oneElement : constrainableElements ) {
-	
-			if( oneElement.getConstrainedMetaDataKind() == ConstraintMetaDataKind.PROPERTY ) {
-				propertyMetaDatas.add((PropertyMetaData)oneElement);
+
+			if ( oneElement.getConstrainedMetaDataKind() == ConstraintMetaDataKind.PROPERTY ) {
+				propertyMetaDatas.add( (PropertyMetaData) oneElement );
 			}
 			else {
-				methodMetaDatas.add((MethodMetaData)oneElement);
+				methodMetaDatas.add( (MethodMetaData) oneElement );
 			}
 		}
-		
-		for ( PropertyMetaData oneProperty : propertyMetaDatas) {
+
+		for ( PropertyMetaData oneProperty : propertyMetaDatas ) {
 			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
 		}
 
@@ -237,14 +236,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public MethodMetaData getMetaDataFor(Method method) {
-		for(Entry<Method, MethodMetaData> oneMethod :methodMetaData.entrySet()) {
-			if(ReflectionHelper.haveSameSignature(method, oneMethod.getKey())) {
-				return oneMethod.getValue();
-			}
-		}
-		
-		return null;
-//		return methodMetaData.get( method );
+		return methodMetaData.get( method.getName() + Arrays.toString( method.getParameterTypes() ) );
 	}
 
 	public Set<MethodMetaData> getAllMethodMetaData() {
@@ -317,21 +309,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Builds up the method meta data for this type by invoking each builder in
 	 * {@link #methodMetaDataBuilders}.
 	 */
-	private Map<Method, MethodMetaData> buildMethodMetaData(Set<MethodMetaData> allMethodMetaData) {
+	private Map<String, MethodMetaData> buildMethodMetaData(Set<MethodMetaData> allMethodMetaData) {
 
-		Map<Method, MethodMetaData> theValue = newHashMap();
+		Map<String, MethodMetaData> theValue = newHashMap();
 
 		for ( MethodMetaData oneAggregatedMethodMetaData : allMethodMetaData ) {
-			theValue.put( oneAggregatedMethodMetaData.getLocation().getMethod(), oneAggregatedMethodMetaData );
-//			//register the aggregated meta data for each underlying method for a quick
-//			//read access
-//			for(Class<?> oneClass : ReflectionHelper.computeClassHierarchy( oneAggregatedMethodMetaData.getLocation().getBeanClass(),true ) ) {
-//				for(Method oneMethod : oneClass.getMethods()) {
-//					if(ReflectionHelper.haveSameSignature( oneAggregatedMethodMetaData.getLocation().getMethod(), oneMethod )) {
-//						theValue.put( oneMethod, oneAggregatedMethodMetaData );
-//					}
-//				}
-//			}
+			theValue.put(
+					oneAggregatedMethodMetaData.getName() + Arrays.toString( oneAggregatedMethodMetaData.getParameterTypes() ),
+					oneAggregatedMethodMetaData
+			);
 		}
 
 		return theValue;

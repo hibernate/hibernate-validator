@@ -47,7 +47,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class MethodMetaData extends AbstractConstraintMetaData {
 
-	private final MethodConstraintLocation location;
+	private final Method rootMethod;
 
 	private final Map<Class<?>, ConstrainedMethod> metaDataByDefiningType;
 
@@ -75,10 +75,10 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 		super( returnValueConstraints, ConstraintMetaDataKind.METHOD );
 
-		location = builder.location;
 		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
 		isCascading = builder.isCascading;
 		isConstrained = builder.isConstrained;
+		rootMethod = builder.location.getMember();
 
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
@@ -400,14 +400,21 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		return metaDataByDefiningType.values();
 	}
 
-	public MethodConstraintLocation getLocation() {
-		return location;
+	public String getName() {
+		return rootMethod.getName();
+	}
+
+	public Class<?> getReturnType() {
+		return rootMethod.getReturnType();
+	}
+
+	public Class<?>[] getParameterTypes() {
+		return rootMethod.getParameterTypes();
 	}
 
 	@Override
 	public String toString() {
-		return "MethodMetaData [location=" + location
-				+ ", isCascading=" + isCascading() + ", isConstrained="
+		return "MethodMetaData [rootMethod=" + rootMethod + ", isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
 
@@ -416,7 +423,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
-				+ ( ( location == null ) ? 0 : location.hashCode() );
+				+ ( ( rootMethod == null ) ? 0 : rootMethod.hashCode() );
 		return result;
 	}
 
@@ -432,12 +439,12 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			return false;
 		}
 		MethodMetaData other = (MethodMetaData) obj;
-		if ( location == null ) {
-			if ( other.location != null ) {
+		if ( rootMethod == null ) {
+			if ( other.rootMethod != null ) {
 				return false;
 			}
 		}
-		else if ( !location.equals( other.location ) ) {
+		else if ( !rootMethod.equals( other.rootMethod ) ) {
 			return false;
 		}
 		return true;

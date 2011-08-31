@@ -22,16 +22,15 @@ import javax.validation.constraints.Min;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -53,7 +52,7 @@ public class BeanMetaDataImplTest {
 		Method method = CustomerRepository.class.getMethod( "baz" );
 		MethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
 				.next()
@@ -71,7 +70,7 @@ public class BeanMetaDataImplTest {
 		MethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
 		assertIterableSize( methodMetaData, 1 );
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 
 		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
@@ -89,7 +88,7 @@ public class BeanMetaDataImplTest {
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
 		MethodMetaData methodMetaData = metaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertTrue( methodMetaData.isCascading() );
 		assertIterableSize( methodMetaData, 0 );
 	}

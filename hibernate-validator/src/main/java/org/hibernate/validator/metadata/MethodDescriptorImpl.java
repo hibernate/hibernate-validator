@@ -31,7 +31,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	private final MethodMetaData methodMetaData;
 
 	public MethodDescriptorImpl(BeanMetaData<?> metaDataBean, MethodMetaData methodMetaData) {
-		super( methodMetaData.getLocation().getMethod().getReturnType(), metaDataBean );
+		super( methodMetaData.getReturnType(), metaDataBean );
 
 		this.methodMetaData = methodMetaData;
 
@@ -42,7 +42,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	}
 
 	public String getMethodName() {
-		return methodMetaData.getLocation().getMethod().getName();
+		return methodMetaData.getName();
 	}
 
 	public List<ParameterDescriptor> getParameterDescriptors() {
