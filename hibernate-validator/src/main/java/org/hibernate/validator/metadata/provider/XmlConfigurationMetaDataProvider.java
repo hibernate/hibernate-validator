@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata.provider;
 
 import java.io.InputStream;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,7 +25,9 @@ import java.util.Set;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
+import org.hibernate.validator.metadata.ConstrainedElement;
 import org.hibernate.validator.metadata.ConstrainedField;
+import org.hibernate.validator.metadata.ConstrainedType;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
@@ -62,7 +65,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			);
 			Set<BeanConstraintLocation> cascades = getCascades( mappingParser, clazz );
 
-			Set<ConstrainedField> propertyMetaData = retrievePropertyMetaData( constraintsByLocation, cascades );
+			Set<ConstrainedElement> propertyMetaData = retrievePropertyMetaData( constraintsByLocation, cascades );
 
 			configuredBeans.put(
 					clazz,
@@ -78,22 +81,32 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		annotationIgnores = mappingParser.getAnnotationIgnores();
 	}
 
-	private Set<ConstrainedField> retrievePropertyMetaData(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
+	private Set<ConstrainedElement> retrievePropertyMetaData(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
 
 		Set<ConstraintLocation> allConfiguredProperties = new HashSet<ConstraintLocation>( cascades );
 		allConfiguredProperties.addAll( constraintsByLocation.keySet() );
 
-		Set<ConstrainedField> propertyMetaData = newHashSet();
+		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
 		for ( ConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
+			if ( oneConfiguredProperty.getElementType() == ElementType.FIELD ) {
+				propertyMetaData.add(
+						new ConstrainedField(
+								constraintsByLocation.get( oneConfiguredProperty ),
+								(BeanConstraintLocation) oneConfiguredProperty,
+								cascades.contains( oneConfiguredProperty )
+						)
+				);
+			}
+			else {
+				propertyMetaData.add(
+						new ConstrainedType(
+								constraintsByLocation.get( oneConfiguredProperty ),
+								(BeanConstraintLocation) oneConfiguredProperty
+						)
+				);
+			}
 
-			propertyMetaData.add(
-					new ConstrainedField(
-							constraintsByLocation.get( oneConfiguredProperty ),
-							(BeanConstraintLocation) oneConfiguredProperty,
-							cascades.contains( oneConfiguredProperty )
-					)
-			);
 		}
 
 		return propertyMetaData;
