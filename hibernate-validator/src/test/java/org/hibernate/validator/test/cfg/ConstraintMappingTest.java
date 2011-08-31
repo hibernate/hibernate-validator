@@ -87,7 +87,8 @@ public class ConstraintMappingTest {
 		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
 
 		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 2 );
+		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
+		assertTrue( context.getMethodConstraintConfig().get( Marathon.class ).size() == 1 );
 	}
 
 	@Test
@@ -102,7 +103,8 @@ public class ConstraintMappingTest {
 		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
 
 		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 2 );
+		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
+		assertTrue( context.getMethodConstraintConfig().get( Marathon.class ).size() == 1 );
 	}
 
 	@Test
