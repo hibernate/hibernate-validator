@@ -26,7 +26,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	private ConstrainedParameter parameterMetaData;
 
 	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ConstrainedParameter parameterMetaData) {
-		super( parameterMetaData.getLocation().getBeanClass(), metaDataBean );
+		super( parameterMetaData.getLocation().getParameterType(), metaDataBean );
 
 		this.parameterMetaData = parameterMetaData;
 

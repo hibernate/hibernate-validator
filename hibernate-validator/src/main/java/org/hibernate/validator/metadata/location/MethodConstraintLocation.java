@@ -98,6 +98,10 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		return parameterIndex;
 	}
 
+	public Class<?> getParameterType() {
+		return parameterIndex != null ? method.getParameterTypes()[parameterIndex] : null;
+	}
+
 	@Override
 	public String toString() {
 		return String.format(

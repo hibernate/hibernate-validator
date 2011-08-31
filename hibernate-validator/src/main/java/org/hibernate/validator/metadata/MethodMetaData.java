@@ -414,7 +414,20 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 	@Override
 	public String toString() {
-		return "MethodMetaData [rootMethod=" + rootMethod + ", isCascading=" + isCascading() + ", isConstrained="
+
+		StringBuilder parameterBuilder = new StringBuilder();
+
+		for ( Class<?> oneParameterType : getParameterTypes() ) {
+			parameterBuilder.append( oneParameterType.getSimpleName() );
+			parameterBuilder.append( ", " );
+		}
+
+		String parameters =
+				parameterBuilder.length() > 0 ?
+						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
+						parameterBuilder.toString();
+
+		return "MethodMetaData [method=" + getReturnType().getSimpleName() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
 

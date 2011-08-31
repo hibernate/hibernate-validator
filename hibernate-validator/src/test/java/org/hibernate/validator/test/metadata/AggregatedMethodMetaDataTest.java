@@ -31,6 +31,7 @@ import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MethodMetaData;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
