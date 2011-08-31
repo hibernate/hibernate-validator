@@ -87,8 +87,8 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		if ( !classLevelConstraints.isEmpty() ) {
 			ConstrainedType classLevelMetaData =
 					new ConstrainedType(
-							new BeanConstraintLocation( beanClass ),
-							classLevelConstraints
+							classLevelConstraints,
+							new BeanConstraintLocation( beanClass )
 					);
 			propertyMetaData.add( classLevelMetaData );
 		}

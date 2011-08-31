@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata.provider;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import org.hibernate.validator.metadata.ConstrainedElement;
 import org.hibernate.validator.metadata.ConstrainedField;
 import org.hibernate.validator.metadata.ConstrainedMethod;
 import org.hibernate.validator.metadata.ConstrainedParameter;
+import org.hibernate.validator.metadata.ConstrainedType;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
@@ -119,13 +121,23 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 		Set<ConstrainedElement> allPropertyMetaData = newHashSet();
 		for ( BeanConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
-			allPropertyMetaData.add(
-					new ConstrainedField(
-							asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
-							oneConfiguredProperty,
-							cascades.contains( oneConfiguredProperty )
-					)
-			);
+			if ( oneConfiguredProperty.getElementType() == ElementType.FIELD ) {
+				allPropertyMetaData.add(
+						new ConstrainedField(
+								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
+								oneConfiguredProperty,
+								cascades.contains( oneConfiguredProperty )
+						)
+				);
+			}
+			else {
+				allPropertyMetaData.add(
+						new ConstrainedType(
+								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
+								oneConfiguredProperty
+						)
+				);
+			}
 		}
 		return allPropertyMetaData;
 	}
