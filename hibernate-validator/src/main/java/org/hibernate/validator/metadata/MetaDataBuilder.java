@@ -16,6 +16,8 @@
  */
 package org.hibernate.validator.metadata;
 
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+
 /**
  * Builds {@link ConstraintMetaData} instances for the
  * {@link ConstrainedElement} objects representing one method or property in a

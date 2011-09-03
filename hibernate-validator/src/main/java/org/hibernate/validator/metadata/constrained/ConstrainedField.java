@@ -14,11 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.metadata;
+package org.hibernate.validator.metadata.constrained;
 
 import java.lang.reflect.Member;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 

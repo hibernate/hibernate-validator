@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
-import org.hibernate.validator.metadata.ConstrainedParameter;
+import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MethodMetaData;
 

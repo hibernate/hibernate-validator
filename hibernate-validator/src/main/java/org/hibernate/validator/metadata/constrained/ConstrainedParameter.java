@@ -14,12 +14,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.metadata;
+package org.hibernate.validator.metadata.constrained;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 import java.util.Set;
 
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 
 /**

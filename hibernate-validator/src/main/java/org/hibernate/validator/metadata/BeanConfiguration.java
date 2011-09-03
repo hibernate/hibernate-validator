@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 
 /**
  * @author Gunnar Morling

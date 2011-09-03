@@ -25,7 +25,7 @@ import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.BeanConfiguration;
 import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
-import org.hibernate.validator.metadata.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;

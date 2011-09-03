@@ -24,7 +24,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.constrained.ConstrainedField;
+import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
+import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.asSet;

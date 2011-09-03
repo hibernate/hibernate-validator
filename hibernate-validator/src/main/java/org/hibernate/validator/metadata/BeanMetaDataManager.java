@@ -22,7 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedField;
+import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
+import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;

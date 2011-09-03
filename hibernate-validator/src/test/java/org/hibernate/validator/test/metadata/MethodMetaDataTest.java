@@ -26,7 +26,7 @@ import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.ConstrainedMethod;
+import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
 import static org.testng.Assert.assertEquals;

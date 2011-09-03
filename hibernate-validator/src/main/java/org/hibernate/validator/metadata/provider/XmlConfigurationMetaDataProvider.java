@@ -25,10 +25,10 @@ import java.util.Set;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
-import org.hibernate.validator.metadata.ConstrainedElement;
-import org.hibernate.validator.metadata.ConstrainedField;
-import org.hibernate.validator.metadata.ConstrainedMethod;
-import org.hibernate.validator.metadata.ConstrainedType;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedField;
+import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
+import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;

@@ -25,7 +25,10 @@ import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 
-import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
+import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 

@@ -18,6 +18,7 @@ package org.hibernate.validator.metadata;
 
 import java.util.List;
 
+import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
