@@ -26,6 +26,7 @@ import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.Contracts;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**
  * @author Emmanuel Bernard
@@ -45,14 +46,24 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
-		if ( propertyName == null ) {
-			throw new IllegalArgumentException( "The property name cannot be null" );
-		}
-		return getMetaDataBean().getPropertyDescriptor( propertyName );
+
+		assertNotNull( propertyName, "The property name cannot be null" );
+
+		return asPropertyDescriptor( getMetaDataBean().getMetaDataFor( propertyName ) );
 	}
 
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
-		return getMetaDataBean().getConstrainedProperties();
+
+		Set<PropertyDescriptor> theValue = newHashSet();
+
+		Set<PropertyMetaData> propertyMetaData = getMetaDataBean().getAllPropertyMetaData();
+		for ( PropertyMetaData oneProperty : propertyMetaData ) {
+			if ( oneProperty.isConstrained() ) {
+				theValue.add( asPropertyDescriptor( oneProperty ) );
+			}
+		}
+
+		return theValue;
 	}
 
 	//TypeDescriptor methods
@@ -111,4 +122,27 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	public BeanDescriptor getBeanDescriptor() {
 		return this;
 	}
+
+	//TODO GM: it would be nicer if PropertyMetaData itself could create an equivalent PropertyDescriptor.
+	//Currently this doesn't work as the descriptor needs a reference to the BeanMetaData object.
+	private PropertyDescriptorImpl asPropertyDescriptor(PropertyMetaData propertyMetaData) {
+
+		if ( propertyMetaData == null || !propertyMetaData.isConstrained() ) {
+			return null;
+		}
+
+		PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
+				propertyMetaData.getType(),
+				propertyMetaData.isCascading(),
+				propertyMetaData.getPropertyName(),
+				getMetaDataBean()
+		);
+
+		for ( MetaConstraint<?> oneConstraint : propertyMetaData ) {
+			propertyDescriptor.addConstraintDescriptor( oneConstraint.getDescriptor() );
+		}
+
+		return propertyDescriptor;
+	}
+
 }

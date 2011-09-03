@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 
@@ -114,7 +113,7 @@ public interface BeanMetaData<T> {
 	 * @return Returns the {@code PropertyDescriptor} for the given property or {@code null} in case the
 	 *         property does not have a descriptor.
 	 */
-	PropertyDescriptor getPropertyDescriptor(String property);
+	PropertyMetaData getMetaDataFor(String propertyName);
 
 	/**
 	 * @param name The name of the property
@@ -128,7 +127,7 @@ public interface BeanMetaData<T> {
 	 * @return the property descriptors having at least one constraint defined or which are marked
 	 *         as cascaded (@Valid).
 	 */
-	Set<PropertyDescriptor> getConstrainedProperties();
+	Set<PropertyMetaData> getAllPropertyMetaData();
 
 	/**
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the

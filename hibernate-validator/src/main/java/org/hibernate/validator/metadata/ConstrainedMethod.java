@@ -94,7 +94,9 @@ public class ConstrainedMethod implements ConstrainedElement {
 
 		this.location = new MethodConstraintLocation( method );
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
-		this.returnValueConstraints = Collections.unmodifiableSet( returnValueConstraints );
+		this.returnValueConstraints = returnValueConstraints != null ? Collections.unmodifiableSet(
+				returnValueConstraints
+		) : Collections.<MetaConstraint<?>>emptySet();
 		this.isCascading = isCascading;
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
 

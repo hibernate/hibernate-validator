@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -52,6 +51,10 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		this.isConstrained = !cascadingMembers.isEmpty() || !constraints.isEmpty();
 	}
 
+	public Class<?> getType() {
+		return type;
+	}
+
 	public String getPropertyName() {
 		return propertyName;
 	}
@@ -66,21 +69,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	public boolean isConstrained() {
 		return isConstrained;
-	}
-
-	public PropertyDescriptor getPropertyDescriptor() {
-
-		if ( !isConstrained ) {
-			return null;
-		}
-
-		PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
-				type, isCascading(), getPropertyName(), null
-		);
-		for ( MetaConstraint<?> oneConstraint : constraints ) {
-			propertyDescriptor.addConstraintDescriptor( oneConstraint.getDescriptor() );
-		}
-		return propertyDescriptor;
 	}
 
 	@Override

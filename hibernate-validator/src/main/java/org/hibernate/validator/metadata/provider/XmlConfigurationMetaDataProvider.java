@@ -27,6 +27,7 @@ import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstrainedElement;
 import org.hibernate.validator.metadata.ConstrainedField;
+import org.hibernate.validator.metadata.ConstrainedMethod;
 import org.hibernate.validator.metadata.ConstrainedType;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
@@ -98,7 +99,16 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 						)
 				);
 			}
-			else {
+			else if ( oneConfiguredProperty.getElementType() == ElementType.METHOD ) {
+				propertyMetaData.add(
+						new ConstrainedMethod(
+								(java.lang.reflect.Method) oneConfiguredProperty.getMember(),
+								constraintsByLocation.get( oneConfiguredProperty ),
+								cascades.contains( oneConfiguredProperty )
+						)
+				);
+			}
+			else if ( oneConfiguredProperty.getElementType() == ElementType.TYPE ) {
 				propertyMetaData.add(
 						new ConstrainedType(
 								constraintsByLocation.get( oneConfiguredProperty ),

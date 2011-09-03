@@ -29,7 +29,6 @@ import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
@@ -243,9 +242,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return new HashSet<MethodMetaData>( methodMetaData.values() );
 	}
 
-	public PropertyDescriptor getPropertyDescriptor(String propertyName) {
-		PropertyMetaData property = propertyMetaData.get( propertyName );
-		return property != null ? property.getPropertyDescriptor() : null;
+	public PropertyMetaData getMetaDataFor(String propertyName) {
+		return propertyMetaData.get( propertyName );
 	}
 
 	public boolean isPropertyPresent(String name) {
@@ -269,17 +267,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return defaultGroupSequenceProvider != null;
 	}
 
-	public Set<PropertyDescriptor> getConstrainedProperties() {
-
-		Set<PropertyDescriptor> theValue = newHashSet();
-
-		for ( PropertyMetaData oneProperty : propertyMetaData.values() ) {
-			if ( oneProperty.isConstrained() ) {
-				theValue.add( oneProperty.getPropertyDescriptor() );
-			}
-		}
-
-		return Collections.unmodifiableSet( theValue );
+	public Set<PropertyMetaData> getAllPropertyMetaData() {
+		return Collections.unmodifiableSet( new HashSet<PropertyMetaData>( propertyMetaData.values() ) );
 	}
 
 	private Set<MetaConstraint<?>> buildAllConstraintSets() {
