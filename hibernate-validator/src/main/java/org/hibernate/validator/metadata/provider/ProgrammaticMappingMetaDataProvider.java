@@ -167,21 +167,15 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			);
 			List<ConstrainedParameter> parameterMetaDatas = newArrayList();
 
-			int i = 0;
-			for ( Class<?> parameterType : oneMethod.getParameterTypes() ) {
-				String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
-				boolean isCascading = cascadesByParameter.containsKey( i );
-
+			for ( int i = 0; i < oneMethod.getParameterTypes().length; i++ ) {
 				parameterMetaDatas.add(
 						new ConstrainedParameter(
 								new MethodConstraintLocation( oneMethod, i ),
-								parameterName,
+								DEFAULT_PARAMETER_NAME_PREFIX + i,
 								asMetaConstraints( constraintsByParameter.get( i ) ),
-								isCascading
+								cascadesByParameter.containsKey( i )
 						)
 				);
-
-				i++;
 			}
 
 			ConstrainedMethod methodMetaData = new ConstrainedMethod(
