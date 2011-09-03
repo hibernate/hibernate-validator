@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata.constrained;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -28,21 +29,33 @@ import org.hibernate.validator.metadata.location.ConstraintLocation;
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
+	private final EnumSet<ConfigurationSource> sources;
+
 	private final ConstraintLocation location;
 
 	private final Set<MetaConstraint<?>> constraints;
 
 	private final boolean isCascading;
 
+	public AbstractConstrainedElement(ConfigurationSource source, ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+
+		this( EnumSet.of( source ), location, constraints, isCascading );
+	}
+
 	/**
 	 * @param constraints
 	 * @param isCascading
 	 */
-	public AbstractConstrainedElement(ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	public AbstractConstrainedElement(EnumSet<ConfigurationSource> sources, ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
+		this.sources = sources;
 		this.location = location;
 		this.constraints = constraints != null ? constraints : Collections.<MetaConstraint<?>>emptySet();
 		this.isCascading = isCascading;
+	}
+
+	public EnumSet<ConfigurationSource> getSources() {
+		return sources;
 	}
 
 	public ConstraintLocation getLocation() {
@@ -67,8 +80,8 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
 	@Override
 	public String toString() {
-		return "AbstractConstrainedElement [location=" + location
-				+ ", constraints=" + constraints + ", isCascading="
+		return "AbstractConstrainedElement [sources=" + sources + ", location="
+				+ location + ", constraints=" + constraints + ", isCascading="
 				+ isCascading + "]";
 	}
 
@@ -77,10 +90,8 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ( ( constraints == null ) ? 0 : constraints.hashCode() );
-		result = prime * result + ( isCascading ? 1231 : 1237 );
-		result = prime * result
 				+ ( ( location == null ) ? 0 : location.hashCode() );
+		result = prime * result + ( ( sources == null ) ? 0 : sources.hashCode() );
 		return result;
 	}
 
@@ -96,17 +107,6 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 			return false;
 		}
 		AbstractConstrainedElement other = (AbstractConstrainedElement) obj;
-		if ( constraints == null ) {
-			if ( other.constraints != null ) {
-				return false;
-			}
-		}
-		else if ( !constraints.equals( other.constraints ) ) {
-			return false;
-		}
-		if ( isCascading != other.isCascading ) {
-			return false;
-		}
 		if ( location == null ) {
 			if ( other.location != null ) {
 				return false;
@@ -115,7 +115,16 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		else if ( !location.equals( other.location ) ) {
 			return false;
 		}
+		if ( sources == null ) {
+			if ( other.sources != null ) {
+				return false;
+			}
+		}
+		else if ( !sources.equals( other.sources ) ) {
+			return false;
+		}
 		return true;
 	}
+
 
 }

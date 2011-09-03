@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedType;
@@ -54,7 +54,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 	 */
 	public XmlConfigurationMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
 
-		super( ConfigurationSource.XML, constraintHelper );
+		super( constraintHelper );
 
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
 		mappingParser.parse( mappingStreams );
@@ -93,6 +93,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			if ( oneConfiguredProperty.getElementType() == ElementType.FIELD ) {
 				propertyMetaData.add(
 						new ConstrainedField(
+								ConfigurationSource.XML,
 								(BeanConstraintLocation) oneConfiguredProperty,
 								constraintsByLocation.get( oneConfiguredProperty ),
 								cascades.contains( oneConfiguredProperty )
@@ -102,6 +103,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			else if ( oneConfiguredProperty.getElementType() == ElementType.METHOD ) {
 				propertyMetaData.add(
 						new ConstrainedMethod(
+								ConfigurationSource.XML,
 								(java.lang.reflect.Method) oneConfiguredProperty.getMember(),
 								constraintsByLocation.get( oneConfiguredProperty ),
 								cascades.contains( oneConfiguredProperty )
@@ -111,6 +113,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			else if ( oneConfiguredProperty.getElementType() == ElementType.TYPE ) {
 				propertyMetaData.add(
 						new ConstrainedType(
+								ConfigurationSource.XML,
 								constraintsByLocation.get( oneConfiguredProperty ),
 								(BeanConstraintLocation) oneConfiguredProperty
 						)

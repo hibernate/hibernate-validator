@@ -29,12 +29,12 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
@@ -57,7 +57,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, ConstraintMapping mapping) {
 
-		super( ConfigurationSource.API, constraintHelper );
+		super( constraintHelper );
 
 		initProgrammaticConfiguration( mapping );
 	}
@@ -124,6 +124,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			if ( oneConfiguredProperty.getElementType() == ElementType.FIELD ) {
 				allPropertyMetaData.add(
 						new ConstrainedField(
+								ConfigurationSource.API,
 								oneConfiguredProperty,
 								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
 								cascades.contains( oneConfiguredProperty )
@@ -133,6 +134,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			else {
 				allPropertyMetaData.add(
 						new ConstrainedType(
+								ConfigurationSource.API,
 								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
 								oneConfiguredProperty
 						)
@@ -170,6 +172,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			for ( int i = 0; i < oneMethod.getParameterTypes().length; i++ ) {
 				parameterMetaDatas.add(
 						new ConstrainedParameter(
+								ConfigurationSource.API,
 								new MethodConstraintLocation( oneMethod, i ),
 								DEFAULT_PARAMETER_NAME_PREFIX + i,
 								asMetaConstraints( constraintsByParameter.get( i ) ),
@@ -179,6 +182,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			}
 
 			ConstrainedMethod methodMetaData = new ConstrainedMethod(
+					ConfigurationSource.API,
 					oneMethod,
 					parameterMetaDatas,
 					asMetaConstraints( constraintsByParameter.get( null ) ),

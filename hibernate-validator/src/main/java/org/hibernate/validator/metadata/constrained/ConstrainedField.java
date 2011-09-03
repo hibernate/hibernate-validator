@@ -33,10 +33,10 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param constraints
 	 * @param isCascading
 	 */
-	public ConstrainedField(BeanConstraintLocation location, Set<MetaConstraint<?>> constraints,
+	public ConstrainedField(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints,
 							boolean isCascading) {
 
-		super( location, constraints, isCascading );
+		super( source, location, constraints, isCascading );
 
 		Member member = location.getMember();
 		if ( member != null && isConstrained() ) {

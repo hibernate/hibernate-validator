@@ -34,12 +34,12 @@ import javax.validation.Valid;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
@@ -60,7 +60,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, Class<?> beanClass, AnnotationIgnores annotationIgnores) {
 
-		super( ConfigurationSource.ANNOTATION, constraintHelper );
+		super( constraintHelper );
 
 		this.annotationIgnores = annotationIgnores;
 
@@ -87,6 +87,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		if ( !classLevelConstraints.isEmpty() ) {
 			ConstrainedType classLevelMetaData =
 					new ConstrainedType(
+							ConfigurationSource.ANNOTATION,
 							classLevelConstraints,
 							new BeanConstraintLocation( beanClass )
 					);
@@ -162,6 +163,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		return
 				new ConstrainedField(
+						ConfigurationSource.ANNOTATION,
 						new BeanConstraintLocation( field ),
 						constraints,
 						isCascading
@@ -213,7 +215,13 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		Set<MetaConstraint<?>> constraints =
 				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
 
-		return new ConstrainedMethod( method, parameterConstraints, constraints, isCascading );
+		return new ConstrainedMethod(
+				ConfigurationSource.ANNOTATION,
+				method,
+				parameterConstraints,
+				constraints,
+				isCascading
+		);
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
@@ -268,6 +276,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 			metaData.add(
 					new ConstrainedParameter(
+							ConfigurationSource.ANNOTATION,
 							new MethodConstraintLocation( method, i ),
 							parameterName,
 							constraintsOfOneParameter,

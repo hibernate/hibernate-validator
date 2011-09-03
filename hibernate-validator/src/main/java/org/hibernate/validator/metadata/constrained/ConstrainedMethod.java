@@ -18,6 +18,7 @@ package org.hibernate.validator.metadata.constrained;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,16 +46,28 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	private final boolean hasParameterConstraints;
 
 	public ConstrainedMethod(
+			ConfigurationSource source,
 			Method method,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
 		this(
+				source,
 				method,
 				Collections.<ConstrainedParameter>emptyList(),
 				returnValueConstraints,
 				isCascading
 		);
+	}
+
+	public ConstrainedMethod(
+			ConfigurationSource source,
+			Method method,
+			List<ConstrainedParameter> parameterMetaData,
+			Set<MetaConstraint<?>> returnValueConstraints,
+			boolean isCascading) {
+
+		this( EnumSet.of( source ), method, parameterMetaData, returnValueConstraints, isCascading );
 	}
 
 	/**
@@ -71,12 +84,13 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 * return value shall be performed or not.
 	 */
 	public ConstrainedMethod(
+			EnumSet<ConfigurationSource> sources,
 			Method method,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
-		super( new MethodConstraintLocation( method ), returnValueConstraints, isCascading );
+		super( sources, new MethodConstraintLocation( method ), returnValueConstraints, isCascading );
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
 			throw new IllegalArgumentException(
@@ -201,7 +215,12 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 					)
 			);
 		}
+
+		EnumSet<ConfigurationSource> sources = EnumSet.copyOf( getSources() );
+		sources.addAll( otherMetaData.getSources() );
+
 		return new ConstrainedMethod(
+				sources,
 				getLocation().getMethod(),
 				mergedParameterMetaData,
 				mergedReturnValueConstraints,
@@ -214,44 +233,6 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		return "ConstrainedMethod [location=" + getLocation()
 				+ ", parameterMetaData=" + parameterMetaData
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ( hasParameterConstraints ? 1231 : 1237 );
-		result = prime
-				* result
-				+ ( ( parameterMetaData == null ) ? 0 : parameterMetaData
-				.hashCode() );
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( !super.equals( obj ) ) {
-			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		ConstrainedMethod other = (ConstrainedMethod) obj;
-		if ( hasParameterConstraints != other.hasParameterConstraints ) {
-			return false;
-		}
-		if ( parameterMetaData == null ) {
-			if ( other.parameterMetaData != null ) {
-				return false;
-			}
-		}
-		else if ( !parameterMetaData.equals( other.parameterMetaData ) ) {
-			return false;
-		}
-		return true;
 	}
 
 }
