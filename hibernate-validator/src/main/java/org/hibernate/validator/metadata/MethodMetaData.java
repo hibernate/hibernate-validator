@@ -90,7 +90,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 * @author Gunnar Morling
 	 * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
 	 */
-	public static class Builder extends BeanMetaDataManager.Builder {
+	public static class Builder extends BeanMetaDataManager.MetaDataBuilder {
 
 		private MethodConstraintLocation location;
 
@@ -99,8 +99,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		private boolean isCascading;
 
 		private boolean isConstrained;
-
-		private final String propertyName;
 
 		/**
 		 * Creates a new builder based on the given method meta data.
@@ -114,16 +112,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			metaDataByDefiningType.put( location.getMethod().getDeclaringClass(), metaData );
 			isCascading = metaData.isCascading();
 			isConstrained = metaData.isConstrained();
-			if ( metaData.isGetterMethod() ) {
-				propertyName = ReflectionHelper.getPropertyName( metaData.getLocation().getMember() );
-			}
-			else {
-				propertyName = null;
-			}
-		}
-
-		public Builder(String propertyName) {
-			this.propertyName = propertyName;
 		}
 
 		/**
@@ -141,10 +129,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 			if ( metaData.getConstrainedElementKind() != ConstrainedElementKind.METHOD ) {
 				return false;
-			}
-
-			if ( propertyName != null ) {
-				return propertyName.equals( ReflectionHelper.getPropertyName( metaData.getLocation().getMember() ) );
 			}
 
 			return ReflectionHelper.haveSameSignature(

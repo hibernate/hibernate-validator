@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -170,7 +171,7 @@ public class BeanMetaDataManager {
 
 		Class<T> beanClass = rootConfiguration.getBeanClass();
 
-		Set<Builder> builders = newHashSet();
+		Set<BuilderDelegate> builders = newHashSet();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 
@@ -186,11 +187,8 @@ public class BeanMetaDataManager {
 		}
 
 		Set<ConstraintMetaData> aggregatedElements = newHashSet();
-		for ( Builder oneBuilder : builders ) {
-			ConstraintMetaData metaData = oneBuilder.build();
-			if ( metaData != null ) {
-				aggregatedElements.add( metaData );
-			}
+		for ( BuilderDelegate oneBuilder : builders ) {
+			aggregatedElements.addAll( oneBuilder.build() );
 		}
 
 		return new BeanMetaDataImpl<T>(
@@ -201,26 +199,20 @@ public class BeanMetaDataManager {
 		);
 	}
 
-	private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<Builder> builders) {
+	private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
 
-		boolean foundBuilder = false;
+		for ( BuilderDelegate oneBuilder : builders ) {
+			boolean foundBuilder = oneBuilder.add( constrainableElement );
 
-		for ( Builder oneBuilder : builders ) {
-			if ( oneBuilder.accepts( constrainableElement ) ) {
-				oneBuilder.add( constrainableElement );
-				foundBuilder = true;
+			if ( foundBuilder ) {
+				return;
 			}
 		}
 
-		if ( foundBuilder ) {
-			return;
-		}
-
-		Set<Builder> builder = Builder.getInstance( constrainableElement, constraintHelper );
-		builders.addAll( builder );
+		builders.add( new BuilderDelegate( constrainableElement, constraintHelper ) );
 	}
 
-	public static abstract class Builder {
+	public static abstract class MetaDataBuilder {
 
 		public abstract boolean accepts(ConstrainedElement constrainableElement);
 
@@ -228,53 +220,80 @@ public class BeanMetaDataManager {
 
 		public abstract ConstraintMetaData build();
 
-		public static Set<Builder> getInstance(ConstrainedElement constrainableElement, ConstraintHelper constraintHelper) {
+	}
 
-			Set<Builder> builders = newHashSet();
+	private static class BuilderDelegate {
 
-			switch ( constrainableElement.getConstrainedElementKind() ) {
+		private PropertyMetaData.Builder propertyBuilder;
+
+		private MethodMetaData.Builder methodBuilder;
+
+		public BuilderDelegate(ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
+
+			switch ( constrainedElement.getConstrainedElementKind() ) {
+
 				case FIELD:
-					builders.add(
-							new PropertyMetaData.Builder(
-									(ConstrainedField) constrainableElement,
-									constraintHelper
-							)
-					);
-					builders.add(
-							new MethodMetaData.Builder(
-									( (ConstrainedField) constrainableElement ).getLocation()
-											.getPropertyName()
-							)
-					);
+
+					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
+					propertyBuilder = new PropertyMetaData.Builder( constrainedField, constraintHelper );
 					break;
+
 				case METHOD:
-					builders.add( new MethodMetaData.Builder( (ConstrainedMethod) constrainableElement ) );
-					if ( ( (ConstrainedMethod) constrainableElement ).isGetterMethod() ) {
-						builders.add(
-								new PropertyMetaData.Builder(
-										(ConstrainedMethod) constrainableElement,
-										constraintHelper
-								)
-						);
+
+					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
+					methodBuilder = new MethodMetaData.Builder( constrainedMethod );
+
+					if ( constrainedMethod.isGetterMethod() ) {
+						propertyBuilder = new PropertyMetaData.Builder( constrainedMethod, constraintHelper );
 					}
 					break;
 
 				case TYPE:
-					builders.add(
-							new PropertyMetaData.Builder(
-									(ConstrainedType) constrainableElement,
-									constraintHelper
-							)
-					);
+
+					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
+					propertyBuilder = new PropertyMetaData.Builder( constrainedType, constraintHelper );
 					break;
-				default:
-					throw new IllegalArgumentException();
+			}
+		}
+
+
+		public boolean add(ConstrainedElement constrainedElement) {
+
+			boolean added = false;
+
+			if ( methodBuilder != null && methodBuilder.accepts( constrainedElement ) ) {
+				methodBuilder.add( constrainedElement );
+				added = true;
 			}
 
-			return builders;
+			if ( propertyBuilder != null && propertyBuilder.accepts( constrainedElement ) ) {
+				propertyBuilder.add( constrainedElement );
+
+				if ( added == false && constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
+					methodBuilder = new MethodMetaData.Builder( (ConstrainedMethod) constrainedElement );
+				}
+
+				added = true;
+			}
+
+			return added;
+		}
+
+		public Set<ConstraintMetaData> build() {
+
+			Set<ConstraintMetaData> theValue = newHashSet();
+
+			if ( propertyBuilder != null ) {
+				theValue.add( propertyBuilder.build() );
+			}
+
+			if ( methodBuilder != null ) {
+				theValue.add( methodBuilder.build() );
+			}
+
+			return theValue;
 		}
 
 	}
-
 
 }
