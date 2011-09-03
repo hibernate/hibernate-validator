@@ -28,18 +28,15 @@ import org.hibernate.validator.util.ReflectionHelper;
  */
 public class ConstrainedField extends AbstractConstrainedElement {
 
-	private final BeanConstraintLocation location;
-
 	/**
-	 * @param constraints
 	 * @param location
+	 * @param constraints
 	 * @param isCascading
 	 */
-	public ConstrainedField(Set<MetaConstraint<?>> constraints,
-							BeanConstraintLocation location, boolean isCascading) {
+	public ConstrainedField(BeanConstraintLocation location, Set<MetaConstraint<?>> constraints,
+							boolean isCascading) {
 
-		super( constraints, isCascading );
-		this.location = location;
+		super( location, constraints, isCascading );
 
 		Member member = location.getMember();
 		if ( member != null && isConstrained() ) {
@@ -52,44 +49,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	}
 
 	public BeanConstraintLocation getLocation() {
-		return location;
-	}
-
-	@Override
-	public String toString() {
-		return "ConstrainedField [location=" + location + ", constraints=" + getConstraints() + ", isCascading=" + isCascading() + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result
-				+ ( ( location == null ) ? 0 : location.hashCode() );
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( !super.equals( obj ) ) {
-			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		ConstrainedField other = (ConstrainedField) obj;
-		if ( location == null ) {
-			if ( other.location != null ) {
-				return false;
-			}
-		}
-		else if ( !location.equals( other.location ) ) {
-			return false;
-		}
-		return true;
+		return (BeanConstraintLocation) super.getLocation();
 	}
 
 }

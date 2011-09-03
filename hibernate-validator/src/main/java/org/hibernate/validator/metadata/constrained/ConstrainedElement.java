@@ -16,23 +16,57 @@
 */
 package org.hibernate.validator.metadata.constrained;
 
+import java.util.Set;
+
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
- * @author Gunnar Morling
+ * Represents a (potentially) constrained element such as a type or field. Such
+ * an element has a set of {@link MetaConstraints} and can be marked for a
+ * cascaded validation.
  *
+ * @author Gunnar Morling
  */
 public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 
-	public static enum ConstrainedElementKind {
+	/**
+	 * The kind of a {@link ConstrainedElement}. Can be used to determine an
+	 * element's type when traversing over a collection of constrained elements.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public enum ConstrainedElementKind {
 		TYPE, FIELD, METHOD, PARAMETER;
 	}
-	
+
+	public enum ConfigurationSource {
+		ANNOTATION, XML, API
+	}
+
 	ConstrainedElementKind getConstrainedElementKind();
-	
+
 	ConstraintLocation getLocation();
-	
+
+	Set<MetaConstraint<?>> getConstraints();
+
+	/**
+	 * Whether cascading validation for the represented element shall be
+	 * performed or not.
+	 *
+	 * @return <code>True</code>, if cascading validation for the represented
+	 *         element shall be performed, <code>false</code> otherwise.
+	 */
 	boolean isCascading();
-	
+
+	/**
+	 * Whether this element is constrained or not. This is the case, if this
+	 * element has at least one constraint or a cascaded validation shall be
+	 * performed for it.
+	 *
+	 * @return <code>True</code>, if this element is constrained,
+	 *         <code>false</code> otherwise.
+	 */
+	boolean isConstrained();
+
 }

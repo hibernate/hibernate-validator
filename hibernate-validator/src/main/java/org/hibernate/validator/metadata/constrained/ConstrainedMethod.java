@@ -16,10 +16,8 @@
 */
 package org.hibernate.validator.metadata.constrained;
 
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -37,18 +35,12 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class ConstrainedMethod implements ConstrainedElement {
-
-	private final MethodConstraintLocation location;
+public class ConstrainedMethod extends AbstractConstrainedElement {
 
 	/**
 	 * Constrained-related meta data for this method's parameters.
 	 */
 	private final List<ConstrainedParameter> parameterMetaData;
-
-	private final Set<MetaConstraint<?>> returnValueConstraints;
-
-	private final boolean isCascading;
 
 	private final boolean hasParameterConstraints;
 
@@ -84,6 +76,8 @@ public class ConstrainedMethod implements ConstrainedElement {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
+		super( new MethodConstraintLocation( method ), returnValueConstraints, isCascading );
+
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
 			throw new IllegalArgumentException(
 					String.format(
@@ -93,17 +87,11 @@ public class ConstrainedMethod implements ConstrainedElement {
 			);
 		}
 
-		this.location = new MethodConstraintLocation( method );
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
-		this.returnValueConstraints = returnValueConstraints != null ? Collections.unmodifiableSet(
-				returnValueConstraints
-		) : Collections.<MetaConstraint<?>>emptySet();
-		this.isCascading = isCascading;
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
 
-		Member member = location.getMember();
 		if ( isConstrained() ) {
-			ReflectionHelper.setAccessibility( member );
+			ReflectionHelper.setAccessibility( method );
 		}
 	}
 
@@ -123,7 +111,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 	}
 
 	public MethodConstraintLocation getLocation() {
-		return location;
+		return (MethodConstraintLocation) super.getLocation();
 	}
 
 	/**
@@ -141,7 +129,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw new IllegalArgumentException( "Method " + location.getMethod() + " doesn't have a parameter with index " + parameterIndex );
+			throw new IllegalArgumentException( "Method " + getLocation().getMethod() + " doesn't have a parameter with index " + parameterIndex );
 		}
 
 		return parameterMetaData.get( parameterIndex );
@@ -160,25 +148,6 @@ public class ConstrainedMethod implements ConstrainedElement {
 	}
 
 	/**
-	 * An iterator with the return value constraints of the represented method.
-	 */
-	public Iterator<MetaConstraint<?>> iterator() {
-		return returnValueConstraints.iterator();
-	}
-
-	/**
-	 * Whether cascading validation for the return value of the represented
-	 * method shall be performed or not.
-	 *
-	 * @return <code>True</code>, if cascading validation for the represented
-	 *         method's return value shall be performed, <code>false</code>
-	 *         otherwise.
-	 */
-	public boolean isCascading() {
-		return isCascading;
-	}
-
-	/**
 	 * Whether the represented method is constrained or not. This is the case if
 	 * it has at least one constrained parameter, at least one parameter marked
 	 * for cascaded validation, at least one return value constraint or if the
@@ -189,7 +158,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 	 */
 	public boolean isConstrained() {
 
-		return isCascading || !returnValueConstraints.isEmpty() || hasParameterConstraints;
+		return super.isConstrained() || hasParameterConstraints;
 	}
 
 	/**
@@ -210,7 +179,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return ReflectionHelper.isGetterMethod( location.getMethod() );
+		return ReflectionHelper.isGetterMethod( getLocation().getMethod() );
 	}
 
 	public ConstrainedMethod merge(ConstrainedMethod otherMetaData) {
@@ -219,7 +188,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 
 		// 1 - aggregate return value constraints
 		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet(
-				this.returnValueConstraints, otherMetaData.returnValueConstraints
+				this.getConstraints(), otherMetaData.getConstraints()
 		);
 
 		// 2 - aggregate parameter metaData. The two method MetaData have the same signature, consequently they
@@ -233,7 +202,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 			);
 		}
 		return new ConstrainedMethod(
-				location.getMethod(),
+				getLocation().getMethod(),
 				mergedParameterMetaData,
 				mergedReturnValueConstraints,
 				isCascading
@@ -242,28 +211,20 @@ public class ConstrainedMethod implements ConstrainedElement {
 
 	@Override
 	public String toString() {
-		return "ConstrainedMethod [location=" + location + ", parameterMetaData="
-				+ parameterMetaData + ", returnValueConstraints="
-				+ returnValueConstraints + ", isCascading=" + isCascading
+		return "ConstrainedMethod [location=" + getLocation()
+				+ ", parameterMetaData=" + parameterMetaData
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + ( hasParameterConstraints ? 1231 : 1237 );
-		result = prime * result + ( isCascading ? 1231 : 1237 );
-		result = prime * result
-				+ ( ( location == null ) ? 0 : location.hashCode() );
 		result = prime
 				* result
 				+ ( ( parameterMetaData == null ) ? 0 : parameterMetaData
 				.hashCode() );
-		result = prime
-				* result
-				+ ( ( returnValueConstraints == null ) ? 0
-				: returnValueConstraints.hashCode() );
 		return result;
 	}
 
@@ -272,7 +233,7 @@ public class ConstrainedMethod implements ConstrainedElement {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj == null ) {
+		if ( !super.equals( obj ) ) {
 			return false;
 		}
 		if ( getClass() != obj.getClass() ) {
@@ -282,31 +243,12 @@ public class ConstrainedMethod implements ConstrainedElement {
 		if ( hasParameterConstraints != other.hasParameterConstraints ) {
 			return false;
 		}
-		if ( isCascading != other.isCascading ) {
-			return false;
-		}
-		if ( location == null ) {
-			if ( other.location != null ) {
-				return false;
-			}
-		}
-		else if ( !location.equals( other.location ) ) {
-			return false;
-		}
 		if ( parameterMetaData == null ) {
 			if ( other.parameterMetaData != null ) {
 				return false;
 			}
 		}
 		else if ( !parameterMetaData.equals( other.parameterMetaData ) ) {
-			return false;
-		}
-		if ( returnValueConstraints == null ) {
-			if ( other.returnValueConstraints != null ) {
-				return false;
-			}
-		}
-		else if ( !returnValueConstraints.equals( other.returnValueConstraints ) ) {
 			return false;
 		}
 		return true;

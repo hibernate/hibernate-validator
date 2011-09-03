@@ -26,16 +26,13 @@ import org.hibernate.validator.metadata.location.BeanConstraintLocation;
  */
 public class ConstrainedType extends AbstractConstrainedElement {
 
-	private final BeanConstraintLocation location;
-
 	/**
 	 * @param constraints
 	 * @param location
 	 */
 	public ConstrainedType(Set<MetaConstraint<?>> constraints, BeanConstraintLocation location) {
 
-		super( constraints, false );
-		this.location = location;
+		super( location, constraints, false );
 	}
 
 	public ConstrainedElementKind getConstrainedElementKind() {
@@ -43,7 +40,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 	}
 
 	public BeanConstraintLocation getLocation() {
-		return location;
+		return (BeanConstraintLocation) super.getLocation();
 	}
 
 }

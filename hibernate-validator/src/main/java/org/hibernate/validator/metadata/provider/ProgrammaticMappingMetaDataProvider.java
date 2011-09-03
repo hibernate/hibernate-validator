@@ -30,15 +30,15 @@ import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanConfiguration.ConfigurationSource;
+import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.ConstraintOrigin;
+import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.metadata.constrained.ConstrainedType;
-import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
-import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.ConstraintOrigin;
-import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
@@ -124,8 +124,8 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			if ( oneConfiguredProperty.getElementType() == ElementType.FIELD ) {
 				allPropertyMetaData.add(
 						new ConstrainedField(
-								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
 								oneConfiguredProperty,
+								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
 								cascades.contains( oneConfiguredProperty )
 						)
 				);

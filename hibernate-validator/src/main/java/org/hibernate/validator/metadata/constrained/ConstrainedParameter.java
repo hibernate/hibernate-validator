@@ -16,12 +16,12 @@
 */
 package org.hibernate.validator.metadata.constrained;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-
 import java.util.Set;
 
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -30,24 +30,21 @@ import org.hibernate.validator.metadata.location.MethodConstraintLocation;
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
 
-	private final MethodConstraintLocation location;
-
 	private final String name;
 
 	public ConstrainedParameter(MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
-		super(constraints, isCascading);
-		
-		this.location = location;
+		super( location, constraints, isCascading );
+
 		this.name = name;
 	}
 
 	public ConstrainedElementKind getConstrainedElementKind() {
 		return ConstrainedElementKind.PARAMETER;
 	}
-	
+
 	public MethodConstraintLocation getLocation() {
-		return location;
+		return (MethodConstraintLocation) super.getLocation();
 	}
 
 	public String getParameterName() {
@@ -57,7 +54,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	public ConstrainedParameter merge(ConstrainedParameter otherMetaData) {
 
 		return new ConstrainedParameter(
-				location,
+				getLocation(),
 				name,
 				newHashSet( this.getConstraints(), otherMetaData.getConstraints() ),
 				isCascading() || otherMetaData.isCascading()
@@ -77,7 +74,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		String constraintsAsString = sb.length() > 0 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-		return "ParameterMetaData [location=" + location + "], name=" + name + "], constraints=["
+		return "ParameterMetaData [location=" + getLocation() + "], name=" + name + "], constraints=["
 				+ constraintsAsString + "], isCascading=" + isCascading() + "]";
 	}
 }

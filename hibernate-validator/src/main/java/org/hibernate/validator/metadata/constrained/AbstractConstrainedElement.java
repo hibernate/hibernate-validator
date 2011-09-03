@@ -21,11 +21,14 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
  * @author Gunnar Morling
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
+
+	private final ConstraintLocation location;
 
 	private final Set<MetaConstraint<?>> constraints;
 
@@ -35,10 +38,15 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	 * @param constraints
 	 * @param isCascading
 	 */
-	public AbstractConstrainedElement(Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	public AbstractConstrainedElement(ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
+		this.location = location;
 		this.constraints = constraints != null ? constraints : Collections.<MetaConstraint<?>>emptySet();
 		this.isCascading = isCascading;
+	}
+
+	public ConstraintLocation getLocation() {
+		return location;
 	}
 
 	public Iterator<MetaConstraint<?>> iterator() {
@@ -53,18 +61,17 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		return isCascading;
 	}
 
-	/**
-	 * Whether this element is constrained or not. This is the case, if this
-	 * element has at least one constraint or a cascaded validation shall be
-	 * performed for it.
-	 *
-	 * @return <code>True</code>, if this element is constrained,
-	 *         <code>false</code> otherwise.
-	 */
 	public boolean isConstrained() {
 		return isCascading || !constraints.isEmpty();
 	}
-	
+
+	@Override
+	public String toString() {
+		return "AbstractConstrainedElement [location=" + location
+				+ ", constraints=" + constraints + ", isCascading="
+				+ isCascading + "]";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -72,6 +79,8 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		result = prime * result
 				+ ( ( constraints == null ) ? 0 : constraints.hashCode() );
 		result = prime * result + ( isCascading ? 1231 : 1237 );
+		result = prime * result
+				+ ( ( location == null ) ? 0 : location.hashCode() );
 		return result;
 	}
 
@@ -98,13 +107,15 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		if ( isCascading != other.isCascading ) {
 			return false;
 		}
+		if ( location == null ) {
+			if ( other.location != null ) {
+				return false;
+			}
+		}
+		else if ( !location.equals( other.location ) ) {
+			return false;
+		}
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "PropertyMetaData [constraints=" + constraints
-				+ ", isCascading=" + isCascading + "]";
 	}
 
 }
