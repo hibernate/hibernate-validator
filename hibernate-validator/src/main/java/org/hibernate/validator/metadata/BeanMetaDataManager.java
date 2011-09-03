@@ -212,16 +212,6 @@ public class BeanMetaDataManager {
 		builders.add( new BuilderDelegate( constrainableElement, constraintHelper ) );
 	}
 
-	public static abstract class MetaDataBuilder {
-
-		public abstract boolean accepts(ConstrainedElement constrainableElement);
-
-		public abstract void add(ConstrainedElement constrainableElement);
-
-		public abstract ConstraintMetaData build();
-
-	}
-
 	private static class BuilderDelegate {
 
 		private PropertyMetaData.Builder propertyBuilder;

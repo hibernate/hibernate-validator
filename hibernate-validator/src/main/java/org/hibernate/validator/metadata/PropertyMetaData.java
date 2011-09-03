@@ -158,7 +158,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				+ "], isConstrained=" + isConstrained + "]";
 	}
 
-	public static class Builder extends BeanMetaDataManager.MetaDataBuilder {
+	public static class Builder extends MetaDataBuilder {
 
 		private final ConstraintHelper constraintHelper;
 

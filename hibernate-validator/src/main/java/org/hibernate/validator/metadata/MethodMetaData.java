@@ -90,7 +90,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 * @author Gunnar Morling
 	 * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
 	 */
-	public static class Builder extends BeanMetaDataManager.MetaDataBuilder {
+	public static class Builder extends MetaDataBuilder {
 
 		private MethodConstraintLocation location;
 
@@ -115,34 +115,20 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		}
 
 		/**
-		 * Whether the given method can be added to this builder or not. This is
-		 * the case if the given method has the same signature as this builder's
-		 * base method (and originates from the same type hierarchy, which
-		 * currently is not checked).
-		 *
-		 * @param metaData The method of interest.
-		 *
-		 * @return <code>True</code>, if the given method can be added to this
-		 *         builder, <code>false</code> otherwise.
+		 * {@inheritDoc}
 		 */
 		public boolean accepts(ConstrainedElement metaData) {
 
-			if ( metaData.getConstrainedElementKind() != ConstrainedElementKind.METHOD ) {
-				return false;
-			}
-
-			return ReflectionHelper.haveSameSignature(
-					location.getMethod(),
-					( (ConstrainedMethod) metaData ).getLocation().getMethod()
-			);
+			return
+					metaData.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+							ReflectionHelper.haveSameSignature(
+									location.getMethod(),
+									( (ConstrainedMethod) metaData ).getLocation().getMethod()
+							);
 		}
 
 		/**
-		 * Adds the given method to this builder. It must be checked with
-		 * {@link #accepts(ConstrainedMethod)} before, whether this is allowed or
-		 * not.
-		 *
-		 * @param metaData The meta data to add.
+		 * {@inheritDoc}
 		 */
 		public void add(ConstrainedElement constrainedElement) {
 
@@ -156,10 +142,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			}
 
 			//use the lowest method found in the hierarchy for this aggregation
-			if ( location == null ||
-					location.getMethod()
-							.getDeclaringClass()
-							.isAssignableFrom( metaData.getLocation().getMethod().getDeclaringClass() ) ) {
+			if ( location.getMethod()
+					.getDeclaringClass()
+					.isAssignableFrom( metaData.getLocation().getMethod().getDeclaringClass() ) ) {
 				location = metaData.getLocation();
 			}
 
@@ -169,21 +154,16 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		}
 
 		/**
-		 * Creates a new, read-only {@link MethodMetaData} object from
-		 * this builder.
-		 *
-		 * @return An {@code AggregatedMethodMetaData} object
+		 * {@inheritDoc}
 		 */
 		public MethodMetaData build() {
 			return
-					location != null ?
-							new MethodMetaData(
-									this,
-									collectReturnValueConstraints(),
-									findParameterMetaData(),
-									checkParameterConstraints()
-							)
-							: null;
+					new MethodMetaData(
+							this,
+							collectReturnValueConstraints(),
+							findParameterMetaData(),
+							checkParameterConstraints()
+					);
 		}
 
 		/**
