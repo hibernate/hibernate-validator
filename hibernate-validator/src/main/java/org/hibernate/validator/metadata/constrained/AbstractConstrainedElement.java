@@ -28,6 +28,8 @@ import org.hibernate.validator.metadata.location.ConstraintLocation;
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
+	private final ConstrainedElementKind kind;
+
 	private final ConfigurationSource source;
 
 	private final ConstraintLocation location;
@@ -36,12 +38,17 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
 	private final boolean isCascading;
 
-	public AbstractConstrainedElement(ConfigurationSource source, ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	public AbstractConstrainedElement(ConfigurationSource source, ConstrainedElementKind kind, ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
+		this.kind = kind;
 		this.source = source;
 		this.location = location;
-		this.constraints = constraints != null ? constraints : Collections.<MetaConstraint<?>>emptySet();
+		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.isCascading = isCascading;
+	}
+
+	public ConstrainedElementKind getConstrainedElementKind() {
+		return kind;
 	}
 
 	public ConfigurationSource getSource() {
@@ -70,9 +77,9 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
 	@Override
 	public String toString() {
-		return "AbstractConstrainedElement [sources=" + source + ", location="
-				+ location + ", constraints=" + constraints + ", isCascading="
-				+ isCascading + "]";
+		return "AbstractConstrainedElement [kind=" + kind + ", source="
+				+ source + ", location=" + location + ", constraints="
+				+ constraints + ", isCascading=" + isCascading + "]";
 	}
 
 	@Override

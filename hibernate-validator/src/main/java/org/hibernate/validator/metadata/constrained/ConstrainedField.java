@@ -36,16 +36,12 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public ConstrainedField(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints,
 							boolean isCascading) {
 
-		super( source, location, constraints, isCascading );
+		super( source, ConstrainedElementKind.FIELD, location, constraints, isCascading );
 
 		Member member = location.getMember();
 		if ( member != null && isConstrained() ) {
 			ReflectionHelper.setAccessibility( member );
 		}
-	}
-
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return ConstrainedElementKind.FIELD;
 	}
 
 	public BeanConstraintLocation getLocation() {

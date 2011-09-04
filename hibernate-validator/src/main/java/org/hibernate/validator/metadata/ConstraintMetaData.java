@@ -17,6 +17,12 @@
 package org.hibernate.validator.metadata;
 
 /**
+ * <p>
+ * An aggregated view of the constraint related meta data for a given bean/type
+ * element and all the elements in the inheritance hierarchy which it overrides
+ * or implements.
+ * </p>
+ *
  * @author Gunnar Morling
  */
 public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
@@ -28,5 +34,7 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	ConstraintMetaDataKind getConstrainedMetaDataKind();
 
 	boolean isCascading();
+
+	boolean isConstrained();
 
 }

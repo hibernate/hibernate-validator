@@ -32,13 +32,9 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	public ConstrainedParameter(ConfigurationSource source, MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
-		super( source, location, constraints, isCascading );
+		super( source, ConstrainedElementKind.PARAMETER, location, constraints, isCascading );
 
 		this.name = name;
-	}
-
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return ConstrainedElementKind.PARAMETER;
 	}
 
 	public MethodConstraintLocation getLocation() {

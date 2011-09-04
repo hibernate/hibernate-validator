@@ -35,8 +35,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 	private final String name;
 
-	private final boolean isConstrained;
-
 	/**
 	 * @param constraints
 	 * @param isCascading
@@ -44,12 +42,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 	 */
 	public ParameterMetaData(Set<MetaConstraint<?>> constraints, boolean isCascading, String name, Class<?> type, int index) {
 
-		super( constraints, ConstraintMetaDataKind.PARAMETER, isCascading );
+		super( constraints, ConstraintMetaDataKind.PARAMETER, isCascading, !constraints.isEmpty() || isCascading );
 
 		this.type = type;
 		this.index = index;
 		this.name = name;
-		this.isConstrained = !constraints.isEmpty() || isCascading;
 	}
 
 	public Class<?> getType() {
@@ -62,10 +59,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 	public String getName() {
 		return name;
-	}
-
-	public boolean isConstrained() {
-		return isConstrained;
 	}
 
 	public static class Builder extends MetaDataBuilder {

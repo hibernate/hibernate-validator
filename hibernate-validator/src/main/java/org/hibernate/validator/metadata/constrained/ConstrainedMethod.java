@@ -76,7 +76,13 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
-		super( source, new MethodConstraintLocation( method ), returnValueConstraints, isCascading );
+		super(
+				source,
+				ConstrainedElementKind.METHOD,
+				new MethodConstraintLocation( method ),
+				returnValueConstraints,
+				isCascading
+		);
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
 			throw new IllegalArgumentException(
@@ -104,10 +110,6 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		}
 
 		return false;
-	}
-
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return ConstrainedElementKind.METHOD;
 	}
 
 	public MethodConstraintLocation getLocation() {

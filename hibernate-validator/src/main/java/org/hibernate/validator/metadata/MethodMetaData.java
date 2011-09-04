@@ -50,10 +50,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 	private final Method rootMethod;
 
-//	private final Map<Class<?>, ConstrainedMethod> metaDataByDefiningType;
-
-	private final boolean isConstrained;
-
 	private final List<ParameterMetaData> parameterMetaData;
 
 	/**
@@ -74,12 +70,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			boolean isCascading,
 			boolean isConstrained) {
 
-		super( returnValueConstraints, ConstraintMetaDataKind.METHOD, isCascading );
+		super( returnValueConstraints, ConstraintMetaDataKind.METHOD, isCascading, isConstrained );
 
-//		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
-		this.isConstrained = isConstrained;
-		rootMethod = builder.location.getMember();
-
+		this.rootMethod = builder.location.getMember();
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
 	}
@@ -330,17 +323,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 */
 	public List<ParameterMetaData> getAllParameterMetaData() {
 		return parameterMetaData;
-	}
-
-	/**
-	 * Whether the represented method itself or any of the method's up in the
-	 * inheritance hierarchy which it overrides/implements is constrained.
-	 *
-	 * @return <code>True</code>, if this method is constrained by any means,
-	 *         <code>false</code> otherwise.
-	 */
-	public boolean isConstrained() {
-		return isConstrained;
 	}
 
 	public String getName() {

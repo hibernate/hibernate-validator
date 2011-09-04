@@ -32,11 +32,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 	 */
 	public ConstrainedType(ConfigurationSource source, Set<MetaConstraint<?>> constraints, BeanConstraintLocation location) {
 
-		super( source, location, constraints, false );
-	}
-
-	public ConstrainedElementKind getConstrainedElementKind() {
-		return ConstrainedElementKind.TYPE;
+		super( source, ConstrainedElementKind.TYPE, location, constraints, false );
 	}
 
 	public BeanConstraintLocation getLocation() {

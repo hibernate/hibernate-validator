@@ -22,9 +22,25 @@ import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
- * Represents a (potentially) constrained element such as a type or field. Such
- * an element has a set of {@link MetaConstraints} and can be marked for a
- * cascaded validation.
+ * <p>
+ * Represents a (potentially) constrained Java element such as a type, field or
+ * method. Such an element has a set of {@link MetaConstraints} and can be
+ * marked for a cascaded validation. Furthermore each constrained element has a
+ * {@link ConfigurationSource configuration source} which determines its origin.
+ * </p>
+ * <p>
+ * The hierarchy of constrained elements resembles the physical structure of the
+ * represented Java types. In particular it doesn't provide the notion of
+ * properties and it doesn't aggregate meta data for overridden elements in an
+ * inheritance hierarchy.
+ * </p>
+ * <p>
+ * Identity of implementations is based on the element location and constraint
+ * source. That means that for instance in a set there can be two configurations
+ * for one and the same Java field created by two different configuration
+ * sources (e.g. via annotation and XML) but not two configurations for the same
+ * field originating from one configuration source.
+ * </p>
  *
  * @author Gunnar Morling
  */

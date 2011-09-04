@@ -25,22 +25,25 @@ import java.util.Set;
  */
 public class AbstractConstraintMetaData implements ConstraintMetaData {
 
-	protected final Set<MetaConstraint<?>> constraints;
-
 	private final ConstraintMetaDataKind constrainedMetaDataKind;
 
+	protected final Set<MetaConstraint<?>> constraints;
+
 	private final boolean isCascading;
+
+	private final boolean isConstrained;
 
 	/**
 	 * @param constraints
 	 * @param constrainedMetaDataKind
 	 * @param isCascading
 	 */
-	public AbstractConstraintMetaData(Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind, boolean isCascading) {
+	public AbstractConstraintMetaData(Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind, boolean isCascading, boolean isConstrained) {
 
 		this.constraints = Collections.unmodifiableSet( constraints );
 		this.constrainedMetaDataKind = constrainedMetaDataKind;
 		this.isCascading = isCascading;
+		this.isConstrained = isConstrained;
 	}
 
 	public Iterator<MetaConstraint<?>> iterator() {
@@ -53,6 +56,10 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	public boolean isCascading() {
 		return isCascading;
+	}
+
+	public boolean isConstrained() {
+		return isConstrained;
 	}
 
 	@Override

@@ -45,14 +45,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	private final Set<Member> cascadingMembers;
 
-	private final boolean isConstrained;
-
 	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
-		super( constraints, ConstraintMetaDataKind.PROPERTY, !cascadingMembers.isEmpty() );
+		super(
+				constraints,
+				ConstraintMetaDataKind.PROPERTY,
+				!cascadingMembers.isEmpty(),
+				!cascadingMembers.isEmpty() || !constraints.isEmpty()
+		);
 		this.type = type;
 		this.propertyName = propertyName;
 		this.cascadingMembers = cascadingMembers;
-		this.isConstrained = !cascadingMembers.isEmpty() || !constraints.isEmpty();
 	}
 
 	public Class<?> getType() {
@@ -67,18 +69,10 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		return cascadingMembers;
 	}
 
-	public boolean isConstrained() {
-		return isConstrained;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime
-				* result
-				+ ( ( cascadingMembers == null ) ? 0 : cascadingMembers.hashCode() );
-		result = prime * result + ( isConstrained ? 1231 : 1237 );
 		result = prime * result
 				+ ( ( propertyName == null ) ? 0 : propertyName.hashCode() );
 		result = prime * result + ( ( type == null ) ? 0 : type.hashCode() );
@@ -97,17 +91,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			return false;
 		}
 		PropertyMetaData other = (PropertyMetaData) obj;
-		if ( cascadingMembers == null ) {
-			if ( other.cascadingMembers != null ) {
-				return false;
-			}
-		}
-		else if ( !cascadingMembers.equals( other.cascadingMembers ) ) {
-			return false;
-		}
-		if ( isConstrained != other.isConstrained ) {
-			return false;
-		}
 		if ( propertyName == null ) {
 			if ( other.propertyName != null ) {
 				return false;
@@ -142,8 +125,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		return "PropertyMetaData [type=" + type.getSimpleName() + ", propertyName="
-				+ propertyName + ", cascadingMembers=[" + cascadingMembers
-				+ "], isConstrained=" + isConstrained + "]";
+				+ propertyName + ", cascadingMembers=[" + cascadingMembers + "]]";
 	}
 
 	public static class Builder extends MetaDataBuilder {
