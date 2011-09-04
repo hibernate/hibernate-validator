@@ -42,12 +42,14 @@ import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
+import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.util.CollectionHelper.partition;
 import static org.hibernate.validator.util.ReflectionHelper.computeAllImplementedInterfaces;
 import static org.hibernate.validator.util.ReflectionHelper.getMethods;
 import static org.hibernate.validator.util.ReflectionHelper.newInstance;
@@ -119,12 +121,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private List<Class<?>> classHierarchyWithoutInterfaces;
 
 	/**
-	 * A list of all property names in the class (constrained and un-constrained).
-	 */
-	// Used to avoid ReflectionHelper#containsMember which is slow
-	private final Set<String> propertyNames = newHashSet( 30 );
-
-	/**
 	 * Creates a new {@link BeanMetaDataImpl}
 	 *
 	 * @param beanClass The Java type represented by this meta data object.
@@ -136,9 +132,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
 							Set<ConstraintMetaData> constraintMetaData) {
-		this.beanClass = beanClass;
-		beanDescriptor = new BeanDescriptorImpl<T>( this );
 
+		this.beanClass = beanClass;
 		this.propertyMetaData = newHashMap();
 
 		Set<PropertyMetaData> propertyMetaDatas = newHashSet();
@@ -156,20 +151,25 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Set<Member> cascadedMembers = newHashSet();
 		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
+		Set<MetaConstraint<?>> allClassLevelConstraints = newHashSet();
 
 		for ( PropertyMetaData oneProperty : propertyMetaDatas ) {
 
 			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
-			propertyNames.add( oneProperty.getPropertyName() );
 
 			if ( oneProperty.isCascading() ) {
 				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
 			}
 
-			for ( MetaConstraint<?> constraint : oneProperty ) {
-				addMetaConstraint( constraint.getLocation().getBeanClass(), constraint );
-				allMetaConstraints.add( constraint );
+			Set<MetaConstraint<?>> classLevelConstraints = partition(
+					oneProperty.getConstraints(),
+					byElementType()
+			).get( ElementType.TYPE );
+			if ( classLevelConstraints != null ) {
+				allClassLevelConstraints.addAll( classLevelConstraints );
 			}
+
+			allMetaConstraints.addAll( oneProperty.getConstraints() );
 		}
 
 		this.cascadedMembers = Collections.unmodifiableSet( cascadedMembers );
@@ -182,6 +182,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		directMetaConstraints = buildDirectConstraintSets();
 
 		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDatas ) );
+		beanDescriptor = new BeanDescriptorImpl<T>( this, allClassLevelConstraints );
 	}
 
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
@@ -240,7 +241,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public boolean isPropertyPresent(String name) {
-		return propertyNames.contains( name );
+		return propertyMetaData.containsKey( name );
 	}
 
 	public List<Class<?>> getDefaultGroupSequence(T beanState) {
@@ -336,14 +337,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return validDefaultGroupSequence;
 	}
 
-	private void addMetaConstraint(Class<?> clazz, MetaConstraint<?> metaConstraint) {
-
-		// but we also have to update the descriptors exposing the BV metadata API
-		if ( metaConstraint.getElementType() == ElementType.TYPE ) {
-			beanDescriptor.addConstraintDescriptor( metaConstraint.getDescriptor() );
-		}
-	}
-
 	public List<Class<?>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
 	}
@@ -365,6 +358,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		throw new GroupDefinitionException(
 				"The default group sequence provider defined for " + beanClass.getName() + " has the wrong type"
 		);
+	}
+
+	private Partitioner<ElementType, MetaConstraint<?>> byElementType() {
+		return new Partitioner<ElementType, MetaConstraint<?>>() {
+			public ElementType getPartition(MetaConstraint<?> constraint) {
+				return constraint.getElementType();
+			}
+		};
 	}
 
 	@Override

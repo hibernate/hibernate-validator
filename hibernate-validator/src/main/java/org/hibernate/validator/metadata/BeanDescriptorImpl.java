@@ -35,8 +35,12 @@ import static org.hibernate.validator.util.Contracts.assertNotNull;
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor, TypeDescriptor {
 
-	public BeanDescriptorImpl(BeanMetaData<T> beanMetaData) {
+	public BeanDescriptorImpl(BeanMetaData<T> beanMetaData, Set<MetaConstraint<?>> classLevelConstraints) {
 		super( beanMetaData.getBeanClass(), beanMetaData );
+
+		for ( MetaConstraint<?> oneConstraint : classLevelConstraints ) {
+			addConstraintDescriptor( oneConstraint.getDescriptor() );
+		}
 	}
 
 	//BeanDescriptor methods

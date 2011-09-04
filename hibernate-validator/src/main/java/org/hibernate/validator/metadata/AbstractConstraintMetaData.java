@@ -50,6 +50,10 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 		return constraints.iterator();
 	}
 
+	public Set<MetaConstraint<?>> getConstraints() {
+		return constraints;
+	}
+
 	public ConstraintMetaDataKind getConstrainedMetaDataKind() {
 		return constrainedMetaDataKind;
 	}
