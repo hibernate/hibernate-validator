@@ -34,13 +34,13 @@ import javax.validation.Valid;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanConfiguration;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.constrained.BeanConfiguration;
+import org.hibernate.validator.metadata.constrained.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
-import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
@@ -109,6 +109,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		return
 				createBeanConfiguration(
+						ConfigurationSource.ANNOTATION,
 						beanClass,
 						propertyMetaData,
 						getDefaultGroupSequence( beanClass ),

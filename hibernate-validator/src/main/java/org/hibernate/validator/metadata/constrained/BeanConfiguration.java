@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.metadata;
+package org.hibernate.validator.metadata.constrained;
 
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
@@ -28,6 +27,8 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class BeanConfiguration<T> {
+
+	private final ConfigurationSource source;
 
 	private final Class<T> beanClass;
 
@@ -44,11 +45,13 @@ public class BeanConfiguration<T> {
 	 * @param defaultGroupSequence
 	 */
 	public BeanConfiguration(
+			ConfigurationSource source,
 			Class<T> beanClass,
 			Set<? extends ConstrainedElement> constrainableElements,
 			List<Class<?>> defaultGroupSequence,
 			Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
+		this.source = source;
 		this.beanClass = beanClass;
 		this.constrainableElements = newHashSet( constrainableElements );
 		this.defaultGroupSequence = defaultGroupSequence;

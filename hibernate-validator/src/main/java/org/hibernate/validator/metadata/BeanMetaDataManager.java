@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.constrained.BeanConfiguration;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
@@ -41,7 +42,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  * required by the validation engine.
  * </p>
  * <p>
- * Actual retrieval as meta data is delegated to {@link MetaDataProvider}
+ * Actual retrieval of meta data is delegated to {@link MetaDataProvider}
  * implementations which load meta-data based e.g. based on annotations or XML.
  * </p>
  * <p>

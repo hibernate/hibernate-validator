@@ -19,7 +19,7 @@ package org.hibernate.validator.metadata.provider;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.BeanConfiguration;
+import org.hibernate.validator.metadata.constrained.BeanConfiguration;
 
 /**
  * <p>

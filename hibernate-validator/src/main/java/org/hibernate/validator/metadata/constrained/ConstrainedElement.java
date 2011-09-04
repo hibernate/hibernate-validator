@@ -59,10 +59,6 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 		TYPE, FIELD, METHOD, PARAMETER;
 	}
 
-	public enum ConfigurationSource {
-		ANNOTATION, XML, API
-	}
-
 	ConstrainedElementKind getConstrainedElementKind();
 
 	ConstraintLocation getLocation();

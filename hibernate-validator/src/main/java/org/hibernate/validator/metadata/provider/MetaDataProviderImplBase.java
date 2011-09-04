@@ -23,8 +23,9 @@ import java.util.Set;
 
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.metadata.BeanConfiguration;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.constrained.BeanConfiguration;
+import org.hibernate.validator.metadata.constrained.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
@@ -77,9 +78,11 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 		return configuredBeans.get( beanClass );
 	}
 
-	protected <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass, Set<? extends ConstrainedElement> constrainableElements, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
+	protected <T> BeanConfiguration<T> createBeanConfiguration(
+			ConfigurationSource source, Class<T> beanClass, Set<? extends ConstrainedElement> constrainableElements, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		return new BeanConfiguration<T>(
+				source,
 				beanClass,
 				constrainableElements,
 				defaultGroupSequence,

@@ -27,8 +27,8 @@ import java.util.Set;
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.constrained.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
-import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedType;
@@ -73,6 +73,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
+							ConfigurationSource.XML,
 							clazz,
 							constrainedElements,
 							mappingParser.getDefaultSequenceForClass( clazz ),

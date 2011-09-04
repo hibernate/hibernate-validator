@@ -33,8 +33,8 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.metadata.MetaConstraint;
+import org.hibernate.validator.metadata.constrained.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
-import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
@@ -94,6 +94,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
+							ConfigurationSource.API,
 							clazz,
 							constrainedElements,
 							context.getDefaultSequence( clazz ),
