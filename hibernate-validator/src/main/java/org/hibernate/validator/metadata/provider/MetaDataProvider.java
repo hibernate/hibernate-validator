@@ -41,4 +41,6 @@ public interface MetaDataProvider {
 
 	AnnotationIgnores getAnnotationIgnores();
 
+	Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
+
 }

@@ -34,6 +34,7 @@ import javax.validation.Valid;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.AnnotationIgnores;
+import org.hibernate.validator.metadata.BeanConfiguration;
 import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
@@ -58,25 +59,37 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 	private final AnnotationIgnores annotationIgnores;
 
-	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, Class<?> beanClass, AnnotationIgnores annotationIgnores) {
+	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
 
 		super( constraintHelper );
 
 		this.annotationIgnores = annotationIgnores;
-
-		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
-			retrieveBeanMetaData( oneHierarchyClass );
-		}
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
 		return null;
 	}
 
+	public BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
+
+		BeanConfiguration<?> configuration = configuredBeans.get( beanClass );
+
+		if ( configuration != null ) {
+			return configuration;
+		}
+
+		configuration = retrieveBeanConfiguration( beanClass );
+		configuredBeans.put( beanClass, configuration );
+
+		return configuration;
+	}
+
 	/**
 	 * Retrieves constraint related meta data from the annotations of the given type.
+	 *
+	 * @return
 	 */
-	private void retrieveBeanMetaData(Class<?> beanClass) {
+	private BeanConfiguration<?> retrieveBeanConfiguration(Class<?> beanClass) {
 
 		Set<ConstrainedElement> propertyMetaData = getPropertyMetaData( beanClass );
 		propertyMetaData.addAll( getMethodMetaData( beanClass ) );
@@ -94,15 +107,13 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			propertyMetaData.add( classLevelMetaData );
 		}
 
-		configuredBeans.put(
-				beanClass,
+		return
 				createBeanConfiguration(
 						beanClass,
 						propertyMetaData,
 						getDefaultGroupSequence( beanClass ),
 						getDefaultGroupSequenceProviderClass( beanClass )
-				)
-		);
+				);
 	}
 
 	private List<Class<?>> getDefaultGroupSequence(Class<?> beanClass) {

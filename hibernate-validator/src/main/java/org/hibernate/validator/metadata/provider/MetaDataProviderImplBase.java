@@ -28,8 +28,10 @@ import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * @author Gunnar Morling
@@ -54,6 +56,25 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 
 	public Set<BeanConfiguration<?>> getAllBeanConfigurations() {
 		return new HashSet<BeanConfiguration<?>>( configuredBeans.values() );
+	}
+
+	public Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
+
+		Set<BeanConfiguration<?>> configurations = newHashSet();
+
+		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+			BeanConfiguration<?> configuration = getBeanConfiguration( oneHierarchyClass );
+			if ( configuration != null ) {
+				configurations.add( configuration );
+			}
+		}
+
+		return configurations;
+
+	}
+
+	protected BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
+		return configuredBeans.get( beanClass );
 	}
 
 	protected <T> BeanConfiguration<T> createBeanConfiguration(Class<T> beanClass, Set<? extends ConstrainedElement> constrainableElements, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
