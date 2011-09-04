@@ -41,6 +41,9 @@ import org.hibernate.validator.metadata.location.ConstraintLocation;
  * sources (e.g. via annotation and XML) but not two configurations for the same
  * field originating from one configuration source.
  * </p>
+ * <p>
+ * Implementations are strictly read-only.
+ * </p>
  *
  * @author Gunnar Morling
  */

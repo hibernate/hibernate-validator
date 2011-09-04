@@ -19,6 +19,7 @@ package org.hibernate.validator.metadata.provider;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -105,7 +106,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 				propertyMetaData.add(
 						new ConstrainedMethod(
 								ConfigurationSource.XML,
-								new MethodConstraintLocation( (java.lang.reflect.Method) oneConfiguredLocation.getMember() ),
+								new MethodConstraintLocation( (Method) oneConfiguredLocation.getMember() ),
 								constraintsByLocation.get( oneConfiguredLocation ),
 								cascades.contains( oneConfiguredLocation )
 						)

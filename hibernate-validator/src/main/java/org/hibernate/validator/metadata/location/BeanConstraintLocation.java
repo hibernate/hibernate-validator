@@ -38,12 +38,6 @@ public class BeanConstraintLocation implements ConstraintLocation {
 	private final Member member;
 
 	/**
-	 * The JavaBeans name of the field/property the constraint was placed on. {@code null} if this is a
-	 * class level constraint.
-	 */
-	private final String propertyName;
-
-	/**
 	 * The class of the bean hosting this constraint.
 	 */
 	private final Class<?> beanClass;
@@ -70,11 +64,9 @@ public class BeanConstraintLocation implements ConstraintLocation {
 		this.member = member;
 
 		if ( this.member != null ) {
-			this.propertyName = ReflectionHelper.getPropertyName( member );
 			this.elementType = ( member instanceof Method ) ? ElementType.METHOD : ElementType.FIELD;
 		}
 		else {
-			this.propertyName = null;
 			this.elementType = ElementType.TYPE;
 		}
 		this.beanClass = beanClass;
@@ -86,14 +78,6 @@ public class BeanConstraintLocation implements ConstraintLocation {
 
 	public Member getMember() {
 		return member;
-	}
-
-	/**
-	 * @return The JavaBeans name of the field/property the constraint was placed on. {@code null} if this is a
-	 *         class level constraint.
-	 */
-	public String getPropertyName() {
-		return propertyName;
 	}
 
 	public Type typeOfAnnotatedElement() {
@@ -133,9 +117,6 @@ public class BeanConstraintLocation implements ConstraintLocation {
 		if ( member != null ? !member.equals( that.member ) : that.member != null ) {
 			return false;
 		}
-		if ( propertyName != null ? !propertyName.equals( that.propertyName ) : that.propertyName != null ) {
-			return false;
-		}
 
 		return true;
 	}
@@ -143,14 +124,13 @@ public class BeanConstraintLocation implements ConstraintLocation {
 	@Override
 	public int hashCode() {
 		int result = member != null ? member.hashCode() : 0;
-		result = 31 * result + ( propertyName != null ? propertyName.hashCode() : 0 );
 		result = 31 * result + ( beanClass != null ? beanClass.hashCode() : 0 );
 		return result;
 	}
 
 	@Override
 	public String toString() {
-		return "BeanConstraintLocation [" + beanClass.getSimpleName() + "#" + propertyName + " (" + elementType + ")]";
+		return "BeanConstraintLocation [" + beanClass.getSimpleName() + "#" + ReflectionHelper.getPropertyName( member ) + " (" + elementType + ")]";
 	}
 
 }
