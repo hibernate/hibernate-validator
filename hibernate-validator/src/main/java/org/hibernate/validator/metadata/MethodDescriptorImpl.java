@@ -18,7 +18,6 @@ package org.hibernate.validator.metadata;
 
 import java.util.List;
 
-import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
@@ -50,7 +49,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 
 		List<ParameterDescriptor> theValue = newArrayList();
 
-		for ( ConstrainedParameter oneParameter : methodMetaData.getAllParameterMetaData() ) {
+		for ( ParameterMetaData oneParameter : methodMetaData.getAllParameterMetaData() ) {
 			theValue.add( new ParameterDescriptorImpl( getMetaDataBean(), oneParameter ) );
 		}
 

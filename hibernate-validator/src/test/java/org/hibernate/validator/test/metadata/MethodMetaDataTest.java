@@ -26,6 +26,7 @@ import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.MethodMetaData;
 import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
@@ -52,9 +53,10 @@ public class MethodMetaDataTest {
 	public void methodWithConstrainedParameter() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getName(), method.getName() );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
@@ -65,9 +67,10 @@ public class MethodMetaDataTest {
 	public void methodWithCascadedParameter() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getName(), method.getName() );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
@@ -78,9 +81,10 @@ public class MethodMetaDataTest {
 	public void methodWithConstrainedReturnValue() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "bar" );
-		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getName(), method.getName() );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 1 );
@@ -94,9 +98,10 @@ public class MethodMetaDataTest {
 	public void methodWithCascadedReturnValue() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "foo" );
-		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getName(), method.getName() );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
@@ -107,9 +112,10 @@ public class MethodMetaDataTest {
 	public void unconstrainedMethod() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		ConstrainedMethod methodMetaData = beanMetaData.getMetaDataFor( method ).getSingleMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
-		assertEquals( methodMetaData.getLocation().getMethod(), method );
+		assertEquals( methodMetaData.getName(), method.getName() );
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertFalse( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );

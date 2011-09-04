@@ -17,10 +17,8 @@
 package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
@@ -32,7 +30,7 @@ import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
@@ -52,13 +50,11 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 	private final Method rootMethod;
 
-	private final Map<Class<?>, ConstrainedMethod> metaDataByDefiningType;
-
-	private final boolean isCascading;
+//	private final Map<Class<?>, ConstrainedMethod> metaDataByDefiningType;
 
 	private final boolean isConstrained;
 
-	private final List<ConstrainedParameter> parameterMetaData;
+	private final List<ParameterMetaData> parameterMetaData;
 
 	/**
 	 * A declaration exception in case this method contains any illegal method
@@ -73,14 +69,15 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	private MethodMetaData(
 			Builder builder,
 			Set<MetaConstraint<?>> returnValueConstraints,
-			List<ConstrainedParameter> parameterMetaData,
-			ConstraintDeclarationException parameterConstraintDeclarationException) {
+			List<ParameterMetaData> parameterMetaData,
+			ConstraintDeclarationException parameterConstraintDeclarationException,
+			boolean isCascading,
+			boolean isConstrained) {
 
-		super( returnValueConstraints, ConstraintMetaDataKind.METHOD );
+		super( returnValueConstraints, ConstraintMetaDataKind.METHOD, isCascading );
 
-		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
-		isCascading = builder.isCascading;
-		isConstrained = builder.isConstrained;
+//		metaDataByDefiningType = Collections.unmodifiableMap( builder.metaDataByDefiningType );
+		this.isConstrained = isConstrained;
 		rootMethod = builder.location.getMember();
 
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
@@ -95,9 +92,11 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 */
 	public static class Builder extends MetaDataBuilder {
 
+		private Set<ConstrainedMethod> constrainedMethods = newHashSet();
+
 		private MethodConstraintLocation location;
 
-		private final Map<Class<?>, ConstrainedMethod> metaDataByDefiningType = newHashMap();
+		private final Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
 
 		private boolean isCascading;
 
@@ -106,15 +105,16 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		/**
 		 * Creates a new builder based on the given method meta data.
 		 *
-		 * @param metaData The base method for this builder. This is the lowest
+		 * @param constrainedMethod The base method for this builder. This is the lowest
 		 * method with a given signature within a type hierarchy.
 		 */
-		public Builder(ConstrainedMethod metaData) {
+		public Builder(ConstrainedMethod constrainedMethod) {
 
-			location = metaData.getLocation();
-			metaDataByDefiningType.put( location.getMethod().getDeclaringClass(), metaData );
-			isCascading = metaData.isCascading();
-			isConstrained = metaData.isConstrained();
+			location = constrainedMethod.getLocation();
+			constrainedMethods.add( constrainedMethod );
+			isCascading = constrainedMethod.isCascading();
+			isConstrained = constrainedMethod.isConstrained();
+			returnValueConstraints.addAll( constrainedMethod.getConstraints() );
 		}
 
 		/**
@@ -137,12 +137,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 			ConstrainedMethod metaData = (ConstrainedMethod) constrainedElement;
 
-			ConstrainedMethod existingMetaData =
-					metaDataByDefiningType.get( metaData.getLocation().getMethod().getDeclaringClass() );
-
-			if ( existingMetaData != null ) {
-				metaData = existingMetaData.merge( metaData );
-			}
+			constrainedMethods.add( metaData );
 
 			//use the lowest method found in the hierarchy for this aggregation
 			if ( location.getMethod()
@@ -151,9 +146,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 				location = metaData.getLocation();
 			}
 
-			metaDataByDefiningType.put( metaData.getLocation().getMethod().getDeclaringClass(), metaData );
 			isCascading = isCascading || metaData.isCascading();
 			isConstrained = isConstrained || metaData.isConstrained();
+			returnValueConstraints.addAll( metaData.getConstraints() );
 		}
 
 		/**
@@ -163,29 +158,12 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			return
 					new MethodMetaData(
 							this,
-							collectReturnValueConstraints(),
+							returnValueConstraints,
 							findParameterMetaData(),
-							checkParameterConstraints()
+							checkParameterConstraints(),
+							isCascading,
+							isConstrained
 					);
-		}
-
-		/**
-		 * Collects all return value constraints from this builder's method
-		 * hierarchy.
-		 *
-		 * @return A list with all return value constraints.
-		 */
-		private Set<MetaConstraint<?>> collectReturnValueConstraints() {
-
-			Set<MetaConstraint<?>> theValue = newHashSet();
-
-			for ( ConstrainedMethod oneMethodMetaData : metaDataByDefiningType.values() ) {
-				for ( MetaConstraint<?> oneConstraint : oneMethodMetaData ) {
-					theValue.add( oneConstraint );
-				}
-			}
-
-			return theValue;
 		}
 
 		/**
@@ -195,16 +173,35 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 *
 		 * @return The parameter meta data for this builder's method.
 		 */
-		private List<ConstrainedParameter> findParameterMetaData() {
+		private List<ParameterMetaData> findParameterMetaData() {
 
-			for ( ConstrainedMethod oneMethod : metaDataByDefiningType.values() ) {
+			List<ParameterMetaData.Builder> parameterBuilders = null;
 
-				if ( oneMethod.hasParameterConstraints() ) {
-					return oneMethod.getAllParameterMetaData();
+			for ( ConstrainedMethod oneMethod : constrainedMethods ) {
+
+				if ( parameterBuilders == null ) {
+					parameterBuilders = newArrayList();
+
+					for ( ConstrainedParameter oneParameter : oneMethod.getAllParameterMetaData() ) {
+						parameterBuilders.add( new ParameterMetaData.Builder( oneParameter ) );
+					}
+				}
+				else {
+					int i = 0;
+					for ( ConstrainedParameter oneParameter : oneMethod.getAllParameterMetaData() ) {
+						parameterBuilders.get( i ).add( oneParameter );
+						i++;
+					}
 				}
 			}
 
-			return metaDataByDefiningType.get( location.getBeanClass() ).getAllParameterMetaData();
+			List<ParameterMetaData> parameterMetaDatas = newArrayList();
+
+			for ( ParameterMetaData.Builder oneBuilder : parameterBuilders ) {
+				parameterMetaDatas.add( oneBuilder.build() );
+			}
+
+			return parameterMetaDatas;
 		}
 
 		/**
@@ -217,14 +214,20 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 */
 		private ConstraintDeclarationException checkParameterConstraints() {
 
-			Collection<ConstrainedMethod> allMethods = metaDataByDefiningType.values();
-			Set<ConstrainedMethod> methodsWithParameterConstraints = getMethodsWithParameterConstraints( allMethods );
+			Set<ConstrainedMethod> methodsWithParameterConstraints = getMethodsWithParameterConstraints(
+					constrainedMethods
+			);
 
 			if ( methodsWithParameterConstraints.isEmpty() ) {
 				return null;
 			}
+			Set<Class<?>> definingTypes = newHashSet();
 
-			if ( methodsWithParameterConstraints.size() > 1 ) {
+			for ( ConstrainedMethod constrainedMethod : methodsWithParameterConstraints ) {
+				definingTypes.add( constrainedMethod.getLocation().getBeanClass() );
+			}
+
+			if ( definingTypes.size() > 1 ) {
 				return new ConstraintDeclarationException(
 						"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, " +
 								"but there are parameter constraints defined at all of the following overridden methods: " +
@@ -234,7 +237,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 			ConstrainedMethod constrainedMethod = methodsWithParameterConstraints.iterator().next();
 
-			for ( ConstrainedMethod oneMethod : allMethods ) {
+			for ( ConstrainedMethod oneMethod : constrainedMethods ) {
 
 				if ( !constrainedMethod.getLocation().getBeanClass()
 						.isAssignableFrom( oneMethod.getLocation().getBeanClass() ) ) {
@@ -308,7 +311,12 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 * @return Meta data for the specified parameter. Will never be
 	 *         <code>null</code>.
 	 */
-	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
+	public ParameterMetaData getParameterMetaData(int parameterIndex) {
+
+		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
+			throw new IllegalArgumentException( "Method " + getName() + " doesn't have a parameter with index " + parameterIndex );
+		}
+
 		return parameterMetaData.get( parameterIndex );
 	}
 
@@ -320,21 +328,8 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 *         object, so an empty list may be returned (in case of a
 	 *         parameterless method), but never <code>null</code>.
 	 */
-	public List<ConstrainedParameter> getAllParameterMetaData() {
+	public List<ParameterMetaData> getAllParameterMetaData() {
 		return parameterMetaData;
-	}
-
-	/**
-	 * Whether a cascaded validation of the return value of the represented
-	 * method shall be performed or not. This is the case if either the method
-	 * itself is annotated with {@link Valid} or any of the method's up in the
-	 * inheritance hierarchy which it overrides.
-	 *
-	 * @return <code>True</code>, if a cascaded return value validation shall be
-	 *         performed, <code>false</code> otherwise.
-	 */
-	public boolean isCascading() {
-		return isCascading;
 	}
 
 	/**
@@ -346,25 +341,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 */
 	public boolean isConstrained() {
 		return isConstrained;
-	}
-
-	/**
-	 * Returns a single method meta data from this aggregation.
-	 *
-	 * @param method The method to retrieve the meta data for. Must either be the
-	 * method represented by this meta data object or one method from
-	 * a super-type, which the method represented by this meta data
-	 * object overrides/implements.
-	 *
-	 * @return The meta data for the given method or null if this aggregation
-	 *         doesn't contain any meta data for that method.
-	 */
-	public ConstrainedMethod getSingleMetaDataFor(Method method) {
-		return metaDataByDefiningType.get( method.getDeclaringClass() );
-	}
-
-	public Iterable<ConstrainedMethod> getAllMethodMetaData() {
-		return metaDataByDefiningType.values();
 	}
 
 	public String getName() {

@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 /**
@@ -24,15 +23,15 @@ import org.hibernate.validator.method.metadata.ParameterDescriptor;
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
 
-	private ConstrainedParameter parameterMetaData;
+	private ParameterMetaData parameterMetaData;
 
-	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ConstrainedParameter parameterMetaData) {
-		super( parameterMetaData.getLocation().getParameterType(), metaDataBean );
+	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ParameterMetaData oneParameter) {
+		super( oneParameter.getType(), metaDataBean );
 
-		this.parameterMetaData = parameterMetaData;
+		this.parameterMetaData = oneParameter;
 
 		//add constraints of the represented parameter to the constraint descriptor list
-		for ( MetaConstraint<?> oneConstraint : parameterMetaData ) {
+		for ( MetaConstraint<?> oneConstraint : oneParameter ) {
 			addConstraintDescriptor( oneConstraint.getDescriptor() );
 		}
 	}
@@ -42,7 +41,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	}
 
 	public int getIndex() {
-		return parameterMetaData.getLocation().getParameterIndex();
+		return parameterMetaData.getIndex();
 	}
 
 }

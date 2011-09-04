@@ -18,16 +18,12 @@ package org.hibernate.validator.metadata.constrained;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
-
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
@@ -60,16 +56,6 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		);
 	}
 
-	public ConstrainedMethod(
-			ConfigurationSource source,
-			Method method,
-			List<ConstrainedParameter> parameterMetaData,
-			Set<MetaConstraint<?>> returnValueConstraints,
-			boolean isCascading) {
-
-		this( EnumSet.of( source ), method, parameterMetaData, returnValueConstraints, isCascading );
-	}
-
 	/**
 	 * Creates a new method meta data object.
 	 *
@@ -84,13 +70,13 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 * return value shall be performed or not.
 	 */
 	public ConstrainedMethod(
-			EnumSet<ConfigurationSource> sources,
+			ConfigurationSource source,
 			Method method,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
-		super( sources, new MethodConstraintLocation( method ), returnValueConstraints, isCascading );
+		super( source, new MethodConstraintLocation( method ), returnValueConstraints, isCascading );
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
 			throw new IllegalArgumentException(
@@ -194,38 +180,6 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 */
 	public boolean isGetterMethod() {
 		return ReflectionHelper.isGetterMethod( getLocation().getMethod() );
-	}
-
-	public ConstrainedMethod merge(ConstrainedMethod otherMetaData) {
-
-		boolean isCascading = isCascading() || otherMetaData.isCascading();
-
-		// 1 - aggregate return value constraints
-		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet(
-				this.getConstraints(), otherMetaData.getConstraints()
-		);
-
-		// 2 - aggregate parameter metaData. The two method MetaData have the same signature, consequently they
-		// have the same number of parameters.
-		List<ConstrainedParameter> mergedParameterMetaData = newArrayList();
-		for ( ConstrainedParameter oneParameterMetaData : getAllParameterMetaData() ) {
-			mergedParameterMetaData.add(
-					oneParameterMetaData.merge(
-							otherMetaData.getParameterMetaData( oneParameterMetaData.getLocation().getParameterIndex() )
-					)
-			);
-		}
-
-		EnumSet<ConfigurationSource> sources = EnumSet.copyOf( getSources() );
-		sources.addAll( otherMetaData.getSources() );
-
-		return new ConstrainedMethod(
-				sources,
-				getLocation().getMethod(),
-				mergedParameterMetaData,
-				mergedReturnValueConstraints,
-				isCascading
-		);
 	}
 
 	@Override

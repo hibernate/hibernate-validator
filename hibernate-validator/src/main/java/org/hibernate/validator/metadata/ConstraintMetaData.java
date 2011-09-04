@@ -18,14 +18,15 @@ package org.hibernate.validator.metadata;
 
 /**
  * @author Gunnar Morling
- *
  */
 public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 
 	public static enum ConstraintMetaDataKind {
-		METHOD, PROPERTY;
+		METHOD, PROPERTY, PARAMETER;
 	}
-	
+
 	ConstraintMetaDataKind getConstrainedMetaDataKind();
-	
+
+	boolean isCascading();
+
 }

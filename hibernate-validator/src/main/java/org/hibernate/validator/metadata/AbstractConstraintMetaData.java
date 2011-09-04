@@ -22,22 +22,25 @@ import java.util.Set;
 
 /**
  * @author Gunnar Morling
- *
  */
 public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	protected final Set<MetaConstraint<?>> constraints;
-	
+
 	private final ConstraintMetaDataKind constrainedMetaDataKind;
-	
+
+	private final boolean isCascading;
+
 	/**
 	 * @param constraints
 	 * @param constrainedMetaDataKind
+	 * @param isCascading
 	 */
-	public AbstractConstraintMetaData( Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind) {
+	public AbstractConstraintMetaData(Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind, boolean isCascading) {
 
 		this.constraints = Collections.unmodifiableSet( constraints );
 		this.constrainedMetaDataKind = constrainedMetaDataKind;
+		this.isCascading = isCascading;
 	}
 
 	public Iterator<MetaConstraint<?>> iterator() {
@@ -46,6 +49,10 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	public ConstraintMetaDataKind getConstrainedMetaDataKind() {
 		return constrainedMetaDataKind;
+	}
+
+	public boolean isCascading() {
+		return isCascading;
 	}
 
 	@Override
@@ -61,30 +68,37 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 		int result = 1;
 		result = prime
 				* result
-				+ ((constrainedMetaDataKind == null) ? 0
-						: constrainedMetaDataKind.hashCode());
+				+ ( ( constrainedMetaDataKind == null ) ? 0
+				: constrainedMetaDataKind.hashCode() );
 		result = prime * result
-				+ ((constraints == null) ? 0 : constraints.hashCode());
+				+ ( ( constraints == null ) ? 0 : constraints.hashCode() );
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if ( this == obj ) {
 			return true;
-		if (obj == null)
+		}
+		if ( obj == null ) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		AbstractConstraintMetaData other = (AbstractConstraintMetaData) obj;
-		if (constrainedMetaDataKind != other.constrainedMetaDataKind)
+		if ( constrainedMetaDataKind != other.constrainedMetaDataKind ) {
 			return false;
-		if (constraints == null) {
-			if (other.constraints != null)
+		}
+		if ( constraints == null ) {
+			if ( other.constraints != null ) {
 				return false;
-		} else if (!constraints.equals(other.constraints))
+			}
+		}
+		else if ( !constraints.equals( other.constraints ) ) {
 			return false;
+		}
 		return true;
 	}
-	
+
 }

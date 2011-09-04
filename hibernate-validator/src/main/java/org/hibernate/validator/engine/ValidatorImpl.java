@@ -48,6 +48,7 @@ import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.ParameterMetaData;
 import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
@@ -921,7 +922,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				}
 
 				Object value = parameterValues[i];
-				String parameterName = methodMetaData.getParameterMetaData( i ).getParameterName();
+				String parameterName = methodMetaData.getParameterMetaData( i ).getName();
 
 				// validate constraints at parameter itself
 				ValueContext<T, Object> valueContext = ValueContext.getLocalExecutionContext(
@@ -953,8 +954,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 
 			Object value = parameterValues[i];
-			ConstrainedParameter parameterMetaData = methodMetaData.getParameterMetaData( i );
-			String parameterName = parameterMetaData.getParameterName();
+			ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( i );
+			String parameterName = parameterMetaData.getName();
 
 			if ( parameterMetaData.isCascading() && value != null ) {
 
@@ -986,7 +987,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @return The number of constraint violations occurred during validation of
 	 *         the specified constraints.
 	 */
-	private <T, U, V> int validateParameterForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext, ConstrainedParameter parameterMetaData) {
+	private <T, U, V> int validateParameterForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext, ParameterMetaData parameterMetaData) {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 

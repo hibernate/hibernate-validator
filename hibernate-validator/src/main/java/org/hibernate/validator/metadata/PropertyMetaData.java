@@ -48,7 +48,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	private final boolean isConstrained;
 
 	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
-		super( constraints, ConstraintMetaDataKind.PROPERTY );
+		super( constraints, ConstraintMetaDataKind.PROPERTY, !cascadingMembers.isEmpty() );
 		this.type = type;
 		this.propertyName = propertyName;
 		this.cascadingMembers = cascadingMembers;
@@ -61,10 +61,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	public String getPropertyName() {
 		return propertyName;
-	}
-
-	public boolean isCascading() {
-		return !cascadingMembers.isEmpty();
 	}
 
 	public Set<Member> getCascadingMembers() {

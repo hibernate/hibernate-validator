@@ -16,13 +16,10 @@
 */
 package org.hibernate.validator.metadata.constrained;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.MetaConstraint;
 import org.hibernate.validator.metadata.location.MethodConstraintLocation;
-
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -34,12 +31,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	private final String name;
 
 	public ConstrainedParameter(ConfigurationSource source, MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
-		this( EnumSet.of( source ), location, name, constraints, isCascading );
-	}
 
-	public ConstrainedParameter(EnumSet<ConfigurationSource> sources, MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
-
-		super( sources, location, constraints, isCascading );
+		super( source, location, constraints, isCascading );
 
 		this.name = name;
 	}
@@ -54,20 +47,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	public String getParameterName() {
 		return name;
-	}
-
-	public ConstrainedParameter merge(ConstrainedParameter otherMetaData) {
-
-		EnumSet<ConfigurationSource> sources = EnumSet.copyOf( getSources() );
-		sources.addAll( otherMetaData.getSources() );
-
-		return new ConstrainedParameter(
-				sources,
-				getLocation(),
-				name,
-				newHashSet( this.getConstraints(), otherMetaData.getConstraints() ),
-				isCascading() || otherMetaData.isCascading()
-		);
 	}
 
 	@Override

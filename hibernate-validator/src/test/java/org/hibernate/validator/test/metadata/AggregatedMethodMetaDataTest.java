@@ -26,9 +26,9 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.metadata.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataImpl;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
-import org.hibernate.validator.metadata.constrained.ConstrainedParameter;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.MethodMetaData;
+import org.hibernate.validator.metadata.ParameterMetaData;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
 import static org.testng.Assert.assertEquals;
@@ -61,7 +61,7 @@ public class AggregatedMethodMetaDataTest {
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
 
-		List<ConstrainedParameter> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 2 );
 
 		assertFalse( parameterMetaData.get( 0 ).isConstrained() );
@@ -90,7 +90,7 @@ public class AggregatedMethodMetaDataTest {
 		assertTrue( methodMetaData.isConstrained() );
 		assertIterableSize( methodMetaData, 0 );
 
-		List<ConstrainedParameter> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 1 );
 
 		assertTrue( parameterMetaData.get( 0 ).isConstrained() );
@@ -114,7 +114,7 @@ public class AggregatedMethodMetaDataTest {
 				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
 
-		List<ConstrainedParameter> parameterMetaData = methodMetaData.getAllParameterMetaData();
+		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 0 );
 	}
 
