@@ -32,22 +32,22 @@ public class BeanMetaDataCache {
 	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
 	 * entity.
 	 */
-	private final ConcurrentMap<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
+	private final ConcurrentMap<Class<?>, BeanMetaData<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaData<?>>(
 			10
 	);
 
 	@SuppressWarnings("unchecked")
-	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
+	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		assertNotNull( beanClass, "Class cannot be null" );
 
 		return (BeanMetaDataImpl<T>) metadataProviders.get( beanClass );
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> BeanMetaDataImpl<T> addBeanMetaData(Class<T> beanClass, BeanMetaDataImpl<T> metaData) {
+	public <T> BeanMetaData<T> addBeanMetaData(Class<T> beanClass, BeanMetaData<T> metaData) {
 		assertNotNull( beanClass, "Class cannot be null" );
 		assertNotNull( metaData, "MetaData cannot be null" );
 
-		return (BeanMetaDataImpl<T>) metadataProviders.putIfAbsent( beanClass, metaData );
+		return (BeanMetaData<T>) metadataProviders.putIfAbsent( beanClass, metaData );
 	}
 }

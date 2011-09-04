@@ -17,22 +17,16 @@
 package org.hibernate.validator.metadata;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.metadata.BeanMetaDataImpl.BeanMetaDataBuilder;
 import org.hibernate.validator.metadata.constrained.BeanConfiguration;
-import org.hibernate.validator.metadata.constrained.ConstrainedElement;
-import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConstrainedElementKind;
-import org.hibernate.validator.metadata.constrained.ConstrainedField;
-import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
-import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.util.ReflectionHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
@@ -60,7 +54,7 @@ public class BeanMetaDataManager {
 	/**
 	 * Default provider which is always used for meta data retrieval.
 	 */
-	private MetaDataProvider defaultProvider;
+	private final MetaDataProvider defaultProvider;
 
 	/**
 	 * Eager providers which are additionally used for meta data retrieval if
@@ -77,8 +71,7 @@ public class BeanMetaDataManager {
 
 	private AnnotationIgnores annotationIgnores;
 
-	//TODO GM: can this be merged with cache?
-	private Map<Class<?>, BeanConfiguration<?>> configurationsByClass;
+	private final Map<Class<?>, Set<BeanConfiguration<?>>> configurationsByClass;
 
 	public BeanMetaDataManager(ConstraintHelper constraintHelper, MetaDataProvider... eagerMetaDataProviders) {
 		this( constraintHelper, Arrays.asList( eagerMetaDataProviders ) );
@@ -97,19 +90,62 @@ public class BeanMetaDataManager {
 		beanMetaDataCache = new BeanMetaDataCache();
 
 		loadConfigurationsFromEagerProviders();
-		loadConfigurationsFromDefaultProvider();
-		convertEagerConfigurationsToBeanMetaData();
+
+		defaultProvider = new AnnotationMetaDataProvider( constraintHelper, annotationIgnores );
 	}
 
+	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
+
+		BeanMetaData<T> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
+
+		if ( beanMetaData == null ) {
+
+			addAll( defaultProvider.getBeanConfigurationForHierarchy( beanClass ) );
+			beanMetaData = createBeanMetaData( beanClass );
+
+			final BeanMetaData<T> cachedBeanMetaData = beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
+			if ( cachedBeanMetaData != null ) {
+				beanMetaData = cachedBeanMetaData;
+			}
+		}
+
+		return beanMetaData;
+	}
+
+	/**
+	 * Creates a {@link BeanMetaData} containing the meta data from all meta
+	 * data providers for the given type and its hierarchy.
+	 *
+	 * @param <T> The type of interest.
+	 * @param clazz The type's class.
+	 *
+	 * @return A bean meta data object for the given type.
+	 */
+	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
+
+		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, clazz );
+
+		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( clazz, true ) ) {
+			for ( BeanConfiguration<?> oneConfiguration : configurationsByClass.get( oneHierarchyClass ) ) {
+				builder.add( oneConfiguration );
+			}
+		}
+
+		return builder.build();
+	}
+
+	/**
+	 * Loads all {@link BeanConfiguration}s from the registered eager meta data
+	 * providers.
+	 */
 	private void loadConfigurationsFromEagerProviders() {
 
-		//load meta data from eager providers
 		for ( MetaDataProvider oneProvider : eagerMetaDataProviders ) {
 			//TODO GM: merge, if also programmatic provider has this option
 			if ( oneProvider.getAnnotationIgnores() != null ) {
 				annotationIgnores = oneProvider.getAnnotationIgnores();
 			}
-			addOrMergeAll( oneProvider.getAllBeanConfigurations() );
+			addAll( oneProvider.getAllBeanConfigurations() );
 		}
 
 		if ( annotationIgnores == null ) {
@@ -117,204 +153,18 @@ public class BeanMetaDataManager {
 		}
 	}
 
-	private void loadConfigurationsFromDefaultProvider() {
+	private void addAll(Set<BeanConfiguration<?>> configurations) {
 
-		//load annotation meta data for eagerly configured types and their hierarchy
-		Set<Class<?>> preconfiguredClasses = new HashSet<Class<?>>( configurationsByClass.keySet() );
+		for ( BeanConfiguration<?> beanConfiguration : configurations ) {
 
-		this.defaultProvider = new AnnotationMetaDataProvider( constraintHelper, annotationIgnores );
-		//TODO GM: don't retrieve annotation meta data several times per type
-		for ( Class<?> oneConfiguredClass : preconfiguredClasses ) {
-			addOrMergeAll( defaultProvider.getBeanConfigurationForHierarchy( oneConfiguredClass ) );
-		}
-	}
+			Set<BeanConfiguration<?>> configurationsForType = configurationsByClass.get( beanConfiguration.getBeanClass() );
 
-	private void convertEagerConfigurationsToBeanMetaData() {
-		//store eagerly loaded meta data in cache
-		List<BeanMetaDataImpl<?>> allMetaData = configurationAsBeanMetaData();
-
-		for ( BeanMetaDataImpl<?> oneBeanMetaData : allMetaData ) {
-			registerWithCache( oneBeanMetaData );
-		}
-	}
-
-	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		BeanMetaDataImpl<T> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
-		if ( beanMetaData == null ) {
-
-			addOrMergeAll( defaultProvider.getBeanConfigurationForHierarchy( beanClass ) );
-
-			beanMetaData = mergeWithMetaDataFromHierarchy( getConfigurationForClass( beanClass ) );
-
-			final BeanMetaDataImpl<T> cachedBeanMetaData = beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
-			if ( cachedBeanMetaData != null ) {
-				beanMetaData = cachedBeanMetaData;
-			}
-		}
-		return beanMetaData;
-	}
-
-	private <T> void registerWithCache(BeanMetaDataImpl<T> metaData) {
-		beanMetaDataCache.addBeanMetaData( metaData.getBeanClass(), metaData );
-	}
-
-	private void addOrMergeAll(Iterable<BeanConfiguration<?>> configurations) {
-		for ( BeanConfiguration<?> oneBeanConfiguration : configurations ) {
-			addOrMerge( oneBeanConfiguration );
-		}
-	}
-
-	private <T> void addOrMerge(BeanConfiguration<T> beanConfiguration) {
-
-		BeanConfiguration<T> existingConfiguration = getConfigurationForClass( beanConfiguration.getBeanClass() );
-
-		if ( existingConfiguration == null ) {
-			configurationsByClass.put(
-					beanConfiguration.getBeanClass(), beanConfiguration
-			);
-		}
-		else {
-			existingConfiguration.merge( beanConfiguration );
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> BeanConfiguration<T> getConfigurationForClass(Class<T> clazz) {
-		return (BeanConfiguration<T>) configurationsByClass.get( clazz );
-	}
-
-	/**
-	 * @return
-	 */
-	private List<BeanMetaDataImpl<?>> configurationAsBeanMetaData() {
-
-
-		List<BeanMetaDataImpl<?>> theValue = newArrayList();
-
-		for ( BeanConfiguration<?> oneConfiguration : configurationsByClass.values() ) {
-			theValue.add( mergeWithMetaDataFromHierarchy( oneConfiguration ) );
-		}
-
-		return theValue;
-	}
-
-	private <T> BeanMetaDataImpl<T> mergeWithMetaDataFromHierarchy(BeanConfiguration<T> rootConfiguration) {
-
-		Class<T> beanClass = rootConfiguration.getBeanClass();
-
-		Set<BuilderDelegate> builders = newHashSet();
-
-		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
-
-			BeanConfiguration<?> configurationForHierarchyClass = getConfigurationForClass( oneHierarchyClass );
-
-			if ( configurationForHierarchyClass == null ) {
-				continue;
+			if ( configurationsForType == null ) {
+				configurationsForType = newHashSet();
+				configurationsByClass.put( beanConfiguration.getBeanClass(), configurationsForType );
 			}
 
-			for ( ConstrainedElement oneConstrainedElement : configurationForHierarchyClass.getConstrainableElements() ) {
-				addMetaDataToBuilder( oneConstrainedElement, builders );
-			}
+			configurationsForType.add( beanConfiguration );
 		}
-
-		Set<ConstraintMetaData> aggregatedElements = newHashSet();
-		for ( BuilderDelegate oneBuilder : builders ) {
-			aggregatedElements.addAll( oneBuilder.build() );
-		}
-
-		return new BeanMetaDataImpl<T>(
-				beanClass,
-				rootConfiguration.getDefaultGroupSequence(),
-				rootConfiguration.getDefaultGroupSequenceProvider(),
-				aggregatedElements
-		);
 	}
-
-	private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
-
-		for ( BuilderDelegate oneBuilder : builders ) {
-			boolean foundBuilder = oneBuilder.add( constrainableElement );
-
-			if ( foundBuilder ) {
-				return;
-			}
-		}
-
-		builders.add( new BuilderDelegate( constrainableElement, constraintHelper ) );
-	}
-
-	private static class BuilderDelegate {
-
-		private PropertyMetaData.Builder propertyBuilder;
-
-		private MethodMetaData.Builder methodBuilder;
-
-		public BuilderDelegate(ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
-
-			switch ( constrainedElement.getConstrainedElementKind() ) {
-
-				case FIELD:
-
-					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
-					propertyBuilder = new PropertyMetaData.Builder( constrainedField, constraintHelper );
-					break;
-
-				case METHOD:
-
-					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
-					methodBuilder = new MethodMetaData.Builder( constrainedMethod );
-
-					if ( constrainedMethod.isGetterMethod() ) {
-						propertyBuilder = new PropertyMetaData.Builder( constrainedMethod, constraintHelper );
-					}
-					break;
-
-				case TYPE:
-
-					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
-					propertyBuilder = new PropertyMetaData.Builder( constrainedType, constraintHelper );
-					break;
-			}
-		}
-
-
-		public boolean add(ConstrainedElement constrainedElement) {
-
-			boolean added = false;
-
-			if ( methodBuilder != null && methodBuilder.accepts( constrainedElement ) ) {
-				methodBuilder.add( constrainedElement );
-				added = true;
-			}
-
-			if ( propertyBuilder != null && propertyBuilder.accepts( constrainedElement ) ) {
-				propertyBuilder.add( constrainedElement );
-
-				if ( added == false && constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
-					methodBuilder = new MethodMetaData.Builder( (ConstrainedMethod) constrainedElement );
-				}
-
-				added = true;
-			}
-
-			return added;
-		}
-
-		public Set<ConstraintMetaData> build() {
-
-			Set<ConstraintMetaData> theValue = newHashSet();
-
-			if ( propertyBuilder != null ) {
-				theValue.add( propertyBuilder.build() );
-			}
-
-			if ( methodBuilder != null ) {
-				theValue.add( methodBuilder.build() );
-			}
-
-			return theValue;
-		}
-
-	}
-
 }

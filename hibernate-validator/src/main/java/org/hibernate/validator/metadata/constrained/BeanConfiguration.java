@@ -24,6 +24,9 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
+ * Represents the constraint related configuration of one Java type originating
+ * from one {@link ConfigurationSource}.
+ * 
  * @author Gunnar Morling
  */
 public class BeanConfiguration<T> {
@@ -32,28 +35,29 @@ public class BeanConfiguration<T> {
 
 	private final Class<T> beanClass;
 
-	private final Set<ConstrainedElement> constrainableElements;
+	private final Set<ConstrainedElement> constrainedElements;
 
-	private List<Class<?>> defaultGroupSequence;
+	private final List<Class<?>> defaultGroupSequence;
 
-	private Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
+	private final Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
 
 	/**
+	 * @param source
 	 * @param beanClass
-	 * @param constraints
-	 * @param cascadedMembers
+	 * @param constrainedElements
 	 * @param defaultGroupSequence
+	 * @param defaultGroupSequenceProvider
 	 */
 	public BeanConfiguration(
 			ConfigurationSource source,
 			Class<T> beanClass,
-			Set<? extends ConstrainedElement> constrainableElements,
+			Set<? extends ConstrainedElement> constrainedElements,
 			List<Class<?>> defaultGroupSequence,
 			Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		this.source = source;
 		this.beanClass = beanClass;
-		this.constrainableElements = newHashSet( constrainableElements );
+		this.constrainedElements = newHashSet( constrainedElements );
 		this.defaultGroupSequence = defaultGroupSequence;
 		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
 	}
@@ -62,8 +66,8 @@ public class BeanConfiguration<T> {
 		return beanClass;
 	}
 
-	public Set<ConstrainedElement> getConstrainableElements() {
-		return constrainableElements;
+	public Set<ConstrainedElement> getConstrainedElements() {
+		return constrainedElements;
 	}
 
 	public List<Class<?>> getDefaultGroupSequence() {
@@ -74,30 +78,49 @@ public class BeanConfiguration<T> {
 		return defaultGroupSequenceProvider;
 	}
 
-	public void merge(BeanConfiguration<T> other) {
-
-		constrainableElements.addAll( other.getConstrainableElements() );
-
-		// TODO GM: Determine which default sequence should be taken
-		if ( ( defaultGroupSequence == null || defaultGroupSequence.isEmpty() )
-				&& other.getDefaultGroupSequence() != null ) {
-			defaultGroupSequence = other.getDefaultGroupSequence();
-		}
-
-		// TODO GM: Determine which default sequence provider should be taken
-		if ( defaultGroupSequenceProvider == null
-				&& other.getDefaultGroupSequenceProvider() != null ) {
-			defaultGroupSequenceProvider = other.getDefaultGroupSequenceProvider();
-		}
-	}
-
 	@Override
 	public String toString() {
-		return "BeanConfiguration [beanClass=" + beanClass.getSimpleName()
-				+ ", constrainableElements=" + constrainableElements
+		return "BeanConfiguration [source=" + source + ", beanClass="
+				+ beanClass + ", constrainedElements=" + constrainedElements
 				+ ", defaultGroupSequence=" + defaultGroupSequence
 				+ ", defaultGroupSequenceProvider="
 				+ defaultGroupSequenceProvider + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ( ( beanClass == null ) ? 0 : beanClass.hashCode() );
+		result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		BeanConfiguration<?> other = (BeanConfiguration<?>) obj;
+		if ( beanClass == null ) {
+			if ( other.beanClass != null ) {
+				return false;
+			}
+		}
+		else if ( !beanClass.equals( other.beanClass ) ) {
+			return false;
+		}
+		if ( source != other.source ) {
+			return false;
+		}
+		return true;
 	}
 
 }

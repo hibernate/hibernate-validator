@@ -34,6 +34,12 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.ConstraintMetaData.ConstraintMetaDataKind;
+import org.hibernate.validator.metadata.constrained.BeanConfiguration;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.metadata.constrained.ConstrainedField;
+import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
+import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
@@ -400,5 +406,155 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		sb.append( ", defaultGroupSequence=" ).append( getDefaultGroupSequence( null ) );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	public static class BeanMetaDataBuilder<T> {
+
+		private ConstraintHelper constraintHelper;
+
+		private final Class<T> beanClass;
+
+		private List<Class<?>> defaultGroupSequence;
+
+		private Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
+
+		Set<BuilderDelegate> builders = newHashSet();
+
+		public BeanMetaDataBuilder(ConstraintHelper constraintHelper, Class<T> beanClass) {
+			this.beanClass = beanClass;
+			this.constraintHelper = constraintHelper;
+		}
+
+		public static <T> BeanMetaDataBuilder<T> getInstance(ConstraintHelper constraintHelper, Class<T> beanClass) {
+			return new BeanMetaDataBuilder<T>( constraintHelper, beanClass );
+		}
+
+		public boolean accepts(BeanConfiguration<?> configuration) {
+			return configuration.getBeanClass().isAssignableFrom( beanClass );
+		}
+
+		public void add(BeanConfiguration<?> configuration) {
+
+			// TODO GM: Determine which default sequence should be taken
+			if ( ( defaultGroupSequence == null || defaultGroupSequence.isEmpty() )
+					&& configuration.getDefaultGroupSequence() != null
+					&& configuration.getBeanClass().equals( beanClass ) ) {
+				defaultGroupSequence = configuration.getDefaultGroupSequence();
+			}
+
+			// TODO GM: Determine which default sequence provider should be taken
+			if ( defaultGroupSequenceProvider == null
+					&& configuration.getDefaultGroupSequenceProvider() != null
+					&& configuration.getBeanClass().equals( beanClass ) ) {
+				defaultGroupSequenceProvider = configuration.getDefaultGroupSequenceProvider();
+			}
+
+			for ( ConstrainedElement oneConstrainedElement : configuration.getConstrainedElements() ) {
+				addMetaDataToBuilder( oneConstrainedElement, builders );
+			}
+		}
+
+		private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
+
+			for ( BuilderDelegate oneBuilder : builders ) {
+				boolean foundBuilder = oneBuilder.add( constrainableElement );
+
+				if ( foundBuilder ) {
+					return;
+				}
+			}
+
+			builders.add( new BuilderDelegate( constrainableElement, constraintHelper ) );
+		}
+
+		public BeanMetaDataImpl<T> build() {
+
+			Set<ConstraintMetaData> aggregatedElements = newHashSet();
+
+			for ( BuilderDelegate oneBuilder : builders ) {
+				aggregatedElements.addAll( oneBuilder.build() );
+			}
+
+			return new BeanMetaDataImpl<T>(
+					beanClass,
+					defaultGroupSequence,
+					defaultGroupSequenceProvider,
+					aggregatedElements
+			);
+		}
+	}
+
+	private static class BuilderDelegate {
+
+		private PropertyMetaData.Builder propertyBuilder;
+
+		private MethodMetaData.Builder methodBuilder;
+
+		public BuilderDelegate(ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
+
+			switch ( constrainedElement.getConstrainedElementKind() ) {
+
+				case FIELD:
+
+					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
+					propertyBuilder = new PropertyMetaData.Builder( constrainedField, constraintHelper );
+					break;
+
+				case METHOD:
+
+					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
+					methodBuilder = new MethodMetaData.Builder( constrainedMethod );
+
+					if ( constrainedMethod.isGetterMethod() ) {
+						propertyBuilder = new PropertyMetaData.Builder( constrainedMethod, constraintHelper );
+					}
+					break;
+
+				case TYPE:
+
+					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
+					propertyBuilder = new PropertyMetaData.Builder( constrainedType, constraintHelper );
+					break;
+			}
+		}
+
+
+		public boolean add(ConstrainedElement constrainedElement) {
+
+			boolean added = false;
+
+			if ( methodBuilder != null && methodBuilder.accepts( constrainedElement ) ) {
+				methodBuilder.add( constrainedElement );
+				added = true;
+			}
+
+			if ( propertyBuilder != null && propertyBuilder.accepts( constrainedElement ) ) {
+				propertyBuilder.add( constrainedElement );
+
+				if ( added == false && constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
+					methodBuilder = new MethodMetaData.Builder( (ConstrainedMethod) constrainedElement );
+				}
+
+				added = true;
+			}
+
+			return added;
+		}
+
+		public Set<ConstraintMetaData> build() {
+
+			Set<ConstraintMetaData> theValue = newHashSet();
+
+			if ( propertyBuilder != null ) {
+				theValue.add( propertyBuilder.build() );
+			}
+
+			if ( methodBuilder != null ) {
+				theValue.add( methodBuilder.build() );
+			}
+
+			return theValue;
+		}
+
 	}
 }
