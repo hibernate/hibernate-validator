@@ -70,12 +70,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Class<T> beanClass;
 
 	/**
-	 * Map of all direct constraints which belong to the entity {@code beanClass}. The constraints are mapped to the class
-	 * (eg super class or interface) in which they are defined.
-	 */
-	private final Map<Class<?>, List<MetaConstraint<?>>> metaConstraints = newHashMap();
-
-	/**
 	 * Set of all constraints for this bean type (defined on any implemented interfaces or super types)
 	 */
 	private final Set<MetaConstraint<?>> allMetaConstraints;
@@ -96,14 +90,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * aggregated view on each method together with all the methods from the
 	 * inheritance hierarchy with the same signature.
 	 */
-	private Map<String, MethodMetaData> methodMetaData;
+	private final Map<String, MethodMetaData> methodMetaData;
 
 	private final Map<String, PropertyMetaData> propertyMetaData;
 
 	/**
 	 * List of cascaded members.
 	 */
-	private Set<Member> cascadedMembers = newHashSet();
+	private final Set<Member> cascadedMembers;
 
 	/**
 	 * The default groups sequence for this bean class.
@@ -131,20 +125,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<String> propertyNames = newHashSet( 30 );
 
 	/**
-	 * Constructor used when creating a bean meta data instance via the xml or programmatic API. In this case
-	 * additional metadata (the already configured constraints, cascaded members, etc) are passed as well.
+	 * Creates a new {@link BeanMetaDataImpl}
 	 *
-	 * @param beanClass The bean type for which to create the meta data
-	 * @param defaultGroupSequence programmatic/xml configured default group sequence (overrides annotations)
-	 * @param defaultGroupSequenceProvider programmatic configured default group sequence provider class (overrides annotations)
-	 * @param constraints programmatic/xml configured constraints
-	 * @param methodMetaDatas programmatic configured method constraints
-	 * @param cascadedMembers programmatic/xml configured cascaded members
+	 * @param beanClass The Java type represented by this meta data object.
+	 * @param defaultGroupSequence The default group sequence.
+	 * @param defaultGroupSequenceProvider The default group sequence provider if set.
+	 * @param constraintMetaData All constraint meta data relating to the represented type.
 	 */
 	public BeanMetaDataImpl(Class<T> beanClass,
 							List<Class<?>> defaultGroupSequence,
 							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
-							Set<ConstraintMetaData> constrainableElements) {
+							Set<ConstraintMetaData> constraintMetaData) {
 		this.beanClass = beanClass;
 		beanDescriptor = new BeanDescriptorImpl<T>( this );
 
@@ -153,7 +144,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Set<PropertyMetaData> propertyMetaDatas = newHashSet();
 		Set<MethodMetaData> methodMetaDatas = newHashSet();
 
-		for ( ConstraintMetaData oneElement : constrainableElements ) {
+		for ( ConstraintMetaData oneElement : constraintMetaData ) {
 
 			if ( oneElement.getConstrainedMetaDataKind() == ConstraintMetaDataKind.PROPERTY ) {
 				propertyMetaDatas.add( (PropertyMetaData) oneElement );
@@ -163,32 +154,31 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		for ( PropertyMetaData oneProperty : propertyMetaDatas ) {
-			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
-		}
-
 		Set<Member> cascadedMembers = newHashSet();
+		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
 
 		for ( PropertyMetaData oneProperty : propertyMetaDatas ) {
+
+			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
+			propertyNames.add( oneProperty.getPropertyName() );
+
 			if ( oneProperty.isCascading() ) {
 				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
 			}
-			propertyNames.add( oneProperty.getPropertyName() );
+
+			for ( MetaConstraint<?> constraint : oneProperty ) {
+				addMetaConstraint( constraint.getLocation().getBeanClass(), constraint );
+				allMetaConstraints.add( constraint );
+			}
 		}
+
 		this.cascadedMembers = Collections.unmodifiableSet( cascadedMembers );
+		this.allMetaConstraints = Collections.unmodifiableSet( allMetaConstraints );
 
 		classHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy( beanClass, false );
 
 		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider );
 
-		// add the explicitly configured constraints
-		for ( PropertyMetaData onePropertyMetaData : propertyMetaDatas ) {
-			for ( MetaConstraint<?> constraint : onePropertyMetaData ) {
-				addMetaConstraint( constraint.getLocation().getBeanClass(), constraint );
-			}
-		}
-
-		allMetaConstraints = buildAllConstraintSets();
 		directMetaConstraints = buildDirectConstraintSets();
 
 		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDatas ) );
@@ -227,10 +217,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public Set<Member> getCascadedMembers() {
 		return cascadedMembers;
-	}
-
-	public Map<Class<?>, List<MetaConstraint<?>>> getMetaConstraintsAsMap() {
-		return Collections.unmodifiableMap( metaConstraints );
 	}
 
 	public Set<MetaConstraint<?>> getMetaConstraints() {
@@ -278,26 +264,21 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return Collections.unmodifiableSet( new HashSet<PropertyMetaData>( propertyMetaData.values() ) );
 	}
 
-	private Set<MetaConstraint<?>> buildAllConstraintSets() {
-		Set<MetaConstraint<?>> constraints = newHashSet();
-		for ( List<MetaConstraint<?>> list : metaConstraints.values() ) {
-			constraints.addAll( list );
-		}
-		return Collections.unmodifiableSet( constraints );
-	}
-
 	private Set<MetaConstraint<?>> buildDirectConstraintSets() {
+
 		Set<MetaConstraint<?>> constraints = newHashSet();
-		// collect all constraints directly defined in this bean
-		if ( metaConstraints.get( beanClass ) != null ) {
-			constraints.addAll( metaConstraints.get( beanClass ) );
-		}
+
 		Set<Class<?>> classAndInterfaces = computeAllImplementedInterfaces( beanClass );
+		classAndInterfaces.add( beanClass );
+
 		for ( Class<?> clazz : classAndInterfaces ) {
-			if ( metaConstraints.get( clazz ) != null ) {
-				constraints.addAll( metaConstraints.get( clazz ) );
+			for ( MetaConstraint<?> oneConstraint : allMetaConstraints ) {
+				if ( oneConstraint.getLocation().getBeanClass().equals( clazz ) ) {
+					constraints.add( oneConstraint );
+				}
 			}
 		}
+
 		return Collections.unmodifiableSet( constraints );
 	}
 
@@ -356,17 +337,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addMetaConstraint(Class<?> clazz, MetaConstraint<?> metaConstraint) {
-
-		// first we add the meta constraint to our meta constraint map
-		List<MetaConstraint<?>> constraintList;
-		if ( !metaConstraints.containsKey( clazz ) ) {
-			constraintList = new ArrayList<MetaConstraint<?>>();
-			metaConstraints.put( clazz, constraintList );
-		}
-		else {
-			constraintList = metaConstraints.get( clazz );
-		}
-		constraintList.add( metaConstraint );
 
 		// but we also have to update the descriptors exposing the BV metadata API
 		if ( metaConstraint.getElementType() == ElementType.TYPE ) {
