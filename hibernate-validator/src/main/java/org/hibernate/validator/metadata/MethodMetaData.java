@@ -113,13 +113,13 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		/**
 		 * {@inheritDoc}
 		 */
-		public boolean accepts(ConstrainedElement metaData) {
+		public boolean accepts(ConstrainedElement constrainedElement) {
 
 			return
-					metaData.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+					constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
 							ReflectionHelper.haveSameSignature(
-									location.getMethod(),
-									( (ConstrainedMethod) metaData ).getLocation().getMethod()
+									location.getMember(),
+									( (ConstrainedMethod) constrainedElement ).getLocation().getMember()
 							);
 		}
 
@@ -128,20 +128,12 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 */
 		public void add(ConstrainedElement constrainedElement) {
 
-			ConstrainedMethod metaData = (ConstrainedMethod) constrainedElement;
+			ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 
-			constrainedMethods.add( metaData );
-
-			//use the lowest method found in the hierarchy for this aggregation
-			if ( location.getMethod()
-					.getDeclaringClass()
-					.isAssignableFrom( metaData.getLocation().getMethod().getDeclaringClass() ) ) {
-				location = metaData.getLocation();
-			}
-
-			isCascading = isCascading || metaData.isCascading();
-			isConstrained = isConstrained || metaData.isConstrained();
-			returnValueConstraints.addAll( metaData.getConstraints() );
+			constrainedMethods.add( constrainedMethod );
+			isCascading = isCascading || constrainedMethod.isCascading();
+			isConstrained = isConstrained || constrainedMethod.isConstrained();
+			returnValueConstraints.addAll( constrainedMethod.getConstraints() );
 		}
 
 		/**

@@ -217,7 +217,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		return new ConstrainedMethod(
 				ConfigurationSource.ANNOTATION,
-				method,
+				new MethodConstraintLocation( method ),
 				parameterConstraints,
 				constraints,
 				isCascading

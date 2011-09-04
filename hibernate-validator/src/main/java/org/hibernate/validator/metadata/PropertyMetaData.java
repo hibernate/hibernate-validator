@@ -161,7 +161,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			this.constraints = newHashSet( constrainedMethod );
 			this.cascadingMembers = constrainedMethod.isCascading() ? asSet(
 					(Member) constrainedMethod.getLocation()
-							.getMethod()
+							.getMember()
 			) : new HashSet<Member>();
 		}
 

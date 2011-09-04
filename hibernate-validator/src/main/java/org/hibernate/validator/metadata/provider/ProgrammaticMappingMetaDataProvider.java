@@ -183,7 +183,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 			ConstrainedMethod methodMetaData = new ConstrainedMethod(
 					ConfigurationSource.API,
-					oneMethod,
+					new MethodConstraintLocation( oneMethod ),
 					parameterMetaDatas,
 					asMetaConstraints( constraintsByParameter.get( null ) ),
 					cascadesByParameter.containsKey( null )
@@ -223,7 +223,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	private Partitioner<Method, MethodConstraintLocation> cascadesByMethod() {
 		return new Partitioner<Method, MethodConstraintLocation>() {
 			public Method getPartition(MethodConstraintLocation location) {
-				return location.getMethod();
+				return location.getMember();
 			}
 		};
 	}
@@ -239,7 +239,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	private Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>> constraintsByMethod() {
 		return new Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>>() {
 			public Method getPartition(ConfiguredConstraint<?, MethodConstraintLocation> constraint) {
-				return constraint.getLocation().getMethod();
+				return constraint.getLocation().getMember();
 			}
 		};
 	}

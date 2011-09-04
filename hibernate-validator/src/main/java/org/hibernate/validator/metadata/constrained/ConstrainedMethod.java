@@ -43,13 +43,13 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 
 	public ConstrainedMethod(
 			ConfigurationSource source,
-			Method method,
+			MethodConstraintLocation location,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
 		this(
 				source,
-				method,
+				location,
 				Collections.<ConstrainedParameter>emptyList(),
 				returnValueConstraints,
 				isCascading
@@ -71,7 +71,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 */
 	public ConstrainedMethod(
 			ConfigurationSource source,
-			Method method,
+			MethodConstraintLocation location,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
@@ -79,10 +79,12 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		super(
 				source,
 				ConstrainedElementKind.METHOD,
-				new MethodConstraintLocation( method ),
+				location,
 				returnValueConstraints,
 				isCascading
 		);
+
+		Method method = location.getMember();
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
 			throw new IllegalArgumentException(
@@ -131,7 +133,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw new IllegalArgumentException( "Method " + getLocation().getMethod() + " doesn't have a parameter with index " + parameterIndex );
+			throw new IllegalArgumentException( "Method " + getLocation().getMember() + " doesn't have a parameter with index " + parameterIndex );
 		}
 
 		return parameterMetaData.get( parameterIndex );
@@ -181,7 +183,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return ReflectionHelper.isGetterMethod( getLocation().getMethod() );
+		return ReflectionHelper.isGetterMethod( getLocation().getMember() );
 	}
 
 	@Override

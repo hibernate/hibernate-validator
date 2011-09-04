@@ -69,43 +69,4 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 				+ constrainedMetaDataKind + "]";
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime
-				* result
-				+ ( ( constrainedMetaDataKind == null ) ? 0
-				: constrainedMetaDataKind.hashCode() );
-		result = prime * result
-				+ ( ( constraints == null ) ? 0 : constraints.hashCode() );
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj == null ) {
-			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		AbstractConstraintMetaData other = (AbstractConstraintMetaData) obj;
-		if ( constrainedMetaDataKind != other.constrainedMetaDataKind ) {
-			return false;
-		}
-		if ( constraints == null ) {
-			if ( other.constraints != null ) {
-				return false;
-			}
-		}
-		else if ( !constraints.equals( other.constraints ) ) {
-			return false;
-		}
-		return true;
-	}
-
 }

@@ -33,6 +33,7 @@ import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.xml.XmlMappingParser;
 
@@ -66,13 +67,13 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			);
 			Set<BeanConstraintLocation> cascades = getCascades( mappingParser, clazz );
 
-			Set<ConstrainedElement> propertyMetaData = retrievePropertyMetaData( constraintsByLocation, cascades );
+			Set<ConstrainedElement> constrainedElements = getConstrainedElements( constraintsByLocation, cascades );
 
 			configuredBeans.put(
 					clazz,
 					createBeanConfiguration(
 							clazz,
-							propertyMetaData,
+							constrainedElements,
 							mappingParser.getDefaultSequenceForClass( clazz ),
 							null
 					)
@@ -82,40 +83,40 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		annotationIgnores = mappingParser.getAnnotationIgnores();
 	}
 
-	private Set<ConstrainedElement> retrievePropertyMetaData(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
+	private Set<ConstrainedElement> getConstrainedElements(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
 
-		Set<ConstraintLocation> allConfiguredProperties = new HashSet<ConstraintLocation>( cascades );
-		allConfiguredProperties.addAll( constraintsByLocation.keySet() );
+		Set<ConstraintLocation> configuredLocations = new HashSet<ConstraintLocation>( cascades );
+		configuredLocations.addAll( constraintsByLocation.keySet() );
 
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
-		for ( ConstraintLocation oneConfiguredProperty : allConfiguredProperties ) {
-			if ( oneConfiguredProperty.getElementType() == ElementType.FIELD ) {
+		for ( ConstraintLocation oneConfiguredLocation : configuredLocations ) {
+			if ( oneConfiguredLocation.getElementType() == ElementType.FIELD ) {
 				propertyMetaData.add(
 						new ConstrainedField(
 								ConfigurationSource.XML,
-								(BeanConstraintLocation) oneConfiguredProperty,
-								constraintsByLocation.get( oneConfiguredProperty ),
-								cascades.contains( oneConfiguredProperty )
+								(BeanConstraintLocation) oneConfiguredLocation,
+								constraintsByLocation.get( oneConfiguredLocation ),
+								cascades.contains( oneConfiguredLocation )
 						)
 				);
 			}
-			else if ( oneConfiguredProperty.getElementType() == ElementType.METHOD ) {
+			else if ( oneConfiguredLocation.getElementType() == ElementType.METHOD ) {
 				propertyMetaData.add(
 						new ConstrainedMethod(
 								ConfigurationSource.XML,
-								(java.lang.reflect.Method) oneConfiguredProperty.getMember(),
-								constraintsByLocation.get( oneConfiguredProperty ),
-								cascades.contains( oneConfiguredProperty )
+								new MethodConstraintLocation( (java.lang.reflect.Method) oneConfiguredLocation.getMember() ),
+								constraintsByLocation.get( oneConfiguredLocation ),
+								cascades.contains( oneConfiguredLocation )
 						)
 				);
 			}
-			else if ( oneConfiguredProperty.getElementType() == ElementType.TYPE ) {
+			else if ( oneConfiguredLocation.getElementType() == ElementType.TYPE ) {
 				propertyMetaData.add(
 						new ConstrainedType(
 								ConfigurationSource.XML,
-								constraintsByLocation.get( oneConfiguredProperty ),
-								(BeanConstraintLocation) oneConfiguredProperty
+								constraintsByLocation.get( oneConfiguredLocation ),
+								(BeanConstraintLocation) oneConfiguredLocation
 						)
 				);
 			}
