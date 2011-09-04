@@ -22,5 +22,27 @@ package org.hibernate.validator.metadata.constrained;
  * @author Gunnar Morling
  */
 public enum ConfigurationSource {
-	ANNOTATION, XML, API
+
+	ANNOTATION( 0 ),
+
+	XML( 1 ),
+
+	API( 2 );
+
+	private int priority;
+
+	private ConfigurationSource(int priority) {
+		this.priority = priority;
+	}
+
+	/**
+	 * Returns this sources priority. Can be used to determine which
+	 * configuration shall apply in case of conflicting configurations by
+	 * several providers.
+	 *
+	 * @return This source's priority.
+	 */
+	public int getPriority() {
+		return priority;
+	}
 }

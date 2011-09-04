@@ -26,7 +26,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 /**
  * Represents the constraint related configuration of one Java type originating
  * from one {@link ConfigurationSource}.
- * 
+ *
  * @author Gunnar Morling
  */
 public class BeanConfiguration<T> {
@@ -60,6 +60,10 @@ public class BeanConfiguration<T> {
 		this.constrainedElements = newHashSet( constrainedElements );
 		this.defaultGroupSequence = defaultGroupSequence;
 		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
+	}
+
+	public ConfigurationSource getSource() {
+		return source;
 	}
 
 	public Class<T> getBeanClass() {

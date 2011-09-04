@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.ConstraintMetaData.ConstraintMetaDataKind;
 import org.hibernate.validator.metadata.constrained.BeanConfiguration;
+import org.hibernate.validator.metadata.constrained.ConfigurationSource;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
 import org.hibernate.validator.metadata.constrained.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.constrained.ConstrainedField;
@@ -410,15 +411,20 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public static class BeanMetaDataBuilder<T> {
 
-		private ConstraintHelper constraintHelper;
+		private final ConstraintHelper constraintHelper;
 
 		private final Class<T> beanClass;
+
+		private final Set<BuilderDelegate> builders = newHashSet();
+
+		private ConfigurationSource sequenceSource;
+
+		private ConfigurationSource providerSource;
 
 		private List<Class<?>> defaultGroupSequence;
 
 		private Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
 
-		Set<BuilderDelegate> builders = newHashSet();
 
 		public BeanMetaDataBuilder(ConstraintHelper constraintHelper, Class<T> beanClass) {
 			this.beanClass = beanClass;
@@ -429,24 +435,25 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			return new BeanMetaDataBuilder<T>( constraintHelper, beanClass );
 		}
 
-		public boolean accepts(BeanConfiguration<?> configuration) {
-			return configuration.getBeanClass().isAssignableFrom( beanClass );
-		}
-
 		public void add(BeanConfiguration<?> configuration) {
 
-			// TODO GM: Determine which default sequence should be taken
-			if ( ( defaultGroupSequence == null || defaultGroupSequence.isEmpty() )
-					&& configuration.getDefaultGroupSequence() != null
-					&& configuration.getBeanClass().equals( beanClass ) ) {
-				defaultGroupSequence = configuration.getDefaultGroupSequence();
-			}
+			if ( configuration.getBeanClass().equals( beanClass ) ) {
 
-			// TODO GM: Determine which default sequence provider should be taken
-			if ( defaultGroupSequenceProvider == null
-					&& configuration.getDefaultGroupSequenceProvider() != null
-					&& configuration.getBeanClass().equals( beanClass ) ) {
-				defaultGroupSequenceProvider = configuration.getDefaultGroupSequenceProvider();
+				if ( configuration.getDefaultGroupSequence() != null &&
+						( sequenceSource == null || configuration.getSource()
+								.getPriority() >= sequenceSource.getPriority() ) ) {
+
+					sequenceSource = configuration.getSource();
+					defaultGroupSequence = configuration.getDefaultGroupSequence();
+				}
+
+				if ( configuration.getDefaultGroupSequenceProvider() != null &&
+						( providerSource == null || configuration.getSource()
+								.getPriority() >= providerSource.getPriority() ) ) {
+
+					providerSource = configuration.getSource();
+					defaultGroupSequenceProvider = configuration.getDefaultGroupSequenceProvider();
+				}
 			}
 
 			for ( ConstrainedElement oneConstrainedElement : configuration.getConstrainedElements() ) {
