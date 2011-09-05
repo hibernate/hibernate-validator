@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.metadata;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -56,5 +57,8 @@ public class CustomerRepository {
 	}
 
 	public void qux() {
+	}
+
+	public void zap(@Max(1) int i) {
 	}
 }

@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -130,8 +129,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	public static class Builder extends MetaDataBuilder {
 
-		private final ConstraintHelper constraintHelper;
-
 		private final ConstrainedElement root;
 
 		private final Set<MetaConstraint<?>> constraints;
@@ -139,7 +136,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Set<Member> cascadingMembers;
 
 		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
-			this.constraintHelper = constraintHelper;
+			super( constraintHelper );
+
 			this.root = constrainedField;
 			this.constraints = newHashSet( constrainedField );
 			this.cascadingMembers = constrainedField.isCascading() ? asSet(
@@ -149,14 +147,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		public Builder(ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
-			this.constraintHelper = constraintHelper;
+			super( constraintHelper );
+
 			this.root = constrainedType;
 			this.constraints = newHashSet( constrainedType );
 			this.cascadingMembers = Collections.<Member>emptySet();
 		}
 
 		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
-			this.constraintHelper = constraintHelper;
+			super( constraintHelper );
+
 			this.root = constrainedMethod;
 			this.constraints = newHashSet( constrainedMethod );
 			this.cascadingMembers = constrainedMethod.isCascading() ? asSet(
@@ -202,15 +202,10 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		public PropertyMetaData build() {
 
-			Set<MetaConstraint<?>> adaptedConstraints = newHashSet();
-
-			for ( MetaConstraint<?> oneConstraint : constraints ) {
-				adaptedConstraints.add(
-						adaptOriginAndImplicitGroup(
-								root.getLocation().getBeanClass(), oneConstraint
-						)
-				);
-			}
+			Set<MetaConstraint<?>> adaptedConstraints = adaptOriginsAndImplicitGroups(
+					root.getLocation()
+							.getBeanClass(), constraints
+			);
 
 			Member member = root.getLocation().getMember();
 			return new PropertyMetaData(
@@ -219,62 +214,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					adaptedConstraints,
 					cascadingMembers
 			);
-		}
-
-		/**
-		 * Adapts the given constraint to the given bean type. In case the
-		 * constraint is defined locally at the bean class the original constraint
-		 * will be returned without any modifications. If the constraint is defined
-		 * in the hierarchy (interface or super class) a new constraint will be
-		 * returned with an origin of {@link ConstraintOrigin#DEFINED_IN_HIERARCHY}.
-		 * If the constraint is defined on an interface, the interface type will
-		 * additionally be part of the constraint's groups (implicit grouping).
-		 *
-		 * @param <A> The type of the constraint's annotation.
-		 * @param beanClass The bean type to which the constraint shall be adapted.
-		 * @param constraint The constraint that shall be adapted. This constraint itself
-		 * will not be altered.
-		 *
-		 * @return A constraint adapted to the given bean type.
-		 */
-		private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(Class<?> beanClass, MetaConstraint<A> constraint) {
-
-			ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
-
-			if ( definedIn == ConstraintOrigin.DEFINED_LOCALLY ) {
-				return constraint;
-			}
-
-			Class<?> constraintClass = constraint.getLocation().getBeanClass();
-
-			ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
-					(A) constraint.getDescriptor().getAnnotation(),
-					constraintHelper,
-					constraintClass.isInterface() ? constraintClass : null,
-					constraint.getElementType(),
-					definedIn
-			);
-
-			return new MetaConstraint<A>(
-					descriptor,
-					constraint.getLocation()
-			);
-		}
-
-		/**
-		 * @param rootClass The root class. That is the class for which we currently create a  {@code BeanMetaData}
-		 * @param hierarchyClass The class on which the current constraint is defined on
-		 *
-		 * @return Returns {@code ConstraintOrigin.DEFINED_LOCALLY} if the constraint was defined on the root bean,
-		 *         {@code ConstraintOrigin.DEFINED_IN_HIERARCHY} otherwise.
-		 */
-		private ConstraintOrigin definedIn(Class<?> rootClass, Class<?> hierarchyClass) {
-			if ( hierarchyClass.equals( rootClass ) ) {
-				return ConstraintOrigin.DEFINED_LOCALLY;
-			}
-			else {
-				return ConstraintOrigin.DEFINED_IN_HIERARCHY;
-			}
 		}
 	}
 

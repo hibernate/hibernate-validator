@@ -24,7 +24,6 @@ import java.util.Set;
 import org.hibernate.validator.engine.ConstraintTree;
 import org.hibernate.validator.engine.ValidationContext;
 import org.hibernate.validator.engine.ValueContext;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -93,7 +92,7 @@ public class MetaConstraint<A extends Annotation> {
 	protected final Type typeOfAnnotatedElement() {
 		return location.typeOfAnnotatedElement();
 	}
-	
+
 	/**
 	 * @param o the object from which to retrieve the value.
 	 *

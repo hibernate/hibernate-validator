@@ -91,9 +91,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 		private final Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
 
-		private boolean isCascading;
+		private boolean isCascading = false;
 
-		private boolean isConstrained;
+		private boolean isConstrained = false;
 
 		/**
 		 * Creates a new builder based on the given method meta data.
@@ -101,13 +101,12 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * @param constrainedMethod The base method for this builder. This is the lowest
 		 * method with a given signature within a type hierarchy.
 		 */
-		public Builder(ConstrainedMethod constrainedMethod) {
+		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
+
+			super( constraintHelper );
 
 			location = constrainedMethod.getLocation();
-			constrainedMethods.add( constrainedMethod );
-			isCascading = constrainedMethod.isCascading();
-			isConstrained = constrainedMethod.isConstrained();
-			returnValueConstraints.addAll( constrainedMethod.getConstraints() );
+			add( constrainedMethod );
 		}
 
 		/**
@@ -143,7 +142,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			return
 					new MethodMetaData(
 							this,
-							returnValueConstraints,
+							adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
 							findParameterMetaData(),
 							checkParameterConstraints(),
 							isCascading,
@@ -168,7 +167,13 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 					parameterBuilders = newArrayList();
 
 					for ( ConstrainedParameter oneParameter : oneMethod.getAllParameterMetaData() ) {
-						parameterBuilders.add( new ParameterMetaData.Builder( oneParameter ) );
+						parameterBuilders.add(
+								new ParameterMetaData.Builder(
+										location.getBeanClass(),
+										oneParameter,
+										constraintHelper
+								)
+						);
 					}
 				}
 				else {

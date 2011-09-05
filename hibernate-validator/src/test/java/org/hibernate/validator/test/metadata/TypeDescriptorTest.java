@@ -184,9 +184,10 @@ public class TypeDescriptorTest {
 		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
-		assertEquals( constrainedMethods.size(), 5 );
+		assertEquals( constrainedMethods.size(), 6 );
 		assertEquals(
-				getMethodNames( constrainedMethods ), asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz" )
+				getMethodNames( constrainedMethods ),
+				asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz", "zap" )
 		);
 	}
 
@@ -196,10 +197,10 @@ public class TypeDescriptorTest {
 		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
-		assertEquals( constrainedMethods.size(), 6 );
+		assertEquals( constrainedMethods.size(), 7 );
 		assertEquals(
 				getMethodNames( constrainedMethods ),
-				asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz", "zip" )
+				asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz", "zip", "zap" )
 		);
 	}
 

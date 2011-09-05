@@ -464,11 +464,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static class BuilderDelegate {
 
-		private PropertyMetaData.Builder propertyBuilder;
+		private final ConstraintHelper constraintHelper;
+
+		private MetaDataBuilder propertyBuilder;
 
 		private MethodMetaData.Builder methodBuilder;
 
 		public BuilderDelegate(ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
+
+			this.constraintHelper = constraintHelper;
 
 			switch ( constrainedElement.getConstrainedElementKind() ) {
 
@@ -481,7 +485,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				case METHOD:
 
 					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
-					methodBuilder = new MethodMetaData.Builder( constrainedMethod );
+					methodBuilder = new MethodMetaData.Builder( constrainedMethod, constraintHelper );
 
 					if ( constrainedMethod.isGetterMethod() ) {
 						propertyBuilder = new PropertyMetaData.Builder( constrainedMethod, constraintHelper );
@@ -510,7 +514,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				propertyBuilder.add( constrainedElement );
 
 				if ( added == false && constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
-					methodBuilder = new MethodMetaData.Builder( (ConstrainedMethod) constrainedElement );
+					methodBuilder = new MethodMetaData.Builder(
+							(ConstrainedMethod) constrainedElement,
+							constraintHelper
+					);
 				}
 
 				added = true;

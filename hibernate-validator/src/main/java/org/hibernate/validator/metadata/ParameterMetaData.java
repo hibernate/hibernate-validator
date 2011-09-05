@@ -63,16 +63,27 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 	public static class Builder extends MetaDataBuilder {
 
+		private final Class<?> rootClass;
+
+		private final Class<?> parameterType;
+
+		private final int parameterIndex;
+
+		private final Set<MetaConstraint<?>> constraints = newHashSet();
+
 		private String name;
 
-		private ConstrainedParameter root;
+		private boolean isCascading = false;
 
-		private Set<ConstrainedParameter> parameters = newHashSet();
+		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
 
-		public Builder(ConstrainedParameter constrainedParameter) {
-			this.root = constrainedParameter;
-			this.parameters.add( constrainedParameter );
-			this.name = root.getParameterName();
+			super( constraintHelper );
+
+			this.rootClass = rootClass;
+			this.parameterType = constrainedParameter.getLocation().getParameterType();
+			this.parameterIndex = constrainedParameter.getLocation().getParameterIndex();
+
+			add( constrainedParameter );
 		}
 
 		@Override
@@ -82,39 +93,32 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 				return false;
 			}
 
-			ConstrainedParameter constrainedParameter = (ConstrainedParameter) constrainedElement;
-
-			return constrainedParameter.getLocation().getParameterIndex() == root.getLocation().getParameterIndex();
+			return ( (ConstrainedParameter) constrainedElement ).getLocation().getParameterIndex() == parameterIndex;
 		}
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
 
 			ConstrainedParameter constrainedParameter = (ConstrainedParameter) constrainedElement;
-			parameters.add( constrainedParameter );
+
+			constraints.addAll( constrainedParameter.getConstraints() );
 
 			if ( name == null ) {
 				name = constrainedParameter.getParameterName();
 			}
+
+			isCascading = isCascading || constrainedParameter.isCascading();
 		}
 
 		@Override
 		public ParameterMetaData build() {
 
-			Set<MetaConstraint<?>> constraints = newHashSet();
-			boolean isCascading = false;
-
-			for ( ConstrainedParameter oneParameter : parameters ) {
-				constraints.addAll( oneParameter.getConstraints() );
-				isCascading = isCascading || oneParameter.isCascading();
-			}
-
 			return new ParameterMetaData(
-					constraints,
+					adaptOriginsAndImplicitGroups( rootClass, constraints ),
 					isCascading,
 					name,
-					root.getLocation().getParameterType(),
-					root.getLocation().getParameterIndex()
+					parameterType,
+					parameterIndex
 			);
 		}
 

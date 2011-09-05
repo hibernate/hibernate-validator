@@ -16,7 +16,12 @@
  */
 package org.hibernate.validator.metadata;
 
+import java.lang.annotation.Annotation;
+import java.util.Set;
+
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
+
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Builds {@link ConstraintMetaData} instances for the
@@ -26,6 +31,12 @@ import org.hibernate.validator.metadata.constrained.ConstrainedElement;
  * @author Gunnar Morling
  */
 public abstract class MetaDataBuilder {
+
+	protected final ConstraintHelper constraintHelper;
+
+	protected MetaDataBuilder(ConstraintHelper constraintHelper) {
+		this.constraintHelper = constraintHelper;
+	}
 
 	/**
 	 * Whether this builder allows to add the given element or not. This is the
@@ -57,4 +68,76 @@ public abstract class MetaDataBuilder {
 	 */
 	public abstract ConstraintMetaData build();
 
+	/**
+	 * Adapts the given constraints to the given bean type. In case a constraint
+	 * is defined locally at the bean class the original constraint will be
+	 * returned without any modifications. If a constraint is defined in the
+	 * hierarchy (interface or super class) a new constraint will be returned
+	 * with an origin of {@link ConstraintOrigin#DEFINED_IN_HIERARCHY}. If a
+	 * constraint is defined on an interface, the interface type will
+	 * additionally be part of the constraint's groups (implicit grouping).
+	 *
+	 * @param <A> The type of the constraint's annotation.
+	 * @param beanClass The bean type to which the constraint shall be adapted.
+	 * @param constraint The constraint that shall be adapted. This constraint itself
+	 * will not be altered.
+	 *
+	 * @return A constraint adapted to the given bean type.
+	 */
+	protected Set<MetaConstraint<?>> adaptOriginsAndImplicitGroups(Class<?> beanClass,
+																   Set<MetaConstraint<?>> constraints) {
+		Set<MetaConstraint<?>> adaptedConstraints = newHashSet();
+
+		for ( MetaConstraint<?> oneConstraint : constraints ) {
+			adaptedConstraints.add(
+					adaptOriginAndImplicitGroup(
+							beanClass, oneConstraint
+					)
+			);
+		}
+		return adaptedConstraints;
+	}
+
+	private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(
+			Class<?> beanClass, MetaConstraint<A> constraint) {
+
+		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
+
+		if ( definedIn == ConstraintOrigin.DEFINED_LOCALLY ) {
+			return constraint;
+		}
+
+		Class<?> constraintClass = constraint.getLocation().getBeanClass();
+
+		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
+				(A) constraint.getDescriptor().getAnnotation(),
+				constraintHelper,
+				constraintClass.isInterface() ? constraintClass : null,
+				constraint.getElementType(),
+				definedIn
+		);
+
+		return new MetaConstraint<A>(
+				descriptor,
+				constraint.getLocation()
+		);
+	}
+
+	/**
+	 * @param rootClass The root class. That is the class for which we currently
+	 * create a {@code BeanMetaData}
+	 * @param hierarchyClass The class on which the current constraint is defined on
+	 *
+	 * @return Returns {@code ConstraintOrigin.DEFINED_LOCALLY} if the
+	 *         constraint was defined on the root bean,
+	 *         {@code ConstraintOrigin.DEFINED_IN_HIERARCHY} otherwise.
+	 */
+	private ConstraintOrigin definedIn(Class<?> rootClass, Class<?> hierarchyClass) {
+		if ( hierarchyClass.equals( rootClass ) ) {
+			return ConstraintOrigin.DEFINED_LOCALLY;
+		}
+		else {
+			return ConstraintOrigin.DEFINED_IN_HIERARCHY;
+		}
+	}
 }

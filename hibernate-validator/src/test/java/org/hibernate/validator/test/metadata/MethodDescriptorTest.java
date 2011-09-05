@@ -95,8 +95,8 @@ public class MethodDescriptorTest {
 		assertEquals( methodDescriptor.getConstraintDescriptors().size(), 2 );
 	}
 
-	@Test(enabled = false, description = "Temporarily disabled due to HV-443")
-	public void testFindConstraintLookingAt() {
+	@Test(description = "HV-443")
+	public void testFindReturnValueConstraintLookingAt() {
 
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 
@@ -107,6 +107,27 @@ public class MethodDescriptorTest {
 		assertEquals( constraintDescriptors.iterator().next().getAnnotation().annotationType(), Min.class );
 
 		constraintDescriptors = methodDescriptor.findConstraints()
+				.lookingAt( Scope.HIERARCHY )
+				.getConstraintDescriptors();
+		assertEquals( constraintDescriptors.size(), 2 );
+	}
+
+	@Test(description = "HV-443")
+	public void testFindParameterConstraintLookingAt() {
+
+		ParameterDescriptor parameterDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class,
+				"zap",
+				int.class
+		).getParameterDescriptors().get( 0 );
+
+		Set<ConstraintDescriptor<?>> constraintDescriptors = parameterDescriptor.findConstraints()
+				.lookingAt( Scope.LOCAL_ELEMENT )
+				.getConstraintDescriptors();
+		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( constraintDescriptors.iterator().next().getAnnotation().annotationType(), Min.class );
+
+		constraintDescriptors = parameterDescriptor.findConstraints()
 				.lookingAt( Scope.HIERARCHY )
 				.getConstraintDescriptors();
 		assertEquals( constraintDescriptors.size(), 2 );
