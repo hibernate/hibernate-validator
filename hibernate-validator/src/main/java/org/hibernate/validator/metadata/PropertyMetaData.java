@@ -18,9 +18,7 @@ package org.hibernate.validator.metadata;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.constrained.ConstrainedElement;
@@ -30,10 +28,23 @@ import org.hibernate.validator.metadata.constrained.ConstrainedMethod;
 import org.hibernate.validator.metadata.constrained.ConstrainedType;
 import org.hibernate.validator.util.ReflectionHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.asSet;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
+ * <p>
+ * Represents the constraint related meta data for a JavaBeans property.
+ * Abstracts from the concrete physical type of the underlying Java element(s)
+ * (fields or getter methods).
+ * </p>
+ * <p>
+ * In order to provide a unified access to all JavaBeans constraints also
+ * class-level constraints are represented by this meta data type.
+ * </p>
+ * <p>
+ * Identity is solely based on the property name, hence sets and similar
+ * collections of this type may only be created in the scope of one Java type.
+ * </p>
+ *
  * @author Gunnar Morling
  */
 public class PropertyMetaData extends AbstractConstraintMetaData {
@@ -71,10 +82,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
 		result = prime * result
 				+ ( ( propertyName == null ) ? 0 : propertyName.hashCode() );
-		result = prime * result + ( ( type == null ) ? 0 : type.hashCode() );
 		return result;
 	}
 
@@ -83,7 +93,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( !super.equals( obj ) ) {
+		if ( obj == null ) {
 			return false;
 		}
 		if ( getClass() != obj.getClass() ) {
@@ -96,14 +106,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 		}
 		else if ( !propertyName.equals( other.propertyName ) ) {
-			return false;
-		}
-		if ( type == null ) {
-			if ( other.type != null ) {
-				return false;
-			}
-		}
-		else if ( !type.equals( other.type ) ) {
 			return false;
 		}
 		return true;
@@ -129,47 +131,52 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	public static class Builder extends MetaDataBuilder {
 
-		private final ConstrainedElement root;
+		private final static EnumSet<ConstrainedElementKind> SUPPORTED_ELEMENT_KINDS = EnumSet.of(
+				ConstrainedElementKind.TYPE,
+				ConstrainedElementKind.FIELD,
+				ConstrainedElementKind.METHOD
+		);
 
-		private final Set<MetaConstraint<?>> constraints;
+		private final Class<?> beanClass;
 
-		private final Set<Member> cascadingMembers;
+		private final String propertyName;
+
+		private final Class<?> propertyType;
+
+		private final Set<MetaConstraint<?>> constraints = newHashSet();
+
+		private final Set<Member> cascadingMembers = newHashSet();
 
 		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
 
-			this.root = constrainedField;
-			this.constraints = newHashSet( constrainedField );
-			this.cascadingMembers = constrainedField.isCascading() ? asSet(
-					constrainedField.getLocation()
-							.getMember()
-			) : new HashSet<Member>();
+			this.beanClass = constrainedField.getLocation().getBeanClass();
+			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
+			this.propertyType = ( (Field) constrainedField.getLocation().getMember() ).getType();
+			add( constrainedField );
 		}
 
 		public Builder(ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
 
-			this.root = constrainedType;
-			this.constraints = newHashSet( constrainedType );
-			this.cascadingMembers = Collections.<Member>emptySet();
+			this.beanClass = constrainedType.getLocation().getBeanClass();
+			this.propertyName = null;
+			this.propertyType = null;
+			add( constrainedType );
 		}
 
 		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
 
-			this.root = constrainedMethod;
-			this.constraints = newHashSet( constrainedMethod );
-			this.cascadingMembers = constrainedMethod.isCascading() ? asSet(
-					(Member) constrainedMethod.getLocation()
-							.getMember()
-			) : new HashSet<Member>();
+			this.beanClass = constrainedMethod.getLocation().getBeanClass();
+			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
+			this.propertyType = constrainedMethod.getLocation().getMember().getReturnType();
+			add( constrainedMethod );
 		}
 
 		public boolean accepts(ConstrainedElement constrainedElement) {
 
-			if ( constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.TYPE &&
-					constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.FIELD &&
-					constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.METHOD ) {
+			if ( !SUPPORTED_ELEMENT_KINDS.contains( constrainedElement.getConstrainedElementKind() ) ) {
 				return false;
 			}
 
@@ -178,22 +185,15 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				return false;
 			}
 
-			String propertyName1 = ReflectionHelper.getPropertyName( constrainedElement.getLocation().getMember() );
-			String propertyName2 = ReflectionHelper.getPropertyName( root.getLocation().getMember() );
-
-			return
-					constrainedElement.getLocation()
-							.getBeanClass()
-							.isAssignableFrom( root.getLocation().getBeanClass() )
-							&& ( ( propertyName1 != null && propertyName1.equals( propertyName2 ) ) ||
-							propertyName1 == null && propertyName2 == null );
+			return equals(
+					ReflectionHelper.getPropertyName( constrainedElement.getLocation().getMember() ),
+					propertyName
+			);
 		}
 
 		public void add(ConstrainedElement constrainedElement) {
 
-			for ( MetaConstraint<?> oneConstraint : constrainedElement ) {
-				constraints.add( oneConstraint );
-			}
+			constraints.addAll( constrainedElement.getConstraints() );
 
 			if ( constrainedElement.isCascading() ) {
 				cascadingMembers.add( constrainedElement.getLocation().getMember() );
@@ -202,18 +202,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		public PropertyMetaData build() {
 
-			Set<MetaConstraint<?>> adaptedConstraints = adaptOriginsAndImplicitGroups(
-					root.getLocation()
-							.getBeanClass(), constraints
-			);
-
-			Member member = root.getLocation().getMember();
 			return new PropertyMetaData(
-					member != null ? member instanceof Field ? ( (Field) member ).getType() : ( (Method) member ).getReturnType() : null,
-					member != null ? ReflectionHelper.getPropertyName( member ) : null,
-					adaptedConstraints,
+					propertyType,
+					propertyName,
+					adaptOriginsAndImplicitGroups( beanClass, constraints ),
 					cascadingMembers
 			);
+		}
+
+		private boolean equals(String s1, String s2) {
+			return ( s1 != null && s1.equals( s2 ) ) || ( s1 == null && s2 == null );
 		}
 	}
 
