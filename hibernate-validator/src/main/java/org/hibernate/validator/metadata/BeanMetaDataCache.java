@@ -19,6 +19,9 @@ package org.hibernate.validator.metadata;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.hibernate.validator.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.metadata.aggregated.BeanMetaDataImpl;
+
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**

@@ -23,7 +23,7 @@ import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
-import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.core.ConstraintHelper;
 
 /**
  * @author Emmanuel Bernard

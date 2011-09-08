@@ -14,31 +14,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.metadata.provider;
+package org.hibernate.validator.metadata.raw;
 
 import java.util.Set;
 
-import org.hibernate.validator.metadata.core.AnnotationIgnores;
-import org.hibernate.validator.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 
 /**
- * <p>
- * A provider for constraint related meta data such as constraints, default
- * group sequences etc.
- * </p>
- * <p>
- * Implementations are based one different meta data sources such as XML,
- * programmatic mappings and annotations. Meta data providers only return meta
- * data directly configured for one class, they don't deal with merging meta
- * data from super-classes or implemented interfaces.
- * </p>
- *
  * @author Gunnar Morling
  */
-public interface MetaDataProvider {
-	Set<BeanConfiguration<?>> getAllBeanConfigurations();
+public class ConstrainedType extends AbstractConstrainedElement {
 
-	AnnotationIgnores getAnnotationIgnores();
+	/**
+	 * @param constraints
+	 * @param location
+	 */
+	public ConstrainedType(ConfigurationSource source, Set<MetaConstraint<?>> constraints, BeanConstraintLocation location) {
 
-	Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
+		super( source, ConstrainedElementKind.TYPE, location, constraints, false );
+	}
+
+	public BeanConstraintLocation getLocation() {
+		return (BeanConstraintLocation) super.getLocation();
+	}
+
 }

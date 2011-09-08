@@ -26,14 +26,13 @@ import javax.validation.constraints.Size;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.engine.ValidatorImpl;
-import org.hibernate.validator.metadata.BeanMetaDataImpl;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodValidator;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
- * Integration test for {@link ValidatorImpl} and {@link BeanMetaDataImpl} which
+ * Integration test for {@link ValidatorImpl} and {@link org.hibernate.validator.metadata.aggregated.BeanMetaDataImpl} which
  * tests that illegal method parameter constraints are handled properly.
  *
  * @author Gunnar Morling

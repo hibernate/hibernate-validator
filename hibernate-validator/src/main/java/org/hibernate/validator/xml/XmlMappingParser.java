@@ -44,11 +44,11 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.hibernate.validator.metadata.AnnotationIgnores;
-import org.hibernate.validator.metadata.MetaConstraint;
-import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
-import org.hibernate.validator.metadata.ConstraintHelper;
-import org.hibernate.validator.metadata.ConstraintOrigin;
+import org.hibernate.validator.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;

@@ -21,10 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.BeanMetaDataImpl.BeanMetaDataBuilder;
-import org.hibernate.validator.metadata.constrained.BeanConfiguration;
+import org.hibernate.validator.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
+import org.hibernate.validator.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.metadata.aggregated.BeanMetaDataImpl;
+import org.hibernate.validator.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
@@ -57,10 +61,10 @@ public class BeanMetaDataManager {
 	private final MetaDataProvider defaultProvider;
 
 	/**
-	 * Eager providers which are additionally used for meta data retrieval if
+	 * Additional metadata providers used for meta data retrieval if
 	 * the XML and/or programmatic configuration is used.
 	 */
-	private final List<MetaDataProvider> eagerMetaDataProviders;
+	private final List<MetaDataProvider> nonAnnotationMetaDataProviders;
 
 	private final ConstraintHelper constraintHelper;
 
@@ -73,33 +77,30 @@ public class BeanMetaDataManager {
 
 	private final Map<Class<?>, Set<BeanConfiguration<?>>> configurationsByClass;
 
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, MetaDataProvider... eagerMetaDataProviders) {
-		this( constraintHelper, Arrays.asList( eagerMetaDataProviders ) );
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, MetaDataProvider... metaDataProviders) {
+		this( constraintHelper, Arrays.asList( metaDataProviders ) );
 	}
 
 	/**
-	 * @param constraintHelper
-	 * @param eagerMetaDataProviders
+	 * @param constraintHelper the constraint helper
+	 * @param metaDataProviders optional meta data provider used on top of the annotation based provider
 	 */
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> eagerMetaDataProviders) {
-
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> metaDataProviders) {
 		this.constraintHelper = constraintHelper;
-		this.eagerMetaDataProviders = eagerMetaDataProviders;
+		this.nonAnnotationMetaDataProviders = metaDataProviders;
 
 		configurationsByClass = newHashMap();
 		beanMetaDataCache = new BeanMetaDataCache();
 
-		loadConfigurationsFromEagerProviders();
+		loadConfigurationsNonDefaultProviders();
 
 		defaultProvider = new AnnotationMetaDataProvider( constraintHelper, annotationIgnores );
 	}
 
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-
 		BeanMetaData<T> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
 
 		if ( beanMetaData == null ) {
-
 			addAll( defaultProvider.getBeanConfigurationForHierarchy( beanClass ) );
 			beanMetaData = createBeanMetaData( beanClass );
 
@@ -113,7 +114,7 @@ public class BeanMetaDataManager {
 	}
 
 	/**
-	 * Creates a {@link BeanMetaData} containing the meta data from all meta
+	 * Creates a {@link org.hibernate.validator.metadata.aggregated.BeanMetaData} containing the meta data from all meta
 	 * data providers for the given type and its hierarchy.
 	 *
 	 * @param <T> The type of interest.
@@ -122,7 +123,6 @@ public class BeanMetaDataManager {
 	 * @return A bean meta data object for the given type.
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
-
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, clazz );
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( clazz, true ) ) {
@@ -138,14 +138,13 @@ public class BeanMetaDataManager {
 	 * Loads all {@link BeanConfiguration}s from the registered eager meta data
 	 * providers.
 	 */
-	private void loadConfigurationsFromEagerProviders() {
-
-		for ( MetaDataProvider oneProvider : eagerMetaDataProviders ) {
+	private void loadConfigurationsNonDefaultProviders() {
+		for ( MetaDataProvider metaDataProvider : nonAnnotationMetaDataProviders ) {
 			//TODO GM: merge, if also programmatic provider has this option
-			if ( oneProvider.getAnnotationIgnores() != null ) {
-				annotationIgnores = oneProvider.getAnnotationIgnores();
+			if ( metaDataProvider.getAnnotationIgnores() != null ) {
+				annotationIgnores = metaDataProvider.getAnnotationIgnores();
 			}
-			addAll( oneProvider.getAllBeanConfigurations() );
+			addAll( metaDataProvider.getAllBeanConfigurations() );
 		}
 
 		if ( annotationIgnores == null ) {
@@ -154,7 +153,6 @@ public class BeanMetaDataManager {
 	}
 
 	private void addAll(Set<BeanConfiguration<?>> configurations) {
-
 		for ( BeanConfiguration<?> beanConfiguration : configurations ) {
 
 			Set<BeanConfiguration<?>> configurationsForType = configurationsByClass.get( beanConfiguration.getBeanClass() );

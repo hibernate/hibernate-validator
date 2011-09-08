@@ -28,7 +28,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
-import org.hibernate.validator.metadata.ConstraintHelper;
+import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.metadata.provider.ProgrammaticMappingMetaDataProvider;
 import org.hibernate.validator.metadata.provider.XmlConfigurationMetaDataProvider;
@@ -36,7 +36,7 @@ import org.hibernate.validator.metadata.provider.XmlConfigurationMetaDataProvide
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 
 /**
- * Factory returning initialized {@code Validator} instances. This is Hibernate Validator's default
+ * Factory returning initialized {@code Validator} instances. This is Hibernate Validator default
  * implementation of the {@code ValidatorFactory} interface.
  *
  * @author Emmanuel Bernard
@@ -66,7 +66,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
-
 			metaDataProviders.add(
 					new XmlConfigurationMetaDataProvider(
 							constraintHelper, configurationState.getMappingStreams()

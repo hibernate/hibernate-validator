@@ -36,7 +36,7 @@ import com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
-import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.util.LRUMap;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ValidatorTypeHelper;

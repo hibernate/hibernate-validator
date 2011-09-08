@@ -34,6 +34,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.testutil.CountValidationCalls;
 import org.hibernate.validator.testutil.CountValidationCallsValidator;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
@@ -154,6 +155,26 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "bar[0].alwaysNull" );
 	}
 
+	@Test
+	public void testConstraintDefinedOnEntityNotFollowingBeanNotation() {
+		CountValidationCallsValidator.init();
+		Set<ConstraintViolation<NotFollowingJavaBeanNotation>> constraintViolations = getValidator().validate( new NotFollowingJavaBeanNotation() );
+
+		// validating the whole entity
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+
+		// using validateProperty (which is used by JSF) to validate explicitly
+		constraintViolations = getValidator().validateProperty( new NotFollowingJavaBeanNotation(), "m_foo" );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+
+	    // using validateProperty (which is used by JSF) to validate explicitly (no violation, because there is no
+		// property foo Validator knows about
+		constraintViolations = getValidator().validateProperty( new NotFollowingJavaBeanNotation(), "foo" );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
 	class A {
 		@NotNull
 		String b;
@@ -253,5 +274,14 @@ public class ValidatorTest {
 	class Bar {
 		@NotNull
 		String alwaysNull;
+	}
+
+	class NotFollowingJavaBeanNotation {
+		@NotNull
+		String m_foo;
+
+		public String getFoo() {
+			return m_foo;
+		}
 	}
 }
