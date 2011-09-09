@@ -491,8 +491,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			builders.add(
 					new BuilderDelegate(
 							constrainableElement,
-							( defaultGroupSequence != null && defaultGroupSequence.size() > 1 ) || defaultGroupSequenceProvider != null,
-							defaultGroupSequence,
 							constraintHelper
 					)
 			);
@@ -503,12 +501,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			Set<ConstraintMetaData> aggregatedElements = newHashSet();
 
 			for ( BuilderDelegate oneBuilder : builders ) {
-				
-				oneBuilder.setDefaultGroupSequence(
-						( defaultGroupSequence != null && defaultGroupSequence.size() > 1 ) || defaultGroupSequenceProvider != null,
-						defaultGroupSequence);		
-				
-				aggregatedElements.addAll( oneBuilder.build() );
+				aggregatedElements.addAll( 
+						oneBuilder.build(
+								( defaultGroupSequence != null && defaultGroupSequence.size() > 1 ) || defaultGroupSequenceProvider != null,
+								defaultGroupSequence)		
+						) ;
 			}
 
 			return new BeanMetaDataImpl<T>(
@@ -522,20 +519,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static class BuilderDelegate {
 
-		private final boolean defaultGroupSequenceRedefined;
-
-		private final List<Class<?>> defaultGroupSequence;
-
 		private final ConstraintHelper constraintHelper;
 
 		private MetaDataBuilder propertyBuilder;
 
 		private MethodMetaData.Builder methodBuilder;
 
-		public BuilderDelegate(ConstrainedElement constrainedElement, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
+		public BuilderDelegate(ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
 
-			this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
-			this.defaultGroupSequence = defaultGroupSequence;
 			this.constraintHelper = constraintHelper;
 
 			switch ( constrainedElement.getConstrainedElementKind() ) {
@@ -545,8 +536,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
 					propertyBuilder = new PropertyMetaData.Builder(
 							constrainedField,
-							defaultGroupSequenceRedefined,
-							defaultGroupSequence,
 							constraintHelper
 					);
 					break;
@@ -556,16 +545,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 					methodBuilder = new MethodMetaData.Builder(
 							constrainedMethod,
-							defaultGroupSequenceRedefined,
-							defaultGroupSequence,
 							constraintHelper
 					);
 
 					if ( constrainedMethod.isGetterMethod() ) {
 						propertyBuilder = new PropertyMetaData.Builder(
 								constrainedMethod,
-								defaultGroupSequenceRedefined,
-								defaultGroupSequence,
 								constraintHelper
 						);
 					}
@@ -576,24 +561,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
 					propertyBuilder = new PropertyMetaData.Builder(
 							constrainedType,
-							defaultGroupSequenceRedefined,
-							defaultGroupSequence,
 							constraintHelper
 					);
 					break;
 			}
 		}
-
-
-		/**
-		 * @param b
-		 * @param defaultGroupSequence2
-		 */
-		public void setDefaultGroupSequence(boolean b, List<Class<?>> defaultGroupSequence2) {
-			// TODO Auto-generated method stub
-			
-		}
-
 
 		public boolean add(ConstrainedElement constrainedElement) {
 
@@ -611,8 +583,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 					methodBuilder = new MethodMetaData.Builder(
 							constrainedMethod,
-							defaultGroupSequenceRedefined,
-							defaultGroupSequence,
 							constraintHelper
 					);
 				}
@@ -623,16 +593,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			return added;
 		}
 
-		public Set<ConstraintMetaData> build() {
+		public Set<ConstraintMetaData> build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
 			Set<ConstraintMetaData> theValue = newHashSet();
 
 			if ( propertyBuilder != null ) {
-				theValue.add( propertyBuilder.build() );
+				theValue.add( propertyBuilder.build( defaultGroupSequenceRedefined, defaultGroupSequence ) );
 			}
 
 			if ( methodBuilder != null ) {
-				theValue.add( methodBuilder.build() );
+				theValue.add( methodBuilder.build(defaultGroupSequenceRedefined, defaultGroupSequence ) );
 			}
 
 			return theValue;

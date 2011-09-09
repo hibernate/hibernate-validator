@@ -39,13 +39,7 @@ public abstract class MetaDataBuilder {
 
 	protected final ConstraintHelper constraintHelper;
 
-	protected final boolean defaultGroupSequenceRedefined;
-
-	protected final List<Class<?>> defaultGroupSequence;
-
-	protected MetaDataBuilder(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
-		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
-		this.defaultGroupSequence = defaultGroupSequence;
+	protected MetaDataBuilder(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
 	}
 
@@ -77,7 +71,7 @@ public abstract class MetaDataBuilder {
 	 *
 	 * @return A {@link ConstraintMetaData} object.
 	 */
-	public abstract ConstraintMetaData build();
+	public abstract ConstraintMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence);
 
 	/**
 	 * Adapts the given constraints to the given bean type. In case a constraint

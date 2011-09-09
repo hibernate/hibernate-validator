@@ -167,8 +167,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Set<Member> cascadingMembers = newHashSet();
 
 
-		public Builder(ConstrainedField constrainedField, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
-			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
+		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
+			super( constraintHelper );
 
 			this.beanClass = constrainedField.getLocation().getBeanClass();
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
@@ -176,8 +176,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			add( constrainedField );
 		}
 
-		public Builder(ConstrainedType constrainedType, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
-			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
+		public Builder(ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
+			super( constraintHelper );
 
 			this.beanClass = constrainedType.getLocation().getBeanClass();
 			this.propertyName = null;
@@ -185,8 +185,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			add( constrainedType );
 		}
 
-		public Builder(ConstrainedMethod constrainedMethod, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
-			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
+		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
+			super( constraintHelper );
 
 			this.beanClass = constrainedMethod.getLocation().getBeanClass();
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
@@ -220,7 +220,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 		}
 
-		public PropertyMetaData build() {
+		public PropertyMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
 			return new PropertyMetaData(
 					propertyType,
