@@ -98,9 +98,9 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 		private boolean isCascading = false;
 
-		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
+		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
 
-			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
+			super( constraintHelper );
 
 			this.rootClass = rootClass;
 			this.parameterType = constrainedParameter.getLocation().getParameterType();
@@ -134,7 +134,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		}
 
 		@Override
-		public ParameterMetaData build() {
+		public ParameterMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
 			return new ParameterMetaData(
 					adaptOriginsAndImplicitGroups( rootClass, constraints ),

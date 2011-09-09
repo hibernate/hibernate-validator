@@ -73,15 +73,17 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException,
 			boolean isCascading,
-			boolean isConstrained) {
+			boolean isConstrained,
+			boolean defaultGroupSequenceRedefined, 
+			List<Class<?>> defaultGroupSequence) {
 
 		super(
 				returnValueConstraints,
 				ConstraintMetaDataKind.METHOD,
 				isCascading,
 				isConstrained,
-				builder.defaultGroupSequenceRedefined,
-				builder.defaultGroupSequence
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
 		);
 
 		this.rootMethod = builder.location.getMember();
@@ -113,9 +115,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * @param constrainedMethod The base method for this builder. This is the lowest
 		 * method with a given signature within a type hierarchy.
 		 */
-		public Builder(ConstrainedMethod constrainedMethod, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
+		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
 
-			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
+			super( constraintHelper );
 
 			location = constrainedMethod.getLocation();
 			add( constrainedMethod );
@@ -150,15 +152,17 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		/**
 		 * {@inheritDoc}
 		 */
-		public MethodMetaData build() {
+		public MethodMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 			return
 					new MethodMetaData(
 							this,
 							adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
-							findParameterMetaData(),
+							findParameterMetaData(defaultGroupSequenceRedefined, defaultGroupSequence),
 							checkParameterConstraints(),
 							isCascading,
-							isConstrained
+							isConstrained,
+							defaultGroupSequenceRedefined,
+							defaultGroupSequence
 					);
 		}
 
@@ -169,7 +173,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 *
 		 * @return The parameter meta data for this builder's method.
 		 */
-		private List<ParameterMetaData> findParameterMetaData() {
+		private List<ParameterMetaData> findParameterMetaData(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
 			List<ParameterMetaData.Builder> parameterBuilders = null;
 
@@ -183,8 +187,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 								new ParameterMetaData.Builder(
 										location.getBeanClass(),
 										oneParameter,
-										defaultGroupSequenceRedefined,
-										defaultGroupSequence,
 										constraintHelper
 								)
 						);
@@ -202,7 +204,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData> parameterMetaDatas = newArrayList();
 
 			for ( ParameterMetaData.Builder oneBuilder : parameterBuilders ) {
-				parameterMetaDatas.add( oneBuilder.build() );
+				parameterMetaDatas.add( oneBuilder.build( defaultGroupSequenceRedefined, defaultGroupSequence) );
 			}
 
 			return parameterMetaDatas;
