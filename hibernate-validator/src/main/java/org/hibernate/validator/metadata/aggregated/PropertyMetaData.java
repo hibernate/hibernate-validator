@@ -19,10 +19,12 @@ package org.hibernate.validator.metadata.aggregated;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.raw.ConstrainedField;
@@ -57,13 +59,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	private final Set<Member> cascadingMembers;
 
-	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
+	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		super(
 				constraints,
 				ConstraintMetaDataKind.PROPERTY,
 				!cascadingMembers.isEmpty(),
-				!cascadingMembers.isEmpty() || !constraints.isEmpty()
+				!cascadingMembers.isEmpty() || !constraints.isEmpty(),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
 		);
+
 		this.type = type;
 		this.propertyName = propertyName;
 		this.cascadingMembers = cascadingMembers;
@@ -79,6 +84,18 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	public Set<Member> getCascadingMembers() {
 		return cascadingMembers;
+	}
+
+	public PropertyDescriptorImpl asDescriptor() {
+
+		return new PropertyDescriptorImpl(
+				type,
+				isCascading(),
+				propertyName,
+				asDescriptors( constraints ),
+				isDefaultGroupSequenceRedefined(),
+				getDefaultGroupSequence()
+		);
 	}
 
 	@Override
@@ -149,8 +166,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		private final Set<Member> cascadingMembers = newHashSet();
 
-		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+
+		public Builder(ConstrainedField constrainedField, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
+			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
 
 			this.beanClass = constrainedField.getLocation().getBeanClass();
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
@@ -158,8 +176,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			add( constrainedField );
 		}
 
-		public Builder(ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+		public Builder(ConstrainedType constrainedType, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
+			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
 
 			this.beanClass = constrainedType.getLocation().getBeanClass();
 			this.propertyName = null;
@@ -167,8 +185,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			add( constrainedType );
 		}
 
-		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+		public Builder(ConstrainedMethod constrainedMethod, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
+			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
 
 			this.beanClass = constrainedMethod.getLocation().getBeanClass();
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
@@ -208,7 +226,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					propertyType,
 					propertyName,
 					adaptOriginsAndImplicitGroups( beanClass, constraints ),
-					cascadingMembers
+					cascadingMembers,
+					defaultGroupSequenceRedefined,
+					defaultGroupSequence
 			);
 		}
 
