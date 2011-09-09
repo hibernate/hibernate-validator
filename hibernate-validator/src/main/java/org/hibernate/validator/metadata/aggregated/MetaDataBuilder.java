@@ -17,13 +17,14 @@
 package org.hibernate.validator.metadata.aggregated;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
-import org.hibernate.validator.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
-import org.hibernate.validator.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.raw.ConstrainedElement;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
@@ -38,7 +39,13 @@ public abstract class MetaDataBuilder {
 
 	protected final ConstraintHelper constraintHelper;
 
-	protected MetaDataBuilder(ConstraintHelper constraintHelper) {
+	protected final boolean defaultGroupSequenceRedefined;
+
+	protected final List<Class<?>> defaultGroupSequence;
+
+	protected MetaDataBuilder(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
+		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
+		this.defaultGroupSequence = defaultGroupSequence;
 		this.constraintHelper = constraintHelper;
 	}
 

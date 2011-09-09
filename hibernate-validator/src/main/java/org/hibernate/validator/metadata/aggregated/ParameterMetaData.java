@@ -16,13 +16,16 @@
 */
 package org.hibernate.validator.metadata.aggregated;
 
+import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.ParameterDescriptorImpl;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
@@ -42,9 +45,16 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 	 * @param isCascading
 	 * @param constrainedMetaDataKind
 	 */
-	public ParameterMetaData(Set<MetaConstraint<?>> constraints, boolean isCascading, String name, Class<?> type, int index) {
+	public ParameterMetaData(Set<MetaConstraint<?>> constraints, boolean isCascading, String name, Class<?> type, int index, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
-		super( constraints, ConstraintMetaDataKind.PARAMETER, isCascading, !constraints.isEmpty() || isCascading );
+		super(
+				constraints,
+				ConstraintMetaDataKind.PARAMETER,
+				isCascading,
+				!constraints.isEmpty() || isCascading,
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
+		);
 
 		this.type = type;
 		this.index = index;
@@ -63,6 +73,17 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		return name;
 	}
 
+	public ParameterDescriptor asDescriptor() {
+		return new ParameterDescriptorImpl(
+				type,
+				index,
+				isCascading(),
+				asDescriptors( getConstraints() ),
+				isDefaultGroupSequenceRedefined(),
+				getDefaultGroupSequence()
+		);
+	}
+
 	public static class Builder extends MetaDataBuilder {
 
 		private final Class<?> rootClass;
@@ -77,9 +98,9 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 		private boolean isCascading = false;
 
-		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
+		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
 
-			super( constraintHelper );
+			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
 
 			this.rootClass = rootClass;
 			this.parameterType = constrainedParameter.getLocation().getParameterType();
@@ -120,7 +141,9 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 					isCascading,
 					name,
 					parameterType,
-					parameterIndex
+					parameterIndex,
+					defaultGroupSequenceRedefined,
+					defaultGroupSequence
 			);
 		}
 

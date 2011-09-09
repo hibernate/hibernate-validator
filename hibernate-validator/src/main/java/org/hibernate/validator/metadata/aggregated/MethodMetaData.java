@@ -23,13 +23,16 @@ import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.MethodDescriptorImpl;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.method.metadata.MethodDescriptor;
+import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -72,7 +75,14 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			boolean isCascading,
 			boolean isConstrained) {
 
-		super( returnValueConstraints, ConstraintMetaDataKind.METHOD, isCascading, isConstrained );
+		super(
+				returnValueConstraints,
+				ConstraintMetaDataKind.METHOD,
+				isCascading,
+				isConstrained,
+				builder.defaultGroupSequenceRedefined,
+				builder.defaultGroupSequence
+		);
 
 		this.rootMethod = builder.location.getMember();
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
@@ -103,9 +113,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * @param constrainedMethod The base method for this builder. This is the lowest
 		 * method with a given signature within a type hierarchy.
 		 */
-		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
+		public Builder(ConstrainedMethod constrainedMethod, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence, ConstraintHelper constraintHelper) {
 
-			super( constraintHelper );
+			super( defaultGroupSequenceRedefined, defaultGroupSequence, constraintHelper );
 
 			location = constrainedMethod.getLocation();
 			add( constrainedMethod );
@@ -173,6 +183,8 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 								new ParameterMetaData.Builder(
 										location.getBeanClass(),
 										oneParameter,
+										defaultGroupSequenceRedefined,
+										defaultGroupSequence,
 										constraintHelper
 								)
 						);
@@ -334,6 +346,28 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 	public Class<?>[] getParameterTypes() {
 		return rootMethod.getParameterTypes();
+	}
+
+	public MethodDescriptor asDescriptor() {
+		return new MethodDescriptorImpl(
+				rootMethod.getReturnType(),
+				rootMethod.getName(),
+				isCascading(),
+				asDescriptors( getConstraints() ),
+				parametersAsDescriptors(),
+				isDefaultGroupSequenceRedefined(),
+				getDefaultGroupSequence()
+		);
+	}
+
+	private List<ParameterDescriptor> parametersAsDescriptors() {
+		List<ParameterDescriptor> theValue = newArrayList();
+
+		for ( ParameterMetaData oneParameter : parameterMetaData ) {
+			theValue.add( oneParameter.asDescriptor() );
+		}
+
+		return theValue;
 	}
 
 	@Override
