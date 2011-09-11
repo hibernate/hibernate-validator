@@ -73,17 +73,13 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException,
 			boolean isCascading,
-			boolean isConstrained,
-			boolean defaultGroupSequenceRedefined, 
-			List<Class<?>> defaultGroupSequence) {
+			boolean isConstrained) {
 
 		super(
 				returnValueConstraints,
 				ConstraintMetaDataKind.METHOD,
 				isCascading,
-				isConstrained,
-				defaultGroupSequenceRedefined,
-				defaultGroupSequence
+				isConstrained
 		);
 
 		this.rootMethod = builder.location.getMember();
@@ -152,17 +148,15 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		/**
 		 * {@inheritDoc}
 		 */
-		public MethodMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		public MethodMetaData build() {
 			return
 					new MethodMetaData(
 							this,
 							adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
-							findParameterMetaData(defaultGroupSequenceRedefined, defaultGroupSequence),
+							findParameterMetaData(),
 							checkParameterConstraints(),
 							isCascading,
-							isConstrained,
-							defaultGroupSequenceRedefined,
-							defaultGroupSequence
+							isConstrained
 					);
 		}
 
@@ -173,7 +167,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 *
 		 * @return The parameter meta data for this builder's method.
 		 */
-		private List<ParameterMetaData> findParameterMetaData(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		private List<ParameterMetaData> findParameterMetaData() {
 
 			List<ParameterMetaData.Builder> parameterBuilders = null;
 
@@ -204,7 +198,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData> parameterMetaDatas = newArrayList();
 
 			for ( ParameterMetaData.Builder oneBuilder : parameterBuilders ) {
-				parameterMetaDatas.add( oneBuilder.build( defaultGroupSequenceRedefined, defaultGroupSequence) );
+				parameterMetaDatas.add( oneBuilder.build() );
 			}
 
 			return parameterMetaDatas;
@@ -350,23 +344,23 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		return rootMethod.getParameterTypes();
 	}
 
-	public MethodDescriptor asDescriptor() {
+	public MethodDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new MethodDescriptorImpl(
 				rootMethod.getReturnType(),
 				rootMethod.getName(),
 				isCascading(),
 				asDescriptors( getConstraints() ),
-				parametersAsDescriptors(),
-				isDefaultGroupSequenceRedefined(),
-				getDefaultGroupSequence()
+				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
 		);
 	}
 
-	private List<ParameterDescriptor> parametersAsDescriptors() {
+	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		List<ParameterDescriptor> theValue = newArrayList();
 
 		for ( ParameterMetaData oneParameter : parameterMetaData ) {
-			theValue.add( oneParameter.asDescriptor() );
+			theValue.add( oneParameter.asDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ) );
 		}
 
 		return theValue;
