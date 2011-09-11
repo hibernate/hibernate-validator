@@ -28,14 +28,12 @@ import org.hibernate.validator.method.metadata.ParameterDescriptor;
 public class MethodDescriptorImpl extends ElementDescriptorImpl implements MethodDescriptor {
 
 	private final String name;
-	private final boolean isCascaded;
 	private final List<ParameterDescriptor> parameters;
 
 	public MethodDescriptorImpl(Class<?> returnType, String name, boolean isCascaded, Set<ConstraintDescriptorImpl<?>> returnValueConstraints, List<ParameterDescriptor> parameters, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		super( returnType, returnValueConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
+		super( returnType, returnValueConstraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.name = name;
-		this.isCascaded = isCascaded;
 		this.parameters = parameters;
 	}
 
@@ -45,10 +43,6 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 
 	public List<ParameterDescriptor> getParameterDescriptors() {
 		return parameters;
-	}
-
-	public boolean isCascaded() {
-		return isCascaded;
 	}
 
 }

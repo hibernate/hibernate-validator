@@ -48,22 +48,20 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 
 	private final Class<?> type;
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
+	private final boolean cascaded;
 	private final boolean defaultGroupSequenceRedefined;
 	private final List<Class<?>> defaultGroupSequence;
 
-	public ElementDescriptorImpl(Class<?> type, Set<ConstraintDescriptorImpl<?>> constraintDescriptors, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public ElementDescriptorImpl(Class<?> type, Set<ConstraintDescriptorImpl<?>> constraintDescriptors, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		this.type = type;
 		this.constraintDescriptors = constraintDescriptors;
+		this.cascaded = cascaded;
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
 		this.defaultGroupSequence = defaultGroupSequence;
 	}
 
-	public boolean isDefaultGroupSequenceRedefined() {
-		return defaultGroupSequenceRedefined;
-	}
-
-	public List<Class<?>> getDefaultGroupSequence() {
-		return defaultGroupSequence;
+	public boolean isCascaded() {
+		return cascaded;
 	}
 
 	public final boolean hasConstraints() {

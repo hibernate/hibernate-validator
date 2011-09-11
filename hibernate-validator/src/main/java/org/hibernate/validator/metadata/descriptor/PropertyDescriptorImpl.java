@@ -27,18 +27,12 @@ import javax.validation.metadata.PropertyDescriptor;
  * @author Hardy Ferentschik
  */
 public class PropertyDescriptorImpl extends ElementDescriptorImpl implements PropertyDescriptor {
-	private final boolean cascaded;
+
 	private final String property;
 
-
 	public PropertyDescriptorImpl(Class<?> returnType, boolean cascaded, String property, Set<ConstraintDescriptorImpl<?>> constraints, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		super( returnType, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
-		this.cascaded = cascaded;
+		super( returnType, constraints, cascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
 		this.property = property;
-	}
-
-	public boolean isCascaded() {
-		return cascaded;
 	}
 
 	public String getPropertyName() {

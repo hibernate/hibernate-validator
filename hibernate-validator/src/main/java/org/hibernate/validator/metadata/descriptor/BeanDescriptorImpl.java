@@ -44,7 +44,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	private final Map<String, MethodDescriptor> methods;
 
 	public BeanDescriptorImpl(Class<T> beanClass, Set<ConstraintDescriptorImpl<?>> classLevelConstraints, Map<String, PropertyDescriptor> properties, Map<String, MethodDescriptor> methods, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
+		super( beanClass, classLevelConstraints, false, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.properties = properties;
 		this.methods = methods;

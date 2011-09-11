@@ -198,8 +198,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		);
 	}
 
-
-	protected static Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
+	private Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
 		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
 
 		for ( MetaConstraint<?> oneConstraint : constraints ) {
@@ -208,7 +207,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		return theValue;
 	}
-
 
 	private Map<String, PropertyDescriptor> getConstrainedPropertiesAsDescriptors() {
 		Map<String, PropertyDescriptor> theValue = newHashMap();
