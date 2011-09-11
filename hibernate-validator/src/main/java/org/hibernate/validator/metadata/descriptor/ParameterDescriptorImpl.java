@@ -28,17 +28,10 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 
 	private final int index;
 
-	private final boolean isCascaded;
-
 	public ParameterDescriptorImpl(Class<?> type, int index, boolean isCascaded, Set<ConstraintDescriptorImpl<?>> constraints, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		super( type, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
+		super( type, constraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.index = index;
-		this.isCascaded = isCascaded;
-	}
-
-	public boolean isCascaded() {
-		return isCascaded;
 	}
 
 	public int getIndex() {
