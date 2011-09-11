@@ -18,6 +18,7 @@ package org.hibernate.validator.metadata.aggregated;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -69,7 +70,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		this.type = type;
 		this.propertyName = propertyName;
-		this.cascadingMembers = cascadingMembers;
+		this.cascadingMembers = Collections.unmodifiableSet( cascadingMembers );
 	}
 
 	public Class<?> getType() {
@@ -88,9 +89,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		return new PropertyDescriptorImpl(
 				type,
-				isCascading(),
+				asDescriptors( getConstraints() ),
 				propertyName,
-				asDescriptors( constraints ),
+				isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);

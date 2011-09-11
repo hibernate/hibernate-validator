@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata.descriptor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,32 +40,32 @@ import static org.hibernate.validator.util.Contracts.assertNotNull;
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor, TypeDescriptor {
 
-	private final Map<String, PropertyDescriptor> properties;
+	private final Map<String, PropertyDescriptor> constrainedProperties;
 
 	private final Map<String, MethodDescriptor> methods;
 
 	public BeanDescriptorImpl(Class<T> beanClass, Set<ConstraintDescriptorImpl<?>> classLevelConstraints, Map<String, PropertyDescriptor> properties, Map<String, MethodDescriptor> methods, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		super( beanClass, classLevelConstraints, false, defaultGroupSequenceRedefined, defaultGroupSequence );
 
-		this.properties = properties;
-		this.methods = methods;
+		this.constrainedProperties = Collections.unmodifiableMap( properties );
+		this.methods = Collections.unmodifiableMap( methods );
 	}
 
 	//BeanDescriptor methods
 
 	public final boolean isBeanConstrained() {
-		return hasConstraints() || !properties.isEmpty();
+		return hasConstraints() || !constrainedProperties.isEmpty();
 	}
 
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
 
 		assertNotNull( propertyName, "The property name cannot be null" );
 
-		return properties.get( propertyName );
+		return constrainedProperties.get( propertyName );
 	}
 
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
-		return new HashSet<PropertyDescriptor>( properties.values() );
+		return new HashSet<PropertyDescriptor>( constrainedProperties.values() );
 	}
 
 	//TypeDescriptor methods
@@ -91,6 +92,8 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		return theValue;
 	}
 
+	//TODO GM: to be compatible with getConstraintsForProperty() this method should only return
+	//a descriptor if the given method is constrained.
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 
 		Contracts.assertNotNull( methodName, "The method name must not be null" );
