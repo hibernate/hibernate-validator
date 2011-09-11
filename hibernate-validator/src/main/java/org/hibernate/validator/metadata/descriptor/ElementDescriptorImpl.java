@@ -54,10 +54,10 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 
 	public ElementDescriptorImpl(Class<?> type, Set<ConstraintDescriptorImpl<?>> constraintDescriptors, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		this.type = type;
-		this.constraintDescriptors = constraintDescriptors;
+		this.constraintDescriptors = Collections.unmodifiableSet( constraintDescriptors );
 		this.cascaded = cascaded;
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
-		this.defaultGroupSequence = defaultGroupSequence;
+		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupSequence );
 	}
 
 	public boolean isCascaded() {

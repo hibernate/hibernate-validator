@@ -26,13 +26,16 @@ import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
+ * Base implementation for {@link ConstraintMetaData} with attributes common
+ * to all type of meta data.
+ *
  * @author Gunnar Morling
  */
 public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	private final ConstraintMetaDataKind constrainedMetaDataKind;
 
-	protected final Set<MetaConstraint<?>> constraints;
+	private final Set<MetaConstraint<?>> constraints;
 
 	private final boolean isCascading;
 

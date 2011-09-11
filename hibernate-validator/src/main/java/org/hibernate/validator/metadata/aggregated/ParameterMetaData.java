@@ -30,6 +30,11 @@ import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
+ * <p>
+ * An aggregated view of the constraint related meta data for a single method
+ * parameter.
+ * </p>
+ *
  * @author Gunnar Morling
  */
 public class ParameterMetaData extends AbstractConstraintMetaData {
@@ -45,7 +50,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 	 * @param isCascading
 	 * @param constrainedMetaDataKind
 	 */
-	public ParameterMetaData(Set<MetaConstraint<?>> constraints, boolean isCascading, String name, Class<?> type, int index) {
+	public ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
 		super(
 				constraints,
@@ -135,11 +140,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		public ParameterMetaData build() {
 
 			return new ParameterMetaData(
-					adaptOriginsAndImplicitGroups( rootClass, constraints ),
-					isCascading,
+					parameterIndex,
 					name,
 					parameterType,
-					parameterIndex
+					adaptOriginsAndImplicitGroups( rootClass, constraints ),
+					isCascading
 			);
 		}
 

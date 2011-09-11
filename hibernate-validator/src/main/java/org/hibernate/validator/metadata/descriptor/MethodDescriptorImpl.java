@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.metadata.descriptor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -30,11 +31,11 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
 
-	public MethodDescriptorImpl(Class<?> returnType, String name, boolean isCascaded, Set<ConstraintDescriptorImpl<?>> returnValueConstraints, List<ParameterDescriptor> parameters, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public MethodDescriptorImpl(Class<?> returnType, String name, Set<ConstraintDescriptorImpl<?>> returnValueConstraints, boolean isCascaded, List<ParameterDescriptor> parameters, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		super( returnType, returnValueConstraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.name = name;
-		this.parameters = parameters;
+		this.parameters = Collections.unmodifiableList( parameters );
 	}
 
 	public String getMethodName() {
