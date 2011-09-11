@@ -18,7 +18,6 @@ package org.hibernate.validator.metadata.aggregated;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.core.MetaConstraint;
@@ -39,23 +38,17 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	private final boolean isConstrained;
 
-	private final boolean defaultGroupSequenceRedefined;
-
-	private final List<Class<?>> defaultGroupSequence;
-
 	/**
 	 * @param constraints
 	 * @param constrainedMetaDataKind
 	 * @param isCascading
 	 */
-	public AbstractConstraintMetaData(Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind, boolean isCascading, boolean isConstrained, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public AbstractConstraintMetaData(Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind, boolean isCascading, boolean isConstrained) {
 
 		this.constraints = Collections.unmodifiableSet( constraints );
 		this.constrainedMetaDataKind = constrainedMetaDataKind;
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
-		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
-		this.defaultGroupSequence = defaultGroupSequence;
 	}
 
 	public Iterator<MetaConstraint<?>> iterator() {
@@ -76,14 +69,6 @@ public class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	public boolean isConstrained() {
 		return isConstrained;
-	}
-
-	public boolean isDefaultGroupSequenceRedefined() {
-		return defaultGroupSequenceRedefined;
-	}
-
-	public List<Class<?>> getDefaultGroupSequence() {
-		return defaultGroupSequence;
 	}
 
 	protected Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {

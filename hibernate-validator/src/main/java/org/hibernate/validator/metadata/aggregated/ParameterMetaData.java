@@ -45,15 +45,13 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 	 * @param isCascading
 	 * @param constrainedMetaDataKind
 	 */
-	public ParameterMetaData(Set<MetaConstraint<?>> constraints, boolean isCascading, String name, Class<?> type, int index, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public ParameterMetaData(Set<MetaConstraint<?>> constraints, boolean isCascading, String name, Class<?> type, int index) {
 
 		super(
 				constraints,
 				ConstraintMetaDataKind.PARAMETER,
 				isCascading,
-				!constraints.isEmpty() || isCascading,
-				defaultGroupSequenceRedefined,
-				defaultGroupSequence
+				!constraints.isEmpty() || isCascading
 		);
 
 		this.type = type;
@@ -73,14 +71,14 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		return name;
 	}
 
-	public ParameterDescriptor asDescriptor() {
+	public ParameterDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ParameterDescriptorImpl(
 				type,
 				index,
 				isCascading(),
 				asDescriptors( getConstraints() ),
-				isDefaultGroupSequenceRedefined(),
-				getDefaultGroupSequence()
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
 		);
 	}
 
@@ -134,16 +132,14 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		}
 
 		@Override
-		public ParameterMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		public ParameterMetaData build() {
 
 			return new ParameterMetaData(
 					adaptOriginsAndImplicitGroups( rootClass, constraints ),
 					isCascading,
 					name,
 					parameterType,
-					parameterIndex,
-					defaultGroupSequenceRedefined,
-					defaultGroupSequence
+					parameterIndex
 			);
 		}
 

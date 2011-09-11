@@ -215,7 +215,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		for ( Entry<String, PropertyMetaData> oneProperty : propertyMetaData.entrySet() ) {
 			if ( oneProperty.getValue().isConstrained() ) {
-				theValue.put( oneProperty.getKey(), oneProperty.getValue().asDescriptor() );
+				theValue.put(
+						oneProperty.getKey(),
+						oneProperty.getValue()
+								.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
+				);
 			}
 		}
 
@@ -226,7 +230,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<String, MethodDescriptor> theValue = newHashMap();
 
 		for ( Entry<String, MethodMetaData> oneMethod : methodMetaData.entrySet() ) {
-			theValue.put( oneMethod.getKey(), oneMethod.getValue().asDescriptor() );
+			theValue.put(
+					oneMethod.getKey(), oneMethod.getValue().asDescriptor(
+					defaultGroupSequenceIsRedefined(),
+					getDefaultGroupSequence( null )
+			)
+			);
 		}
 
 		return theValue;
@@ -501,11 +510,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			Set<ConstraintMetaData> aggregatedElements = newHashSet();
 
 			for ( BuilderDelegate oneBuilder : builders ) {
-				aggregatedElements.addAll( 
+				aggregatedElements.addAll(
 						oneBuilder.build(
 								( defaultGroupSequence != null && defaultGroupSequence.size() > 1 ) || defaultGroupSequenceProvider != null,
-								defaultGroupSequence)		
-						) ;
+								defaultGroupSequence
+						)
+				);
 			}
 
 			return new BeanMetaDataImpl<T>(
@@ -598,11 +608,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			Set<ConstraintMetaData> theValue = newHashSet();
 
 			if ( propertyBuilder != null ) {
-				theValue.add( propertyBuilder.build( defaultGroupSequenceRedefined, defaultGroupSequence ) );
+				theValue.add( propertyBuilder.build() );
 			}
 
 			if ( methodBuilder != null ) {
-				theValue.add( methodBuilder.build(defaultGroupSequenceRedefined, defaultGroupSequence ) );
+				theValue.add( methodBuilder.build() );
 			}
 
 			return theValue;

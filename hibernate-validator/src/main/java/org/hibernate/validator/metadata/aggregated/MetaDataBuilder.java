@@ -17,7 +17,6 @@
 package org.hibernate.validator.metadata.aggregated;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.metadata.core.ConstraintHelper;
@@ -71,7 +70,7 @@ public abstract class MetaDataBuilder {
 	 *
 	 * @return A {@link ConstraintMetaData} object.
 	 */
-	public abstract ConstraintMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence);
+	public abstract ConstraintMetaData build();
 
 	/**
 	 * Adapts the given constraints to the given bean type. In case a constraint

@@ -59,14 +59,12 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 	private final Set<Member> cascadingMembers;
 
-	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
 		super(
 				constraints,
 				ConstraintMetaDataKind.PROPERTY,
 				!cascadingMembers.isEmpty(),
-				!cascadingMembers.isEmpty() || !constraints.isEmpty(),
-				defaultGroupSequenceRedefined,
-				defaultGroupSequence
+				!cascadingMembers.isEmpty() || !constraints.isEmpty()
 		);
 
 		this.type = type;
@@ -86,15 +84,15 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		return cascadingMembers;
 	}
 
-	public PropertyDescriptorImpl asDescriptor() {
+	public PropertyDescriptorImpl asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
 		return new PropertyDescriptorImpl(
 				type,
 				isCascading(),
 				propertyName,
 				asDescriptors( constraints ),
-				isDefaultGroupSequenceRedefined(),
-				getDefaultGroupSequence()
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
 		);
 	}
 
@@ -220,15 +218,13 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 		}
 
-		public PropertyMetaData build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		public PropertyMetaData build() {
 
 			return new PropertyMetaData(
 					propertyType,
 					propertyName,
 					adaptOriginsAndImplicitGroups( beanClass, constraints ),
-					cascadingMembers,
-					defaultGroupSequenceRedefined,
-					defaultGroupSequence
+					cascadingMembers
 			);
 		}
 
