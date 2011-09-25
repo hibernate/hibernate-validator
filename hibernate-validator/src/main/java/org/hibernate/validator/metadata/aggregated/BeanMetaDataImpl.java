@@ -161,7 +161,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		for ( PropertyMetaData oneProperty : propertyMetaDataSet ) {
 
-			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
+			propertyMetaData.put( oneProperty.getName(), oneProperty );
 
 			if ( oneProperty.isCascading() ) {
 				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
