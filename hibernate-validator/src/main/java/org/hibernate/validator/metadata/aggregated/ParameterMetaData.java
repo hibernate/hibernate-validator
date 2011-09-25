@@ -39,11 +39,7 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class ParameterMetaData extends AbstractConstraintMetaData {
 
-	private final Class<?> type;
-
 	private final int index;
-
-	private final String name;
 
 	/**
 	 * @param constraints
@@ -53,35 +49,27 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 	public ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
 		super(
+				name,
+				type,
 				constraints,
 				ConstraintMetaDataKind.PARAMETER,
 				isCascading,
 				!constraints.isEmpty() || isCascading
 		);
 
-		this.type = type;
 		this.index = index;
-		this.name = name;
-	}
-
-	public Class<?> getType() {
-		return type;
 	}
 
 	public int getIndex() {
 		return index;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public ParameterDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ParameterDescriptorImpl(
-				type,
+				getType(),
 				index,
-				isCascading(),
 				asDescriptors( getConstraints() ),
+				isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);

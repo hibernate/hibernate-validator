@@ -60,10 +60,6 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class MethodMetaData extends AbstractConstraintMetaData {
 
-	private final String name;
-
-	private final Class<?> returnType;
-
 	private final Class<?>[] parameterTypes;
 
 	private final List<ParameterMetaData> parameterMetaData;
@@ -89,14 +85,14 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			boolean isConstrained) {
 
 		super(
+				name,
+				returnType,
 				returnValueConstraints,
 				ConstraintMetaDataKind.METHOD,
 				isCascading,
 				isConstrained
 		);
 
-		this.name = name;
-		this.returnType = returnType;
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
@@ -352,22 +348,14 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		return parameterMetaData;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public Class<?> getReturnType() {
-		return returnType;
-	}
-
 	public Class<?>[] getParameterTypes() {
 		return parameterTypes;
 	}
 
 	public MethodDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new MethodDescriptorImpl(
-				returnType,
-				name,
+				getType(),
+				getName(),
 				asDescriptors( getConstraints() ),
 				isCascading(),
 				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
@@ -401,15 +389,14 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
 						parameterBuilder.toString();
 
-		return "MethodMetaData [method=" + getReturnType().getSimpleName() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
+		return "MethodMetaData [method=" + getType().getSimpleName() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
+		int result = super.hashCode();
 		result = prime * result + Arrays.hashCode( parameterTypes );
 		return result;
 	}
@@ -419,21 +406,13 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj == null ) {
+		if ( !super.equals( obj ) ) {
 			return false;
 		}
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
 		MethodMetaData other = (MethodMetaData) obj;
-		if ( name == null ) {
-			if ( other.name != null ) {
-				return false;
-			}
-		}
-		else if ( !name.equals( other.name ) ) {
-			return false;
-		}
 		if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
 			return false;
 		}

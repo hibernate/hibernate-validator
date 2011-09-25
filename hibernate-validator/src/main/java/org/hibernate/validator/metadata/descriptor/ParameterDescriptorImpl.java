@@ -28,7 +28,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 
 	private final int index;
 
-	public ParameterDescriptorImpl(Class<?> type, int index, boolean isCascaded, Set<ConstraintDescriptorImpl<?>> constraints, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public ParameterDescriptorImpl(Class<?> type, int index, Set<ConstraintDescriptorImpl<?>> constraints, boolean isCascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		super( type, constraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.index = index;

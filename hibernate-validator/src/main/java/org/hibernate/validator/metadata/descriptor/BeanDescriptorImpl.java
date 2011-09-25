@@ -17,6 +17,7 @@
 package org.hibernate.validator.metadata.descriptor;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -44,11 +45,14 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 
 	private final Map<String, MethodDescriptor> methods;
 
+	private final Set<MethodDescriptor> constrainedMethods;
+
 	public BeanDescriptorImpl(Class<T> beanClass, Set<ConstraintDescriptorImpl<?>> classLevelConstraints, Map<String, PropertyDescriptor> properties, Map<String, MethodDescriptor> methods, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		super( beanClass, classLevelConstraints, false, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.constrainedProperties = Collections.unmodifiableMap( properties );
 		this.methods = Collections.unmodifiableMap( methods );
+		this.constrainedMethods = Collections.unmodifiableSet( getConstrainedMethods( methods.values() ) );
 	}
 
 	//BeanDescriptor methods
@@ -71,25 +75,11 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	//TypeDescriptor methods
 
 	public boolean isTypeConstrained() {
-		return isBeanConstrained() || !getConstrainedMethods().isEmpty();
+		return isBeanConstrained() || !constrainedMethods.isEmpty();
 	}
 
 	public Set<MethodDescriptor> getConstrainedMethods() {
-		Set<MethodDescriptor> theValue = newHashSet();
-
-		for ( MethodDescriptor oneMethod : methods.values() ) {
-			if ( oneMethod.hasConstraints() || oneMethod.isCascaded() ) {
-				theValue.add( oneMethod );
-			}
-
-			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
-				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
-					theValue.add( oneMethod );
-				}
-			}
-		}
-
-		return theValue;
+		return constrainedMethods;
 	}
 
 	//TODO GM: to be compatible with getConstraintsForProperty() this method should only return
@@ -103,6 +93,24 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 
 	public BeanDescriptor getBeanDescriptor() {
 		return this;
+	}
+
+	private Set<MethodDescriptor> getConstrainedMethods(Collection<MethodDescriptor> methods) {
+		Set<MethodDescriptor> theValue = newHashSet();
+
+		for ( MethodDescriptor oneMethod : methods ) {
+			if ( oneMethod.hasConstraints() || oneMethod.isCascaded() ) {
+				theValue.add( oneMethod );
+			}
+
+			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
+				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
+					theValue.add( oneMethod );
+				}
+			}
+		}
+
+		return theValue;
 	}
 
 }

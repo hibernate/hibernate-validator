@@ -27,13 +27,49 @@ import org.hibernate.validator.metadata.core.MetaConstraint;
  */
 public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 
+	/**
+	 * The kind of a {@link ConstraintMetaData}. Can be used to determine the type of
+	 * meta data when traversing over a collection of constraint meta data objects.
+	 *
+	 * @author Gunnar Morling
+	 */
 	public static enum ConstraintMetaDataKind {
 		METHOD, PROPERTY, PARAMETER
 	}
 
+	/**
+	 * Returns the name of this meta data object.
+	 *
+	 * @return This meta data object's name.
+	 */
+	String getName();
+
+	/**
+	 * Returns the data type of this meta data object, e.g. the type of a bean property or the
+	 * return type of a method.
+	 *
+	 * @return This meta data object's type.
+	 */
+	Class<?> getType();
+
+	/**
+	 * Returns the {@link ConstraintMetaDataKind kind} of this meta data object.
+	 *
+	 * @return The {@link ConstraintMetaDataKind kind} of this meta data object.
+	 */
 	ConstraintMetaDataKind getConstrainedMetaDataKind();
 
+	/**
+	 * Whether this meta data object is marked for cascaded validation or not.
+	 *
+	 * @return <code>True</code> if this object is marked for cascaded validation, <code>false</code> otherwise.
+	 */
 	boolean isCascading();
 
+	/**
+	 * Whether this meta data object is constrained by any means or not.
+	 *
+	 * @return <code>True</code> if this object is marked for cascaded validation or has any constraints, <code>false</code> otherwise.
+	 */
 	boolean isConstrained();
 }

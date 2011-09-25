@@ -30,9 +30,9 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 
 	private final String property;
 
-	public PropertyDescriptorImpl(Class<?> returnType, Set<ConstraintDescriptorImpl<?>> constraints, String property, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public PropertyDescriptorImpl(Class<?> returnType, String propertyName, Set<ConstraintDescriptorImpl<?>> constraints, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		super( returnType, constraints, cascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
-		this.property = property;
+		this.property = propertyName;
 	}
 
 	public String getPropertyName() {
