@@ -90,6 +90,12 @@ public class Car {
       <note>
         <para>Static fields and properties cannot be validated.</para>
       </note>
+
+      <tip>
+        <para>When validating byte code enhanced objects property level
+        constraints should be used, because the byte code enhancing library
+        won't be able to determine a field access via reflection.</para>
+      </tip>
     </section>
 
     <section>
@@ -177,9 +183,9 @@ public class Car {
       <classname>Car</classname>. We also add the constraint
       <classname>PassengerCount</classname> on the class level. We will later
       see how we can actually create this custom constraint (see <xref
-      linkend="validator-customconstraints" />). For now it is enough to
-      know that <classname>PassengerCount</classname> will ensure that there
-      cannot be more passengers in a car than there are seats.</para>
+      linkend="validator-customconstraints" />). For now it is enough to know
+      that <classname>PassengerCount</classname> will ensure that there cannot
+      be more passengers in a car than there are seats.</para>
 
       <example id="example-class-level">
         <title>Class level constraint</title>
