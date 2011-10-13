@@ -17,11 +17,19 @@
 package org.hibernate.validator.test.engine.messageinterpolation;
 
 import java.io.ByteArrayInputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import javax.validation.Configuration;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
+import javax.validation.Payload;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -34,12 +42,13 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.testng.Assert.assertEquals;
 
 /**
- * Tests for HV-184
- *
  * @author Hardy Ferentschik
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class MessageInterpolationTest {
 	private Validator validator;
@@ -49,6 +58,7 @@ public class MessageInterpolationTest {
 		final StringBuilder lines = new StringBuilder();
 		lines.append( "bar=Message is \\\\{escaped\\\\}" ).append( "\r\n" );
 		lines.append( "baz=Message is US$ {value}" ).append( "\r\n" );
+		lines.append( "buz=Message is {values}" ).append( "\r\n" );
 		lines.append( "qux=Message is {missing}" ).append( "\r\n" );
 		lines.append( "escaped=wrong" ).append( "\r\n" );
 		final ResourceBundle bundle = new PropertyResourceBundle(
@@ -73,22 +83,28 @@ public class MessageInterpolationTest {
 		validator = factory.getValidator();
 	}
 
-	@Test
+	@Test(description = "HV-184")
 	public void testCurlyBracesEscapingShouldBeRespected() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Bar.class ).iterator().next();
 		assertEquals( violation.getMessage(), "Message is {escaped}" );
 	}
 
-	@Test
+	@Test(description = "HV-184")
 	public void testAppendReplacementNeedsToEscapeBackslashAndDollarSign() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Baz.class ).iterator().next();
 		assertEquals( violation.getMessage(), "Message is US$ 5" );
 	}
 
-	@Test
+	@Test(description = "HV-184")
 	public void testUnknownParametersShouldBePreserved() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Qux.class ).iterator().next();
 		assertEquals( violation.getMessage(), "Message is {missing}" );
+	}
+
+	@Test(description = "HV-506")
+	public void testInterpolationOfArrayParameter() {
+		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Buz.class ).iterator().next();
+		assertEquals( violation.getMessage(), "Message is [bar, baz, qux]" );
 	}
 
 	public static interface Bar {
@@ -97,22 +113,58 @@ public class MessageInterpolationTest {
 	public static interface Baz {
 	}
 
+	public static interface Buz {
+	}
+
 	public static interface Qux {
 	}
 
+	@Target(METHOD)
+	@Retention(RUNTIME)
+	@Constraint(validatedBy = AllowedValuesValidator.class)
+	public static @interface AllowedValues {
+		String[] values();
+
+		String message() default "{buz}";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+	}
+
+	public static class AllowedValuesValidator implements ConstraintValidator<AllowedValues, String> {
+
+		private List<String> values;
+
+		public void initialize(AllowedValues values) {
+			this.values = Arrays.asList( values.values() );
+		}
+
+		public boolean isValid(String value, ConstraintValidatorContext context) {
+			if ( value == null ) {
+				return true;
+			}
+			return values.contains( value );
+		}
+	}
+
 	public static class Foo {
-		@NotNull(message = "{bar}", groups = { Bar.class })
+		@NotNull(message = "{bar}", groups = Bar.class)
 		public String getBar() {
 			return null;
 		}
 
-		@Min(value = 5, message = "{baz}", groups = { Baz.class })
+		@Min(value = 5, message = "{baz}", groups = Baz.class)
 		public int getBaz() {
 			return 0;
 		}
 
+		@AllowedValues(values = { "bar", "baz", "qux" }, groups = Buz.class)
+		public String getBuz() {
+			return "buz";
+		}
 
-		@NotNull(message = "{qux}", groups = { Qux.class })
+		@NotNull(message = "{qux}", groups = Qux.class)
 		public String getQux() {
 			return null;
 		}
