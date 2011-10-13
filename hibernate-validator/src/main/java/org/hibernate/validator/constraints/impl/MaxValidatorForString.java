@@ -26,13 +26,14 @@ import javax.validation.constraints.Max;
  * less than or equal to the maximum value specified.
  *
  * @author Alaa Nassef
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class MaxValidatorForString implements ConstraintValidator<Max, String> {
 
-	private long maxValue;
+	private BigDecimal maxValue;
 
 	public void initialize(Max maxValue) {
-		this.maxValue = maxValue.value();
+		this.maxValue = BigDecimal.valueOf( maxValue.value() );
 	}
 
 	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
@@ -41,7 +42,7 @@ public class MaxValidatorForString implements ConstraintValidator<Max, String> {
 			return true;
 		}
 		try {
-			return new BigDecimal( value ).compareTo( BigDecimal.valueOf( maxValue ) ) != 1;
+			return new BigDecimal( value ).compareTo( maxValue ) != 1;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;
