@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -208,7 +209,12 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			String parameter = matcher.group( 1 );
 			Object variable = annotationParameters.get( removeCurlyBrace( parameter ) );
 			if ( variable != null ) {
-				resolvedParameterValue = variable.toString();
+				if ( variable.getClass().isArray() ) {
+					resolvedParameterValue = Arrays.toString( (Object[]) variable );
+				}
+				else {
+					resolvedParameterValue = variable.toString();
+				}
 			}
 			else {
 				resolvedParameterValue = parameter;
