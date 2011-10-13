@@ -26,13 +26,14 @@ import javax.validation.constraints.Min;
  * more than or equal to the minimum value specified.
  *
  * @author Alaa Nassef
+ * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
 public class MinValidatorForString implements ConstraintValidator<Min, String> {
 
-	private long minValue;
+	private BigDecimal minValue;
 
 	public void initialize(Min minValue) {
-		this.minValue = minValue.value();
+		this.minValue = BigDecimal.valueOf( minValue.value() );
 	}
 
 	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
@@ -41,7 +42,7 @@ public class MinValidatorForString implements ConstraintValidator<Min, String> {
 			return true;
 		}
 		try {
-			return new BigDecimal( ( String ) value ).compareTo( BigDecimal.valueOf( minValue ) ) != -1;
+			return new BigDecimal( value ).compareTo( minValue ) != -1;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;
