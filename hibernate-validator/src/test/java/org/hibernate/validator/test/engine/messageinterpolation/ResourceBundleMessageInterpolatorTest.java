@@ -191,7 +191,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	public void testMessageInterpolationWithLocale() {
 		interpolator = new ResourceBundleMessageInterpolator();
 
-		String expected = "kann nicht null sein";
+		String expected = "darf nicht null sein";
 		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
 		String actual = interpolator.interpolate( notNull.message(), context, Locale.GERMAN );
 		assertEquals( actual, expected, "Wrong substitution" );
