@@ -22,7 +22,7 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.constraints.Length;
 
 /**
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 @GroupSequenceProvider(DynamicGroupSequenceProvider.class)
 public class User {

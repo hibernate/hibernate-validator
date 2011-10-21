@@ -17,7 +17,7 @@
 package org.hibernate.validator.test.engine.groups.defaultgroupsequenceprovider;
 
 /**
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public interface StrongCheck {
 

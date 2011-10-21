@@ -22,7 +22,7 @@ import javax.validation.ValidationException;
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @author Kevin Pollet
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class LoadClass implements PrivilegedAction<Class<?>> {
 

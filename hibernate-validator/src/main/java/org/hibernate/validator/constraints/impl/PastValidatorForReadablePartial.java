@@ -27,7 +27,7 @@ import org.joda.time.ReadablePartial;
  * {@code org.joda.time.ReadablePartial}
  * is in the past.
  *
- * @author Kevin Pollet
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class PastValidatorForReadablePartial implements ConstraintValidator<Past, ReadablePartial> {
 

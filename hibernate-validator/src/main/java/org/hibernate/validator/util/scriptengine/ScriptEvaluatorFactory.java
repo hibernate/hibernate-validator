@@ -29,7 +29,7 @@ import javax.script.ScriptException;
  * class is thread-safe.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ScriptEvaluatorFactory {
 

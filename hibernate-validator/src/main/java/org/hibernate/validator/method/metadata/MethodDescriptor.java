@@ -24,7 +24,7 @@ import javax.validation.metadata.ElementDescriptor;
  * Describes a method and the constraints associated with it.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public interface MethodDescriptor extends ElementDescriptor {
 

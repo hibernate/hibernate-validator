@@ -42,7 +42,7 @@ import static org.hibernate.validator.util.CollectionHelper.newArrayList;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 

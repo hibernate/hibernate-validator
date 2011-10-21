@@ -33,7 +33,7 @@ import com.googlecode.jtype.TypeUtils;
 /**
  * Helper methods around <code>ConstraintValidator</code> types.
  *
- * @author Emmanuel Bernanrd
+ * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public final class ValidatorTypeHelper {

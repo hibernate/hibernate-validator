@@ -21,7 +21,7 @@ package org.hibernate.validator.cfg.context;
  * element as to be validated in a cascaded way.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public interface Cascadable<C extends Cascadable<C>> {
 	/**

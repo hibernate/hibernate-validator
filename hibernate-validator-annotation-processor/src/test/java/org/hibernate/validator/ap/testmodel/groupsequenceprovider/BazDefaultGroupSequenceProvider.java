@@ -23,7 +23,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import static org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition.Baz;
 
 /**
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public interface BazDefaultGroupSequenceProvider extends DefaultGroupSequenceProvider<Baz> {
 

@@ -41,7 +41,7 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  * Each {@link ConstraintCheckError} occurred will be reported using the
  * {@link javax.annotation.processing.Messager} API.
  *
- * @author Gunnar Morling.
+ * @author Gunnar Morling
  */
 final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<AnnotationMirror>> {
 

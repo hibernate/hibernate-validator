@@ -61,7 +61,7 @@ import org.hibernate.validator.group.GroupSequenceProvider;
  * whether a given annotation is allowed to be declared at a given element.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ConstraintHelper {
 
@@ -94,7 +94,7 @@ public class ConstraintHelper {
 	 * The type of an annotation with respect to the BV API.
 	 *
 	 * @author Gunnar Morling
-	 * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
 	 */
 	public enum AnnotationType {
 

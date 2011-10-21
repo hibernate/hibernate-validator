@@ -33,7 +33,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <li>{@code GroupSequenceProvider} is a Hibernate Validator specific annotation and not portable.</li>
  * </ul>
  *
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Hardy Ferentschik
  * @see javax.validation.GroupSequence
  */

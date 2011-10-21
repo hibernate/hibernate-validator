@@ -27,7 +27,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.impl.PastValidatorForReadableInstant;
 
 /**
- * @author Kevin Pollet
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class PastValidatorForReadableInstantTest {
 

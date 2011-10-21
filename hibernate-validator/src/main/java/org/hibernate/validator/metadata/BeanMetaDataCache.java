@@ -28,7 +28,7 @@ import static org.hibernate.validator.util.Contracts.assertNotNull;
  * Cache for created instances of {@code BeanMetaData}.
  *
  * @author Hardy Ferentschik
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class BeanMetaDataCache {
 	/**

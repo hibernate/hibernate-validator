@@ -22,7 +22,7 @@ import java.lang.annotation.ElementType;
  * Facet of a constraint mapping creational context which allows to the select the bean
  * property to which the next operations shall apply.
  *
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Gunnar Morling
  */
 public interface PropertyTarget {

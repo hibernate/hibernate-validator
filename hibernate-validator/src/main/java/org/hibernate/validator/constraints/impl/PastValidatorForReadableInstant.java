@@ -27,7 +27,7 @@ import org.joda.time.ReadableInstant;
  * {@code org.joda.time.ReadableInstant}
  * is in the past.
  *
- * @author Kevin Pollet
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class PastValidatorForReadableInstant implements ConstraintValidator<Past, ReadableInstant> {
 

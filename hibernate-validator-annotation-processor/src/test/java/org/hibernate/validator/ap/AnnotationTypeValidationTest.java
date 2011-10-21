@@ -38,7 +38,7 @@ import static org.testng.Assert.assertFalse;
  * Test cases for {@link ConstraintValidationProcessor} testing the checking of constraint
  * annotation type declarations.
  *
- * @author Gunnar Morling.
+ * @author Gunnar Morling
  */
 public class AnnotationTypeValidationTest extends ConstraintValidationProcessorTestBase {
 

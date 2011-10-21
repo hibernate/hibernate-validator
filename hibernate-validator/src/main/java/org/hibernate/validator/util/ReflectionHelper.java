@@ -61,7 +61,7 @@ import org.hibernate.validator.util.privilegedactions.SetAccessibility;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class ReflectionHelper {
 	private static String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };

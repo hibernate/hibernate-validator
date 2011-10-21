@@ -22,7 +22,7 @@ import java.util.List;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
 /**
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class DynamicGroupSequenceProvider implements DefaultGroupSequenceProvider<User> {
 

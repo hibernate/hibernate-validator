@@ -27,7 +27,7 @@ import org.hibernate.validator.metadata.BeanMetaDataManager;
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Gunnar Morling
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
