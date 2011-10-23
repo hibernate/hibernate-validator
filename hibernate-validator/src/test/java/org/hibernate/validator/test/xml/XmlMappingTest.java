@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.test.xml;
 
+import java.io.InputStream;
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,13 +27,20 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.ValidatorUtil;
+
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class XmlMappingTest {
 
@@ -122,5 +131,42 @@ public class XmlMappingTest {
 		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
 		assertEquals( violations.size(), 0 );
+	}
+
+	/**
+	 * HV-480
+	 */
+	@Test
+	public void testConstraintsFromXmlAndProgrammaticApiAddUp() {
+
+		//given
+		final ConstraintMapping programmaticMapping = new ConstraintMapping();
+		programmaticMapping.type( Customer.class )
+				.property( "firstName", ElementType.FIELD )
+				.constraint( new SizeDef().min( 2 ).max( 10 ) );
+
+		final InputStream xmlMapping = XmlMappingTest.class.getResourceAsStream( "hv-480-mapping.xml" );
+
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
+
+		configuration.addMapping( programmaticMapping );
+		configuration.addMapping( xmlMapping );
+
+		final Customer customer = new Customer();
+		customer.setFirstName( "" );
+
+		//when
+		final Set<ConstraintViolation<Customer>> violations = configuration.buildValidatorFactory()
+				.getValidator()
+				.validate(
+						customer
+				);
+
+		//then
+		assertCorrectConstraintViolationMessages(
+				violations,
+				"size must be between 1 and 10",
+				"size must be between 2 and 10"
+		);
 	}
 }
