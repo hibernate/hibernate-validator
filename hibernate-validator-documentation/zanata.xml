@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config xmlns="http://zanata.org/namespace/config/">
       <url>https://translate.jboss.org/</url>
-      <project>hibernate_search</project>
+      <project>hibernate_validator</project>
       <project-version>4.2.0</project-version>
       <locales>
          <locale map-from="de-DE">de</locale>
