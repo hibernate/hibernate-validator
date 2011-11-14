@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~  indicated by the @author tags or express copyright attribution
+  ~  statements applied by the authors.  All third-party contributions are
+  ~  distributed under license by Red Hat, Inc.
+  ~
+  ~  This copyrighted material is made available to anyone wishing to use, modify,
+  ~  copy, or redistribute it subject to the terms and conditions of the GNU
+  ~  Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~  for more details.
+  ~
+  ~  You should have received a copy of the GNU Lesser General Public License
+  ~  along with this distribution; if not, write to:
+  ~  Free Software Foundation, Inc.
+  ~  51 Franklin Street, Fifth Floor
+  ~  Boston, MA  02110-1301  USA
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>hibernate-validator-parent</artifactId>
+        <groupId>org.hibernate</groupId>
+        <version>4.3.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>hibernate-validator-documentation</artifactId>
+    <packaging>jdocbook</packaging>
+
+    <name>Hibernate Validator Manual</name>
+    <description>The Hibernate Validator reference manual</description>
+
+    <properties>
+        <jdocbookSourceDirectory>${basedir}/src/main/docbook</jdocbookSourceDirectory>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+                <configuration>
+                    <sourceDirectory>${jdocbookSourceDirectory}</sourceDirectory>
+                    <sourceDocumentName>master.xml</sourceDocumentName>
+                    <masterTranslation>en-US</masterTranslation>
+                    <translations>
+                        <translation>zh-CN</translation>
+                    </translations>
+                    <imageResource>
+                        <directory>${basedir}/src/main/docbook/en-US/images</directory>
+                    </imageResource>
+                    <formats>
+                        <format>
+                            <formatName>pdf</formatName>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
+                            </stylesheetResource>
+                            <finalName>hibernate_validator_reference.pdf</finalName>
+                        </format>
+                        <format>
+                            <formatName>html_single</formatName>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
+                            </stylesheetResource>
+                            <finalName>index.html</finalName>
+                        </format>
+                        <format>
+                            <formatName>html</formatName>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
+                            </stylesheetResource>
+                            <finalName>index.html</finalName>
+                        </format>
+                    </formats>
+                    <options>
+                        <xincludeSupported>true</xincludeSupported>
+                        <xmlTransformerType>saxon</xmlTransformerType>
+                        <!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
+                        <!--     could also locate the docbook dependency and inspect its version... -->
+                        <docbookVersion>1.72.0</docbookVersion>
+                        <localeSeparator>-</localeSeparator>
+                    </options>
+                    <profiling>
+                        <enabled>true</enabled>
+                    </profiling>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!--
+                            here we are attaching the translate goal so that the translations are processed
+                            before compilation so that the translated XML is also transformed during
+                            generation
+                        -->
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>translate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.zanata</groupId>
+                <artifactId>zanata-maven-plugin</artifactId>
+                <version>1.3</version>
+                <configuration>
+                    <srcDir>${basedir}/src/main/docbook</srcDir>
+                    <srcDirPot>${basedir}/src/main/docbook/pot</srcDirPot>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
