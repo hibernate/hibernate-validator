@@ -106,7 +106,7 @@
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>../hibernate-validator/target/docbook/publish</directory>
+            <directory>../hibernate-validator-documentation/target/docbook/publish</directory>
             <outputDirectory>docs/reference</outputDirectory>
         </fileSet>
 
