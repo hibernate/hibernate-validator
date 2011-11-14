@@ -6,67 +6,67 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2010-07-06 14:51+0000\n"
+"POT-Creation-Date: 2011-11-14 10:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: application/x-xml2pot; charset=UTF-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Tag: title
-#: gettingstarted.xml:25
+#: gettingstarted.xml:24
 #, no-c-format
 msgid "Getting started"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:27
+#: gettingstarted.xml:26
 #, no-c-format
 msgid "This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quickstart you need:"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:33
+#: gettingstarted.xml:32
 #, no-c-format
 msgid "A JDK &gt;= 5"
 msgstr ""
 
 #. Tag: ulink
-#: gettingstarted.xml:37
+#: gettingstarted.xml:36
 #, no-c-format
 msgid "Apache Maven"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:41
+#: gettingstarted.xml:40
 #, no-c-format
 msgid "An Internet connection (Maven has to download all required libraries)"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:46
+#: gettingstarted.xml:45
 #, no-c-format
 msgid ""
-      "A properly configured remote repository. Add the following to your <filename>settings.xml</filename>: <example> <title>Configuring the JBoss Maven repository in <filename>settings.xml</filename></title> <programlisting>&lt;repositories&gt;\n"
+      "A properly configured remote repository. Add the following to your <filename>settings.xml</filename>: <example id=\"example-jboss-maven-url\"> <title>Configuring the JBoss Maven repository</title> <programlisting>&lt;repositories&gt;\n"
       "    &lt;repository&gt;\n"
-      "        &lt;id&gt;jboss&lt;/id&gt;\n"
-      "        &lt;url&gt;http://repository.jboss.com/maven2&lt;/url&gt;\n"
+      "        &lt;id&gt;jboss-public-repository-group&lt;/id&gt;\n"
+      "        &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-jboss&lt;/url&gt;\n"
       "        &lt;releases&gt;\n"
-      "            &lt;enabled&gt;true&lt;/enabled&gt;\n"
+      "          &lt;enabled&gt;true&lt;/enabled&gt;\n"
       "        &lt;/releases&gt;\n"
       "        &lt;snapshots&gt;\n"
-      "            &lt;enabled&gt;false&lt;/enabled&gt;\n"
+      "          &lt;enabled&gt;true&lt;/enabled&gt;\n"
       "        &lt;/snapshots&gt;\n"
-      "    &lt;/repository&gt;\n"
-      "&lt;/repositories&gt;</programlisting> </example>More information about <filename>settings.xml</filename> can be found in the <ulink url=\"http://maven.apache.org/ref/2.0.8/maven-settings/settings.html\">Maven Local Settings Model</ulink>."
+      "     &lt;/repository&gt;\n"
+      "&lt;/repositories&gt;        </programlisting> </example>More information about <filename>settings.xml</filename> can be found in the <ulink url=\"http://maven.apache.org/ref/2.0.8/maven-settings/settings.html\">Maven Local Settings Model</ulink>."
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:60
+#: gettingstarted.xml:58
 #, no-c-format
 msgid ""
-      "Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java Class Library since Java 6 which means that if you run Hibernate Validator with Java 5 you will have to add additional JAXB dependencies. Using maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;\n"
+      "Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java Class Library since Java 6 which means that if you run Hibernate Validator with Java 5 you will have to add additional JAXB dependencies. Using Maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;\n"
       "    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
       "    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
       "    &lt;version&gt;2.2&lt;/version&gt;\n"
@@ -80,72 +80,79 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:73
+#: gettingstarted.xml:71
 #, no-c-format
 msgid "Setting up a new Maven project"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:75
+#: gettingstarted.xml:73
 #, no-c-format
 msgid "Start by creating new Maven project using the Maven archetype plugin as follows:"
 msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:79
+#: gettingstarted.xml:77
 #, no-c-format
 msgid "Using Maven's archetype plugin to create a sample project using Hibernate Validator"
 msgstr ""
 
 #. Tag: programlisting
-#: gettingstarted.xml:82
+#: gettingstarted.xml:80
 #, no-c-format
 msgid ""
-      "mvn archetype:create -DarchetypeGroupId=org.hibernate \\\n"
-      "                     -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \\\n"
-      "                     -DarchetypeVersion=&version; \\\n"
-      "                     -DgroupId=com.mycompany \n"
-      "                     -DartifactId=hv-quickstart"
+      "mvn archetype:generate -DarchetypeGroupId=org.hibernate \\\n"
+      "                       -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \\\n"
+      "                       -DarchetypeVersion=&version; \\\n"
+      "                       -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public-jboss/ \\\n"
+      "                       -DgroupId=com.mycompany \\\n"
+      "                       -DartifactId=hv-quickstart"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:85
+#: gettingstarted.xml:83
 #, no-c-format
 msgid "Maven will create your project in the directory hv-quickstart. Change into this directory and run:"
 msgstr ""
 
 #. Tag: programlisting
-#: gettingstarted.xml:88
+#: gettingstarted.xml:86
 #, no-c-format
 msgid "mvn test"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:88
+#: gettingstarted.xml:86
 #, no-c-format
 msgid "Maven will compile the example code and run the implemented unit tests. Let's have a look at the actual code."
 msgstr ""
 
+#. Tag: para
+#: gettingstarted.xml:91
+#, no-c-format
+msgid "From version 4.2.0.Beta2, the maven command <command>mvn archetype:create</command> will be no longer supported and will fail. You should use the command described in the above listing. If you want more details, look at <ulink url=\"http://maven.apache.org/archetype/maven-archetype-plugin/\"> Maven Archetype plugin</ulink> page."
+msgstr ""
+
 #. Tag: title
-#: gettingstarted.xml:94
+#: gettingstarted.xml:101
 #, no-c-format
 msgid "Applying constraints"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:96
+#: gettingstarted.xml:103
 #, no-c-format
 msgid "Open the project in the IDE of your choice and have a look at the class <classname>Car</classname>:"
 msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:100
+#: gettingstarted.xml:107
 #, no-c-format
 msgid "Class Car annotated with constraints"
 msgstr ""
 
 #. Tag: programlisting
-#: gettingstarted.xml:102
+#: gettingstarted.xml:109
 #, no-c-format
 msgid ""
       "package com.mycompany;\n"
@@ -177,49 +184,49 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:105
+#: gettingstarted.xml:112
 #, no-c-format
 msgid "<classname>@NotNull</classname>, <classname>@Size</classname> and <classname>@Min</classname> are so-called constraint annotations, that we use to declare constraints, which shall be applied to the fields of a <classname>Car</classname> instance:"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:112
+#: gettingstarted.xml:119
 #, no-c-format
 msgid "<property>manufacturer</property> shall never be null"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:116
+#: gettingstarted.xml:123
 #, no-c-format
 msgid "<property>licensePlate</property> shall never be null and must be between 2 and 14 characters long"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:121
+#: gettingstarted.xml:128
 #, no-c-format
 msgid "<property>seatCount</property> shall be at least 2."
 msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:127
+#: gettingstarted.xml:134
 #, no-c-format
 msgid "Validating constraints"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:129
+#: gettingstarted.xml:136
 #, no-c-format
 msgid "To perform a validation of these constraints, we use a <classname>Validator</classname> instance. Let's have a look at the <classname>CarTest</classname> class:"
 msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:134
+#: gettingstarted.xml:141
 #, no-c-format
 msgid "Class CarTest showing validation examples"
 msgstr ""
 
 #. Tag: programlisting
-#: gettingstarted.xml:136
+#: gettingstarted.xml:143
 #, no-c-format
 msgid ""
       "package com.mycompany;\n"
@@ -292,56 +299,56 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:139
+#: gettingstarted.xml:146
 #, no-c-format
 msgid "In the <methodname>setUp()</methodname> method we get a <classname>Validator</classname> instance from the <classname>ValidatorFactory</classname>. A <classname>Validator</classname> instance is thread-safe and may be reused multiple times. For this reason we store it as field of our test class. We can use the <classname>Validator</classname> now to validate the different car instances in the test methods."
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:147
+#: gettingstarted.xml:154
 #, no-c-format
 msgid "The <methodname>validate()</methodname> method returns a set of <classname>ConstraintViolation</classname> instances, which we can iterate in order to see which validation errors occurred. The first three test methods show some expected constraint violations:"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:154
+#: gettingstarted.xml:161
 #, no-c-format
 msgid "The <classname>@NotNull</classname> constraint on manufacturer is violated in <methodname>manufacturerIsNull()</methodname>"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:159
+#: gettingstarted.xml:166
 #, no-c-format
 msgid "The <classname>@Size</classname> constraint on licensePlate is violated in <methodname>licensePlateTooShort()</methodname>"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:164
+#: gettingstarted.xml:171
 #, no-c-format
 msgid "The <classname>@Min</classname> constraint on seatCount is violated in <methodname>seatCountTooLow()</methodname>"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:169
+#: gettingstarted.xml:176
 #, no-c-format
 msgid "If the object validates successfully, <methodname>validate()</methodname> returns an empty set."
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:172
+#: gettingstarted.xml:179
 #, no-c-format
 msgid "Note that we only use classes from the package <package>javax.validation</package> from the Bean Validation API. As we don't reference any classes of the RI directly, it would be no problem to switch to another implementation of the API, should that need arise."
 msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:180
+#: gettingstarted.xml:187
 #, no-c-format
 msgid "Where to go next?"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:182
+#: gettingstarted.xml:189
 #, no-c-format
-msgid "That concludes our 5 minute tour through the world of Hibernate Validator. Continue exploring the code examples or look at further examples referenced in <xref linkend=\"chapter-further-reading\"/>. To deepen your understanding of Hibernate Validator just continue reading <xref linkend=\"validator-usingvalidator\"/>. In case your application has specific validation requirements have a look at <xref linkend=\"validator-customconstraints\"/>."
+msgid "That concludes our 5 minute tour through the world of Hibernate Validator. Continue exploring the code examples or look at further examples referenced in <xref linkend=\"validator-further-reading\"/>. To deepen your understanding of Hibernate Validator just continue reading <xref linkend=\"validator-usingvalidator\"/>. In case your application has specific validation requirements have a look at <xref linkend=\"validator-customconstraints\"/>."
 msgstr ""
 

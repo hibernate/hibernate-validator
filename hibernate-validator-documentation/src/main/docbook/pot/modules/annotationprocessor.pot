@@ -6,277 +6,301 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2010-07-06 14:46+0000\n"
+"POT-Creation-Date: 2011-11-14 10:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: application/x-xml2pot; charset=UTF-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Tag: title
-#: annotationprocessor.xml:25
+#: annotationprocessor.xml:24
 #, no-c-format
-msgid "Annotation Processor (EXPERIMENTAL)"
+msgid "Annotation Processor"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:27
+#: annotationprocessor.xml:26
 #, no-c-format
 msgid "Have you ever caught yourself by unintentionally doing things like"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:32
+#: annotationprocessor.xml:31
 #, no-c-format
-msgid "annotating Strings with @Min to specify a minimum length (instead of using @Size)"
+msgid "specifying constraint annotations at unsupported data types (e.g. by annotating a String with @Past)"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:37
+#: annotationprocessor.xml:36
 #, no-c-format
 msgid "annotating the setter of a JavaBean property (instead of the getter method)"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:42
+#: annotationprocessor.xml:41
 #, no-c-format
 msgid "annotating static fields/methods with constraint annotations (which is not supported)?"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:47
+#: annotationprocessor.xml:46
 #, no-c-format
 msgid "Then the Hibernate Validator Annotation Processor is the right thing for you. It helps preventing such mistakes by plugging into the build process and raising compilation errors whenever constraint annotations are incorrectly used."
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:53
+#: annotationprocessor.xml:52
 #, no-c-format
-msgid "A first version of the Hibernate Validator Annotation Processor is part of Hibernate Validator since release 4.1. It is currently still under development and should therefore be considered as an experimental feature. Some <link linkend=\"section-known-issues\">known issues</link> can be found at the end of this chapter. In case any problems arise when using the processor feel free to ask for help at the <ulink url=\"https://forum.hibernate.org/viewforum.php?f=9\">forum</ulink> or create an issue within<ulink url=\"http://opensource.atlassian.com/projects/hibernate/browse/HV/component/10356\"> JIRA</ulink>."
+msgid "You can find the Hibernate Validator Annotation Processor as part of the distribution bundle on <ulink url=\"http://sourceforge.net/projects/hibernate/files/hibernate-validator\">Sourceforge</ulink> or in the JBoss Maven Repository (see <xref linkend=\"example-jboss-maven-url\"/>) under the GAV org.hibernate:hibernate-validator-annotation-processor."
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:66
+#: annotationprocessor.xml:61
 #, no-c-format
 msgid "Prerequisites"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:68
+#: annotationprocessor.xml:63
 #, no-c-format
 msgid "The Hibernate Validator Annotation Processor is based on the \"Pluggable Annotation Processing API\" as defined by <ulink url=\"http://jcp.org/en/jsr/detail?id=269\">JSR 269</ulink>. This API is part of the Java Platform since Java 6. So be sure to use this or a later version."
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:76
+#: annotationprocessor.xml:71
 #, no-c-format
 msgid "Features"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:78
+#: annotationprocessor.xml:73
 #, no-c-format
-msgid "As of Hibernate Validator 4.1 the Hibernate Validator Annotation Processor checks that:"
+msgid "As of Hibernate Validator &version; the Hibernate Validator Annotation Processor checks that:"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:83
+#: annotationprocessor.xml:78
 #, no-c-format
 msgid "constraint annotations are allowed for the type of the annotated element"
 msgstr ""
 
 #. Tag: para
+#: annotationprocessor.xml:83
+#, no-c-format
+msgid "only non-static fields or methods are annotated with constraint annotations"
+msgstr ""
+
+#. Tag: para
 #: annotationprocessor.xml:88
 #, no-c-format
-msgid "JavaBean getter methods are annotated in case of property validation"
+msgid "only non-primitive fields or methods are annotated with @Valid"
 msgstr ""
 
 #. Tag: para
 #: annotationprocessor.xml:93
 #, no-c-format
-msgid "only non-static fields or properties are annotated with constraint annotations"
+msgid "only such methods are annotated with constraint annotations which are valid JavaBeans getter methods (optionally, see below)"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:98
-#, no-c-format
-msgid "only non-primitive fields or properties are annotated with @Valid"
-msgstr ""
-
-#. Tag: para
-#: annotationprocessor.xml:103
+#: annotationprocessor.xml:99
 #, no-c-format
 msgid "only such annotation types are annotated with constraint annotations which are constraint annotations themselves"
 msgstr ""
 
+#. Tag: para
+#: annotationprocessor.xml:104
+#, no-c-format
+msgid "definition of dynamic default group sequence with @GroupSequenceProvider is valid"
+msgstr ""
+
 #. Tag: title
-#: annotationprocessor.xml:110
+#: annotationprocessor.xml:111
 #, no-c-format
 msgid "Options"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:112
+#: annotationprocessor.xml:113
 #, no-c-format
 msgid "The behavior of the Hibernate Validator Annotation Processor can be controlled using the <ulink url=\"http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options\">processor options</ulink> listed in table<xref linkend=\"table_processor_options\"/>:"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:119
+#: annotationprocessor.xml:120
 #, no-c-format
 msgid "Hibernate Validator Annotation Processor options"
 msgstr ""
 
 #. Tag: entry
-#: annotationprocessor.xml:124
+#: annotationprocessor.xml:125
 #, no-c-format
 msgid "Option"
 msgstr ""
 
 #. Tag: entry
-#: annotationprocessor.xml:126
+#: annotationprocessor.xml:127
 #, no-c-format
 msgid "Explanation"
 msgstr ""
 
 #. Tag: varname
-#: annotationprocessor.xml:132
+#: annotationprocessor.xml:133
 #, no-c-format
 msgid "diagnosticKind"
 msgstr ""
 
 #. Tag: entry
-#: annotationprocessor.xml:134
+#: annotationprocessor.xml:135
 #, no-c-format
 msgid "Controls how constraint problems are reported. Must be the string representation of one of the values from the enum <classname>javax.tools.Diagnostic.Kind</classname>, e.g. <classname>WARNING</classname>. A value of <classname>ERROR</classname> will cause compilation to halt whenever the AP detects a constraint problem. Defaults to <classname>ERROR</classname>."
 msgstr ""
 
 #. Tag: varname
-#: annotationprocessor.xml:144
+#: annotationprocessor.xml:145
+#, no-c-format
+msgid "methodConstraintsSupported"
+msgstr ""
+
+#. Tag: entry
+#: annotationprocessor.xml:147
+#, no-c-format
+msgid "Controls whether constraints are allowed at methods of any kind. Must be set to <varname>true</varname> when working with method level constraints as supported by Hibernate Validator. Can be set to <varname>false</varname> to allow constraints only at JavaBeans getter methods as defined by the Bean Validation API. Defaults to <varname>true</varname>."
+msgstr ""
+
+#. Tag: varname
+#: annotationprocessor.xml:156
 #, no-c-format
 msgid "verbose"
 msgstr ""
 
 #. Tag: entry
-#: annotationprocessor.xml:146
+#: annotationprocessor.xml:158
 #, no-c-format
-msgid "Controls whether detailed processing information shall be displayed or not, useful for debugging purposes. Must be either <varname>true</varname> or<varname>false</varname>. Defaults to <varname>false</varname>."
+msgid "Controls whether detailed processing information shall be displayed or not, useful for debugging purposes. Must be either <varname>true</varname> or <varname>false</varname>. Defaults to <varname>false</varname>."
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:157
+#: annotationprocessor.xml:169
 #, no-c-format
 msgid "Using the Annotation Processor"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:159
+#: annotationprocessor.xml:171
 #, no-c-format
 msgid "This section shows in detail how to integrate the Hibernate Validator Annotation Processor into command line builds (javac, Ant, Maven) as well as IDE-based builds (Eclipse, IntelliJ IDEA, NetBeans)."
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:165
+#: annotationprocessor.xml:177
 #, no-c-format
 msgid "Command line builds"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:168
+#: annotationprocessor.xml:180
 #, no-c-format
 msgid "javac"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:170
+#: annotationprocessor.xml:182
 #, no-c-format
 msgid "When compiling on the command line using <ulink url=\"http://java.sun.com/javase/6/docs/technotes/guides/javac/index.html\">javac</ulink>, specify the following JARs using the \"processorpath\" option:"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:176 annotationprocessor.xml:287 annotationprocessor.xml:377
+#: annotationprocessor.xml:188 annotationprocessor.xml:303 annotationprocessor.xml:397
 #, no-c-format
 msgid "validation-api-&bvVersion;.jar"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:180 annotationprocessor.xml:291 annotationprocessor.xml:381
+#: annotationprocessor.xml:192 annotationprocessor.xml:307 annotationprocessor.xml:401
+#, no-c-format
+msgid "hibernate-validator-&version;.jar"
+msgstr ""
+
+#. Tag: para
+#: annotationprocessor.xml:196 annotationprocessor.xml:311 annotationprocessor.xml:405
 #, no-c-format
 msgid "hibernate-validator-annotation-processor-&version;.jar"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:184
+#: annotationprocessor.xml:200
 #, no-c-format
 msgid "The following listing shows an example. The processor will be detected automatically by the compiler and invoked during compilation."
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:189
-#, no-c-format
-msgid "Using the annotation processor with javac"
-msgstr ""
-
-#. Tag: programlisting
-#: annotationprocessor.xml:191
-#, no-c-format
-msgid ""
-      "javac src/main/java/org/hibernate/validator/ap/demo/Car.java \\\n"
-      "   -cp /path/to/validation-api-&bvVersion;.jar \\ \n"
-      "   -processorpath /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar"
-msgstr ""
-
-#. Tag: title
-#: annotationprocessor.xml:196
-#, no-c-format
-msgid "Apache Ant"
-msgstr ""
-
-#. Tag: para
-#: annotationprocessor.xml:198
-#, no-c-format
-msgid "Similar to directly working with javac, the annotation processor can be added as as compiler argument when invoking the <ulink url=\"http://ant.apache.org/manual/CoreTasks/javac.html\">javac task</ulink> for <ulink url=\"http://ant.apache.org/\">Apache Ant</ulink>:"
-msgstr ""
-
-#. Tag: title
 #: annotationprocessor.xml:205
 #, no-c-format
-msgid "Using the annotation processor with Ant"
+msgid "Using the annotation processor with javac"
 msgstr ""
 
 #. Tag: programlisting
 #: annotationprocessor.xml:207
 #, no-c-format
 msgid ""
-      "&lt;javac srcdir=\"src/main\"\n"
-      "       destdir=\"build/classes\"\n"
-      "       classpath=\"/path/to/validation-api-&bvVersion;.jar\"&gt;\n"
-      "       &lt;compilerarg value=\"-processorpath\" /&gt;\n"
-      "       &lt;compilerarg value=\"/path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar\"/&gt;\n"
-      "&lt;/javac&gt;"
+      "javac src/main/java/org/hibernate/validator/ap/demo/Car.java \\\n"
+      "   -cp /path/to/validation-api-&bvVersion;.jar \\\n"
+      "   -processorpath /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;:/path/to/hibernate-validator-annotation-processor-&version;.jar"
 msgstr ""
 
 #. Tag: title
 #: annotationprocessor.xml:212
 #, no-c-format
-msgid "Maven"
+msgid "Apache Ant"
 msgstr ""
 
 #. Tag: para
 #: annotationprocessor.xml:214
 #, no-c-format
+msgid "Similar to directly working with javac, the annotation processor can be added as as compiler argument when invoking the <ulink url=\"http://ant.apache.org/manual/CoreTasks/javac.html\">javac task</ulink> for <ulink url=\"http://ant.apache.org/\">Apache Ant</ulink>:"
+msgstr ""
+
+#. Tag: title
+#: annotationprocessor.xml:221
+#, no-c-format
+msgid "Using the annotation processor with Ant"
+msgstr ""
+
+#. Tag: programlisting
+#: annotationprocessor.xml:223
+#, no-c-format
+msgid ""
+      "&lt;javac srcdir=\"src/main\"\n"
+      "       destdir=\"build/classes\"\n"
+      "       classpath=\"/path/to/validation-api-&bvVersion;.jar\"&gt;\n"
+      "       &lt;compilerarg value=\"-processorpath\" /&gt;\n"
+      "       &lt;compilerarg value=\"/path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;:/path/to/hibernate-validator-annotation-processor-&version;.jar\"/&gt;\n"
+      "&lt;/javac&gt;"
+msgstr ""
+
+#. Tag: title
+#: annotationprocessor.xml:228
+#, no-c-format
+msgid "Maven"
+msgstr ""
+
+#. Tag: para
+#: annotationprocessor.xml:230
+#, no-c-format
 msgid "There are several options for integrating the annotation processor with <ulink url=\"http://maven.apache.org/\">Apache Maven</ulink>. Generally it is sufficient to add the Hibernate Validator Annotation Processor as dependency to your project:"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:220
+#: annotationprocessor.xml:236
 #, no-c-format
 msgid "Adding the HV Annotation Processor as dependency"
 msgstr ""
 
 #. Tag: programlisting
-#: annotationprocessor.xml:222
+#: annotationprocessor.xml:238
 #, no-c-format
 msgid ""
       "...\n"
@@ -290,25 +314,25 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:225
+#: annotationprocessor.xml:241
 #, no-c-format
 msgid "The processor will then be executed automatically by the compiler. This basically works, but comes with the disadavantage that in some cases messages from the annotation processor are not displayed (see <ulink url=\"http://jira.codehaus.org/browse/MCOMPILER-66\">MCOMPILER-66</ulink>)."
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:231
+#: annotationprocessor.xml:247
 #, no-c-format
 msgid "Another option is using the <ulink url=\"http://code.google.com/p/maven-annotation-plugin/\">Maven Annotation Plugin</ulink>. At the time of this writing the plugin is not yet available in any of the well-known repositories. Therefore you have to add the project's own repository to your settings.xml or pom.xml:"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:239
+#: annotationprocessor.xml:255
 #, no-c-format
 msgid "Adding the Maven Annotation Plugin repository"
 msgstr ""
 
 #. Tag: programlisting
-#: annotationprocessor.xml:241
+#: annotationprocessor.xml:257
 #, no-c-format
 msgid ""
       "...\n"
@@ -322,19 +346,19 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:242
+#: annotationprocessor.xml:258
 #, no-c-format
 msgid "Now disable the standard annotation processing performed by the compiler plugin and configure the annotation plugin by specifying an execution and adding the Hibernate Validator Annotation Processor as plugin dependency (that way the AP is not visible on the project's actual classpath):"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:249
+#: annotationprocessor.xml:265
 #, no-c-format
 msgid "Configuring the Maven Annotation Plugin"
 msgstr ""
 
 #. Tag: programlisting
-#: annotationprocessor.xml:251
+#: annotationprocessor.xml:267
 #, no-c-format
 msgid ""
       "...\n"
@@ -372,158 +396,164 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:257
+#: annotationprocessor.xml:273
 #, no-c-format
 msgid "IDE builds"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:260
+#: annotationprocessor.xml:276
 #, no-c-format
 msgid "Eclipse"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:262
+#: annotationprocessor.xml:278
 #, no-c-format
 msgid "Do the following to use the annotation processor within the <ulink url=\"http://www.eclipse.org/\">Eclipse</ulink> IDE:"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:267 annotationprocessor.xml:368
+#: annotationprocessor.xml:283 annotationprocessor.xml:388
 #, no-c-format
 msgid "Right-click your project, choose \"Properties\""
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:271
+#: annotationprocessor.xml:287
 #, no-c-format
 msgid "Go to \"Java Compiler\" and make sure, that \"Compiler compliance level\" is set to \"1.6\". Otherwise the processor won't be activated"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:277
+#: annotationprocessor.xml:293
 #, no-c-format
 msgid "Go to \"Java Compiler - Annotation Processing\" and choose \"Enable annotation processing\""
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:282
+#: annotationprocessor.xml:298
 #, no-c-format
 msgid "Go to \"Java Compiler - Annotation Processing - Factory Path\" and add the following JARs:"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:297
+#: annotationprocessor.xml:317
 #, no-c-format
 msgid "Confirm the workspace rebuild"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:301
+#: annotationprocessor.xml:321
 #, no-c-format
 msgid "You now should see any annotation problems as regular error markers within the editor and in the \"Problem\" view:"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:313
+#: annotationprocessor.xml:333
 #, no-c-format
 msgid "IntelliJ IDEA"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:315
+#: annotationprocessor.xml:335
 #, no-c-format
 msgid "The following steps must be followed to use the annotation processor within <ulink url=\"http://www.jetbrains.com/idea/\">IntelliJ IDEA</ulink> (version 9 and above):"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:321
+#: annotationprocessor.xml:341
 #, no-c-format
 msgid "Go to \"File\", then \"Settings\","
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:325
+#: annotationprocessor.xml:345
 #, no-c-format
 msgid "Expand the node \"Compiler\", then \"Annotation Processors\""
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:330
+#: annotationprocessor.xml:350
 #, no-c-format
-msgid "Choose \"Enable annotation processing\" and enter the following as \"Processor path\": /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar"
+msgid "Choose \"Enable annotation processing\" and enter the following as \"Processor path\": /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:336
+#: annotationprocessor.xml:356
 #, no-c-format
 msgid "Add the processor's fully qualified name <classname>org.hibernate.validator.ap.ConstraintValidationProcessor</classname> to the \"Annotation Processors\" list"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:342
+#: annotationprocessor.xml:362
 #, no-c-format
 msgid "If applicable add you module to the \"Processed Modules\" list"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:347
+#: annotationprocessor.xml:367
 #, no-c-format
 msgid "Rebuilding your project then should show any erronous constraint annotations:"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:359
+#: annotationprocessor.xml:379
 #, no-c-format
 msgid "NetBeans"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:361
+#: annotationprocessor.xml:381
 #, no-c-format
 msgid "Starting with version 6.9, also the <ulink url=\"http://www.netbeans.org/\">NetBeans</ulink> IDE supports using annotation processors within the IDE build. To do so, do the following:"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:372
+#: annotationprocessor.xml:392
 #, no-c-format
-msgid "Go to \"Libraries\", tab \"Processor\", and add the following two JARs:"
+msgid "Go to \"Libraries\", tab \"Processor\", and add the following JARs:"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:387
+#: annotationprocessor.xml:411
 #, no-c-format
 msgid "Go to \"Build - Compiling\", select \"Enable Annotation Processing\" and \"Enable Annotation Processing in Editor\". Add the annotation processor by specifying its fully qualified name <classname>org.hibernate.validator.ap.ConstraintValidationProcessor</classname>"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:394
+#: annotationprocessor.xml:418
 #, no-c-format
 msgid "Any constraint annotation problems will then be marked directly within the editor:"
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:408
+#: annotationprocessor.xml:432
 #, no-c-format
 msgid "Known issues"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:410
+#: annotationprocessor.xml:434
 #, no-c-format
 msgid "The following known issues exist as of May 2010:"
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:414
+#: annotationprocessor.xml:438
 #, no-c-format
 msgid "<ulink url=\"http://opensource.atlassian.com/projects/hibernate/browse/HV-308\">HV-308</ulink>: Additional validators registered for a constraint <ulink url=\"http://docs.jboss.org/hibernate/stable/validator/reference/en/html_single/#d0e1957\">using XML</ulink> are not evaluated by the annotation processor."
 msgstr ""
 
 #. Tag: para
-#: annotationprocessor.xml:422
+#: annotationprocessor.xml:446
 #, no-c-format
 msgid "Sometimes custom constraints can't be <ulink url=\"http://opensource.atlassian.com/projects/hibernate/browse/HV-293\">properly evaluated</ulink> when using the processor within Eclipse. Cleaning the project can help in these situations. This seems to be an issue with the Eclipse JSR 269 API implementation, but further investigation is required here."
+msgstr ""
+
+#. Tag: para
+#: annotationprocessor.xml:455
+#, no-c-format
+msgid "When using the processor within Eclipse, the check of dynamic default group sequence definitions doesn't work. After further investigation, it seems to be an issue with the Eclipse JSR 269 API implementation."
 msgstr ""
 

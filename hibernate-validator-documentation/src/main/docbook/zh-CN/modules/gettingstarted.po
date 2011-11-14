@@ -5,62 +5,77 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2010-07-06 14:46+0000\n"
+"POT-Creation-Date: 2011-11-14 10:37+0000\n"
 "PO-Revision-Date: 2010-07-07 03:33+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Tag: title
-#: gettingstarted.xml:25
+#: gettingstarted.xml:24
 #, no-c-format
 msgid "Getting started"
 msgstr "开始入门"
 
 #. Tag: para
-#: gettingstarted.xml:27
+#: gettingstarted.xml:26
 #, no-c-format
-msgid "This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quickstart you need:"
-msgstr "本章将会告诉你如何使用Hibernate Validator, 在开始之前,你需要准备好下面的环境:"
+msgid ""
+"This chapter will show you how to get started with Hibernate Validator, the "
+"reference implementation (RI) of Bean Validation. For the following "
+"quickstart you need:"
+msgstr ""
+"本章将会告诉你如何使用Hibernate Validator, 在开始之前,你需要准备好下面的环境:"
 
 #. Tag: para
-#: gettingstarted.xml:33
+#: gettingstarted.xml:32
 #, no-c-format
 msgid "A JDK &gt;= 5"
 msgstr "A JDK &gt;= 5"
 
 #. Tag: ulink
-#: gettingstarted.xml:37
+#: gettingstarted.xml:36
 #, no-c-format
 msgid "Apache Maven"
 msgstr "Apache Maven"
 
 #. Tag: para
-#: gettingstarted.xml:41
+#: gettingstarted.xml:40
 #, no-c-format
 msgid "An Internet connection (Maven has to download all required libraries)"
 msgstr "网络连接 ( Maven需要通过互联网下载所需的类库)"
 
 #. Tag: para
-#: gettingstarted.xml:46
-#, no-c-format
+#: gettingstarted.xml:45
+#, fuzzy, no-c-format
 msgid ""
-"A properly configured remote repository. Add the following to your <filename>settings.xml</filename>: <example> <title>Configuring the JBoss Maven repository in <filename>settings.xml</filename></title> <programlisting>&lt;repositories&gt;\n"
+"A properly configured remote repository. Add the following to your "
+"<filename>settings.xml</filename>: <example id=\"example-jboss-maven-url\"> "
+"<title>Configuring the JBoss Maven repository</title> <programlisting>&lt;"
+"repositories&gt;\n"
 "    &lt;repository&gt;\n"
-"        &lt;id&gt;jboss&lt;/id&gt;\n"
-"        &lt;url&gt;http://repository.jboss.com/maven2&lt;/url&gt;\n"
+"        &lt;id&gt;jboss-public-repository-group&lt;/id&gt;\n"
+"        &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-"
+"jboss&lt;/url&gt;\n"
 "        &lt;releases&gt;\n"
-"            &lt;enabled&gt;true&lt;/enabled&gt;\n"
+"          &lt;enabled&gt;true&lt;/enabled&gt;\n"
 "        &lt;/releases&gt;\n"
 "        &lt;snapshots&gt;\n"
-"            &lt;enabled&gt;false&lt;/enabled&gt;\n"
+"          &lt;enabled&gt;true&lt;/enabled&gt;\n"
 "        &lt;/snapshots&gt;\n"
-"    &lt;/repository&gt;\n"
-"&lt;/repositories&gt;</programlisting> </example>More information about <filename>settings.xml</filename> can be found in the <ulink url=\"http://maven.apache.org/ref/2.0.8/maven-settings/settings.html\">Maven Local Settings Model</ulink>."
+"     &lt;/repository&gt;\n"
+"&lt;/repositories&gt;        </programlisting> </example>More information "
+"about <filename>settings.xml</filename> can be found in the <ulink url="
+"\"http://maven.apache.org/ref/2.0.8/maven-settings/settings.html\">Maven "
+"Local Settings Model</ulink>."
 msgstr ""
-"配置远端maven仓库. 添加下面的内容到你的<filename>settings.xml</filename>中:<example> <title>Configuring the JBoss Maven repository in <filename>settings.xml</filename></title> <programlisting>&lt;repositories&gt;\n"
+"配置远端maven仓库. 添加下面的内容到你的<filename>settings.xml</filename>中:"
+"<example> <title>Configuring the JBoss Maven repository in "
+"<filename>settings.xml</filename></title> <programlisting>&lt;"
+"repositories&gt;\n"
 "    &lt;repository&gt;\n"
 "        &lt;id&gt;jboss&lt;/id&gt;\n"
 "        &lt;url&gt;http://repository.jboss.com/maven2&lt;/url&gt;\n"
@@ -71,13 +86,19 @@ msgstr ""
 "            &lt;enabled&gt;false&lt;/enabled&gt;\n"
 "        &lt;/snapshots&gt;\n"
 "    &lt;/repository&gt;\n"
-"&lt;/repositories&gt;</programlisting> </example>更多关于<filename>settings.xml</filename> 的信息请参考<ulink url=\"http://maven.apache.org/ref/2.0.8/maven-settings/settings.html\">Maven Local Settings Model</ulink>."
+"&lt;/repositories&gt;</programlisting> </example>更多关于<filename>settings."
+"xml</filename> 的信息请参考<ulink url=\"http://maven.apache.org/ref/2.0.8/"
+"maven-settings/settings.html\">Maven Local Settings Model</ulink>."
 
 #. Tag: para
-#: gettingstarted.xml:60
-#, no-c-format
+#: gettingstarted.xml:58
+#, fuzzy, no-c-format
 msgid ""
-"Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java Class Library since Java 6 which means that if you run Hibernate Validator with Java 5 you will have to add additional JAXB dependencies. Using maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;\n"
+"Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java "
+"Class Library since Java 6 which means that if you run Hibernate Validator "
+"with Java 5 you will have to add additional JAXB dependencies. Using Maven "
+"you have to add the following dependencies:<programlisting>&lt;"
+"dependency&gt;\n"
 "    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
 "    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
 "    &lt;version&gt;2.2&lt;/version&gt;\n"
@@ -87,9 +108,17 @@ msgid ""
 "    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;\n"
 "    &lt;version&gt;2.1.12&lt;/version&gt;\n"
 "&lt;/dependency&gt;\n"
-"</programlisting> if you are using the SourceForge package you find the necessary libraries in the <filename>lib/jdk5</filename> directory. In case you are not using the XML configuration you can also disable it explicitly by calling <methodname>Configuration.ignoreXmlConfiguration()</methodname> during <classname>ValidationFactory</classname> creation. In this case the JAXB dependencies are not needed."
+"</programlisting> if you are using the SourceForge package you find the "
+"necessary libraries in the <filename>lib/jdk5</filename> directory. In case "
+"you are not using the XML configuration you can also disable it explicitly "
+"by calling <methodname>Configuration.ignoreXmlConfiguration()</methodname> "
+"during <classname>ValidationFactory</classname> creation. In this case the "
+"JAXB dependencies are not needed."
 msgstr ""
-"Hibernate Validator 使用JAXB 来解析XML. JAXB 已经被集成进Java 6了, 所以,如果你要在Java 5上使用Hibernate Validator的话, 那么,还需要添加额外的JAXB的依赖. 如果你使用Maven的话,你可以把下面的内容添加到pom当中:<programlisting>&lt;dependency&gt;\n"
+"Hibernate Validator 使用JAXB 来解析XML. JAXB 已经被集成进Java 6了, 所以,如果"
+"你要在Java 5上使用Hibernate Validator的话, 那么,还需要添加额外的JAXB的依赖. "
+"如果你使用Maven的话,你可以把下面的内容添加到pom当中:<programlisting>&lt;"
+"dependency&gt;\n"
 "    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
 "    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
 "    &lt;version&gt;2.2&lt;/version&gt;\n"
@@ -102,77 +131,103 @@ msgstr ""
 "</programlisting>"
 
 #. Tag: title
-#: gettingstarted.xml:73
+#: gettingstarted.xml:71
 #, no-c-format
 msgid "Setting up a new Maven project"
 msgstr "第一个Maven项目"
 
 #. Tag: para
-#: gettingstarted.xml:75
+#: gettingstarted.xml:73
 #, no-c-format
-msgid "Start by creating new Maven project using the Maven archetype plugin as follows:"
+msgid ""
+"Start by creating new Maven project using the Maven archetype plugin as "
+"follows:"
 msgstr "使用Maven archetype插件来创建一个新的Maven 项目"
 
 #. Tag: title
-#: gettingstarted.xml:79
+#: gettingstarted.xml:77
 #, no-c-format
-msgid "Using Maven's archetype plugin to create a sample project using Hibernate Validator"
+msgid ""
+"Using Maven's archetype plugin to create a sample project using Hibernate "
+"Validator"
 msgstr "使用Maven archetype 插件来创建一个简单的基于Hibernate Validator的项目"
 
 #. Tag: programlisting
-#: gettingstarted.xml:82
-#, no-c-format
+#: gettingstarted.xml:80
+#, fuzzy, no-c-format
 msgid ""
-"mvn archetype:create -DarchetypeGroupId=org.hibernate \\\n"
-"                     -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \\\n"
-"                     -DarchetypeVersion=&version; \\\n"
-"                     -DgroupId=com.mycompany \n"
-"                     -DartifactId=hv-quickstart"
+"mvn archetype:generate -DarchetypeGroupId=org.hibernate \\\n"
+"                       -DarchetypeArtifactId=hibernate-validator-quickstart-"
+"archetype \\\n"
+"                       -DarchetypeVersion=&version; \\\n"
+"                       -DarchetypeRepository=http://repository.jboss.org/"
+"nexus/content/groups/public-jboss/ \\\n"
+"                       -DgroupId=com.mycompany \\\n"
+"                       -DartifactId=hv-quickstart"
 msgstr ""
 "mvn archetype:create -DarchetypeGroupId=org.hibernate \\\n"
-"                     -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \\\n"
+"                     -DarchetypeArtifactId=hibernate-validator-quickstart-"
+"archetype \\\n"
 "                     -DarchetypeVersion=&version; \\\n"
 "                     -DgroupId=com.mycompany \n"
 "                     -DartifactId=hv-quickstart"
 
 #. Tag: para
-#: gettingstarted.xml:85
+#: gettingstarted.xml:83
 #, no-c-format
-msgid "Maven will create your project in the directory hv-quickstart. Change into this directory and run:"
+msgid ""
+"Maven will create your project in the directory hv-quickstart. Change into "
+"this directory and run:"
 msgstr "Maven 将会把你的项目创建在hv-quickstart目录中. 进入这个目录并且执行:"
 
 #. Tag: programlisting
-#: gettingstarted.xml:88
+#: gettingstarted.xml:86
 #, no-c-format
 msgid "mvn test"
 msgstr "mvn test"
 
 #. Tag: para
-#: gettingstarted.xml:88
+#: gettingstarted.xml:86
 #, no-c-format
-msgid "Maven will compile the example code and run the implemented unit tests. Let's have a look at the actual code."
-msgstr "这样, Maven会编译示例代码并且运行单元测试, 接下来,让我们看看生成的代码."
+msgid ""
+"Maven will compile the example code and run the implemented unit tests. "
+"Let's have a look at the actual code."
+msgstr ""
+"这样, Maven会编译示例代码并且运行单元测试, 接下来,让我们看看生成的代码."
+
+#. Tag: para
+#: gettingstarted.xml:91
+#, no-c-format
+msgid ""
+"From version 4.2.0.Beta2, the maven command <command>mvn archetype:create</"
+"command> will be no longer supported and will fail. You should use the "
+"command described in the above listing. If you want more details, look at "
+"<ulink url=\"http://maven.apache.org/archetype/maven-archetype-plugin/\"> "
+"Maven Archetype plugin</ulink> page."
+msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:94
+#: gettingstarted.xml:101
 #, no-c-format
 msgid "Applying constraints"
 msgstr "添加约束"
 
 #. Tag: para
-#: gettingstarted.xml:96
+#: gettingstarted.xml:103
 #, no-c-format
-msgid "Open the project in the IDE of your choice and have a look at the class <classname>Car</classname>:"
+msgid ""
+"Open the project in the IDE of your choice and have a look at the class "
+"<classname>Car</classname>:"
 msgstr "在你喜欢的IDE中打开这个项目中的<classname>Car</classname>类:"
 
 #. Tag: title
-#: gettingstarted.xml:100
+#: gettingstarted.xml:107
 #, no-c-format
 msgid "Class Car annotated with constraints"
 msgstr "带约束性标注(annotated with constraints)的Car 类"
 
 #. Tag: programlisting
-#: gettingstarted.xml:102
+#: gettingstarted.xml:109
 #, no-c-format
 msgid ""
 "package com.mycompany;\n"
@@ -230,49 +285,66 @@ msgstr ""
 "}"
 
 #. Tag: para
-#: gettingstarted.xml:105
+#: gettingstarted.xml:112
 #, no-c-format
-msgid "<classname>@NotNull</classname>, <classname>@Size</classname> and <classname>@Min</classname> are so-called constraint annotations, that we use to declare constraints, which shall be applied to the fields of a <classname>Car</classname> instance:"
-msgstr "<classname>@NotNull</classname>, <classname>@Size</classname> and <classname>@Min</classname>就是上面所属的约束性标注( constraint annotations), 我们就是使用它们来声明约束, 例如在<classname>Car</classname>的字段中我们可以看到:"
+msgid ""
+"<classname>@NotNull</classname>, <classname>@Size</classname> and "
+"<classname>@Min</classname> are so-called constraint annotations, that we "
+"use to declare constraints, which shall be applied to the fields of a "
+"<classname>Car</classname> instance:"
+msgstr ""
+"<classname>@NotNull</classname>, <classname>@Size</classname> and "
+"<classname>@Min</classname>就是上面所属的约束性标注( constraint "
+"annotations), 我们就是使用它们来声明约束, 例如在<classname>Car</classname>的"
+"字段中我们可以看到:"
 
 #. Tag: para
-#: gettingstarted.xml:112
+#: gettingstarted.xml:119
 #, no-c-format
 msgid "<property>manufacturer</property> shall never be null"
 msgstr "<property>manufacturer</property>永远不能为null"
 
 #. Tag: para
-#: gettingstarted.xml:116
+#: gettingstarted.xml:123
 #, no-c-format
-msgid "<property>licensePlate</property> shall never be null and must be between 2 and 14 characters long"
-msgstr "<property>licensePlate</property>永远不能为null,并且它的值字符串的长度要在2到14之间"
+msgid ""
+"<property>licensePlate</property> shall never be null and must be between 2 "
+"and 14 characters long"
+msgstr ""
+"<property>licensePlate</property>永远不能为null,并且它的值字符串的长度要在2到"
+"14之间"
 
 #. Tag: para
-#: gettingstarted.xml:121
+#: gettingstarted.xml:128
 #, no-c-format
 msgid "<property>seatCount</property> shall be at least 2."
 msgstr "<property>seatCount</property>的值要不能小于2"
 
 #. Tag: title
-#: gettingstarted.xml:127
+#: gettingstarted.xml:134
 #, no-c-format
 msgid "Validating constraints"
 msgstr "校验约束"
 
 #. Tag: para
-#: gettingstarted.xml:129
+#: gettingstarted.xml:136
 #, no-c-format
-msgid "To perform a validation of these constraints, we use a <classname>Validator</classname> instance. Let's have a look at the <classname>CarTest</classname> class:"
-msgstr "我们需要使用<classname>Validator</classname>来对上面的那些约束进行校验. 让我们来看看<classname>CarTest</classname>这个类:"
+msgid ""
+"To perform a validation of these constraints, we use a <classname>Validator</"
+"classname> instance. Let's have a look at the <classname>CarTest</classname> "
+"class:"
+msgstr ""
+"我们需要使用<classname>Validator</classname>来对上面的那些约束进行校验. 让我"
+"们来看看<classname>CarTest</classname>这个类:"
 
 #. Tag: title
-#: gettingstarted.xml:134
+#: gettingstarted.xml:141
 #, no-c-format
 msgid "Class CarTest showing validation examples"
 msgstr "在CarTest中使用校验"
 
 #. Tag: programlisting
-#: gettingstarted.xml:136
+#: gettingstarted.xml:143
 #, no-c-format
 msgid ""
 "package com.mycompany;\n"
@@ -295,7 +367,8 @@ msgid ""
 "\n"
 "    @BeforeClass\n"
 "    public static void setUp() {\n"
-"        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"        ValidatorFactory factory = Validation.buildDefaultValidatorFactory"
+"();\n"
 "        validator = factory.getValidator();\n"
 "    }\n"
 "\n"
@@ -307,7 +380,8 @@ msgid ""
 "            validator.validate(car);\n"
 "\n"
 "        assertEquals(1, constraintViolations.size());\n"
-"        assertEquals(\"may not be null\", constraintViolations.iterator().next().getMessage());\n"
+"        assertEquals(\"may not be null\", constraintViolations.iterator()."
+"next().getMessage());\n"
 "    }\n"
 "\n"
 "    @Test\n"
@@ -318,7 +392,8 @@ msgid ""
 "            validator.validate(car);\n"
 "\n"
 "        assertEquals(1, constraintViolations.size());\n"
-"        assertEquals(\"size must be between 2 and 14\", constraintViolations.iterator().next().getMessage());\n"
+"        assertEquals(\"size must be between 2 and 14\", constraintViolations."
+"iterator().next().getMessage());\n"
 "    }\n"
 "    \n"
 "    @Test\n"
@@ -329,7 +404,8 @@ msgid ""
 "            validator.validate(car);\n"
 "\n"
 "        assertEquals(1, constraintViolations.size());\n"
-"        assertEquals(\"must be greater than or equal to 2\", constraintViolations.iterator().next().getMessage());\n"
+"        assertEquals(\"must be greater than or equal to 2\", "
+"constraintViolations.iterator().next().getMessage());\n"
 "    }\n"
 "\n"
 "    @Test\n"
@@ -363,7 +439,8 @@ msgstr ""
 "\n"
 "    @BeforeClass\n"
 "    public static void setUp() {\n"
-"        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"        ValidatorFactory factory = Validation.buildDefaultValidatorFactory"
+"();\n"
 "        validator = factory.getValidator();\n"
 "    }\n"
 "\n"
@@ -375,7 +452,8 @@ msgstr ""
 "            validator.validate(car);\n"
 "\n"
 "        assertEquals(1, constraintViolations.size());\n"
-"        assertEquals(\"may not be null\", constraintViolations.iterator().next().getMessage());\n"
+"        assertEquals(\"may not be null\", constraintViolations.iterator()."
+"next().getMessage());\n"
 "    }\n"
 "\n"
 "    @Test\n"
@@ -386,7 +464,8 @@ msgstr ""
 "            validator.validate(car);\n"
 "\n"
 "        assertEquals(1, constraintViolations.size());\n"
-"        assertEquals(\"size must be between 2 and 14\", constraintViolations.iterator().next().getMessage());\n"
+"        assertEquals(\"size must be between 2 and 14\", constraintViolations."
+"iterator().next().getMessage());\n"
 "    }\n"
 "    \n"
 "    @Test\n"
@@ -397,7 +476,8 @@ msgstr ""
 "            validator.validate(car);\n"
 "\n"
 "        assertEquals(1, constraintViolations.size());\n"
-"        assertEquals(\"must be greater than or equal to 2\", constraintViolations.iterator().next().getMessage());\n"
+"        assertEquals(\"must be greater than or equal to 2\", "
+"constraintViolations.iterator().next().getMessage());\n"
 "    }\n"
 "\n"
 "    @Test\n"
@@ -412,56 +492,108 @@ msgstr ""
 "}"
 
 #. Tag: para
-#: gettingstarted.xml:139
+#: gettingstarted.xml:146
 #, no-c-format
-msgid "In the <methodname>setUp()</methodname> method we get a <classname>Validator</classname> instance from the <classname>ValidatorFactory</classname>. A <classname>Validator</classname> instance is thread-safe and may be reused multiple times. For this reason we store it as field of our test class. We can use the <classname>Validator</classname> now to validate the different car instances in the test methods."
-msgstr "在<methodname>setUp()</methodname>方法中,我们通过<classname>ValidatorFactory</classname>得到了一个<classname>Validator</classname>的实例. <classname>Validator</classname>是线程安全的,并且可以重复使用, 所以我们把它保存成一个类变量. 现在我们可以在test方法中使用这个validator的实例来校验不同的car实例了."
-
-#. Tag: para
-#: gettingstarted.xml:147
-#, no-c-format
-msgid "The <methodname>validate()</methodname> method returns a set of <classname>ConstraintViolation</classname> instances, which we can iterate in order to see which validation errors occurred. The first three test methods show some expected constraint violations:"
-msgstr "<methodname>validate()</methodname>方法会返回一个set的<classname>ConstraintViolation</classname>的实例的集合, 我们可以通过遍历它来查看有哪些验证错误. 前面三个测试用例显示了一些预期的校验约束:"
+msgid ""
+"In the <methodname>setUp()</methodname> method we get a "
+"<classname>Validator</classname> instance from the "
+"<classname>ValidatorFactory</classname>. A <classname>Validator</classname> "
+"instance is thread-safe and may be reused multiple times. For this reason we "
+"store it as field of our test class. We can use the <classname>Validator</"
+"classname> now to validate the different car instances in the test methods."
+msgstr ""
+"在<methodname>setUp()</methodname>方法中,我们通过"
+"<classname>ValidatorFactory</classname>得到了一个<classname>Validator</"
+"classname>的实例. <classname>Validator</classname>是线程安全的,并且可以重复使"
+"用, 所以我们把它保存成一个类变量. 现在我们可以在test方法中使用这个validator的"
+"实例来校验不同的car实例了."
 
 #. Tag: para
 #: gettingstarted.xml:154
 #, no-c-format
-msgid "The <classname>@NotNull</classname> constraint on manufacturer is violated in <methodname>manufacturerIsNull()</methodname>"
-msgstr "在<methodname>manufacturerIsNull()</methodname>中可以看到manufacturer违反了<classname>@NotNull</classname>约束"
+msgid ""
+"The <methodname>validate()</methodname> method returns a set of "
+"<classname>ConstraintViolation</classname> instances, which we can iterate "
+"in order to see which validation errors occurred. The first three test "
+"methods show some expected constraint violations:"
+msgstr ""
+"<methodname>validate()</methodname>方法会返回一个set的"
+"<classname>ConstraintViolation</classname>的实例的集合, 我们可以通过遍历它来"
+"查看有哪些验证错误. 前面三个测试用例显示了一些预期的校验约束:"
 
 #. Tag: para
-#: gettingstarted.xml:159
+#: gettingstarted.xml:161
 #, no-c-format
-msgid "The <classname>@Size</classname> constraint on licensePlate is violated in <methodname>licensePlateTooShort()</methodname>"
-msgstr "<methodname>licensePlateTooShort()</methodname>中的licensePlate违反了<classname>@Size</classname>约束"
+msgid ""
+"The <classname>@NotNull</classname> constraint on manufacturer is violated "
+"in <methodname>manufacturerIsNull()</methodname>"
+msgstr ""
+"在<methodname>manufacturerIsNull()</methodname>中可以看到manufacturer违反了"
+"<classname>@NotNull</classname>约束"
 
 #. Tag: para
-#: gettingstarted.xml:164
+#: gettingstarted.xml:166
 #, no-c-format
-msgid "The <classname>@Min</classname> constraint on seatCount is violated in <methodname>seatCountTooLow()</methodname>"
-msgstr "而<methodname>seatCountTooLow()</methodname>中则导致seatCount违反了<classname>@Min</classname>约束"
+msgid ""
+"The <classname>@Size</classname> constraint on licensePlate is violated in "
+"<methodname>licensePlateTooShort()</methodname>"
+msgstr ""
+"<methodname>licensePlateTooShort()</methodname>中的licensePlate违反了"
+"<classname>@Size</classname>约束"
 
 #. Tag: para
-#: gettingstarted.xml:169
+#: gettingstarted.xml:171
 #, no-c-format
-msgid "If the object validates successfully, <methodname>validate()</methodname> returns an empty set."
-msgstr " 如果一个对象没有校验出问题的话,那么<methodname>validate()</methodname> 会返回一个空的set对象."
+msgid ""
+"The <classname>@Min</classname> constraint on seatCount is violated in "
+"<methodname>seatCountTooLow()</methodname>"
+msgstr ""
+"而<methodname>seatCountTooLow()</methodname>中则导致seatCount违反了"
+"<classname>@Min</classname>约束"
 
 #. Tag: para
-#: gettingstarted.xml:172
+#: gettingstarted.xml:176
 #, no-c-format
-msgid "Note that we only use classes from the package <package>javax.validation</package> from the Bean Validation API. As we don't reference any classes of the RI directly, it would be no problem to switch to another implementation of the API, should that need arise."
-msgstr "注意,我们只使用了Bean Validation API中的package <package>javax.validation</package>中的类, 并没有直接调用参考实现中的任何类,所以, 没有任何问题如果切换到其他的实现."
+msgid ""
+"If the object validates successfully, <methodname>validate()</methodname> "
+"returns an empty set."
+msgstr ""
+" 如果一个对象没有校验出问题的话,那么<methodname>validate()</methodname> 会返"
+"回一个空的set对象."
+
+#. Tag: para
+#: gettingstarted.xml:179
+#, no-c-format
+msgid ""
+"Note that we only use classes from the package <package>javax.validation</"
+"package> from the Bean Validation API. As we don't reference any classes of "
+"the RI directly, it would be no problem to switch to another implementation "
+"of the API, should that need arise."
+msgstr ""
+"注意,我们只使用了Bean Validation API中的package <package>javax.validation</"
+"package>中的类, 并没有直接调用参考实现中的任何类,所以, 没有任何问题如果切换到"
+"其他的实现."
 
 #. Tag: title
-#: gettingstarted.xml:180
+#: gettingstarted.xml:187
 #, no-c-format
 msgid "Where to go next?"
 msgstr "更进一步"
 
 #. Tag: para
-#: gettingstarted.xml:182
-#, no-c-format
-msgid "That concludes our 5 minute tour through the world of Hibernate Validator. Continue exploring the code examples or look at further examples referenced in <xref linkend=\"chapter-further-reading\"/>. To deepen your understanding of Hibernate Validator just continue reading <xref linkend=\"validator-usingvalidator\"/>. In case your application has specific validation requirements have a look at <xref linkend=\"validator-customconstraints\"/>."
-msgstr "在本章中, 您了解了一个基于Hibernate Validator的简单例子. 更多的示例请参考 <xref linkend=\"chapter-further-reading\"/>. 如果想进一步了解Hibenate Validator, 请继续阅读<xref linkend=\"validator-usingvalidator\"/>.  如果您的应用程序有特殊的校验需求,请参考 <xref linkend=\"validator-customconstraints\"/>."
-
+#: gettingstarted.xml:189
+#, fuzzy, no-c-format
+msgid ""
+"That concludes our 5 minute tour through the world of Hibernate Validator. "
+"Continue exploring the code examples or look at further examples referenced "
+"in <xref linkend=\"validator-further-reading\"/>. To deepen your "
+"understanding of Hibernate Validator just continue reading <xref linkend="
+"\"validator-usingvalidator\"/>. In case your application has specific "
+"validation requirements have a look at <xref linkend=\"validator-"
+"customconstraints\"/>."
+msgstr ""
+"在本章中, 您了解了一个基于Hibernate Validator的简单例子. 更多的示例请参考 "
+"<xref linkend=\"chapter-further-reading\"/>. 如果想进一步了解Hibenate "
+"Validator, 请继续阅读<xref linkend=\"validator-usingvalidator\"/>.  如果您的"
+"应用程序有特殊的校验需求,请参考 <xref linkend=\"validator-customconstraints"
+"\"/>."
