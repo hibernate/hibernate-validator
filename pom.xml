@@ -64,7 +64,6 @@
         <module>hibernate-validator-tck-runner</module>
         <module>hibernate-validator-annotation-processor</module>
         <module>hibernate-validator-archetype</module>
-        <module>hibernate-validator-distribution</module>
     </modules>
 
     <properties>
@@ -491,6 +490,18 @@
             </activation>
             <modules>
                 <module>hibernate-validator-documentation</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dist</id>
+            <activation>
+                <property>
+                    <name>disableDistributionBuild</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>hibernate-validator-distribution</module>
             </modules>
         </profile>
     </profiles>  
