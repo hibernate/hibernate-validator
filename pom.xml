@@ -340,12 +340,16 @@
                 <plugin>
                     <groupId>org.jboss.maven.plugins</groupId>
                     <artifactId>maven-jdocbook-plugin</artifactId>
-                    <version>2.2.3</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jboss.maven.plugins</groupId>
-                    <artifactId>maven-jdocbook-style-plugin</artifactId>
-                    <version>2.0.0</version>
+                    <version>2.3.5</version>
+                    <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jdocbook-style</artifactId>
+                            <version>2.0.1</version>
+                            <type>jdocbook-style</type>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -476,4 +480,18 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <profiles>
+        <profile>
+            <id>docs</id>
+            <activation>
+                <property>
+                    <name>disableDocumentationBuild</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>hibernate-validator-documentation</module>
+            </modules>
+        </profile>
+    </profiles>  
 </project>
