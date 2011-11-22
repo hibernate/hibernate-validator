@@ -23,7 +23,6 @@ import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
-import org.hibernate.validator.metadata.core.ConstraintHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -39,21 +38,18 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private final MessageInterpolator factoryMessageInterpolator;
 	private final TraversableResolver factoryTraversableResolver;
 	private final ConstraintValidatorFactory factoryConstraintValidatorFactory;
-	private final ConstraintHelper constraintHelper;
 	private final BeanMetaDataManager beanMetaDataManager;
 	private boolean failFast;
 
 	public ValidatorContextImpl(ConstraintValidatorFactory constraintValidatorFactory,
 								MessageInterpolator factoryMessageInterpolator,
 								TraversableResolver factoryTraversableResolver,
-								ConstraintHelper constraintHelper,
 								BeanMetaDataManager beanMetaDataManager,
 								boolean failFast) {
 
 		this.factoryConstraintValidatorFactory = constraintValidatorFactory;
 		this.factoryMessageInterpolator = factoryMessageInterpolator;
 		this.factoryTraversableResolver = factoryTraversableResolver;
-		this.constraintHelper = constraintHelper;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.failFast = failFast;
 
@@ -102,7 +98,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
-				constraintHelper,
 				beanMetaDataManager,
 				failFast
 		);

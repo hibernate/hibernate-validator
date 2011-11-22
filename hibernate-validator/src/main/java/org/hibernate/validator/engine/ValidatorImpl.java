@@ -46,7 +46,6 @@ import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableReso
 import org.hibernate.validator.metadata.aggregated.MethodMetaData;
 import org.hibernate.validator.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
-import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.method.MethodConstraintViolation;
@@ -95,11 +94,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private final TraversableResolver traversableResolver;
 
 	/**
-	 * Passed at creation time of this validator instance.
-	 */
-	private final ConstraintHelper constraintHelper;
-
-	/**
 	 * Used to get access to the bean meta data. Used to avoid to parsing the constraint configuration for each call
 	 * of a given entity.
 	 */
@@ -110,11 +104,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private final boolean failFast;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, ConstraintHelper constraintHelper, BeanMetaDataManager beanMetaDataManager, boolean failFast) {
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, BeanMetaDataManager beanMetaDataManager, boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
-		this.constraintHelper = constraintHelper;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.failFast = failFast;
 

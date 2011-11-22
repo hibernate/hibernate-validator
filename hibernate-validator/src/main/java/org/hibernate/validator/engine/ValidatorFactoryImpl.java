@@ -49,7 +49,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
-	private final ConstraintHelper constraintHelper;
 	private final BeanMetaDataManager metaDataManager;
 	private final boolean failFast;
 
@@ -58,7 +57,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
-		this.constraintHelper = new ConstraintHelper();
+		ConstraintHelper constraintHelper = new ConstraintHelper();
 
 		boolean tmpFailFast = false;
 
@@ -124,7 +123,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
-				constraintHelper,
 				metaDataManager,
 				failFast
 		);
