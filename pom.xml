@@ -144,6 +144,11 @@
                 <version>5.14.2</version>
             </dependency>
             <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>1.8.3</version>
+            </dependency>
+            <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
                 <version>3.0</version>
@@ -504,5 +509,5 @@
                 <module>hibernate-validator-distribution</module>
             </modules>
         </profile>
-    </profiles>  
+    </profiles>
 </project>

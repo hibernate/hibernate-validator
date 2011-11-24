@@ -41,14 +41,14 @@ public class ScriptAssertValidatorTest {
 
 	@Test
 	public void scriptEvaluatesToTrue() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "true" );
+		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "true" );
 
 		assertTrue( validator.isValid( new Object(), null ) );
 	}
 
 	@Test
 	public void scriptEvaluatesToFalse() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "false" );
+		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "false" );
 
 		assertFalse( validator.isValid( new Object(), null ) );
 	}
@@ -56,7 +56,7 @@ public class ScriptAssertValidatorTest {
 	@Test
 	public void scriptExpressionReferencingAnnotatedObject() throws Exception {
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
-				"javascript", "_this.startDate.before(_this.endDate)"
+				"groovy", "_this.startDate.before(_this.endDate)"
 		);
 
 		Date startDate = new GregorianCalendar( 2009, 8, 20 ).getTime();
@@ -69,7 +69,7 @@ public class ScriptAssertValidatorTest {
 	@Test
 	public void scriptExpressionUsingCustomizedAlias() throws Exception {
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
-				"javascript", "_.startDate.before(_.endDate)", "_"
+				"groovy", "_.startDate.before(_.endDate)", "_"
 		);
 
 		Date startDate = new GregorianCalendar( 2009, 8, 20 ).getTime();
@@ -102,14 +102,14 @@ public class ScriptAssertValidatorTest {
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void illegalScriptExpressionRaisesException() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "foo" );
+		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "foo" );
 
 		validator.isValid( new Object(), null );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNullRaisesException() throws Exception {
-		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "javascript", "null" );
+		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator( "groovy", "null" );
 
 		validator.isValid( new Object(), null );
 	}
@@ -117,7 +117,7 @@ public class ScriptAssertValidatorTest {
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	public void scriptExpressionReturningNoBooleanRaisesException() throws Exception {
 		ConstraintValidator<ScriptAssert, Object> validator = getInitializedValidator(
-				"javascript", "new java.util.Date()"
+				"groovy", "new java.util.Date()"
 		);
 
 		validator.isValid( new Object(), null );
