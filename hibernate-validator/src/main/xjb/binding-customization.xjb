@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jxb:bindings version="1.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
+              xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
     <jxb:bindings schemaLocation="../xsd/validation-mapping-1.0.xsd" node="/xs:schema">
+        <!-- let jaxb be whitespace tolerant - http://www.highlevelbits.com/2009/08/jaxb-with-maven_16.html -->
         <jxb:globalBindings>
-            <xjc:javaType name="java.lang.String" xmlType="xs:string" 
-                adapter="javax.xml.bind.annotation.adapters.CollapsedStringAdapter"/>
+            <xjc:javaType name="java.lang.String" xmlType="xs:string"
+                          adapter="javax.xml.bind.annotation.adapters.CollapsedStringAdapter"/>
         </jxb:globalBindings>
 
         <jxb:bindings node="//xs:complexType[9]/xs:sequence[1]/xs:element[1]">
