@@ -96,7 +96,7 @@ public class XmlMappingParser {
 			for ( BeanType bean : mapping.getBean() ) {
 				Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
 				checkClassHasNotBeenProcessed( processedClasses, beanClass );
-				annotationIgnores.setDefaultIgnoreAnnotation( beanClass, bean.isIgnoreAnnotations() );
+				annotationIgnores.setDefaultIgnoreAnnotation( beanClass, bean.getIgnoreAnnotations() );
 				parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
 				parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
 				parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
@@ -146,7 +146,7 @@ public class XmlMappingParser {
 
 			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
 			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = newArrayList();
-			if ( validatedByType.isIncludeExistingValidators() != null && validatedByType.isIncludeExistingValidators() ) {
+			if ( validatedByType.getIncludeExistingValidators() != null && validatedByType.getIncludeExistingValidators() ) {
 				constraintValidatorClasses.addAll( findConstraintValidatorClasses( annotationClass ) );
 			}
 			for ( String validatorClassName : validatedByType.getValue() ) {
@@ -206,7 +206,7 @@ public class XmlMappingParser {
 			final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
 
 			// ignore annotations
-			boolean ignoreFieldAnnotation = fieldType.isIgnoreAnnotations() == null ? false : fieldType.isIgnoreAnnotations();
+			boolean ignoreFieldAnnotation = fieldType.getIgnoreAnnotations() == null ? false : fieldType.getIgnoreAnnotations();
 			if ( ignoreFieldAnnotation ) {
 				annotationIgnores.setIgnoreAnnotationsOnMember( field );
 			}
@@ -243,7 +243,7 @@ public class XmlMappingParser {
 			final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
 
 			// ignore annotations
-			boolean ignoreGetterAnnotation = getterType.isIgnoreAnnotations() == null ? false : getterType.isIgnoreAnnotations();
+			boolean ignoreGetterAnnotation = getterType.getIgnoreAnnotations() == null ? false : getterType.getIgnoreAnnotations();
 			if ( ignoreGetterAnnotation ) {
 				annotationIgnores.setIgnoreAnnotationsOnMember( method );
 			}
@@ -269,8 +269,8 @@ public class XmlMappingParser {
 		}
 
 		// ignore annotation
-		if ( classType.isIgnoreAnnotations() != null ) {
-			annotationIgnores.setIgnoreAnnotationsOnClass( beanClass, classType.isIgnoreAnnotations() );
+		if ( classType.getIgnoreAnnotations() != null ) {
+			annotationIgnores.setIgnoreAnnotationsOnClass( beanClass, classType.getIgnoreAnnotations() );
 		}
 
 		// group sequence
