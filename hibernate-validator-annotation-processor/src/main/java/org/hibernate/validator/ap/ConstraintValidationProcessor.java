@@ -23,7 +23,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -57,8 +56,7 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  * @author Gunnar Morling
  */
 @SupportedAnnotationTypes("*")
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
-@SupportedOptions( {
+@SupportedOptions({
 		Configuration.DIAGNOSTIC_KIND_PROCESSOR_OPTION,
 		Configuration.VERBOSE_PROCESSOR_OPTION,
 		Configuration.METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION
@@ -87,6 +85,11 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 
 		configuration = new Configuration( processingEnv.getOptions(), processingEnv.getMessager() );
 		messager = new MessagerAdapter( processingEnv.getMessager(), configuration.getDiagnosticKind() );
+	}
+
+	@Override
+	public SourceVersion getSupportedSourceVersion() {
+		return SourceVersion.latestSupported();
 	}
 
 	@Override
