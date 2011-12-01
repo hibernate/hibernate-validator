@@ -24,14 +24,21 @@ import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
+ * Represents a field of a Java type and all its associated meta-data relevant
+ * in the context of bean validation, for instance its constraints.
+ *
  * @author Gunnar Morling
  */
 public class ConstrainedField extends AbstractConstrainedElement {
 
 	/**
-	 * @param location
-	 * @param constraints
-	 * @param isCascading
+	 * Creates a new field meta data object.
+	 *
+	 * @param source The source of meta data.
+	 * @param location The location of the represented field.
+	 * @param constraints The constraints of the represented field, if any.
+	 * @param isCascading Whether a cascaded validation of the represented field shall
+	 * be performed or not.
 	 */
 	public ConstrainedField(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints,
 							boolean isCascading) {

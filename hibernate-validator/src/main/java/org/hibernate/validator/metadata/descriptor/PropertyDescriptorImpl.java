@@ -21,7 +21,7 @@ import java.util.Set;
 import javax.validation.metadata.PropertyDescriptor;
 
 /**
- * Describes a validated element (class, field or property).
+ * Describes a validated property.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

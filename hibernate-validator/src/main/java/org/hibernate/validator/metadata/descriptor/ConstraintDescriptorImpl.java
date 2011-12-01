@@ -56,7 +56,7 @@ import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 import static org.hibernate.validator.constraints.CompositionType.AND;
 
 /**
- * Describe a single constraint (including it's composing constraints).
+ * Describes a single constraint (including it's composing constraints).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

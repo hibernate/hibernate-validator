@@ -22,15 +22,22 @@ import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 
 /**
+ * Represents a Java type and all its associated meta-data relevant in the
+ * context of bean validation, for instance its constraints. Only class level
+ * meta-data is represented by this type, but not meta-data for any members.
+ *
  * @author Gunnar Morling
  */
 public class ConstrainedType extends AbstractConstrainedElement {
 
 	/**
-	 * @param constraints
-	 * @param location
+	 * Creates a new type meta data object.
+	 *
+	 * @param source The source of meta data.
+	 * @param location The location of the represented type.
+	 * @param constraints The constraints of the represented type, if any.
 	 */
-	public ConstrainedType(ConfigurationSource source, Set<MetaConstraint<?>> constraints, BeanConstraintLocation location) {
+	public ConstrainedType(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints) {
 
 		super( source, ConstrainedElementKind.TYPE, location, constraints, false );
 	}
