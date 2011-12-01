@@ -35,6 +35,8 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**
+ * Describes a validated bean.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Gunnar Morling

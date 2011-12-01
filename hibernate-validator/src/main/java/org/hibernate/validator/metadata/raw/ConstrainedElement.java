@@ -59,10 +59,27 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 		TYPE, FIELD, METHOD, PARAMETER;
 	}
 
+	/**
+	 * Returns the kind of this constrained element.
+	 *
+	 * @return The kind of this constrained element.
+	 */
 	ConstrainedElementKind getConstrainedElementKind();
 
+	/**
+	 * Returns the location of this constrained element.
+	 *
+	 * @return The location of this constrained element.
+	 */
 	ConstraintLocation getLocation();
 
+	/**
+	 * Returns a set containing the constraints specified for this constrained
+	 * element.
+	 *
+	 * @return A set with this constrained element's constraints. May be empty,
+	 *         but never <code>null</code>.
+	 */
 	Set<MetaConstraint<?>> getConstraints();
 
 	/**

@@ -27,14 +27,14 @@ import java.util.Set;
 import org.hibernate.validator.metadata.core.AnnotationIgnores;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.metadata.raw.ConstrainedField;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.ConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.xml.XmlMappingParser;
 
@@ -117,8 +117,8 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 				propertyMetaData.add(
 						new ConstrainedType(
 								ConfigurationSource.XML,
-								constraintsByLocation.get( oneConfiguredLocation ),
-								(BeanConstraintLocation) oneConfiguredLocation
+								(BeanConstraintLocation) oneConfiguredLocation,
+								constraintsByLocation.get( oneConfiguredLocation )
 						)
 				);
 			}

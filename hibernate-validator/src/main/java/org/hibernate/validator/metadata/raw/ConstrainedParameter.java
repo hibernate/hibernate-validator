@@ -30,6 +30,17 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	private final String name;
 
+	/**
+	 * Creates a new parameter meta data object.
+	 *
+	 * @param source The source of meta data.
+	 * @param location The location of the represented method parameter.
+	 * @param name The name of the represented parameter.
+	 * @param constraints The constraints of the represented method parameter, if
+	 * any.
+	 * @param isCascading Whether a cascaded validation of the represented method
+	 * parameter shall be performed or not.
+	 */
 	public ConstrainedParameter(ConfigurationSource source, MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
 		super( source, ConstrainedElementKind.PARAMETER, location, constraints, isCascading );

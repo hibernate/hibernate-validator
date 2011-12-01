@@ -41,6 +41,16 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 
 	private final boolean hasParameterConstraints;
 
+	/**
+	 * Creates a new method meta data object for a parameter-less method.
+	 *
+	 * @param source The source of meta data.
+	 * @param location The location of the represented method.
+	 * @param returnValueConstraints The return value constraints of the represented method, if
+	 * any.
+	 * @param isCascading Whether a cascaded validation of the represented method's
+	 * return value shall be performed or not.
+	 */
 	public ConstrainedMethod(
 			ConfigurationSource source,
 			MethodConstraintLocation location,
@@ -59,11 +69,12 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	/**
 	 * Creates a new method meta data object.
 	 *
-	 * @param method The method to represent.
+	 * @param source The source of meta data.
+	 * @param location The location of the represented method.
 	 * @param parameterMetaData A list with parameter meta data. The length must correspond
 	 * with the number of parameters of the represented method. So
-	 * this list may be empty returned (in case of a parameterless
-	 * method), but never <code>null</code>.
+	 * this list may be empty (in case of a parameterless method),
+	 * but never <code>null</code>.
 	 * @param returnValueConstraints The return value constraints of the represented method, if
 	 * any.
 	 * @param isCascading Whether a cascaded validation of the represented method's

@@ -22,6 +22,8 @@ import java.util.Set;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 /**
+ * Describes a validated method parameter.
+ *
  * @author Gunnar Morling
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {

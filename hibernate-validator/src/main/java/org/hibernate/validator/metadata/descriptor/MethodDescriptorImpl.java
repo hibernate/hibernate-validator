@@ -24,6 +24,8 @@ import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 /**
+ * Describes a validated method.
+ *
  * @author Gunnar Morling
  */
 public class MethodDescriptorImpl extends ElementDescriptorImpl implements MethodDescriptor {
