@@ -181,6 +181,98 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDataSet ) );
 	}
 
+	public Class<T> getBeanClass() {
+		return beanClass;
+	}
+
+	public BeanDescriptor getBeanDescriptor() {
+		return getBeanDescriptorInternal();
+	}
+
+	public TypeDescriptor getTypeDescriptor() {
+		return getBeanDescriptorInternal();
+	}
+
+	public Set<Member> getCascadedMembers() {
+		return cascadedMembers;
+	}
+
+	public Set<MetaConstraint<?>> getMetaConstraints() {
+		return allMetaConstraints;
+	}
+
+	public Set<MetaConstraint<?>> getDirectMetaConstraints() {
+		return directMetaConstraints;
+	}
+
+	public MethodMetaData getMetaDataFor(Method method) {
+		return methodMetaData.get( method.getName() + Arrays.toString( method.getParameterTypes() ) );
+	}
+
+	public Set<MethodMetaData> getAllMethodMetaData() {
+		return new HashSet<MethodMetaData>( methodMetaData.values() );
+	}
+
+	public PropertyMetaData getMetaDataFor(String propertyName) {
+		return propertyMetaData.get( propertyName );
+	}
+
+	public boolean isPropertyPresent(String name) {
+		return propertyMetaData.containsKey( name );
+	}
+
+	public List<Class<?>> getDefaultGroupSequence(T beanState) {
+		if ( hasDefaultGroupSequenceProvider() ) {
+			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
+			return getValidDefaultGroupSequence( providerDefaultGroupSequence );
+		}
+
+		return Collections.unmodifiableList( defaultGroupSequence );
+	}
+
+	public boolean defaultGroupSequenceIsRedefined() {
+		return defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
+	}
+
+	public Set<PropertyMetaData> getAllPropertyMetaData() {
+		return Collections.unmodifiableSet( new HashSet<PropertyMetaData>( propertyMetaData.values() ) );
+	}
+
+	public List<Class<?>> getClassHierarchy() {
+		return classHierarchyWithoutInterfaces;
+	}
+
+	/**
+	 * Returns a bean descriptor representing this meta data object. The
+	 * descriptor is instantiated when this method is called for the first time.
+	 * This instance is cached, so later invocations will always return the same
+	 * instance.
+	 *
+	 * It might happen that initially two descriptors are created, if none was
+	 * cached yet and two parallel requests for the descriptor arrive at the
+	 * same time. This behavior is accepted as there are no guarantees about the
+	 * descriptor's identity.
+	 *
+	 * @return A bean descriptor for this meta data object.
+	 */
+	private BeanDescriptorImpl<T> getBeanDescriptorInternal() {
+
+		if ( beanDescriptor != null ) {
+			return beanDescriptor;
+		}
+
+		beanDescriptor = new BeanDescriptorImpl<T>(
+				beanClass,
+				asDescriptors( getClassLevelConstraints( allMetaConstraints ) ),
+				getConstrainedPropertiesAsDescriptors(),
+				getMethodsAsDescriptors(),
+				defaultGroupSequenceIsRedefined(),
+				getDefaultGroupSequence( null )
+		);
+
+		return beanDescriptor;
+	}
+
 	private Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
 		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
 
@@ -239,98 +331,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		else {
 			setDefaultGroupSequence( Arrays.<Class<?>>asList( beanClass ) );
 		}
-	}
-
-	public Class<T> getBeanClass() {
-		return beanClass;
-	}
-
-	public BeanDescriptor getBeanDescriptor() {
-		return getBeanDescriptorInternal();
-	}
-
-	public TypeDescriptor getTypeDescriptor() {
-		return getBeanDescriptorInternal();
-	}
-
-	public Set<Member> getCascadedMembers() {
-		return cascadedMembers;
-	}
-
-	public Set<MetaConstraint<?>> getMetaConstraints() {
-		return allMetaConstraints;
-	}
-
-	public Set<MetaConstraint<?>> getDirectMetaConstraints() {
-		return directMetaConstraints;
-	}
-
-	public MethodMetaData getMetaDataFor(Method method) {
-		return methodMetaData.get( method.getName() + Arrays.toString( method.getParameterTypes() ) );
-	}
-
-	public Set<MethodMetaData> getAllMethodMetaData() {
-		return new HashSet<MethodMetaData>( methodMetaData.values() );
-	}
-
-	public PropertyMetaData getMetaDataFor(String propertyName) {
-		return propertyMetaData.get( propertyName );
-	}
-
-	public boolean isPropertyPresent(String name) {
-		return propertyMetaData.containsKey( name );
-	}
-
-	public List<Class<?>> getDefaultGroupSequence(T beanState) {
-		if ( hasDefaultGroupSequenceProvider() ) {
-			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
-			return getValidDefaultGroupSequence( providerDefaultGroupSequence );
-		}
-
-		return Collections.unmodifiableList( defaultGroupSequence );
-	}
-
-	public boolean defaultGroupSequenceIsRedefined() {
-		return defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
-	}
-
-	private boolean hasDefaultGroupSequenceProvider() {
-		return defaultGroupSequenceProvider != null;
-	}
-
-	public Set<PropertyMetaData> getAllPropertyMetaData() {
-		return Collections.unmodifiableSet( new HashSet<PropertyMetaData>( propertyMetaData.values() ) );
-	}
-
-	/**
-	 * Returns a bean descriptor representing this meta data object. The
-	 * descriptor is instantiated when this method is called for the first time.
-	 * This instance is cached, so later invocations will always return the same
-	 * instance.
-	 *
-	 * It might happen that initially two descriptors are created, if none was
-	 * cached yet and two parallel requests for the descriptor arrive at the
-	 * same time. This behavior is accepted as there are no guarantees about the
-	 * descriptor's identity.
-	 *
-	 * @return A bean descriptor for this meta data object.
-	 */
-	private BeanDescriptorImpl<T> getBeanDescriptorInternal() {
-
-		if ( beanDescriptor != null ) {
-			return beanDescriptor;
-		}
-
-		beanDescriptor = new BeanDescriptorImpl<T>(
-				beanClass,
-				asDescriptors( getClassLevelConstraints( allMetaConstraints ) ),
-				getConstrainedPropertiesAsDescriptors(),
-				getMethodsAsDescriptors(),
-				defaultGroupSequenceIsRedefined(),
-				getDefaultGroupSequence( null )
-		);
-
-		return beanDescriptor;
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Set<MetaConstraint<?>> constraints) {
@@ -414,8 +414,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return validDefaultGroupSequence;
 	}
 
-	public List<Class<?>> getClassHierarchy() {
-		return classHierarchyWithoutInterfaces;
+	private boolean hasDefaultGroupSequenceProvider() {
+		return defaultGroupSequenceProvider != null;
 	}
 
 	@SuppressWarnings("unchecked")
