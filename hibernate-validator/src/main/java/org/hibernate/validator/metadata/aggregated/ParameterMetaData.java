@@ -41,12 +41,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 	private final int index;
 
-	/**
-	 * @param constraints
-	 * @param isCascading
-	 * @param constrainedMetaDataKind
-	 */
-	public ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	private ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading) {
 
 		super(
 				name,
@@ -103,7 +98,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		@Override
 		public boolean accepts(ConstrainedElement constrainedElement) {
 
-			if ( constrainedElement.getConstrainedElementKind() != ConstrainedElementKind.PARAMETER ) {
+			if ( constrainedElement.getKind() != ConstrainedElementKind.PARAMETER ) {
 				return false;
 			}
 

@@ -64,7 +64,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 *
 	 * @return The kind of this constrained element.
 	 */
-	ConstrainedElementKind getConstrainedElementKind();
+	ConstrainedElementKind getKind();
 
 	/**
 	 * Returns the location of this constrained element.

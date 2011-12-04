@@ -136,7 +136,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		public boolean accepts(ConstrainedElement constrainedElement) {
 
 			return
-					constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+					constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
 							ReflectionHelper.haveSameSignature(
 									location.getMember(),
 									( (ConstrainedMethod) constrainedElement ).getLocation().getMember()

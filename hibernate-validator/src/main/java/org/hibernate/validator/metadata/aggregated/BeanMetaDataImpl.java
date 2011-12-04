@@ -147,7 +147,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Set<MethodMetaData> methodMetaDataSet = newHashSet();
 
 		for ( ConstraintMetaData oneElement : constraintMetaData ) {
-			if ( oneElement.getConstrainedMetaDataKind() == ConstraintMetaDataKind.PROPERTY ) {
+			if ( oneElement.getKind() == ConstraintMetaDataKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) oneElement );
 			}
 			else {
@@ -263,7 +263,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		beanDescriptor = new BeanDescriptorImpl<T>(
 				beanClass,
-				asDescriptors( getClassLevelConstraints( allMetaConstraints ) ),
+				getClassLevelConstraintsAsDescriptors(),
 				getConstrainedPropertiesAsDescriptors(),
 				getMethodsAsDescriptors(),
 				defaultGroupSequenceIsRedefined(),
@@ -273,10 +273,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return beanDescriptor;
 	}
 
-	private Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
+	private Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors() {
+
+		Set<MetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( allMetaConstraints );
+
 		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
 
-		for ( MetaConstraint<?> oneConstraint : constraints ) {
+		for ( MetaConstraint<?> oneConstraint : classLevelConstraints ) {
 			theValue.add( oneConstraint.getDescriptor() );
 		}
 
@@ -561,7 +564,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			this.constraintHelper = constraintHelper;
 
-			switch ( constrainedElement.getConstrainedElementKind() ) {
+			switch ( constrainedElement.getKind() ) {
 
 				case FIELD:
 
@@ -611,7 +614,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( propertyBuilder != null && propertyBuilder.accepts( constrainedElement ) ) {
 				propertyBuilder.add( constrainedElement );
 
-				if ( added == false && constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
+				if ( added == false && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
 					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 					methodBuilder = new MethodMetaData.Builder(
 							constrainedMethod,

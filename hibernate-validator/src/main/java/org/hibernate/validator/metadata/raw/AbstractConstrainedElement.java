@@ -49,7 +49,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		this.isCascading = isCascading;
 	}
 
-	public ConstrainedElementKind getConstrainedElementKind() {
+	public ConstrainedElementKind getKind() {
 		return kind;
 	}
 
