@@ -16,6 +16,9 @@
 */
 package org.hibernate.validator.metadata.aggregated;
 
+import java.util.List;
+import javax.validation.metadata.ElementDescriptor;
+
 import org.hibernate.validator.metadata.core.MetaConstraint;
 
 /**
@@ -57,7 +60,7 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	 *
 	 * @return The {@link ConstraintMetaDataKind kind} of this meta data object.
 	 */
-	ConstraintMetaDataKind getConstrainedMetaDataKind();
+	ConstraintMetaDataKind getKind();
 
 	/**
 	 * Whether this meta data object is marked for cascaded validation or not.
@@ -72,4 +75,20 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	 * @return <code>True</code> if this object is marked for cascaded validation or has any constraints, <code>false</code> otherwise.
 	 */
 	boolean isConstrained();
+
+	/**
+	 * Returns this meta data object's corresponding representation in the
+	 * descriptor model.
+	 *
+	 * @param defaultGroupSequenceRedefined Whether the bean hosting the represented element has a
+	 * redefined default group sequence or not.
+	 * @param defaultGroupSequence The default group sequence of the bean hosting the represented
+	 * element.
+	 *
+	 * @return This meta data object's corresponding descriptor model
+	 *         representation. Implementations should return a specific sub type
+	 *         of {@link ElementDescriptor}.
+	 */
+	ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence);
+
 }

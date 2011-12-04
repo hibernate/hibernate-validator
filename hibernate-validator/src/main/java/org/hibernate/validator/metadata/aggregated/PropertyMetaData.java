@@ -170,11 +170,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		public boolean accepts(ConstrainedElement constrainedElement) {
 
-			if ( !SUPPORTED_ELEMENT_KINDS.contains( constrainedElement.getConstrainedElementKind() ) ) {
+			if ( !SUPPORTED_ELEMENT_KINDS.contains( constrainedElement.getKind() ) ) {
 				return false;
 			}
 
-			if ( constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
 					!( (ConstrainedMethod) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}

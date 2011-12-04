@@ -75,7 +75,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		return constraints;
 	}
 
-	public ConstraintMetaDataKind getConstrainedMetaDataKind() {
+	public ConstraintMetaDataKind getKind() {
 		return constrainedMetaDataKind;
 	}
 
