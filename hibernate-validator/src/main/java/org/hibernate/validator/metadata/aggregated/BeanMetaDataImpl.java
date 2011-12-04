@@ -157,7 +157,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Set<Member> cascadedMembers = newHashSet();
 		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
-		Set<MetaConstraint<?>> allClassLevelConstraints = newHashSet();
 
 		for ( PropertyMetaData oneProperty : propertyMetaDataSet ) {
 
@@ -165,14 +164,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			if ( oneProperty.isCascading() ) {
 				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
-			}
-
-			Set<MetaConstraint<?>> classLevelConstraints = partition(
-					oneProperty.getConstraints(),
-					byElementType()
-			).get( ElementType.TYPE );
-			if ( classLevelConstraints != null ) {
-				allClassLevelConstraints.addAll( classLevelConstraints );
 			}
 
 			allMetaConstraints.addAll( oneProperty.getConstraints() );
@@ -188,14 +179,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		directMetaConstraints = buildDirectConstraintSets();
 
 		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDataSet ) );
-		beanDescriptor = new BeanDescriptorImpl<T>(
-				beanClass,
-				asDescriptors( allClassLevelConstraints ),
-				getConstrainedPropertiesAsDescriptors(),
-				getMethodsAsDescriptors(),
-				defaultGroupSequenceIsRedefined(),
-				getDefaultGroupSequence( null )
-		);
 	}
 
 	private Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
@@ -263,11 +246,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public BeanDescriptor getBeanDescriptor() {
-		return beanDescriptor;
+		return getBeanDescriptorInternal();
 	}
 
 	public TypeDescriptor getTypeDescriptor() {
-		return beanDescriptor;
+		return getBeanDescriptorInternal();
 	}
 
 	public Set<Member> getCascadedMembers() {
@@ -317,6 +300,47 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public Set<PropertyMetaData> getAllPropertyMetaData() {
 		return Collections.unmodifiableSet( new HashSet<PropertyMetaData>( propertyMetaData.values() ) );
+	}
+
+	/**
+	 * Returns a bean descriptor representing this meta data object. The
+	 * descriptor is instantiated when this method is called for the first time.
+	 * This instance is cached, so later invocations will always return the same
+	 * instance.
+	 *
+	 * It might happen that initially two descriptors are created, if none was
+	 * cached yet and two parallel requests for the descriptor arrive at the
+	 * same time. This behavior is accepted as there are no guarantees about the
+	 * descriptor's identity.
+	 *
+	 * @return A bean descriptor for this meta data object.
+	 */
+	private BeanDescriptorImpl<T> getBeanDescriptorInternal() {
+
+		if ( beanDescriptor != null ) {
+			return beanDescriptor;
+		}
+
+		beanDescriptor = new BeanDescriptorImpl<T>(
+				beanClass,
+				asDescriptors( getClassLevelConstraints( allMetaConstraints ) ),
+				getConstrainedPropertiesAsDescriptors(),
+				getMethodsAsDescriptors(),
+				defaultGroupSequenceIsRedefined(),
+				getDefaultGroupSequence( null )
+		);
+
+		return beanDescriptor;
+	}
+
+	private Set<MetaConstraint<?>> getClassLevelConstraints(Set<MetaConstraint<?>> constraints) {
+
+		Set<MetaConstraint<?>> classLevelConstraints = partition(
+				constraints,
+				byElementType()
+		).get( ElementType.TYPE );
+
+		return classLevelConstraints != null ? classLevelConstraints : Collections.<MetaConstraint<?>>emptySet();
 	}
 
 	private Set<MetaConstraint<?>> buildDirectConstraintSets() {
