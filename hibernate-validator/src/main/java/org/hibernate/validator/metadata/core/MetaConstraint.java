@@ -79,7 +79,7 @@ public class MetaConstraint<A extends Annotation> {
 		return constraintDescriptor.getElementType();
 	}
 
-	public <T, U, V> boolean validateConstraint(ValidationContext<T, ?> executionContext, ValueContext<U, V> valueContext) {
+	public boolean validateConstraint(ValidationContext<?, ?> executionContext, ValueContext<?, ?> valueContext) {
 		valueContext.setElementType( getElementType() );
 		valueContext.setTypeOfAnnotatedElement( typeOfAnnotatedElement() );
 
