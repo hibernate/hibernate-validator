@@ -72,8 +72,12 @@
             <source>../readme.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
-       <file>
+        <file>
             <source>../changelog.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>../copyright.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
@@ -90,13 +94,20 @@
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
                 <exclude>readme.txt</exclude>
+                <exclude>changelog.txt</exclude>
+                <exclude>copyright.txt</exclude>
                 <exclude>license.txt</exclude>
+                <exclude>**/zanata.sh</exclude>
+                <exclude>**/zanata.xml</exclude>
+                <exclude>src/main/scripts/**</exclude>
                 <exclude>.git</exclude>
                 <exclude>.gitignore</exclude>
                 <exclude>**/target/**</exclude>
                 <exclude>**/.idea/**</exclude>
                 <exclude>.sonar-ide.properties</exclude>
                 <exclude>**/*.iml</exclude>
+                <exclude>**/*.ipr</exclude>
+                <exclude>**/*.iws</exclude>
             </excludes>
         </fileSet>
 
