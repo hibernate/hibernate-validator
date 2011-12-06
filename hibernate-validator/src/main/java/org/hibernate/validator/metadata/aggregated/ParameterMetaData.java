@@ -41,8 +41,15 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 	private final int index;
 
+	/**
+	 * @param index the parameter index
+	 * @param name the parameter name
+	 * @param type the parameter type
+	 * @param constraints the constraints defined for this parameter
+	 * @param isCascading should cascading constraints be evaluated. Returns {@code true} is the constrained element
+	 * is marked for cascaded validation ({@code @Valid}), {@code false} otherwise.
+	 */
 	private ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading) {
-
 		super(
 				name,
 				type,

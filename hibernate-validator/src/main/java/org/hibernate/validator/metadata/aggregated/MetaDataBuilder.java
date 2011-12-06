@@ -82,7 +82,7 @@ public abstract class MetaDataBuilder {
 	 * additionally be part of the constraint's groups (implicit grouping).
 	 *
 	 * @param beanClass The bean type to which the constraint shall be adapted.
-	 * @param constraint The constraint that shall be adapted. This constraint itself
+	 * @param constraints The constraints that shall be adapted. The constraints themselves
 	 * will not be altered.
 	 *
 	 * @return A constraint adapted to the given bean type.

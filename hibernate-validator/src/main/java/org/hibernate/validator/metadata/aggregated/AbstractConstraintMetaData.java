@@ -46,11 +46,21 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	private final boolean isConstrained;
 
 	/**
-	 * @param constraints
-	 * @param constrainedMetaDataKind
-	 * @param isCascading
+	 * @param name the name of the constrained property, method or parameter
+	 * @param type the type of the constrained element
+	 * @param constraints the set of constraints
+	 * @param constrainedMetaDataKind the type of constraint - property, method or parameter constraint
+	 * @param isCascading should cascading constraints be evaluated. Returns {@code true} is the constrained element
+	 * is marked for cascaded validation ({@code @Valid}), {@code false} otherwise.
+	 * @param isConstrained returns {@code true} is there are direct constraints defined on this element or it is
+	 * marked for cascaded validation, {@code false} otherwise.
 	 */
-	public AbstractConstraintMetaData(String name, Class<?> type, Set<MetaConstraint<?>> constraints, ConstraintMetaDataKind constrainedMetaDataKind, boolean isCascading, boolean isConstrained) {
+	public AbstractConstraintMetaData(String name,
+									  Class<?> type,
+									  Set<MetaConstraint<?>> constraints,
+									  ConstraintMetaDataKind constrainedMetaDataKind,
+									  boolean isCascading,
+									  boolean isConstrained) {
 		this.name = name;
 		this.type = type;
 		this.constraints = Collections.unmodifiableSet( constraints );
