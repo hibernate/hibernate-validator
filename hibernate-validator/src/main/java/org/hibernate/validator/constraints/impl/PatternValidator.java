@@ -25,7 +25,7 @@ import javax.validation.constraints.Pattern;
 /**
  * @author Hardy Ferentschik
  */
-public class PatternValidator implements ConstraintValidator<Pattern, String> {
+public class PatternValidator implements ConstraintValidator<Pattern, CharSequence> {
 
 	private java.util.regex.Pattern pattern;
 
@@ -44,7 +44,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, String> {
 		}
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;
 		}

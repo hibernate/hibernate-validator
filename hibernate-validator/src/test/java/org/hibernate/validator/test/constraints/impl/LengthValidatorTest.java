@@ -16,14 +16,16 @@
 */
 package org.hibernate.validator.test.constraints.impl;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.impl.LengthValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests the <code>LengthConstraint</code>.
@@ -47,6 +49,19 @@ public class LengthValidatorTest {
 		assertTrue( constraint.isValid( "fo", null ) );
 		assertTrue( constraint.isValid( "foo", null ) );
 		assertFalse( constraint.isValid( "foobar", null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-502")
+	public void testIsValidCharSequence() {
+		AnnotationDescriptor<Length> descriptor = new AnnotationDescriptor<Length>( Length.class );
+		descriptor.setValue( "min", 1 );
+		descriptor.setValue( "max", 3 );
+		Length l = AnnotationFactory.create( descriptor );
+		LengthValidator constraint = new LengthValidator();
+		constraint.initialize( l );
+		assertTrue( constraint.isValid( new MyCustomStringImpl( "foo" ), null ) );
+		assertFalse( constraint.isValid( new MyCustomStringImpl( "foobar" ), null ) );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

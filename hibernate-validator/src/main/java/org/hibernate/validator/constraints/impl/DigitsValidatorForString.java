@@ -22,13 +22,13 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Digits;
 
 /**
- * Validates that the <code>String</code> being validated consists of digits,
+ * Validates that the character sequence (string) being validated consists of digits,
  * and matches the pattern defined in the constraint.
  *
  * @author Alaa Nassef
  * @author Hardy Ferentschik
  */
-public class DigitsValidatorForString implements ConstraintValidator<Digits, String> {
+public class DigitsValidatorForString implements ConstraintValidator<Digits, CharSequence> {
 
 	private int maxIntegerLength;
 	private int maxFractionLength;
@@ -39,13 +39,13 @@ public class DigitsValidatorForString implements ConstraintValidator<Digits, Str
 		validateParameters();
 	}
 
-	public boolean isValid(String str, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
-		if ( str == null ) {
+		if ( charSequence == null ) {
 			return true;
 		}
 
-		BigDecimal bigNum = getBigDecimalValue( str );
+		BigDecimal bigNum = getBigDecimalValue( charSequence );
 		if ( bigNum == null ) {
 			return false;
 		}
@@ -56,10 +56,10 @@ public class DigitsValidatorForString implements ConstraintValidator<Digits, Str
 		return ( maxIntegerLength >= integerPartLength && maxFractionLength >= fractionPartLength );
 	}
 
-	private BigDecimal getBigDecimalValue(String str) {
+	private BigDecimal getBigDecimalValue(CharSequence charSequence) {
 		BigDecimal bd;
 		try {
-			bd = new BigDecimal( str );
+			bd = new BigDecimal( charSequence.toString() );
 		}
 		catch ( NumberFormatException nfe ) {
 			return null;

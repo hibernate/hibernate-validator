@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.Email;
 
 /**
- * Checks that a given string is a well-formed email address.
+ * Checks that a given character sequence (string) is a well-formed email address.
  * <p>
  * The specification of a valid email can be found in
  * <a href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>
@@ -21,7 +21,7 @@ import org.hibernate.validator.constraints.Email;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class EmailValidator implements ConstraintValidator<Email, String> {
+public class EmailValidator implements ConstraintValidator<Email, CharSequence> {
 	private static String ATOM = "[a-z0-9!#$%&'*+/=?^_`{|}~-]";
 	private static String DOMAIN = "(" + ATOM + "+(\\." + ATOM + "+)*";
 	private static String IP_DOMAIN = "\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\]";
@@ -38,7 +38,7 @@ public class EmailValidator implements ConstraintValidator<Email, String> {
 	public void initialize(Email annotation) {
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext context) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null || value.length() == 0 ) {
 			return true;
 		}

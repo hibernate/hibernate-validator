@@ -22,13 +22,13 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Min;
 
 /**
- * Check that the String being validated represents a number, and has a value
+ * Check that the character sequence (string) being validated represents a number, and has a value
  * more than or equal to the minimum value specified.
  *
  * @author Alaa Nassef
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class MinValidatorForString implements ConstraintValidator<Min, String> {
+public class MinValidatorForString implements ConstraintValidator<Min, CharSequence> {
 
 	private BigDecimal minValue;
 
@@ -36,13 +36,13 @@ public class MinValidatorForString implements ConstraintValidator<Min, String> {
 		this.minValue = BigDecimal.valueOf( minValue.value() );
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
 		try {
-			return new BigDecimal( value ).compareTo( minValue ) != -1;
+			return new BigDecimal( value.toString() ).compareTo( minValue ) != -1;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;
