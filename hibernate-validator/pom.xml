@@ -284,10 +284,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.jboss.maven.plugins</groupId>
-                <artifactId>maven-jdocbook-style-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
             </plugin>

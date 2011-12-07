@@ -22,7 +22,9 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -40,6 +42,7 @@
 
     <properties>
         <jdocbookSourceDirectory>${basedir}/src/main/docbook</jdocbookSourceDirectory>
+        <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
@@ -56,6 +59,12 @@
                     <translations>
                         <translation>zh-CN</translation>
                     </translations>
+                    <!--
+                    The jdookbook plug-in doesn't define an expression for this property, therefore
+                    it can't be passed on the command line. To address this issue the value is retrieved
+                    from a custom property, which itself can be set using -DignoreTranslations=...
+                    -->
+                    <ignoreTranslations>${jdocbook.ignoreTranslations}</ignoreTranslations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
