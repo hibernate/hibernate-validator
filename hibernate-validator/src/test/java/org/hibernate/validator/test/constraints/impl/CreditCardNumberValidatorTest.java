@@ -20,6 +20,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.CreditCardNumberValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -42,8 +43,20 @@ public class CreditCardNumberValidatorTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-502")
+	public void testInvalidCreditCardNumberAsCharSequence() throws Exception {
+		assertFalse( validator.isValid( new MyCustomStringImpl( "1234567890123456" ), null ) );
+	}
+
+	@Test
 	public void testValidCreditCardNumber() throws Exception {
 		assertTrue( validator.isValid( "541234567890125", null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-502")
+	public void testValidCreditCardNumberAsCharSequence() throws Exception {
+		assertTrue( validator.isValid( new MyCustomStringImpl( "541234567890125" ), null ) );
 	}
 
 	@Test

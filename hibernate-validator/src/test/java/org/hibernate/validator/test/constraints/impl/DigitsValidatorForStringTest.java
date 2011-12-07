@@ -18,14 +18,16 @@ package org.hibernate.validator.test.constraints.impl;
 
 import javax.validation.constraints.Digits;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DigitsValidatorForString;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Alaa Nassef
@@ -85,5 +87,11 @@ public class DigitsValidatorForStringTest {
 
 		DigitsValidatorForString constraint = new DigitsValidatorForString();
 		constraint.initialize( p );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-502")
+	public void testIsValidCharSequence() {
+		assertTrue( constraint.isValid( new MyCustomStringImpl( "500.2" ), null ) );
 	}
 }

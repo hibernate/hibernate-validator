@@ -22,12 +22,12 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.DecimalMax;
 
 /**
- * Check that the String being validated represents a number, and has a value
+ * Check that the character sequence (string) being validated represents a number, and has a value
  * less than or equal to the maximum value specified.
  *
  * @author Alaa Nassef
  */
-public class DecimalMaxValidatorForString implements ConstraintValidator<DecimalMax, String> {
+public class DecimalMaxValidatorForString implements ConstraintValidator<DecimalMax, CharSequence> {
 
 	private BigDecimal maxValue;
 
@@ -42,13 +42,13 @@ public class DecimalMaxValidatorForString implements ConstraintValidator<Decimal
 		}
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
 		try {
-			return new BigDecimal( value ).compareTo( maxValue ) != 1;
+			return new BigDecimal( value.toString() ).compareTo( maxValue ) != 1;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;

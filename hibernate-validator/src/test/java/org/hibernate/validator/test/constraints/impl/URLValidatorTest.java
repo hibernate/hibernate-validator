@@ -27,6 +27,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.impl.URLValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -56,6 +57,18 @@ public class URLValidatorTest {
 		assertFalse( validator.isValid( "http", null ) );
 		assertFalse( validator.isValid( "ftp//abc.de", null ) );
 		assertTrue( validator.isValid( "ftp://abc.de", null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-502")
+	public void testIsValidUrlWithCharSequence() {
+		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
+		URL url = AnnotationFactory.create( descriptor );
+		URLValidator validator = new URLValidator();
+		validator.initialize( url );
+
+		assertFalse( validator.isValid( new MyCustomStringImpl( "ftp//abc.de" ), null ) );
+		assertTrue( validator.isValid( new MyCustomStringImpl( "ftp://abc.de" ), null ) );
 	}
 
 	@Test
@@ -116,7 +129,8 @@ public class URLValidatorTest {
 		assertTrue( validator.isValid( "http://www.hibernate.org:80", null ) );
 	}
 
-	@Test(description = "HV-323")
+	@Test
+	@TestForIssue(jiraKey = "HV-323")
 	public void testIsValidEmptyString() {
 		AnnotationDescriptor<URL> descriptor = new AnnotationDescriptor<URL>( URL.class );
 		descriptor.setValue( "protocol", "http" );
@@ -129,7 +143,8 @@ public class URLValidatorTest {
 		assertTrue( validator.isValid( "", null ) );
 	}
 
-	@Test(description = "HV-406")
+	@Test
+	@TestForIssue(jiraKey = "HV-406")
 	public void testRegExp() {
 		// first run the test with @URL configured via annotations
 		Validator validator = ValidatorUtil.getValidator();
@@ -147,7 +162,8 @@ public class URLValidatorTest {
 		runUrlContainerValidation( validator, container, true );
 	}
 
-	@Test(description = "HV-406")
+	@Test
+	@TestForIssue(jiraKey = "HV-406")
 	public void testRegExpCaseInsensitive() {
 
 		// first run the test with @URL configured via annotations
@@ -226,5 +242,4 @@ public class URLValidatorTest {
 
 	private static class URLContainerNoAnnotations extends URLContainer {
 	}
-
 }
