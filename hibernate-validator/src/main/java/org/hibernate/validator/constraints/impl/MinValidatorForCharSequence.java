@@ -19,21 +19,21 @@ package org.hibernate.validator.constraints.impl;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 /**
- * Check that the character sequence (string) validated represents a number, and has a value
- * less than or equal to the maximum value specified.
+ * Check that the character sequence (e.g. string) being validated represents a number, and has a value
+ * more than or equal to the minimum value specified.
  *
  * @author Alaa Nassef
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public class MaxValidatorForString implements ConstraintValidator<Max, CharSequence> {
+public class MinValidatorForCharSequence implements ConstraintValidator<Min, CharSequence> {
 
-	private BigDecimal maxValue;
+	private BigDecimal minValue;
 
-	public void initialize(Max maxValue) {
-		this.maxValue = BigDecimal.valueOf( maxValue.value() );
+	public void initialize(Min minValue) {
+		this.minValue = BigDecimal.valueOf( minValue.value() );
 	}
 
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
@@ -42,7 +42,7 @@ public class MaxValidatorForString implements ConstraintValidator<Max, CharSeque
 			return true;
 		}
 		try {
-			return new BigDecimal( value.toString() ).compareTo( maxValue ) != 1;
+			return new BigDecimal( value.toString() ).compareTo( minValue ) != -1;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;

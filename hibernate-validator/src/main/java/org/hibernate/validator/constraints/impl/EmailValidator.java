@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.Email;
 
 /**
- * Checks that a given character sequence (string) is a well-formed email address.
+ * Checks that a given character sequence (e.g. string) is a well-formed email address.
  * <p>
  * The specification of a valid email can be found in
  * <a href="http://www.faqs.org/rfcs/rfc2822.html">RFC 2822</a>

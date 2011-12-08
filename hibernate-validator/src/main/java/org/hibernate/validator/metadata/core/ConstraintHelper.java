@@ -44,19 +44,19 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.impl.AssertFalseValidator;
 import org.hibernate.validator.constraints.impl.AssertTrueValidator;
 import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForString;
+import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForCharSequence;
 import org.hibernate.validator.constraints.impl.DecimalMinValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMinValidatorForString;
+import org.hibernate.validator.constraints.impl.DecimalMinValidatorForCharSequence;
 import org.hibernate.validator.constraints.impl.DigitsValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DigitsValidatorForString;
+import org.hibernate.validator.constraints.impl.DigitsValidatorForCharSequence;
 import org.hibernate.validator.constraints.impl.FutureValidatorForCalendar;
 import org.hibernate.validator.constraints.impl.FutureValidatorForDate;
 import org.hibernate.validator.constraints.impl.FutureValidatorForReadableInstant;
 import org.hibernate.validator.constraints.impl.FutureValidatorForReadablePartial;
 import org.hibernate.validator.constraints.impl.MaxValidatorForNumber;
-import org.hibernate.validator.constraints.impl.MaxValidatorForString;
+import org.hibernate.validator.constraints.impl.MaxValidatorForCharSequence;
 import org.hibernate.validator.constraints.impl.MinValidatorForNumber;
-import org.hibernate.validator.constraints.impl.MinValidatorForString;
+import org.hibernate.validator.constraints.impl.MinValidatorForCharSequence;
 import org.hibernate.validator.constraints.impl.NotNullValidator;
 import org.hibernate.validator.constraints.impl.NullValidator;
 import org.hibernate.validator.constraints.impl.PastValidatorForCalendar;
@@ -74,7 +74,7 @@ import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfInt;
 import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validator.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validator.constraints.impl.SizeValidatorForMap;
-import org.hibernate.validator.constraints.impl.SizeValidatorForString;
+import org.hibernate.validator.constraints.impl.SizeValidatorForCharSequence;
 import org.hibernate.validator.util.ReflectionHelper;
 
 /**
@@ -105,16 +105,16 @@ public class ConstraintHelper {
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( DecimalMaxValidatorForNumber.class );
-		constraintList.add( DecimalMaxValidatorForString.class );
+		constraintList.add( DecimalMaxValidatorForCharSequence.class );
 		builtinConstraints.put( DecimalMax.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( DecimalMinValidatorForNumber.class );
-		constraintList.add( DecimalMinValidatorForString.class );
+		constraintList.add( DecimalMinValidatorForCharSequence.class );
 		builtinConstraints.put( DecimalMin.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
-		constraintList.add( DigitsValidatorForString.class );
+		constraintList.add( DigitsValidatorForCharSequence.class );
 		constraintList.add( DigitsValidatorForNumber.class );
 		builtinConstraints.put( Digits.class, constraintList );
 
@@ -129,12 +129,12 @@ public class ConstraintHelper {
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( MaxValidatorForNumber.class );
-		constraintList.add( MaxValidatorForString.class );
+		constraintList.add( MaxValidatorForCharSequence.class );
 		builtinConstraints.put( Max.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
 		constraintList.add( MinValidatorForNumber.class );
-		constraintList.add( MinValidatorForString.class );
+		constraintList.add( MinValidatorForCharSequence.class );
 		builtinConstraints.put( Min.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
@@ -159,7 +159,7 @@ public class ConstraintHelper {
 		builtinConstraints.put( Pattern.class, constraintList );
 
 		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
-		constraintList.add( SizeValidatorForString.class );
+		constraintList.add( SizeValidatorForCharSequence.class );
 		constraintList.add( SizeValidatorForCollection.class );
 		constraintList.add( SizeValidatorForArray.class );
 		constraintList.add( SizeValidatorForMap.class );

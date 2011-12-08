@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
- * Check that a character sequence's (string) trimmed length is not empty.
+ * Check that a character sequence's (e.g. string) trimmed length is not empty.
  *
  * @author Hardy Ferentschik
  */
@@ -35,7 +35,7 @@ public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequ
 	/**
 	 * Checks that the trimmed string is not empty.
 	 *
-	 * @param charSequence The string to validate.
+	 * @param charSequence The character sequence to validate.
 	 * @param constraintValidatorContext context in which the constraint is evaluated.
 	 *
 	 * @return Returns <code>true</code> if the string is <code>null</code> or the length of <code>charSequence</code> between the specified

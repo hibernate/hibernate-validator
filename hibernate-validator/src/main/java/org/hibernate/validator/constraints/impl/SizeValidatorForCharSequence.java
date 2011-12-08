@@ -21,13 +21,13 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
 
 /**
- * Check that a string's length is between min and max.
+ * Check that the length of a character sequence is between min and max.
  *
  * @author Emmanuel Bernard
  * @author Gavin King
  * @author Hardy Ferentschik
  */
-public class SizeValidatorForString implements ConstraintValidator<Size, CharSequence> {
+public class SizeValidatorForCharSequence implements ConstraintValidator<Size, CharSequence> {
 	private int min;
 	private int max;
 
@@ -38,9 +38,9 @@ public class SizeValidatorForString implements ConstraintValidator<Size, CharSeq
 	}
 
 	/**
-	 * Checks the length of the specified character sequence (string).
+	 * Checks the length of the specified character sequence (e.g. string).
 	 *
-	 * @param charSequence The string to validate.
+	 * @param charSequence The character sequence to validate.
 	 * @param constraintValidatorContext context in which the constraint is evaluated.
 	 *
 	 * @return Returns <code>true</code> if the string is <code>null</code> or the length of <code>charSequence</code> between the specified

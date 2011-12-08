@@ -37,7 +37,7 @@ import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfShort;
 import org.hibernate.validator.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validator.constraints.impl.SizeValidatorForMap;
-import org.hibernate.validator.constraints.impl.SizeValidatorForString;
+import org.hibernate.validator.constraints.impl.SizeValidatorForCharSequence;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
@@ -144,7 +144,7 @@ public class SizeValidatorTest {
 
 	@Test
 	public void testIsValidString() throws Exception {
-		ConstraintValidator<Size, String> validator = getValidatorMin1Max2( SizeValidatorForString.class );
+		ConstraintValidator<Size, String> validator = getValidatorMin1Max2( SizeValidatorForCharSequence.class );
 
 		assertTrue( validator.isValid( null, null ) );
 		assertFalse( validator.isValid( "", null ) );
@@ -156,7 +156,7 @@ public class SizeValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-502")
 	public void testIsValidCharSequence() throws Exception {
-		ConstraintValidator<Size, CharSequence> validator = getValidatorMin1Max2( SizeValidatorForString.class );
+		ConstraintValidator<Size, CharSequence> validator = getValidatorMin1Max2( SizeValidatorForCharSequence.class );
 
 		assertTrue( validator.isValid( new MyCustomStringImpl( "ab" ), null ) );
 		assertFalse( validator.isValid( new MyCustomStringImpl( "abc" ), null ) );

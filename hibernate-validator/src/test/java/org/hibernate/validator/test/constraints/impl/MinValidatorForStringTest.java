@@ -23,8 +23,8 @@ import javax.validation.constraints.Min;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DecimalMinValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMinValidatorForString;
-import org.hibernate.validator.constraints.impl.MinValidatorForString;
+import org.hibernate.validator.constraints.impl.DecimalMinValidatorForCharSequence;
+import org.hibernate.validator.constraints.impl.MinValidatorForCharSequence;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
@@ -45,7 +45,7 @@ public class MinValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.min}" );
 		Min m = AnnotationFactory.create( descriptor );
 
-		MinValidatorForString constraint = new MinValidatorForString();
+		MinValidatorForCharSequence constraint = new MinValidatorForCharSequence();
 		constraint.initialize( m );
 		testMinValidator( constraint );
 	}
@@ -57,7 +57,7 @@ public class MinValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.min}" );
 		DecimalMin m = AnnotationFactory.create( descriptor );
 
-		DecimalMinValidatorForString constraint = new DecimalMinValidatorForString();
+		DecimalMinValidatorForCharSequence constraint = new DecimalMinValidatorForCharSequence();
 		constraint.initialize( m );
 		testMinValidator( constraint );
 	}

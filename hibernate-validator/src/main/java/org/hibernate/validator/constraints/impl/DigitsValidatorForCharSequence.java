@@ -22,13 +22,13 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Digits;
 
 /**
- * Validates that the character sequence (string) being validated consists of digits,
+ * Validates that the character sequence (e.g. string) being validated consists of digits,
  * and matches the pattern defined in the constraint.
  *
  * @author Alaa Nassef
  * @author Hardy Ferentschik
  */
-public class DigitsValidatorForString implements ConstraintValidator<Digits, CharSequence> {
+public class DigitsValidatorForCharSequence implements ConstraintValidator<Digits, CharSequence> {
 
 	private int maxIntegerLength;
 	private int maxFractionLength;

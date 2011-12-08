@@ -19,21 +19,24 @@ package org.hibernate.validator.constraints.impl;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.DecimalMin;
 
 /**
- * Check that the character sequence (string) being validated represents a number, and has a value
- * more than or equal to the minimum value specified.
- *
- * @author Alaa Nassef
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Hardy Ferentschik
  */
-public class MinValidatorForString implements ConstraintValidator<Min, CharSequence> {
+public class DecimalMinValidatorForCharSequence implements ConstraintValidator<DecimalMin, CharSequence> {
 
 	private BigDecimal minValue;
 
-	public void initialize(Min minValue) {
-		this.minValue = BigDecimal.valueOf( minValue.value() );
+	public void initialize(DecimalMin minValue) {
+		try {
+			this.minValue = new BigDecimal( minValue.value() );
+		}
+		catch ( NumberFormatException nfe ) {
+			throw new IllegalArgumentException(
+					minValue.value() + " does not represent a valid BigDecimal format", nfe
+			);
+		}
 	}
 
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {

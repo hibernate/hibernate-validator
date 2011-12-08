@@ -23,8 +23,8 @@ import javax.validation.constraints.Max;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForString;
-import org.hibernate.validator.constraints.impl.MaxValidatorForString;
+import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForCharSequence;
+import org.hibernate.validator.constraints.impl.MaxValidatorForCharSequence;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 
@@ -45,7 +45,7 @@ public class MaxValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.max}" );
 		Max m = AnnotationFactory.create( descriptor );
 
-		MaxValidatorForString constraint = new MaxValidatorForString();
+		MaxValidatorForCharSequence constraint = new MaxValidatorForCharSequence();
 		constraint.initialize( m );
 		testMaxValidator( constraint );
 	}
@@ -58,7 +58,7 @@ public class MaxValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.max}" );
 		DecimalMax m = AnnotationFactory.create( descriptor );
 
-		DecimalMaxValidatorForString constraint = new DecimalMaxValidatorForString();
+		DecimalMaxValidatorForCharSequence constraint = new DecimalMaxValidatorForCharSequence();
 		constraint.initialize( m );
 		testMaxValidator( constraint );
 	}

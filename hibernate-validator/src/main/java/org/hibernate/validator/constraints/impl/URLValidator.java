@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.URL;
 
 /**
- * Validate that the character sequence (string) is a valid URL.
+ * Validate that the character sequence (e.g. string) is a valid URL.
  *
  * @author Hardy Ferentschik
  */
