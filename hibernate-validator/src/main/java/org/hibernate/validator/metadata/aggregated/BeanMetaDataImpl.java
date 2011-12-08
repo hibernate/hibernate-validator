@@ -89,11 +89,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<MetaConstraint<?>> directMetaConstraints;
 
 	/**
-	 * The main element descriptor for {@link #beanClass}.
-	 */
-	private BeanDescriptorImpl<T> beanDescriptor;
-
-	/**
 	 * Contains constrained related meta data for all methods of the type
 	 * represented by this bean meta data. Keyed by method, values are an
 	 * aggregated view on each method together with all the methods from the
@@ -243,25 +238,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	/**
-	 * Returns a bean descriptor representing this meta data object. The
-	 * descriptor is instantiated when this method is called for the first time.
-	 * This instance is cached, so later invocations will always return the same
-	 * instance.
-	 *
-	 * It might happen that initially two descriptors are created, if none was
-	 * cached yet and two parallel requests for the descriptor arrive at the
-	 * same time. This behavior is accepted as there are no guarantees about the
-	 * descriptor's identity.
-	 *
+	 * Returns a bean descriptor representing this meta data object. A new
+	 * descriptor instance is created with each invocation. The descriptor might
+	 * be cached internally in the future should that need arise.
+	 * 
 	 * @return A bean descriptor for this meta data object.
 	 */
 	private BeanDescriptorImpl<T> getBeanDescriptorInternal() {
 
-		if ( beanDescriptor != null ) {
-			return beanDescriptor;
-		}
-
-		beanDescriptor = new BeanDescriptorImpl<T>(
+		return new BeanDescriptorImpl<T>(
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
 				getConstrainedPropertiesAsDescriptors(),
@@ -269,8 +254,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				defaultGroupSequenceIsRedefined(),
 				getDefaultGroupSequence( null )
 		);
-
-		return beanDescriptor;
 	}
 
 	private Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors() {
