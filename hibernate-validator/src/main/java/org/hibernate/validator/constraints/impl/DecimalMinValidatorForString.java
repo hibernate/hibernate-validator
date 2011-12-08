@@ -24,7 +24,7 @@ import javax.validation.constraints.DecimalMin;
 /**
  * @author Hardy Ferentschik
  */
-public class DecimalMinValidatorForString implements ConstraintValidator<DecimalMin, String> {
+public class DecimalMinValidatorForString implements ConstraintValidator<DecimalMin, CharSequence> {
 
 	private BigDecimal minValue;
 
@@ -39,13 +39,13 @@ public class DecimalMinValidatorForString implements ConstraintValidator<Decimal
 		}
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
 		try {
-			return new BigDecimal( value ).compareTo( minValue ) != -1;
+			return new BigDecimal( value.toString() ).compareTo( minValue ) != -1;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;
