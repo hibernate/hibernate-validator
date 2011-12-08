@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.DecimalMaxDef;
 import org.hibernate.validator.cfg.defs.DecimalMinDef;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -36,7 +37,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  * @author Hardy Ferentschik
  */
 public class DecimalMinMaxValidatorBoundaryTest {
-	public Double d;
+	private Double d;
 
 	@Test
 	public void testDecimalMinValue() {
@@ -69,7 +70,8 @@ public class DecimalMinMaxValidatorBoundaryTest {
 	}
 
 
-	@Test	  // see HV-508
+	@Test
+	@TestForIssue(jiraKey = "HV-508")
 	public void testDoubleTrouble() {
 		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )

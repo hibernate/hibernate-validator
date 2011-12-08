@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class CreditCardNumberValidator implements ConstraintValidator<CreditCardNumber, String> {
+public class CreditCardNumberValidator implements ConstraintValidator<CreditCardNumber, CharSequence> {
 	private LuhnValidator luhnValidator;
 
 	public CreditCardNumberValidator() {
@@ -21,10 +21,10 @@ public class CreditCardNumberValidator implements ConstraintValidator<CreditCard
 	public void initialize(CreditCardNumber annotation) {
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext context) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null ) {
 			return true;
 		}
-		return luhnValidator.passesLuhnTest( value );
+		return luhnValidator.passesLuhnTest( value.toString() );
 	}
 }

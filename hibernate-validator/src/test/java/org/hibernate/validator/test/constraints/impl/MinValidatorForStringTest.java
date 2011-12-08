@@ -20,16 +20,17 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DecimalMinValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMinValidatorForString;
-import org.hibernate.validator.constraints.impl.MinValidatorForString;
+import org.hibernate.validator.constraints.impl.DecimalMinValidatorForCharSequence;
+import org.hibernate.validator.constraints.impl.MinValidatorForCharSequence;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * @author Alaa Nassef
@@ -44,7 +45,7 @@ public class MinValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.min}" );
 		Min m = AnnotationFactory.create( descriptor );
 
-		MinValidatorForString constraint = new MinValidatorForString();
+		MinValidatorForCharSequence constraint = new MinValidatorForCharSequence();
 		constraint.initialize( m );
 		testMinValidator( constraint );
 	}
@@ -56,7 +57,7 @@ public class MinValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.min}" );
 		DecimalMin m = AnnotationFactory.create( descriptor );
 
-		DecimalMinValidatorForString constraint = new DecimalMinValidatorForString();
+		DecimalMinValidatorForCharSequence constraint = new DecimalMinValidatorForCharSequence();
 		constraint.initialize( m );
 		testMinValidator( constraint );
 	}
@@ -79,7 +80,7 @@ public class MinValidatorForStringTest {
 		}
 	}
 
-	private void testMinValidator(ConstraintValidator<?, String> constraint) {
+	private void testMinValidator(ConstraintValidator<?, CharSequence> constraint) {
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( "20", null ) );
 		assertTrue( constraint.isValid( "15", null ) );
@@ -87,6 +88,10 @@ public class MinValidatorForStringTest {
 		assertFalse( constraint.isValid( "10", null ) );
 		assertFalse( constraint.isValid( "14.99", null ) );
 		assertFalse( constraint.isValid( "-14.99", null ) );
+
+		// HV-502
+		assertTrue( constraint.isValid( new MyCustomStringImpl( "20" ), null ) );
+
 		//number format exception
 		assertFalse( constraint.isValid( "15l", null ) );
 	}

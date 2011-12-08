@@ -22,12 +22,12 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.Length;
 
 /**
- * Check that a string's length is between min and max.
+ * Check that the character sequence length is between min and max.
  *
  * @author Emmanuel Bernard
  * @author Gavin King
  */
-public class LengthValidator implements ConstraintValidator<Length, String> {
+public class LengthValidator implements ConstraintValidator<Length, CharSequence> {
 	private int min;
 	private int max;
 
@@ -37,7 +37,7 @@ public class LengthValidator implements ConstraintValidator<Length, String> {
 		validateParameters();
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;
 		}

@@ -18,13 +18,15 @@ package org.hibernate.validator.test.constraints.impl;
 
 import javax.validation.constraints.Pattern;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.PatternValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -45,6 +47,19 @@ public class PatternValidatorTest {
 		assertFalse( constraint.isValid( "", null ) );
 		assertFalse( constraint.isValid( "bla bla", null ) );
 		assertFalse( constraint.isValid( "This test is not foobar", null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-502")
+	public void testIsValidForCharSequence() {
+		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
+		descriptor.setValue( "regexp", "char sequence" );
+		Pattern p = AnnotationFactory.create( descriptor );
+
+		PatternValidator constraint = new PatternValidator();
+		constraint.initialize( p );
+
+		assertTrue( constraint.isValid( new MyCustomStringImpl( "char sequence" ), null ) );
 	}
 
 	@Test

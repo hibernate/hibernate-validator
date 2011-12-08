@@ -20,6 +20,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.EmailValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -67,27 +68,32 @@ public class EmailValidatorTest {
 		isWrongEmail( "emma@nuel@hibernate.org" );
 		isWrongEmail( "Just a string" );
 		isWrongEmail( "string" );
-		isWrongEmail( "me@");
-		isWrongEmail( "@example.com");
-		isWrongEmail( "me.@example.com");
-		isWrongEmail( ".me@example.com");
-		isWrongEmail( "me@example..com");
-		isWrongEmail( "me\\@example.com");
+		isWrongEmail( "me@" );
+		isWrongEmail( "@example.com" );
+		isWrongEmail( "me.@example.com" );
+		isWrongEmail( ".me@example.com" );
+		isWrongEmail( "me@example..com" );
+		isWrongEmail( "me\\@example.com" );
 	}
 
-	/**
-	 * HV-339
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-339")
 	public void testAccent() {
 		isRightEmail( "Test^Email@example.com" );
 	}
 
-	private void isRightEmail(String email) {
+	@Test
+	@TestForIssue(jiraKey = "HV-502")
+	public void testValidEmailCharSequence() throws Exception {
+		isRightEmail( new MyCustomStringImpl( "emmanuel@hibernate.org" ) );
+		isWrongEmail( new MyCustomStringImpl( "@example.com" ) );
+	}
+
+	private void isRightEmail(CharSequence email) {
 		assertTrue( validator.isValid( email, null ), "Expected a valid email." );
 	}
 
-	private void isWrongEmail(String email) {
+	private void isWrongEmail(CharSequence email) {
 		assertFalse( validator.isValid( email, null ), "Expected a invalid email." );
 	}
 }

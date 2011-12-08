@@ -23,11 +23,11 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.URL;
 
 /**
- * Validate that the string is a valid URL.
+ * Validate that the character sequence (e.g. string) is a valid URL.
  *
  * @author Hardy Ferentschik
  */
-public class URLValidator implements ConstraintValidator<URL, String> {
+public class URLValidator implements ConstraintValidator<URL, CharSequence> {
 	private String protocol;
 	private String host;
 	private int port;
@@ -38,14 +38,14 @@ public class URLValidator implements ConstraintValidator<URL, String> {
 		this.port = url.port();
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null || value.length() == 0 ) {
 			return true;
 		}
 
 		java.net.URL url;
 		try {
-			url = new java.net.URL( value );
+			url = new java.net.URL( value.toString() );
 		}
 		catch ( MalformedURLException e ) {
 			return false;

@@ -19,30 +19,33 @@ package org.hibernate.validator.constraints.impl;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Max;
+import javax.validation.constraints.DecimalMin;
 
 /**
- * Check that the String being validated represents a number, and has a value
- * less than or equal to the maximum value specified.
- *
- * @author Alaa Nassef
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Hardy Ferentschik
  */
-public class MaxValidatorForString implements ConstraintValidator<Max, String> {
+public class DecimalMinValidatorForCharSequence implements ConstraintValidator<DecimalMin, CharSequence> {
 
-	private BigDecimal maxValue;
+	private BigDecimal minValue;
 
-	public void initialize(Max maxValue) {
-		this.maxValue = BigDecimal.valueOf( maxValue.value() );
+	public void initialize(DecimalMin minValue) {
+		try {
+			this.minValue = new BigDecimal( minValue.value() );
+		}
+		catch ( NumberFormatException nfe ) {
+			throw new IllegalArgumentException(
+					minValue.value() + " does not represent a valid BigDecimal format", nfe
+			);
+		}
 	}
 
-	public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {
 			return true;
 		}
 		try {
-			return new BigDecimal( value ).compareTo( maxValue ) != 1;
+			return new BigDecimal( value.toString() ).compareTo( minValue ) != -1;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;

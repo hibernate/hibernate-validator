@@ -20,16 +20,17 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForNumber;
-import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForString;
-import org.hibernate.validator.constraints.impl.MaxValidatorForString;
+import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForCharSequence;
+import org.hibernate.validator.constraints.impl.MaxValidatorForCharSequence;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -44,7 +45,7 @@ public class MaxValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.max}" );
 		Max m = AnnotationFactory.create( descriptor );
 
-		MaxValidatorForString constraint = new MaxValidatorForString();
+		MaxValidatorForCharSequence constraint = new MaxValidatorForCharSequence();
 		constraint.initialize( m );
 		testMaxValidator( constraint );
 	}
@@ -57,7 +58,7 @@ public class MaxValidatorForStringTest {
 		descriptor.setValue( "message", "{validator.max}" );
 		DecimalMax m = AnnotationFactory.create( descriptor );
 
-		DecimalMaxValidatorForString constraint = new DecimalMaxValidatorForString();
+		DecimalMaxValidatorForCharSequence constraint = new DecimalMaxValidatorForCharSequence();
 		constraint.initialize( m );
 		testMaxValidator( constraint );
 	}
@@ -80,7 +81,7 @@ public class MaxValidatorForStringTest {
 		}
 	}
 
-	private void testMaxValidator(ConstraintValidator<?, String> constraint) {
+	private void testMaxValidator(ConstraintValidator<?, CharSequence> constraint) {
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( "15", null ) );
 		assertTrue( constraint.isValid( "15.0", null ) );
@@ -88,6 +89,10 @@ public class MaxValidatorForStringTest {
 		assertTrue( constraint.isValid( "14.99", null ) );
 		assertTrue( constraint.isValid( "-14.99", null ) );
 		assertFalse( constraint.isValid( "20", null ) );
+
+		// HV-502
+		assertTrue( constraint.isValid( new MyCustomStringImpl( "10" ), null ) );
+
 		//number format exception
 		assertFalse( constraint.isValid( "15l", null ) );
 	}
