@@ -40,7 +40,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class PathImplTest {
 

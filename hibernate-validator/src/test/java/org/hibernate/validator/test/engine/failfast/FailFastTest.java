@@ -33,7 +33,7 @@ import static org.testng.Assert.fail;
  * See HV-381
  *
  * @author Emmanuel Bernard
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class FailFastTest {
 	private static final Logger log = LoggerFactory.make();

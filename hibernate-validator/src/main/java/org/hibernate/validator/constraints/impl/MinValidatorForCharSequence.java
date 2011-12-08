@@ -26,7 +26,7 @@ import javax.validation.constraints.Min;
  * more than or equal to the minimum value specified.
  *
  * @author Alaa Nassef
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class MinValidatorForCharSequence implements ConstraintValidator<Min, CharSequence> {
 

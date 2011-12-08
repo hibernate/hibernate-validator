@@ -27,7 +27,7 @@ import org.joda.time.ReadablePartial;
  * {@code org.joda.time.ReadablePartial}
  * is in the future.
  *
- * @author Kevin Pollet
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class FutureValidatorForReadablePartial implements ConstraintValidator<Future, ReadablePartial> {
 

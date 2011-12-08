@@ -34,7 +34,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
  * @author Hardy Ferentschik
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class RedefiningDefaultGroupTest {
 

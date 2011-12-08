@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentMap;
  * locator and caches values retrieved from that locator.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class CachingResourceBundleLocator extends DelegatingResourceBundleLocator {
 

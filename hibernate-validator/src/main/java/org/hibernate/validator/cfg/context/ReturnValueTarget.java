@@ -20,7 +20,7 @@ package org.hibernate.validator.cfg.context;
  * Facet of a constraint mapping creational context which allows to the select the current method's
  * return value as target for the next operations.
  *
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Gunnar Morling
  */
 public interface ReturnValueTarget {

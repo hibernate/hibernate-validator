@@ -48,7 +48,7 @@ import static org.testng.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class MessageInterpolationTest {
 	private Validator validator;

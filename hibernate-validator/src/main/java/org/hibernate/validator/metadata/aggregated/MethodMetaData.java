@@ -102,7 +102,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 * Creates new {@link MethodMetaData} instances.
 	 *
 	 * @author Gunnar Morling
-	 * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
 

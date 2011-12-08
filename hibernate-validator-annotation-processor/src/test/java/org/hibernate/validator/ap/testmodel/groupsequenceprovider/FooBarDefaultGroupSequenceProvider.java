@@ -23,7 +23,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import static org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition.FooBar;
 
 /**
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public abstract class FooBarDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<FooBar> {
 

@@ -28,9 +28,9 @@ import org.hibernate.validator.util.scriptengine.ScriptEvaluatorFactory;
 /**
  * Validator for the {@link ScriptAssert} constraint annotation.
  *
- * @author Gunnar Morling.
+ * @author Gunnar Morling
  * @author Hardy Ferentschik
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, Object> {
 	private String script;

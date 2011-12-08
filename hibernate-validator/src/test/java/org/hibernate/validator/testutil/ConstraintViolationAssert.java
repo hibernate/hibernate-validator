@@ -35,7 +35,7 @@ import static org.testng.Assert.assertTrue;
  * This class provides useful functions to assert correctness of constraint violations raised
  * during tests.
  *
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */

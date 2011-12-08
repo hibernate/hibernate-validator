@@ -27,7 +27,7 @@ import org.hibernate.validator.resourceloading.ResourceBundleLocator;
  *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Hardy Ferentschik
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {

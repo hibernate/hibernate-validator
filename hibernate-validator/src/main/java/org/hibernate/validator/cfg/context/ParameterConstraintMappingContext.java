@@ -22,7 +22,7 @@ package org.hibernate.validator.cfg.context;
  * navigate to other constraint targets.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public interface ParameterConstraintMappingContext
 		extends TypeTarget, ParameterTarget, ReturnValueTarget, MethodTarget, Constrainable<ParameterConstraintMappingContext>, Cascadable<ParameterConstraintMappingContext> {

@@ -49,7 +49,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * </ul>
  * </p>
  *
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 

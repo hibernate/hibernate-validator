@@ -23,7 +23,7 @@ import javax.validation.ValidatorFactory;
  * Provides Hibernate Validator extensions to {@link ValidatorFactory}.
  *
  * @author Emmanuel Bernard
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public interface HibernateValidatorFactory extends ValidatorFactory {
 
