@@ -1144,7 +1144,8 @@ public class RentalCar extends Car {
               <classname>short</classname>, <classname>int</classname>,
               <classname>long</classname> and the respective wrappers of the
               primitive types. Additionally supported by HV: any sub-type of
-              <classname>Number</classname>.</entry>
+              <classname>Number</classname> and
+              <classname>CharSequence</classname>.</entry>
 
               <entry>The annotated element must be a number whose value must
               be lower or equal to the specified maximum. The parameter value
@@ -1163,7 +1164,8 @@ public class RentalCar extends Car {
               <classname>short</classname>, <classname>int</classname>,
               <classname>long</classname> and the respective wrappers of the
               primitive types. Additionally supported by HV: any sub-type of
-              <classname>Number</classname>.</entry>
+              <classname>Number </classname>and
+              <classname>CharSequence</classname>.</entry>
 
               <entry>The annotated element must be a number whose value must
               be higher or equal to the specified minimum. The parameter value
@@ -1182,7 +1184,8 @@ public class RentalCar extends Car {
               <classname>short</classname>, <classname>int</classname>,
               <classname>long</classname> and the respective wrappers of the
               primitive types. Additionally supported by HV: any sub-type of
-              <classname>Number</classname>.</entry>
+              <classname>Number</classname> and
+              <classname>CharSequence</classname>.</entry>
 
               <entry>Checks whether the annoted value is a number having up to
               <literal>integer</literal> digits and
@@ -1215,10 +1218,10 @@ public class RentalCar extends Car {
               <classname>BigInteger</classname>, <classname>byte</classname>,
               <classname>short</classname>, <classname>int</classname>,
               <classname>long</classname> and the respective wrappers of the
-              primitive types. Additionally supported by HV:
-              <classname>String</classname> (the numeric value represented by
-              a String is evaluated), any sub-type of
-              <classname>Number</classname>.</entry>
+              primitive types. Additionally supported by HV: any sub-type
+              of<classname>CharSequence</classname> (the numeric value
+              represented by the character sequence is evaluated), any
+              sub-type of <classname>Number</classname>.</entry>
 
               <entry>Checks whether the annotated value is less than or equal
               to the specified maximum.</entry>
@@ -1233,9 +1236,9 @@ public class RentalCar extends Car {
               <classname>BigInteger</classname>, <classname>byte</classname>,
               <classname>short</classname>, <classname>int</classname>,
               <classname>long</classname> and the respective wrappers of the
-              primitive types. Additionally supported by HV:
-              <classname>String</classname> (the numeric value represented by
-              a String is evaluated), any sub-type of
+              primitive types. Additionally supported by HV: any sub-type of
+              <classname>CharSequence</classname> (the numeric value
+              represented by the char sequence is evaluated), any sub-type of
               <classname>Number</classname>.</entry>
 
               <entry>Checks whether the annotated value is higher than or
@@ -1285,7 +1288,8 @@ public class RentalCar extends Car {
             <row>
               <entry>@Pattern(regex=, flag=)</entry>
 
-              <entry><classname>String</classname></entry>
+              <entry><classname>String</classname>. Additionally supported by
+              HV: any sub-type of <classname>CharSequence</classname>.</entry>
 
               <entry>Checks if the annotated string matches the regular
               expression <parameter>regex</parameter> considering the given
@@ -1299,7 +1303,8 @@ public class RentalCar extends Car {
 
               <entry><classname>String</classname>,
               <classname>Collection</classname>, <classname>Map</classname>
-              and <classname>arrays</classname></entry>
+              and <classname>arrays</classname>. Additionally supported by HV:
+              any sub-type of <classname>CharSequence</classname>.</entry>
 
               <entry>Checks if the annotated element's size is between min and
               max (inclusive).</entry>
