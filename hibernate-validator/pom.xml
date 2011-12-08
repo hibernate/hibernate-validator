@@ -192,9 +192,11 @@
                         <id>test-jar</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>jar</goal>
                         </goals>
                         <configuration>
+                            <classifier>testing</classifier>
+                            <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
                             <includes>
                                 <include>org/hibernate/validator/testutil/**</include>
                             </includes>
