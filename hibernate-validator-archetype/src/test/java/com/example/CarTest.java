@@ -22,11 +22,10 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import static org.junit.Assert.assertEquals;
-
-import com.example.Car;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * <p>
@@ -115,6 +114,30 @@ public class CarTest {
 		Car car = new Car( "Morris", "DD-AB-123", 2 );
 
 		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
+		assertEquals( 0, constraintViolations.size() );
+	}
+
+	/**
+	 * Validating the default group leads to validation on the default group sequence of {@code RentalCar}.
+	 */
+	@Test
+	public void carIsRented() {
+		RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
+		rentalCar.setPassedVehicleInspection( true );
+		rentalCar.setRented( true );
+
+		Set<ConstraintViolation<RentalCar>> constraintViolations = validator.validate( rentalCar );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals(
+				"Wrong message",
+				"The car is currently rented out",
+				constraintViolations.iterator().next().getMessage()
+		);
+
+		rentalCar.setRented( false );
+		constraintViolations = validator.validate( rentalCar );
 
 		assertEquals( 0, constraintViolations.size() );
 	}
