@@ -16,52 +16,36 @@
 */
 package org.hibernate.validator.metadata.descriptor;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
-import org.hibernate.validator.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.metadata.aggregated.MethodMetaData;
-import org.hibernate.validator.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-
 /**
+ * Describes a validated method.
+ *
  * @author Gunnar Morling
  */
 public class MethodDescriptorImpl extends ElementDescriptorImpl implements MethodDescriptor {
 
-	private final MethodMetaData methodMetaData;
+	private final String name;
+	private final List<ParameterDescriptor> parameters;
 
-	public MethodDescriptorImpl(BeanMetaData<?> metaDataBean, MethodMetaData methodMetaData) {
-		super( methodMetaData.getReturnType(), metaDataBean );
+	public MethodDescriptorImpl(Class<?> returnType, String name, Set<ConstraintDescriptorImpl<?>> returnValueConstraints, boolean isCascaded, List<ParameterDescriptor> parameters, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		super( returnType, returnValueConstraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
 
-		this.methodMetaData = methodMetaData;
-
-		//add the return value constraints of the represented method to the constraint descriptor list
-		for ( MetaConstraint<?> oneConstraint : methodMetaData ) {
-			addConstraintDescriptor( oneConstraint.getDescriptor() );
-		}
+		this.name = name;
+		this.parameters = Collections.unmodifiableList( parameters );
 	}
 
 	public String getMethodName() {
-		return methodMetaData.getName();
+		return name;
 	}
 
 	public List<ParameterDescriptor> getParameterDescriptors() {
-
-		List<ParameterDescriptor> theValue = newArrayList();
-
-		for ( ParameterMetaData oneParameter : methodMetaData.getAllParameterMetaData() ) {
-			theValue.add( new ParameterDescriptorImpl( getMetaDataBean(), oneParameter ) );
-		}
-
-		return theValue;
-	}
-
-	public boolean isCascaded() {
-		return methodMetaData.isCascading();
+		return parameters;
 	}
 
 }

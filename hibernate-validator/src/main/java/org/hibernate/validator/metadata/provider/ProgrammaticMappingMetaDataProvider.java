@@ -28,20 +28,20 @@ import java.util.Set;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
-import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.core.AnnotationIgnores;
-import org.hibernate.validator.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.ConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.metadata.raw.ConstrainedField;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.ConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -136,8 +136,8 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 				allPropertyMetaData.add(
 						new ConstrainedType(
 								ConfigurationSource.API,
-								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
-								oneConfiguredProperty
+								oneConfiguredProperty,
+								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) )
 						)
 				);
 			}

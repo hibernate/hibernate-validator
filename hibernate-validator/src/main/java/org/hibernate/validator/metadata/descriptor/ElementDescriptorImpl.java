@@ -32,8 +32,10 @@ import javax.validation.metadata.Scope;
 import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
-import org.hibernate.validator.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+
+import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
  * Describes a validated element (class, field or property).
@@ -43,17 +45,23 @@ import org.hibernate.validator.metadata.core.ConstraintOrigin;
  * @author Gunnar Morling
  */
 public class ElementDescriptorImpl implements ElementDescriptor {
-	private final BeanMetaData<?> metaDataBean;
-	private final Class<?> type;
-	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors = new HashSet<ConstraintDescriptorImpl<?>>();
 
-	public ElementDescriptorImpl(Class<?> type, BeanMetaData<?> metaDataBean) {
-		this.metaDataBean = metaDataBean;
+	private final Class<?> type;
+	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
+	private final boolean cascaded;
+	private final boolean defaultGroupSequenceRedefined;
+	private final List<Class<?>> defaultGroupSequence;
+
+	public ElementDescriptorImpl(Class<?> type, Set<ConstraintDescriptorImpl<?>> constraintDescriptors, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		this.type = type;
+		this.constraintDescriptors = Collections.unmodifiableSet( constraintDescriptors );
+		this.cascaded = cascaded;
+		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
+		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupSequence );
 	}
 
-	public final void addConstraintDescriptor(ConstraintDescriptorImpl<?> constraintDescriptor) {
-		constraintDescriptors.add( constraintDescriptor );
+	public boolean isCascaded() {
+		return cascaded;
 	}
 
 	public final boolean hasConstraints() {
@@ -72,8 +80,14 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		return new ConstraintFinderImpl();
 	}
 
-	public BeanMetaData<?> getMetaDataBean() {
-		return metaDataBean;
+	protected static Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
+		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
+
+		for ( MetaConstraint<?> oneConstraint : constraints ) {
+			theValue.add( oneConstraint.getDescriptor() );
+		}
+
+		return theValue;
 	}
 
 	private class ConstraintFinderImpl implements ConstraintFinder {
@@ -99,8 +113,8 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		public ConstraintFinder unorderedAndMatchingGroups(Class<?>... classes) {
 			this.groups = new ArrayList<Class<?>>();
 			for ( Class<?> clazz : classes ) {
-				if ( Default.class.equals( clazz ) && metaDataBean.defaultGroupSequenceIsRedefined() ) {
-					this.groups.addAll( metaDataBean.getDefaultGroupSequence( null ) );
+				if ( Default.class.equals( clazz ) && defaultGroupSequenceRedefined ) {
+					this.groups.addAll( defaultGroupSequence );
 				}
 				else {
 					groups.add( clazz );

@@ -16,29 +16,23 @@
 */
 package org.hibernate.validator.metadata.descriptor;
 
+import java.util.List;
+import java.util.Set;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.metadata.aggregated.BeanMetaData;
-
 /**
- * Describes a validated element (class, field or property).
+ * Describes a validated property.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public class PropertyDescriptorImpl extends ElementDescriptorImpl implements PropertyDescriptor {
-	private final boolean cascaded;
+
 	private final String property;
 
-
-	public PropertyDescriptorImpl(Class<?> returnType, boolean cascaded, String property, BeanMetaData<?> beanMetaData) {
-		super( returnType, beanMetaData );
-		this.cascaded = cascaded;
-		this.property = property;
-	}
-
-	public boolean isCascaded() {
-		return cascaded;
+	public PropertyDescriptorImpl(Class<?> returnType, String propertyName, Set<ConstraintDescriptorImpl<?>> constraints, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		super( returnType, constraints, cascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
+		this.property = propertyName;
 	}
 
 	public String getPropertyName() {

@@ -36,9 +36,32 @@ import org.hibernate.validator.metadata.raw.BeanConfiguration;
  * @author Gunnar Morling
  */
 public interface MetaDataProvider {
+
+	/**
+	 * Returns a set with all bean configurations by this provider.
+	 *
+	 * @return a set with all bean configurations by this provider. May be
+	 *         empty, but never <code>null</code>.
+	 */
 	Set<BeanConfiguration<?>> getAllBeanConfigurations();
 
+	/**
+	 * Returns the annotation processing options as configured by this provider.
+	 *
+	 * @return The annotation processing options as configured by this provider.
+	 */
 	AnnotationIgnores getAnnotationIgnores();
 
+	/**
+	 * Returns a set with the configurations for all types contained in the
+	 * given type's hierarchy (including implemented interfaces) as configured
+	 * by this provider.
+	 *
+	 * @param beanClass The type of interest.
+	 *
+	 * @return A set with the configurations for the complete hierarchy of the
+	 *         given type. May be empty, but never <code>null</code>.
+	 */
 	Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
+
 }

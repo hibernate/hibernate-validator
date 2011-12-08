@@ -25,17 +25,21 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 import org.slf4j.Logger;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.metadata.core.MetaConstraint;
-import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
+import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.BeanDescriptorImpl;
+import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
@@ -43,7 +47,7 @@ import org.hibernate.validator.metadata.raw.ConstrainedElement.ConstrainedElemen
 import org.hibernate.validator.metadata.raw.ConstrainedField;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
-import org.hibernate.validator.metadata.descriptor.BeanDescriptorImpl;
+import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.util.LoggerFactory;
@@ -83,11 +87,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
 	 */
 	private final Set<MetaConstraint<?>> directMetaConstraints;
-
-	/**
-	 * The main element descriptor for {@link #beanClass}.
-	 */
-	private BeanDescriptorImpl<T> beanDescriptor;
 
 	/**
 	 * Contains constrained related meta data for all methods of the type
@@ -143,7 +142,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Set<MethodMetaData> methodMetaDataSet = newHashSet();
 
 		for ( ConstraintMetaData oneElement : constraintMetaData ) {
-			if ( oneElement.getConstrainedMetaDataKind() == ConstraintMetaDataKind.PROPERTY ) {
+			if ( oneElement.getKind() == ConstraintMetaDataKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) oneElement );
 			}
 			else {
@@ -153,22 +152,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Set<Member> cascadedMembers = newHashSet();
 		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
-		Set<MetaConstraint<?>> allClassLevelConstraints = newHashSet();
 
 		for ( PropertyMetaData oneProperty : propertyMetaDataSet ) {
 
-			propertyMetaData.put( oneProperty.getPropertyName(), oneProperty );
+			propertyMetaData.put( oneProperty.getName(), oneProperty );
 
 			if ( oneProperty.isCascading() ) {
 				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
-			}
-
-			Set<MetaConstraint<?>> classLevelConstraints = partition(
-					oneProperty.getConstraints(),
-					byElementType()
-			).get( ElementType.TYPE );
-			if ( classLevelConstraints != null ) {
-				allClassLevelConstraints.addAll( classLevelConstraints );
 			}
 
 			allMetaConstraints.addAll( oneProperty.getConstraints() );
@@ -184,26 +174,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		directMetaConstraints = buildDirectConstraintSets();
 
 		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDataSet ) );
-		beanDescriptor = new BeanDescriptorImpl<T>( this, allClassLevelConstraints );
-	}
-
-	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
-
-		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
-			throw new GroupDefinitionException(
-					"Default group sequence and default group sequence provider cannot be defined at the same time."
-			);
-		}
-
-		if ( defaultGroupSequenceProvider != null ) {
-			this.defaultGroupSequenceProvider = newGroupSequenceProviderInstance( defaultGroupSequenceProvider );
-		}
-		else if ( defaultGroupSequence != null && !defaultGroupSequence.isEmpty() ) {
-			setDefaultGroupSequence( defaultGroupSequence );
-		}
-		else {
-			setDefaultGroupSequence( Arrays.<Class<?>>asList( beanClass ) );
-		}
 	}
 
 	public Class<T> getBeanClass() {
@@ -211,11 +181,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public BeanDescriptor getBeanDescriptor() {
-		return beanDescriptor;
+		return getBeanDescriptorInternal();
 	}
 
 	public TypeDescriptor getTypeDescriptor() {
-		return beanDescriptor;
+		return getBeanDescriptorInternal();
 	}
 
 	public Set<Member> getCascadedMembers() {
@@ -259,12 +229,104 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
 	}
 
-	private boolean hasDefaultGroupSequenceProvider() {
-		return defaultGroupSequenceProvider != null;
-	}
-
 	public Set<PropertyMetaData> getAllPropertyMetaData() {
 		return Collections.unmodifiableSet( new HashSet<PropertyMetaData>( propertyMetaData.values() ) );
+	}
+
+	public List<Class<?>> getClassHierarchy() {
+		return classHierarchyWithoutInterfaces;
+	}
+
+	/**
+	 * Returns a bean descriptor representing this meta data object. A new
+	 * descriptor instance is created with each invocation. The descriptor might
+	 * be cached internally in the future should that need arise.
+	 * 
+	 * @return A bean descriptor for this meta data object.
+	 */
+	private BeanDescriptorImpl<T> getBeanDescriptorInternal() {
+
+		return new BeanDescriptorImpl<T>(
+				beanClass,
+				getClassLevelConstraintsAsDescriptors(),
+				getConstrainedPropertiesAsDescriptors(),
+				getMethodsAsDescriptors(),
+				defaultGroupSequenceIsRedefined(),
+				getDefaultGroupSequence( null )
+		);
+	}
+
+	private Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors() {
+
+		Set<MetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( allMetaConstraints );
+
+		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
+
+		for ( MetaConstraint<?> oneConstraint : classLevelConstraints ) {
+			theValue.add( oneConstraint.getDescriptor() );
+		}
+
+		return theValue;
+	}
+
+	private Map<String, PropertyDescriptor> getConstrainedPropertiesAsDescriptors() {
+		Map<String, PropertyDescriptor> theValue = newHashMap();
+
+		for ( Entry<String, PropertyMetaData> oneProperty : propertyMetaData.entrySet() ) {
+			if ( oneProperty.getValue().isConstrained() ) {
+				theValue.put(
+						oneProperty.getKey(),
+						oneProperty.getValue()
+								.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
+				);
+			}
+		}
+
+		return theValue;
+	}
+
+	private Map<String, MethodDescriptor> getMethodsAsDescriptors() {
+		Map<String, MethodDescriptor> theValue = newHashMap();
+
+		for ( Entry<String, MethodMetaData> oneMethod : methodMetaData.entrySet() ) {
+			theValue.put(
+					oneMethod.getKey(), oneMethod.getValue().asDescriptor(
+					defaultGroupSequenceIsRedefined(),
+					getDefaultGroupSequence( null )
+			)
+			);
+		}
+
+		return theValue;
+	}
+
+	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
+
+		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
+			throw new GroupDefinitionException(
+					"Default group sequence and default group sequence provider cannot be defined at the same time."
+			);
+		}
+
+		if ( defaultGroupSequenceProvider != null ) {
+			this.defaultGroupSequenceProvider = newGroupSequenceProviderInstance( defaultGroupSequenceProvider );
+		}
+		else if ( defaultGroupSequence != null && !defaultGroupSequence.isEmpty() ) {
+			setDefaultGroupSequence( defaultGroupSequence );
+		}
+		else {
+			setDefaultGroupSequence( Arrays.<Class<?>>asList( beanClass ) );
+		}
+	}
+
+	private Set<MetaConstraint<?>> getClassLevelConstraints(Set<MetaConstraint<?>> constraints) {
+
+		Set<MetaConstraint<?>> classLevelConstraints = partition(
+				constraints,
+				byElementType()
+		).get( ElementType.TYPE );
+
+		return classLevelConstraints != null ? classLevelConstraints : Collections.<MetaConstraint<?>>emptySet();
 	}
 
 	private Set<MetaConstraint<?>> buildDirectConstraintSets() {
@@ -338,8 +400,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return validDefaultGroupSequence;
 	}
 
-	public List<Class<?>> getClassHierarchy() {
-		return classHierarchyWithoutInterfaces;
+	private boolean hasDefaultGroupSequenceProvider() {
+		return defaultGroupSequenceProvider != null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -443,7 +505,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				}
 			}
 
-			builders.add( new BuilderDelegate( constrainableElement, constraintHelper ) );
+			builders.add(
+					new BuilderDelegate(
+							constrainableElement,
+							constraintHelper
+					)
+			);
 		}
 
 		public BeanMetaDataImpl<T> build() {
@@ -451,7 +518,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			Set<ConstraintMetaData> aggregatedElements = newHashSet();
 
 			for ( BuilderDelegate oneBuilder : builders ) {
-				aggregatedElements.addAll( oneBuilder.build() );
+				aggregatedElements.addAll(
+						oneBuilder.build(
+								( defaultGroupSequence != null && defaultGroupSequence.size() > 1 ) || defaultGroupSequenceProvider != null,
+								defaultGroupSequence
+						)
+				);
 			}
 
 			return new BeanMetaDataImpl<T>(
@@ -475,32 +547,43 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			this.constraintHelper = constraintHelper;
 
-			switch ( constrainedElement.getConstrainedElementKind() ) {
+			switch ( constrainedElement.getKind() ) {
 
 				case FIELD:
 
 					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
-					propertyBuilder = new PropertyMetaData.Builder( constrainedField, constraintHelper );
+					propertyBuilder = new PropertyMetaData.Builder(
+							constrainedField,
+							constraintHelper
+					);
 					break;
 
 				case METHOD:
 
 					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
-					methodBuilder = new MethodMetaData.Builder( constrainedMethod, constraintHelper );
+					methodBuilder = new MethodMetaData.Builder(
+							constrainedMethod,
+							constraintHelper
+					);
 
 					if ( constrainedMethod.isGetterMethod() ) {
-						propertyBuilder = new PropertyMetaData.Builder( constrainedMethod, constraintHelper );
+						propertyBuilder = new PropertyMetaData.Builder(
+								constrainedMethod,
+								constraintHelper
+						);
 					}
 					break;
 
 				case TYPE:
 
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
-					propertyBuilder = new PropertyMetaData.Builder( constrainedType, constraintHelper );
+					propertyBuilder = new PropertyMetaData.Builder(
+							constrainedType,
+							constraintHelper
+					);
 					break;
 			}
 		}
-
 
 		public boolean add(ConstrainedElement constrainedElement) {
 
@@ -514,9 +597,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( propertyBuilder != null && propertyBuilder.accepts( constrainedElement ) ) {
 				propertyBuilder.add( constrainedElement );
 
-				if ( added == false && constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
+				if ( added == false && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
+					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 					methodBuilder = new MethodMetaData.Builder(
-							(ConstrainedMethod) constrainedElement,
+							constrainedMethod,
 							constraintHelper
 					);
 				}
@@ -527,7 +611,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			return added;
 		}
 
-		public Set<ConstraintMetaData> build() {
+		public Set<ConstraintMetaData> build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
 			Set<ConstraintMetaData> theValue = newHashSet();
 

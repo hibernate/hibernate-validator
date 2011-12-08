@@ -31,13 +31,15 @@ import java.util.Set;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.metadata.core.AnnotationIgnores;
-import org.hibernate.validator.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
@@ -45,8 +47,6 @@ import org.hibernate.validator.metadata.raw.ConstrainedField;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -101,8 +101,8 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			ConstrainedType classLevelMetaData =
 					new ConstrainedType(
 							ConfigurationSource.ANNOTATION,
-							classLevelConstraints,
-							new BeanConstraintLocation( beanClass )
+							new BeanConstraintLocation( beanClass ),
+							classLevelConstraints
 					);
 			propertyMetaData.add( classLevelMetaData );
 		}

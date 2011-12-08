@@ -24,8 +24,10 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
- * Represents the constraint related configuration of one Java type originating
- * from one {@link ConfigurationSource}.
+ * Represents the complete constraint related configuration of one Java type
+ * originating from one {@link ConfigurationSource}. Contains meta-data on
+ * constraints (field, method and class level) as well as meta data on default
+ * group sequences.
  *
  * @author Gunnar Morling
  */
@@ -42,11 +44,16 @@ public class BeanConfiguration<T> {
 	private final Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
 
 	/**
-	 * @param source
-	 * @param beanClass
-	 * @param constrainedElements
-	 * @param defaultGroupSequence
-	 * @param defaultGroupSequenceProvider
+	 * Creates a new bean configuration.
+	 *
+	 * @param source The source of this configuration.
+	 * @param beanClass The type represented by this configuration.
+	 * @param constrainedElements The constraint elements representing this type's fields,
+	 * methods etc.
+	 * @param defaultGroupSequence The default group sequence for the given type as configured by
+	 * the given configuration source.
+	 * @param defaultGroupSequenceProvider The default group sequence provider for the given type as
+	 * configured by the given configuration source.
 	 */
 	public BeanConfiguration(
 			ConfigurationSource source,

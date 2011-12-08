@@ -16,16 +16,18 @@
 */
 package org.hibernate.validator.metadata.descriptor;
 
-import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
-import org.hibernate.validator.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.metadata.aggregated.MethodMetaData;
-import org.hibernate.validator.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
+import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.Contracts;
 
@@ -33,124 +35,84 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**
+ * Describes a validated bean.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor, TypeDescriptor {
 
-	public BeanDescriptorImpl(BeanMetaData<T> beanMetaData, Set<MetaConstraint<?>> classLevelConstraints) {
-		super( beanMetaData.getBeanClass(), beanMetaData );
+	private final Map<String, PropertyDescriptor> constrainedProperties;
 
-		for ( MetaConstraint<?> oneConstraint : classLevelConstraints ) {
-			addConstraintDescriptor( oneConstraint.getDescriptor() );
-		}
+	private final Map<String, MethodDescriptor> methods;
+
+	private final Set<MethodDescriptor> constrainedMethods;
+
+	public BeanDescriptorImpl(Class<T> beanClass, Set<ConstraintDescriptorImpl<?>> classLevelConstraints, Map<String, PropertyDescriptor> properties, Map<String, MethodDescriptor> methods, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		super( beanClass, classLevelConstraints, false, defaultGroupSequenceRedefined, defaultGroupSequence );
+
+		this.constrainedProperties = Collections.unmodifiableMap( properties );
+		this.methods = Collections.unmodifiableMap( methods );
+		this.constrainedMethods = Collections.unmodifiableSet( getConstrainedMethods( methods.values() ) );
 	}
 
 	//BeanDescriptor methods
 
 	public final boolean isBeanConstrained() {
-		return getMetaDataBean().getMetaConstraints().size() > 0;
+		return hasConstraints() || !constrainedProperties.isEmpty();
 	}
 
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
 
 		assertNotNull( propertyName, "The property name cannot be null" );
 
-		return asPropertyDescriptor( getMetaDataBean().getMetaDataFor( propertyName ) );
+		return constrainedProperties.get( propertyName );
 	}
 
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
-
-		Set<PropertyDescriptor> theValue = newHashSet();
-
-		Set<PropertyMetaData> propertyMetaData = getMetaDataBean().getAllPropertyMetaData();
-		for ( PropertyMetaData oneProperty : propertyMetaData ) {
-			if ( oneProperty.isConstrained() ) {
-				theValue.add( asPropertyDescriptor( oneProperty ) );
-			}
-		}
-
-		return theValue;
+		return new HashSet<PropertyDescriptor>( constrainedProperties.values() );
 	}
 
 	//TypeDescriptor methods
 
 	public boolean isTypeConstrained() {
-
-		//are there any bean/property constraints?
-		if ( isBeanConstrained() ) {
-			return true;
-		}
-
-		//are there any method-level constraints?
-		for ( MethodMetaData oneMethodMetaData : getMetaDataBean().getAllMethodMetaData() ) {
-
-			if ( oneMethodMetaData.isConstrained() ) {
-				return true;
-			}
-		}
-
-		return false;
+		return isBeanConstrained() || !constrainedMethods.isEmpty();
 	}
 
 	public Set<MethodDescriptor> getConstrainedMethods() {
-
-		BeanMetaData<?> beanMetaData = getMetaDataBean();
-
-		Set<MethodDescriptor> theValue = newHashSet();
-
-		for ( MethodMetaData oneMethodMetaData : beanMetaData.getAllMethodMetaData() ) {
-			if ( oneMethodMetaData.isConstrained() ) {
-				theValue.add( new MethodDescriptorImpl( beanMetaData, oneMethodMetaData ) );
-			}
-		}
-
-		return theValue;
+		return constrainedMethods;
 	}
 
+	//TODO GM: to be compatible with getConstraintsForProperty() this method should only return
+	//a descriptor if the given method is constrained.
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 
 		Contracts.assertNotNull( methodName, "The method name must not be null" );
 
-		Method method;
-
-		try {
-			method = getMetaDataBean().getBeanClass().getMethod( methodName, parameterTypes );
-		}
-		//No method with the given name/parameter types exists on this type. To be consistent  
-		//with getConstraintsForProperty() this is signaled by simply returning null
-		catch ( Exception e ) {
-			return null;
-		}
-
-		return new MethodDescriptorImpl( getMetaDataBean(), getMetaDataBean().getMetaDataFor( method ) );
+		return methods.get( methodName + Arrays.toString( parameterTypes ) );
 	}
 
 	public BeanDescriptor getBeanDescriptor() {
 		return this;
 	}
 
-	//TODO GM: it would be nicer if PropertyMetaData itself could create an equivalent PropertyDescriptor.
-	//Currently this doesn't work as the descriptor needs a reference to the BeanMetaData object.
-	private PropertyDescriptorImpl asPropertyDescriptor(PropertyMetaData propertyMetaData) {
+	private Set<MethodDescriptor> getConstrainedMethods(Collection<MethodDescriptor> methods) {
+		Set<MethodDescriptor> theValue = newHashSet();
 
-		if ( propertyMetaData == null || !propertyMetaData.isConstrained() ) {
-			return null;
+		for ( MethodDescriptor oneMethod : methods ) {
+			if ( oneMethod.hasConstraints() || oneMethod.isCascaded() ) {
+				theValue.add( oneMethod );
+			}
+
+			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
+				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
+					theValue.add( oneMethod );
+				}
+			}
 		}
 
-		PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
-				propertyMetaData.getType(),
-				propertyMetaData.isCascading(),
-				propertyMetaData.getPropertyName(),
-				getMetaDataBean()
-		);
-
-		for ( MetaConstraint<?> oneConstraint : propertyMetaData ) {
-			propertyDescriptor.addConstraintDescriptor( oneConstraint.getDescriptor() );
-		}
-
-		return propertyDescriptor;
+		return theValue;
 	}
 
 }

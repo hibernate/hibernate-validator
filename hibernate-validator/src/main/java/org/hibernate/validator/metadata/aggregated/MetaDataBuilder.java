@@ -19,11 +19,11 @@ package org.hibernate.validator.metadata.aggregated;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
-import org.hibernate.validator.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
-import org.hibernate.validator.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.metadata.raw.ConstrainedElement;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 

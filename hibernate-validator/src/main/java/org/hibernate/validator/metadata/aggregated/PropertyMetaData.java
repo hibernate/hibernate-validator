@@ -18,11 +18,14 @@ package org.hibernate.validator.metadata.aggregated;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.raw.ConstrainedField;
@@ -51,66 +54,35 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  */
 public class PropertyMetaData extends AbstractConstraintMetaData {
 
-	private final Class<?> type;
-
-	private final String propertyName;
-
 	private final Set<Member> cascadingMembers;
 
-	private PropertyMetaData(Class<?> type, String propertyName, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
+	private PropertyMetaData(String propertyName, Class<?> type, Set<MetaConstraint<?>> constraints, Set<Member> cascadingMembers) {
 		super(
+				propertyName,
+				type,
 				constraints,
 				ConstraintMetaDataKind.PROPERTY,
 				!cascadingMembers.isEmpty(),
 				!cascadingMembers.isEmpty() || !constraints.isEmpty()
 		);
-		this.type = type;
-		this.propertyName = propertyName;
-		this.cascadingMembers = cascadingMembers;
-	}
 
-	public Class<?> getType() {
-		return type;
-	}
-
-	public String getPropertyName() {
-		return propertyName;
+		this.cascadingMembers = Collections.unmodifiableSet( cascadingMembers );
 	}
 
 	public Set<Member> getCascadingMembers() {
 		return cascadingMembers;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ( ( propertyName == null ) ? 0 : propertyName.hashCode() );
-		return result;
-	}
+	public PropertyDescriptorImpl asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj == null ) {
-			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		PropertyMetaData other = (PropertyMetaData) obj;
-		if ( propertyName == null ) {
-			if ( other.propertyName != null ) {
-				return false;
-			}
-		}
-		else if ( !propertyName.equals( other.propertyName ) ) {
-			return false;
-		}
-		return true;
+		return new PropertyDescriptorImpl(
+				getType(),
+				getName(),
+				asDescriptors( getConstraints() ),
+				isCascading(),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
+		);
 	}
 
 	@Override
@@ -127,8 +99,27 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			cascadingMembers.subSequence( 0, cascadingMembers.length() - 2 );
 		}
 
-		return "PropertyMetaData [type=" + type.getSimpleName() + ", propertyName="
-				+ propertyName + ", cascadingMembers=[" + cascadingMembers + "]]";
+		return "PropertyMetaData [type=" + getType().getSimpleName() + ", propertyName="
+				+ getName() + ", cascadingMembers=[" + cascadingMembers + "]]";
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		return true;
 	}
 
 	public static class Builder extends MetaDataBuilder {
@@ -148,6 +139,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Set<MetaConstraint<?>> constraints = newHashSet();
 
 		private final Set<Member> cascadingMembers = newHashSet();
+
 
 		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
@@ -178,11 +170,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		public boolean accepts(ConstrainedElement constrainedElement) {
 
-			if ( !SUPPORTED_ELEMENT_KINDS.contains( constrainedElement.getConstrainedElementKind() ) ) {
+			if ( !SUPPORTED_ELEMENT_KINDS.contains( constrainedElement.getKind() ) ) {
 				return false;
 			}
 
-			if ( constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
 					!( (ConstrainedMethod) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}
@@ -205,8 +197,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		public PropertyMetaData build() {
 
 			return new PropertyMetaData(
-					propertyType,
 					propertyName,
+					propertyType,
 					adaptOriginsAndImplicitGroups( beanClass, constraints ),
 					cascadingMembers
 			);

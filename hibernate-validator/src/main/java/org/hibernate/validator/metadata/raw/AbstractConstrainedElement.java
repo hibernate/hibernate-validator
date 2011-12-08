@@ -24,6 +24,8 @@ import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
+ * Base implementation with functionality common to all {@link ConstrainedElement} implementations.
+ *
  * @author Gunnar Morling
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
@@ -47,7 +49,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		this.isCascading = isCascading;
 	}
 
-	public ConstrainedElementKind getConstrainedElementKind() {
+	public ConstrainedElementKind getKind() {
 		return kind;
 	}
 

@@ -24,10 +24,10 @@ import java.util.Set;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.util.ReflectionHelper;
 
@@ -35,6 +35,8 @@ import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 
 /**
+ * Base implementation for all {@link MetaDataProvider}s.
+ *
  * @author Gunnar Morling
  */
 public abstract class MetaDataProviderImplBase implements MetaDataProvider {

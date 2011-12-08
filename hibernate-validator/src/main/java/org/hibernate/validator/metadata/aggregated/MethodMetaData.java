@@ -17,19 +17,23 @@
 package org.hibernate.validator.metadata.aggregated;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 
-import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
+import org.hibernate.validator.metadata.core.MetaConstraint;
+import org.hibernate.validator.metadata.descriptor.MethodDescriptorImpl;
+import org.hibernate.validator.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.method.metadata.MethodDescriptor;
+import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.util.ReflectionHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -43,14 +47,20 @@ import static org.hibernate.validator.util.CollectionHelper.newHashSet;
  * </p>
  * <p>
  * Instances are retrieved by creating a {@link Builder} and adding all required
- * {@link ConstrainedMethod} objects to it. Instances are read-only after creation.
+ * {@link ConstrainedMethod} objects to it. Instances are read-only after
+ * creation.
+ * </p>
+ * <p>
+ * Identity is solely based on the method's name and parameter types, hence sets
+ * and similar collections of this type may only be created in the scope of one
+ * Java type.
  * </p>
  *
  * @author Gunnar Morling
  */
 public class MethodMetaData extends AbstractConstraintMetaData {
 
-	private final Method rootMethod;
+	private final Class<?>[] parameterTypes;
 
 	private final List<ParameterMetaData> parameterMetaData;
 
@@ -65,16 +75,25 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	private final ConstraintDeclarationException parameterConstraintDeclarationException;
 
 	private MethodMetaData(
-			Builder builder,
+			String name,
+			Class<?> returnType,
+			Class<?>[] parameterTypes,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException,
 			boolean isCascading,
 			boolean isConstrained) {
 
-		super( returnValueConstraints, ConstraintMetaDataKind.METHOD, isCascading, isConstrained );
+		super(
+				name,
+				returnType,
+				returnValueConstraints,
+				ConstraintMetaDataKind.METHOD,
+				isCascading,
+				isConstrained
+		);
 
-		this.rootMethod = builder.location.getMember();
+		this.parameterTypes = parameterTypes;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
 	}
@@ -117,7 +136,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		public boolean accepts(ConstrainedElement constrainedElement) {
 
 			return
-					constrainedElement.getConstrainedElementKind() == ConstrainedElementKind.METHOD &&
+					constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
 							ReflectionHelper.haveSameSignature(
 									location.getMember(),
 									( (ConstrainedMethod) constrainedElement ).getLocation().getMember()
@@ -141,9 +160,14 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * {@inheritDoc}
 		 */
 		public MethodMetaData build() {
+
+			Method method = location.getMember();
+
 			return
 					new MethodMetaData(
-							this,
+							method.getName(),
+							method.getReturnType(),
+							method.getParameterTypes(),
 							adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
 							findParameterMetaData(),
 							checkParameterConstraints(),
@@ -324,16 +348,30 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		return parameterMetaData;
 	}
 
-	public String getName() {
-		return rootMethod.getName();
-	}
-
-	public Class<?> getReturnType() {
-		return rootMethod.getReturnType();
-	}
-
 	public Class<?>[] getParameterTypes() {
-		return rootMethod.getParameterTypes();
+		return parameterTypes;
+	}
+
+	public MethodDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		return new MethodDescriptorImpl(
+				getType(),
+				getName(),
+				asDescriptors( getConstraints() ),
+				isCascading(),
+				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
+		);
+	}
+
+	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		List<ParameterDescriptor> theValue = newArrayList();
+
+		for ( ParameterMetaData oneParameter : parameterMetaData ) {
+			theValue.add( oneParameter.asDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ) );
+		}
+
+		return theValue;
 	}
 
 	@Override
@@ -351,7 +389,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
 						parameterBuilder.toString();
 
-		return "MethodMetaData [method=" + getReturnType().getSimpleName() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
+		return "MethodMetaData [method=" + getType().getSimpleName() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
 
@@ -359,8 +397,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ( ( rootMethod == null ) ? 0 : rootMethod.hashCode() );
+		result = prime * result + Arrays.hashCode( parameterTypes );
 		return result;
 	}
 
@@ -376,12 +413,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			return false;
 		}
 		MethodMetaData other = (MethodMetaData) obj;
-		if ( rootMethod == null ) {
-			if ( other.rootMethod != null ) {
-				return false;
-			}
-		}
-		else if ( !rootMethod.equals( other.rootMethod ) ) {
+		if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
 			return false;
 		}
 		return true;

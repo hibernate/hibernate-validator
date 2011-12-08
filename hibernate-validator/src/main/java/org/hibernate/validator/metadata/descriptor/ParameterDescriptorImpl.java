@@ -16,34 +16,27 @@
 */
 package org.hibernate.validator.metadata.descriptor;
 
-import org.hibernate.validator.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.metadata.core.MetaConstraint;
-import org.hibernate.validator.metadata.aggregated.ParameterMetaData;
+import java.util.List;
+import java.util.Set;
+
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 /**
+ * Describes a validated method parameter.
+ *
  * @author Gunnar Morling
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
 
-	private ParameterMetaData parameterMetaData;
+	private final int index;
 
-	public ParameterDescriptorImpl(BeanMetaData<?> metaDataBean, ParameterMetaData oneParameter) {
-		super( oneParameter.getType(), metaDataBean );
+	public ParameterDescriptorImpl(Class<?> type, int index, Set<ConstraintDescriptorImpl<?>> constraints, boolean isCascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		super( type, constraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
 
-		this.parameterMetaData = oneParameter;
-
-		//add constraints of the represented parameter to the constraint descriptor list
-		for ( MetaConstraint<?> oneConstraint : oneParameter ) {
-			addConstraintDescriptor( oneConstraint.getDescriptor() );
-		}
-	}
-
-	public boolean isCascaded() {
-		return parameterMetaData.isCascading();
+		this.index = index;
 	}
 
 	public int getIndex() {
-		return parameterMetaData.getIndex();
+		return index;
 	}
 }
