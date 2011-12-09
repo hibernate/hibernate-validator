@@ -961,18 +961,18 @@ public void testOrderedChecks() {
           <programlisting language="JAVA" role="JAVA">@GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })
 public class RentalCar extends Car {
     @AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
-    private boolean isRented;    
+    private boolean rented;
 
     public RentalCar(String manufacturer, String licencePlate, int seatCount) {
         super( manufacturer, licencePlate, seatCount );
     }
 
     public boolean isRented() {
-        return isRented;
+        return rented;
     }
 
-    public void setRented(booelan rented) {
-        isRented = rented;
+    public void setRented(boolean rented) {
+        this.rented = rented;
     }
 }</programlisting>
         </example>
@@ -1019,7 +1019,7 @@ public void carIsRented() {
           associated objects. This means in particular that adding
           <classname>DriverChecks</classname> to the default group sequence of
           <classname>RentalCar</classname> would not have any effects. Only
-          the group <classname>Default</classname> will be propagted to the
+          the group <classname>Default</classname> will be propagated to the
           driver association when validation a rental car instance.</para>
         </note>
       </section>
@@ -1044,7 +1044,8 @@ public void carIsRented() {
 
           <programlisting language="JAVA" role="JAVA">@GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
 public class RentalCar extends Car {
-    private boolean rented;    
+    @AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
+    private boolean rented;
 
     public RentalCar(String manufacturer, String licencePlate, int seatCount) {
         super( manufacturer, licencePlate, seatCount );
