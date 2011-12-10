@@ -243,7 +243,6 @@
                                 <Implementation-Vendor>${project.groupId}</Implementation-Vendor>
                                 <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
                                 <Implementation-URL>${project.url}</Implementation-URL>
-                                <Specification-Title>Bean Validation</Specification-Title>
                             </manifestEntries>
                         </archive>
                     </configuration>

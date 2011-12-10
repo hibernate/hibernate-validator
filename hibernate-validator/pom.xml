@@ -184,6 +184,9 @@
                         <configuration>
                             <archive>
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                                <manifestEntries>
+                                    <Specification-Title>Bean Validation</Specification-Title>
+                                </manifestEntries>
                             </archive>
                         </configuration>
                     </execution>
