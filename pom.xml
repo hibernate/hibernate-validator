@@ -242,7 +242,7 @@
                                 <Implementation-Version>${project.version}</Implementation-Version>
                                 <Implementation-Vendor>${project.groupId}</Implementation-Vendor>
                                 <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
-                                <Implementation-URL>${project.url}</Implementation-URL>
+                                <Implementation-URL>http://validator.hibernate.org</Implementation-URL>
                             </manifestEntries>
                         </archive>
                     </configuration>
