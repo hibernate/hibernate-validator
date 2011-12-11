@@ -240,8 +240,8 @@
                             <manifestEntries>
                                 <Implementation-Title>${project.artifactId}</Implementation-Title>
                                 <Implementation-Version>${project.version}</Implementation-Version>
-                                <Implementation-Vendor>${project.groupId}</Implementation-Vendor>
-                                <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+                                <Implementation-Vendor>${project.parent.groupId}</Implementation-Vendor>
+                                <Implementation-Vendor-Id>${project.parent.groupId}</Implementation-Vendor-Id>
                                 <Implementation-URL>http://validator.hibernate.org</Implementation-URL>
                             </manifestEntries>
                         </archive>
