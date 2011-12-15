@@ -34,7 +34,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.jboss.as>7.1.0.CR1-SNAPSHOT</version.jboss.as>
+        <version.jboss.as>7.1.0.Beta1</version.jboss.as>
+        <!--<version.jboss.as>7.1.0.CR1-SNAPSHOT</version.jboss.as>-->
         <version.arquillian>1.0.0.CR6</version.arquillian>
     </properties>
 
