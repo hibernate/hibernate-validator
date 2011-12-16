@@ -27,6 +27,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
@@ -51,10 +52,8 @@ public class MessageInterpolationWithDefaultBundleTest {
 		Locale.setDefault( defaultLocale );
 	}
 
-	/**
-	 * HV-268
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-268")
 	public void testEmailAndRangeMessageEnglishLocale() {
 		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.ENGLISH );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
@@ -69,10 +68,8 @@ public class MessageInterpolationWithDefaultBundleTest {
 		);
 	}
 
-	/**
-	 * HV-268
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-268")
 	public void testEmailAndRangeMessageGermanLocale() {
 		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.GERMAN );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
@@ -87,10 +84,8 @@ public class MessageInterpolationWithDefaultBundleTest {
 		);
 	}
 
-	/**
-	 * HV-268
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-268")
 	public void testEmailAndRangeMessageFrenchLocale() {
 		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.FRENCH );
 		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
@@ -101,7 +96,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 		Set<ConstraintViolation<User>> constraintViolations = validator.validate( user );
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectConstraintViolationMessages(
-				constraintViolations, "Addresse email mal form\u00E9e", "doit \u00EAtre entre 18 et 21"
+				constraintViolations, "Adresse email mal form\u00E9e", "doit \u00EAtre entre 18 et 21"
 		);
 	}
 
@@ -110,6 +105,7 @@ public class MessageInterpolationWithDefaultBundleTest {
 	 * must take precedence over the system's default locale.
 	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-306")
 	public void testThatExplicitlySetEnglishLocaleHasPrecedenceOverDefaultLocale() {
 		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.FRENCH );
 		config.messageInterpolator( new LocalizedMessageInterpolator( Locale.ENGLISH ) );
