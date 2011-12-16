@@ -17,7 +17,6 @@
 package org.hibernate.validator.method.metadata;
 
 import java.util.List;
-import javax.validation.Valid;
 import javax.validation.metadata.ElementDescriptor;
 
 /**
@@ -52,7 +51,7 @@ public interface MethodDescriptor extends ElementDescriptor {
 	/**
 	 * Whether a cascaded validation for this method's return value shall be
 	 * performed or not. This is the case if this method is marked for a
-	 * cascaded validation (e.g. by annotating it with the {@link Valid}
+	 * cascaded validation (e.g. by annotating it with the {@link javax.validation.Valid}
 	 * annotation) either locally or in the inheritance hierarchy.
 	 *
 	 * @return <code>True</code>, if this method's return value shall be

@@ -17,7 +17,6 @@
 package org.hibernate.validator.method.metadata;
 
 import java.util.Set;
-import javax.validation.Valid;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 
@@ -36,15 +35,15 @@ public interface TypeDescriptor extends ElementDescriptor {
 	 * <li>a constraint is hosted on any of this type's bean properties
 	 * (represented by fields or getter methods),</li>
 	 * <li>any of this type's bean properties (represented by fields or getter
-	 * methods) is marked for cascaded validation with the {@link Valid}
+	 * methods) is marked for cascaded validation with the {@link javax.validation.Valid}
 	 * annotation,</li>
 	 * <li>a constraint is hosted on any of this type's method's parameters,</li>
 	 * <li>any of this type's method's parameters is marked for cascaded
-	 * validation with the {@link Valid} annotation,</li>
+	 * validation with the {@link javax.validation.Valid} annotation,</li>
 	 * <li>a constraint is hosted on the return value of any of this type's
 	 * methods or</li>
 	 * <li>the return value of any of this type's methods is marked for cascaded
-	 * validation with the {@link Valid} annotation</li>
+	 * validation with the {@link javax.validation.Valid} annotation</li>
 	 * </ul>
 	 *
 	 * @return <code>True</code>, if this type has any constraints,

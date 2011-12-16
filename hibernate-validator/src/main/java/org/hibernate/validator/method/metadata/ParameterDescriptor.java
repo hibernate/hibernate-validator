@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.method.metadata;
 
-import javax.validation.Valid;
 import javax.validation.metadata.ElementDescriptor;
 
 /**
@@ -29,7 +28,7 @@ public interface ParameterDescriptor extends ElementDescriptor {
 	/**
 	 * Whether cascaded validation for this parameter shall be
 	 * performed or not. This is the case if this parameter is annotated with the
-	 * {@link Valid} annotation either locally or in the inheritance hierarchy.
+	 * {@link javax.validation.Valid} annotation either locally or in the inheritance hierarchy.
 	 *
 	 * @return <code>True</code>, if this parameter shall be
 	 *         validated recursively, <code>false</code> otherwise.

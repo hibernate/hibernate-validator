@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.Valid;
 
 import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.metadata.core.MetaConstraint;
@@ -271,7 +270,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		/**
 		 * Returns a set with those methods from the given pile of methods that have
 		 * at least one constrained parameter or at least one parameter annotated
-		 * with {@link Valid}.
+		 * with {@link javax.validation.Valid}.
 		 *
 		 * @param methods The methods to search in.
 		 *
