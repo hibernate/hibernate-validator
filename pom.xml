@@ -84,7 +84,7 @@
     <properties>
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4jVersion>1.6.1</slf4jVersion>
+        <slf4j.version>1.6.1</slf4j.version>
     </properties>
 
     <dependencyManagement>
@@ -122,17 +122,17 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.jtype</groupId>

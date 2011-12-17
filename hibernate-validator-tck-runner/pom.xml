@@ -262,7 +262,7 @@
                                 <validation.provider>${validation.provider}</validation.provider>
                             </systemPropertyVariables>
                             <environmentVariables>
-                                 <JBOSS_HOME>${project.build.directory}/jboss-as-7.1.0.Beta1b</JBOSS_HOME>
+                                 <JBOSS_HOME>${project.build.directory}/jboss-as-${jbossas.version}</JBOSS_HOME>
                             </environmentVariables>
                         </configuration>
                     </plugin>
