@@ -84,10 +84,7 @@
     <properties>
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4jVersion>1.6.1</slf4jVersion>
-        <jsr303.tck.version>1.0.6.GA</jsr303.tck.version>
-        <arquillian.version>1.0.0.CR1</arquillian.version>
-        <jbossas.version>7.0.0.CR1</jbossas.version>
+        <slf4j.version>1.6.1</slf4j.version>
     </properties>
 
     <dependencyManagement>
@@ -125,17 +122,17 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>${slf4jVersion}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.googlecode.jtype</groupId>
@@ -173,34 +170,9 @@
                 <version>1.2.124</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate.jsr303.tck</groupId>
-                <artifactId>jsr303-tck</artifactId>
-                <version>${jsr303.tck.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>1.6.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-controller-client</artifactId>
-                <version>${jbossas.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-arquillian-container-managed</artifactId>
-                <version>${jbossas.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.container</groupId>
-                <artifactId>arquillian-container-impl-base</artifactId>
-                <version>${arquillian.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.jbossas.as7-cdi-tck</groupId>
-                <artifactId>jbossas-container</artifactId>
-                <version>1.0.0.CR1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -274,7 +246,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>2.11</version>
                     <configuration>
                         <forkMode>once</forkMode>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -286,7 +258,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>2.11</version>
                     <executions>
                         <execution>
                             <id>generate-test-report</id>
