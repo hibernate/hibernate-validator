@@ -77,6 +77,7 @@
     <modules>
         <module>hibernate-validator</module>
         <module>hibernate-validator-tck-runner</module>
+        <module>hibernate-validator-integrationtest</module>
         <module>hibernate-validator-annotation-processor</module>
         <module>hibernate-validator-archetype</module>
     </modules>
