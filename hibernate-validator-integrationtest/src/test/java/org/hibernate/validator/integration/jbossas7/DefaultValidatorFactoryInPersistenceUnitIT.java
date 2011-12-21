@@ -46,6 +46,8 @@ import static junit.framework.Assert.assertTrue;
  * Tests the integration of Hibernate Validator in JBoss AS 7
  *
  * @author Hardy Ferentschik
+ * @todo the test should execute an actual validation. It is not guaranteed that one can access the validator factory
+ * under javax.persistence.validation.factory
  */
 @RunWith(Arquillian.class)
 public class DefaultValidatorFactoryInPersistenceUnitIT {

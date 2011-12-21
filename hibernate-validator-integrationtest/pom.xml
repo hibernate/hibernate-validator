@@ -34,9 +34,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.jboss.as>7.1.0.Beta1</version.jboss.as>
-        <!--<version.jboss.as>7.1.0.CR1-SNAPSHOT</version.jboss.as>-->
-        <version.arquillian>1.0.0.CR6</version.arquillian>
+        <jbossas.version>7.1.0.Beta1</jbossas.version>
+        <arquillian.version>1.0.0.CR6</arquillian.version>
     </properties>
 
     <dependencyManagement>
@@ -44,7 +43,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>${version.arquillian}</version>
+                <version>${arquillian.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -66,7 +65,7 @@
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-arquillian-container-managed</artifactId>
-                <version>${version.jboss.as}</version>
+                <version>${jbossas.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -112,7 +111,7 @@
                                 <artifactItem>
                                     <groupId>org.jboss.as</groupId>
                                     <artifactId>jboss-as-dist</artifactId>
-                                    <version>${version.jboss.as}</version>
+                                    <version>${jbossas.version}</version>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
