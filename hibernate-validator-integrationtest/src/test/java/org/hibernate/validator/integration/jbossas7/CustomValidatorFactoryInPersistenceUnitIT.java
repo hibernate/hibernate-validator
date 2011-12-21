@@ -44,8 +44,6 @@ import static junit.framework.Assert.assertTrue;
  * Tests the integration of Hibernate Validator in JBoss AS 7
  *
  * @author Hardy Ferentschik
- * @todo the test should execute an actual validation. It is not guaranteed that one can access the validator factory
- * under javax.persistence.validation.factory
  */
 @RunWith(Arquillian.class)
 public class CustomValidatorFactoryInPersistenceUnitIT {
@@ -90,6 +88,9 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 	public void testValidatorFactoryPassedToPersistenceUnit() throws Exception {
 		log.debug( "Running testValidatorFactoryPassedToPersistenceUnit..." );
 		Map<String, Object> properties = em.getEntityManagerFactory().getProperties();
+
+        // TODO the test should also execute an actual validation. It is not guaranteed that one can access the validator factory
+        // under javax.persistence.validation.factory. This works for the JBoss AS purposes, but not generically
 		Object obj = properties.get( "javax.persistence.validation.factory" );
 		assertTrue( "There should be an object under this property", obj != null );
 		ValidatorFactory factory = (ValidatorFactory) obj;
