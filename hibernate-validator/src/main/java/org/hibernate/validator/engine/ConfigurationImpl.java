@@ -18,7 +18,6 @@ package org.hibernate.validator.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +39,7 @@ import org.hibernate.validator.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.util.CollectionHelper;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.Version;
 import org.hibernate.validator.xml.ValidationBootstrapParameters;
@@ -73,8 +73,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
-	private Set<InputStream> configurationStreams = new HashSet<InputStream>();
-	private ConstraintMapping mapping;
+	private Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
+	private Set<ConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
 
 	public ConfigurationImpl(BootstrapState state) {
@@ -133,7 +133,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		if ( mapping == null ) {
 			throw new IllegalArgumentException( "The mapping cannot be null." );
 		}
-		this.mapping = mapping;
+		this.programmaticMappings.add(mapping);
 		return this;
 	}
 
@@ -232,8 +232,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return defaultResourceBundleLocator;
 	}
 
-	public final ConstraintMapping getMapping() {
-		return mapping;
+	public final Set<ConstraintMapping> getProgrammaticMappings() {
+		return programmaticMappings;
 	}
 
 	private boolean isSpecificProvider() {
