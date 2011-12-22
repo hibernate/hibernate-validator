@@ -18,16 +18,14 @@ package org.hibernate.validator.util;
 
 /**
  * @author Gunnar Morling
- *
  */
 public class Contracts {
 
 	public static void assertNotNull(Object o) {
-		assertNotNull(o, "must not be null");
+		assertNotNull( o, "must not be null" );
 	}
 
 	public static void assertNotNull(Object o, String message) {
-		
 		if ( o == null ) {
 			throw new IllegalArgumentException( message );
 		}
