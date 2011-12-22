@@ -75,11 +75,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
-			if ( hibernateSpecificConfig.getMapping() != null ) {
+			if ( hibernateSpecificConfig.getProgrammaticMappings().size() > 0 ) {
 				metaDataProviders.add(
 						new ProgrammaticMappingMetaDataProvider(
 								constraintHelper,
-								hibernateSpecificConfig.getMapping()
+								hibernateSpecificConfig.getProgrammaticMappings()
 						)
 				);
 			}

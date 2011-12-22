@@ -57,6 +57,10 @@ public class ConstraintMappingContext {
 
 	/**
 	 * Returns the constraint mapping context from the given constraint mapping.
+	 *
+	 * @param mapping the programmatic constraint mapping
+	 *
+	 * @return returns the constraint mapping context from the given constraint mapping
 	 */
 	public static ConstraintMappingContext getFromMapping(ConstraintMapping mapping) {
 		return new ConstraintMappingContextAccessor( mapping ).getContext();

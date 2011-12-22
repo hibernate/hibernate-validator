@@ -22,12 +22,10 @@ import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
- * <p>
  * Represents a (potentially) constrained Java element such as a type, field or
  * method. Such an element has a set of {@link org.hibernate.validator.metadata.core.MetaConstraint}s and can be
  * marked for a cascaded validation. Furthermore each constrained element has a
  * {@link ConfigurationSource configuration source} which determines its origin.
- * </p>
  * <p>
  * The hierarchy of constrained elements resembles the physical structure of the
  * represented Java types. In particular it doesn't provide the notion of
@@ -56,7 +54,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * @author Gunnar Morling
 	 */
 	public enum ConstrainedElementKind {
-		TYPE, FIELD, METHOD, PARAMETER;
+		TYPE, FIELD, METHOD, PARAMETER
 	}
 
 	/**
@@ -100,5 +98,4 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 *         <code>false</code> otherwise.
 	 */
 	boolean isConstrained();
-
 }
