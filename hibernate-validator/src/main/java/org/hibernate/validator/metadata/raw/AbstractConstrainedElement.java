@@ -24,20 +24,16 @@ import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
 
 /**
- * Base implementation with functionality common to all {@link ConstrainedElement} implementations.
+ * Base implementation of with functionality common to all {@link ConstrainedElement} implementations.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
-
 	private final ConstrainedElementKind kind;
-
 	private final ConfigurationSource source;
-
 	private final ConstraintLocation location;
-
 	private final Set<MetaConstraint<?>> constraints;
-
 	private final boolean isCascading;
 
 	public AbstractConstrainedElement(ConfigurationSource source, ConstrainedElementKind kind, ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
@@ -88,8 +84,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ( ( location == null ) ? 0 : location.hashCode() );
+		result = prime * result + ( ( location == null ) ? 0 : location.hashCode() );
 		result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
 		return result;
 	}
@@ -124,6 +119,4 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		}
 		return true;
 	}
-
-
 }
