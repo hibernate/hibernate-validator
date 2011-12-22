@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.GroupDefinitionException;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
@@ -43,6 +44,7 @@ import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.util.Contracts;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
@@ -55,11 +57,11 @@ import static org.hibernate.validator.util.CollectionHelper.partition;
  */
 public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBase {
 
-	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, ConstraintMapping mapping) {
-
+	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
-
-		initProgrammaticConfiguration( mapping );
+		Contracts.assertNotNull( programmaticMappings );
+		ConstraintMappingContext mergedContext = createMergedMappingContext( programmaticMappings );
+		initProgrammaticConfiguration( mergedContext );
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
@@ -67,14 +69,11 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 	}
 
 	/**
-	 * Reads the configuration from {@code mapping} and creates the appropriate meta-data structures.
+	 * Reads the configuration from {@code context} and creates the appropriate meta-data structures.
 	 *
-	 * @param mapping The constraint configuration created via the programmatic API.
+	 * @param context the pre-processed configuration information
 	 */
-	private <T> void initProgrammaticConfiguration(ConstraintMapping mapping) {
-
-		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
-
+	private void initProgrammaticConfiguration(ConstraintMappingContext context) {
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
 
 			Set<ConstrainedElement> constrainedElements =
@@ -168,10 +167,10 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			Map<Integer, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByParameter = partition(
 					constraintsByMethod.get( oneMethod ), constraintsByParameterIndex()
 			);
-			List<ConstrainedParameter> parameterMetaDatas = newArrayList();
+			List<ConstrainedParameter> parameterMetaDataList = newArrayList();
 
 			for ( int i = 0; i < oneMethod.getParameterTypes().length; i++ ) {
-				parameterMetaDatas.add(
+				parameterMetaDataList.add(
 						new ConstrainedParameter(
 								ConfigurationSource.API,
 								new MethodConstraintLocation( oneMethod, i ),
@@ -185,7 +184,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 			ConstrainedMethod methodMetaData = new ConstrainedMethod(
 					ConfigurationSource.API,
 					new MethodConstraintLocation( oneMethod ),
-					parameterMetaDatas,
+					parameterMetaDataList,
 					asMetaConstraints( constraintsByParameter.get( null ) ),
 					cascadesByParameter.containsKey( null )
 			);
@@ -256,4 +255,76 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		};
 	}
 
+	/**
+	 * Creates a single merged {@code ConstraintMappingContext} in case multiple programmatic mappings are provided.
+	 *
+	 * @param programmaticMappings set of constraint mappings to merge into a single context
+	 *
+	 * @return a single merged constraint context
+	 */
+	private ConstraintMappingContext createMergedMappingContext(Set<ConstraintMapping> programmaticMappings) {
+		// if we only have one mapping we can return the context of just this mapping
+		if ( programmaticMappings.size() == 1 ) {
+			return ConstraintMappingContext.getFromMapping( programmaticMappings.iterator().next() );
+		}
+
+		ConstraintMappingContext mergedContext = new ConstraintMappingContext();
+		for ( ConstraintMapping mapping : programmaticMappings ) {
+			ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
+
+			for ( Set<ConfiguredConstraint<?, BeanConstraintLocation>> propertyConstraints : context.getConstraintConfig()
+					.values() ) {
+				for ( ConfiguredConstraint<?, BeanConstraintLocation> constraint : propertyConstraints ) {
+					mergedContext.addConstraintConfig( constraint );
+				}
+			}
+
+			for ( Set<BeanConstraintLocation> beanConstraintLocations : context.getCascadeConfig().values() ) {
+				for ( BeanConstraintLocation beanLocation : beanConstraintLocations ) {
+					mergedContext.addCascadeConfig( beanLocation );
+				}
+			}
+
+			for ( Set<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints : context.getMethodConstraintConfig()
+					.values() ) {
+				for ( ConfiguredConstraint<?, MethodConstraintLocation> methodConstraint : methodConstraints ) {
+					mergedContext.addMethodConstraintConfig( methodConstraint );
+				}
+			}
+
+			for ( Set<MethodConstraintLocation> cascadedMethodConstraints : context.getMethodCascadeConfig()
+					.values() ) {
+				for ( MethodConstraintLocation methodCascade : cascadedMethodConstraints ) {
+					mergedContext.addMethodCascadeConfig( methodCascade );
+				}
+			}
+
+			mergeGroupSequenceAndGroupSequenceProvider( mergedContext, context );
+		}
+		return mergedContext;
+	}
+
+	private void mergeGroupSequenceAndGroupSequenceProvider(ConstraintMappingContext mergedContext, ConstraintMappingContext context) {
+		for ( Class<?> clazz : context.getConfiguredClasses() ) {
+			if ( context.getDefaultGroupSequenceProvider( clazz ) != null ) {
+				if ( mergedContext.getDefaultGroupSequenceProvider( clazz ) != null ) {
+					throw new GroupDefinitionException( "Multiple definitions of default group sequence provider" );
+				}
+				mergedContext.addDefaultGroupSequenceProvider(
+						clazz,
+						context.getDefaultGroupSequenceProvider( clazz )
+				);
+			}
+
+			if ( context.getDefaultSequence( clazz ) != null ) {
+				if ( mergedContext.getDefaultSequence( clazz ) != null ) {
+					throw new GroupDefinitionException( "Multiple definitions of default group sequence" );
+				}
+				mergedContext.addDefaultGroupSequence(
+						clazz,
+						context.getDefaultSequence( clazz )
+				);
+			}
+		}
+	}
 }
