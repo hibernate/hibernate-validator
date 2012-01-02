@@ -70,6 +70,22 @@
   Hibernate Validator itself as well as the Bean Validation API and TCK are all provided and distributed under
   the Apache Software License 2.0. Refer to license.txt for more information
 
+  Build from Source
+  -----------------
+
+  You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git
+  You will also need a JDK 6 or 7 and a Maven 3. With these prerequisites in place you can compile the source via
+
+  mvn clean install -s settings-example.xml
+
+  The documentation module requires an additional tool called po2xml. If you don't have po2xml installed you can
+  skip the building of the documentation via:
+
+  mvn clean install -DdisableDocumentationBuild=true -s settings-example.xml
+
+  There are more build options available as well. For more information refer to
+  http://community.jboss.org/wiki/ContributingtoHibernateValidator
+
   Hibernate Validator URLs
   ------------------------
 
