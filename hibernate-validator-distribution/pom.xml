@@ -129,6 +129,7 @@
                         <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
                     </descriptors>
                     <finalName>hibernate-validator-${project.version}</finalName>
+                    <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
                 <executions>
                     <execution>
