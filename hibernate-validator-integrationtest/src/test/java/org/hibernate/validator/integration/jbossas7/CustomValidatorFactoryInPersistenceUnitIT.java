@@ -54,7 +54,7 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( User.class )
-				.addAsLibraries( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
+				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
 				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
