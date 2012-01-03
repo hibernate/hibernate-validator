@@ -108,9 +108,39 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                println "[INFO] ------------------------------------------------------------------------";
+                                println "[INFO] DOCUMENTATION BUILD INFO                                                ";
+                                println "[INFO] ------------------------------------------------------------------------";
+                                println "[INFO] The documentation build requires the external tool po2xml for processing";
+                                println "[INFO] translations. You can skip the whole documentation build via specifying ";
+                                println "[INFO] the property 'disableDocumentationBuil':                                ";
+                                println "[INFO]                                                                         ";
+                                println "[INFO] mvn install -DdisableDocumentationBuild=true                            ";
+                                println "[INFO]                                                                         ";
+                                println "[INFO] Or you can just skip the translations:                                  ";
+                                println "[INFO]                                                                         ";
+                                println "[INFO] mvn install -Djdocbook.ignoreTranslations=true                          ";
+                                println "[INFO]                                                                         ";
+                                println "[INFO] See http://community.jboss.org/wiki/ContributingtoHibernateValidator    ";
+                                println "[INFO] ------------------------------------------------------------------------";
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.zanata</groupId>
                 <artifactId>zanata-maven-plugin</artifactId>
-                <version>1.3</version>
                 <configuration>
                     <srcDir>${basedir}/src/main/docbook</srcDir>
                     <srcDirPot>${basedir}/src/main/docbook/pot</srcDirPot>
