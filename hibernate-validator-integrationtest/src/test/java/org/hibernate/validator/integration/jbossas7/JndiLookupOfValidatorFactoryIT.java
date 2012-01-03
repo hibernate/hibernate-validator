@@ -26,14 +26,12 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.hibernate.validator.engine.ValidatorImpl;
+import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
@@ -45,19 +43,15 @@ import static junit.framework.Assert.fail;
  */
 @RunWith(Arquillian.class)
 public class JndiLookupOfValidatorFactoryIT {
-
+	private static final String WAR_FILE_NAME = JndiLookupOfValidatorFactoryIT.class.getSimpleName() + ".war";
 	private static final Logger log = Logger.getLogger( JndiLookupOfValidatorFactoryIT.class );
 	private static final String DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY = "java:comp/ValidatorFactory";
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
-				.create( WebArchive.class, JndiLookupOfValidatorFactoryIT.class.getSimpleName() + ".war" )
-				.addAsLibraries(
-						DependencyResolvers.use( MavenDependencyResolver.class )
-								.artifact( "log4j:log4j:1.2.16" )
-								.resolveAs( JavaArchive.class )
-				)
+				.create( WebArchive.class, WAR_FILE_NAME )
+				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" );
 	}
 
@@ -66,7 +60,7 @@ public class JndiLookupOfValidatorFactoryIT {
 		log.debug( "Running testDefaultValidatorFactoryLookup..." );
 		try {
 			Context ctx = new InitialContext();
-			Object obj = ctx.lookup(  DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY );
+			Object obj = ctx.lookup( DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY );
 			assertTrue( "The default validator factory should be bound", obj != null );
 			ValidatorFactory factory = (ValidatorFactory) obj;
 			assertTrue(
