@@ -65,6 +65,8 @@ public class IntegrationTestUtil {
 		Collection<JavaArchive> hibernateValidatorWithDependencies = DependencyResolvers.use(
 				MavenDependencyResolver.class
 		)
+				// go offline to make sure to get the SNAPSHOT from the current build and not a resolved SNAPSHOT
+				// from a remote repo
 				.goOffline()
 				.artifact( "org.hibernate:hibernate-validator:" + VALIDATOR_VERSION )
 				.resolveAs( JavaArchive.class );
