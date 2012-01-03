@@ -29,14 +29,13 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceDescriptor;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -47,26 +46,19 @@ import static junit.framework.Assert.assertTrue;
  */
 @RunWith(Arquillian.class)
 public class CustomValidatorFactoryInPersistenceUnitIT {
-
+	private static final String WAR_FILE_NAME = CustomValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
 	private static final Logger log = Logger.getLogger( CustomValidatorFactoryInPersistenceUnitIT.class );
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
-				.create( WebArchive.class, CustomValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war" )
-				.addClasses( User.class, MyValidationProvider.class, MyValidatorConfiguration.class )
+				.create( WebArchive.class, WAR_FILE_NAME )
+				.addClasses( User.class )
+				.addAsLibraries( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
+				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
+				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
-				.addAsResource(
-						"javax.validation.spi.ValidationProvider",
-						"META-INF/services/javax.validation.spi.ValidationProvider"
-				)
-				.addAsLibraries(
-						DependencyResolvers.use( MavenDependencyResolver.class )
-								.artifact( "log4j:log4j:1.2.16" )
-								.resolveAs( JavaArchive.class )
-				)
-				.addAsResource( "log4j.properties" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -89,8 +81,8 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		log.debug( "Running testValidatorFactoryPassedToPersistenceUnit..." );
 		Map<String, Object> properties = em.getEntityManagerFactory().getProperties();
 
-        // TODO the test should also execute an actual validation. It is not guaranteed that one can access the validator factory
-        // under javax.persistence.validation.factory. This works for the JBoss AS purposes, but not generically
+		// TODO the test should also execute an actual validation. It is not guaranteed that one can access the validator factory
+		// under javax.persistence.validation.factory. This works for the JBoss AS purposes, but not generically
 		Object obj = properties.get( "javax.persistence.validation.factory" );
 		assertTrue( "There should be an object under this property", obj != null );
 		ValidatorFactory factory = (ValidatorFactory) obj;

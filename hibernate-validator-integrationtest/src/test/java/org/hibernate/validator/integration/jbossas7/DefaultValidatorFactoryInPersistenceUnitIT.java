@@ -29,16 +29,14 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceDescriptor;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.hibernate.validator.engine.ValidatorImpl;
+import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -51,21 +49,17 @@ import static junit.framework.Assert.assertTrue;
  */
 @RunWith(Arquillian.class)
 public class DefaultValidatorFactoryInPersistenceUnitIT {
-
+	private static final String WAR_FILE_NAME = DefaultValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
 	private static final Logger log = Logger.getLogger( DefaultValidatorFactoryInPersistenceUnitIT.class );
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
-				.create( WebArchive.class, DefaultValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war" )
+				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( User.class )
-				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsLibraries(
-						DependencyResolvers.use( MavenDependencyResolver.class )
-								.artifact( "log4j:log4j:1.2.16" )
-								.resolveAs( JavaArchive.class )
-				)
+				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" )
+				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
