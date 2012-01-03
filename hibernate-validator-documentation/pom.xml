@@ -112,7 +112,7 @@
                 <artifactId>gmaven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>process-resources</phase>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
