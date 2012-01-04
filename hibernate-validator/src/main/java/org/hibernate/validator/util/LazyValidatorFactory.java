@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -41,7 +39,11 @@ import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
 
+import org.slf4j.Logger;
+
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
 
 /**
  * This class lazily initialize the ValidatorFactory on the first usage
@@ -58,6 +60,7 @@ import org.hibernate.validator.HibernateValidator;
  * @author Hardy Ferentschik
  */
 public class LazyValidatorFactory implements ValidatorFactory {
+	private static final Logger log = LoggerFactory.make();
 	private final Configuration<?> configuration;
 	private volatile ValidatorFactory delegate; //use as a barrier
 
@@ -125,47 +128,16 @@ public class LazyValidatorFactory implements ValidatorFactory {
 	}
 
 	private static class HibernateProviderResolver implements ValidationProviderResolver {
-		private final List<ValidationProvider<?>> providerList;
-
-		private HibernateProviderResolver() {
-			List<ValidationProvider<?>> customProviderList = new ArrayList<ValidationProvider<?>>();
-			boolean containsHibernateValidator = false;
-			ValidationProviderResolver defaultResolver = new DefaultValidationProviderResolver();
-			for ( ValidationProvider<?> provider : defaultResolver.getValidationProviders() ) {
-				if ( provider instanceof HibernateValidator ) {
-					// make sure Hibernate Validator is the default Bean Validation implementation
-					customProviderList.add( 0, provider );
-					containsHibernateValidator = true;
-				}
-				else {
-					customProviderList.add( provider );
-				}
-
-			}
-
-			if ( !containsHibernateValidator ) {
-				customProviderList.add( 0, new HibernateValidator() );
-			}
-
-			this.providerList = Collections.unmodifiableList( customProviderList );
-		}
-
-		public List<ValidationProvider<?>> getValidationProviders() {
-			return providerList;
-		}
-	}
-
-	// initially taken from javax.validation.Validation
-	private static class DefaultValidationProviderResolver implements ValidationProviderResolver {
 		//cache per classloader for an appropriate discovery
 		//keep them in a weak hash map to avoid memory leaks and allow proper hot redeployment
 		private static final Map<ClassLoader, List<ValidationProvider<?>>> providersPerClassloader = new WeakHashMap<ClassLoader, List<ValidationProvider<?>>>();
 		private static final String SERVICES_FILE = "META-INF/services/" + ValidationProvider.class.getName();
+		private static final String HIBERNATE_VALIDATOR_PROVIDER_NAME = HibernateValidator.class.getName();
 
 		public List<ValidationProvider<?>> getValidationProviders() {
-			ClassLoader classloader = GetClassLoader.fromContext();
+			ClassLoader classloader = GetClassLoader.fromContext().run();
 			if ( classloader == null ) {
-				classloader = GetClassLoader.fromClass( DefaultValidationProviderResolver.class );
+				classloader = GetClassLoader.fromClass( HibernateProviderResolver.class ).run();
 			}
 
 			List<ValidationProvider<?>> providers;
@@ -179,7 +151,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 			}
 
 			synchronized ( providersPerClassloader ) {
-				providersPerClassloader.put( classloader, providers );
+				providersPerClassloader.put( classloader, Collections.unmodifiableList( providers ) );
 			}
 
 			return providers;
@@ -190,11 +162,12 @@ public class LazyValidatorFactory implements ValidatorFactory {
 			Class<?> providerClass;
 			for ( String providerName : providerNames ) {
 				try {
-					providerClass = loadClass( providerName, DefaultValidationProviderResolver.class );
+					providerClass = LoadClass.action( providerName, HibernateProviderResolver.class ).run();
 				}
-				catch ( ClassNotFoundException e ) {
+				catch ( ValidationException e ) {
 					// ignore - we don't want to  fail the whole loading because of a black sheep. Hibernate Validator
 					// will be added either way
+					log.warn( "Unable to load provider class " + providerName );
 					continue;
 				}
 
@@ -244,64 +217,19 @@ public class LazyValidatorFactory implements ValidatorFactory {
 			catch ( IOException e ) {
 				throw new ValidationException( "Unable to read " + SERVICES_FILE, e );
 			}
+
+			// we want to make sure that Hibernate Validator is in the list and on the first position. This
+			// way Hibernate Validator will be always the default provider is nothing else is specified
+			int index = providerNames.indexOf( HIBERNATE_VALIDATOR_PROVIDER_NAME );
+			if ( index < 0 ) {
+				providerNames.add( 0, HIBERNATE_VALIDATOR_PROVIDER_NAME );
+			}
+			else if ( index > 0 ) {
+				providerNames.remove( HIBERNATE_VALIDATOR_PROVIDER_NAME );
+				providerNames.add( 0, HIBERNATE_VALIDATOR_PROVIDER_NAME );
+			}
+
 			return providerNames;
-		}
-
-		private static Class<?> loadClass(String name, Class<?> caller) throws ClassNotFoundException {
-			try {
-				//try context classloader, if fails try caller classloader
-				ClassLoader loader = GetClassLoader.fromContext();
-				if ( loader != null ) {
-					return loader.loadClass( name );
-				}
-			}
-			catch ( ClassNotFoundException e ) {
-				//trying caller classloader
-				if ( caller == null ) {
-					throw e;
-				}
-			}
-			return Class.forName( name, true, GetClassLoader.fromClass( caller ) );
-		}
-	}
-
-	private static class GetClassLoader implements PrivilegedAction<ClassLoader> {
-		private final Class<?> clazz;
-
-		public static ClassLoader fromContext() {
-			final GetClassLoader action = new GetClassLoader( null );
-			if ( System.getSecurityManager() != null ) {
-				return AccessController.doPrivileged( action );
-			}
-			else {
-				return action.run();
-			}
-		}
-
-		public static ClassLoader fromClass(Class<?> clazz) {
-			if ( clazz == null ) {
-				throw new IllegalArgumentException( "Class is null" );
-			}
-			final GetClassLoader action = new GetClassLoader( clazz );
-			if ( System.getSecurityManager() != null ) {
-				return AccessController.doPrivileged( action );
-			}
-			else {
-				return action.run();
-			}
-		}
-
-		private GetClassLoader(Class<?> clazz) {
-			this.clazz = clazz;
-		}
-
-		public ClassLoader run() {
-			if ( clazz != null ) {
-				return clazz.getClassLoader();
-			}
-			else {
-				return Thread.currentThread().getContextClassLoader();
-			}
 		}
 	}
 }
