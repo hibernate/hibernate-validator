@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.integration.lazyfactory;
 
-import javax.inject.Inject;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -30,9 +28,9 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
+import org.hibernate.validator.util.LazyValidatorFactory;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 
 /**
@@ -54,7 +52,6 @@ public class LazyValidatorFactoryWithValidationXmlButNoProviderTestIT {
 			fail( "MyValidationProvider was not as expected in the custom jar" );
 		}
 		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
-				.addClasses( MyValidatorCreator.class )
 				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( true ) )
 				.addAsLibrary( beanValidationJarWithMissingProvider )
 				.addAsResource( "log4j.properties" )
@@ -62,16 +59,13 @@ public class LazyValidatorFactoryWithValidationXmlButNoProviderTestIT {
 				.addAsWebInfResource( "jboss-deployment-structure.xml" );
 	}
 
-	@Inject
-	private MyValidatorCreator validatorCreator;
-
 	@Test
 	public void testBootstrappingDoesNotFailDueToMissingCustomProvider() throws Exception {
-		assertNotNull( "The creator bean should have been injected", validatorCreator );
+		LazyValidatorFactory factory = new LazyValidatorFactory();
 		assertEquals(
 				"Since the custom provider cannot be loaded, Hibernate Validator should be the default",
 				ValidatorImpl.class.getName(),
-				validatorCreator.getValidator().getClass().getName()
+				factory.getValidator().getClass().getName()
 		);
 	}
 }
