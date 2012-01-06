@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.integration.lazyfactory;
 
-import javax.inject.Inject;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -29,9 +27,9 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
+import org.hibernate.validator.util.LazyValidatorFactory;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 
 /**
  * Tests for {@code LazyValidatorFactory}. See HV-546.
@@ -45,7 +43,6 @@ public class LazyValidatorFactoryWithoutValidationXmlTestIT {
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
-				.addClasses( MyValidatorCreator.class )
 				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( true ) )
 				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
 				.addAsResource( "log4j.properties" )
@@ -53,17 +50,14 @@ public class LazyValidatorFactoryWithoutValidationXmlTestIT {
 				.addAsWebInfResource( "jboss-deployment-structure.xml" );
 	}
 
-	@Inject
-	private MyValidatorCreator validatorCreator;
-
 	@Test
 	public void testBootstrapWithoutValidationXmlCreatesHibernateValidatorInstance() throws Exception {
-		assertNotNull( "The creator bean should have been injected", validatorCreator );
+		LazyValidatorFactory factory = new LazyValidatorFactory();
 		assertEquals(
 				"Hibernate Validator should be the chosen provider. " +
 						"Even though we bundle another provider it does not get explicitly configured.",
 				ValidatorImpl.class.getName(),
-				validatorCreator.getValidator().getClass().getName()
+				factory.getValidator().getClass().getName()
 		);
 	}
 }
