@@ -176,15 +176,12 @@ public class LazyValidatorFactory implements ValidatorFactory {
 				}
 				catch ( IllegalAccessException e ) {
 					throw new ValidationException(
-							"Unable to instantiate Bean Validation provider" + providerNames,
-							e
+							"Unable to instantiate Bean Validation provider" + providerNames, e
 					);
 				}
-				catch ( InstantiationException
-						e ) {
+				catch ( InstantiationException e ) {
 					throw new ValidationException(
-							"Unable to instantiate Bean Validation provider" + providerNames,
-							e
+							"Unable to instantiate Bean Validation provider" + providerNames, e
 					);
 				}
 			}

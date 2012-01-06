@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -46,14 +45,12 @@ public class LazyValidatorFactoryWithValidationXmlTestIT {
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
-				.addClasses(
-						MyValidatorCreator.class
-				)
+				.addClasses( MyValidatorCreator.class )
 				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( true ) )
 				.addAsLibraries( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
 				.addAsResource( "log4j.properties" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, ArchivePaths.create( "beans.xml" ) )
+				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure.xml" );
 	}
 
