@@ -46,7 +46,6 @@ public class LazyValidatorFactoryWithoutValidationXmlTestIT {
 				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( true ) )
 				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
 				.addAsResource( "log4j.properties" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure.xml" );
 	}
 

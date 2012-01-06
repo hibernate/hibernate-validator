@@ -47,7 +47,6 @@ public class LazyValidatorFactoryWithValidationXmlTestIT {
 				.addAsLibraries( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
 				.addAsResource( "log4j.properties" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure.xml" );
 	}
 
