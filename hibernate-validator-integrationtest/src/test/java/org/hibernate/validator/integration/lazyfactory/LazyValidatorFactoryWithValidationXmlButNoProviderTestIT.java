@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -55,13 +54,11 @@ public class LazyValidatorFactoryWithValidationXmlButNoProviderTestIT {
 			fail( "MyValidationProvider was not as expected in the custom jar" );
 		}
 		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
-				.addClasses(
-						MyValidatorCreator.class
-				)
+				.addClasses( MyValidatorCreator.class )
 				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( true ) )
 				.addAsLibrary( beanValidationJarWithMissingProvider )
 				.addAsResource( "log4j.properties" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, ArchivePaths.create( "beans.xml" ) )
+				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure.xml" );
 	}
 
