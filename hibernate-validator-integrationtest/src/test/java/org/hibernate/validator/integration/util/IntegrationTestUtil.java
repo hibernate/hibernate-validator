@@ -36,7 +36,6 @@ public class IntegrationTestUtil {
 	// a dependency to the hibernate-validator jar file since the version string in org.hibernate.validator.util.Version
 	// works with byte code enhancement
 	private static final String VALIDATOR_VERSION = Version.getVersionString();
-	private static final String SLF4J_VERSION = "1.6.1";
 	private static final String CUSTOM_BV_JAR_NAME = "dummy-bean-validation-provider.jar";
 	private static final String VALIDATION_PROVIDER_SERVICE_FILE_PATH = "META-INF/services/javax.validation.spi.ValidationProvider";
 
@@ -87,7 +86,8 @@ public class IntegrationTestUtil {
 
 	public static Collection<JavaArchive> bundleLoggingDependencies() {
 		return DependencyResolvers.use( MavenDependencyResolver.class )
-				.artifact( "org.slf4j:slf4j-log4j12:" + SLF4J_VERSION )
+				.loadMetadataFromPom( "pom.xml" )
+				.artifact( "org.slf4j:slf4j-log4j12" )
 				.resolveAs( JavaArchive.class );
 	}
 }
