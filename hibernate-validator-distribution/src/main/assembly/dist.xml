@@ -25,13 +25,15 @@
 
     <!-- Configure the artifacts to include  -->
     <dependencySets>
-        <!-- first the actual artifacts -->
+        <!-- first the actual project artifacts -->
         <dependencySet>
+            <outputDirectory>dist</outputDirectory>
             <includes>
                 <include>org.hibernate:hibernate-validator-annotation-processor</include>
             </includes>
         </dependencySet>
         <dependencySet>
+            <outputDirectory>dist</outputDirectory>
             <includes>
                 <include>org.hibernate:hibernate-validator</include>
             </includes>
@@ -39,7 +41,7 @@
 
         <!-- Now we take care of the transitive dependencies -->
         <dependencySet>
-            <outputDirectory>lib/required</outputDirectory>
+            <outputDirectory>dist/lib/required</outputDirectory>
             <includes>
                 <include>javax.validation:validation-api</include>
                 <include>org.slf4j:slf4j-api</include>
@@ -47,7 +49,7 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>lib/jdk5</outputDirectory>
+            <outputDirectory>dist/lib/jdk5</outputDirectory>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <includes>
                 <include>javax.xml.bind:jaxb-api</include>
@@ -57,7 +59,7 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>lib/optional</outputDirectory>
+            <outputDirectory>dist/lib/optional</outputDirectory>
             <includes>
                 <include>org.slf4j:slf4j-log4j12</include>
                 <include>log4j:log4j</include>
