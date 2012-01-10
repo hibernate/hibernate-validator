@@ -43,6 +43,7 @@
             <includes>
                 <include>javax.validation:validation-api</include>
                 <include>org.slf4j:slf4j-api</include>
+                <include>com.googlecode.jtype:jtype</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -87,19 +88,24 @@
     </files>
 
     <fileSets>
-        <!-- Include all sources -->
+        <!-- Include all sources  -->
         <fileSet>
             <directory>..</directory>
             <outputDirectory>project</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
+                <!-- we already have these files at the top level of the distribution -->
                 <exclude>readme.txt</exclude>
                 <exclude>changelog.txt</exclude>
                 <exclude>copyright.txt</exclude>
                 <exclude>license.txt</exclude>
+
+                <!-- only needed for documentation and helper scripts, no need to include them -->
                 <exclude>**/zanata.sh</exclude>
                 <exclude>**/zanata.xml</exclude>
                 <exclude>src/main/scripts/**</exclude>
+
+                <!-- actual files which should be ignored -->
                 <exclude>.git</exclude>
                 <exclude>.gitignore</exclude>
                 <exclude>**/target/**</exclude>
