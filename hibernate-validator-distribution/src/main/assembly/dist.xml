@@ -25,13 +25,15 @@
 
     <!-- Configure the artifacts to include  -->
     <dependencySets>
-        <!-- first the actual artifacts -->
+        <!-- first the actual project artifacts -->
         <dependencySet>
+            <outputDirectory>dist</outputDirectory>
             <includes>
                 <include>org.hibernate:hibernate-validator-annotation-processor</include>
             </includes>
         </dependencySet>
         <dependencySet>
+            <outputDirectory>dist</outputDirectory>
             <includes>
                 <include>org.hibernate:hibernate-validator</include>
             </includes>
@@ -39,14 +41,15 @@
 
         <!-- Now we take care of the transitive dependencies -->
         <dependencySet>
-            <outputDirectory>lib/required</outputDirectory>
+            <outputDirectory>dist/lib/required</outputDirectory>
             <includes>
                 <include>javax.validation:validation-api</include>
                 <include>org.slf4j:slf4j-api</include>
+                <include>com.googlecode.jtype:jtype</include>
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>lib/jdk5</outputDirectory>
+            <outputDirectory>dist/lib/jdk5</outputDirectory>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <includes>
                 <include>javax.xml.bind:jaxb-api</include>
@@ -56,7 +59,7 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>lib/optional</outputDirectory>
+            <outputDirectory>dist/lib/optional</outputDirectory>
             <includes>
                 <include>org.slf4j:slf4j-log4j12</include>
                 <include>log4j:log4j</include>
@@ -87,19 +90,24 @@
     </files>
 
     <fileSets>
-        <!-- Include all sources -->
+        <!-- Include all sources  -->
         <fileSet>
             <directory>..</directory>
             <outputDirectory>project</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
+                <!-- we already have these files at the top level of the distribution -->
                 <exclude>readme.txt</exclude>
                 <exclude>changelog.txt</exclude>
                 <exclude>copyright.txt</exclude>
                 <exclude>license.txt</exclude>
+
+                <!-- only needed for documentation and helper scripts, no need to include them -->
                 <exclude>**/zanata.sh</exclude>
                 <exclude>**/zanata.xml</exclude>
                 <exclude>src/main/scripts/**</exclude>
+
+                <!-- actual files which should be ignored -->
                 <exclude>.git</exclude>
                 <exclude>.gitignore</exclude>
                 <exclude>**/target/**</exclude>
