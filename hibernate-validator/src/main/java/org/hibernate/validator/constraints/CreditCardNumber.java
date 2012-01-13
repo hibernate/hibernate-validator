@@ -21,8 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
-
-import org.hibernate.validator.constraints.impl.CreditCardNumberValidator;
+import javax.validation.ReportAsSingleViolation;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -40,9 +39,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Emmanuel Bernard
  */
 @Documented
-@Constraint(validatedBy = CreditCardNumberValidator.class)
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
+@ReportAsSingleViolation
+@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
 public @interface CreditCardNumber {
 	String message() default "{org.hibernate.validator.constraints.CreditCardNumber.message}";
 

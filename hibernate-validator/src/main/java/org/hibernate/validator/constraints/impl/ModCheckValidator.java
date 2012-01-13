@@ -18,156 +18,163 @@ package org.hibernate.validator.constraints.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ModCheck.ModType;
+import org.hibernate.validator.util.ModUtil;
 
 /**
  * Mod check validator for MOD10 and MOD11 algorithms
- * 
+ *
  * http://en.wikipedia.org/wiki/Luhn_algorithm
  * http://en.wikipedia.org/wiki/Check_digit
- * 
+ *
  * @author George Gastaldi
- * 
+ * @author Hardy Ferentschik
  */
-public class ModCheckValidator implements ConstraintValidator<ModCheck, String> {
+public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequence> {
 
-    private static final String NUMBERS_ONLY_REGEXP = "[^0-9]";
-    private static final int DEC_RADIX = 10;
-    private int multiplier;
-    private int rangeStart;
-    private int rangeEnd;
-    private int checkDigitIndex;
-    private ModType modType;
+	private static final String NUMBERS_ONLY_REGEXP = "[^0-9]";
+	private static final int DEC_RADIX = 10;
 
-    public void initialize(ModCheck constraintAnnotation) {
-        this.modType = constraintAnnotation.value();
-        this.multiplier = constraintAnnotation.multiplier();
-        this.rangeStart = constraintAnnotation.rangeStart();
-        this.rangeEnd = constraintAnnotation.rangeEnd();
-        this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
-        if ( this.rangeStart > this.rangeEnd ) {
-            throw new IllegalArgumentException(
-                    String.format( "Invalid Range: %d > %d", this.rangeStart, this.rangeEnd ) );
-        }
-    }
+	/**
+	 * Multiplier used by the mod algorithms
+	 */
+	private int multiplier;
 
-    public boolean isValid(final String value, final ConstraintValidatorContext context) {
-        if ( value == null ) {
-            return true;
-        }
-        boolean ret;
-        String input = value.replaceAll( NUMBERS_ONLY_REGEXP, "" );
-        // No need to test rangeEnd, because substring will consider the length of the string if over-limit
-        if ( isRangeInbounds( checkDigitIndex, input ) && isRangeInbounds( rangeStart, input ) ) {
-            String substring = input.substring( this.rangeStart, this.rangeEnd );
-            if ( modType == ModType.MOD10 ) {
-                ret = passesMod10Test( substring, multiplier );
-            }
-            else {
-                ret = passesMod11Test( input, substring );
-            }
-        } else {
-            ret = false;
-        }
-        return ret;
-    }
+	/**
+	 * The start index for the checksum calculation
+	 */
+	private int startIndex;
 
-    /**
-     * Check if the input passes the mod11 test
-     * 
-     * @param input
-     * @param substring
-     * @return
-     */
-    public boolean passesMod11Test(String input, String substring) {
-        boolean ret;
-        int modResult = mod11( substring, this.multiplier );
-        int digit = Character.digit( input.charAt( checkDigitIndex ), DEC_RADIX );
-        ret = ( modResult == digit );
-        return ret;
-    }
+	/**
+	 * The end index for the checksum calculation
+	 */
+	private int endIndex;
 
-    /**
-     * Test if the range is inbounds
-     * 
-     * @param range
-     * @param input
-     * @return
-     */
-    private boolean isRangeInbounds(int range, String input) {
-        return range >= 0 && range < input.length();
-    }
+	/**
+	 * The index of the checksum digit
+	 */
+	private int checkDigitIndex;
 
-    /**
-     * Mod10 (Luhn) algorithm implementation
-     * 
-     * @param value
-     * @param multiplicator
-     * @return
-     */
-    public final boolean passesMod10Test(final String value, final int multiplicator) {
-        List<Integer> digits = extractNumbers( value );
-        int sum = 0;
-        boolean even = false;
-        for ( int index = digits.size() - 1; index >= 0; index-- ) {
-            int digit = digits.get( index );
-            if ( even ) {
-                digit *= multiplicator;
-            }
-            if ( digit > 9 ) {
-                digit = digit / 10 + digit % 10;
-            }
-            sum += digit;
-            even = !even;
-        }
-        return sum % 10 == 0;
-    }
+	/**
+	 * The type of checksum algorithm
+	 */
+	private ModType modType;
 
-    /**
-     * Calculate Mod11
-     * 
-     * @param value
-     *            extracts
-     * @param max_weight
-     *            maximum weight for multiplication
-     * @return the result of the mod11 function
-     */
-    public final int mod11(final String value, final int max_weight) {
-        int sum = 0;
-        int weight = 2;
+	private boolean ignoreNonDigitCharacters;
 
-        List<Integer> digits = extractNumbers( value );
-        for ( int index = digits.size() - 1; index >= 0; index-- ) {
-            sum += digits.get( index ) * weight++;
-            if ( weight > max_weight ) {
-                weight = 2;
-            }
-        }
-        int mod = 11 - ( sum % 11 );
-        return ( mod > 9 ) ? 0 : mod;
-    }
+	public void initialize(ModCheck constraintAnnotation) {
+		this.modType = constraintAnnotation.modType();
+		this.multiplier = constraintAnnotation.multiplier();
+		this.startIndex = constraintAnnotation.startIndex();
+		this.endIndex = constraintAnnotation.endIndex();
+		this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
+		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
 
-    /**
-     * Parses the {@link String} value as a {@link List} of {@link Integer} objects
-     * 
-     * @param value
-     *            the input string to be parsed
-     * @return List of Integer objects. Ignores non-numeric chars
-     */
-    private List<Integer> extractNumbers(final String value) {
-        List<Integer> digits = new ArrayList<Integer>( value.length() );
-        char[] chars = value.toCharArray();
-        for ( char c : chars ) {
-            if ( Character.isDigit( c ) ) {
-                digits.add( Character.digit( c, 10 ) );
-            }
-        }
-        return digits;
-    }
+		if ( this.startIndex < 0 ) {
+			throw new IllegalArgumentException(
+					String.format( "Start index cannot be negative: %d", this.startIndex )
+			);
+		}
 
+		if ( this.endIndex < 0 ) {
+			throw new IllegalArgumentException(
+					String.format( "End index cannot be negative: %d", this.startIndex )
+			);
+		}
+
+		if ( this.startIndex > this.endIndex ) {
+			throw new IllegalArgumentException(
+					String.format( "Invalid Range: %d > %d", this.startIndex, this.endIndex )
+			);
+		}
+
+		if ( checkDigitIndex > 0 && startIndex <= checkDigitIndex && endIndex > checkDigitIndex ) {
+			throw new IllegalArgumentException(
+					String.format(
+							"A explicitly specified check digit must lie outside the interval: [%d, %d]",
+							this.startIndex,
+							this.endIndex
+					)
+			);
+		}
+	}
+
+	public boolean isValid(final CharSequence value, final ConstraintValidatorContext context) {
+		if ( value == null ) {
+			return true;
+		}
+
+		String valueAsString = value.toString();
+		if ( ignoreNonDigitCharacters ) {
+			valueAsString = valueAsString.replaceAll( NUMBERS_ONLY_REGEXP, "" );
+		}
+
+		try {
+			valueAsString = extractVerificationString( valueAsString );
+		}
+		catch ( IndexOutOfBoundsException e ) {
+			return false;
+		}
+
+		List<Integer> digits;
+		try {
+			digits = extractDigits( valueAsString );
+		}
+		catch ( NumberFormatException e ) {
+			return false;
+		}
+
+		boolean isValid;
+
+		if ( modType.equals( ModType.MOD10 ) ) {
+			isValid = ModUtil.passesMod10Test( digits, multiplier );
+		}
+		else {
+			isValid = ModUtil.passesMod11Test( digits, multiplier );
+		}
+		return isValid;
+	}
+
+	private String extractVerificationString(String value) throws IndexOutOfBoundsException {
+		// the whole string should be verified (check digit is implicit)
+		if ( endIndex == Integer.MAX_VALUE ) {
+			return value;
+		}
+
+		String verificationString = value.substring( startIndex, endIndex );
+
+		// append the check digit of explicitly specified
+		if ( checkDigitIndex > 0 ) {
+			verificationString = verificationString + value.charAt( checkDigitIndex );
+		}
+
+		return verificationString;
+	}
+
+	/**
+	 * Parses the {@link String} value as a {@link List} of {@link Integer} objects
+	 *
+	 * @param value the input string to be parsed
+	 *
+	 * @return List of {@code Integer} objects.
+	 *
+	 * @throws NumberFormatException in case ant of the characters is not a digit
+	 */
+	private List<Integer> extractDigits(final String value) throws NumberFormatException {
+		List<Integer> digits = new ArrayList<Integer>( value.length() );
+		char[] chars = value.toCharArray();
+		for ( char c : chars ) {
+			if ( Character.isDigit( c ) ) {
+				digits.add( Character.digit( c, DEC_RADIX ) );
+			}
+			else {
+				throw new NumberFormatException( String.format( "'%s' is not a digit", c ) );
+			}
+		}
+		return digits;
+	}
 }
