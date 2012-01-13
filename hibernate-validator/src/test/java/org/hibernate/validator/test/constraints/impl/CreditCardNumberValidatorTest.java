@@ -16,51 +16,83 @@
 */
 package org.hibernate.validator.test.constraints.impl;
 
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.constraints.impl.CreditCardNumberValidator;
+import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
  * @author Hardy Ferentschik
  */
 public class CreditCardNumberValidatorTest {
-
-	private static CreditCardNumberValidator validator;
+	private static Validator validator;
 
 	@BeforeClass
 	public static void init() {
-		validator = new CreditCardNumberValidator();
+		validator = getValidator();
 	}
 
 	@Test
 	public void testInvalidCreditCardNumber() throws Exception {
-		assertFalse( validator.isValid( "1234567890123456", null ) );
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumber( "1234567890123456" );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-502")
 	public void testInvalidCreditCardNumberAsCharSequence() throws Exception {
-		assertFalse( validator.isValid( new MyCustomStringImpl( "1234567890123456" ), null ) );
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumberAsCharSequence( new MyCustomStringImpl( "1234567890123456" ) );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
 	@Test
 	public void testValidCreditCardNumber() throws Exception {
-		assertTrue( validator.isValid( "541234567890125", null ) );
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumber( "541234567890125" );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-502")
 	public void testValidCreditCardNumberAsCharSequence() throws Exception {
-		assertTrue( validator.isValid( new MyCustomStringImpl( "541234567890125" ), null ) );
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumberAsCharSequence( new MyCustomStringImpl( "541234567890125" ) );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
 	@Test
 	public void testNullValue() throws Exception {
-		assertTrue( validator.isValid( null, null ) );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( new CreditCard() );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	public static class CreditCard {
+		@CreditCardNumber
+		String creditCardNumber;
+
+		@CreditCardNumber
+		CharSequence creditCardNumberAsCharSequence;
+
+		public void setCreditCardNumber(String creditCardNumber) {
+			this.creditCardNumber = creditCardNumber;
+		}
+
+		public void setCreditCardNumberAsCharSequence(CharSequence creditCardNumberAsCharSequence) {
+			this.creditCardNumberAsCharSequence = creditCardNumberAsCharSequence;
+		}
 	}
 }

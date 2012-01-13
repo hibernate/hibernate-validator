@@ -16,6 +16,14 @@
  */
 package org.hibernate.validator.constraints;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+
+import org.hibernate.validator.constraints.impl.ModCheckValidator;
+
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -23,71 +31,80 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.validation.Constraint;
-import javax.validation.Payload;
-
-import org.hibernate.validator.constraints.impl.ModCheckValidator;
-
 /**
- * Modulus check constraint.
- * 
+ * Modulo check constraint.
+ * <p>
+ * Allows to validate that a series of digits pass the mod 10 or mod 11 checksum algorithm.
+ * </p>
+ * <p>
+ * The supported types is {@code String}. {@code null} is considered valid.
+ * </p>
+ *
  * @author George Gastaldi
+ * @author Hardy Ferentschik
  */
 @Documented
 @Constraint(validatedBy = ModCheckValidator.class)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface ModCheck {
-    String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
+	String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
 
-    /**
-     * @return The modulus algorithm to be used
-     */
-    ModType value();
+	Class<?>[] groups() default { };
 
-    /**
-     * @return The position of the Check Digit in input (After removing all non-numeric characters)
-     */
-    int checkDigitPosition() default 0;
+	Class<? extends Payload>[] payload() default { };
 
-    /**
-     * @return The multiplier to be used by the chosen mod algorithm
-     */
-    int multiplier();
+	/**
+	 * @return The modulus algorithm to be used
+	 */
+	ModType modType();
 
-    /**
-     * @return
-     */
-    int rangeStart() default 0;
+	/**
+	 * @return The multiplier to be used by the chosen mod algorithm
+	 */
+	int multiplier();
 
-    int rangeEnd() default Integer.MAX_VALUE;
+	/**
+	 * @return the start index (inclusive) for calculating the checksum. If not specified 0 is assumed.
+	 */
+	int startIndex() default 0;
 
-    Class<?>[] groups() default {};
+	/**
+	 * @return the end index (exclusive) for calculating the checksum. If not specified the whole value is considered
+	 */
+	int endIndex() default Integer.MAX_VALUE;
 
-    Class<? extends Payload>[] payload() default {};
+	/**
+	 * @return The position of the check digit in input. Per default it is assumes that the check digit is part of the
+	 * specified range. If set, the digit at the specified position is used as check digit. If set it the following holds
+	 * true: {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
+	 */
+	int checkDigitPosition() default -1;
 
-    /**
-     * Defines several {@code @ModCheck} annotations on the same element.
-     */
-    @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
-    @Retention(RUNTIME)
-    @Documented
-    public @interface List {
-        ModCheck[] value();
-    }
+	/**
+	 * @return Returns {@code true} if non digit characters should be ignored, {@code false} if a non digit character
+	 *         results in a validation error.
+	 */
+	boolean ignoreNonDigitCharacters() default true;
 
-    public enum ModType {
-        /**
-         * Represents a MOD10 algorithm (Also known as Luhn algorithm)
-         */
-        MOD10,
-        /**
-         * Represents a MOD11 algorithm
-         */
-        MOD11
-    }
+	/**
+	 * Defines several {@code @ModCheck} annotations on the same element.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface List {
+		ModCheck[] value();
+	}
+
+	public enum ModType {
+		/**
+		 * Represents a MOD10 algorithm (Also known as Luhn algorithm)
+		 */
+		MOD10,
+		/**
+		 * Represents a MOD11 algorithm
+		 */
+		MOD11
+	}
 }
