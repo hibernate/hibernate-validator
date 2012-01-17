@@ -85,12 +85,4 @@ class DefaultGenericArrayType implements GenericArrayType, Serializable
 		return componentType.equals(type.getGenericComponentType());
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		return TypeUtils.toString(this);
-	}
 }

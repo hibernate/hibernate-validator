@@ -42,33 +42,9 @@ final class Utils
 		return object;
 	}
 	
-	public static void checkTrue(boolean condition, String message)
-	{
-		if (!condition)
-		{
-			throw new IllegalArgumentException(message);
-		}
-	}
-	
 	public static void checkTrue(boolean condition, String message, Object value)
 	{
 		if (!condition)
-		{
-			throw new IllegalArgumentException(message + value);
-		}
-	}
-	
-	public static void checkFalse(boolean condition, String message)
-	{
-		if (condition)
-		{
-			throw new IllegalArgumentException(message);
-		}
-	}
-	
-	public static void checkFalse(boolean condition, String message, Object value)
-	{
-		if (condition)
 		{
 			throw new IllegalArgumentException(message + value);
 		}

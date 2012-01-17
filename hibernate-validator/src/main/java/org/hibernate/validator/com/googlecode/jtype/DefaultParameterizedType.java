@@ -155,12 +155,4 @@ class DefaultParameterizedType implements ParameterizedType, Serializable
 			&& Arrays.equals(actualTypeArguments, type.getActualTypeArguments());
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		return TypeUtils.toString(this);
-	}
 }

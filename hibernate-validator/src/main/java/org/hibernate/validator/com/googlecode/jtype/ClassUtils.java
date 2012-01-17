@@ -16,9 +16,6 @@
 package org.hibernate.validator.com.googlecode.jtype;
 
 import java.lang.reflect.Array;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Provides utility methods for working with classes.
@@ -29,11 +26,6 @@ import java.util.Map;
  */
 final class ClassUtils
 {
-	// constants --------------------------------------------------------------
-	
-	private static final Map<String, String> PRIMITIVE_DESCRIPTORS_BY_CLASS_NAME =
-		createPrimitiveDescriptorsByClassName();
-	
 	// constructors -----------------------------------------------------------
 	
 	private ClassUtils()
@@ -43,107 +35,9 @@ final class ClassUtils
 	
 	// public methods ---------------------------------------------------------
 	
-	public static String getUnqualifiedClassName(Class<?> klass)
-	{
-		return getUnqualifiedClassName(klass.getName());
-	}
-
-	public static String getUnqualifiedClassName(String className)
-	{
-		int dot = className.lastIndexOf('.');
-		
-		return (dot == -1) ? className : className.substring(dot + 1);
-	}
-	
-	public static String getSimpleClassName(Class<?> klass)
-	{
-		return getSimpleClassName(klass.getName());
-	}
-	
-	public static String getSimpleClassName(String className)
-	{
-		int index = className.lastIndexOf('$');
-		
-		if (index == -1)
-		{
-			index = className.lastIndexOf('.');
-		}
-		
-		return (index == -1) ? className : className.substring(index + 1);
-	}
-	
 	public static Class<?> getArrayType(Class<?> componentType)
 	{
 		return Array.newInstance(componentType, 0).getClass();
 	}
 	
-	public static Class<?> valueOf(String className)
-	{
-		if (isPrimitiveClassName(className))
-		{
-			return valueOfPrimitive(className);
-		}
-		
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-		try
-		{
-			return Class.forName(className, true, classLoader);
-		}
-		catch (ClassNotFoundException exception)
-		{
-			return null;
-		}
-	}
-	
-	// private methods --------------------------------------------------------
-	
-	private static Map<String, String> createPrimitiveDescriptorsByClassName()
-	{
-		Map<String, String> primitiveDescriptorsByClassName = new HashMap<String, String>();
-		
-		// from JVM specification 4.3.2
-		// see http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html#84645
-		primitiveDescriptorsByClassName.put("byte", "B");
-		primitiveDescriptorsByClassName.put("char", "C");
-		primitiveDescriptorsByClassName.put("double", "D");
-		primitiveDescriptorsByClassName.put("float", "F");
-		primitiveDescriptorsByClassName.put("int", "I");
-		primitiveDescriptorsByClassName.put("long", "J");
-		primitiveDescriptorsByClassName.put("short", "S");
-		primitiveDescriptorsByClassName.put("boolean", "Z");
-		
-		return Collections.unmodifiableMap(primitiveDescriptorsByClassName);
-	}
-	
-	private static Class<?> valueOfPrimitive(String className)
-	{
-		// cannot load primitives directly so load primitive array type and use component type instead
-		
-		String descriptor = getPrimitiveDescriptor(className);
-		String arrayDescriptor = getArrayDescriptor(descriptor);
-		Class<?> arrayType = valueOf(arrayDescriptor);
-		
-		return arrayType.getComponentType();
-	}
-	
-	private static boolean isPrimitiveClassName(String className)
-	{
-		return PRIMITIVE_DESCRIPTORS_BY_CLASS_NAME.containsKey(className);
-	}
-	
-	private static String getPrimitiveDescriptor(String className)
-	{
-		if (!isPrimitiveClassName(className))
-		{
-			throw new IllegalArgumentException("className is not a primitive class name: " + className);
-		}
-		
-		return PRIMITIVE_DESCRIPTORS_BY_CLASS_NAME.get(className);
-	}
-	
-	private static String getArrayDescriptor(String componentDescriptor)
-	{
-		return "[" + componentDescriptor;
-	}
 }

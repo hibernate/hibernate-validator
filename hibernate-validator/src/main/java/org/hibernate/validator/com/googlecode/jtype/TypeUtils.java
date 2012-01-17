@@ -53,88 +53,6 @@ public final class TypeUtils
 	
 	// public methods ---------------------------------------------------------
 	
-	public static void accept(Type type, TypeVisitor visitor)
-	{
-		Utils.checkNotNull(type, "type");
-		Utils.checkNotNull(visitor, "visitor");
-		
-		if (type instanceof Class<?>)
-		{
-			visitor.visit((Class<?>) type);
-		}
-		else if (type instanceof TypeVariable<?>)
-		{
-			TypeVariable<?> typeVariable = (TypeVariable<?>) type;
-			
-			if (visitor.beginVisit(typeVariable))
-			{
-				// visit bounds
-			
-				Type[] bounds = typeVariable.getBounds();
-				
-				for (int i = 0; i < bounds.length; i++)
-				{
-					visitor.visitTypeVariableBound(bounds[i], i);
-				}
-			}
-			
-			visitor.endVisit(typeVariable);
-		}
-		else if (type instanceof GenericArrayType)
-		{
-			visitor.visit((GenericArrayType) type);
-		}
-		else if (type instanceof ParameterizedType)
-		{
-			ParameterizedType parameterizedType = (ParameterizedType) type;
-			
-			if (visitor.beginVisit(parameterizedType))
-			{
-				// visit actual type arguments
-				
-				Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-				
-				for (int i = 0; i < actualTypeArguments.length; i++)
-				{
-					visitor.visitActualTypeArgument(actualTypeArguments[i], i);
-				}
-			}
-			
-			visitor.endVisit(parameterizedType);
-		}
-		else if (type instanceof WildcardType)
-		{
-			WildcardType wildcardType = (WildcardType) type;
-
-			if (visitor.beginVisit(wildcardType))
-			{
-				// visit upper bounds
-				
-				Type[] upperBounds = wildcardType.getUpperBounds();
-				
-				for (int i = 0; i < upperBounds.length; i++)
-				{
-					visitor.visitUpperBound(upperBounds[i], i);
-				}
-				
-				// visit lower bounds
-				
-				Type[] lowerBounds = wildcardType.getLowerBounds();
-				
-				for (int i = 0; i < lowerBounds.length; i++)
-				{
-					visitor.visitLowerBound(lowerBounds[i], i);
-				}
-			}
-				
-			visitor.endVisit(wildcardType);
-		}
-		else
-		{
-			throw new IllegalArgumentException("Unknown type: " + type);
-		}
-	}
-	
 	public static boolean isAssignable(Type supertype, Type type)
 	{
 		Utils.checkNotNull(supertype, "supertype");
@@ -218,11 +136,6 @@ public final class TypeUtils
 		return false;
 	}
 	
-	public static boolean isInstance(Type type, Object object)
-	{
-		return getErasedReferenceType(type).isInstance(object);
-	}
-	
 	/**
 	 * Gets the erased type of the specified type.
 	 * 
@@ -264,31 +177,17 @@ public final class TypeUtils
 		return type;
 	}
 	
-	public static Class<?> getErasedReferenceType(Type type)
+	private static Class<?> getErasedReferenceType(Type type)
 	{
 		Utils.checkTrue(isReferenceType(type), "type is not a reference type: ", type);
 		
 		return (Class<?>) getErasedType(type);
 	}
 
-	/**
-	 * @deprecated Use {@link #getErasedReferenceType(Type)} instead.
-	 */
-	@Deprecated
-	public static Class<?> getRawType(Type type)
-	{
-		return getErasedReferenceType(type);
-	}
-	
 	public static boolean isArray(Type type)
 	{
 		return (type instanceof Class<?> && ((Class<?>) type).isArray())
 			|| (type instanceof GenericArrayType);
-	}
-	
-	public static boolean isPrimitive(Type type)
-	{
-		return (type instanceof Class<?>) && ((Class<?>) type).isPrimitive();
 	}
 	
 	public static Type getComponentType(Type type)
@@ -320,53 +219,7 @@ public final class TypeUtils
 		return Types.genericArrayType(componentType);
 	}
 	
-	// TODO: perform isSubtype(type, Types.parameterizedType(rawType, Types.unboundedWildcardType()))
-	public static boolean isSimpleParameterizedType(Type type, Class<?> rawType)
-	{
-		Utils.checkNotNull(type, "type");
-		Utils.checkNotNull(rawType, "rawType");
-		
-		if (!(type instanceof ParameterizedType))
-		{
-			return false;
-		}
-		
-		ParameterizedType paramType = (ParameterizedType) type;
-		
-		Type paramRawType = paramType.getRawType();
-		
-		if (!(paramRawType instanceof Class<?>))
-		{
-			return false;
-		}
-		
-		Class<?> paramRawClass = (Class<?>) paramRawType;
-		
-		if (!rawType.isAssignableFrom(paramRawClass))
-		{
-			return false;
-		}
-		
-		Type[] typeArgs = paramType.getActualTypeArguments();
-		
-		return (typeArgs.length == 1);
-	}
-	
-	// TODO: remove?
-	public static Type getActualTypeArgument(Type type)
-	{
-		Utils.checkNotNull(type, "type");
-		
-		ParameterizedType paramType = (ParameterizedType) type;
-		
-		Type[] typeArgs = paramType.getActualTypeArguments();
-		
-		Utils.checkTrue(typeArgs.length == 1, "type must be a ParameterizedType with one actual type argument: ", type);
-		
-		return typeArgs[0];
-	}
-	
-	public static Type getResolvedSuperclass(Type type)
+	private static Type getResolvedSuperclass(Type type)
 	{
 		Utils.checkNotNull(type, "type");
 		
@@ -381,7 +234,7 @@ public final class TypeUtils
 		return resolveTypeVariables(supertype, type);
 	}
 	
-	public static Type[] getResolvedInterfaces(Type type)
+	private static Type[] getResolvedInterfaces(Type type)
 	{
 		Utils.checkNotNull(type, "type");
 		
@@ -395,35 +248,6 @@ public final class TypeUtils
 		}
 		
 		return resolvedInterfaces;
-	}
-	
-	public static String toString(Type type)
-	{
-		return toString(type, ClassSerializers.QUALIFIED);
-	}
-	
-	public static String toString(Type type, ClassSerializer serializer)
-	{
-		if (type == null)
-		{
-			return String.valueOf(type);
-		}
-		
-		SerializingTypeVisitor visitor = new SerializingTypeVisitor(serializer);
-		
-		accept(type, visitor);
-		
-		return visitor.toString();
-	}
-
-	public static String toUnqualifiedString(Type type)
-	{
-		return toString(type, ClassSerializers.UNQUALIFIED);
-	}
-	
-	public static String toSimpleString(Type type)
-	{
-		return toString(type, ClassSerializers.SIMPLE);
 	}
 	
 	// private methods --------------------------------------------------------
