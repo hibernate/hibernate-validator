@@ -32,7 +32,7 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import com.googlecode.jtype.TypeUtils;
+import org.hibernate.validator.com.googlecode.jtype.TypeUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;

@@ -37,7 +37,7 @@ import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
-import com.googlecode.jtype.TypeUtils;
+import org.hibernate.validator.com.googlecode.jtype.TypeUtils;
 
 import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;

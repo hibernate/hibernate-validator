@@ -27,7 +27,7 @@ import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 
-import com.googlecode.jtype.TypeUtils;
+import org.hibernate.validator.com.googlecode.jtype.TypeUtils;
 
 
 /**

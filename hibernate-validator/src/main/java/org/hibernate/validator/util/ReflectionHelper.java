@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.ValidationException;
 
-import com.googlecode.jtype.TypeUtils;
+import org.hibernate.validator.com.googlecode.jtype.TypeUtils;
 
 import org.hibernate.validator.util.privilegedactions.ConstructorInstance;
 import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
