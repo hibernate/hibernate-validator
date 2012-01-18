@@ -19,8 +19,12 @@ package org.hibernate.validator.internal.util;
 /**
  * @author Gunnar Morling
  * @author Hardy Ferentschik
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
  */
-public class Contracts {
+public final class Contracts {
+
+	private Contracts() {
+	}
 
 	public static void assertNotNull(Object o) {
 		assertNotNull( o, "must not be null" );
