@@ -42,16 +42,15 @@ import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.slf4j.Logger;
-
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
 
@@ -66,7 +65,7 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
 	private static final long serialVersionUID = -2563102960314069246L;
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 	private static final String GROUPS = "groups";
 	private static final String PAYLOAD = "payload";
@@ -416,7 +415,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			if ( constraintHelper.isConstraintComposition( declaredAnnotationType ) ) {
 				this.setCompositionType( ( (ConstraintComposition) declaredAnnotation ).value() );
 				if ( log.isDebugEnabled() ) {
-					log.debug( "Adding Bool" + declaredAnnotationType.getName() );
+					log.debugf( "Adding Bool %s.", declaredAnnotationType.getName() );
 				}
 				continue;
 			}
@@ -427,9 +426,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 						declaredAnnotation, overrideParameters, OVERRIDES_PARAMETER_DEFAULT_INDEX
 				);
 				composingConstraintsSet.add( descriptor );
-				if ( log.isDebugEnabled() ) {
-					log.debug( "Adding composing constraint: " + descriptor );
-				}
+				log.debugf( "Adding composing constraint: %s.", descriptor );
 			}
 			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotationType ) ) {
 				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
@@ -439,9 +436,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 							constraintAnnotation, overrideParameters, index
 					);
 					composingConstraintsSet.add( descriptor );
-					if ( log.isDebugEnabled() ) {
-						log.debug( "Adding composing constraint: " + descriptor );
-					}
+					log.debugf( "Adding composing constraint: %s.", descriptor );
 					index++;
 				}
 			}

@@ -22,10 +22,9 @@ import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 
-import org.slf4j.Logger;
-
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * A JPA 2 aware {@code TraversableResolver}.
@@ -35,7 +34,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public class DefaultTraversableResolver implements TraversableResolver {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * Class to load to check whether JPA is on the classpath.
@@ -72,8 +71,8 @@ public class DefaultTraversableResolver implements TraversableResolver {
 			persistenceClass = ReflectionHelper.loadClass( PERSISTENCE_CLASS_NAME, this.getClass() );
 		}
 		catch ( ValidationException e ) {
-			log.debug(
-					"Cannot find {} on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.",
+			log.debugf(
+					"Cannot find %s on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME
 			);
 			return;
@@ -82,8 +81,8 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		// check whether Persistence contains getPersistenceUtil
 		Method persistenceUtilGetter = ReflectionHelper.getMethod( persistenceClass, PERSISTENCE_UTIL_METHOD );
 		if ( persistenceUtilGetter == null ) {
-			log.debug(
-					"Found {} on classpath, but no method '{}'. Assuming JPA 1 environment. All properties will per default be traversable.",
+			log.debugf(
+					"Found %s on classpath, but no method '%s'. Assuming JPA 1 environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME,
 					PERSISTENCE_UTIL_METHOD
 			);
@@ -97,15 +96,15 @@ public class DefaultTraversableResolver implements TraversableResolver {
 			ReflectionHelper.getValue(persistenceUtilGetter, persistence );
 		}
 		catch ( Exception e ) {
-			log.debug(
-					"Unable to invoke {}.{}. Inconsistent JPA environment. All properties will per default be traversable.",
+			log.debugf(
+					"Unable to invoke %s.%s. Inconsistent JPA environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME,
 					PERSISTENCE_UTIL_METHOD
 			);
 		}
 
-		log.debug(
-				"Found {} on classpath containing '{}'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver",
+		log.debugf(
+				"Found %s on classpath containing '%s'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver",
 				PERSISTENCE_CLASS_NAME,
 				PERSISTENCE_UTIL_METHOD
 		);
@@ -115,13 +114,13 @@ public class DefaultTraversableResolver implements TraversableResolver {
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
 					ReflectionHelper.loadClass( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
 			jpaTraversableResolver = ReflectionHelper.newInstance( jpaAwareResolverClass, "" );
-			log.debug(
-					"Instantiated JPA aware TraversableResolver of type {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
+			log.debugf(
+					"Instantiated JPA aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
 		catch ( ValidationException e ) {
-			log.debug(
-					"Unable to load or instantiate JPA aware resolver {}. All properties will per default be traversable.",
+			log.debugf(
+					"Unable to load or instantiate JPA aware resolver %s. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}

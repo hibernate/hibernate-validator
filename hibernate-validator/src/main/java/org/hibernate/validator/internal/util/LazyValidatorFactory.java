@@ -39,9 +39,8 @@ import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
 
-import org.slf4j.Logger;
-
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
@@ -61,7 +60,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  * @author Hardy Ferentschik
  */
 public class LazyValidatorFactory implements ValidatorFactory {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final Configuration<?> configuration;
 	private volatile ValidatorFactory delegate; //use as a barrier
 
@@ -168,7 +167,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 				catch ( ValidationException e ) {
 					// ignore - we don't want to  fail the whole loading because of a black sheep. Hibernate Validator
 					// will be added either way
-					log.warn( "Unable to load provider class " + providerName );
+					log.unableToLoadProviderClass( providerName );
 					continue;
 				}
 

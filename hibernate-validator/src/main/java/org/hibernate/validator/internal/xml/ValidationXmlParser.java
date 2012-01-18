@@ -32,11 +32,11 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -45,7 +45,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public class ValidationXmlParser {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
 	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.0.xsd";
 
@@ -83,7 +83,7 @@ public class ValidationXmlParser {
 								clazz, "constraint factory class"
 						)
 				);
-				log.info( "Using {} as constraint factory.", constraintFactoryClass );
+				log.usingConstraintFactory( constraintFactoryClass );
 			}
 			catch ( ValidationException e ) {
 				throw new ValidationException(
@@ -96,8 +96,8 @@ public class ValidationXmlParser {
 	private void setPropertiesFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
 		for ( PropertyType property : config.getProperty() ) {
 			if ( log.isDebugEnabled() ) {
-				log.debug(
-						"Found property '{}' with value '{}' in validation.xml.",
+				log.debugf(
+						"Found property '%s' with value '%s' in validation.xml.",
 						property.getName(),
 						property.getValue()
 				);
@@ -108,11 +108,8 @@ public class ValidationXmlParser {
 
 	private void setMappingStreamsFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
 		for ( String mappingFileName : config.getConstraintMapping() ) {
-			if ( log.isDebugEnabled() ) {
-				log.debug(
-						"Trying to open input stream for {}.", mappingFileName
-				);
-			}
+			log.debugf( "Trying to open input stream for %s.", mappingFileName);
+
 			InputStream in = getInputStreamForPath( mappingFileName );
 			if ( in == null ) {
 				throw new ValidationException( "Unable to open input stream for mapping file " + mappingFileName + "." );
@@ -130,7 +127,7 @@ public class ValidationXmlParser {
 						messageInterpolatorClass, this.getClass()
 				);
 				xmlParameters.setMessageInterpolator( clazz.newInstance() );
-				log.info( "Using {} as message interpolator.", messageInterpolatorClass );
+				log.usingMessageInterpolator( messageInterpolatorClass );
 			}
 			catch ( ValidationException e ) {
 				throw new ValidationException(
@@ -159,7 +156,7 @@ public class ValidationXmlParser {
 						traversableResolverClass, this.getClass()
 				);
 				xmlParameters.setTraversableResolver( clazz.newInstance() );
-				log.info( "Using {} as traversable resolver.", traversableResolverClass );
+				log.usingTraversableResolver( traversableResolverClass );
 			}
 			catch ( ValidationException e ) {
 				throw new ValidationException(
@@ -189,7 +186,7 @@ public class ValidationXmlParser {
 								providerClassName, this.getClass()
 						)
 				);
-				log.info( "Using {} as validation provider.", providerClassName );
+				log.usingValidationProvider( providerClassName );
 			}
 			catch ( Exception e ) {
 				throw new ValidationException(
@@ -200,14 +197,14 @@ public class ValidationXmlParser {
 	}
 
 	private ValidationConfigType getValidationConfig() {
-		log.debug( "Trying to load {} for XML based Validator configuration.", VALIDATION_XML_FILE );
+		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
 		InputStream inputStream = getInputStreamForPath( VALIDATION_XML_FILE );
 		if ( inputStream == null ) {
-			log.debug( "No {} found. Using annotation based configuration only", VALIDATION_XML_FILE );
+			log.debugf( "No %s found. Using annotation based configuration only.", VALIDATION_XML_FILE );
 			return null;
 		}
 
-		log.info( "{} found. Parsing XML based configuration.", VALIDATION_XML_FILE );
+		log.parsingXMLFile( VALIDATION_XML_FILE );
 
 		ValidationConfigType validationConfig;
 		Schema schema = getValidationConfigurationSchema();
@@ -220,7 +217,6 @@ public class ValidationXmlParser {
 			validationConfig = root.getValue();
 		}
 		catch ( JAXBException e ) {
-			log.error( "Error parsing {}: {}", VALIDATION_XML_FILE, e.getMessage() );
 			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE, e );
 		}
 		finally {
@@ -228,7 +224,7 @@ public class ValidationXmlParser {
 				inputStream.close();
 			}
 			catch ( IOException io ) {
-				log.warn( "Unable to close input stream for " + VALIDATION_XML_FILE );
+				log.unableToCloseXMLFileInputStream( VALIDATION_XML_FILE );
 			}
 		}
 		return validationConfig;
@@ -269,7 +265,7 @@ public class ValidationXmlParser {
 			schema = sf.newSchema( schemaUrl );
 		}
 		catch ( SAXException e ) {
-			log.warn( "Unable to create schema for {}: {}", VALIDATION_CONFIGURATION_XSD, e.getMessage() );
+			log.unableToCreateSchema( VALIDATION_CONFIGURATION_XSD, e.getMessage() );
 		}
 		return schema;
 	}

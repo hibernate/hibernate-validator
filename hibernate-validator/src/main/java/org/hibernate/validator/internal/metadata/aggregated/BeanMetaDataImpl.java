@@ -32,8 +32,6 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.slf4j.Logger;
-
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -47,11 +45,12 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -71,7 +70,7 @@ import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The root bean class for this meta data.
@@ -390,8 +389,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			throw new GroupDefinitionException( beanClass.getName() + " must be part of the redefined default group sequence." );
 		}
 		if ( log.isTraceEnabled() ) {
-			log.trace(
-					"Members of the default group sequence for bean {} are: {}",
+			log.tracef(
+					"Members of the default group sequence for bean %s are: %s.",
 					beanClass.getName(),
 					validDefaultGroupSequence
 			);

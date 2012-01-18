@@ -22,8 +22,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-
+import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
@@ -35,8 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
-	private static final Logger log = LoggerFactory.make();
-
+	private static final Log log = LoggerFactory.make();
 	private String bundleName;
 
 	public PlatformResourceBundleLocator(String bundleName) {
@@ -67,13 +65,11 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 					+ " not found by validator classloader"
 			);
 		}
-		if ( log.isDebugEnabled() ) {
-			if ( rb != null ) {
-				log.debug( bundleName + " found" );
-			}
-			else {
-				log.debug( bundleName + " not found." );
-			}
+		if ( rb != null ) {
+			log.debugf( "%s found.", bundleName );
+		}
+		else {
+			log.debugf( "%s not found.", bundleName );
 		}
 		return rb;
 	}

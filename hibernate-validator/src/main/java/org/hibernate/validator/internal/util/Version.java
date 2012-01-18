@@ -20,10 +20,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
+ * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
  */
 public final class Version {
 	static {
-		LoggerFactory.make().info( "Hibernate Validator {}", getVersionString() );
+		LoggerFactory.make().version( getVersionString() );
 	}
 
 	public static String getVersionString() {

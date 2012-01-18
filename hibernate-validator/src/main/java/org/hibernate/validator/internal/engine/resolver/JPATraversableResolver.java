@@ -21,8 +21,7 @@ import javax.persistence.Persistence;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 
-import org.slf4j.Logger;
-
+import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
@@ -35,7 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class JPATraversableResolver implements TraversableResolver {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	public final boolean isReachable(Object traversableObject,
 									 Path.Node traversableProperty,
@@ -43,8 +42,8 @@ public class JPATraversableResolver implements TraversableResolver {
 									 Path pathToTraversableObject,
 									 ElementType elementType) {
 		if ( log.isTraceEnabled() ) {
-			log.trace(
-					"Calling isReachable on object {} with node name {}",
+			log.tracef(
+					"Calling isReachable on object %s with node name %s.",
 					traversableObject,
 					traversableProperty.getName()
 			);

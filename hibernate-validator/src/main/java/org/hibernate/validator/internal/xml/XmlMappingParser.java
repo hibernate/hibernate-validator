@@ -41,19 +41,19 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -64,7 +64,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class XmlMappingParser {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private static final String VALIDATION_MAPPING_XSD = "META-INF/validation-mapping-1.0.xsd";
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
@@ -590,9 +590,7 @@ public class XmlMappingParser {
 			constraintMappings = root.getValue();
 		}
 		catch ( JAXBException e ) {
-			String msg = "Error parsing mapping file.";
-			log.error( msg );
-			throw new ValidationException( msg, e );
+			throw new ValidationException( "Error parsing mapping file.", e );
 		}
 		return constraintMappings;
 	}
@@ -606,7 +604,7 @@ public class XmlMappingParser {
 			schema = sf.newSchema( schemaUrl );
 		}
 		catch ( SAXException e ) {
-			log.warn( "Unable to create schema for {}: {}", VALIDATION_MAPPING_XSD, e.getMessage() );
+			log.unableToCreateSchema( VALIDATION_MAPPING_XSD, e.getMessage() );
 		}
 		return schema;
 	}
