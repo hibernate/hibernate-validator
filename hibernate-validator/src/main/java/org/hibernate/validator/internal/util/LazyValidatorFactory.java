@@ -42,6 +42,7 @@ import javax.validation.spi.ValidationProvider;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 

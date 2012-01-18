@@ -23,7 +23,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * A resource bundle locator, that loads resource bundles by simply
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
-	private static final Logger log = LoggerFactory.getLogger( PlatformResourceBundleLocator.class );
+	private static final Logger log = LoggerFactory.make();
 
 	private String bundleName;
 

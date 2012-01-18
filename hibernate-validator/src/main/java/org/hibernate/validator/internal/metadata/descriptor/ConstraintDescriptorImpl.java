@@ -48,7 +48,7 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;

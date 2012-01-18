@@ -50,7 +50,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;

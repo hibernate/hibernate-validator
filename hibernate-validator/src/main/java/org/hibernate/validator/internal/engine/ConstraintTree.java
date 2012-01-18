@@ -38,8 +38,8 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.LRUMap;
-import org.hibernate.validator.internal.util.LoggerFactory;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
