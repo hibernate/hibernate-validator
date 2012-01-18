@@ -170,6 +170,11 @@
                 <artifactId>jsoup</artifactId>
                 <version>1.6.1</version>
             </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.1.0.CR2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -406,6 +411,40 @@
                     <groupId>org.zanata</groupId>
                     <artifactId>zanata-maven-plugin</artifactId>
                     <version>1.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>2.0.2</version>
+                    <configuration>
+                        <processors>
+                            <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
+                        </processors>
+                        <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.5 -target 1.5 -sourcepath ${project.build.directory}/generated-sources -encoding UTF-8</compilerArguments>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>process</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>process</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>process-test</id>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>process-test</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging-processor</artifactId>
+                            <version>1.0.0.CR5</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
