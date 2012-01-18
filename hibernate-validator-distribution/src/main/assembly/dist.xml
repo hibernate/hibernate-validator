@@ -44,7 +44,7 @@
             <outputDirectory>dist/lib/required</outputDirectory>
             <includes>
                 <include>javax.validation:validation-api</include>
-                <include>org.slf4j:slf4j-api</include>
+                <include>org.jboss.logging:jboss-logging</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -60,6 +60,7 @@
         <dependencySet>
             <outputDirectory>dist/lib/optional</outputDirectory>
             <includes>
+                <include>org.slf4j:slf4j-api</include>
                 <include>org.slf4j:slf4j-log4j12</include>
                 <include>log4j:log4j</include>
                 <include>joda-time:joda-time</include>
