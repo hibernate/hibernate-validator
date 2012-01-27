@@ -36,7 +36,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validates a <a href="http://ghiorzi.org/cgcancpf.htm">Titulo Eleitoral</a>.
+ * Validates a <a href="http://ghiorzi.org/cgcancpf.htm">T\u00edtulo Eleitoral</a>.
  *
  * @author George Gastaldi
  */
