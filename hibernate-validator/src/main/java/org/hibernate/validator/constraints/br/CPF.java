@@ -36,7 +36,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validates a CPF (Cadastro de Pessoa Física)
+ * Validates a CPF (Cadastro de Pessoa F\u00edsica)
  *
  * @author George Gastaldi
  */
