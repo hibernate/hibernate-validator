@@ -1088,7 +1088,8 @@ public class RentalCar extends Car {
     constraints. These are foremost the constraints defined by the Bean
     Validation specification (see <xref linkend="table-spec-constraints" />).
     Additionally, Hibernate Validator provides useful custom constraints (see
-    <xref linkend="table-custom-constraints" />).</para>
+    <xref linkend="table-custom-constraints" /> and <xref
+    linkend="table-custom-country-constraints" />).</para>
 
     <section id="validator-defineconstraints-spec">
       <title>Bean Validation constraints</title>
@@ -1370,7 +1371,7 @@ public class RentalCar extends Car {
       @ScriptAssert is a class-level constraint.</para>
 
       <table id="table-custom-constraints">
-        <title>Custom constraints provided by Hibernate Validator</title>
+        <title>Custom constraints</title>
 
         <tgroup cols="4">
           <colspec align="left" />
@@ -1397,11 +1398,11 @@ public class RentalCar extends Car {
             <row>
               <entry>@CreditCardNumber</entry>
 
-              <entry><classname>String</classname></entry>
+              <entry><classname>CharSequence</classname></entry>
 
-              <entry>Checks that the annotated string passes the Luhn checksum
-              test. Note, this validation aims to check for user mistakes, not
-              credit card validity! See also <ulink
+              <entry>Checks that the annotated character sequence passes the
+              Luhn checksum test. Note, this validation aims to check for user
+              mistakes, not credit card validity! See also <ulink
               url="http://www.merriampark.com/anatomycc.htm">Anatomy of Credit
               Card Numbers</ulink>.</entry>
 
@@ -1411,10 +1412,10 @@ public class RentalCar extends Car {
             <row>
               <entry>@Email</entry>
 
-              <entry><classname>String</classname></entry>
+              <entry><classname>CharSequence</classname></entry>
 
-              <entry>Checks whether the specified string is a valid email
-              address.</entry>
+              <entry>Checks whether the specified character sequence is a
+              valid email address.</entry>
 
               <entry>none</entry>
             </row>
@@ -1422,24 +1423,49 @@ public class RentalCar extends Car {
             <row>
               <entry>@Length(min=, max=)</entry>
 
-              <entry><classname>String</classname></entry>
+              <entry><classname>CharSequence</classname></entry>
 
-              <entry>Validates that the annotated string is between
-              <parameter>min</parameter> and <parameter>max</parameter>
-              included.</entry>
+              <entry>Validates that the annotated character sequence is
+              between <parameter>min</parameter> and
+              <parameter>max</parameter> included.</entry>
 
               <entry>Column length will be set to max.</entry>
             </row>
 
             <row>
+              <entry>@ModCheck(modType=, multiplier=, startIndex=, endIndex=,
+              checkDigitPosition=, ignoreNonDigitCharacters=)</entry>
+
+              <entry><classname>CharSequence</classname></entry>
+
+              <entry>Checks that the digits within the annotated character
+              sequence pass the mod 10 or mod 11 checksum algorithm.
+              <constant>modType</constant> is used to select the modulo type
+              and the <constant>multiplier</constant> determines the algorithm
+              specific multiplier (see also <ulink
+              url="http://en.wikipedia.org/wiki/Luhn_algorithm">Luhn
+              algorithm</ulink>). <constant>startIndex</constant> and
+              <constant>endIndex</constant> allow to only run the modulo
+              algorithm on the specified sub-string.
+              <constant>checkDigitPosition</constant> allows to use an
+              arbirtrary digit within the character sequence to be the check
+              digit. If not specified it is assumed that the check digit is
+              part of the specified range. Last but not least,
+              <constant>ignoreNonDigitCharacters</constant> allows to ignore
+              non digit characters. </entry>
+
+              <entry>none</entry>
+            </row>
+
+            <row>
               <entry>@NotBlank</entry>
 
-              <entry><classname>String</classname></entry>
+              <entry><classname>CharSequence</classname></entry>
 
-              <entry>Checks that the annotated string is not null and the
-              trimmed length is greater than 0. The difference to @NotEmpty is
-              that this constraint can only be applied on strings and that
-              trailing whitespaces are ignored.</entry>
+              <entry>Checks that the annotated character sequence is not null
+              and the trimmed length is greater than 0. The difference to
+              @NotEmpty is that this constraint can only be applied on strings
+              and that trailing whitespaces are ignored.</entry>
 
               <entry>none</entry>
             </row>
@@ -1447,7 +1473,7 @@ public class RentalCar extends Car {
             <row>
               <entry>@NotEmpty</entry>
 
-              <entry><classname>String</classname>,
+              <entry><classname>CharSequence</classname>,
               <classname>Collection</classname>, <classname>Map</classname>
               and arrays</entry>
 
@@ -1462,10 +1488,10 @@ public class RentalCar extends Car {
 
               <entry><classname>BigDecimal</classname>,
               <classname>BigInteger</classname>,
-              <classname>String</classname>, <classname>byte</classname>,
-              <classname>short</classname>, <classname>int</classname>,
-              <classname>long</classname> and the respective wrappers of the
-              primitive types</entry>
+              <classname>CharSequence</classname>,
+              <classname>byte</classname>, <classname>short</classname>,
+              <classname>int</classname>, <classname>long</classname> and the
+              respective wrappers of the primitive types</entry>
 
               <entry>Checks whether the annotated value lies between
               (inclusive) the specified minimum and maximum.</entry>
@@ -1512,10 +1538,10 @@ public class RentalCar extends Car {
             <row>
               <entry>@URL(protocol=, host=, port=, regexp=, flags=)</entry>
 
-              <entry><classname>String</classname></entry>
+              <entry><classname>CharSequence</classname></entry>
 
-              <entry>Checks if the annotated string is a valid URL according
-              to RFC2396. If any of the optional parameters
+              <entry>Checks if the annotated character sequence is a valid URL
+              according to RFC2396. If any of the optional parameters
               <parameter>protocol</parameter>, <parameter>host</parameter> or
               <parameter>port</parameter> are specified, the corresponding URL
               fragments must match the specified values. The optional
@@ -1530,11 +1556,97 @@ public class RentalCar extends Car {
         </tgroup>
       </table>
 
-      <para>In some cases neither the Bean Validation constraints nor the
-      custom constraints provided by Hibernate Validator will fulfill your
-      requirements completely. In this case you can literally in a minute
-      write your own constraints. We will discuss this in <xref
-      linkend="validator-customconstraints" />.</para>
+      <section>
+        <title>Country specific constraints</title>
+
+        <para>Hibernate Validator offers also constraints which validate
+        country specific constraints, eg social security numbers. <note>
+            <para>If you have to implement a country specific constraint,
+            consider making it a contribution to Hibernate Validator!</para>
+          </note></para>
+
+        <table id="table-custom-country-constraints">
+          <title>Custom country specific constraints</title>
+
+          <tgroup cols="5">
+            <colspec align="left" />
+
+            <colspec align="left" />
+
+            <colspec align="left" />
+
+            <colspec align="left" />
+
+            <colspec align="left" />
+
+            <thead>
+              <row>
+                <entry>Annotation</entry>
+
+                <entry>Supported data types</entry>
+
+                <entry>Use</entry>
+
+                <entry>Country</entry>
+
+                <entry>Hibernate metadata impact</entry>
+              </row>
+            </thead>
+
+            <tbody valign="top">
+              <row>
+                <entry>@CNPJ</entry>
+
+                <entry><classname>CharSequence</classname></entry>
+
+                <entry>Checks that the annotated character sequence represents
+                a Brazilian Corporate Tax Payer Registry number - Cadastro de
+                Pessoa JurÍeddica</entry>
+
+                <entry>Brazil</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry>@CPF</entry>
+
+                <entry><classname>CharSequence</classname></entry>
+
+                <entry>Checks that the annotated character sequence represents
+                a Brazilian Cadastro de Pessoa FÍdsica.</entry>
+
+                <entry>Brazil</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry>@TituloEleitoral</entry>
+
+                <entry><classname>CharSequence</classname></entry>
+
+                <entry>Checks that the annotated character sequence represents
+                a Brazilian <ulink
+                url="http://ghiorzi.org/cgcancpf.htm">TÍtulo
+                Eleitoral</ulink>.</entry>
+
+                <entry>Brazil</entry>
+
+                <entry>none</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <tip>
+          <para>In some cases neither the Bean Validation constraints nor the
+          custom constraints provided by Hibernate Validator will fulfill your
+          requirements. In this case you can easily write your own constraint.
+          We will discuss this in <xref
+          linkend="validator-customconstraints" />.</para>
+        </tip>
+      </section>
     </section>
   </section>
 </chapter>
