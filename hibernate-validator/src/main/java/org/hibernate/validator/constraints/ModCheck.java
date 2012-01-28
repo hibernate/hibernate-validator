@@ -76,14 +76,15 @@ public @interface ModCheck {
 
 	/**
 	 * @return The position of the check digit in input. Per default it is assumes that the check digit is part of the
-	 * specified range. If set, the digit at the specified position is used as check digit. If set it the following holds
-	 * true: {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
+	 *         specified range. If set, the digit at the specified position is used as check digit. If set it the following holds
+	 *         true: {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
 	 */
 	int checkDigitPosition() default -1;
 
 	/**
 	 * @return Returns {@code true} if non digit characters should be ignored, {@code false} if a non digit character
-	 *         results in a validation error.
+	 *         results in a validation error. {@code startIndex} and {@code endIndex} are always only referring to digit
+	 *         characters.
 	 */
 	boolean ignoreNonDigitCharacters() default true;
 
