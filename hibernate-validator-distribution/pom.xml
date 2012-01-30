@@ -74,12 +74,6 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
         </dependency>
-
-        <!-- Dependency needed for aggregated javadoc generation -->
-        <dependency>
-            <groupId>com.googlecode.jtype</groupId>
-            <artifactId>jtype</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

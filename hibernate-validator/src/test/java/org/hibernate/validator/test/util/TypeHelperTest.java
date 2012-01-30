@@ -1,4 +1,5 @@
-// code originates from jtype (http://code.google.com/p/jtype/) and has been modified
+// Code originates from jtype 0.1.2 (http://code.google.com/p/jtype/) and has
+// been modified (original class was com.googlecode.jtype.TypeUtilsTest).
 /*
  * Copyright 2009 IIZUKA Software Technologies Ltd
  *
