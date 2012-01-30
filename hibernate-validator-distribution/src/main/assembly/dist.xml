@@ -45,7 +45,6 @@
             <includes>
                 <include>javax.validation:validation-api</include>
                 <include>org.slf4j:slf4j-api</include>
-                <include>com.googlecode.jtype:jtype</include>
             </includes>
         </dependencySet>
         <dependencySet>
