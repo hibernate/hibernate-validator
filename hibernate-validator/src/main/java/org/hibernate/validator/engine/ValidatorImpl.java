@@ -37,7 +37,7 @@ import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
-import com.googlecode.jtype.TypeUtils;
+import org.hibernate.validator.util.TypeHelper;
 
 import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
@@ -529,7 +529,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			iter = map.entrySet().iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
-		else if ( TypeUtils.isArray( type ) ) {
+		else if ( TypeHelper.isArray( type ) ) {
 			List<?> arrayList = Arrays.asList( (Object[]) value );
 			iter = arrayList.iterator();
 			valueContext.markCurrentPropertyAsIterable();
@@ -558,7 +558,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		else if ( ReflectionHelper.isMap( type ) ) {
 			isIndexable = true;
 		}
-		else if ( TypeUtils.isArray( type ) ) {
+		else if ( TypeHelper.isArray( type ) ) {
 			isIndexable = true;
 		}
 		return isIndexable;

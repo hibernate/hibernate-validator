@@ -38,8 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.ValidationException;
 
-import com.googlecode.jtype.TypeUtils;
-
 import org.hibernate.validator.util.privilegedactions.ConstructorInstance;
 import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
 import org.hibernate.validator.util.privilegedactions.GetClassLoader;
@@ -294,7 +292,7 @@ public final class ReflectionHelper {
 			throw new IllegalArgumentException( "Member " + member + " is neither a field nor a method" );
 		}
 		if ( type instanceof TypeVariable ) {
-			type = TypeUtils.getErasedType( type );
+			type = TypeHelper.getErasedType( type );
 		}
 		return type;
 	}
@@ -312,7 +310,7 @@ public final class ReflectionHelper {
 		Type type = method.getGenericParameterTypes()[parameterIndex];
 
 		if ( type instanceof TypeVariable ) {
-			type = TypeUtils.getErasedType( type );
+			type = TypeHelper.getErasedType( type );
 		}
 		return type;
 	}
@@ -373,8 +371,8 @@ public final class ReflectionHelper {
 			ParameterizedType paramType = (ParameterizedType) type;
 			indexedType = paramType.getActualTypeArguments()[1];
 		}
-		else if ( TypeUtils.isArray( type ) ) {
-			indexedType = TypeUtils.getComponentType( type );
+		else if ( TypeHelper.isArray( type ) ) {
+			indexedType = TypeHelper.getComponentType( type );
 		}
 		return indexedType;
 	}
@@ -457,7 +455,7 @@ public final class ReflectionHelper {
 		if ( isIterable( type ) ) {
 			iter = ( (Iterable<?>) value ).iterator();
 		}
-		else if ( TypeUtils.isArray( type ) ) {
+		else if ( TypeHelper.isArray( type ) ) {
 			List<?> arrayList = Arrays.asList( (Object) value );
 			iter = arrayList.iterator();
 		}

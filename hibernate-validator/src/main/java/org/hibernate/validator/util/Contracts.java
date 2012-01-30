@@ -18,6 +18,7 @@ package org.hibernate.validator.util;
 
 /**
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class Contracts {
 
@@ -27,6 +28,12 @@ public class Contracts {
 
 	public static void assertNotNull(Object o, String message) {
 		if ( o == null ) {
+			throw new IllegalArgumentException( message );
+		}
+	}
+
+	public static void assertTrue(boolean condition, String message) {
+		if ( !condition ) {
 			throw new IllegalArgumentException( message );
 		}
 	}
