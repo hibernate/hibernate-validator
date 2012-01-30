@@ -32,14 +32,14 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.com.googlecode.jtype.TypeUtils;
+import org.hibernate.validator.util.TypeHelper;
+
 import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.util.LRUMap;
 import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.ValidatorTypeHelper;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
@@ -96,7 +96,7 @@ public class ConstraintTree<A extends Annotation> {
 			children.add( treeNode );
 		}
 
-		availableValidatorTypes = ValidatorTypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
+		availableValidatorTypes = TypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
 		suitableTypeMap = Collections.synchronizedMap( new LRUMap<Type, Type>( MAX_TYPE_CACHE_SIZE ) );
 	}
 
@@ -399,7 +399,7 @@ public class ConstraintTree<A extends Annotation> {
 	private List<Type> findSuitableValidatorTypes(Type type) {
 		List<Type> determinedSuitableTypes = new ArrayList<Type>();
 		for ( Type validatorType : availableValidatorTypes.keySet() ) {
-			if ( TypeUtils.isAssignable( validatorType, type ) && !determinedSuitableTypes.contains( validatorType ) ) {
+			if ( TypeHelper.isAssignable( validatorType, type ) && !determinedSuitableTypes.contains( validatorType ) ) {
 				determinedSuitableTypes.add( validatorType );
 			}
 		}
@@ -422,10 +422,10 @@ public class ConstraintTree<A extends Annotation> {
 			typesToRemove.clear();
 			Type type = assignableTypes.get( 0 );
 			for ( int i = 1; i < assignableTypes.size(); i++ ) {
-				if ( TypeUtils.isAssignable( type, assignableTypes.get( i ) ) ) {
+				if ( TypeHelper.isAssignable( type, assignableTypes.get( i ) ) ) {
 					typesToRemove.add( type );
 				}
-				else if ( TypeUtils.isAssignable( assignableTypes.get( i ), type ) ) {
+				else if ( TypeHelper.isAssignable( assignableTypes.get( i ), type ) ) {
 					typesToRemove.add( assignableTypes.get( i ) );
 				}
 			}
