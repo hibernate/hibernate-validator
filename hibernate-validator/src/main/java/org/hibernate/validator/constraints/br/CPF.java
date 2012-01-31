@@ -25,7 +25,6 @@ import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.List;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -40,8 +39,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author George Gastaldi
  */
-@Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})")
-@List({
+@Pattern.List({
+		@Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})"),
+		// 000.000.000-00 is not a valid CPF, but passes the mod check. Needs to be singled out via regexp
+		@Pattern(regexp = "^(?:(?!000\\.000\\.000-00).)*$"),
+		// same for 999.999.999-99
+		@Pattern(regexp = "^(?:(?!999\\.999\\.999-99).)*$")
+})
+@ModCheck.List({
 		@ModCheck(modType = ModType.MOD11,
 				checkDigitPosition = 9,
 				multiplier = 10,

@@ -39,6 +39,20 @@ public class CPFValidatorTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
+	public void testCPFBoundaryConditions() {
+		Set<ConstraintViolation<Person>> violations = ValidatorUtil.getValidator().validate(
+				new Person( "000.000.000-00" )
+		);
+		assertNumberOfViolations( violations, 1 );
+
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "999.999.999-99" )
+		);
+		assertNumberOfViolations( violations, 1 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-491")
 	public void testIncorrectFormattedCPFWithReportAsSingleViolation() {
 		Set<ConstraintViolation<Person>> violations = ValidatorUtil.getValidator().validate(
 				new Person( "48255-77" )
