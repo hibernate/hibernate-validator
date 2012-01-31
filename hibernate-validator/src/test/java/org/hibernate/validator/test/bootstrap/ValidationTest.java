@@ -31,9 +31,9 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.impl.NotNullValidator;
-import org.hibernate.validator.engine.ConfigurationImpl;
-import org.hibernate.validator.engine.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.engine.ValidatorFactoryImpl;
+import org.hibernate.validator.internal.engine.ConfigurationImpl;
+import org.hibernate.validator.internal.engine.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;

@@ -27,8 +27,8 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepository;
-import org.hibernate.validator.test.engine.methodlevel.service.CustomerRepositoryImpl;
+import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
+import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
 import static org.testng.Assert.assertEquals;

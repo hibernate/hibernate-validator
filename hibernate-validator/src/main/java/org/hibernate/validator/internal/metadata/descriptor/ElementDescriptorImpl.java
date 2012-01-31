@@ -29,9 +29,9 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.Scope;
 
-import org.hibernate.validator.engine.groups.Group;
-import org.hibernate.validator.engine.groups.GroupChain;
-import org.hibernate.validator.engine.groups.GroupChainGenerator;
+import org.hibernate.validator.internal.engine.groups.Group;
+import org.hibernate.validator.internal.engine.groups.GroupChain;
+import org.hibernate.validator.internal.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
