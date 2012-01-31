@@ -1,4 +1,5 @@
-// code originates from jtype (http://code.google.com/p/jtype/) and has been modified
+// code originates from TypeUtilsTest.java in jtype (http://code.google.com/p/jtype/) and has been modified to suite
+// the HV requirements and code style
 /*
  * Copyright 2009 IIZUKA Software Technologies Ltd
  *
