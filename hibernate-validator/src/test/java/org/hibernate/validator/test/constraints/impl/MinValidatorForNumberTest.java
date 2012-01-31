@@ -29,8 +29,8 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DecimalMinValidatorForNumber;
 import org.hibernate.validator.constraints.impl.MinValidatorForNumber;
-import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 
 /**
  * @author Alaa Nassef

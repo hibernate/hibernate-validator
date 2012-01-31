@@ -23,8 +23,8 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DigitsValidatorForCharSequence;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

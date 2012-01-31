@@ -41,6 +41,9 @@ import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableResolver;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
 import org.hibernate.validator.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.metadata.aggregated.MethodMetaData;
@@ -49,12 +52,9 @@ import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.util.Contracts;
-import org.hibernate.validator.util.ReflectionHelper;
-import org.hibernate.validator.util.TypeHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.

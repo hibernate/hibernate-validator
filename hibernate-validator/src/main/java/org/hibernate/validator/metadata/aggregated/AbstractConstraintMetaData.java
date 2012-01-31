@@ -23,7 +23,7 @@ import java.util.Set;
 import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Base implementation for {@link ConstraintMetaData} with attributes common

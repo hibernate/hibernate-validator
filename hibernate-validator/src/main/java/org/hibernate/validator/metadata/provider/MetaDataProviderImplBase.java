@@ -28,11 +28,11 @@ import org.hibernate.validator.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Base implementation for all {@link MetaDataProvider}s.

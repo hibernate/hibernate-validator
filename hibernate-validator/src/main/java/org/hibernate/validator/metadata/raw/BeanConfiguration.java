@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents the complete constraint related configuration of one Java type

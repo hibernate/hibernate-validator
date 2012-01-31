@@ -21,7 +21,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * A {@link ConstraintLocation} implementation that represents either a bean (in case of class-level

@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.internal.util.LoggerFactory;
 
 /**
  * An  {@code AnnotationIgnores} instance keeps track of annotations which should be ignored as configuration source.

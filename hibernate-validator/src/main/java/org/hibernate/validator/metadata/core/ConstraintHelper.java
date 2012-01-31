@@ -75,7 +75,7 @@ import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validator.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validator.constraints.impl.SizeValidatorForMap;
 import org.hibernate.validator.constraints.impl.SizeValidatorForCharSequence;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.

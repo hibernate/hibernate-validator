@@ -20,8 +20,8 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.util.Contracts;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * A {@link ConstraintLocation} implementation that represents a method

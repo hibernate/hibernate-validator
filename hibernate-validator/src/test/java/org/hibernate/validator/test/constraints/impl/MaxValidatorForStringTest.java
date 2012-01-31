@@ -25,8 +25,8 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForNumber;
 import org.hibernate.validator.constraints.impl.DecimalMaxValidatorForCharSequence;
 import org.hibernate.validator.constraints.impl.MaxValidatorForCharSequence;
-import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

@@ -23,7 +23,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.testutil.ValidatorUtil;
-import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.internal.util.LoggerFactory;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;

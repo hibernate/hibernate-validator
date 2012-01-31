@@ -24,8 +24,8 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.impl.DigitsValidatorForNumber;
-import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 
 /**
  * @author Alaa Nassef

@@ -33,7 +33,7 @@ import org.hibernate.validator.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.metadata.provider.ProgrammaticMappingMetaDataProvider;
 import org.hibernate.validator.metadata.provider.XmlConfigurationMetaDataProvider;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator default

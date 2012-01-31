@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Represents a field of a Java type and all its associated meta-data relevant

@@ -47,10 +47,10 @@ import org.hibernate.validator.metadata.raw.ConstrainedField;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * @author Gunnar Morling

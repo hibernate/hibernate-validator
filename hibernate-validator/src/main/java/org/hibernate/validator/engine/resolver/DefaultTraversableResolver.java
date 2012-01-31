@@ -24,8 +24,8 @@ import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * A JPA 2 aware {@code TraversableResolver}.

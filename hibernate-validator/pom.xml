@@ -315,7 +315,7 @@
                             <expression>${project.version}</expression>
                             <targetMembers>
                                 <methodBodyReturn>
-                                    <className>org.hibernate.validator.util.Version</className>
+                                    <className>org.hibernate.validator.internal.util.Version</className>
                                     <methodName>getVersionString</methodName>
                                 </methodBodyReturn>
                             </targetMembers>

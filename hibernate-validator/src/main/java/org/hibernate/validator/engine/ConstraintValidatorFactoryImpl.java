@@ -19,7 +19,7 @@ package org.hibernate.validator.engine;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.

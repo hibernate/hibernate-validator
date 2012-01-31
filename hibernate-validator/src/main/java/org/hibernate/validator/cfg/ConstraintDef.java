@@ -20,7 +20,7 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import javax.validation.Payload;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a

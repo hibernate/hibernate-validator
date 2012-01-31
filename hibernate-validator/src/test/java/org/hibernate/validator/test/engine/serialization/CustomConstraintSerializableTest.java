@@ -34,7 +34,7 @@ import org.hibernate.validator.testutil.ValidatorUtil;
  * >this blog</a> gives a validation result that is not Serializable with
  * Hibernate Validator 4.0.2.GA with underlying cause that
  * <p/>
- * <code>org.hibernate.validator.util.annotationfactory.AnnotationProxy</code>
+ * <code>org.hibernate.validator.internal.util.annotationfactory.AnnotationProxy</code>
  * <p/>
  * <p/>
  * Note that Hibernate Validator does not guarantee at all that a

@@ -29,10 +29,10 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.util.Contracts;
+import org.hibernate.validator.internal.util.Contracts;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.util.Contracts.assertNotNull;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 /**
  * Describes a validated bean.

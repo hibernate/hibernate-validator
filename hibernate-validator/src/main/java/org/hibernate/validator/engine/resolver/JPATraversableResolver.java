@@ -23,7 +23,7 @@ import javax.validation.TraversableResolver;
 
 import org.slf4j.Logger;
 
-import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.internal.util.LoggerFactory;
 
 /**
  * An implementation of {@code TraversableResolver} which is aware of JPA 2 and utilizes {@code PersistenceUtil} to get

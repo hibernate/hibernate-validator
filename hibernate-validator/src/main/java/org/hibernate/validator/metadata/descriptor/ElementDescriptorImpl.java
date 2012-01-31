@@ -35,7 +35,7 @@ import org.hibernate.validator.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.metadata.core.MetaConstraint;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Describes a validated element (class, field or property).

@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.hibernate.validator.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.metadata.aggregated.BeanMetaDataImpl;
 
-import static org.hibernate.validator.util.Contracts.assertNotNull;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 /**
  * Cache for created instances of {@code BeanMetaData}.

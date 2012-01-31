@@ -39,9 +39,9 @@ import org.hibernate.validator.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
-import org.hibernate.validator.util.CollectionHelper;
-import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.Version;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 

@@ -43,12 +43,12 @@ import org.hibernate.validator.metadata.raw.ConstrainedField;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
-import org.hibernate.validator.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.util.Contracts;
+import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.internal.util.Contracts;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.util.CollectionHelper.partition;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 
 /**
  * A {@link MetaDataProvider} based on the programmatic constraint API.

@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.hibernate.validator.util.IteratorEnumeration;
+import org.hibernate.validator.internal.util.IteratorEnumeration;
 
 /**
  * A {@link ResourceBundleLocator} implementation that provides access

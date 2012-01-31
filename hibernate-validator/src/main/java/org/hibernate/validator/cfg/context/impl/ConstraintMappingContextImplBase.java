@@ -24,8 +24,8 @@ import javax.validation.ValidationException;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.util.Contracts;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Base class for implementations of constraint mapping creational context types.

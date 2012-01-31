@@ -19,7 +19,7 @@ package org.hibernate.validator.cfg;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
 import org.hibernate.validator.cfg.context.impl.TypeConstraintMappingContextImpl;
-import org.hibernate.validator.util.Contracts;
+import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * Top level class for constraints configured via the programmatic API.

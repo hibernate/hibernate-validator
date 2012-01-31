@@ -26,7 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.Path;
 
-import org.hibernate.validator.util.Contracts;
+import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * @author Hardy Ferentschik

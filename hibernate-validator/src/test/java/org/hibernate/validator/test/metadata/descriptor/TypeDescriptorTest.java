@@ -32,9 +32,9 @@ import org.hibernate.validator.test.metadata.CustomerRepository;
 import org.hibernate.validator.test.metadata.CustomerRepositoryExt;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getTypeDescriptor;
-import static org.hibernate.validator.util.CollectionHelper.asSet;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.util.Contracts.assertNotNull;
+import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;

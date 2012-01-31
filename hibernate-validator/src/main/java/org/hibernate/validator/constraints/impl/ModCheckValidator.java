@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ModCheck.ModType;
-import org.hibernate.validator.util.ModUtil;
+import org.hibernate.validator.internal.util.ModUtil;
 
 /**
  * Mod check validator for MOD10 and MOD11 algorithms

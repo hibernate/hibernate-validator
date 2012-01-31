@@ -49,17 +49,17 @@ import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
-import static org.hibernate.validator.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.util.CollectionHelper.partition;
-import static org.hibernate.validator.util.ReflectionHelper.computeAllImplementedInterfaces;
-import static org.hibernate.validator.util.ReflectionHelper.getMethods;
-import static org.hibernate.validator.util.ReflectionHelper.newInstance;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.partition;
+import static org.hibernate.validator.internal.util.ReflectionHelper.computeAllImplementedInterfaces;
+import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
+import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can

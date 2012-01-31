@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.metadata.core.ConstraintHelper;
 import org.hibernate.validator.test.metadata.Engine;
 import org.hibernate.validator.test.metadata.Order;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;

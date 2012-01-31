@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.hibernate.validator.test.engine.methodlevel.model.Customer;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * @author Gunnar Morling

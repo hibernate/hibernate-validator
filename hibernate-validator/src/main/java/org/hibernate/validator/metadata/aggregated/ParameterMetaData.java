@@ -27,7 +27,7 @@ import org.hibernate.validator.metadata.raw.ConstrainedElement.ConstrainedElemen
 import org.hibernate.validator.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
-import static org.hibernate.validator.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * <p>

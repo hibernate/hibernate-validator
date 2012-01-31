@@ -32,14 +32,14 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.util.TypeHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 
 import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.util.LRUMap;
-import org.hibernate.validator.util.LoggerFactory;
+import org.hibernate.validator.internal.util.LRUMap;
+import org.hibernate.validator.internal.util.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;

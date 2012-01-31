@@ -32,7 +32,7 @@ import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.util.IdentitySet;
+import org.hibernate.validator.internal.util.IdentitySet;
 
 /**
  * Context object keeping track of all important data for a top level {@link javax.validation.Validator#validate(Object, Class[])} },

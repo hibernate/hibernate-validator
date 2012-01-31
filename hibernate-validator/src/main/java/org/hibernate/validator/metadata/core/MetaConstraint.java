@@ -26,7 +26,7 @@ import org.hibernate.validator.engine.ValidationContext;
 import org.hibernate.validator.engine.ValueContext;
 import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.location.ConstraintLocation;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
