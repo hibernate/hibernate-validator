@@ -35,7 +35,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validates a CPF (Cadastro de Pessoa F\u00edsica)
+ * Validates a CPF (Cadastro de Pessoa F\u00edsica - Brazilian individual taxpayer registry number).
  *
  * @author George Gastaldi
  */

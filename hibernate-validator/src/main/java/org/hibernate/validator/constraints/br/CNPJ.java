@@ -36,7 +36,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validates a CNPJ (Cadastro de Pessoa Jur\u00eddica - Corporate Tax Payer Registry)
+ * Validates a CNPJ (Cadastro de Pessoa Jur\u00eddica - Brazilian corporate tax payer registry number).
  *
  * @author George Gastaldi
  */

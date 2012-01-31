@@ -37,7 +37,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Allows to validate that a series of digits pass the mod 10 or mod 11 checksum algorithm.
  * </p>
  * <p>
- * The supported types is {@code String}. {@code null} is considered valid.
+ * The supported type is {@code CharSequence}. {@code null} is considered valid.
  * </p>
  *
  * @author George Gastaldi
