@@ -1448,11 +1448,11 @@ public class RentalCar extends Car {
               <constant>endIndex</constant> allow to only run the modulo
               algorithm on the specified sub-string.
               <constant>checkDigitPosition</constant> allows to use an
-              arbirtrary digit within the character sequence to be the check
+              arbitrary digit within the character sequence to be the check
               digit. If not specified it is assumed that the check digit is
               part of the specified range. Last but not least,
               <constant>ignoreNonDigitCharacters</constant> allows to ignore
-              non digit characters. </entry>
+              non digit characters.</entry>
 
               <entry>none</entry>
             </row>
@@ -1559,8 +1559,8 @@ public class RentalCar extends Car {
       <section>
         <title>Country specific constraints</title>
 
-        <para>Hibernate Validator offers also constraints which validate
-        country specific constraints, eg social security numbers. <note>
+        <para>Hibernate Validator offers also some country specific
+        constraints, e.g. for the validation of social security numbers. <note>
             <para>If you have to implement a country specific constraint,
             consider making it a contribution to Hibernate Validator!</para>
           </note></para>
@@ -1600,8 +1600,8 @@ public class RentalCar extends Car {
                 <entry><classname>CharSequence</classname></entry>
 
                 <entry>Checks that the annotated character sequence represents
-                a Brazilian Corporate Tax Payer Registry number - Cadastro de
-                Pessoa JurÍeddica</entry>
+                a Brazilian corporate tax payer registry number (Cadastro de
+                Pessoa Juríeddica)</entry>
 
                 <entry>Brazil</entry>
 
@@ -1614,7 +1614,8 @@ public class RentalCar extends Car {
                 <entry><classname>CharSequence</classname></entry>
 
                 <entry>Checks that the annotated character sequence represents
-                a Brazilian Cadastro de Pessoa FÍdsica.</entry>
+                a Brazilian individual taxpayer registry number (Cadastro de
+                Pessoa Fídsica).</entry>
 
                 <entry>Brazil</entry>
 
@@ -1627,9 +1628,9 @@ public class RentalCar extends Car {
                 <entry><classname>CharSequence</classname></entry>
 
                 <entry>Checks that the annotated character sequence represents
-                a Brazilian <ulink
-                url="http://ghiorzi.org/cgcancpf.htm">TÍtulo
-                Eleitoral</ulink>.</entry>
+                a Brazilian voter ID card number (<ulink
+                url="http://ghiorzi.org/cgcancpf.htm">Título
+                Eleitoral</ulink>).</entry>
 
                 <entry>Brazil</entry>
 
