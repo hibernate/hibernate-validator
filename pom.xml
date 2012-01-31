@@ -136,11 +136,6 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.googlecode.jtype</groupId>
-                <artifactId>jtype</artifactId>
-                <version>0.1.2</version>
-            </dependency>
-            <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.0-api</artifactId>
                 <version>1.0.1.Final</version>
