@@ -32,7 +32,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getMethodValidator;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
- * Integration test for {@link ValidatorImpl} and {@link org.hibernate.validator.metadata.aggregated.BeanMetaDataImpl} which
+ * Integration test for {@link ValidatorImpl} and {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl} which
  * tests that illegal method parameter constraints are handled properly.
  *
  * @author Gunnar Morling

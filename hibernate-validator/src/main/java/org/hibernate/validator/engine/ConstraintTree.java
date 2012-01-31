@@ -37,7 +37,7 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
-import org.hibernate.validator.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.LRUMap;
 import org.hibernate.validator.internal.util.LoggerFactory;
 

@@ -22,7 +22,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
-import org.hibernate.validator.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 
 /**
  * @author Emmanuel Bernard

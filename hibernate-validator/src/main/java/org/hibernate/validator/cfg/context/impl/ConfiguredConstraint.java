@@ -23,9 +23,9 @@ import java.util.Map;
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.ConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 

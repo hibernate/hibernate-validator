@@ -27,11 +27,11 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.metadata.BeanMetaDataManager;
-import org.hibernate.validator.metadata.core.ConstraintHelper;
-import org.hibernate.validator.metadata.provider.MetaDataProvider;
-import org.hibernate.validator.metadata.provider.ProgrammaticMappingMetaDataProvider;
-import org.hibernate.validator.metadata.provider.XmlConfigurationMetaDataProvider;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.ProgrammaticMappingMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.XmlConfigurationMetaDataProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

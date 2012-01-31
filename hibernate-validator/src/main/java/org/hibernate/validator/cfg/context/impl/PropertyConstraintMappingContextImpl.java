@@ -22,8 +22,8 @@ import java.lang.reflect.Method;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
