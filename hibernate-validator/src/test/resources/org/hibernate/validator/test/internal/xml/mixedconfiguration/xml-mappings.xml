@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+		http://jboss.org/xml/ns/javax/validation/mapping
+		validation-mapping-1.0.xsd">
+
+    <default-package>org.hibernate.validator.internal.xml.mixedconfiguration.xml</default-package>
+
+    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Competition" ignore-annotations="true">
+        <field name="name">
+            <constraint annotation="javax.validation.constraints.NotNull"/>
+            <constraint annotation="javax.validation.constraints.Size">
+                <element name="min">1</element>
+            </constraint>
+        </field>
+    </bean>
+    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.PersonCompetition" ignore-annotations="true"/>
+    <!--bean class="TeamCompetition"/-->
+
+    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Game" ignore-annotations="true">
+        <field name="detail">
+            <valid/>
+            <constraint annotation="javax.validation.constraints.NotNull"/>
+        </field>
+    </bean>
+
+    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.GameDetail" ignore-annotations="true">
+        <field name="competition">
+            <valid/>
+            <constraint annotation="javax.validation.constraints.NotNull"/>
+        </field>
+    </bean>
+    <bean class="org.hibernate.validator.test.internal.xml.mixedconfiguration.xml.Fixture"/>
+
+</constraint-mappings>

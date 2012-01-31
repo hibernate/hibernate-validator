@@ -168,7 +168,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <packageName>org.hibernate.validator.xml</packageName>
+                    <packageName>org.hibernate.validator.internal.xml</packageName>
                     <outputDirectory>${basedir}/target/generated-sources</outputDirectory>
                     <extension>true</extension>
                 </configuration>

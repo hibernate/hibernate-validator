@@ -1,0 +1,10 @@
+<constraint-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
+                     xmlns="http://jboss.org/xml/ns/javax/validation/mapping">
+    <default-package>org.hibernate.validator.internal.xml</default-package>
+    <bean class="org.hibernate.validator.test.internal.xml.MyInterface" ignore-annotations="true">
+        <getter name="id" ignore-annotations="true">
+            <constraint annotation="javax.validation.constraints.NotNull"/>
+        </getter>
+    </bean>
+</constraint-mappings>

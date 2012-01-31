@@ -42,8 +42,8 @@ import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.util.CollectionHelper;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.Version;
-import org.hibernate.validator.xml.ValidationBootstrapParameters;
-import org.hibernate.validator.xml.ValidationXmlParser;
+import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
+import org.hibernate.validator.internal.xml.ValidationXmlParser;
 
 /**
  * Hibernate specific {@code Configuration} implementation.

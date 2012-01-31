@@ -36,7 +36,7 @@ import org.hibernate.validator.metadata.raw.ConstrainedField;
 import org.hibernate.validator.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.metadata.raw.ConstrainedType;
 import org.hibernate.validator.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.xml.XmlMappingParser;
+import org.hibernate.validator.internal.xml.XmlMappingParser;
 
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.CollectionHelper.partition;
