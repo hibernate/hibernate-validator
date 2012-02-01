@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.util.SoftLimitMRUCache;
+import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
