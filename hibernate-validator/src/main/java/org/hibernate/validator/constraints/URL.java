@@ -25,7 +25,7 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.impl.URLValidator;
+import org.hibernate.validator.internal.constraints.URLValidator;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;

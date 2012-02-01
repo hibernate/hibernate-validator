@@ -25,7 +25,7 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.impl.NotBlankValidator;
+import org.hibernate.validator.internal.constraints.NotBlankValidator;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;

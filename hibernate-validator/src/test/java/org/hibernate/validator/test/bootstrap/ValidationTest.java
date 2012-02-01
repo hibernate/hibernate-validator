@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.constraints.impl.NotNullValidator;
+import org.hibernate.validator.internal.constraints.NotNullValidator;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.internal.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;

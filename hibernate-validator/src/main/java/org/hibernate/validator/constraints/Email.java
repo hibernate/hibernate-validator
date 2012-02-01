@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import org.hibernate.validator.constraints.impl.EmailValidator;
+import org.hibernate.validator.internal.constraints.EmailValidator;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
