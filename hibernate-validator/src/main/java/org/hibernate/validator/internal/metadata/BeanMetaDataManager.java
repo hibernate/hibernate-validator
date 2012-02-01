@@ -21,15 +21,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
-import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -71,7 +72,7 @@ public class BeanMetaDataManager {
 	/**
 	 * Used to cache the constraint meta data for validated entities
 	 */
-	private final BeanMetaDataCache beanMetaDataCache;
+	private final SoftLimitMRUCache<Class<?>, BeanMetaData<?>> beanMetaDataCache;
 
 	private AnnotationIgnores annotationIgnores;
 
@@ -90,21 +91,25 @@ public class BeanMetaDataManager {
 		this.nonAnnotationMetaDataProviders = metaDataProviders;
 
 		configurationsByClass = newHashMap();
-		beanMetaDataCache = new BeanMetaDataCache();
+		beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>();
 
 		loadConfigurationsNonDefaultProviders();
 
 		defaultProvider = new AnnotationMetaDataProvider( constraintHelper, annotationIgnores );
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		BeanMetaData<T> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
 
 		if ( beanMetaData == null ) {
 			addAll( defaultProvider.getBeanConfigurationForHierarchy( beanClass ) );
 			beanMetaData = createBeanMetaData( beanClass );
 
-			final BeanMetaData<T> cachedBeanMetaData = beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
+			final BeanMetaData<T> cachedBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.put(
+					beanClass,
+					beanMetaData
+			);
 			if ( cachedBeanMetaData != null ) {
 				beanMetaData = cachedBeanMetaData;
 			}
