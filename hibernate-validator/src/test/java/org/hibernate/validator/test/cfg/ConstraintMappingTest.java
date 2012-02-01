@@ -38,7 +38,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
-import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
+import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.defs.FutureDef;
 import org.hibernate.validator.cfg.defs.MinDef;

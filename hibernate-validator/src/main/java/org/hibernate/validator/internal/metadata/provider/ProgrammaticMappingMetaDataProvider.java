@@ -27,8 +27,8 @@ import java.util.Set;
 import javax.validation.GroupDefinitionException;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.context.impl.ConfiguredConstraint;
-import org.hibernate.validator.cfg.context.impl.ConstraintMappingContext;
+import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
+import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
