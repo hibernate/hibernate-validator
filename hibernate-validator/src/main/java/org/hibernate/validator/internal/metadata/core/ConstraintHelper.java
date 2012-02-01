@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.metadata.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.Constraint;
@@ -40,8 +39,6 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
@@ -52,22 +49,22 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.internal.constraints.AssertFalseValidator;
 import org.hibernate.validator.internal.constraints.AssertTrueValidator;
-import org.hibernate.validator.internal.constraints.DecimalMaxValidatorForNumber;
 import org.hibernate.validator.internal.constraints.DecimalMaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraints.DecimalMinValidatorForNumber;
+import org.hibernate.validator.internal.constraints.DecimalMaxValidatorForNumber;
 import org.hibernate.validator.internal.constraints.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraints.DigitsValidatorForNumber;
+import org.hibernate.validator.internal.constraints.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraints.DigitsValidatorForCharSequence;
+import org.hibernate.validator.internal.constraints.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.constraints.EmailValidator;
 import org.hibernate.validator.internal.constraints.FutureValidatorForCalendar;
 import org.hibernate.validator.internal.constraints.FutureValidatorForDate;
 import org.hibernate.validator.internal.constraints.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraints.FutureValidatorForReadablePartial;
 import org.hibernate.validator.internal.constraints.LengthValidator;
-import org.hibernate.validator.internal.constraints.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraints.MaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraints.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraints.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraints.MinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraints.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraints.NotBlankValidator;
 import org.hibernate.validator.internal.constraints.NotNullValidator;
 import org.hibernate.validator.internal.constraints.NullValidator;
@@ -86,11 +83,13 @@ import org.hibernate.validator.internal.constraints.SizeValidatorForArraysOfDoub
 import org.hibernate.validator.internal.constraints.SizeValidatorForArraysOfFloat;
 import org.hibernate.validator.internal.constraints.SizeValidatorForArraysOfInt;
 import org.hibernate.validator.internal.constraints.SizeValidatorForArraysOfLong;
+import org.hibernate.validator.internal.constraints.SizeValidatorForCharSequence;
 import org.hibernate.validator.internal.constraints.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraints.SizeValidatorForMap;
-import org.hibernate.validator.internal.constraints.SizeValidatorForCharSequence;
 import org.hibernate.validator.internal.constraints.URLValidator;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -98,7 +97,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Hardy Ferentschik
  * @author Alaa Nassef
  * @author Gunnar Morling
- *
  */
 public class ConstraintHelper {
 
@@ -111,31 +109,30 @@ public class ConstraintHelper {
 			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
 
 	public ConstraintHelper() {
-		List<Class<? extends ConstraintValidator<?, ?>>> constraintList =
-				new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		List<Class<? extends ConstraintValidator<?, ?>>> constraintList = newArrayList();
 		constraintList.add( AssertFalseValidator.class );
 		builtinConstraints.put( AssertFalse.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( AssertTrueValidator.class );
 		builtinConstraints.put( AssertTrue.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( DecimalMaxValidatorForNumber.class );
 		constraintList.add( DecimalMaxValidatorForCharSequence.class );
 		builtinConstraints.put( DecimalMax.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( DecimalMinValidatorForNumber.class );
 		constraintList.add( DecimalMinValidatorForCharSequence.class );
 		builtinConstraints.put( DecimalMin.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( DigitsValidatorForCharSequence.class );
 		constraintList.add( DigitsValidatorForNumber.class );
 		builtinConstraints.put( Digits.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( FutureValidatorForCalendar.class );
 		constraintList.add( FutureValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
@@ -144,25 +141,25 @@ public class ConstraintHelper {
 		}
 		builtinConstraints.put( Future.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( MaxValidatorForNumber.class );
 		constraintList.add( MaxValidatorForCharSequence.class );
 		builtinConstraints.put( Max.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( MinValidatorForNumber.class );
 		constraintList.add( MinValidatorForCharSequence.class );
 		builtinConstraints.put( Min.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( NotNullValidator.class );
 		builtinConstraints.put( NotNull.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( NullValidator.class );
 		builtinConstraints.put( Null.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( PastValidatorForCalendar.class );
 		constraintList.add( PastValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
@@ -171,11 +168,11 @@ public class ConstraintHelper {
 		}
 		builtinConstraints.put( Past.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( PatternValidator.class );
 		builtinConstraints.put( Pattern.class, constraintList );
 
-		constraintList = new ArrayList<Class<? extends ConstraintValidator<?, ?>>>();
+		constraintList = newArrayList();
 		constraintList.add( SizeValidatorForCharSequence.class );
 		constraintList.add( SizeValidatorForCollection.class );
 		constraintList.add( SizeValidatorForArray.class );
@@ -225,8 +222,7 @@ public class ConstraintHelper {
 			throw new ValidationException( "Unable to find constraints for  " + annotationClass );
 		}
 
-		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraints =
-				new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>( builtInList.size() );
+		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraints = newArrayList( builtInList.size() );
 		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : builtInList ) {
 			//safe cause all CV for a given annotation A are CV<A, ?>
 			@SuppressWarnings("unchecked")
@@ -278,7 +274,7 @@ public class ConstraintHelper {
 	 *         annotation.
 	 */
 	public <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
-		List<Annotation> annotationList = new ArrayList<Annotation>();
+		List<Annotation> annotationList = newArrayList();
 		try {
 			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
 			if ( method != null ) {
@@ -418,8 +414,8 @@ public class ConstraintHelper {
 				annotationClass
 		);
 
-		List<Class<? extends ConstraintValidator<T, ?>>> constraintsValidators =
-				new ArrayList<Class<? extends ConstraintValidator<T, ?>>>( list.size() );
+		List<Class<? extends ConstraintValidator<T, ?>>> constraintsValidators = newArrayList( list.size() );
+
 		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : list ) {
 			//safe cause all CV for a given annotation A are CV<A, ?>
 			@SuppressWarnings("unchecked")
