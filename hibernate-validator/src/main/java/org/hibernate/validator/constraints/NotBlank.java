@@ -25,8 +25,6 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.internal.constraints.NotBlankValidator;
-
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -41,7 +39,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Hardy Ferentschik
  */
 @Documented
-@Constraint(validatedBy = { NotBlankValidator.class })
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 @ReportAsSingleViolation

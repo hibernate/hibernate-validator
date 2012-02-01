@@ -22,8 +22,6 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import org.hibernate.validator.internal.constraints.ScriptAssertValidator;
-
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -80,9 +78,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author Gunnar Morling
  */
-@Target( { TYPE })
+@Target({ TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = ScriptAssertValidator.class)
+@Constraint(validatedBy = { })
 @Documented
 public @interface ScriptAssert {
 
@@ -123,7 +121,7 @@ public @interface ScriptAssert {
 	/**
 	 * Defines several {@code @ScriptAssert} annotations on the same element.
 	 */
-	@Target( { TYPE })
+	@Target({ TYPE })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {

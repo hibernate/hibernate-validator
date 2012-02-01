@@ -40,7 +40,16 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.ModCheck;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.internal.constraints.AssertFalseValidator;
 import org.hibernate.validator.internal.constraints.AssertTrueValidator;
 import org.hibernate.validator.internal.constraints.DecimalMaxValidatorForNumber;
@@ -49,14 +58,17 @@ import org.hibernate.validator.internal.constraints.DecimalMinValidatorForNumber
 import org.hibernate.validator.internal.constraints.DecimalMinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraints.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.constraints.DigitsValidatorForCharSequence;
+import org.hibernate.validator.internal.constraints.EmailValidator;
 import org.hibernate.validator.internal.constraints.FutureValidatorForCalendar;
 import org.hibernate.validator.internal.constraints.FutureValidatorForDate;
 import org.hibernate.validator.internal.constraints.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraints.FutureValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraints.LengthValidator;
 import org.hibernate.validator.internal.constraints.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraints.MaxValidatorForCharSequence;
 import org.hibernate.validator.internal.constraints.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraints.MinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraints.NotBlankValidator;
 import org.hibernate.validator.internal.constraints.NotNullValidator;
 import org.hibernate.validator.internal.constraints.NullValidator;
 import org.hibernate.validator.internal.constraints.PastValidatorForCalendar;
@@ -64,6 +76,8 @@ import org.hibernate.validator.internal.constraints.PastValidatorForDate;
 import org.hibernate.validator.internal.constraints.PastValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraints.PastValidatorForReadablePartial;
 import org.hibernate.validator.internal.constraints.PatternValidator;
+import org.hibernate.validator.internal.constraints.SafeHtmlValidator;
+import org.hibernate.validator.internal.constraints.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraints.SizeValidatorForArray;
 import org.hibernate.validator.internal.constraints.SizeValidatorForArraysOfBoolean;
 import org.hibernate.validator.internal.constraints.SizeValidatorForArraysOfByte;
@@ -75,6 +89,7 @@ import org.hibernate.validator.internal.constraints.SizeValidatorForArraysOfLong
 import org.hibernate.validator.internal.constraints.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraints.SizeValidatorForMap;
 import org.hibernate.validator.internal.constraints.SizeValidatorForCharSequence;
+import org.hibernate.validator.internal.constraints.URLValidator;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -82,6 +97,8 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  *
  * @author Hardy Ferentschik
  * @author Alaa Nassef
+ * @author Gunnar Morling
+ *
  */
 public class ConstraintHelper {
 
@@ -171,6 +188,34 @@ public class ConstraintHelper {
 		constraintList.add( SizeValidatorForArraysOfInt.class );
 		constraintList.add( SizeValidatorForArraysOfLong.class );
 		builtinConstraints.put( Size.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( EmailValidator.class );
+		builtinConstraints.put( Email.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( LengthValidator.class );
+		builtinConstraints.put( Length.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( ModCheckValidator.class );
+		builtinConstraints.put( ModCheck.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( NotBlankValidator.class );
+		builtinConstraints.put( NotBlank.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( SafeHtmlValidator.class );
+		builtinConstraints.put( SafeHtml.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( ScriptAssertValidator.class );
+		builtinConstraints.put( ScriptAssert.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( URLValidator.class );
+		builtinConstraints.put( URL.class, constraintList );
 	}
 
 	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getBuiltInConstraints(Class<? extends Annotation> annotationClass) {
