@@ -39,61 +39,77 @@ public class EmailValidatorTest {
 
 	@Test
 	public void testNullAndEmptyString() throws Exception {
-		isRightEmail( "" );
-		isRightEmail( null );
+		isValidEmail( "" );
+		isValidEmail( null );
 	}
 
 	@Test
 	public void testValidEmail() throws Exception {
-		isRightEmail( "emmanuel@hibernate.org" );
-		isRightEmail( "emmanuel@hibernate" );
-		isRightEmail( "emma-n_uel@hibernate" );
-		isRightEmail( "emma+nuel@hibernate.org" );
-		isRightEmail( "emma=nuel@hibernate.org" );
-		isRightEmail( "emmanuel@[123.12.2.11]" );
-		isRightEmail( "*@example.net" );
-		isRightEmail( "fred&barny@example.com" );
-		isRightEmail( "---@example.com" );
-		isRightEmail( "foo-bar@example.net" );
-		isRightEmail( "mailbox.sub1.sub2@this-domain" );
+		isValidEmail( "emmanuel@hibernate.org" );
+		isValidEmail( "emmanuel@hibernate" );
+		isValidEmail( "emma-n_uel@hibernate" );
+		isValidEmail( "emma+nuel@hibernate.org" );
+		isValidEmail( "emma=nuel@hibernate.org" );
+		isValidEmail( "emmanuel@[123.12.2.11]" );
+		isValidEmail( "*@example.net" );
+		isValidEmail( "fred&barny@example.com" );
+		isValidEmail( "---@example.com" );
+		isValidEmail( "foo-bar@example.net" );
+		isValidEmail( "mailbox.sub1.sub2@this-domain" );
 	}
 
 	@Test
 	public void testInValidEmail() throws Exception {
-		isWrongEmail( "emmanuel.hibernate.org" );
-		isWrongEmail( "emma nuel@hibernate.org" );
-		isWrongEmail( "emma(nuel@hibernate.org" );
-		isWrongEmail( "emmanuel@" );
-		isWrongEmail( "emma\nnuel@hibernate.org" );
-		isWrongEmail( "emma@nuel@hibernate.org" );
-		isWrongEmail( "Just a string" );
-		isWrongEmail( "string" );
-		isWrongEmail( "me@" );
-		isWrongEmail( "@example.com" );
-		isWrongEmail( "me.@example.com" );
-		isWrongEmail( ".me@example.com" );
-		isWrongEmail( "me@example..com" );
-		isWrongEmail( "me\\@example.com" );
+		isInvalidEmail( "emmanuel.hibernate.org" );
+		isInvalidEmail( "emma nuel@hibernate.org" );
+		isInvalidEmail( "emma(nuel@hibernate.org" );
+		isInvalidEmail( "emmanuel@" );
+		isInvalidEmail( "emma\nnuel@hibernate.org" );
+		isInvalidEmail( "emma@nuel@hibernate.org" );
+		isInvalidEmail( "Just a string" );
+		isInvalidEmail( "string" );
+		isInvalidEmail( "me@" );
+		isInvalidEmail( "@example.com" );
+		isInvalidEmail( "me.@example.com" );
+		isInvalidEmail( ".me@example.com" );
+		isInvalidEmail( "me@example..com" );
+		isInvalidEmail( "me\\@example.com" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-339")
 	public void testAccent() {
-		isRightEmail( "Test^Email@example.com" );
+		isValidEmail( "Test^Email@example.com" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-502")
 	public void testValidEmailCharSequence() throws Exception {
-		isRightEmail( new MyCustomStringImpl( "emmanuel@hibernate.org" ) );
-		isWrongEmail( new MyCustomStringImpl( "@example.com" ) );
+		isValidEmail( new MyCustomStringImpl( "emmanuel@hibernate.org" ) );
+		isInvalidEmail( new MyCustomStringImpl( "@example.com" ) );
 	}
 
-	private void isRightEmail(CharSequence email) {
-		assertTrue( validator.isValid( email, null ), "Expected a valid email." );
+	@Test
+	@TestForIssue(jiraKey = "HV-472")
+	public void testMailWithInternationalDomainName() throws Exception {
+		isValidEmail( "myname@östereich.at", "A valid email address with umlaut" );
+		isValidEmail( "θσερ@εχαμπλε.ψομ", "A valid greek email address" );
+		isInvalidEmail( "θσερ.εχαμπλε.ψομ", "Email does not contain an @ character and should be invalid" );
 	}
 
-	private void isWrongEmail(CharSequence email) {
-		assertFalse( validator.isValid( email, null ), "Expected a invalid email." );
+	private void isValidEmail(CharSequence email, String message) {
+		assertTrue( validator.isValid( email, null ), message );
+	}
+
+	private void isValidEmail(CharSequence email) {
+		isValidEmail( email, "Expected a valid email." );
+	}
+
+	private void isInvalidEmail(CharSequence email, String message) {
+		assertFalse( validator.isValid( email, null ), message );
+	}
+
+	private void isInvalidEmail(CharSequence email) {
+		isInvalidEmail( email, "Expected a invalid email." );
 	}
 }

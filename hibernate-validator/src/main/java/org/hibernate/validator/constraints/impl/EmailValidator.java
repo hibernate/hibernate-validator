@@ -1,5 +1,6 @@
 package org.hibernate.validator.constraints.impl;
 
+import java.net.IDN;
 import java.util.regex.Matcher;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -16,6 +17,9 @@ import org.hibernate.validator.constraints.Email;
  * <a href="http://www.regular-expressions.info/email.html">article</a> discusses it is not necessarily practical to
  * implement a 100% compliant email validator. This implementation is a trade-off trying to match most email while ignoring
  * for example emails with double quotes or comments.
+ * </p>
+ * <p>
+ * Note: This validator required Java 6, because it uses {@code java.lang.IDN} to support internationalized domain names (IDNs).
  * </p>
  *
  * @author Emmanuel Bernard
@@ -42,7 +46,8 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 		if ( value == null || value.length() == 0 ) {
 			return true;
 		}
-		Matcher m = pattern.matcher( value );
+		String asciiString = IDN.toASCII( value.toString() );
+		Matcher m = pattern.matcher( asciiString );
 		return m.matches();
 	}
 }
