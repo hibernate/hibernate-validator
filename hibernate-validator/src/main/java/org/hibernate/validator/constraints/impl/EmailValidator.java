@@ -1,5 +1,6 @@
 package org.hibernate.validator.constraints.impl;
 
+import java.net.IDN;
 import java.util.regex.Matcher;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -42,7 +43,8 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 		if ( value == null || value.length() == 0 ) {
 			return true;
 		}
-		Matcher m = pattern.matcher( value );
+		String asciiString = IDN.toASCII( value.toString() );
+		Matcher m = pattern.matcher( asciiString );
 		return m.matches();
 	}
 }
