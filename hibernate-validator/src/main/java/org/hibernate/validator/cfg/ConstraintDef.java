@@ -17,10 +17,9 @@
 package org.hibernate.validator.cfg;
 
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
 import java.util.Map;
 import javax.validation.Payload;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a
@@ -56,7 +55,7 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 
 	protected ConstraintDef(Class<A> constraintType) {
 		this.constraintType = constraintType;
-		this.parameters = newHashMap();
+		this.parameters = new HashMap<String, Object>();
 	}
 
 	protected ConstraintDef(ConstraintDef<?, A> original) {

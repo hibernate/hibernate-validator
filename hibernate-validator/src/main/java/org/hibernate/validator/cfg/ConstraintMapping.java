@@ -19,7 +19,6 @@ package org.hibernate.validator.cfg;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.context.TypeConstraintMappingContextImpl;
-import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * Top level class for constraints configured via the programmatic API.
@@ -51,7 +50,9 @@ public class ConstraintMapping {
 	 */
 	public final <C> TypeConstraintMappingContext<C> type(Class<C> beanClass) {
 
-		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
+		if ( beanClass == null ) {
+			throw new IllegalArgumentException( "The bean type must not be null when creating a constraint mapping." );
+		}
 
 		return new TypeConstraintMappingContextImpl<C>( beanClass, context );
 	}
