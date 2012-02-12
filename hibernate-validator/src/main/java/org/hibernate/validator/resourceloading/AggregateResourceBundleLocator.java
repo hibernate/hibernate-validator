@@ -20,12 +20,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.hibernate.validator.internal.util.IteratorEnumeration;
 
 /**
  * A {@link ResourceBundleLocator} implementation that provides access
@@ -141,6 +140,41 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 		@Override
 		protected Object handleGetObject(String key) {
 			return contents.get( key );
+		}
+	}
+
+	/**
+	 * An {@link Enumeration} implementation, that wraps an {@link Iterator}. Can
+	 * be used to integrate older APIs working with enumerations with iterators.
+	 *
+	 * @param <T> The enumerated type.
+	 *
+	 * @author Gunnar Morling
+	 */
+	private static class IteratorEnumeration<T> implements Enumeration<T> {
+
+		private Iterator<T> source;
+
+		/**
+		 * Creates a new IterationEnumeration.
+		 *
+		 * @param source The source iterator. Must not be null.
+		 */
+		public IteratorEnumeration(Iterator<T> source) {
+
+			if ( source == null ) {
+				throw new IllegalArgumentException( "Source must not be null" );
+			}
+
+			this.source = source;
+		}
+
+		public boolean hasMoreElements() {
+			return source.hasNext();
+		}
+
+		public T nextElement() {
+			return source.next();
 		}
 	}
 }
