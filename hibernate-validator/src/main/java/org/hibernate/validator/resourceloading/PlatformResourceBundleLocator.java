@@ -16,14 +16,14 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
-
-import org.hibernate.validator.internal.util.LoggerFactory;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.slf4j.LoggerFactory;
 
 /**
  * A resource bundle locator, that loads resource bundles by simply
@@ -34,7 +34,8 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.getLogger( PlatformResourceBundleLocator.class );
+
 	private String bundleName;
 
 	public PlatformResourceBundleLocator(String bundleName) {
@@ -51,18 +52,18 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	public ResourceBundle getResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
-		ClassLoader classLoader = ReflectionHelper.getClassLoaderFromContext();
+		ClassLoader classLoader = GetClassLoader.fromContext();
 		if ( classLoader != null ) {
 			rb = loadBundle(
 					classLoader, locale, bundleName
-							+ " not found by thread local classloader"
+					+ " not found by thread local classloader"
 			);
 		}
 		if ( rb == null ) {
-			classLoader = ReflectionHelper.getClassLoaderFromClass( PlatformResourceBundleLocator.class );
+			classLoader = GetClassLoader.fromClass( PlatformResourceBundleLocator.class );
 			rb = loadBundle(
 					classLoader, locale, bundleName
-							+ " not found by validator classloader"
+					+ " not found by validator classloader"
 			);
 		}
 		if ( log.isDebugEnabled() ) {
@@ -88,5 +89,45 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			log.trace( message );
 		}
 		return rb;
+	}
+
+	private static class GetClassLoader implements PrivilegedAction<ClassLoader> {
+		private final Class<?> clazz;
+
+		public static ClassLoader fromContext() {
+			final GetClassLoader action = new GetClassLoader( null );
+			if ( System.getSecurityManager() != null ) {
+				return AccessController.doPrivileged( action );
+			}
+			else {
+				return action.run();
+			}
+		}
+
+		public static ClassLoader fromClass(Class<?> clazz) {
+			if ( clazz == null ) {
+				throw new IllegalArgumentException( "Class is null" );
+			}
+			final GetClassLoader action = new GetClassLoader( clazz );
+			if ( System.getSecurityManager() != null ) {
+				return AccessController.doPrivileged( action );
+			}
+			else {
+				return action.run();
+			}
+		}
+
+		private GetClassLoader(Class<?> clazz) {
+			this.clazz = clazz;
+		}
+
+		public ClassLoader run() {
+			if ( clazz != null ) {
+				return clazz.getClassLoader();
+			}
+			else {
+				return Thread.currentThread().getContextClassLoader();
+			}
+		}
 	}
 }
