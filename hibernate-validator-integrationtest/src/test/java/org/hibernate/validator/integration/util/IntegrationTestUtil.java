@@ -24,7 +24,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 
-import org.hibernate.validator.util.Version;
+import org.hibernate.validator.internal.util.Version;
 
 /**
  * Helper functions for creating integration tests with Arquillian and Shrinkwrap.

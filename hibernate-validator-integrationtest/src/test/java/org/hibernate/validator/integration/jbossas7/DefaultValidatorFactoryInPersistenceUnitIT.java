@@ -35,9 +35,9 @@ import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceDescr
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -85,9 +85,10 @@ public class DefaultValidatorFactoryInPersistenceUnitIT {
 		Object obj = properties.get( "javax.persistence.validation.factory" );
 		assertTrue( "There should be an object under this property", obj != null );
 		ValidatorFactory factory = (ValidatorFactory) obj;
-		assertTrue(
+		assertEquals(
 				"The Hibernate Validator implementation should be used",
-				factory.getValidator() instanceof ValidatorImpl
+				"ValidatorImpl",
+				factory.getValidator().getClass().getSimpleName()
 		);
 		log.debug( "testValidatorFactoryPassedToPersistenceUnit completed" );
 	}

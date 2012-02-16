@@ -30,9 +30,9 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
@@ -63,9 +63,10 @@ public class JndiLookupOfValidatorFactoryIT {
 			Object obj = ctx.lookup( DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY );
 			assertTrue( "The default validator factory should be bound", obj != null );
 			ValidatorFactory factory = (ValidatorFactory) obj;
-			assertTrue(
+			assertEquals(
 					"The Hibernate Validator implementation should be used",
-					factory.getValidator() instanceof ValidatorImpl
+					"ValidatorImpl",
+					factory.getValidator().getClass().getSimpleName()
 			);
 		}
 		catch ( NamingException e ) {

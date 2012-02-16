@@ -21,14 +21,13 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.engine.ValidatorImpl;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
-import org.hibernate.validator.util.LazyValidatorFactory;
+import org.hibernate.validator.internal.engine.ValidatorImpl;
+import org.hibernate.validator.internal.util.LazyValidatorFactory;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
