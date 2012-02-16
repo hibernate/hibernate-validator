@@ -38,10 +38,10 @@ public class JPATraversableResolver implements TraversableResolver {
 	private static final Logger log = LoggerFactory.make();
 
 	public final boolean isReachable(Object traversableObject,
-							   Path.Node traversableProperty,
-							   Class<?> rootBeanType,
-							   Path pathToTraversableObject,
-							   ElementType elementType) {
+									 Path.Node traversableProperty,
+									 Class<?> rootBeanType,
+									 Path pathToTraversableObject,
+									 ElementType elementType) {
 		if ( log.isTraceEnabled() ) {
 			log.trace(
 					"Calling isReachable on object {} with node name {}",
@@ -51,10 +51,7 @@ public class JPATraversableResolver implements TraversableResolver {
 		}
 
 		// we have to check traversableProperty.getName() against null to check the root gets validated (see HV-266)
-		// also check the element type, if it is ElementType.TYPE then we don't have to call is reachable since we have
-		// a class level constraint (HV-305)
-		if ( traversableObject == null || traversableProperty.getName() == null
-				|| ElementType.TYPE.equals( elementType ) ) {
+		if ( traversableObject == null || traversableProperty.getName() == null ) {
 			return true;
 		}
 		else {

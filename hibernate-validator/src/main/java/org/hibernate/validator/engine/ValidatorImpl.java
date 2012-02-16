@@ -37,15 +37,13 @@ import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
-import org.hibernate.validator.util.TypeHelper;
-
 import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableResolver;
-import org.hibernate.validator.metadata.aggregated.MethodMetaData;
-import org.hibernate.validator.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.metadata.BeanMetaDataManager;
+import org.hibernate.validator.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.metadata.aggregated.MethodMetaData;
 import org.hibernate.validator.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.metadata.core.MetaConstraint;
 import org.hibernate.validator.method.MethodConstraintViolation;
@@ -53,6 +51,7 @@ import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.Contracts;
 import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.TypeHelper;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
@@ -1212,6 +1211,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return false;
 		}
 
+		// HV-524 - class level constraints are reachable
+		if ( ElementType.TYPE.equals( metaConstraint.getElementType() ) ) {
+			return true;
+		}
+
 		boolean isReachable;
 		PathImpl path = valueContext.getPropertyPath();
 		Path pathToObject = path.getPathWithoutLeafNode();
@@ -1240,30 +1244,41 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		PathImpl path = valueContext.getPropertyPath();
 		Path pathToObject = path.getPathWithoutLeafNode();
 
-		try {
-			isReachable = validationContext.getTraversableResolver().isReachable(
-					valueContext.getCurrentBean(),
-					path.getLeafNode(),
-					validationContext.getRootBeanClass(),
-					pathToObject,
-					type
-			);
+		// HV-524 - class level constraints are reachable
+		if ( ElementType.TYPE.equals( type ) ) {
+			isReachable = true;
 		}
-		catch ( RuntimeException e ) {
-			throw new ValidationException( "Call to TraversableResolver.isReachable() threw an exception", e );
+		else {
+			try {
+				isReachable = validationContext.getTraversableResolver().isReachable(
+						valueContext.getCurrentBean(),
+						path.getLeafNode(),
+						validationContext.getRootBeanClass(),
+						pathToObject,
+						type
+				);
+			}
+			catch ( RuntimeException e ) {
+				throw new ValidationException( "Call to TraversableResolver.isReachable() threw an exception", e );
+			}
 		}
 
-		try {
-			isCascadable = validationContext.getTraversableResolver().isCascadable(
-					valueContext.getCurrentBean(),
-					path.getLeafNode(),
-					validationContext.getRootBeanClass(),
-					pathToObject,
-					type
-			);
+		if ( ElementType.TYPE.equals( type ) ) {
+			isCascadable = true;
 		}
-		catch ( RuntimeException e ) {
-			throw new ValidationException( "Call to TraversableResolver.isCascadable() threw an exception", e );
+		else {
+			try {
+				isCascadable = validationContext.getTraversableResolver().isCascadable(
+						valueContext.getCurrentBean(),
+						path.getLeafNode(),
+						validationContext.getRootBeanClass(),
+						pathToObject,
+						type
+				);
+			}
+			catch ( RuntimeException e ) {
+				throw new ValidationException( "Call to TraversableResolver.isCascadable() threw an exception", e );
+			}
 		}
 
 		return isReachable && isCascadable;
