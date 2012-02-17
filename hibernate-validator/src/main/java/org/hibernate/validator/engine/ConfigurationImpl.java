@@ -102,16 +102,34 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public final ConfigurationImpl messageInterpolator(MessageInterpolator interpolator) {
+		if ( log.isDebugEnabled() ) {
+			if ( interpolator != null ) {
+				log.debug( "Setting custom MessageInterpolator of type " + interpolator.getClass().getName() );
+			}
+		}
 		this.validationBootstrapParameters.setMessageInterpolator( interpolator );
 		return this;
 	}
 
 	public final ConfigurationImpl traversableResolver(TraversableResolver resolver) {
+		if ( log.isDebugEnabled() ) {
+			if ( resolver != null ) {
+				log.debug( "Setting custom TraversableResolver of type " + resolver.getClass().getName() );
+			}
+		}
 		this.validationBootstrapParameters.setTraversableResolver( resolver );
 		return this;
 	}
 
 	public final ConfigurationImpl constraintValidatorFactory(ConstraintValidatorFactory constraintValidatorFactory) {
+		if ( log.isDebugEnabled() ) {
+			if ( constraintValidatorFactory != null ) {
+				log.debug(
+						"Setting custom ConstraintValidatorFactory of type " + constraintValidatorFactory.getClass()
+								.getName()
+				);
+			}
+		}
 		this.validationBootstrapParameters.setConstraintValidatorFactory( constraintValidatorFactory );
 		return this;
 	}
@@ -124,7 +142,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	public final HibernateValidatorConfiguration failFast( boolean failFast) {
+	public final HibernateValidatorConfiguration failFast(boolean failFast) {
 		this.failFast = failFast;
 		return this;
 	}
@@ -133,7 +151,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		if ( mapping == null ) {
 			throw new IllegalArgumentException( "The mapping cannot be null." );
 		}
-		this.programmaticMappings.add(mapping);
+		this.programmaticMappings.add( mapping );
 		return this;
 	}
 
