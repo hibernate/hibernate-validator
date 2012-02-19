@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.test.engine.cascaded;
+package org.hibernate.validator.test.internal.engine.cascaded;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
