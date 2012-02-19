@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.bootstrap;
+package org.hibernate.validator.test.internal.bootstrap;
 
 import java.util.Set;
 import javax.validation.Configuration;
