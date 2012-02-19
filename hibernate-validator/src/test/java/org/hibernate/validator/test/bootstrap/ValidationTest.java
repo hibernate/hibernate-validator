@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.internal.constraints.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.internal.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
@@ -84,7 +84,7 @@ public class ValidationTest {
 
 					public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 						if ( key == NotNullValidator.class ) {
-							return ( T ) new BadlyBehavedNotNullConstraintValidator();
+							return (T) new BadlyBehavedNotNullConstraintValidator();
 						}
 						return new ConstraintValidatorFactoryImpl().getInstance( key );
 					}
