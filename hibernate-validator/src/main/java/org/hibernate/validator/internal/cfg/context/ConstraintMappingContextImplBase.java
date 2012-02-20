@@ -19,13 +19,14 @@ package org.hibernate.validator.internal.cfg.context;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Base class for implementations of constraint mapping creational context types.
@@ -34,8 +35,9 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public abstract class ConstraintMappingContextImplBase {
 
-	protected final Class<?> beanClass;
+	private static final Log log = LoggerFactory.make();
 
+	protected final Class<?> beanClass;
 	protected final ConstraintMappingContext mapping;
 
 	public ConstraintMappingContextImplBase(Class<?> beanClass, ConstraintMappingContext mapping) {
@@ -46,7 +48,7 @@ public abstract class ConstraintMappingContextImplBase {
 
 	public <C> TypeConstraintMappingContext<C> type(Class<C> type) {
 
-		Contracts.assertNotNull( beanClass, "The bean type must not be null when creating a constraint mapping." );
+		Contracts.assertNotNull( beanClass, log.beanTypeMustNotBeNull() );
 
 		return new TypeConstraintMappingContextImpl<C>( type, mapping );
 	}
@@ -55,20 +57,14 @@ public abstract class ConstraintMappingContextImplBase {
 
 		Contracts.assertNotNull( property, "The property name must not be null." );
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
-
-		if ( property.length() == 0 ) {
-			throw new IllegalArgumentException( "The property name must not be empty." );
-		}
+		Contracts.assertNotEmpty( property, log.propertyNameMustNotBeEmpty() );
 
 		Member member = ReflectionHelper.getMember(
 				beanClass, property, elementType
 		);
 
 		if ( member == null ) {
-			throw new ValidationException(
-					"The class " + beanClass + " does not have a property '"
-							+ property + "' with access " + elementType
-			);
+			throw log.unableToFindPropertyWithAccess( beanClass, property, elementType );
 		}
 
 		return new PropertyConstraintMappingContextImpl( beanClass, member, mapping );
@@ -76,7 +72,7 @@ public abstract class ConstraintMappingContextImplBase {
 
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
 
-		Contracts.assertNotNull( name, "The method name must not be null." );
+		Contracts.assertNotNull( name, log.methodNameMustNotBeNull() );
 
 		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
 
@@ -88,9 +84,7 @@ public abstract class ConstraintMappingContextImplBase {
 
 			String parameterTypesAsString = sb.length() > 2 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-			throw new IllegalArgumentException(
-					String.format( "Type %s doesn't have a method %s(%s).", beanClass, name, parameterTypesAsString )
-			);
+			throw log.unableToFindMethod( beanClass, name, parameterTypesAsString );
 		}
 
 		return new MethodConstraintMappingContextImpl( beanClass, method, mapping );

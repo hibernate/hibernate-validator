@@ -20,7 +20,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Map;
-import javax.validation.ValidationException;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
@@ -28,6 +27,8 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Represents a programmatically configured constraint and meta-data
@@ -36,6 +37,8 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
  * @author Gunnar Morling
  */
 public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLocation> {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final ConstraintDefAccessor<A> constraint;
 	private final L location;
@@ -98,9 +101,7 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 			return AnnotationFactory.create( annotationDescriptor );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException(
-					"Unable to create annotation for configured constraint: " + e.getMessage(), e
-			);
+			throw log.unableToCreateAnnotationForConfiguredConstraint( e.getMessage(), e );
 		}
 	}
 

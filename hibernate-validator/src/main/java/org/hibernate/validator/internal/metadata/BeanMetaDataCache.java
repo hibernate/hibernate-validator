@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
@@ -31,6 +33,9 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class BeanMetaDataCache {
+
+	private static final Log log = LoggerFactory.make();
+
 	/**
 	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
 	 * entity.
@@ -41,15 +46,15 @@ public class BeanMetaDataCache {
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		assertNotNull( beanClass, "Class cannot be null" );
+		assertNotNull( beanClass, log.mustNotBeNull( "Class" ) );
 
 		return (BeanMetaDataImpl<T>) metadataProviders.get( beanClass );
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> addBeanMetaData(Class<T> beanClass, BeanMetaData<T> metaData) {
-		assertNotNull( beanClass, "Class cannot be null" );
-		assertNotNull( metaData, "MetaData cannot be null" );
+		assertNotNull( beanClass, log.mustNotBeNull( "Class" ) );
+		assertNotNull( metaData, log.mustNotBeNull( "MetaData" ) );
 
 		return (BeanMetaData<T>) metadataProviders.putIfAbsent( beanClass, metaData );
 	}

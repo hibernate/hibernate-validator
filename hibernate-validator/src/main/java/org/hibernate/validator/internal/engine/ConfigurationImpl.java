@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
@@ -35,6 +34,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -88,7 +88,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ConfigurationImpl(ValidationProvider<?> provider) {
 		if ( provider == null ) {
-			throw new ValidationException( "Assertion error: inconsistent ConfigurationImpl construction" );
+			throw log.inconsistentConfiguration();
 		}
 		this.providerResolver = null;
 		validationBootstrapParameters = new ValidationBootstrapParameters();
@@ -134,9 +134,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
-		if ( stream == null ) {
-			throw new IllegalArgumentException( "The stream cannot be null." );
-		}
+		
+		Contracts.assertNotNull( stream, log.parameterMustNotBeNull( "stream" ) );
+
 		validationBootstrapParameters.addMapping( stream );
 		return this;
 	}
@@ -147,10 +147,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public final HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
-		if ( mapping == null ) {
-			throw new IllegalArgumentException( "The mapping cannot be null." );
-		}
-		this.programmaticMappings.add( mapping );
+		Contracts.assertNotNull( mapping, log.parameterMustNotBeNull( "mapping" ) );
+
+		this.programmaticMappings.add(mapping);
 		return this;
 	}
 
@@ -178,7 +177,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 						}
 					}
 					if ( factory == null ) {
-						throw new ValidationException( "Unable to find provider: " + providerClass );
+						throw log.unableToFindProvider( providerClass );
 					}
 				}
 				else {

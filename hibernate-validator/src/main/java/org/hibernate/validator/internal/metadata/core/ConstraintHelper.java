@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.Constraint;
-import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
@@ -88,7 +87,10 @@ import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCha
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.URLValidator;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
@@ -100,6 +102,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * @author Gunnar Morling
  */
 public class ConstraintHelper {
+
+	private static final Log log = LoggerFactory.make();
 
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 
@@ -220,7 +224,7 @@ public class ConstraintHelper {
 		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = builtinConstraints.get( annotationClass );
 
 		if ( builtInList == null || builtInList.size() == 0 ) {
-			throw new ValidationException( "Unable to find constraints for  " + annotationClass );
+			throw log.unableToFindAnnotationConstraints( annotationClass );
 		}
 
 		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraints = newArrayList( builtInList.size() );
@@ -332,8 +336,7 @@ public class ConstraintHelper {
 		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) ) {
-				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
-				throw new ConstraintDefinitionException( msg );
+				throw log.constraintParametersCannotStartWithValid();
 			}
 		}
 	}
@@ -342,22 +345,15 @@ public class ConstraintHelper {
 		try {
 			final Method method = ReflectionHelper.getMethod( annotationType, "payload" );
 			if ( method == null ) {
-				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
-						"not contain a payload parameter.";
-				throw new ConstraintDefinitionException( msg );
+				throw log.constraintWithoutMandatoryParameter( "payload", annotationType.getName() );
 			}
 			Class<?>[] defaultPayload = (Class<?>[]) method.getDefaultValue();
 			if ( defaultPayload.length != 0 ) {
-				String msg = annotationType
-						.getName() + " contains Constraint annotation, but the payload " +
-						"parameter default value is not the empty array.";
-				throw new ConstraintDefinitionException( msg );
+				throw log.wrongDefaultValueForPayloadParameter( annotationType.getName() );
 			}
 		}
 		catch ( ClassCastException e ) {
-			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
-					"payload parameter is of wrong type.";
-			throw new ConstraintDefinitionException( msg, e );
+			throw log.wrongTypeForPayloadParameter( annotationType.getName(), e );
 		}
 	}
 
@@ -365,51 +361,32 @@ public class ConstraintHelper {
 		try {
 			final Method method = ReflectionHelper.getMethod( annotationType, "groups" );
 			if ( method == null ) {
-				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
-						"not contain a groups parameter.";
-				throw new ConstraintDefinitionException( msg );
+				throw log.constraintWithoutMandatoryParameter( "groups", annotationType.getName() );
 			}
 			Class<?>[] defaultGroups = (Class<?>[]) method.getDefaultValue();
 			if ( defaultGroups.length != 0 ) {
-				String msg = annotationType
-						.getName() + " contains Constraint annotation, but the groups " +
-						"parameter default value is not the empty array.";
-				throw new ConstraintDefinitionException( msg );
+				throw log.wrongDefaultValueForGroupsParameter( annotationType.getName() );
 			}
 		}
 		catch ( ClassCastException e ) {
-			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
-					"groups parameter is of wrong type.";
-			throw new ConstraintDefinitionException( msg, e );
+			throw log.wrongTypeForGroupsParameter( annotationType.getName(), e );
 		}
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
-		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, "message" );
-			if ( method == null ) {
-				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
-						"not contain a message parameter.";
-				throw new ConstraintDefinitionException( msg );
-			}
-			if ( method.getReturnType() != String.class ) {
-				String msg = annotationType.getName() + " contains Constraint annotation, but the message parameter " +
-						"is not of type java.lang.String.";
-				throw new ConstraintDefinitionException( msg );
-			}
+		final Method method = ReflectionHelper.getMethod( annotationType, "message" );
+		if ( method == null ) {
+			throw log.constraintWithoutMandatoryParameter( "message", annotationType.getName() );
 		}
-		catch ( ClassCastException e ) {
-			String msg = annotationType.getName() + " contains Constraint annotation, but the " +
-					"groups parameter is of wrong type.";
-			throw new ConstraintDefinitionException( msg, e );
+		if ( method.getReturnType() != String.class ) {
+			throw log.wrongTypeForMessageParameter( annotationType.getName() );
 		}
 	}
 
 	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorDefinition
 			(Class<T> annotationClass) {
-		if ( annotationClass == null ) {
-			throw new IllegalArgumentException( "Class cannot be null" );
-		}
+
+		Contracts.assertNotNull( annotationClass, log.classCannotBeNull() );
 
 		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitions.get(
 				annotationClass

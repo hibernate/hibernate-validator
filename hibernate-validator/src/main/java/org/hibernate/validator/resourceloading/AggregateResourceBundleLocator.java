@@ -26,6 +26,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * A {@link ResourceBundleLocator} implementation that provides access
  * to multiple source {@link ResourceBundle}s by merging them into one
@@ -34,6 +38,8 @@ import java.util.ResourceBundle;
  * @author Gunnar Morling
  */
 public class AggregateResourceBundleLocator extends DelegatingResourceBundleLocator {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final List<String> bundleNames;
 
@@ -65,9 +71,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate) {
 		super( delegate );
 
-		if ( bundleNames == null ) {
-			throw new IllegalArgumentException( "bundleNames must not be null." );
-		}
+		Contracts.assertNotNull( bundleNames, log.mustNotBeNull( "bundleNames" ) );
 
 		List<String> tmpBundleNames = new ArrayList<String>();
 		tmpBundleNames.addAll( bundleNames );

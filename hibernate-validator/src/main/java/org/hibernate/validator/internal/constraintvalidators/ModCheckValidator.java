@@ -24,6 +24,8 @@ import javax.validation.ConstraintValidatorContext;
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 import org.hibernate.validator.internal.util.ModUtil;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Mod check validator for MOD10 and MOD11 algorithms
@@ -35,6 +37,8 @@ import org.hibernate.validator.internal.util.ModUtil;
  * @author Hardy Ferentschik
  */
 public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequence> {
+
+	private static final Log log = LoggerFactory.make();
 
 	private static final String NUMBERS_ONLY_REGEXP = "[^0-9]";
 	private static final int DEC_RADIX = 10;
@@ -75,31 +79,19 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
 
 		if ( this.startIndex < 0 ) {
-			throw new IllegalArgumentException(
-					String.format( "Start index cannot be negative: %d", this.startIndex )
-			);
+			throw log.startIndexCannotBeNegative( this.startIndex );
 		}
 
 		if ( this.endIndex < 0 ) {
-			throw new IllegalArgumentException(
-					String.format( "End index cannot be negative: %d", this.startIndex )
-			);
+			throw log.endIndexCannotBeNegative( this.endIndex );
 		}
 
 		if ( this.startIndex > this.endIndex ) {
-			throw new IllegalArgumentException(
-					String.format( "Invalid Range: %d > %d", this.startIndex, this.endIndex )
-			);
+			throw log.invalidRange( this.startIndex, this.endIndex );
 		}
 
 		if ( checkDigitIndex > 0 && startIndex <= checkDigitIndex && endIndex > checkDigitIndex ) {
-			throw new IllegalArgumentException(
-					String.format(
-							"A explicitly specified check digit must lie outside the interval: [%d, %d]",
-							this.startIndex,
-							this.endIndex
-					)
-			);
+			throw log.invalidCheckDigit( this.startIndex, this.endIndex );
 		}
 	}
 
@@ -172,7 +164,7 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 				digits.add( Character.digit( c, DEC_RADIX ) );
 			}
 			else {
-				throw new NumberFormatException( String.format( "'%s' is not a digit", c ) );
+				throw log.characterIsNotADigit( c );
 			}
 		}
 		return digits;

@@ -32,7 +32,6 @@ import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.Payload;
-import javax.validation.ValidationException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -140,7 +139,7 @@ public class XmlMappingParser {
 
 			Class<?> clazz = getClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
-				throw new ValidationException( annotationClassName + " is not an annotation" );
+				throw log.isNotAnAnnotation( annotationClassName );
 			}
 			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
@@ -158,7 +157,7 @@ public class XmlMappingParser {
 
 
 				if ( !ConstraintValidator.class.isAssignableFrom( validatorClass ) ) {
-					throw new ValidationException( validatorClass + " is not a constraint validator class" );
+					throw log.isNotAConstraintValidatorClass( validatorClass );
 				}
 
 				constraintValidatorClasses.add( validatorClass );
@@ -185,7 +184,7 @@ public class XmlMappingParser {
 
 	private void checkClassHasNotBeenProcessed(Set<Class<?>> processedClasses, Class<?> beanClass) {
 		if ( processedClasses.contains( beanClass ) ) {
-			throw new ValidationException( beanClass.getName() + " has already be configured in xml." );
+			throw log.beanClassHasAlreadyBeConfiguredInXml( beanClass.getName() );
 		}
 	}
 
@@ -194,14 +193,14 @@ public class XmlMappingParser {
 		for ( FieldType fieldType : fields ) {
 			String fieldName = fieldType.getName();
 			if ( fieldNames.contains( fieldName ) ) {
-				throw new ValidationException( fieldName + " is defined twice in mapping xml for bean " + beanClass.getName() );
+				throw log.isDefinedTwiceInMappingXmlForBean( fieldName, beanClass.getName() );
 			}
 			else {
 				fieldNames.add( fieldName );
 			}
 			final boolean containsField = ReflectionHelper.containsDeclaredField( beanClass, fieldName );
 			if ( !containsField ) {
-				throw new ValidationException( beanClass.getName() + " does not contain the fieldType  " + fieldName );
+				throw log.beanDoesNotContainTheField( beanClass.getName(), fieldName );
 			}
 			final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
 
@@ -231,14 +230,14 @@ public class XmlMappingParser {
 		for ( GetterType getterType : getters ) {
 			String getterName = getterType.getName();
 			if ( getterNames.contains( getterName ) ) {
-				throw new ValidationException( getterName + " is defined twice in mapping xml for bean " + beanClass.getName() );
+				throw log.isDefinedTwiceInMappingXmlForBean( getterName, beanClass.getName() );
 			}
 			else {
 				getterNames.add( getterName );
 			}
 			boolean containsMethod = ReflectionHelper.containsMethodWithPropertyName( beanClass, getterName );
 			if ( !containsMethod ) {
-				throw new ValidationException( beanClass.getName() + " does not contain the property  " + getterName );
+				throw log.beanDoesNotContainTheProperty( beanClass.getName(), getterName );
 			}
 			final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
 
@@ -343,9 +342,7 @@ public class XmlMappingParser {
 			annotation = AnnotationFactory.create( annotationDescriptor );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException(
-					"Unable to create annotation for configured constraint: " + e.getMessage(), e
-			);
+			throw log.unableToCreateAnnotationForConfiguredConstraint( e.getMessage(), e );
 		}
 
 		java.lang.annotation.ElementType type = java.lang.annotation.ElementType.TYPE;
@@ -368,7 +365,7 @@ public class XmlMappingParser {
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
 		Method m = ReflectionHelper.getMethod( annotationClass, name );
 		if ( m == null ) {
-			throw new ValidationException( "Annotation of type " + annotationClass.getName() + " does not contain a parameter " + name + "." );
+			throw log.annotationDoesNotContainAParameter( annotationClass.getName(), name );
 		}
 		return m.getReturnType();
 	}
@@ -379,7 +376,7 @@ public class XmlMappingParser {
 		boolean isArray = returnType.isArray();
 		if ( !isArray ) {
 			if ( elementType.getContent().size() != 1 ) {
-				throw new ValidationException( "Attempt to specify an array where single value is expected." );
+				throw log.attemptToSpecifyAnArrayWhereSingleValueIsExpected();
 			}
 			return getSingleValue( elementType.getContent().get( 0 ), returnType );
 		}
@@ -425,11 +422,11 @@ public class XmlMappingParser {
 				returnValue = createAnnotation( annotationType, annotationClass );
 			}
 			catch ( ClassCastException e ) {
-				throw new ValidationException( "Unexpected parameter value", e );
+				throw log.unexpectedParameterValue( e );
 			}
 		}
 		else {
-			throw new ValidationException( "Unexpected parameter value" );
+			throw log.unexpectedParameterValue();
 		}
 		return returnValue;
 
@@ -453,7 +450,7 @@ public class XmlMappingParser {
 				returnValue = Byte.parseByte( value );
 			}
 			catch ( NumberFormatException e ) {
-				throw new ValidationException( "Invalid byte format", e );
+				throw log.invalidNumberFormat( "byte", e );
 			}
 		}
 		else if ( returnType.getName().equals( short.class.getName() ) ) {
@@ -461,7 +458,7 @@ public class XmlMappingParser {
 				returnValue = Short.parseShort( value );
 			}
 			catch ( NumberFormatException e ) {
-				throw new ValidationException( "Invalid short format", e );
+				throw log.invalidNumberFormat( "short", e );
 			}
 		}
 		else if ( returnType.getName().equals( int.class.getName() ) ) {
@@ -469,7 +466,7 @@ public class XmlMappingParser {
 				returnValue = Integer.parseInt( value );
 			}
 			catch ( NumberFormatException e ) {
-				throw new ValidationException( "Invalid int format", e );
+				throw log.invalidNumberFormat( "int", e );
 			}
 		}
 		else if ( returnType.getName().equals( long.class.getName() ) ) {
@@ -477,7 +474,7 @@ public class XmlMappingParser {
 				returnValue = Long.parseLong( value );
 			}
 			catch ( NumberFormatException e ) {
-				throw new ValidationException( "Invalid long format", e );
+				throw log.invalidNumberFormat( "long", e );
 			}
 		}
 		else if ( returnType.getName().equals( float.class.getName() ) ) {
@@ -485,7 +482,7 @@ public class XmlMappingParser {
 				returnValue = Float.parseFloat( value );
 			}
 			catch ( NumberFormatException e ) {
-				throw new ValidationException( "Invalid float format", e );
+				throw log.invalidNumberFormat( "float", e );
 			}
 		}
 		else if ( returnType.getName().equals( double.class.getName() ) ) {
@@ -493,7 +490,7 @@ public class XmlMappingParser {
 				returnValue = Double.parseDouble( value );
 			}
 			catch ( NumberFormatException e ) {
-				throw new ValidationException( "Invalid double format", e );
+				throw log.invalidNumberFormat( "double", e );
 			}
 		}
 		else if ( returnType.getName().equals( boolean.class.getName() ) ) {
@@ -501,7 +498,7 @@ public class XmlMappingParser {
 		}
 		else if ( returnType.getName().equals( char.class.getName() ) ) {
 			if ( value.length() != 1 ) {
-				throw new ValidationException( "Invalid char value: " + value );
+				throw log.invalidCharValue( value );
 			}
 			returnValue = value.charAt( 0 );
 		}
@@ -518,9 +515,7 @@ public class XmlMappingParser {
 				returnValue = Enum.valueOf( enumClass, value );
 			}
 			catch ( ClassCastException e ) {
-				throw new ValidationException(
-						"Invalid return type: " + returnType + ". Should be a enumeration type.", e
-				);
+				throw log.invalidReturnType( returnType, e );
 			}
 		}
 		return returnValue;
@@ -528,7 +523,7 @@ public class XmlMappingParser {
 
 	private void checkNameIsValid(String name) {
 		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw new ValidationException( MESSAGE_PARAM + ", " + GROUPS_PARAM + ", " + PAYLOAD_PARAM + " are reserved parameter names." );
+			throw log.reservedParameterNames( MESSAGE_PARAM, GROUPS_PARAM, PAYLOAD_PARAM );
 		}
 	}
 
@@ -554,7 +549,7 @@ public class XmlMappingParser {
 		for ( String groupClass : payloadType.getValue() ) {
 			Class<?> payload = getClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
-				throw new ValidationException( "Specified payload class " + payload.getName() + " does not implement javax.validation.Payload" );
+				throw log.wrongPayloadClass( payload.getName() );
 			}
 			else {
 				payloadList.add( (Class<? extends Payload>) payload );
@@ -590,7 +585,7 @@ public class XmlMappingParser {
 			constraintMappings = root.getValue();
 		}
 		catch ( JAXBException e ) {
-			throw new ValidationException( "Error parsing mapping file.", e );
+			throw log.errorParsingMappingFile( e );
 		}
 		return constraintMappings;
 	}

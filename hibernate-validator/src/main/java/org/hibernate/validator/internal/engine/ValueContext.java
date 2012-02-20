@@ -20,6 +20,10 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
  * method invocation.
@@ -28,6 +32,8 @@ import javax.validation.groups.Default;
  * @author Gunnar Morling
  */
 public class ValueContext<T, V> {
+
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
@@ -161,13 +167,11 @@ public class ValueContext<T, V> {
 	 * @param node the name of the new node. Cannot be {@code null}.
 	 */
 	public final void appendNode(String node) {
-		if ( node == null ) {
-			throw new IllegalArgumentException();
-		}
-		else {
-			propertyPath = PathImpl.createCopy( propertyPath );
-			propertyPath.addNode( node );
-		}
+
+		Contracts.assertNotNull( node, log.mustNotBeNull( "node" ) );
+		
+		propertyPath = PathImpl.createCopy( propertyPath );
+		propertyPath.addNode( node );
 	}
 
 	public final void markCurrentPropertyAsIterable() {

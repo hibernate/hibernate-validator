@@ -22,7 +22,9 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
-import javax.validation.ValidationException;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 
 /**
@@ -36,6 +38,9 @@ import javax.validation.ValidationException;
  * @author Hardy Ferentschik
  */
 public class ValueFormatterMessageInterpolator implements MessageInterpolator {
+
+	private static final Log log = LoggerFactory.make();
+
 	public static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
 	public static final String VALIDATED_VALUE_FORMAT_SEPARATOR = ":";
 
@@ -134,7 +139,7 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 	 */
 	private boolean isEscaped(String enclosingString, int charIndex) {
 		if ( charIndex < 0 || charIndex > enclosingString.length() ) {
-			throw new IndexOutOfBoundsException( "The given index must be between 0 and enclosingString.length() - 1" );
+			throw log.invalidIndex("0", "enclosingString.length() - 1");
 		}
 		return charIndex > 0 && enclosingString.charAt( charIndex - 1 ) == '\\';
 	}
@@ -158,13 +163,13 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 		else {
 			String format = expression.substring( separatorIndex + 1, expression.length() - 1 );
 			if ( format.length() == 0 ) {
-				throw new ValidationException( "Missing format string in template: " + expression );
+				throw log.missingFormatStringInTemplate( expression );
 			}
 			try {
 				interpolatedValue = String.format( locale, format, validatedValue );
 			}
 			catch ( IllegalFormatException e ) {
-				throw new ValidationException( "Invalid format: " + e.getMessage(), e );
+				throw log.invalidFormat( e.getMessage(), e );
 			}
 		}
 		return interpolatedValue;

@@ -28,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.CompositionType;
@@ -284,7 +282,7 @@ public class ConstraintTree<A extends Annotation> {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unexpected exception during isValid call", e );
+			throw log.exceptionDuringIsValidCall( e );
 		}
 		if ( !isValid ) {
 			//We do not add them these violations yet, since we don't know how they are
@@ -343,9 +341,7 @@ public class ConstraintTree<A extends Annotation> {
 				validatorClass
 		);
 		if ( constraintValidator == null ) {
-			throw new ValidationException(
-					"Constraint factory returned null when trying to create instance of " + validatorClass.getName()
-			);
+			throw log.constraintFactoryMustNotReturnNull( validatorClass.getName() );
 		}
 		initializeConstraint( descriptor, constraintValidator );
 		return constraintValidator;
@@ -384,19 +380,16 @@ public class ConstraintTree<A extends Annotation> {
 					className = clazz.getName();
 				}
 			}
-			throw new UnexpectedTypeException( "No validator could be found for type: " + className );
+			throw log.noValidatorFoundForType( className );
 		}
 		else if ( assignableClasses.size() > 1 ) {
 			StringBuilder builder = new StringBuilder();
-			builder.append( "There are multiple validator classes which could validate the type " );
-			builder.append( valueClass );
-			builder.append( ". The validator classes are: " );
 			for ( Type clazz : assignableClasses ) {
 				builder.append( clazz );
 				builder.append( ", " );
 			}
 			builder.delete( builder.length() - 2, builder.length() );
-			throw new UnexpectedTypeException( builder.toString() );
+			throw log.moreThanOneValidatorFoundForType( valueClass, builder.toString() );
 		}
 	}
 
@@ -446,7 +439,7 @@ public class ConstraintTree<A extends Annotation> {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to initialize " + constraintValidator.getClass().getName(), e );
+			throw log.unableToInitializeConstraintValidator( constraintValidator.getClass().getName(), e );
 		}
 	}
 

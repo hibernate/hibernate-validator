@@ -24,6 +24,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Factory responsible for the creation of {@link ScriptEvaluator}s. This
  * class is thread-safe.
@@ -32,6 +35,8 @@ import javax.script.ScriptException;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ScriptEvaluatorFactory {
+
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * A reference with an instance of this factory. Allows the factory to be reused several times, but can be GC'ed if required.
@@ -97,7 +102,7 @@ public class ScriptEvaluatorFactory {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {
-			throw new ScriptException( "No JSR 223 script engine found for language \"" + languageName + "\"." );
+			throw log.unableToFindScriptEngine( languageName );
 		}
 
 		return new ScriptEvaluator( engine );

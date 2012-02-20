@@ -21,6 +21,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Digits;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Validates that the <code>Number</code> being validates matches the pattern
  * defined in the constraint.
@@ -30,6 +33,8 @@ import javax.validation.constraints.Digits;
  */
 public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Number> {
 
+	private static final Log log = LoggerFactory.make();
+	
 	private int maxIntegerLength;
 	private int maxFractionLength;
 
@@ -61,10 +66,10 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 
 	private void validateParameters() {
 		if ( maxIntegerLength < 0 ) {
-			throw new IllegalArgumentException( "The length of the integer part cannot be negative." );
+			throw log.invalidLengthForIntegerPart();
 		}
 		if ( maxFractionLength < 0 ) {
-			throw new IllegalArgumentException( "The length of the fraction part cannot be negative." );
+			throw log.invalidLengthForFractionPart();
 		}
 	}
 }

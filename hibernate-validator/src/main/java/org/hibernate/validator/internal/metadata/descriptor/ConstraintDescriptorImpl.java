@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
-import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
@@ -323,10 +322,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				parameters.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch ( IllegalAccessException e ) {
-				throw new ValidationException( "Unable to read annotation attributes: " + annotation.getClass(), e );
+				throw log.unableToReadAnnotationAttributes( annotation.getClass(), e );
 			}
 			catch ( InvocationTargetException e ) {
-				throw new ValidationException( "Unable to read annotation attributes: " + annotation.getClass(), e );
+				throw log.unableToReadAnnotationAttributes( annotation.getClass(), e );
 			}
 		}
 		return Collections.unmodifiableMap( parameters );
@@ -339,10 +338,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 		// should never happen
 		catch ( IllegalAccessException e ) {
-			throw new ValidationException( "Unable to retrieve annotation parameter value.", e );
+			throw log.unableToRetrieveAnnotationParameterValue( e );
 		}
 		catch ( InvocationTargetException e ) {
-			throw new ValidationException( "Unable to retrieve annotation parameter value.", e );
+			throw log.unableToRetrieveAnnotationParameterValue( e );
 		}
 		return value;
 	}
@@ -388,15 +387,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
 		final Method method = ReflectionHelper.getMethod( overridesAttribute.constraint(), overridesAttribute.name() );
 		if ( method == null ) {
-			throw new ConstraintDefinitionException(
-					"Overridden constraint does not define an attribute with name " + overridesAttribute.name()
-			);
+			throw log.overriddenConstraintAttributeNotFound( overridesAttribute.name() );
 		}
 		Class<?> returnTypeOfOverriddenConstraint = method.getReturnType();
 		if ( !returnTypeOfOverriddenConstraint.equals( m.getReturnType() ) ) {
-			String message = "The overriding type of a composite constraint must be identical to the overridden one. Expected " + returnTypeOfOverriddenConstraint
-					.getName() + " found " + m.getReturnType();
-			throw new ConstraintDefinitionException( message );
+			throw log.wrongAttributeTypeForOverriddenConstraint(
+					returnTypeOfOverriddenConstraint.getName(),
+					m.getReturnType()
+			);
 		}
 	}
 

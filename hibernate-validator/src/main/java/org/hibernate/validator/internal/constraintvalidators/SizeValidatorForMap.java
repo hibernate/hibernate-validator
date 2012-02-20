@@ -21,12 +21,18 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Check that a string's length is between min and max.
  *
  * @author Hardy Ferentschik
  */
 public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>> {
+
+	private static final Log log = LoggerFactory.make();
+
 	private int min;
 	private int max;
 
@@ -56,13 +62,13 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw new IllegalArgumentException( "The min parameter cannot be negative." );
+			throw log.maxCannotBeNegative();
 		}
 		if ( max < 0 ) {
-			throw new IllegalArgumentException( "The max parameter cannot be negative." );
+			throw log.maxCannotBeNegative();
 		}
 		if ( max < min ) {
-			throw new IllegalArgumentException( "The length cannot be negative." );
+			throw log.lengthCannotBeNegative();
 		}
 	}
 }

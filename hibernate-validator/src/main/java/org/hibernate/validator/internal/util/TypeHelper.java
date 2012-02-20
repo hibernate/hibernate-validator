@@ -35,7 +35,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.ConstraintValidator;
-import javax.validation.ValidationException;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Provides utility methods for working with types.
@@ -46,6 +48,7 @@ import javax.validation.ValidationException;
 public final class TypeHelper {
 	private static final Map<Class<?>, Set<Class<?>>> SUBTYPES_BY_PRIMITIVE;
 	private static final int VALIDATOR_TYPE_INDEX = 1;
+	private static final Log log = LoggerFactory.make();
 
 	static {
 		Map<Class<?>, Set<Class<?>>> subtypesByPrimitive = new HashMap<Class<?>, Set<Class<?>>>();
@@ -303,7 +306,7 @@ public final class TypeHelper {
 		//we now have all bind from a type to its resolution at one level
 		Type validatorType = ( (ParameterizedType) constraintValidatorType ).getActualTypeArguments()[VALIDATOR_TYPE_INDEX];
 		if ( validatorType == null ) {
-			throw new ValidationException( "null is an invalid type for a constraint validator." );
+			throw log.nullIsAnInvalidTypeForAConstraintValidator();
 		}
 		else if ( validatorType instanceof GenericArrayType ) {
 			validatorType = TypeHelper.getArrayType( TypeHelper.getComponentType( validatorType ) );
@@ -575,7 +578,7 @@ public final class TypeHelper {
 			Type actualTypeArgument = actualTypeArgumentsByParameter.get( typeParameter );
 
 			if ( actualTypeArgument == null ) {
-				throw new IllegalArgumentException( "Missing actual type argument for type parameter: " + typeParameter );
+				throw log.missingActualTypeArgumentForTypeParameter( typeParameter );
 			}
 
 			actualTypeArguments[i] = actualTypeArgument;

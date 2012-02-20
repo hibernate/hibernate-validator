@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.GroupDefinitionException;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
@@ -45,6 +44,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -56,6 +57,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  * @author Gunnar Morling
  */
 public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBase {
+
+	private static final Log log  = LoggerFactory.make();
 
 	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
@@ -308,7 +311,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
 			if ( context.getDefaultGroupSequenceProvider( clazz ) != null ) {
 				if ( mergedContext.getDefaultGroupSequenceProvider( clazz ) != null ) {
-					throw new GroupDefinitionException( "Multiple definitions of default group sequence provider" );
+					throw log.multipleDefinitionOfDefaultGroupSequenceProvider();
 				}
 				mergedContext.addDefaultGroupSequenceProvider(
 						clazz,
@@ -318,7 +321,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 			if ( context.getDefaultSequence( clazz ) != null ) {
 				if ( mergedContext.getDefaultSequence( clazz ) != null ) {
-					throw new GroupDefinitionException( "Multiple definitions of default group sequence" );
+					throw log.multipleDefinitionOfDefaultGroupSequence();
 				}
 				mergedContext.addDefaultGroupSequence(
 						clazz,

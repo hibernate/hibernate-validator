@@ -32,7 +32,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
@@ -49,6 +48,8 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
@@ -65,6 +66,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ValidatorImpl implements Validator, MethodValidator {
+
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The default group array used in case any of the validate methods is called without a group.
@@ -114,9 +117,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
-		if ( object == null ) {
-			throw new IllegalArgumentException( "Validation of a null object" );
-		}
+
+		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -130,9 +132,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
-		if ( object == null ) {
-			throw new IllegalArgumentException( "Validated object cannot be null." );
-		}
+
+		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
+
 		sanityCheckPropertyPath( propertyName );
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -148,9 +150,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
-		if ( beanType == null ) {
-			throw new IllegalArgumentException( "The bean type cannot be null." );
-		}
+
+		Contracts.assertNotNull( beanType, log.beanTypeCannotBeNull() );
 
 		sanityCheckPropertyPath( propertyName );
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
@@ -168,8 +169,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
 
-		Contracts.assertNotNull( object, "The object to be validated must not be null" );
-		Contracts.assertNotNull( method, "The method to be validated must not be null" );
+		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
+		Contracts.assertNotNull( method, log.validatedMethodMustNotBeNull() );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -193,8 +194,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 
-		Contracts.assertNotNull( object, "The object to be validated must not be null" );
-		Contracts.assertNotNull( method, "The method to be validated must not be null" );
+		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
+		Contracts.assertNotNull( method, log.validatedMethodMustNotBeNull() );
 
 		//this might be the case for parameterless methods
 		if ( parameterValues == null ) {
@@ -219,7 +220,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
 
-		Contracts.assertNotNull( method, "The method to be validated must not be null" );
+		Contracts.assertNotNull( method, log.validatedMethodMustNotBeNull() );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -249,20 +250,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		if ( type.isAssignableFrom( getClass() ) ) {
 			return type.cast( this );
 		}
-
-		throw new ValidationException( "Type " + type + " not supported" );
+		throw log.typeNotSupported( type );
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {
 		if ( propertyName == null || propertyName.length() == 0 ) {
-			throw new IllegalArgumentException( "Invalid property path." );
+			throw log.invalidPropertyPath();
 		}
 	}
 
 	private GroupChain determineGroupExecutionOrder(Class<?>[] groups) {
-		if ( groups == null ) {
-			throw new IllegalArgumentException( "null passed as group name" );
-		}
+
+		Contracts.assertNotNull( groups, log.groupMustNotBeNull() );
 
 		Class<?>[] tmpGroups = groups;
 		// if no groups is specified use the default
@@ -622,7 +621,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 
 		if ( valueContext.getCurrentBean() == null ) {
-			throw new IllegalArgumentException( "Invalid property path." );
+			throw log.invalidPropertyPath();
 		}
 
 		if ( metaConstraints.size() == 0 ) {
@@ -1138,10 +1137,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		BeanMetaData<?> metaData = beanMetaDataManager.getBeanMetaData( clazz );
 		//use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( !metaData.isPropertyPresent( elem.getName() ) ) {
-			throw new IllegalArgumentException(
-					"Invalid property path. There is no property " + elem.getName() + " in entity "
-							+ metaData.getBeanClass().getName()
-			);
+			throw log.invalidPropertyPath( elem.getName(), metaData.getBeanClass().getName() );
 		}
 
 		if ( !propertyIter.hasNext() ) {
@@ -1169,7 +1165,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 							newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
 						}
 						else if ( newValue != null ) {
-							throw new IllegalArgumentException( "Property path must provide index or map key" );
+							throw log.propertyPathMustProvideIndexOrMapKey();
 						}
 						type = ReflectionHelper.getIndexedType( type );
 					}
@@ -1230,7 +1226,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			);
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Call to TraversableResolver.isReachable() threw an exception", e );
+			throw log.errorDuringCallOfTraversableResolverIsReachable( e );
 		}
 
 		return isReachable;
@@ -1259,7 +1255,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				);
 			}
 			catch ( RuntimeException e ) {
-				throw new ValidationException( "Call to TraversableResolver.isReachable() threw an exception", e );
+				throw log.errorDuringCallOfTraversableResolverIsReachable( e );
 			}
 		}
 
@@ -1277,7 +1273,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				);
 			}
 			catch ( RuntimeException e ) {
-				throw new ValidationException( "Call to TraversableResolver.isCascadable() threw an exception", e );
+				throw log.errorDuringCallOfTraversableResolverIsCascadable( e );
 			}
 		}
 

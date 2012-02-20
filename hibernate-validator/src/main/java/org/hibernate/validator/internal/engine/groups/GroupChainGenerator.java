@@ -21,9 +21,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
-import javax.validation.ValidationException;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Helper class used to resolve groups and sequences into a single chain of groups which can then be validated.
@@ -32,6 +33,8 @@ import javax.validation.ValidationException;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class GroupChainGenerator {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final ConcurrentMap<Class<?>, List<Group>> resolvedSequences = new ConcurrentHashMap<Class<?>, List<Group>>();
 
@@ -44,12 +47,12 @@ public class GroupChainGenerator {
 	 */
 	public GroupChain getGroupChainFor(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
-			throw new IllegalArgumentException( "At least one groups has to be specified." );
+			throw log.atLeastOneGroupHasToBeSpecified();
 		}
 
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
-				throw new ValidationException( "A group has to be an interface. " + clazz.getName() + " is not." );
+				throw log.groupHasToBeAnInterface( clazz.getName() );
 			}
 		}
 
@@ -114,9 +117,7 @@ public class GroupChainGenerator {
 	private void addInheritedGroups(Group group, List<Group> expandedGroups) {
 		for ( Class<?> inheritedGroup : group.getGroup().getInterfaces() ) {
 			if ( isGroupSequence( inheritedGroup ) ) {
-				throw new GroupDefinitionException(
-						"Sequence definitions are not allowed as composing parts of a sequence."
-				);
+				throw log.sequenceDefinitionsNotAllowed();
 			}
 			Group g = new Group( inheritedGroup, group.getSequence() );
 			expandedGroups.add( g );
@@ -126,7 +127,7 @@ public class GroupChainGenerator {
 
 	private List<Group> resolveSequence(Class<?> group, List<Class<?>> processedSequences) {
 		if ( processedSequences.contains( group ) ) {
-			throw new GroupDefinitionException( "Cyclic dependency in groups definition" );
+			throw log.cyclicDependencyInGroupsDefinition();
 		}
 		else {
 			processedSequences.add( group );
@@ -152,7 +153,7 @@ public class GroupChainGenerator {
 		for ( Group tmpGroup : groups ) {
 			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence
 					.size() - 1 ) {
-				throw new GroupDefinitionException( "Unable to expand group sequence." );
+				throw log.unableToExpandGroupSequence();
 			}
 			resolvedGroupSequence.add( tmpGroup );
 		}

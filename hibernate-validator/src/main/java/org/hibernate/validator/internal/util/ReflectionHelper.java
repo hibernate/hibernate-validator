@@ -36,8 +36,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ValidationException;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
@@ -62,6 +63,9 @@ import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class ReflectionHelper {
+
+	private static final Log log = LoggerFactory.make();
+
 	private static String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
 
 	/**
@@ -214,16 +218,15 @@ public final class ReflectionHelper {
 	 * @return the member which matching the name and type or {@code null} if no such member exists.
 	 */
 	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
-		if ( clazz == null ) {
-			throw new IllegalArgumentException( "The class cannot be null" );
-		}
+		
+		Contracts.assertNotNull( clazz, log.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
-			throw new IllegalArgumentException( "Property name cannot be null or empty" );
+			throw log.propertyNameCannotBeNullOrEmpty();
 		}
 
 		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
-			throw new IllegalArgumentException( "Element type has to be FIELD or METHOD" );
+			throw log.elementTypeHasToBeFieldOrMethod();
 		}
 
 		Member member = null;
@@ -289,7 +292,7 @@ public final class ReflectionHelper {
 			type = ( (Method) member ).getGenericReturnType();
 		}
 		else {
-			throw new IllegalArgumentException( "Member " + member + " is neither a field nor a method" );
+			throw log.memberIsNeitherAFieldNorAMethod( member );
 		}
 		if ( type instanceof TypeVariable ) {
 			type = TypeHelper.getErasedType( type );
@@ -325,10 +328,10 @@ public final class ReflectionHelper {
 				value = method.invoke( object );
 			}
 			catch ( IllegalAccessException e ) {
-				throw new ValidationException( "Unable to access " + method.getName(), e );
+				throw log.unableToAccessMember( method.getName(), e );
 			}
 			catch ( InvocationTargetException e ) {
-				throw new ValidationException( "Unable to access " + method.getName(), e );
+				throw log.unableToAccessMember( method.getName(), e );
 			}
 		}
 		else if ( member instanceof Field ) {
@@ -337,7 +340,7 @@ public final class ReflectionHelper {
 				value = field.get( object );
 			}
 			catch ( IllegalAccessException e ) {
-				throw new ValidationException( "Unable to access " + field.getName(), e );
+				throw log.unableToAccessMember( field.getName(), e );
 			}
 		}
 		return value;
@@ -669,9 +672,8 @@ public final class ReflectionHelper {
 	 */
 	public static boolean haveSameSignature(Method method1, Method method2) {
 
-		if ( method1 == null || method2 == null ) {
-			throw new IllegalArgumentException( "method1 and method2 must not be null" );
-		}
+		Contracts.assertNotNull( method1, log.mustNotBeNull( "method1" ) );
+		Contracts.assertNotNull( method2, log.mustNotBeNull( "method2" ) );
 
 		return
 				method1.getName().equals( method2.getName() ) &&
@@ -689,7 +691,7 @@ public final class ReflectionHelper {
 	 */
 	public static Class<?> boxedType(Type primitiveType) {
 		if ( !( primitiveType instanceof Class ) && !( (Class<?>) primitiveType ).isPrimitive() ) {
-			throw new IllegalArgumentException( primitiveType.getClass() + "has to be a primitive type" );
+			throw log.hasToBeAPrimitiveType( primitiveType.getClass() );
 		}
 
 		if ( primitiveType == boolean.class ) {
@@ -717,7 +719,7 @@ public final class ReflectionHelper {
 			return Byte.class;
 		}
 		else {
-			throw new RuntimeException( "Unhandled primitive type." );
+			throw log.unhandledPrimitiveType();
 		}
 	}
 

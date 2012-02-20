@@ -20,7 +20,6 @@ import java.util.List;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.spi.ConfigurationState;
 
@@ -32,6 +31,8 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMappingMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlConfigurationMetaDataProvider;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
@@ -45,6 +46,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
@@ -115,7 +118,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( HibernateValidatorFactory.class.equals( type ) ) {
 			return type.cast( this );
 		}
-		throw new ValidationException( "Type " + type + " not supported" );
+		throw log.typeNotSupported( type );
 	}
 
 	public HibernateValidatorContext usingContext() {
@@ -134,10 +137,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( failFastPropValue != null ) {
 			boolean tmpFailFast = Boolean.valueOf( failFastPropValue );
 			if ( programmaticConfiguredFailFast && !tmpFailFast ) {
-				throw new ValidationException(
-						"Inconsistent fail fast configuration. Fail fast enabled via programmatic API, " +
-								"but explicitly disabled via properties"
-				);
+				throw log.inconsistentFailFastConfiguration();
 			}
 			failFast = tmpFailFast;
 		}

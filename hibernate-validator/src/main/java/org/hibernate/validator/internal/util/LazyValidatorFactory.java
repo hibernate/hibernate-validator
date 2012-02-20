@@ -175,14 +175,10 @@ public class LazyValidatorFactory implements ValidatorFactory {
 					providers.add( (ValidationProvider) providerClass.newInstance() );
 				}
 				catch ( IllegalAccessException e ) {
-					throw new ValidationException(
-							"Unable to instantiate Bean Validation provider" + providerNames, e
-					);
+					throw log.unableToInstantiateBeanValidationProvider( providerNames, e );
 				}
 				catch ( InstantiationException e ) {
-					throw new ValidationException(
-							"Unable to instantiate Bean Validation provider" + providerNames, e
-					);
+					throw log.unableToInstantiateBeanValidationProvider( providerNames, e );
 				}
 			}
 			return providers;
@@ -212,7 +208,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 				}
 			}
 			catch ( IOException e ) {
-				throw new ValidationException( "Unable to read " + SERVICES_FILE, e );
+				throw log.unableToReadServicesFile( SERVICES_FILE, e );
 			}
 
 			// we want to make sure that Hibernate Validator is in the list and on the first position. This

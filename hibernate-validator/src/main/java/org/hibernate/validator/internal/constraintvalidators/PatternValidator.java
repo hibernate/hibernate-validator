@@ -22,10 +22,15 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * @author Hardy Ferentschik
  */
 public class PatternValidator implements ConstraintValidator<Pattern, CharSequence> {
+
+	private static final Log log = LoggerFactory.make();
 
 	private java.util.regex.Pattern pattern;
 
@@ -40,7 +45,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 			pattern = java.util.regex.Pattern.compile( parameters.regexp(), intFlag );
 		}
 		catch ( PatternSyntaxException e ) {
-			throw new IllegalArgumentException( "Invalid regular expression.", e );
+			throw log.invalidRegularExpression( e );
 		}
 	}
 

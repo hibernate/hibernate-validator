@@ -22,6 +22,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -34,6 +36,8 @@ public final class ParameterConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ParameterConstraintMappingContext {
 
+	private static final Log log = LoggerFactory.make();
+	
 	private final Method method;
 	private final int parameterIndex;
 
@@ -42,7 +46,7 @@ public final class ParameterConstraintMappingContextImpl
 		super( beanClass, mapping );
 
 		if ( parameterIndex < 0 || parameterIndex >= method.getParameterTypes().length ) {
-			throw new IllegalArgumentException( "A valid parameter index has to be specified for method '" + method.getName() + "'" );
+			throw log.invalidMethodParameterIndex( method.getName() );
 		}
 
 		this.method = method;

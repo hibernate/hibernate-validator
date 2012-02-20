@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -302,9 +301,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
-			throw new GroupDefinitionException(
-					"Default group sequence and default group sequence provider cannot be defined at the same time."
-			);
+			throw log.invalidDefaultGroupSequenceDefinition();
 		}
 
 		if ( defaultGroupSequenceProvider != null ) {
@@ -378,7 +375,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					groupSequenceContainsDefault = true;
 				}
 				else if ( group.getName().equals( Default.class.getName() ) ) {
-					throw new GroupDefinitionException( "'Default.class' cannot appear in default group sequence list." );
+					throw log.noDefaultGroupInGroupSequence();
 				}
 				else {
 					validDefaultGroupSequence.add( group );
@@ -386,7 +383,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 		if ( !groupSequenceContainsDefault ) {
-			throw new GroupDefinitionException( beanClass.getName() + " must be part of the redefined default group sequence." );
+			throw log.beanClassMustBePartOfRedefinedDefaultGroupSequence( beanClass.getName() );
 		}
 		if ( log.isTraceEnabled() ) {
 			log.tracef(
@@ -417,9 +414,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		throw new GroupDefinitionException(
-				"The default group sequence provider defined for " + beanClass.getName() + " has the wrong type"
-		);
+		throw log.wrongDefaultGroupSequenceProviderType( beanClass.getName() );
 	}
 
 	private Partitioner<ElementType, MetaConstraint<?>> byElementType() {

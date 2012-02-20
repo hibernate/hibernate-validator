@@ -21,7 +21,9 @@ package org.hibernate.validator.internal.util.privilegedactions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivilegedAction;
-import javax.validation.ValidationException;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Execute instance creation as privileged action.
@@ -30,6 +32,9 @@ import javax.validation.ValidationException;
  * @author Hardy Ferentschik
  */
 public final class ConstructorInstance<T> implements PrivilegedAction<T> {
+
+	private static final Log log = LoggerFactory.make();
+
 	private final Constructor<T> constructor;
 	private final Object[] initArgs;
 
@@ -47,16 +52,16 @@ public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 			return constructor.newInstance( initArgs );
 		}
 		catch ( InstantiationException e ) {
-			throw new ValidationException( "Unable to instantiate" + constructor.getName(), e );
+			throw log.unableToInstantiate( constructor.getName(), e );
 		}
 		catch ( IllegalAccessException e ) {
-			throw new ValidationException( "Unable to instantiate" + constructor.getName(), e );
+			throw log.unableToInstantiate( constructor.getName(), e );
 		}
 		catch ( InvocationTargetException e ) {
-			throw new ValidationException( "Unable to instantiate" + constructor.getName(), e );
+			throw log.unableToInstantiate( constructor.getName(), e );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to instantiate" + constructor.getName(), e );
+			throw log.unableToInstantiate( constructor.getName(), e );
 		}
 	}
 }

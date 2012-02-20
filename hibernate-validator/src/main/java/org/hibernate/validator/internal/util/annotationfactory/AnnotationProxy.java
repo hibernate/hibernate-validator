@@ -27,7 +27,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
-
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * A concrete implementation of <code>Annotation</code> that pretends it is a
@@ -56,9 +57,10 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 public class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 	private static final long serialVersionUID = 6907601010599429454L;
+	private static final Log log = LoggerFactory.make();
+
 	private final Class<? extends Annotation> annotationType;
 	private final Map<String, Object> values;
-
 
 	public AnnotationProxy(AnnotationDescriptor<?> descriptor) {
 		this.annotationType = descriptor.type();
@@ -78,7 +80,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 				result.put( m.getName(), m.getDefaultValue() );
 			}
 			else {
-				throw new IllegalArgumentException( "No value provided for " + m.getName() );
+				throw log.noValueProvidedForAnnotationParameter( m.getName() );
 			}
 		}
 		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
@@ -86,7 +88,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 			Set<String> unknownParameters = descriptor.getElements().keySet();
 			unknownParameters.removeAll( result.keySet() );
 
-			throw new RuntimeException( "Trying to instantiate " + annotationType + " with unknown parameter(s): " + unknownParameters );
+			throw log.tryingToInstantiateAnnotationWithUnknownParameters( annotationType, unknownParameters );
 		}
 		return result;
 	}
