@@ -58,7 +58,7 @@ public class LengthValidator implements ConstraintValidator<Length, CharSequence
 			throw log.maxCannotBeNegative();
 		}
 		if ( max < min ) {
-			log.lengthCannotBeNegative();
+			throw log.lengthCannotBeNegative();
 		}
 	}
 }

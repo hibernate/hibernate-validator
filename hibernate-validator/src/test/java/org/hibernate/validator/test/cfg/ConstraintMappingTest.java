@@ -68,7 +68,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "The mapping cannot be null."
+			expectedExceptionsMessageRegExp = "The parameter \"mapping\" must not be null."
 	)
 	public void testNullConstraintMapping() {
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -227,7 +227,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "The class class org.hibernate.validator.test.cfg.Marathon does not have a property 'numberOfHelpers' with access METHOD"
+			expectedExceptionsMessageRegExp = "HV[0-9]*: The class class org.hibernate.validator.test.cfg.Marathon does not have a property 'numberOfHelpers' with access METHOD."
 	)
 	public void testSingleConstraintWrongAccessType() throws Throwable {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -284,7 +284,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time."
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -301,7 +301,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time."
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -315,7 +315,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Default group sequence and default group sequence provider cannot be defined at the same time."
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
 		ConstraintMapping mapping = new ConstraintMapping();

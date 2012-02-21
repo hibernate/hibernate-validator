@@ -97,7 +97,7 @@ public class MethodConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "Type .*GreetingService doesn't have a method greet().*"
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Type .*GreetingService doesn't have a method greet().*"
 	)
 	public void testCascadingDefinitionOnMissingMethod() {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -111,7 +111,7 @@ public class MethodConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "A valid parameter index has to be specified for method 'greet'"
+			expectedExceptionsMessageRegExp = "HV[0-9]*: A valid parameter index has to be specified for method 'greet'"
 	)
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
 		ConstraintMapping mapping = new ConstraintMapping();

@@ -225,7 +225,7 @@ public class FailFastTest {
 	}
 
 	@Test(expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "Inconsistent fail fast configuration.*")
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Inconsistent fail fast configuration.*")
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastSetWithInconsistentConfiguration() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );

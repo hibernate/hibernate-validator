@@ -205,7 +205,7 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "Missing format string in template:.*"
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Missing format string in template:.*"
 	)
 	public void testMissingFormatString() {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -234,7 +234,7 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "Invalid format:.*"
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Invalid format:.*"
 	)
 	public void testIllegalFormat() {
 		ConstraintMapping mapping = new ConstraintMapping();

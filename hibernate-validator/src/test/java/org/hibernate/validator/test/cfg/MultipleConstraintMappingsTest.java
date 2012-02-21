@@ -106,7 +106,7 @@ public class MultipleConstraintMappingsTest {
 
 	@TestForIssue(jiraKey = "HV-500")
 	@Test(expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Multiple definitions of default group sequence")
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Multiple definitions of default group sequence.")
 	public void testMultipleConstraintMappingsWithGroupSequenceForSameClass() {
 		ConstraintMapping marathonMapping1 = new ConstraintMapping();
 		marathonMapping1.type( Marathon.class )
@@ -122,7 +122,7 @@ public class MultipleConstraintMappingsTest {
 
 	@TestForIssue(jiraKey = "HV-500")
 	@Test(expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "Multiple definitions of default group sequence provider")
+			expectedExceptionsMessageRegExp = "HV[0-9]*: Multiple definitions of default group sequence provider.")
 	public void testMultipleConstraintMappingsWithGroupSequenceProviderForSameClass() {
 		ConstraintMapping marathonMapping1 = new ConstraintMapping();
 		marathonMapping1.type( Marathon.class )
