@@ -168,7 +168,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <packageName>org.hibernate.validator.internal.xml</packageName>
+                    <packageName>org.hibernate.validator.impl.xml</packageName>
                     <outputDirectory>${basedir}/target/generated-sources</outputDirectory>
                     <extension>true</extension>
                 </configuration>
@@ -315,7 +315,7 @@
                             <expression>${project.version}</expression>
                             <targetMembers>
                                 <methodBodyReturn>
-                                    <className>org.hibernate.validator.internal.util.Version</className>
+                                    <className>org.hibernate.validator.impl.util.Version</className>
                                     <methodName>getVersionString</methodName>
                                 </methodBodyReturn>
                             </targetMembers>

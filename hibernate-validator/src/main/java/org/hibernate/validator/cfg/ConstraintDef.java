@@ -38,7 +38,7 @@ import javax.validation.Payload;
 public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Annotation> {
 
 	// Note on visibility of members: These members are intentionally made
-	// protected and published by a sub-class for internal use. There aren't
+	// protected and published by a sub-class for impl use. There aren't
 	// public getters as they would pollute the fluent definition API.
 
 	/**

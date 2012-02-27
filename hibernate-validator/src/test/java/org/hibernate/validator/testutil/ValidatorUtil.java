@@ -33,7 +33,7 @@ import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.impl.util.Contracts.assertNotNull;
 
 /**
  * A helper providing useful functions for setting up validators.
