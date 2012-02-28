@@ -101,7 +101,7 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 			return AnnotationFactory.create( annotationDescriptor );
 		}
 		catch ( RuntimeException e ) {
-			throw log.unableToCreateAnnotationForConfiguredConstraint( e.getMessage(), e );
+			throw log.throwUnableToCreateAnnotationForConfiguredConstraint( e.getMessage(), e );
 		}
 	}
 

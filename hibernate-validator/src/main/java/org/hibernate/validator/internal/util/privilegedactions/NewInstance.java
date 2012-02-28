@@ -48,13 +48,13 @@ public final class NewInstance<T> implements PrivilegedAction<T> {
 			return clazz.newInstance();
 		}
 		catch ( InstantiationException e ) {
-			throw log.unableToInstantiate( message, clazz, e );
+			throw log.throwUnableToInstantiate( message, clazz, e );
 		}
 		catch ( IllegalAccessException e ) {
-			throw log.unableToInstantiate( clazz, e );
+			throw log.throwUnableToInstantiate( clazz, e );
 		}
 		catch ( RuntimeException e ) {
-			throw log.unableToInstantiate( clazz, e );
+			throw log.throwUnableToInstantiate( clazz, e );
 		}
 	}
 }

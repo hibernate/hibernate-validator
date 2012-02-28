@@ -52,16 +52,16 @@ public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 			return constructor.newInstance( initArgs );
 		}
 		catch ( InstantiationException e ) {
-			throw log.unableToInstantiate( constructor.getName(), e );
+			throw log.throwUnableToInstantiate( constructor.getName(), e );
 		}
 		catch ( IllegalAccessException e ) {
-			throw log.unableToInstantiate( constructor.getName(), e );
+			throw log.throwUnableToInstantiate( constructor.getName(), e );
 		}
 		catch ( InvocationTargetException e ) {
-			throw log.unableToInstantiate( constructor.getName(), e );
+			throw log.throwUnableToInstantiate( constructor.getName(), e );
 		}
 		catch ( RuntimeException e ) {
-			throw log.unableToInstantiate( constructor.getName(), e );
+			throw log.throwUnableToInstantiate( constructor.getName(), e );
 		}
 	}
 }

@@ -66,10 +66,10 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 
 	private void validateParameters() {
 		if ( maxIntegerLength < 0 ) {
-			throw log.invalidLengthForIntegerPart();
+			throw log.throwInvalidLengthForIntegerPart();
 		}
 		if ( maxFractionLength < 0 ) {
-			throw log.invalidLengthForFractionPart();
+			throw log.throwInvalidLengthForFractionPart();
 		}
 	}
 }

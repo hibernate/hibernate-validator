@@ -222,11 +222,11 @@ public final class ReflectionHelper {
 		Contracts.assertNotNull( clazz, log.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
-			throw log.propertyNameCannotBeNullOrEmpty();
+			throw log.throwPropertyNameCannotBeNullOrEmpty();
 		}
 
 		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
-			throw log.elementTypeHasToBeFieldOrMethod();
+			throw log.throwElementTypeHasToBeFieldOrMethod();
 		}
 
 		Member member = null;
@@ -292,7 +292,7 @@ public final class ReflectionHelper {
 			type = ( (Method) member ).getGenericReturnType();
 		}
 		else {
-			throw log.memberIsNeitherAFieldNorAMethod( member );
+			throw log.throwMemberIsNeitherAFieldNorAMethod( member );
 		}
 		if ( type instanceof TypeVariable ) {
 			type = TypeHelper.getErasedType( type );
@@ -328,10 +328,10 @@ public final class ReflectionHelper {
 				value = method.invoke( object );
 			}
 			catch ( IllegalAccessException e ) {
-				throw log.unableToAccessMember( method.getName(), e );
+				throw log.throwUnableToAccessMember( method.getName(), e );
 			}
 			catch ( InvocationTargetException e ) {
-				throw log.unableToAccessMember( method.getName(), e );
+				throw log.throwUnableToAccessMember( method.getName(), e );
 			}
 		}
 		else if ( member instanceof Field ) {
@@ -340,7 +340,7 @@ public final class ReflectionHelper {
 				value = field.get( object );
 			}
 			catch ( IllegalAccessException e ) {
-				throw log.unableToAccessMember( field.getName(), e );
+				throw log.throwUnableToAccessMember( field.getName(), e );
 			}
 		}
 		return value;
@@ -691,7 +691,7 @@ public final class ReflectionHelper {
 	 */
 	public static Class<?> boxedType(Type primitiveType) {
 		if ( !( primitiveType instanceof Class ) && !( (Class<?>) primitiveType ).isPrimitive() ) {
-			throw log.hasToBeAPrimitiveType( primitiveType.getClass() );
+			throw log.throwHasToBeAPrimitiveType( primitiveType.getClass() );
 		}
 
 		if ( primitiveType == boolean.class ) {
@@ -719,7 +719,7 @@ public final class ReflectionHelper {
 			return Byte.class;
 		}
 		else {
-			throw log.unhandledPrimitiveType();
+			throw log.throwUnhandledPrimitiveType();
 		}
 	}
 

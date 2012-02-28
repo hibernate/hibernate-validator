@@ -88,7 +88,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public ConfigurationImpl(ValidationProvider<?> provider) {
 		if ( provider == null ) {
-			throw log.inconsistentConfiguration();
+			throw log.throwInconsistentConfiguration();
 		}
 		this.providerResolver = null;
 		validationBootstrapParameters = new ValidationBootstrapParameters();
@@ -177,7 +177,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 						}
 					}
 					if ( factory == null ) {
-						throw log.unableToFindProvider( providerClass );
+						throw log.throwUnableToFindProvider( providerClass );
 					}
 				}
 				else {

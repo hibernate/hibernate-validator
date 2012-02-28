@@ -322,10 +322,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				parameters.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch ( IllegalAccessException e ) {
-				throw log.unableToReadAnnotationAttributes( annotation.getClass(), e );
+				throw log.throwUnableToReadAnnotationAttributes( annotation.getClass(), e );
 			}
 			catch ( InvocationTargetException e ) {
-				throw log.unableToReadAnnotationAttributes( annotation.getClass(), e );
+				throw log.throwUnableToReadAnnotationAttributes( annotation.getClass(), e );
 			}
 		}
 		return Collections.unmodifiableMap( parameters );
@@ -338,10 +338,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 		// should never happen
 		catch ( IllegalAccessException e ) {
-			throw log.unableToRetrieveAnnotationParameterValue( e );
+			throw log.throwUnableToRetrieveAnnotationParameterValue( e );
 		}
 		catch ( InvocationTargetException e ) {
-			throw log.unableToRetrieveAnnotationParameterValue( e );
+			throw log.throwUnableToRetrieveAnnotationParameterValue( e );
 		}
 		return value;
 	}
@@ -387,11 +387,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
 		final Method method = ReflectionHelper.getMethod( overridesAttribute.constraint(), overridesAttribute.name() );
 		if ( method == null ) {
-			throw log.overriddenConstraintAttributeNotFound( overridesAttribute.name() );
+			throw log.throwOverriddenConstraintAttributeNotFound( overridesAttribute.name() );
 		}
 		Class<?> returnTypeOfOverriddenConstraint = method.getReturnType();
 		if ( !returnTypeOfOverriddenConstraint.equals( m.getReturnType() ) ) {
-			throw log.wrongAttributeTypeForOverriddenConstraint(
+			throw log.throwWrongAttributeTypeForOverriddenConstraint(
 					returnTypeOfOverriddenConstraint.getName(),
 					m.getReturnType()
 			);

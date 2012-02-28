@@ -224,7 +224,7 @@ public class ConstraintHelper {
 		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = builtinConstraints.get( annotationClass );
 
 		if ( builtInList == null || builtInList.size() == 0 ) {
-			throw log.unableToFindAnnotationConstraints( annotationClass );
+			throw log.throwUnableToFindAnnotationConstraints( annotationClass );
 		}
 
 		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraints = newArrayList( builtInList.size() );
@@ -336,7 +336,7 @@ public class ConstraintHelper {
 		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) ) {
-				throw log.constraintParametersCannotStartWithValid();
+				throw log.throwConstraintParametersCannotStartWithValid();
 			}
 		}
 	}
@@ -345,15 +345,15 @@ public class ConstraintHelper {
 		try {
 			final Method method = ReflectionHelper.getMethod( annotationType, "payload" );
 			if ( method == null ) {
-				throw log.constraintWithoutMandatoryParameter( "payload", annotationType.getName() );
+				throw log.throwConstraintWithoutMandatoryParameter( "payload", annotationType.getName() );
 			}
 			Class<?>[] defaultPayload = (Class<?>[]) method.getDefaultValue();
 			if ( defaultPayload.length != 0 ) {
-				throw log.wrongDefaultValueForPayloadParameter( annotationType.getName() );
+				throw log.throwWrongDefaultValueForPayloadParameter( annotationType.getName() );
 			}
 		}
 		catch ( ClassCastException e ) {
-			throw log.wrongTypeForPayloadParameter( annotationType.getName(), e );
+			throw log.throwWrongTypeForPayloadParameter( annotationType.getName(), e );
 		}
 	}
 
@@ -361,25 +361,25 @@ public class ConstraintHelper {
 		try {
 			final Method method = ReflectionHelper.getMethod( annotationType, "groups" );
 			if ( method == null ) {
-				throw log.constraintWithoutMandatoryParameter( "groups", annotationType.getName() );
+				throw log.throwConstraintWithoutMandatoryParameter( "groups", annotationType.getName() );
 			}
 			Class<?>[] defaultGroups = (Class<?>[]) method.getDefaultValue();
 			if ( defaultGroups.length != 0 ) {
-				throw log.wrongDefaultValueForGroupsParameter( annotationType.getName() );
+				throw log.throwWrongDefaultValueForGroupsParameter( annotationType.getName() );
 			}
 		}
 		catch ( ClassCastException e ) {
-			throw log.wrongTypeForGroupsParameter( annotationType.getName(), e );
+			throw log.throwWrongTypeForGroupsParameter( annotationType.getName(), e );
 		}
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
 		final Method method = ReflectionHelper.getMethod( annotationType, "message" );
 		if ( method == null ) {
-			throw log.constraintWithoutMandatoryParameter( "message", annotationType.getName() );
+			throw log.throwConstraintWithoutMandatoryParameter( "message", annotationType.getName() );
 		}
 		if ( method.getReturnType() != String.class ) {
-			throw log.wrongTypeForMessageParameter( annotationType.getName() );
+			throw log.throwWrongTypeForMessageParameter( annotationType.getName() );
 		}
 	}
 

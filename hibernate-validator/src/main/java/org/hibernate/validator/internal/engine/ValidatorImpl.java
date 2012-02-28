@@ -250,12 +250,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		if ( type.isAssignableFrom( getClass() ) ) {
 			return type.cast( this );
 		}
-		throw log.typeNotSupported( type );
+		throw log.throwTypeNotSupported( type );
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {
 		if ( propertyName == null || propertyName.length() == 0 ) {
-			throw log.invalidPropertyPath();
+			throw log.throwInvalidPropertyPath();
 		}
 	}
 
@@ -621,7 +621,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 
 		if ( valueContext.getCurrentBean() == null ) {
-			throw log.invalidPropertyPath();
+			throw log.throwInvalidPropertyPath();
 		}
 
 		if ( metaConstraints.size() == 0 ) {
@@ -1137,7 +1137,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		BeanMetaData<?> metaData = beanMetaDataManager.getBeanMetaData( clazz );
 		//use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( !metaData.isPropertyPresent( elem.getName() ) ) {
-			throw log.invalidPropertyPath( elem.getName(), metaData.getBeanClass().getName() );
+			throw log.throwInvalidPropertyPath( elem.getName(), metaData.getBeanClass().getName() );
 		}
 
 		if ( !propertyIter.hasNext() ) {
@@ -1165,7 +1165,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 							newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
 						}
 						else if ( newValue != null ) {
-							throw log.propertyPathMustProvideIndexOrMapKey();
+							throw log.throwPropertyPathMustProvideIndexOrMapKey();
 						}
 						type = ReflectionHelper.getIndexedType( type );
 					}
@@ -1226,7 +1226,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			);
 		}
 		catch ( RuntimeException e ) {
-			throw log.errorDuringCallOfTraversableResolverIsReachable( e );
+			throw log.throwErrorDuringCallOfTraversableResolverIsReachable( e );
 		}
 
 		return isReachable;
@@ -1255,7 +1255,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				);
 			}
 			catch ( RuntimeException e ) {
-				throw log.errorDuringCallOfTraversableResolverIsReachable( e );
+				throw log.throwErrorDuringCallOfTraversableResolverIsReachable( e );
 			}
 		}
 
@@ -1273,7 +1273,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				);
 			}
 			catch ( RuntimeException e ) {
-				throw log.errorDuringCallOfTraversableResolverIsCascadable( e );
+				throw log.throwErrorDuringCallOfTraversableResolverIsCascadable( e );
 			}
 		}
 

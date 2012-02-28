@@ -42,7 +42,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 			this.maxValue = new BigDecimal( maxValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw log.invalidBigDecimalFormat( maxValue.value(), nfe );
+			throw log.throwInvalidBigDecimalFormat( maxValue.value(), nfe );
 		}
 	}
 

@@ -42,7 +42,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw log.invalidBigDecimalFormat( minValue.value(), nfe );
+			throw log.throwInvalidBigDecimalFormat( minValue.value(), nfe );
 		}
 	}
 

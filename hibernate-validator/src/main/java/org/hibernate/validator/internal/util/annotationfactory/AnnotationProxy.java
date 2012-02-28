@@ -80,7 +80,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 				result.put( m.getName(), m.getDefaultValue() );
 			}
 			else {
-				throw log.noValueProvidedForAnnotationParameter( m.getName() );
+				throw log.throwNoValueProvidedForAnnotationParameter( m.getName() );
 			}
 		}
 		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
@@ -88,7 +88,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 			Set<String> unknownParameters = descriptor.getElements().keySet();
 			unknownParameters.removeAll( result.keySet() );
 
-			throw log.tryingToInstantiateAnnotationWithUnknownParameters( annotationType, unknownParameters );
+			throw log.throwTryingToInstantiateAnnotationWithUnknownParameters( annotationType, unknownParameters );
 		}
 		return result;
 	}

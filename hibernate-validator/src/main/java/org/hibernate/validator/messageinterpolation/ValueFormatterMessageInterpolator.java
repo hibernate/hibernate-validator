@@ -139,7 +139,7 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 	 */
 	private boolean isEscaped(String enclosingString, int charIndex) {
 		if ( charIndex < 0 || charIndex > enclosingString.length() ) {
-			throw log.invalidIndex("0", "enclosingString.length() - 1");
+			throw log.throwInvalidIndex( "0", "enclosingString.length() - 1" );
 		}
 		return charIndex > 0 && enclosingString.charAt( charIndex - 1 ) == '\\';
 	}
@@ -163,13 +163,13 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 		else {
 			String format = expression.substring( separatorIndex + 1, expression.length() - 1 );
 			if ( format.length() == 0 ) {
-				throw log.missingFormatStringInTemplate( expression );
+				throw log.throwMissingFormatStringInTemplate( expression );
 			}
 			try {
 				interpolatedValue = String.format( locale, format, validatedValue );
 			}
 			catch ( IllegalFormatException e ) {
-				throw log.invalidFormat( e.getMessage(), e );
+				throw log.throwInvalidFormat( e.getMessage(), e );
 			}
 		}
 		return interpolatedValue;

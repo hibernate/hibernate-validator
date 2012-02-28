@@ -306,7 +306,7 @@ public final class TypeHelper {
 		//we now have all bind from a type to its resolution at one level
 		Type validatorType = ( (ParameterizedType) constraintValidatorType ).getActualTypeArguments()[VALIDATOR_TYPE_INDEX];
 		if ( validatorType == null ) {
-			throw log.nullIsAnInvalidTypeForAConstraintValidator();
+			throw log.throwNullIsAnInvalidTypeForAConstraintValidator();
 		}
 		else if ( validatorType instanceof GenericArrayType ) {
 			validatorType = TypeHelper.getArrayType( TypeHelper.getComponentType( validatorType ) );
@@ -578,7 +578,7 @@ public final class TypeHelper {
 			Type actualTypeArgument = actualTypeArgumentsByParameter.get( typeParameter );
 
 			if ( actualTypeArgument == null ) {
-				throw log.missingActualTypeArgumentForTypeParameter( typeParameter );
+				throw log.throwMissingActualTypeArgumentForTypeParameter( typeParameter );
 			}
 
 			actualTypeArguments[i] = actualTypeArgument;

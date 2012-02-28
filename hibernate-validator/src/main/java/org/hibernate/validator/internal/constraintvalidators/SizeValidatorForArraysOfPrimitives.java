@@ -41,13 +41,13 @@ public abstract class SizeValidatorForArraysOfPrimitives {
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.minCannotBeNegative();
+			throw log.throwMinCannotBeNegative();
 		}
 		if ( max < 0 ) {
-			throw log.maxCannotBeNegative();
+			throw log.throwMaxCannotBeNegative();
 		}
 		if ( max < min ) {
-			throw log.lengthCannotBeNegative();
+			throw log.throwLengthCannotBeNegative();
 		}
 	}
 }

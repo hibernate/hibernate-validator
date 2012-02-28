@@ -72,11 +72,11 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 				return contextClassLoader.loadClass( className );
 			}
 			else {
-				throw log.unableToLoadClass( className );
+				throw log.throwUnableToLoadClass( className );
 			}
 		}
 		catch ( ClassNotFoundException e ) {
-			throw log.unableToLoadClass( className, e );
+			throw log.throwUnableToLoadClass( className, e );
 		}
 	}
 
@@ -97,7 +97,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 			return Class.forName( className, true, caller.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
-			throw log.unableToLoadClass( className, e );
+			throw log.throwUnableToLoadClass( className, e );
 		}
 	}
 }

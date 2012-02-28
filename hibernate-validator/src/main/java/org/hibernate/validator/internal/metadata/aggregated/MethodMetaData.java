@@ -332,7 +332,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw log.invalidMethodParameterIndex( getName(), parameterIndex );
+			throw log.throwInvalidMethodParameterIndex( getName(), parameterIndex );
 		}
 
 		return parameterMetaData.get( parameterIndex );

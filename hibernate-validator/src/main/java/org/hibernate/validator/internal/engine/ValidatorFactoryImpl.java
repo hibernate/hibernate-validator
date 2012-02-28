@@ -118,7 +118,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( HibernateValidatorFactory.class.equals( type ) ) {
 			return type.cast( this );
 		}
-		throw log.typeNotSupported( type );
+		throw log.throwTypeNotSupported( type );
 	}
 
 	public HibernateValidatorContext usingContext() {
@@ -137,7 +137,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( failFastPropValue != null ) {
 			boolean tmpFailFast = Boolean.valueOf( failFastPropValue );
 			if ( programmaticConfiguredFailFast && !tmpFailFast ) {
-				throw log.inconsistentFailFastConfiguration();
+				throw log.throwInconsistentFailFastConfiguration();
 			}
 			failFast = tmpFailFast;
 		}
