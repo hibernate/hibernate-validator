@@ -102,7 +102,7 @@ public class ScriptEvaluatorFactory {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {
-			throw log.unableToFindScriptEngine( languageName );
+			throw new ScriptException( log.unableToFindScriptEngine( languageName ) );
 		}
 
 		return new ScriptEvaluator( engine );

@@ -26,7 +26,6 @@ import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
-import javax.script.ScriptException;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.GroupDefinitionException;
@@ -129,7 +128,7 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException invalidRegularExpression(@Cause PatternSyntaxException e);
 
 	@Message(id = 23, value = "Error during execution of script \"%s\" occurred.")
-	ConstraintDeclarationException errorDuringScriptExecution(String script, @Cause ScriptException e);
+	ConstraintDeclarationException errorDuringScriptExecution(String script, @Cause Exception e);
 
 	@Message(id = 24, value = "Script \"%s\" returned null, but must return either true or false.")
 	ConstraintDeclarationException scriptMustReturnTrueOrFalse(String script);
@@ -271,157 +270,154 @@ public interface Log extends BasicLogger {
 	@Message(id = 67, value = "Unable to read %s.")
 	ValidationException unableToReadServicesFile(String servicesFileName, @Cause Exception e);
 
-	@Message(id = 68, value = "No JSR 223 script engine found for language \"%s\".")
-	ScriptException unableToFindScriptEngine(String languageName);
-
-	@Message(id = 69, value = "Start index cannot be negative: %d.")
+	@Message(id = 68, value = "Start index cannot be negative: %d.")
 	IllegalArgumentException startIndexCannotBeNegative(int startIndex);
 
-	@Message(id = 70, value = "End index cannot be negative: %d.")
+	@Message(id = 69, value = "End index cannot be negative: %d.")
 	IllegalArgumentException endIndexCannotBeNegative(int endIndex);
 
-	@Message(id = 71, value = "Invalid Range: %1$d > %2$d.")
+	@Message(id = 70, value = "Invalid Range: %1$d > %2$d.")
 	IllegalArgumentException invalidRange(int startIndex, int endIndex);
 
-	@Message(id = 72, value = "A explicitly specified check digit must lie outside the interval: [%1$d, %2$d].")
+	@Message(id = 71, value = "A explicitly specified check digit must lie outside the interval: [%1$d, %2$d].")
 	IllegalArgumentException invalidCheckDigit(int startIndex, int endIndex);
 
-	@Message(id = 73, value = "'%c' is not a digit.")
+	@Message(id = 72, value = "'%c' is not a digit.")
 	NumberFormatException characterIsNotADigit(char c);
 
-	@Message(id = 74, value = "Parameters starting with 'valid' are not allowed in a constraint.")
+	@Message(id = 73, value = "Parameters starting with 'valid' are not allowed in a constraint.")
 	ConstraintDefinitionException constraintParametersCannotStartWithValid();
 
-	@Message(id = 75, value = "%2$s contains Constraint annotation, but does not contain a %1$s parameter.")
+	@Message(id = 74, value = "%2$s contains Constraint annotation, but does not contain a %1$s parameter.")
 	ConstraintDefinitionException constraintWithoutMandatoryParameter(String parameterName, String constraintName);
 
-	@Message(id = 76,
+	@Message(id = 75,
 			value = "%s contains Constraint annotation, but the payload parameter default value is not the empty array.")
 	ConstraintDefinitionException wrongDefaultValueForPayloadParameter(String constraintName);
 
-	@Message(id = 77, value = "%s contains Constraint annotation, but the payload parameter is of wrong type.")
+	@Message(id = 76, value = "%s contains Constraint annotation, but the payload parameter is of wrong type.")
 	ConstraintDefinitionException wrongTypeForPayloadParameter(String constraintName, @Cause ClassCastException e);
 
-	@Message(id = 78,
+	@Message(id = 77,
 			value = "%s contains Constraint annotation, but the groups parameter default value is not the empty array.")
 	ConstraintDefinitionException wrongDefaultValueForGroupsParameter(String constraintName);
 
-	@Message(id = 79, value = "%s contains Constraint annotation, but the groups parameter is of wrong type.")
+	@Message(id = 78, value = "%s contains Constraint annotation, but the groups parameter is of wrong type.")
 	ConstraintDefinitionException wrongTypeForGroupsParameter(String constraintName, @Cause ClassCastException e);
 
-	@Message(id = 80,
+	@Message(id = 79,
 			value = "%s contains Constraint annotation, but the message parameter is not of type java.lang.String.")
 	ConstraintDefinitionException wrongTypeForMessageParameter(String constraintName);
 
-	@Message(id = 81, value = "Overridden constraint does not define an attribute with name %s.")
+	@Message(id = 80, value = "Overridden constraint does not define an attribute with name %s.")
 	ConstraintDefinitionException overriddenConstraintAttributeNotFound(String attributeName);
 
-	@Message(id = 82,
+	@Message(id = 81,
 			value = "The overriding type of a composite constraint must be identical to the overridden one. Expected %1$s found %2$s.")
 	ConstraintDefinitionException wrongAttributeTypeForOverriddenConstraint(String expectedReturnType, Class<?> currentReturnType);
 
-	@Message(id = 83, value = "Wrong parameter type. Expected: %1$s Actual: %2$s.")
+	@Message(id = 82, value = "Wrong parameter type. Expected: %1$s Actual: %2$s.")
 	ValidationException wrongParameterType(String expectedType, String currentType);
 
-	@Message(id = 84, value = "The specified annotation defines no parameter '%s'.")
+	@Message(id = 83, value = "The specified annotation defines no parameter '%s'.")
 	ValidationException unableToFindAnnotationParameter(String parameterName, @Cause NoSuchMethodException e);
 
-	@Message(id = 85, value = "Unable to get '%1$s' from %2$s.")
+	@Message(id = 84, value = "Unable to get '%1$s' from %2$s.")
 	ValidationException unableToGetAnnotationParameter(String parameterName, String annotationName, @Cause Exception e);
 
-	@Message(id = 86, value = "No value provided for %s.")
+	@Message(id = 85, value = "No value provided for %s.")
 	IllegalArgumentException noValueProvidedForAnnotationParameter(String parameterName);
 
-	@Message(id = 87, value = "Trying to instantiate %1$s with unknown parameter(s): %2$s.")
+	@Message(id = 86, value = "Trying to instantiate %1$s with unknown parameter(s): %2$s.")
 	RuntimeException tryingToInstantiateAnnotationWithUnknownParameters(Class<?> annotationType, Set<String> unknownParameters);
 
-	@Message(id = 88, value = "Property name cannot be null or empty.")
+	@Message(id = 87, value = "Property name cannot be null or empty.")
 	IllegalArgumentException propertyNameCannotBeNullOrEmpty();
 
-	@Message(id = 89, value = "Element type has to be FIELD or METHOD.")
+	@Message(id = 88, value = "Element type has to be FIELD or METHOD.")
 	IllegalArgumentException elementTypeHasToBeFieldOrMethod();
 
-	@Message(id = 90, value = "Member %s is neither a field nor a method.")
+	@Message(id = 89, value = "Member %s is neither a field nor a method.")
 	IllegalArgumentException memberIsNeitherAFieldNorAMethod(Member member);
 
-	@Message(id = 91, value = "Unable to access %s.")
+	@Message(id = 90, value = "Unable to access %s.")
 	ValidationException unableToAccessMember(String memberName, @Cause Exception e);
 
-	@Message(id = 92, value = "%s has to be a primitive type.")
+	@Message(id = 91, value = "%s has to be a primitive type.")
 	IllegalArgumentException hasToBeAPrimitiveType(Class<?> clazz);
 
-	@Message(id = 93, value = "Unhandled primitive type.")
+	@Message(id = 92, value = "Unhandled primitive type.")
 	RuntimeException unhandledPrimitiveType();
 
-	@Message(id = 94, value = "null is an invalid type for a constraint validator.")
+	@Message(id = 93, value = "null is an invalid type for a constraint validator.")
 	ValidationException nullIsAnInvalidTypeForAConstraintValidator();
 
-	@Message(id = 95, value = "Missing actual type argument for type parameter: %s.")
+	@Message(id = 94, value = "Missing actual type argument for type parameter: %s.")
 	IllegalArgumentException missingActualTypeArgumentForTypeParameter(TypeVariable<?> typeParameter);
 
-	@Message(id = 96, value = "Unable to instantiate constraint factory class %s.")
+	@Message(id = 95, value = "Unable to instantiate constraint factory class %s.")
 	ValidationException unableToInstantiateConstraintFactoryClass(String constraintFactoryClassName, @Cause ValidationException e);
 
-	@Message(id = 97, value = "Unable to open input stream for mapping file %s.")
+	@Message(id = 96, value = "Unable to open input stream for mapping file %s.")
 	ValidationException unableToOpenInputStreamForMappingFile(String mappingFileName);
 
-	@Message(id = 98, value = "Unable to instantiate message interpolator class %s.")
+	@Message(id = 97, value = "Unable to instantiate message interpolator class %s.")
 	ValidationException unableToInstantiateMessageInterpolatorClass(String messageInterpolatorClassName, @Cause Exception e);
 
-	@Message(id = 99, value = "Unable to instantiate traversable resolver class %s.")
+	@Message(id = 98, value = "Unable to instantiate traversable resolver class %s.")
 	ValidationException unableToInstantiateTraversableResolverClass(String traversableResolverClassName, @Cause Exception e);
 
-	@Message(id = 100, value = "Unable to instantiate validation provider class %s.")
+	@Message(id = 99, value = "Unable to instantiate validation provider class %s.")
 	ValidationException unableToInstantiateValidationProviderClass(String providerClassName, @Cause Exception e);
 
-	@Message(id = 101, value = "Unable to parse %s.")
+	@Message(id = 100, value = "Unable to parse %s.")
 	ValidationException unableToParseValidationXmlFile(String file, @Cause JAXBException e);
 
-	@Message(id = 102, value = "%s is not an annotation.")
+	@Message(id = 101, value = "%s is not an annotation.")
 	ValidationException isNotAnAnnotation(String annotationClassName);
 
-	@Message(id = 103, value = "%s is not a constraint validator class.")
+	@Message(id = 102, value = "%s is not a constraint validator class.")
 	ValidationException isNotAConstraintValidatorClass(Class<?> validatorClass);
 
-	@Message(id = 104, value = "%s has already be configured in xml.")
+	@Message(id = 103, value = "%s has already be configured in xml.")
 	ValidationException beanClassHasAlreadyBeConfiguredInXml(String beanClassName);
 
-	@Message(id = 105, value = "%1$s is defined twice in mapping xml for bean %2$s.")
+	@Message(id = 104, value = "%1$s is defined twice in mapping xml for bean %2$s.")
 	ValidationException isDefinedTwiceInMappingXmlForBean(String name, String beanClassName);
 
-	@Message(id = 106, value = "%1$s does not contain the fieldType %2$s.")
+	@Message(id = 105, value = "%1$s does not contain the fieldType %2$s.")
 	ValidationException beanDoesNotContainTheField(String beanClassName, String fieldName);
 
-	@Message(id = 107, value = "%1$s does not contain the property %2$s.")
+	@Message(id = 106, value = "%1$s does not contain the property %2$s.")
 	ValidationException beanDoesNotContainTheProperty(String beanClassName, String getterName);
 
-	@Message(id = 108, value = "Annotation of type %1$s does not contain a parameter %2$s.")
+	@Message(id = 107, value = "Annotation of type %1$s does not contain a parameter %2$s.")
 	ValidationException annotationDoesNotContainAParameter(String annotationClassName, String parameterName);
 
-	@Message(id = 109, value = "Attempt to specify an array where single value is expected.")
+	@Message(id = 108, value = "Attempt to specify an array where single value is expected.")
 	ValidationException attemptToSpecifyAnArrayWhereSingleValueIsExpected();
 
-	@Message(id = 110, value = "Unexpected parameter value.")
+	@Message(id = 109, value = "Unexpected parameter value.")
 	ValidationException unexpectedParameterValue();
 
 	ValidationException unexpectedParameterValue(@Cause ClassCastException e);
 
-	@Message(id = 111, value = "Invalid %s format.")
+	@Message(id = 110, value = "Invalid %s format.")
 	ValidationException invalidNumberFormat(String formatName, @Cause NumberFormatException e);
 
-	@Message(id = 112, value = "Invalid char value: %s.")
+	@Message(id = 111, value = "Invalid char value: %s.")
 	ValidationException invalidCharValue(String value);
 
-	@Message(id = 113, value = "Invalid return type: %s. Should be a enumeration type.")
+	@Message(id = 112, value = "Invalid return type: %s. Should be a enumeration type.")
 	ValidationException invalidReturnType(Class<?> returnType, @Cause ClassCastException e);
 
-	@Message(id = 114, value = "%s, %s, %s are reserved parameter names.")
+	@Message(id = 113, value = "%s, %s, %s are reserved parameter names.")
 	ValidationException reservedParameterNames(String messageParameterName, String groupsParameterName, String payloadParameterName);
 
-	@Message(id = 115, value = "Specified payload class %s does not implement javax.validation.Payload")
+	@Message(id = 114, value = "Specified payload class %s does not implement javax.validation.Payload")
 	ValidationException wrongPayloadClass(String payloadClassName);
 
-	@Message(id = 116, value = "Error parsing mapping file.")
+	@Message(id = 115, value = "Error parsing mapping file.")
 	ValidationException errorParsingMappingFile(@Cause JAXBException e);
 	
 	/**
@@ -470,4 +466,7 @@ public interface Log extends BasicLogger {
 
 	@Message(value = "Class is null.")
 	String classIsNull();
+
+	@Message(value = "No JSR 223 script engine found for language \"%s\".")
+	String unableToFindScriptEngine(String languageName);
 }
