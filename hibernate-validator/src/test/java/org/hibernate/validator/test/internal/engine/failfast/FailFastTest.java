@@ -1,8 +1,14 @@
 package org.hibernate.validator.test.internal.engine.failfast;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.HashSet;
 import java.util.Set;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
+import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
@@ -20,20 +26,26 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.internal.util.LoggerFactory;
 import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.method.MethodValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
-import org.hibernate.validator.internal.util.LoggerFactory;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.fail;
 
 /**
- * See HV-381
+ * Tests for fail fast mode
  *
  * @author Emmanuel Bernard
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Hardy Ferentschik
  */
 public class FailFastTest {
 	private static final Logger log = LoggerFactory.make();
@@ -41,6 +53,7 @@ public class FailFastTest {
 	private final A testInstance = new A();
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastDefaultBehaviour() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
@@ -52,6 +65,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationDefaultBehaviour() {
 
 		TestService service = getValidatingProxy( new TestServiceImpl() );
@@ -66,6 +80,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastSetOnConfiguration() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
@@ -76,6 +91,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationOnConfiguration() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
@@ -95,6 +111,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
@@ -109,6 +126,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.buildValidatorFactory();
@@ -132,6 +150,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastSetWithProperty() {
 		// with fail fast
 		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -154,6 +173,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationSetWithProperty() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		final ValidatorFactory factory = configuration.addProperty( HibernateValidatorConfiguration.FAIL_FAST, "true" )
@@ -174,6 +194,7 @@ public class FailFastTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastSetWithInvalidProperty() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
@@ -189,6 +210,7 @@ public class FailFastTest {
 
 	@Test(expectedExceptions = ValidationException.class,
 			expectedExceptionsMessageRegExp = "Inconsistent fail fast configuration.*")
+	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastSetWithInconsistentConfiguration() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
@@ -200,7 +222,19 @@ public class FailFastTest {
 		factory.getValidator();
 	}
 
-	public void testFailSafePerf() {
+	@Test
+	@TestForIssue(jiraKey = "HV-550")
+	public void testFailFastComposingConstraints() {
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
+
+		final Validator validator = factory.getValidator();
+		Set<ConstraintViolation<FooBar>> constraintViolations = validator.validate( new FooBar() );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectConstraintViolationMessages( constraintViolations, "Bar constraint failed!" );
+	}
+
+	public void testFailSafePerformance() {
 		final Validator regularValidator = ValidatorUtil.getConfiguration().buildValidatorFactory().getValidator();
 		final Validator failFastValidator = ValidatorUtil.getConfiguration()
 				.buildValidatorFactory()
@@ -209,23 +243,23 @@ public class FailFastTest {
 				.failFast( true )
 				.getValidator();
 
-		final int looptime = 50000;
-		for ( int i = 0; i < looptime; i++ ) {
+		final int loopTime = 50000;
+		for ( int i = 0; i < loopTime; i++ ) {
 			validateBatch( regularValidator );
 		}
 
-		for ( int i = 0; i < looptime; i++ ) {
+		for ( int i = 0; i < loopTime; i++ ) {
 			validateBatch( failFastValidator );
 		}
 
 		long start = System.nanoTime();
-		for ( int i = 0; i < looptime; i++ ) {
+		for ( int i = 0; i < loopTime; i++ ) {
 			validateBatch( regularValidator );
 		}
 		long timeOfRegular = System.nanoTime() - start;
 
 		start = System.nanoTime();
-		for ( int i = 0; i < looptime; i++ ) {
+		for ( int i = 0; i < loopTime; i++ ) {
 			validateBatch( failFastValidator );
 		}
 		long timeOfFailFast = System.nanoTime() - start;
@@ -284,6 +318,53 @@ public class FailFastTest {
 
 	class TestServiceImpl implements TestService {
 		public void testMethod(String param1, String param2) {
+		}
+	}
+
+	@FooConstraint
+	public class FooBar {
+	}
+
+	@BarConstraint(message = "Bar constraint failed!")
+	@Target({ TYPE })
+	@Retention(RUNTIME)
+	@Constraint(validatedBy = { FooConstraintValidator.class })
+	public @interface FooConstraint {
+		public abstract String message() default "invalid name";
+
+		public abstract Class<?>[] groups() default { };
+
+		public abstract Class<? extends Payload>[] payload() default { };
+	}
+
+	@Target({ ANNOTATION_TYPE })
+	@Retention(RUNTIME)
+	@Constraint(validatedBy = { BarConstraintValidator.class })
+	public @interface BarConstraint {
+		public abstract String message() default "invalid name";
+
+		public abstract Class<?>[] groups() default { };
+
+		public abstract Class<? extends Payload>[] payload() default { };
+	}
+
+	public static class BarConstraintValidator implements ConstraintValidator<BarConstraint, FooBar> {
+
+		public void initialize(BarConstraint constraintAnnotation) {
+		}
+
+		public boolean isValid(FooBar value, ConstraintValidatorContext context) {
+			return false;
+		}
+	}
+
+	public static class FooConstraintValidator implements ConstraintValidator<FooConstraint, FooBar> {
+
+		public void initialize(FooConstraint constraintAnnotation) {
+		}
+
+		public boolean isValid(FooBar value, ConstraintValidatorContext context) {
+			throw new RuntimeException( "Should not be executed due to fail fast mode" );
 		}
 	}
 }

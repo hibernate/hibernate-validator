@@ -184,8 +184,8 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		return messageInterpolator;
 	}
 
-	public final boolean shouldFailFast() {
-		return failFast && !failingConstraintViolations.isEmpty();
+	public final boolean isFailFastModeEnabled() {
+		return failFast;
 	}
 
 	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor);

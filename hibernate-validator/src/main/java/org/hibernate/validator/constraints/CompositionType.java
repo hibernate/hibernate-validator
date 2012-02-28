@@ -26,10 +26,12 @@ public enum CompositionType {
 	 * Used to indicate the disjunction of all constraints it is applied to.
 	 */
 	OR,
+
 	/**
 	 * Used to indicate the conjunction of all the constraints it is applied to.
 	 */
 	AND,
+
 	/**
 	 * ALL_FALSE is a generalisation of the usual NOT operator, which is applied to
 	 * a list of conditions rather than just one element.
