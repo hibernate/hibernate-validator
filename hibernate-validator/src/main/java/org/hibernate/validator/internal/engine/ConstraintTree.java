@@ -32,14 +32,14 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.internal.util.TypeHelper;
-
 import org.slf4j.Logger;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.LRUMap;
 import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.TypeHelper;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
@@ -129,11 +129,14 @@ public class ConstraintTree<A extends Annotation> {
 				executionContext, valueContext, constraintViolations
 		);
 
+		Set<E> localViolationList = CollectionHelper.newHashSet();
 
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed (provided
 		// there is one)
-		Set<E> localViolationList = new HashSet<E>();
-		if ( !descriptor.getConstraintValidatorClasses().isEmpty() ) {
+		// If fail fast mode is enabled and there are already failing constraints we don't need to validate the constraint (HV-550)
+		if ( !descriptor.getConstraintValidatorClasses().isEmpty()
+				&& ( !executionContext.isFailFastModeEnabled() || constraintViolations.isEmpty() ) ) {
+
 			if ( log.isTraceEnabled() ) {
 				log.trace(
 						"Validating value {} against constraint defined by {}",
@@ -242,6 +245,9 @@ public class ConstraintTree<A extends Annotation> {
 			}
 			else {
 				compositionResult.setAllTrue( false );
+				if ( executionContext.isFailFastModeEnabled() && descriptor.getCompositionType() == AND ) {
+					break;
+				}
 			}
 		}
 		return compositionResult;
@@ -399,7 +405,8 @@ public class ConstraintTree<A extends Annotation> {
 	private List<Type> findSuitableValidatorTypes(Type type) {
 		List<Type> determinedSuitableTypes = new ArrayList<Type>();
 		for ( Type validatorType : availableValidatorTypes.keySet() ) {
-			if ( TypeHelper.isAssignable( validatorType, type ) && !determinedSuitableTypes.contains( validatorType ) ) {
+			if ( TypeHelper.isAssignable( validatorType, type )
+					&& !determinedSuitableTypes.contains( validatorType ) ) {
 				determinedSuitableTypes.add( validatorType );
 			}
 		}
