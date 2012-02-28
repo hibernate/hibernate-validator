@@ -421,7 +421,7 @@
                         <processors>
                             <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
                         </processors>
-                        <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.5 -target 1.5 -sourcepath ${project.build.directory}/generated-sources -encoding UTF-8</compilerArguments>
+                        <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.5 -target 1.5 -sourcepath ${project.build.directory}/generated-sources/jaxb -encoding UTF-8</compilerArguments>
                     </configuration>
                     <executions>
                         <execution>
