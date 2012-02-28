@@ -417,6 +417,7 @@
                     <artifactId>maven-processor-plugin</artifactId>
                     <version>2.0.2</version>
                     <configuration>
+                        <defaultOutputDirectory>${project.build.directory}/generated-sources/logging</defaultOutputDirectory>
                         <processors>
                             <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
                         </processors>
