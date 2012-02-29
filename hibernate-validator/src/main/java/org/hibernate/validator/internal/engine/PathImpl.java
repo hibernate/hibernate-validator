@@ -30,6 +30,8 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -74,8 +76,8 @@ public final class PathImpl implements Path, Serializable {
 	 * {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
-		
-		Contracts.assertNotNull( propertyPath, log.propertyPathCannotBeNull() );
+
+		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
 			return createNewPath( null );

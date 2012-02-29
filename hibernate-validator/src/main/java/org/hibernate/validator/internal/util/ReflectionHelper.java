@@ -54,6 +54,8 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
  * for situations where a security manager is in place.
@@ -218,8 +220,8 @@ public final class ReflectionHelper {
 	 * @return the member which matching the name and type or {@code null} if no such member exists.
 	 */
 	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
-		
-		Contracts.assertNotNull( clazz, log.classCannotBeNull() );
+
+		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
 			throw log.throwPropertyNameCannotBeNullOrEmpty();
@@ -672,8 +674,8 @@ public final class ReflectionHelper {
 	 */
 	public static boolean haveSameSignature(Method method1, Method method2) {
 
-		Contracts.assertNotNull( method1, log.mustNotBeNull( "method1" ) );
-		Contracts.assertNotNull( method2, log.mustNotBeNull( "method2" ) );
+		Contracts.assertNotNull( method1, MESSAGES.mustNotBeNull( "method1" ) );
+		Contracts.assertNotNull( method2, MESSAGES.mustNotBeNull( "method2" ) );
 
 		return
 				method1.getName().equals( method2.getName() ) &&

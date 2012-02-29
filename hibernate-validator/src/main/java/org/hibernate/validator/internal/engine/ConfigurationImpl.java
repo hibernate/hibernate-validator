@@ -44,6 +44,8 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.resourceloading.ResourceBundleLocator;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * Hibernate specific {@code Configuration} implementation.
  *
@@ -134,8 +136,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
-		
-		Contracts.assertNotNull( stream, log.parameterMustNotBeNull( "stream" ) );
+
+		Contracts.assertNotNull( stream, MESSAGES.parameterMustNotBeNull( "stream" ) );
 
 		validationBootstrapParameters.addMapping( stream );
 		return this;
@@ -147,9 +149,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public final HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
-		Contracts.assertNotNull( mapping, log.parameterMustNotBeNull( "mapping" ) );
+		Contracts.assertNotNull( mapping, MESSAGES.parameterMustNotBeNull( "mapping" ) );
 
-		this.programmaticMappings.add(mapping);
+		this.programmaticMappings.add( mapping );
 		return this;
 	}
 

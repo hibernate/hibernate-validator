@@ -19,6 +19,8 @@ package org.hibernate.validator.internal.util;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * @author Gunnar Morling
  * @author Hardy Ferentschik
@@ -32,7 +34,7 @@ public final class Contracts {
 	}
 
 	public static void assertNotNull(Object o) {
-		assertNotNull( o, log.mustNotBeNull() );
+		assertNotNull( o, MESSAGES.mustNotBeNull() );
 	}
 
 	public static void assertNotNull(Object o, String message) {

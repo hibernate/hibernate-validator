@@ -28,6 +28,8 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * Base class for implementations of constraint mapping creational context types.
  *
@@ -48,7 +50,7 @@ public abstract class ConstraintMappingContextImplBase {
 
 	public <C> TypeConstraintMappingContext<C> type(Class<C> type) {
 
-		Contracts.assertNotNull( beanClass, log.beanTypeMustNotBeNull() );
+		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeMustNotBeNull() );
 
 		return new TypeConstraintMappingContextImpl<C>( type, mapping );
 	}
@@ -57,7 +59,7 @@ public abstract class ConstraintMappingContextImplBase {
 
 		Contracts.assertNotNull( property, "The property name must not be null." );
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
-		Contracts.assertNotEmpty( property, log.propertyNameMustNotBeEmpty() );
+		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
 		Member member = ReflectionHelper.getMember(
 				beanClass, property, elementType
@@ -72,14 +74,14 @@ public abstract class ConstraintMappingContextImplBase {
 
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
 
-		Contracts.assertNotNull( name, log.methodNameMustNotBeNull() );
+		Contracts.assertNotNull( name, MESSAGES.methodNameMustNotBeNull() );
 
 		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
 
 		if ( method == null ) {
 			StringBuilder sb = new StringBuilder();
 			for ( Class<?> oneParameterType : parameterTypes ) {
-				sb.append( oneParameterType.getName() + ", " );
+				sb.append( oneParameterType.getName() ).append( ", " );
 			}
 
 			String parameterTypesAsString = sb.length() > 2 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();

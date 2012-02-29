@@ -20,8 +20,8 @@ import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.context.TypeConstraintMappingContextImpl;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Top level class for constraints configured via the programmatic API.
@@ -31,9 +31,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ConstraintMapping {
-
-	private static final Log log = LoggerFactory.make();
-
 	protected ConstraintMappingContext context;
 
 	public ConstraintMapping() {
@@ -55,7 +52,7 @@ public class ConstraintMapping {
 	 */
 	public final <C> TypeConstraintMappingContext<C> type(Class<C> beanClass) {
 
-		Contracts.assertNotNull( beanClass, log.beanTypeMustNotBeNull() );
+		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeMustNotBeNull() );
 
 		return new TypeConstraintMappingContextImpl<C>( beanClass, context );
 	}

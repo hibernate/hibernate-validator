@@ -22,8 +22,8 @@ import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * A {@link ConstraintLocation} implementation that represents a method
@@ -32,15 +32,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public class MethodConstraintLocation implements ConstraintLocation {
-
-	private static final Log log  = LoggerFactory.make();
-
 	private final Method method;
 	private final Integer parameterIndex;
 
 	public MethodConstraintLocation(Method method) {
 
-		Contracts.assertNotNull( method, log.mustNotBeNull( "Method" ) );
+		Contracts.assertNotNull( method, MESSAGES.mustNotBeNull( "Method" ) );
 
 		this.method = method;
 		this.parameterIndex = null;
@@ -54,7 +51,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	 */
 	public MethodConstraintLocation(Method method, int parameterIndex) {
 
-		Contracts.assertNotNull( method, log.mustNotBeNull( "Method" ) );
+		Contracts.assertNotNull( method, MESSAGES.mustNotBeNull( "Method" ) );
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;

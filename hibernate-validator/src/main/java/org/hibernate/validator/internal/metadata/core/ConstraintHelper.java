@@ -93,6 +93,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -386,7 +387,7 @@ public class ConstraintHelper {
 	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorDefinition
 			(Class<T> annotationClass) {
 
-		Contracts.assertNotNull( annotationClass, log.classCannotBeNull() );
+		Contracts.assertNotNull( annotationClass, MESSAGES.classCannotBeNull() );
 
 		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitions.get(
 				annotationClass

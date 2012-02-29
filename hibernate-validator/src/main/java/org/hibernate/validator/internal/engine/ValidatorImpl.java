@@ -56,6 +56,7 @@ import org.hibernate.validator.method.metadata.TypeDescriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -118,7 +119,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 
-		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
+		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -133,7 +134,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
 
-		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
+		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
 		sanityCheckPropertyPath( propertyName );
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
@@ -151,7 +152,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
 
-		Contracts.assertNotNull( beanType, log.beanTypeCannotBeNull() );
+		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
 
 		sanityCheckPropertyPath( propertyName );
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
@@ -169,8 +170,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
 
-		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
-		Contracts.assertNotNull( method, log.validatedMethodMustNotBeNull() );
+		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
+		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -194,8 +195,8 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public final <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 
-		Contracts.assertNotNull( object, log.validatedObjectMustNotBeNull() );
-		Contracts.assertNotNull( method, log.validatedMethodMustNotBeNull() );
+		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
+		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
 		//this might be the case for parameterless methods
 		if ( parameterValues == null ) {
@@ -220,7 +221,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
 
-		Contracts.assertNotNull( method, log.validatedMethodMustNotBeNull() );
+		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
 		GroupChain groupChain = determineGroupExecutionOrder( groups );
 
@@ -261,7 +262,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 	private GroupChain determineGroupExecutionOrder(Class<?>[] groups) {
 
-		Contracts.assertNotNull( groups, log.groupMustNotBeNull() );
+		Contracts.assertNotNull( groups, MESSAGES.groupMustNotBeNull() );
 
 		Class<?>[] tmpGroups = groups;
 		// if no groups is specified use the default

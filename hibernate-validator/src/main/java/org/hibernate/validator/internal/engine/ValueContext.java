@@ -21,8 +21,8 @@ import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -32,9 +32,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public class ValueContext<T, V> {
-
-	private static final Log log = LoggerFactory.make();
-
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
 	 */
@@ -168,8 +165,8 @@ public class ValueContext<T, V> {
 	 */
 	public final void appendNode(String node) {
 
-		Contracts.assertNotNull( node, log.mustNotBeNull( "node" ) );
-		
+		Contracts.assertNotNull( node, MESSAGES.mustNotBeNull( "node" ) );
+
 		propertyPath = PathImpl.createCopy( propertyPath );
 		propertyPath.addNode( node );
 	}

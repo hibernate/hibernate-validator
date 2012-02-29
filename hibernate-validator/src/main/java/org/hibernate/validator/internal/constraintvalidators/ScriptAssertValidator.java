@@ -28,6 +28,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorFactory;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * Validator for the {@link ScriptAssert} constraint annotation.
  *
@@ -36,9 +38,9 @@ import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorFactory
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, Object> {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private String script;
 	private String languageName;
 	private String alias;
@@ -86,8 +88,8 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 	}
 
 	private void validateParameters(ScriptAssert constraintAnnotation) {
-		Contracts.assertNotEmpty( constraintAnnotation.script(), log.parameterMustNotBeEmpty( "script" ) );
-		Contracts.assertNotEmpty( constraintAnnotation.lang(), log.parameterMustNotBeEmpty( "lang" ) );
-		Contracts.assertNotEmpty( constraintAnnotation.alias(), log.parameterMustNotBeEmpty( "alias" ) );
+		Contracts.assertNotEmpty( constraintAnnotation.script(), MESSAGES.parameterMustNotBeEmpty( "script" ) );
+		Contracts.assertNotEmpty( constraintAnnotation.lang(), MESSAGES.parameterMustNotBeEmpty( "lang" ) );
+		Contracts.assertNotEmpty( constraintAnnotation.alias(), MESSAGES.parameterMustNotBeEmpty( "alias" ) );
 	}
 }

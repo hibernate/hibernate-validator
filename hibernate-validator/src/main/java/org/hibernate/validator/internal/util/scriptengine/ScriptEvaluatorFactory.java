@@ -27,6 +27,9 @@ import javax.script.ScriptException;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
+
 /**
  * Factory responsible for the creation of {@link ScriptEvaluator}s. This
  * class is thread-safe.
@@ -102,7 +105,7 @@ public class ScriptEvaluatorFactory {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {
-			throw new ScriptException( log.unableToFindScriptEngine( languageName ) );
+			throw new ScriptException( MESSAGES.unableToFindScriptEngine( languageName ) );
 		}
 
 		return new ScriptEvaluator( engine );
