@@ -38,7 +38,6 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
-import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.cfg.defs.AssertTrueDef;
 import org.hibernate.validator.cfg.defs.FutureDef;
 import org.hibernate.validator.cfg.defs.MinDef;
@@ -48,6 +47,7 @@ import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -68,7 +68,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "The parameter \"mapping\" must not be null."
+			expectedExceptionsMessageRegExp = "HV[0-9]*: The parameter \"mapping\" must not be null."
 	)
 	public void testNullConstraintMapping() {
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -392,7 +392,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "The bean type must not be null when creating a constraint mapping."
+			expectedExceptionsMessageRegExp = "HV[0-9]*: The bean type must not be null when creating a constraint mapping."
 	)
 	public void testNullBean() {
 		ConstraintMapping mapping = new ConstraintMapping();
@@ -476,7 +476,7 @@ public class ConstraintMappingTest {
 	private interface Foo {
 	}
 
-	@GroupSequence( { Foo.class, A.class })
+	@GroupSequence({ Foo.class, A.class })
 	private static class A {
 		@SuppressWarnings("unused")
 		String a;

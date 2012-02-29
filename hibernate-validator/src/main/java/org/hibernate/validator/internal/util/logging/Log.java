@@ -419,7 +419,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 115, value = "Error parsing mapping file.")
 	ValidationException throwErrorParsingMappingFile(@Cause JAXBException e);
-	
+
+	@Message(id = 116, value = "%s")
+	IllegalArgumentException throwIllegalArgument(String message);
+
 	/**
 	 * The following lines are not a logging statement or an exception factory declaration but these messages have to be
 	 * internationalized.

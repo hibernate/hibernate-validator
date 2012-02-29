@@ -205,7 +205,7 @@ public class PathImplTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "A method is required to create a method return value path."
+			expectedExceptionsMessageRegExp = "HV[0-9]*: A method is required to create a method return value path."
 	)
 	public void creationOfReturnValuePathFailsDueToNullMethod() throws Exception {
 
