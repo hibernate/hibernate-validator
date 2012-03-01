@@ -22,7 +22,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
@@ -206,15 +205,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 48, value = "Unable to expand group sequence.")
 	GroupDefinitionException throwUnableToExpandGroupSequence();
-
-	@Message(id = 49, value = "The given index must be between %1$s and %2$s.")
-	IndexOutOfBoundsException throwInvalidIndex(String lowerBound, String upperBound);
-
-	@Message(id = 50, value = "Missing format string in template: %s.")
-	ValidationException throwMissingFormatStringInTemplate(String expression);
-
-	@Message(id = 51, value = "Invalid format: %s.")
-	ValidationException throwInvalidFormat(String message, @Cause IllegalFormatException e);
 
 	@Message(id = 52,
 			value = "Default group sequence and default group sequence provider cannot be defined at the same time.")

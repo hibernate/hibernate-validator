@@ -22,9 +22,13 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
+import javax.validation.ValidationException;
 
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Cause;
+import org.jboss.logging.Logger;
+import org.jboss.logging.Message;
+import org.jboss.logging.MessageLogger;
 
 
 /**
@@ -38,8 +42,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ValueFormatterMessageInterpolator implements MessageInterpolator {
-
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = Logger.getMessageLogger(
+			Log.class,
+			ValueFormatterMessageInterpolator.class.getName()
+	);
 
 	public static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
 	public static final String VALIDATED_VALUE_FORMAT_SEPARATOR = ":";
@@ -174,4 +180,17 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 		}
 		return interpolatedValue;
 	}
+
+	@MessageLogger(projectCode = "HV")
+	public interface Log extends BasicLogger {
+		@Message(id = 50, value = "Missing format string in template: %s.")
+		ValidationException throwMissingFormatStringInTemplate(String expression);
+
+		@Message(id = 51, value = "Invalid format: %s.")
+		ValidationException throwInvalidFormat(String message, @Cause IllegalFormatException e);
+
+		@Message(id = 49, value = "The given index must be between %1$s and %2$s.")
+		IndexOutOfBoundsException throwInvalidIndex(String lowerBound, String upperBound);
+	}
+
 }
