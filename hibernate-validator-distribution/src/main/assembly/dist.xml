@@ -53,8 +53,6 @@
             <includes>
                 <include>javax.xml.bind:jaxb-api</include>
                 <include>com.sun.xml.bind:jaxb-impl</include>
-                <include>javax.xml.stream:*</include>
-                <include>javax.activation:*</include>
             </includes>
         </dependencySet>
         <dependencySet>
