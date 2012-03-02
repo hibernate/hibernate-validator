@@ -39,19 +39,19 @@ public final class Contracts {
 
 	public static void assertNotNull(Object o, String message) {
 		if ( o == null ) {
-			throw log.throwIllegalArgument( message );
+			throw log.getIllegalArgumentException( message );
 		}
 	}
 
 	public static void assertTrue(boolean condition, String message) {
 		if ( !condition ) {
-			throw log.throwIllegalArgument( message );
+			throw log.getIllegalArgumentException( message );
 		}
 	}
 
 	public static void assertNotEmpty(String s, String message) {
 		if ( s.length() == 0 ) {
-			throw log.throwIllegalArgument( message );
+			throw log.getIllegalArgumentException( message );
 		}
 	}
 }

@@ -47,12 +47,12 @@ public class GroupChainGenerator {
 	 */
 	public GroupChain getGroupChainFor(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
-			throw log.throwAtLeastOneGroupHasToBeSpecified();
+			throw log.getAtLeastOneGroupHasToBeSpecifiedException();
 		}
 
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
-				throw log.throwGroupHasToBeAnInterface( clazz.getName() );
+				throw log.getGroupHasToBeAnInterfaceException( clazz.getName() );
 			}
 		}
 
@@ -117,7 +117,7 @@ public class GroupChainGenerator {
 	private void addInheritedGroups(Group group, List<Group> expandedGroups) {
 		for ( Class<?> inheritedGroup : group.getGroup().getInterfaces() ) {
 			if ( isGroupSequence( inheritedGroup ) ) {
-				throw log.throwSequenceDefinitionsNotAllowed();
+				throw log.getSequenceDefinitionsNotAllowedException();
 			}
 			Group g = new Group( inheritedGroup, group.getSequence() );
 			expandedGroups.add( g );
@@ -127,7 +127,7 @@ public class GroupChainGenerator {
 
 	private List<Group> resolveSequence(Class<?> group, List<Class<?>> processedSequences) {
 		if ( processedSequences.contains( group ) ) {
-			throw log.throwCyclicDependencyInGroupsDefinition();
+			throw log.getCyclicDependencyInGroupsDefinitionException();
 		}
 		else {
 			processedSequences.add( group );
@@ -153,7 +153,7 @@ public class GroupChainGenerator {
 		for ( Group tmpGroup : groups ) {
 			if ( resolvedGroupSequence.contains( tmpGroup ) && resolvedGroupSequence.indexOf( tmpGroup ) < resolvedGroupSequence
 					.size() - 1 ) {
-				throw log.throwUnableToExpandGroupSequence();
+				throw log.getUnableToExpandGroupSequenceException();
 			}
 			resolvedGroupSequence.add( tmpGroup );
 		}

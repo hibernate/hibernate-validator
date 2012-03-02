@@ -311,7 +311,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
 			if ( context.getDefaultGroupSequenceProvider( clazz ) != null ) {
 				if ( mergedContext.getDefaultGroupSequenceProvider( clazz ) != null ) {
-					throw log.throwMultipleDefinitionOfDefaultGroupSequenceProvider();
+					throw log.getMultipleDefinitionOfDefaultGroupSequenceProviderException();
 				}
 				mergedContext.addDefaultGroupSequenceProvider(
 						clazz,
@@ -321,7 +321,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 			if ( context.getDefaultSequence( clazz ) != null ) {
 				if ( mergedContext.getDefaultSequence( clazz ) != null ) {
-					throw log.throwMultipleDefinitionOfDefaultGroupSequence();
+					throw log.getMultipleDefinitionOfDefaultGroupSequenceException();
 				}
 				mergedContext.addDefaultGroupSequence(
 						clazz,

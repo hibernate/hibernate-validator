@@ -282,7 +282,7 @@ public class ConstraintTree<A extends Annotation> {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
 		catch ( RuntimeException e ) {
-			throw log.throwExceptionDuringIsValidCall( e );
+			throw log.getExceptionDuringIsValidCall( e );
 		}
 		if ( !isValid ) {
 			//We do not add them these violations yet, since we don't know how they are
@@ -341,7 +341,7 @@ public class ConstraintTree<A extends Annotation> {
 				validatorClass
 		);
 		if ( constraintValidator == null ) {
-			throw log.throwConstraintFactoryMustNotReturnNull( validatorClass.getName() );
+			throw log.getConstraintFactoryMustNotReturnNullException( validatorClass.getName() );
 		}
 		initializeConstraint( descriptor, constraintValidator );
 		return constraintValidator;
@@ -380,7 +380,7 @@ public class ConstraintTree<A extends Annotation> {
 					className = clazz.getName();
 				}
 			}
-			throw log.throwNoValidatorFoundForType( className );
+			throw log.getNoValidatorFoundForTypeException( className );
 		}
 		else if ( assignableClasses.size() > 1 ) {
 			StringBuilder builder = new StringBuilder();
@@ -389,7 +389,7 @@ public class ConstraintTree<A extends Annotation> {
 				builder.append( ", " );
 			}
 			builder.delete( builder.length() - 2, builder.length() );
-			throw log.throwMoreThanOneValidatorFoundForType( valueClass, builder.toString() );
+			throw log.getMoreThanOneValidatorFoundForTypeException( valueClass, builder.toString() );
 		}
 	}
 
@@ -439,7 +439,7 @@ public class ConstraintTree<A extends Annotation> {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch ( RuntimeException e ) {
-			throw log.throwUnableToInitializeConstraintValidator( constraintValidator.getClass().getName(), e );
+			throw log.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass().getName(), e );
 		}
 	}
 

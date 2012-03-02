@@ -66,7 +66,7 @@ public abstract class ConstraintMappingContextImplBase {
 		);
 
 		if ( member == null ) {
-			throw log.throwUnableToFindPropertyWithAccess( beanClass, property, elementType );
+			throw log.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
 		}
 
 		return new PropertyConstraintMappingContextImpl( beanClass, member, mapping );
@@ -86,7 +86,7 @@ public abstract class ConstraintMappingContextImplBase {
 
 			String parameterTypesAsString = sb.length() > 2 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-			throw log.throwUnableToFindMethod( beanClass, name, parameterTypesAsString );
+			throw log.getUnableToFindMethodException( beanClass, name, parameterTypesAsString );
 		}
 
 		return new MethodConstraintMappingContextImpl( beanClass, method, mapping );

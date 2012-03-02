@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.hibernate.validator.messageinterpolation;
 
 import java.util.IllegalFormatException;
@@ -22,14 +21,9 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
-import javax.validation.ValidationException;
 
-import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Cause;
-import org.jboss.logging.Logger;
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageLogger;
-
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * A message interpolator which can interpolate the validated value and format this value using the syntax from
@@ -42,10 +36,7 @@ import org.jboss.logging.MessageLogger;
  * @author Hardy Ferentschik
  */
 public class ValueFormatterMessageInterpolator implements MessageInterpolator {
-	private static final Log log = Logger.getMessageLogger(
-			Log.class,
-			ValueFormatterMessageInterpolator.class.getName()
-	);
+	private static final Log log = LoggerFactory.make();
 
 	public static final String VALIDATED_VALUE_KEYWORD = "validatedValue";
 	public static final String VALIDATED_VALUE_FORMAT_SEPARATOR = ":";
@@ -145,7 +136,7 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 	 */
 	private boolean isEscaped(String enclosingString, int charIndex) {
 		if ( charIndex < 0 || charIndex > enclosingString.length() ) {
-			throw log.throwInvalidIndex( "0", "enclosingString.length() - 1" );
+			throw log.getInvalidIndexException( "0", "enclosingString.length() - 1" );
 		}
 		return charIndex > 0 && enclosingString.charAt( charIndex - 1 ) == '\\';
 	}
@@ -169,7 +160,7 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 		else {
 			String format = expression.substring( separatorIndex + 1, expression.length() - 1 );
 			if ( format.length() == 0 ) {
-				throw log.throwMissingFormatStringInTemplate( expression );
+				throw log.getMissingFormatStringInTemplateException( expression );
 			}
 			try {
 				interpolatedValue = String.format( locale, format, validatedValue );
@@ -180,17 +171,4 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 		}
 		return interpolatedValue;
 	}
-
-	@MessageLogger(projectCode = "HV")
-	public interface Log extends BasicLogger {
-		@Message(id = 50, value = "Missing format string in template: %s.")
-		ValidationException throwMissingFormatStringInTemplate(String expression);
-
-		@Message(id = 51, value = "Invalid format: %s.")
-		ValidationException throwInvalidFormat(String message, @Cause IllegalFormatException e);
-
-		@Message(id = 49, value = "The given index must be between %1$s and %2$s.")
-		IndexOutOfBoundsException throwInvalidIndex(String lowerBound, String upperBound);
-	}
-
 }

@@ -102,7 +102,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		Method method = location.getMember();
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
-			throw log.throwInvalidLengthOfParameterMetaDataList(
+			throw log.getInvalidLengthOfParameterMetaDataListException(
 					method,
 					method.getParameterTypes().length,
 					parameterMetaData.size()
@@ -147,7 +147,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw log.throwInvalidMethodParameterIndex( getLocation().getMember().getName(), parameterIndex );
+			throw log.getInvalidMethodParameterIndexException( getLocation().getMember().getName(), parameterIndex );
 		}
 
 		return parameterMetaData.get( parameterIndex );

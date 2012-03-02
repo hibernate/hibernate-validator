@@ -38,7 +38,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw log.throwInvalidBigDecimalFormat( minValue.value(), nfe );
+			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
 	}
 

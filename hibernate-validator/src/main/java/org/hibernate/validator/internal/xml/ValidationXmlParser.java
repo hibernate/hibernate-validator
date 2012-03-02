@@ -86,7 +86,7 @@ public class ValidationXmlParser {
 				log.usingConstraintFactory( constraintFactoryClass );
 			}
 			catch ( ValidationException e ) {
-				throw log.throwUnableToInstantiateConstraintFactoryClass( constraintFactoryClass, e );
+				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryClass, e );
 			}
 		}
 	}
@@ -110,7 +110,7 @@ public class ValidationXmlParser {
 
 			InputStream in = getInputStreamForPath( mappingFileName );
 			if ( in == null ) {
-				throw log.throwUnableToOpenInputStreamForMappingFile( mappingFileName );
+				throw log.getUnableToOpenInputStreamForMappingFileException( mappingFileName );
 			}
 			xmlParameters.addMapping( in );
 		}
@@ -128,13 +128,13 @@ public class ValidationXmlParser {
 				log.usingMessageInterpolator( messageInterpolatorClass );
 			}
 			catch ( ValidationException e ) {
-				throw log.throwUnableToInstantiateMessageInterpolatorClass( messageInterpolatorClass, e );
+				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorClass, e );
 			}
 			catch ( InstantiationException e ) {
-				throw log.throwUnableToInstantiateMessageInterpolatorClass( messageInterpolatorClass, e );
+				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorClass, e );
 			}
 			catch ( IllegalAccessException e ) {
-				throw log.throwUnableToInstantiateMessageInterpolatorClass( messageInterpolatorClass, e );
+				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorClass, e );
 			}
 		}
 	}
@@ -151,13 +151,13 @@ public class ValidationXmlParser {
 				log.usingTraversableResolver( traversableResolverClass );
 			}
 			catch ( ValidationException e ) {
-				throw log.throwUnableToInstantiateTraversableResolverClass( traversableResolverClass, e );
+				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverClass, e );
 			}
 			catch ( InstantiationException e ) {
-				throw log.throwUnableToInstantiateTraversableResolverClass( traversableResolverClass, e );
+				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverClass, e );
 			}
 			catch ( IllegalAccessException e ) {
-				throw log.throwUnableToInstantiateTraversableResolverClass( traversableResolverClass, e );
+				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverClass, e );
 			}
 		}
 	}
@@ -175,7 +175,7 @@ public class ValidationXmlParser {
 				log.usingValidationProvider( providerClassName );
 			}
 			catch ( Exception e ) {
-				throw log.throwUnableToInstantiateValidationProviderClass( providerClassName, e );
+				throw log.getUnableToInstantiateValidationProviderClassException( providerClassName, e );
 			}
 		}
 	}
@@ -201,7 +201,7 @@ public class ValidationXmlParser {
 			validationConfig = root.getValue();
 		}
 		catch ( JAXBException e ) {
-			throw log.throwUnableToParseValidationXmlFile( VALIDATION_XML_FILE, e );
+			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 		finally {
 			try {

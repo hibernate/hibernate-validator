@@ -106,7 +106,7 @@ public final class GroupChain {
 				// since we basically have two groups
 				continue;
 			}
-			throw log.throwUnableToExpandDefaultGroupList( defaultGroupList, groupList );
+			throw log.getUnableToExpandDefaultGroupListException( defaultGroupList, groupList );
 		}
 	}
 

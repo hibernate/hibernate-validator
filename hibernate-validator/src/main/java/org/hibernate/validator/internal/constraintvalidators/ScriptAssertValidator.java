@@ -70,14 +70,14 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 			evaluationResult = scriptEvaluator.evaluate( script, value, alias );
 		}
 		catch ( ScriptException e ) {
-			throw log.throwErrorDuringScriptExecution( script, e );
+			throw log.getErrorDuringScriptExecutionException( script, e );
 		}
 
 		if ( evaluationResult == null ) {
-			throw log.throwScriptMustReturnTrueOrFalse( script );
+			throw log.getScriptMustReturnTrueOrFalseException( script );
 		}
 		if ( !( evaluationResult instanceof Boolean ) ) {
-			throw log.throwScriptMustReturnTrueOrFalse(
+			throw log.getScriptMustReturnTrueOrFalseException(
 					script,
 					evaluationResult,
 					evaluationResult.getClass().getCanonicalName()

@@ -45,7 +45,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 			pattern = java.util.regex.Pattern.compile( parameters.regexp(), intFlag );
 		}
 		catch ( PatternSyntaxException e ) {
-			throw log.throwInvalidRegularExpression( e );
+			throw log.getInvalidRegularExpressionException( e );
 		}
 	}
 

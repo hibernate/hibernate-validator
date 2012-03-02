@@ -295,7 +295,7 @@ public final class PathImpl implements Path, Serializable {
 
 				String value = matcher.group( PROPERTY_NAME_GROUP );
 				if ( !isValidJavaIdentifier( value ) ) {
-					throw log.throwInvalidJavaIdentifier( value );
+					throw log.getInvalidJavaIdentifierException( value );
 				}
 
 				// create the node
@@ -322,7 +322,7 @@ public final class PathImpl implements Path, Serializable {
 				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
 			else {
-				throw log.throwUnableToParsePropertyPath( property );
+				throw log.getUnableToParsePropertyPathException( property );
 			}
 		} while ( tmp != null );
 

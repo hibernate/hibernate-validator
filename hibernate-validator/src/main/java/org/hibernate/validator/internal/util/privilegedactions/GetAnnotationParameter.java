@@ -52,20 +52,20 @@ public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 			m.setAccessible( true );
 			Object o = m.invoke( annotation );
 			if ( o.getClass().getName().equals( type.getName() ) ) {
-				return ( T ) o;
+				return (T) o;
 			}
 			else {
-				throw log.throwWrongParameterType( type.getName(), o.getClass().getName() );
+				throw log.getWrongParameterTypeException( type.getName(), o.getClass().getName() );
 			}
 		}
 		catch ( NoSuchMethodException e ) {
-			throw log.throwUnableToFindAnnotationParameter( parameterName, e );
+			throw log.getUnableToFindAnnotationParameterException( parameterName, e );
 		}
 		catch ( IllegalAccessException e ) {
-			throw log.throwUnableToGetAnnotationParameter( parameterName, annotation.getClass().getName(), e );
+			throw log.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass().getName(), e );
 		}
 		catch ( InvocationTargetException e ) {
-			throw log.throwUnableToGetAnnotationParameter( parameterName, annotation.getClass().getName(), e );
+			throw log.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass().getName(), e );
 		}
 	}
 }

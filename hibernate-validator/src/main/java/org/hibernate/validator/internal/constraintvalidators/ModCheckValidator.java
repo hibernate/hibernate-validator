@@ -79,19 +79,19 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
 
 		if ( this.startIndex < 0 ) {
-			throw log.throwStartIndexCannotBeNegative( this.startIndex );
+			throw log.getStartIndexCannotBeNegativeException( this.startIndex );
 		}
 
 		if ( this.endIndex < 0 ) {
-			throw log.throwEndIndexCannotBeNegative( this.endIndex );
+			throw log.getEndIndexCannotBeNegativeException( this.endIndex );
 		}
 
 		if ( this.startIndex > this.endIndex ) {
-			throw log.throwInvalidRange( this.startIndex, this.endIndex );
+			throw log.getInvalidRangeException( this.startIndex, this.endIndex );
 		}
 
 		if ( checkDigitIndex > 0 && startIndex <= checkDigitIndex && endIndex > checkDigitIndex ) {
-			throw log.throwInvalidCheckDigit( this.startIndex, this.endIndex );
+			throw log.getInvalidCheckDigitException( this.startIndex, this.endIndex );
 		}
 	}
 
@@ -164,7 +164,7 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 				digits.add( Character.digit( c, DEC_RADIX ) );
 			}
 			else {
-				throw log.throwCharacterIsNotADigit( c );
+				throw log.getCharacterIsNotADigitException( c );
 			}
 		}
 		return digits;

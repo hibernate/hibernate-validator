@@ -46,7 +46,7 @@ public final class ParameterConstraintMappingContextImpl
 		super( beanClass, mapping );
 
 		if ( parameterIndex < 0 || parameterIndex >= method.getParameterTypes().length ) {
-			throw log.throwInvalidMethodParameterIndex( method.getName() );
+			throw log.getInvalidMethodParameterIndexException( method.getName() );
 		}
 
 		this.method = method;

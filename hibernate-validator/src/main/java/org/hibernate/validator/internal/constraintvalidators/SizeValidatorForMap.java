@@ -62,13 +62,13 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.throwMaxCannotBeNegative();
+			throw log.getMaxCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw log.throwMaxCannotBeNegative();
+			throw log.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw log.throwLengthCannotBeNegative();
+			throw log.getLengthCannotBeNegativeException();
 		}
 	}
 }

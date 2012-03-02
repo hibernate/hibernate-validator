@@ -62,13 +62,13 @@ public class SizeValidatorForCollection implements ConstraintValidator<Size, Col
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw log.throwMinCannotBeNegative();
+			throw log.getMinCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw log.throwMaxCannotBeNegative();
+			throw log.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw log.throwLengthCannotBeNegative();
+			throw log.getLengthCannotBeNegativeException();
 		}
 	}
 }

@@ -301,7 +301,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
-			throw log.throwInvalidDefaultGroupSequenceDefinition();
+			throw log.getInvalidDefaultGroupSequenceDefinitionException();
 		}
 
 		if ( defaultGroupSequenceProvider != null ) {
@@ -375,7 +375,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					groupSequenceContainsDefault = true;
 				}
 				else if ( group.getName().equals( Default.class.getName() ) ) {
-					throw log.throwNoDefaultGroupInGroupSequence();
+					throw log.getNoDefaultGroupInGroupSequenceException();
 				}
 				else {
 					validDefaultGroupSequence.add( group );
@@ -383,7 +383,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 		if ( !groupSequenceContainsDefault ) {
-			throw log.throwBeanClassMustBePartOfRedefinedDefaultGroupSequence( beanClass.getName() );
+			throw log.getBeanClassMustBePartOfRedefinedDefaultGroupSequenceException( beanClass.getName() );
 		}
 		if ( log.isTraceEnabled() ) {
 			log.tracef(
@@ -414,7 +414,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		throw log.throwWrongDefaultGroupSequenceProviderType( beanClass.getName() );
+		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass.getName() );
 	}
 
 	private Partitioner<ElementType, MetaConstraint<?>> byElementType() {

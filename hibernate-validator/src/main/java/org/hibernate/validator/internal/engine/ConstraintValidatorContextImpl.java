@@ -60,7 +60,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	public final List<MessageAndPath> getMessageAndPathList() {
 		if ( defaultDisabled && messageAndPaths.size() == 0 ) {
-			throw log.throwAtLeastOneCustomMessageMustBeCreated();
+			throw log.getAtLeastOneCustomMessageMustBeCreatedException();
 		}
 
 		List<MessageAndPath> returnedMessageAndPaths = new ArrayList<MessageAndPath>( messageAndPaths );
