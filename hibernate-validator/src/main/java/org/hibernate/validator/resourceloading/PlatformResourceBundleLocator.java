@@ -22,8 +22,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 /**
  * A resource bundle locator, that loads resource bundles by simply
@@ -33,9 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author Gunnar Morling
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
-
-	private static final Logger log = LoggerFactory.getLogger( PlatformResourceBundleLocator.class );
-
+	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
 	private String bundleName;
 
 	public PlatformResourceBundleLocator(String bundleName) {
@@ -66,13 +63,11 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 					+ " not found by validator classloader"
 			);
 		}
-		if ( log.isDebugEnabled() ) {
-			if ( rb != null ) {
-				log.debug( bundleName + " found" );
-			}
-			else {
-				log.debug( bundleName + " not found." );
-			}
+		if ( rb != null ) {
+			log.debugf( "%s found.", bundleName );
+		}
+		else {
+			log.debugf( "%s not found.", bundleName );
 		}
 		return rb;
 	}

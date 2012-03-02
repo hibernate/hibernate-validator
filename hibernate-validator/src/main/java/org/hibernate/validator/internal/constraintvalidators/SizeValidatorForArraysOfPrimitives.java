@@ -18,12 +18,18 @@ package org.hibernate.validator.internal.constraintvalidators;
 
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Check that the length of an array is between <i>min</i> and <i>max</i>
  *
  * @author Hardy Ferentschik
  */
 public abstract class SizeValidatorForArraysOfPrimitives {
+	
+	private  static final Log log = LoggerFactory.make();
+
 	protected int min;
 	protected int max;
 
@@ -35,13 +41,13 @@ public abstract class SizeValidatorForArraysOfPrimitives {
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw new IllegalArgumentException( "The min parameter cannot be negative." );
+			throw log.getMinCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw new IllegalArgumentException( "The max parameter cannot be negative." );
+			throw log.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw new IllegalArgumentException( "The length cannot be negative." );
+			throw log.getLengthCannotBeNegativeException();
 		}
 	}
 }

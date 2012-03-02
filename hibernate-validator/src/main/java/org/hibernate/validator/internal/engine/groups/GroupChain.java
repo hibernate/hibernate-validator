@@ -21,8 +21,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * An instance of {@code GroupChain} defines the group order during one full validation call.
@@ -30,6 +32,8 @@ import javax.validation.groups.Default;
  * @author Hardy Ferentschik
  */
 public final class GroupChain {
+
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The list of single groups to be used this validation.
@@ -102,7 +106,7 @@ public final class GroupChain {
 				// since we basically have two groups
 				continue;
 			}
-			throw new GroupDefinitionException( "Unable to expand default group list" + defaultGroupList + " into sequence " + groupList );
+			throw log.getUnableToExpandDefaultGroupListException( defaultGroupList, groupList );
 		}
 	}
 

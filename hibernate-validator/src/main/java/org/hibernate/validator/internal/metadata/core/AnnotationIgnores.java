@@ -23,9 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
-import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * An  {@code AnnotationIgnores} instance keeps track of annotations which should be ignored as configuration source.
@@ -36,7 +35,7 @@ import org.hibernate.validator.internal.util.LoggerFactory;
  */
 public class AnnotationIgnores {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * Keeps track whether the 'ignore-annotations' flag is set on bean level in the xml configuration. If 'ignore-annotations'
@@ -102,7 +101,10 @@ public class AnnotationIgnores {
 		else {
 			type = "Property";
 		}
-		log.debug( type + " level annotations are getting ignored for " + clazz.getName() + "." + member.getName() );
+
+		if ( log.isDebugEnabled() ) {
+			log.debugf( "%s level annotations are getting ignored for %s.%s.", type, clazz.getName(), member.getName() );
+		}
 	}
 
 	public void setIgnoreAnnotationsOnClass(Class<?> clazz, boolean b) {
@@ -118,7 +120,7 @@ public class AnnotationIgnores {
 			ignoreAnnotation = getDefaultIgnoreAnnotation( clazz );
 		}
 		if ( log.isDebugEnabled() && ignoreAnnotation ) {
-			log.debug( "Class level annotation are getting ignored for " + clazz.getName() );
+			log.debugf( "Class level annotation are getting ignored for %s.", clazz.getName() );
 		}
 		return ignoreAnnotation;
 	}

@@ -19,13 +19,17 @@ package org.hibernate.validator.internal.engine;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
 public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final List<MessageAndPath> messageAndPaths = new ArrayList<MessageAndPath>( 3 );
 	private final PathImpl basePath;
@@ -56,9 +60,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	public final List<MessageAndPath> getMessageAndPathList() {
 		if ( defaultDisabled && messageAndPaths.size() == 0 ) {
-			throw new ValidationException(
-					"At least one custom message must be created if the default error message gets disabled."
-			);
+			throw log.getAtLeastOneCustomMessageMustBeCreatedException();
 		}
 
 		List<MessageAndPath> returnedMessageAndPaths = new ArrayList<MessageAndPath>( messageAndPaths );

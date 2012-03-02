@@ -21,6 +21,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Digits;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Validates that the character sequence (e.g. string) being validated consists of digits,
  * and matches the pattern defined in the constraint.
@@ -29,6 +32,8 @@ import javax.validation.constraints.Digits;
  * @author Hardy Ferentschik
  */
 public class DigitsValidatorForCharSequence implements ConstraintValidator<Digits, CharSequence> {
+
+	private static final Log log = LoggerFactory.make();
 
 	private int maxIntegerLength;
 	private int maxFractionLength;
@@ -69,10 +74,10 @@ public class DigitsValidatorForCharSequence implements ConstraintValidator<Digit
 
 	private void validateParameters() {
 		if ( maxIntegerLength < 0 ) {
-			throw new IllegalArgumentException( "The length of the integer part cannot be negative." );
+			throw log.getInvalidLengthForIntegerPartException();
 		}
 		if ( maxFractionLength < 0 ) {
-			throw new IllegalArgumentException( "The length of the fraction part cannot be negative." );
+			throw log.getInvalidLengthForFractionPartException();
 		}
 	}
 }

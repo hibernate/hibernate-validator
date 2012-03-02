@@ -20,6 +20,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Check that the length of a character sequence is between min and max.
  *
@@ -28,6 +31,9 @@ import javax.validation.constraints.Size;
  * @author Hardy Ferentschik
  */
 public class SizeValidatorForCharSequence implements ConstraintValidator<Size, CharSequence> {
+	
+	private static final Log log = LoggerFactory.make();
+	
 	private int min;
 	private int max;
 
@@ -56,13 +62,13 @@ public class SizeValidatorForCharSequence implements ConstraintValidator<Size, C
 
 	private void validateParameters() {
 		if ( min < 0 ) {
-			throw new IllegalArgumentException( "The min parameter cannot be negative." );
+			throw log.getMinCannotBeNegativeException();
 		}
 		if ( max < 0 ) {
-			throw new IllegalArgumentException( "The max parameter cannot be negative." );
+			throw log.getMaxCannotBeNegativeException();
 		}
 		if ( max < min ) {
-			throw new IllegalArgumentException( "The length cannot be negative." );
+			throw log.getLengthCannotBeNegativeException();
 		}
 	}
 }

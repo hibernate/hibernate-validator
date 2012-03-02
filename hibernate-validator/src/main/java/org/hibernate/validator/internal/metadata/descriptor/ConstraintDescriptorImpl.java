@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
-import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
@@ -42,16 +41,15 @@ import javax.validation.ValidationException;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.slf4j.Logger;
-
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.util.LoggerFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
 
@@ -66,7 +64,7 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
 	private static final long serialVersionUID = -2563102960314069246L;
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 	private static final String GROUPS = "groups";
 	private static final String PAYLOAD = "payload";
@@ -324,10 +322,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				parameters.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch ( IllegalAccessException e ) {
-				throw new ValidationException( "Unable to read annotation attributes: " + annotation.getClass(), e );
+				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
 			}
 			catch ( InvocationTargetException e ) {
-				throw new ValidationException( "Unable to read annotation attributes: " + annotation.getClass(), e );
+				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
 			}
 		}
 		return Collections.unmodifiableMap( parameters );
@@ -340,10 +338,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 		// should never happen
 		catch ( IllegalAccessException e ) {
-			throw new ValidationException( "Unable to retrieve annotation parameter value.", e );
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
 		catch ( InvocationTargetException e ) {
-			throw new ValidationException( "Unable to retrieve annotation parameter value.", e );
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
 		return value;
 	}
@@ -389,15 +387,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
 		final Method method = ReflectionHelper.getMethod( overridesAttribute.constraint(), overridesAttribute.name() );
 		if ( method == null ) {
-			throw new ConstraintDefinitionException(
-					"Overridden constraint does not define an attribute with name " + overridesAttribute.name()
-			);
+			throw log.getOverriddenConstraintAttributeNotFoundException( overridesAttribute.name() );
 		}
 		Class<?> returnTypeOfOverriddenConstraint = method.getReturnType();
 		if ( !returnTypeOfOverriddenConstraint.equals( m.getReturnType() ) ) {
-			String message = "The overriding type of a composite constraint must be identical to the overridden one. Expected " + returnTypeOfOverriddenConstraint
-					.getName() + " found " + m.getReturnType();
-			throw new ConstraintDefinitionException( message );
+			throw log.getWrongAttributeTypeForOverriddenConstraintException(
+					returnTypeOfOverriddenConstraint.getName(),
+					m.getReturnType()
+			);
 		}
 	}
 
@@ -416,7 +413,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			if ( constraintHelper.isConstraintComposition( declaredAnnotationType ) ) {
 				this.setCompositionType( ( (ConstraintComposition) declaredAnnotation ).value() );
 				if ( log.isDebugEnabled() ) {
-					log.debug( "Adding Bool" + declaredAnnotationType.getName() );
+					log.debugf( "Adding Bool %s.", declaredAnnotationType.getName() );
 				}
 				continue;
 			}
@@ -427,9 +424,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 						declaredAnnotation, overrideParameters, OVERRIDES_PARAMETER_DEFAULT_INDEX
 				);
 				composingConstraintsSet.add( descriptor );
-				if ( log.isDebugEnabled() ) {
-					log.debug( "Adding composing constraint: " + descriptor );
-				}
+				log.debugf( "Adding composing constraint: %s.", descriptor );
 			}
 			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotationType ) ) {
 				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
@@ -439,9 +434,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 							constraintAnnotation, overrideParameters, index
 					);
 					composingConstraintsSet.add( descriptor );
-					if ( log.isDebugEnabled() ) {
-						log.debug( "Adding composing constraint: " + descriptor );
-					}
+					log.debugf( "Adding composing constraint: %s.", descriptor );
 					index++;
 				}
 			}

@@ -23,6 +23,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Cache for created instances of {@code BeanMetaData}.
@@ -41,15 +42,15 @@ public class BeanMetaDataCache {
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		assertNotNull( beanClass, "Class cannot be null" );
+		assertNotNull( beanClass, MESSAGES.mustNotBeNull( "Class" ) );
 
 		return (BeanMetaDataImpl<T>) metadataProviders.get( beanClass );
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> addBeanMetaData(Class<T> beanClass, BeanMetaData<T> metaData) {
-		assertNotNull( beanClass, "Class cannot be null" );
-		assertNotNull( metaData, "MetaData cannot be null" );
+		assertNotNull( beanClass, MESSAGES.mustNotBeNull( "Class" ) );
+		assertNotNull( metaData, MESSAGES.mustNotBeNull( "MetaData" ) );
 
 		return (BeanMetaData<T>) metadataProviders.putIfAbsent( beanClass, metaData );
 	}

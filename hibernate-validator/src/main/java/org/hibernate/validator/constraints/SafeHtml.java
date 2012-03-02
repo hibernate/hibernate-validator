@@ -28,6 +28,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.constraints.SafeHtml.WhiteListType.RELAXED;
 
 /**
  * Validate a rich text value provided by the user to ensure that it contains no malicious code, such as embedded
@@ -50,7 +51,7 @@ public @interface SafeHtml {
 	/**
 	 * @return The built-in whitelist type which will be applied to the rich text value
 	 */
-	WhiteListType whitelistType() default WhiteListType.RELAXED;
+	WhiteListType whitelistType() default RELAXED;
 
 	/**
 	 * @return Additional whitelist tags which are allowed on top of the tags specified by the

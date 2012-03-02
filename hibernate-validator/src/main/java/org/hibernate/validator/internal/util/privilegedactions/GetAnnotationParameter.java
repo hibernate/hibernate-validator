@@ -20,17 +20,21 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
-import javax.validation.ValidationException;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
+
+	private static final Log log = LoggerFactory.make();
+
 	private final Annotation annotation;
 	private final String parameterName;
 	private final Class<T> type;
-
 
 	public static <T> GetAnnotationParameter<T> action(Annotation annotation, String parameterName, Class<T> type) {
 		return new GetAnnotationParameter<T>( annotation, parameterName, type );
@@ -48,24 +52,20 @@ public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 			m.setAccessible( true );
 			Object o = m.invoke( annotation );
 			if ( o.getClass().getName().equals( type.getName() ) ) {
-				return ( T ) o;
+				return (T) o;
 			}
 			else {
-				String msg = "Wrong parameter type. Expected: " + type.getName() + " Actual: " + o.getClass().getName();
-				throw new ValidationException( msg );
+				throw log.getWrongParameterTypeException( type.getName(), o.getClass().getName() );
 			}
 		}
 		catch ( NoSuchMethodException e ) {
-			String msg = "The specified annotation defines no parameter '" + parameterName + "'.";
-			throw new ValidationException( msg, e );
+			throw log.getUnableToFindAnnotationParameterException( parameterName, e );
 		}
 		catch ( IllegalAccessException e ) {
-			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
-			throw new ValidationException( msg, e );
+			throw log.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass().getName(), e );
 		}
 		catch ( InvocationTargetException e ) {
-			String msg = "Unable to get '" + parameterName + "' from " + annotation.getClass().getName();
-			throw new ValidationException( msg, e );
+			throw log.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass().getName(), e );
 		}
 	}
 }

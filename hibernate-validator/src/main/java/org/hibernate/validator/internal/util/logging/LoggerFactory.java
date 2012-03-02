@@ -1,6 +1,5 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.internal.util;
+package org.hibernate.validator.internal.util.logging;
 
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.jboss.logging.Logger;
 
 /**
  * @author Hardy Ferentschik
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
  */
-public final class Version {
-	static {
-		LoggerFactory.make().version( getVersionString() );
+public final class LoggerFactory {
+	public static Log make() {
+		Throwable t = new Throwable();
+		StackTraceElement directCaller = t.getStackTrace()[1];
+		return Logger.getMessageLogger( Log.class, directCaller.getClassName() );
 	}
 
-	public static String getVersionString() {
-		return "[WORKING]";
-	}
-
-	public static void touch() {
-	}
-
-	// helper class should not have a public constructor
-	private Version() {
+	// private constructor to avoid instantiation
+	private LoggerFactory(){
 	}
 }
+

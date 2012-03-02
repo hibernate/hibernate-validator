@@ -48,13 +48,8 @@
             <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <optional>true</optional>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
         </dependency>
         <!--
         Provided dependencies.
@@ -86,6 +81,11 @@
             <artifactId>joda-time</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
@@ -108,11 +108,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -169,7 +164,6 @@
                 </executions>
                 <configuration>
                     <packageName>org.hibernate.validator.internal.xml</packageName>
-                    <outputDirectory>${basedir}/target/generated-sources</outputDirectory>
                     <extension>true</extension>
                 </configuration>
                 <dependencies>
@@ -184,6 +178,10 @@
                         <version>2.1.13</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -231,7 +229,7 @@
                             javax.validation.*;version="[1.0.0,2.0.0)",
                             javax.xml.*;version="0",
                             org.xml.sax.*;version="0",
-                            org.slf4j.*;version="[1.5.6,2.0.0)",
+                            org.jboss.logging.*;version="[3.1.0,4.0.0)",
                             org.joda.time.*;version="[1.6.0,2.0.0)";resolution:=optional,
                             org.jsoup.*;version="[1.5.2,2.0.0)";resolution:=optional
                         </Import-Package>

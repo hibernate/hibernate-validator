@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.constraints.CompositionType.AND;
 
 /**
  * Boolean operator that is applied to all constraints of a composing constraint annotation.
@@ -42,5 +43,5 @@ public @interface ConstraintComposition {
 	 * namely disjunction (OR), negation of the conjunction (ALL_FALSE),
 	 * or, the default, simple conjunction (AND).
 	 */
-	CompositionType value() default CompositionType.AND;
+	CompositionType value() default AND;
 }

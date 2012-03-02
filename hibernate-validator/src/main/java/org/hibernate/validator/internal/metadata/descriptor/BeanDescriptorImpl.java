@@ -26,13 +26,14 @@ import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
-import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Describes a validated bean.
@@ -42,11 +43,8 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
  * @author Gunnar Morling
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor, TypeDescriptor {
-
 	private final Map<String, PropertyDescriptor> constrainedProperties;
-
 	private final Map<String, MethodDescriptor> methods;
-
 	private final Set<MethodDescriptor> constrainedMethods;
 
 	public BeanDescriptorImpl(Class<T> beanClass, Set<ConstraintDescriptorImpl<?>> classLevelConstraints, Map<String, PropertyDescriptor> properties, Map<String, MethodDescriptor> methods, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
@@ -88,7 +86,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	//a descriptor if the given method is constrained.
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 
-		Contracts.assertNotNull( methodName, "The method name must not be null" );
+		Contracts.assertNotNull( methodName, MESSAGES.methodNameMustNotBeNull() );
 
 		return methods.get( methodName + Arrays.toString( parameterTypes ) );
 	}

@@ -21,11 +21,16 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.DecimalMin;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * @author Hardy Ferentschik
  */
 public class DecimalMinValidatorForCharSequence implements ConstraintValidator<DecimalMin, CharSequence> {
 
+	private static final Log log = LoggerFactory.make();
+	
 	private BigDecimal minValue;
 
 	public void initialize(DecimalMin minValue) {
@@ -33,9 +38,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 			this.minValue = new BigDecimal( minValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw new IllegalArgumentException(
-					minValue.value() + " does not represent a valid BigDecimal format", nfe
-			);
+			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
 	}
 

@@ -22,6 +22,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.DecimalMax;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Check that the number being validated is less than or equal to the maximum
  * value specified.
@@ -30,6 +33,8 @@ import javax.validation.constraints.DecimalMax;
  */
 public class DecimalMaxValidatorForNumber implements ConstraintValidator<DecimalMax, Number> {
 
+	private static final Log log = LoggerFactory.make();
+
 	private BigDecimal maxValue;
 
 	public void initialize(DecimalMax maxValue) {
@@ -37,9 +42,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 			this.maxValue = new BigDecimal( maxValue.value() );
 		}
 		catch ( NumberFormatException nfe ) {
-			throw new IllegalArgumentException(
-					maxValue.value() + " does not represent a valid BigDecimal format", nfe
-			);
+			throw log.getInvalidBigDecimalFormatException( maxValue.value(), nfe );
 		}
 	}
 

@@ -24,16 +24,15 @@ import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-
-import org.hibernate.validator.internal.util.LoggerFactory;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
 public class ValidationMessages extends ResourceBundle {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private static final String DEFAULT_PROPERTIES_FILE_NAME = "/org/hibernate/validator/ValidationMessages.properties";
 
@@ -43,7 +42,7 @@ public class ValidationMessages extends ResourceBundle {
 
 		log.info( "For test purposes are we proxying the built-in messages!" );
 		addTestPropertiesToBundle();
-		log.info( "Adding the following properties to default properties {}", messages );
+		log.infof( "Adding the following properties to default properties %s", messages );
 
 		loadDefaultValidationProperties();
 	}

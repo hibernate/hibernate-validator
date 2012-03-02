@@ -17,7 +17,9 @@
 package org.hibernate.validator.internal.util.privilegedactions;
 
 import java.security.PrivilegedAction;
-import javax.validation.ValidationException;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -25,6 +27,8 @@ import javax.validation.ValidationException;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class LoadClass implements PrivilegedAction<Class<?>> {
+
+	private static final Log log = LoggerFactory.make();
 
 	private static final String HIBERNATE_VALIDATOR_CLASS_NAME = "org.hibernate.validator";
 
@@ -68,11 +72,11 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 				return contextClassLoader.loadClass( className );
 			}
 			else {
-				throw new ValidationException( "Unable to load class: " + className );
+				throw log.getUnableToLoadClassException( className );
 			}
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new ValidationException( "Unable to load class: " + className, e );
+			throw log.getUnableToLoadClassException( className, e );
 		}
 	}
 
@@ -93,7 +97,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 			return Class.forName( className, true, caller.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new ValidationException( "Unable to load class: " + className, e );
+			throw log.getUnableToLoadClassException( className, e );
 		}
 	}
 }

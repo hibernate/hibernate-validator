@@ -22,8 +22,13 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorFactory;
+
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Validator for the {@link ScriptAssert} constraint annotation.
@@ -33,6 +38,9 @@ import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorFactory
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, Object> {
+
+	private static final Log log = LoggerFactory.make();
+
 	private String script;
 	private String languageName;
 	private String alias;
@@ -62,18 +70,17 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 			evaluationResult = scriptEvaluator.evaluate( script, value, alias );
 		}
 		catch ( ScriptException e ) {
-			throw new ConstraintDeclarationException(
-					"Error during execution of script \"" + script + "\" occurred.", e
-			);
+			throw log.getErrorDuringScriptExecutionException( script, e );
 		}
 
 		if ( evaluationResult == null ) {
-			throw new ConstraintDeclarationException( "Script \"" + script + "\" returned null, but must return either true or false." );
+			throw log.getScriptMustReturnTrueOrFalseException( script );
 		}
 		if ( !( evaluationResult instanceof Boolean ) ) {
-			throw new ConstraintDeclarationException(
-					"Script \"" + script + "\" returned " + evaluationResult + " (of type " + evaluationResult.getClass()
-							.getCanonicalName() + "), but must return either true or false."
+			throw log.getScriptMustReturnTrueOrFalseException(
+					script,
+					evaluationResult,
+					evaluationResult.getClass().getCanonicalName()
 			);
 		}
 
@@ -81,14 +88,8 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 	}
 
 	private void validateParameters(ScriptAssert constraintAnnotation) {
-		if ( constraintAnnotation.script().length() == 0 ) {
-			throw new IllegalArgumentException( "The parameter \"script\" must not be empty." );
-		}
-		if ( constraintAnnotation.lang().length() == 0 ) {
-			throw new IllegalArgumentException( "The parameter \"lang\" must not be empty." );
-		}
-		if ( constraintAnnotation.alias().length() == 0 ) {
-			throw new IllegalArgumentException( "The parameter \"alias\" must not be empty." );
-		}
+		Contracts.assertNotEmpty( constraintAnnotation.script(), MESSAGES.parameterMustNotBeEmpty( "script" ) );
+		Contracts.assertNotEmpty( constraintAnnotation.lang(), MESSAGES.parameterMustNotBeEmpty( "lang" ) );
+		Contracts.assertNotEmpty( constraintAnnotation.alias(), MESSAGES.parameterMustNotBeEmpty( "alias" ) );
 	}
 }

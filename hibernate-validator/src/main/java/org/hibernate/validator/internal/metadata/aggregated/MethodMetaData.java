@@ -31,9 +31,11 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -59,8 +61,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class MethodMetaData extends AbstractConstraintMetaData {
 
-	private final Class<?>[] parameterTypes;
+	private static final Log log = LoggerFactory.make();
 
+	private final Class<?>[] parameterTypes;
 	private final List<ParameterMetaData> parameterMetaData;
 
 	/**
@@ -329,7 +332,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw new IllegalArgumentException( "Method " + getName() + " doesn't have a parameter with index " + parameterIndex );
+			throw log.getInvalidMethodParameterIndexException( getName(), parameterIndex );
 		}
 
 		return parameterMetaData.get( parameterIndex );

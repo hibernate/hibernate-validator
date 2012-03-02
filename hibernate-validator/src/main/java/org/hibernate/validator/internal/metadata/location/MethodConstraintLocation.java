@@ -23,6 +23,8 @@ import java.lang.reflect.Type;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * A {@link ConstraintLocation} implementation that represents a method
  * parameter or return value.
@@ -30,14 +32,12 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Gunnar Morling
  */
 public class MethodConstraintLocation implements ConstraintLocation {
-
 	private final Method method;
-
 	private final Integer parameterIndex;
 
 	public MethodConstraintLocation(Method method) {
 
-		Contracts.assertNotNull( method, "Method must not be null" );
+		Contracts.assertNotNull( method, MESSAGES.mustNotBeNull( "Method" ) );
 
 		this.method = method;
 		this.parameterIndex = null;
@@ -51,7 +51,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	 */
 	public MethodConstraintLocation(Method method, int parameterIndex) {
 
-		Contracts.assertNotNull( method, "Method must not be null" );
+		Contracts.assertNotNull( method, MESSAGES.mustNotBeNull( "Method" ) );
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;

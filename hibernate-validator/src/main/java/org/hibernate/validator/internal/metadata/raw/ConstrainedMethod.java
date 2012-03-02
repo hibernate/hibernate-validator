@@ -24,6 +24,8 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
@@ -33,6 +35,8 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Gunnar Morling
  */
 public class ConstrainedMethod extends AbstractConstrainedElement {
+
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * Constrained-related meta data for this method's parameters.
@@ -98,11 +102,10 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		Method method = location.getMember();
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
-			throw new IllegalArgumentException(
-					String.format(
-							"Method %s has %s parameters, but the passed list of parameter meta data has a size of %s.",
-							method, method.getParameterTypes().length, parameterMetaData.size()
-					)
+			throw log.getInvalidLengthOfParameterMetaDataListException(
+					method,
+					method.getParameterTypes().length,
+					parameterMetaData.size()
 			);
 		}
 
@@ -144,7 +147,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw new IllegalArgumentException( "Method " + getLocation().getMember() + " doesn't have a parameter with index " + parameterIndex );
+			throw log.getInvalidMethodParameterIndexException( getLocation().getMember().getName(), parameterIndex );
 		}
 
 		return parameterMetaData.get( parameterIndex );

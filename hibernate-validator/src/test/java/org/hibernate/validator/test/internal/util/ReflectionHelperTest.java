@@ -159,7 +159,7 @@ public class ReflectionHelperTest {
 			fail();
 		}
 		catch ( ValidationException e ) {
-			assertTrue( e.getMessage().startsWith( "Wrong parameter type." ), "Wrong exception message" );
+			assertTrue( e.getMessage().contains( "Wrong parameter type." ), "Wrong exception message" );
 		}
 
 		try {
@@ -168,7 +168,7 @@ public class ReflectionHelperTest {
 		}
 		catch ( ValidationException e ) {
 			assertTrue(
-					e.getMessage().startsWith( "The specified annotation defines no parameter" ),
+					e.getMessage().contains( "The specified annotation defines no parameter" ),
 					"Wrong exception message"
 			);
 		}

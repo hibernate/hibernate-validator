@@ -92,7 +92,7 @@
             <para><package>org.xml.sax.*</package></para>
         </listitem>
         <listitem>
-            <para><package>org.slf4j.*</package>, [1.5.6,2.0.0)</para>
+            <para><package>org.jboss.logging.*</package>, [3.1.0,4.0.0)</para>
         </listitem>
         <listitem>
             <para><package>org.joda.time.*</package>, [1.6.0,2.0.0), optional</para>

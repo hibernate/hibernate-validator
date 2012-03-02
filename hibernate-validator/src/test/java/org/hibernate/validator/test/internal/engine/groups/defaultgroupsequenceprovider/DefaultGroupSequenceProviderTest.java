@@ -72,7 +72,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "The default group sequence provider defined for .* has the wrong type"
+			expectedExceptionsMessageRegExp = "HV[0-9]*: The default group sequence provider defined for .* has the wrong type"
 	)
 	public void testDefinitionOfDefaultGroupSequenceProviderWithWrongType() {
 		validator.validate( new D() );

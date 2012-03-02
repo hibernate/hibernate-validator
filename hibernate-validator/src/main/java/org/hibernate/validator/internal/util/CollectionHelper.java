@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public class CollectionHelper {
+public final class CollectionHelper {
 
 	private CollectionHelper() {
 	}

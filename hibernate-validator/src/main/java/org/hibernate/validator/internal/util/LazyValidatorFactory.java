@@ -39,9 +39,9 @@ import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
 
-import org.slf4j.Logger;
-
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
@@ -60,7 +60,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  * @author Hardy Ferentschik
  */
 public class LazyValidatorFactory implements ValidatorFactory {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final Configuration<?> configuration;
 	private volatile ValidatorFactory delegate; //use as a barrier
 
@@ -167,7 +167,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 				catch ( ValidationException e ) {
 					// ignore - we don't want to  fail the whole loading because of a black sheep. Hibernate Validator
 					// will be added either way
-					log.warn( "Unable to load provider class " + providerName );
+					log.unableToLoadProviderClass( providerName );
 					continue;
 				}
 
@@ -175,14 +175,10 @@ public class LazyValidatorFactory implements ValidatorFactory {
 					providers.add( (ValidationProvider) providerClass.newInstance() );
 				}
 				catch ( IllegalAccessException e ) {
-					throw new ValidationException(
-							"Unable to instantiate Bean Validation provider" + providerNames, e
-					);
+					throw log.getUnableToInstantiateBeanValidationProviderException( providerNames, e );
 				}
 				catch ( InstantiationException e ) {
-					throw new ValidationException(
-							"Unable to instantiate Bean Validation provider" + providerNames, e
-					);
+					throw log.getUnableToInstantiateBeanValidationProviderException( providerNames, e );
 				}
 			}
 			return providers;
@@ -212,7 +208,7 @@ public class LazyValidatorFactory implements ValidatorFactory {
 				}
 			}
 			catch ( IOException e ) {
-				throw new ValidationException( "Unable to read " + SERVICES_FILE, e );
+				throw log.getUnableToReadServicesFileException( SERVICES_FILE, e );
 			}
 
 			// we want to make sure that Hibernate Validator is in the list and on the first position. This

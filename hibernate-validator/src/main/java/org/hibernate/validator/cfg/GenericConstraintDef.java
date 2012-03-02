@@ -38,5 +38,4 @@ public class GenericConstraintDef<A extends Annotation> extends ConstraintDef<Ge
 		addParameter( key, value );
 		return this;
 	}
-
 }

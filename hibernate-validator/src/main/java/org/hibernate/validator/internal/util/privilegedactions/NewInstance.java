@@ -17,7 +17,9 @@
 package org.hibernate.validator.internal.util.privilegedactions;
 
 import java.security.PrivilegedAction;
-import javax.validation.ValidationException;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Execute instance creation as privileged action.
@@ -26,6 +28,9 @@ import javax.validation.ValidationException;
  * @author Hardy Ferentschik
  */
 public final class NewInstance<T> implements PrivilegedAction<T> {
+
+	private static final Log log = LoggerFactory.make();
+
 	private final Class<T> clazz;
 	private final String message;
 
@@ -43,13 +48,13 @@ public final class NewInstance<T> implements PrivilegedAction<T> {
 			return clazz.newInstance();
 		}
 		catch ( InstantiationException e ) {
-			throw new ValidationException( "Unable to instantiate " + message + ": " + clazz, e );
+			throw log.getUnableToInstantiateException( message, clazz, e );
 		}
 		catch ( IllegalAccessException e ) {
-			throw new ValidationException( "Unable to instantiate " + clazz, e );
+			throw log.getUnableToInstantiateException( clazz, e );
 		}
 		catch ( RuntimeException e ) {
-			throw new ValidationException( "Unable to instantiate " + clazz, e );
+			throw log.getUnableToInstantiateException( clazz, e );
 		}
 	}
 }

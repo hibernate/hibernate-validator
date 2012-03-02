@@ -27,6 +27,10 @@ import java.util.regex.Pattern;
 import javax.validation.Path;
 
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * @author Hardy Ferentschik
@@ -36,6 +40,7 @@ import org.hibernate.validator.internal.util.Contracts;
 public final class PathImpl implements Path, Serializable {
 
 	private static final long serialVersionUID = 7564511574909882392L;
+	private static final Log log = LoggerFactory.make();
 
 	public static final String PROPERTY_PATH_SEPARATOR = ".";
 
@@ -71,9 +76,8 @@ public final class PathImpl implements Path, Serializable {
 	 * {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
-		if ( propertyPath == null ) {
-			throw new IllegalArgumentException( "null is not allowed as property path." );
-		}
+
+		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
 			return createNewPath( null );
@@ -291,7 +295,7 @@ public final class PathImpl implements Path, Serializable {
 
 				String value = matcher.group( PROPERTY_NAME_GROUP );
 				if ( !isValidJavaIdentifier( value ) ) {
-					throw new IllegalArgumentException( value + " is not a valid Java Identifier" );
+					throw log.getInvalidJavaIdentifierException( value );
 				}
 
 				// create the node
@@ -318,7 +322,7 @@ public final class PathImpl implements Path, Serializable {
 				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
 			else {
-				throw new IllegalArgumentException( "Unable to parse property path " + property );
+				throw log.getUnableToParsePropertyPathException( property );
 			}
 		} while ( tmp != null );
 

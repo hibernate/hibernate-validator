@@ -18,6 +18,10 @@ package org.hibernate.validator.internal.util.privilegedactions;
 
 import java.security.PrivilegedAction;
 
+import org.hibernate.validator.internal.util.Contracts;
+
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 /**
  * @author Emmanuel Bernard
  */
@@ -29,9 +33,7 @@ public final class GetClassLoader implements PrivilegedAction<ClassLoader> {
 	}
 
 	public static GetClassLoader fromClass(Class<?> clazz) {
-		if ( clazz == null ) {
-			throw new IllegalArgumentException( "Class is null" );
-		}
+		Contracts.assertNotNull( clazz, MESSAGES.classIsNull() );
 		return new GetClassLoader( clazz );
 	}
 
