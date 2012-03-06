@@ -70,7 +70,7 @@
 
     <files>
         <file>
-            <source>../readme.txt</source>
+            <source>../README.md</source>
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
@@ -95,7 +95,7 @@
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
                 <!-- we already have these files at the top level of the distribution -->
-                <exclude>readme.txt</exclude>
+                <exclude>README.md</exclude>
                 <exclude>changelog.txt</exclude>
                 <exclude>copyright.txt</exclude>
                 <exclude>license.txt</exclude>

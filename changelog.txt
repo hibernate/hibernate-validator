@@ -1,5 +1,56 @@
 Hibernate Validator Changelog
-==========================
+=============================
+
+4.3.0.Alpha1 (06.03.2012)
+-------------------------
+
+** Bug
+    * [HV-443] - Scope of ConstraintDescriptors sometimes wrong in type hierarchies
+    * [HV-472] - E-Mail Validator does not validate IDN E-Mail-Addresses
+    * [HV-480] - Constraints configured via XML and programmatic API aren't merged
+    * [HV-506] - Message interpolation should check whether an interpolated annotation paramter is an array
+    * [HV-508] - DecimalMaxValidatorForNumber for a double values is not correct
+    * [HV-509] - Property path is wrong for cascaded validation of class-level constraints
+    * [HV-511] - Minor documentation error
+    * [HV-516] - Hibernate Validator doesn't work well with hibernate persistence when generating DDL
+    * [HV-519] - Typos in ValidationMessages_de.properties
+    * [HV-524] - java.util.NoSuchElementException in type level validation using EclipseLink
+    * [HV-525] - tests fail on openjdk
+    * [HV-531] - hibernate-validator-annotation-processor tests fails when running against JDK7
+    * [HV-537] - Reintroduce jdocbook.ignoreTranslations in the docbook configuration
+    * [HV-543] - spelling mistake in org.hibernate.valisdator.validationMessages_fr.properties
+    * [HV-546] - LazyValidatorFactory does not allow alternative bean validation providers
+    * [HV-550] - fail-fast doesn't work on composite constraints
+    * [HV-551] - @Size doesn't work on List with bounded wildcard
+
+** Improvement
+    * [HV-473] - Add option to Canonicalize String Input
+    * [HV-491] - Add support for MOD11 Algorithm
+    * [HV-500] - ConfigurationImpl should support multiple programmatic constraint mappings
+    * [HV-502] - Changing Generic Type on @Size, @Pattern a.s.o. from String to CharacterSequence
+    * [HV-515] - Performance improvement for MinValidatorForString
+    * [HV-518] - Create copyright.txt as mentioned by the license headers
+    * [HV-520] - Remove package cycle between "descriptor" and "aggregated" packages
+    * [HV-527] - ValidationMessages in Czech language
+    * [HV-529] - ConstraintHelper is obsolete in ValidatorImpl
+    * [HV-539] - Modify how MANIFESTs are generated
+    * [HV-545] - Update TCK runner to run against AS 7.1
+    * [HV-547] - Make Hibernate Validator build not fail
+
+** Task
+    * [HV-441] - Refactor BeanMetaDataImpl
+    * [HV-465] - Remove obsolete type parameter from MetaConstraint#validateConstraint()
+    * [HV-481] - Move to i18n logs and exception via JBoss Logging
+    * [HV-484] - Refactor package organisation to clearly separate spi, public and private APIs - part 1 (internal packages)
+    * [HV-496] - Include Hibernate Validator test classes in a different classifier
+    * [HV-505] - Update tck runner to run against AS 7.0.0.Final
+    * [HV-510] - Upgrade BV TCK dependency to 1.0.6.GA 
+    * [HV-528] - Compilation fails with JDK 7 due to incompatabilites of JAXB versions
+    * [HV-530] - Explain propagation of redefined default groups across associated instances annotated with @Valid
+    * [HV-534] - Consider removing the shading plug-in
+    * [HV-536] - Upgrade JSoup dependency
+    * [HV-540] - Remove repository settings from the master pom
+    * [HV-544] - Create a integration test moodule 
 
 4.2.0.Final (20.06.2011)
 ----------------------
