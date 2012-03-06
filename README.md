@@ -68,7 +68,7 @@ skip the building of the documentation via:
 
     mvn clean install -DdisableDocumentationBuild=true -s settings-example.xml
 
-There are more build options available as well. For more information refer to (Contributing to Hibernate Validator)[http://community.jboss.org/wiki/ContributingtoHibernateValidator].
+There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://community.jboss.org/wiki/ContributingtoHibernateValidator).
 
 ## Hibernate Validator URLs
 
