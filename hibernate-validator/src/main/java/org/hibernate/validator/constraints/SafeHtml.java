@@ -60,7 +60,7 @@ public @interface SafeHtml {
 	String[] additionalTags() default { };
 
 	/**
-	 * Defines several {@code @WebSafe} annotations on the same element.
+	 * Defines several {@code @SafeHtml} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
