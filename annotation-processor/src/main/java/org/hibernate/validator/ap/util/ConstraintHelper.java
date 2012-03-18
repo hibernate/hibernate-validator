@@ -16,15 +16,12 @@
 */
 package org.hibernate.validator.ap.util;
 
-import java.lang.annotation.Annotation;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -36,24 +33,9 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
 import javax.lang.model.util.Types;
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.Valid;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
-import org.hibernate.validator.group.GroupSequenceProvider;
+import static org.hibernate.validator.ap.util.TypeNames.Javax;
+import static org.hibernate.validator.ap.util.TypeNames.Org;
 
 /**
  * Helper class that deals with all constraint-related stuff, such as
@@ -136,12 +118,6 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * The name of the package containing JSR 303 standard annotations
-	 * ("javax.validation.constraints").
-	 */
-	private final Name CONSTRAINT_ANNOTATION_PACKAGE_NAME;
-
-	/**
 	 * Contains the supported types for the built-in constraints. Keyed by
 	 * constraint annotation type names, each value is a set with the allowed
 	 * types for the mapped constraint.
@@ -160,49 +136,58 @@ public class ConstraintHelper {
 		this.typeUtils = typeUtils;
 		this.annotationApiHelper = annotationApiHelper;
 
-		CONSTRAINT_ANNOTATION_PACKAGE_NAME = elementUtils.getName( Size.class.getPackage().getName() );
-
 		builtInConstraints = CollectionHelper.newHashMap();
 
 		registerAllowedTypesForBuiltInConstraint(
-				AssertFalse.class, CollectionHelper.<Class<?>>asSet( Boolean.class )
-		);
-		registerAllowedTypesForBuiltInConstraint( AssertTrue.class, CollectionHelper.<Class<?>>asSet( Boolean.class ) );
-		registerAllowedTypesForBuiltInConstraint(
-				DecimalMax.class, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
+				Javax.Validation.Constraints.ASSERT_FALSE, CollectionHelper.<Class<?>>asSet( Boolean.class )
 		);
 		registerAllowedTypesForBuiltInConstraint(
-				DecimalMin.class, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
+				Javax.Validation.Constraints.ASSERT_TRUE, CollectionHelper.<Class<?>>asSet( Boolean.class )
 		);
 		registerAllowedTypesForBuiltInConstraint(
-				Digits.class, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
+				Javax.Validation.Constraints.DECIMAL_MAX, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
 		);
 		registerAllowedTypesForBuiltInConstraint(
-				Future.class, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
+				Javax.Validation.Constraints.DECIMAL_MIN, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				Javax.Validation.Constraints.DIGITS, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				Javax.Validation.Constraints.FUTURE, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
 		);
 		registerAllowedTypesForBuiltInConstraintByNames(
-				Future.class,
+				Javax.Validation.Constraints.FUTURE,
 				CollectionHelper.<String>asSet( "org.joda.time.ReadablePartial", "org.joda.time.ReadableInstant" )
 		);
 		registerAllowedTypesForBuiltInConstraint(
-				Max.class, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
+				Javax.Validation.Constraints.MAX, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
 		);
 		registerAllowedTypesForBuiltInConstraint(
-				Min.class, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
+				Javax.Validation.Constraints.MIN, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
 		);
-		registerAllowedTypesForBuiltInConstraint( NotNull.class, CollectionHelper.<Class<?>>asSet( Object.class ) );
-		registerAllowedTypesForBuiltInConstraint( Null.class, CollectionHelper.<Class<?>>asSet( Object.class ) );
 		registerAllowedTypesForBuiltInConstraint(
-				Past.class, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
+				Javax.Validation.Constraints.NOT_NULL,
+				CollectionHelper.<Class<?>>asSet( Object.class )
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				Javax.Validation.Constraints.NULL,
+				CollectionHelper.<Class<?>>asSet( Object.class )
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				Javax.Validation.Constraints.PAST, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
 		);
 		registerAllowedTypesForBuiltInConstraintByNames(
-				Past.class, 
+				Javax.Validation.Constraints.PAST,
 				CollectionHelper.<String>asSet( "org.joda.time.ReadablePartial", "org.joda.time.ReadableInstant" )
 		);
 
-		registerAllowedTypesForBuiltInConstraint( Pattern.class, CollectionHelper.<Class<?>>asSet( String.class ) );
 		registerAllowedTypesForBuiltInConstraint(
-				Size.class, CollectionHelper.<Class<?>>asSet(
+				Javax.Validation.Constraints.PATTERN,
+				CollectionHelper.<Class<?>>asSet( String.class )
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				Javax.Validation.Constraints.SIZE, CollectionHelper.<Class<?>>asSet(
 				Object[].class,
 				boolean[].class,
 				byte[].class,
@@ -231,7 +216,7 @@ public class ConstraintHelper {
 	 *         otherwise.
 	 */
 	public boolean isConstraintAnnotation(Element element) {
-		return element.getAnnotation( Constraint.class ) != null;
+		return annotationApiHelper.getMirror( element.getAnnotationMirrors(), Javax.Validation.CONSTRAINT ) != null;
 	}
 
 	/**
@@ -449,7 +434,7 @@ public class ConstraintHelper {
 
 		return typeUtils.isSameType(
 				annotationMirror.getAnnotationType(),
-				annotationApiHelper.getMirrorForType( Valid.class )
+				annotationApiHelper.getDeclaredTypeByName( TypeNames.Javax.Validation.VALID )
 		);
 	}
 
@@ -466,7 +451,7 @@ public class ConstraintHelper {
 
 		return typeUtils.isSameType(
 				annotationMirror.getAnnotationType(),
-				annotationApiHelper.getMirrorForType( GroupSequenceProvider.class )
+				annotationApiHelper.getDeclaredTypeByName( Org.Hibernate.Validator.Group.GROUP_SEQUENCE_PROVIDER )
 		);
 	}
 
@@ -481,17 +466,6 @@ public class ConstraintHelper {
 		}
 
 		return ConstraintCheckResult.DISALLOWED;
-	}
-
-	private Set<TypeMirror> getAllowedTypesForBuiltInConstraint(DeclaredType builtInAnnotationType) {
-
-		Set<TypeMirror> theValue = builtInConstraints.get( builtInAnnotationType.asElement().getSimpleName() );
-
-		if ( theValue == null ) {
-			theValue = Collections.emptySet();
-		}
-
-		return theValue;
 	}
 
 	/**
@@ -616,8 +590,8 @@ public class ConstraintHelper {
 		while ( !superTypes.isEmpty() ) {
 
 			for ( TypeMirror oneSuperType : superTypes ) {
-				if ( typeUtils.asElement( oneSuperType ).getSimpleName()
-						.contentEquals( ConstraintValidator.class.getSimpleName() ) ) {
+				if ( ( (TypeElement) typeUtils.asElement( oneSuperType ) ).getQualifiedName()
+						.contentEquals( Javax.Validation.CONSTRAINT_VALIDATOR ) ) {
 
 					return oneSuperType;
 				}
@@ -645,14 +619,14 @@ public class ConstraintHelper {
 	 * @return The Constraint meta-annotation.
 	 *
 	 * @throws IllegalArgumentException If the given constraint annotation type isn't annotated with
-	 *                                  the {@link Constraint} meta-annotation.
+	 * the {@link Constraint} meta-annotation.
 	 */
 	private AnnotationMirror getConstraintMetaAnnotation(DeclaredType annotationType) {
 
 		List<? extends AnnotationMirror> annotationMirrors = annotationType.asElement().getAnnotationMirrors();
 
 		AnnotationMirror constraintMetaAnnotation = annotationApiHelper.getMirror(
-				annotationMirrors, Constraint.class
+				annotationMirrors, Javax.Validation.CONSTRAINT
 		);
 
 		if ( constraintMetaAnnotation == null ) {
@@ -678,7 +652,9 @@ public class ConstraintHelper {
 		);
 	}
 
-	private void registerAllowedTypesForBuiltInConstraint(Class<? extends Annotation> annotation, Set<Class<?>> allowedTypes) {
+	private void registerAllowedTypesForBuiltInConstraint(String annotationType, Set<Class<?>> allowedTypes) {
+
+		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
 		Set<TypeMirror> allowedTypesForConstraint = getAllowedTypesForBuiltInConstraint( annotation );
 
@@ -687,7 +663,9 @@ public class ConstraintHelper {
 		}
 	}
 
-	private void registerAllowedTypesForBuiltInConstraintByNames(Class<? extends Annotation> annotation, Set<String> allowedTypes) {
+	private void registerAllowedTypesForBuiltInConstraintByNames(String annotationType, Set<String> allowedTypes) {
+
+		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
 		Set<TypeMirror> allowedTypesForConstraint = getAllowedTypesForBuiltInConstraint( annotation );
 
@@ -696,9 +674,9 @@ public class ConstraintHelper {
 		}
 	}
 
-	private Set<TypeMirror> getAllowedTypesForBuiltInConstraint(Class<? extends Annotation> annotation) {
+	private Set<TypeMirror> getAllowedTypesForBuiltInConstraint(DeclaredType annotation) {
 
-		Name key = elementUtils.getName( annotation.getSimpleName() );
+		Name key = annotation.asElement().getSimpleName();
 		Set<TypeMirror> allowedTypes = builtInConstraints.get( key );
 
 		// create a mapping for the given annotation type if required
@@ -723,7 +701,7 @@ public class ConstraintHelper {
 	private boolean isBuiltInConstraint(DeclaredType constraintAnnotationType) {
 
 		return
-				CONSTRAINT_ANNOTATION_PACKAGE_NAME.equals(
+				Javax.Validation.Constraints.NAME.contentEquals(
 						elementUtils.getPackageOf( constraintAnnotationType.asElement() ).getQualifiedName()
 				);
 	}

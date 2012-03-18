@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
@@ -117,6 +116,38 @@ public class AnnotationApiHelper {
 		TypeMirror mirrorForAnnotation = elementUtils.getTypeElement(
 				annotationClazz.getCanonicalName()
 		).asType();
+
+		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
+
+			if ( typeUtils.isSameType(
+					oneAnnotationMirror.getAnnotationType(),
+					mirrorForAnnotation
+			) ) {
+				return oneAnnotationMirror;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns that mirror from the given list of annotation mirrors that
+	 * represents the annotation type specified by the given class.
+	 *
+	 * @param annotationMirrors A list of annotation mirrors.
+	 * @param annotationClazz The class of the annotation of interest.
+	 *
+	 * @return The mirror from the given list that represents the specified
+	 *         annotation or null, if the given list doesn't contain such a
+	 *         mirror.
+	 */
+	public AnnotationMirror getMirror(List<? extends AnnotationMirror> annotationMirrors, String annotationClazz) {
+
+		if ( annotationMirrors == null || annotationClazz == null ) {
+			return null;
+		}
+
+		TypeMirror mirrorForAnnotation = elementUtils.getTypeElement( annotationClazz ).asType();
 
 		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
 

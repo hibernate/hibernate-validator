@@ -30,12 +30,12 @@ import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
 import javax.lang.model.util.Types;
-import javax.validation.Payload;
 
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 
 import static javax.lang.model.util.ElementFilter.methodsIn;
+import static org.hibernate.validator.ap.util.TypeNames.Javax;
 
 /**
  * Checks, that each constraint annotation type declares the members message(), groups() and payload() as
@@ -184,7 +184,9 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 		boolean typeHasNameClass = type.asElement().getSimpleName().contentEquals( "Class" );
 		boolean typeHasExactlyOneTypeArgument = type.getTypeArguments().size() == 1;
 		boolean typeArgumentIsWildcardWithPayloadExtendsBound = validateWildcardBounds(
-				type.getTypeArguments().get( 0 ), annotationApiHelper.getMirrorForType( Payload.class ), null
+				type.getTypeArguments().get( 0 ),
+				annotationApiHelper.getDeclaredTypeByName( Javax.Validation.PAYLOAD ),
+				null
 		);
 
 		if ( !( typeHasNameClass && typeHasExactlyOneTypeArgument && typeArgumentIsWildcardWithPayloadExtendsBound ) ) {
