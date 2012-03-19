@@ -29,7 +29,7 @@
             <property name="executionType">REMOTE</property>
         </protocol>
         <configuration>
-            <property name="jbossHome">target/jboss-as-7.1.0.Beta1</property>
+            <property name="jbossHome">target/jboss-as-${jbossas.version}</property>
             <!--<property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m -XX:MaxPermSize=128m</property>-->
         </configuration>
     </container>
