@@ -158,7 +158,7 @@ public class ConstraintHelper {
 		);
 		registerAllowedTypesForBuiltInConstraintByNames(
 				Javax.Validation.Constraints.FUTURE,
-				CollectionHelper.<String>asSet( "org.joda.time.ReadablePartial", "org.joda.time.ReadableInstant" )
+				CollectionHelper.<String>asSet( Org.Joda.Time.READABLE_PARTIAL, Org.Joda.Time.READABLE_INSTANT )
 		);
 		registerAllowedTypesForBuiltInConstraint(
 				Javax.Validation.Constraints.MAX, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
@@ -179,7 +179,7 @@ public class ConstraintHelper {
 		);
 		registerAllowedTypesForBuiltInConstraintByNames(
 				Javax.Validation.Constraints.PAST,
-				CollectionHelper.<String>asSet( "org.joda.time.ReadablePartial", "org.joda.time.ReadableInstant" )
+				CollectionHelper.<String>asSet( Org.Joda.Time.READABLE_PARTIAL, Org.Joda.Time.READABLE_INSTANT )
 		);
 
 		registerAllowedTypesForBuiltInConstraint(

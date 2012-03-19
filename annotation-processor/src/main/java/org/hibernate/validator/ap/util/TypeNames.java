@@ -88,6 +88,19 @@ public class TypeNames {
 				}
 			}
 		}
+
+		public static class Joda {
+
+			private static final String NAME = getName( Org.NAME, "joda" );
+
+			public static class Time {
+
+				private static final String NAME = getName( Joda.NAME, "time" );
+
+				public final static String READABLE_PARTIAL = getName( NAME, "ReadablePartial" );
+				public final static String READABLE_INSTANT = getName( NAME, "ReadableInstant" );
+			}
+		}
 	}
 
 }
