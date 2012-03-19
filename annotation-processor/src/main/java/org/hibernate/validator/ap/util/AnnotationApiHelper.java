@@ -109,25 +109,7 @@ public class AnnotationApiHelper {
 	 */
 	public AnnotationMirror getMirror(List<? extends AnnotationMirror> annotationMirrors, Class<? extends Annotation> annotationClazz) {
 
-		if ( annotationMirrors == null || annotationClazz == null ) {
-			return null;
-		}
-
-		TypeMirror mirrorForAnnotation = elementUtils.getTypeElement(
-				annotationClazz.getCanonicalName()
-		).asType();
-
-		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
-
-			if ( typeUtils.isSameType(
-					oneAnnotationMirror.getAnnotationType(),
-					mirrorForAnnotation
-			) ) {
-				return oneAnnotationMirror;
-			}
-		}
-
-		return null;
+		return getMirror( annotationMirrors, annotationClazz.getCanonicalName() );
 	}
 
 	/**
@@ -135,19 +117,19 @@ public class AnnotationApiHelper {
 	 * represents the annotation type specified by the given class.
 	 *
 	 * @param annotationMirrors A list of annotation mirrors.
-	 * @param annotationClazz The class of the annotation of interest.
+	 * @param annotationTypeName The FQN of the annotation of interest.
 	 *
 	 * @return The mirror from the given list that represents the specified
 	 *         annotation or null, if the given list doesn't contain such a
 	 *         mirror.
 	 */
-	public AnnotationMirror getMirror(List<? extends AnnotationMirror> annotationMirrors, String annotationClazz) {
+	public AnnotationMirror getMirror(List<? extends AnnotationMirror> annotationMirrors, String annotationTypeName) {
 
-		if ( annotationMirrors == null || annotationClazz == null ) {
+		if ( annotationMirrors == null || annotationTypeName == null ) {
 			return null;
 		}
 
-		TypeMirror mirrorForAnnotation = elementUtils.getTypeElement( annotationClazz ).asType();
+		TypeMirror mirrorForAnnotation = elementUtils.getTypeElement( annotationTypeName ).asType();
 
 		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
 

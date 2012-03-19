@@ -138,56 +138,38 @@ public class ConstraintHelper {
 
 		builtInConstraints = CollectionHelper.newHashMap();
 
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.ASSERT_FALSE, Boolean.class );
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.ASSERT_TRUE, Boolean.class );
 		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.ASSERT_FALSE, CollectionHelper.<Class<?>>asSet( Boolean.class )
+				Javax.Validation.Constraints.DECIMAL_MAX,
+				Number.class,
+				String.class
 		);
 		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.ASSERT_TRUE, CollectionHelper.<Class<?>>asSet( Boolean.class )
+				Javax.Validation.Constraints.DECIMAL_MIN,
+				Number.class,
+				String.class
 		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.DECIMAL_MAX, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.DECIMAL_MIN, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.DIGITS, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.FUTURE, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
-		);
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.DIGITS, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.FUTURE, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraintByNames(
 				Javax.Validation.Constraints.FUTURE,
-				CollectionHelper.<String>asSet( Org.Joda.Time.READABLE_PARTIAL, Org.Joda.Time.READABLE_INSTANT )
+				Org.Joda.Time.READABLE_PARTIAL,
+				Org.Joda.Time.READABLE_INSTANT
 		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.MAX, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.MIN, CollectionHelper.<Class<?>>asSet( Number.class, String.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.NOT_NULL,
-				CollectionHelper.<Class<?>>asSet( Object.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.NULL,
-				CollectionHelper.<Class<?>>asSet( Object.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.PAST, CollectionHelper.<Class<?>>asSet( Calendar.class, Date.class )
-		);
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.MAX, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.MIN, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.NOT_NULL, Object.class );
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.NULL, Object.class );
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.PAST, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraintByNames(
 				Javax.Validation.Constraints.PAST,
-				CollectionHelper.<String>asSet( Org.Joda.Time.READABLE_PARTIAL, Org.Joda.Time.READABLE_INSTANT )
+				Org.Joda.Time.READABLE_PARTIAL,
+				Org.Joda.Time.READABLE_INSTANT
 		);
-
+		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.PATTERN,
-				CollectionHelper.<Class<?>>asSet( String.class )
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.SIZE, CollectionHelper.<Class<?>>asSet(
+				Javax.Validation.Constraints.SIZE,
 				Object[].class,
 				boolean[].class,
 				byte[].class,
@@ -200,7 +182,6 @@ public class ConstraintHelper {
 				Collection.class,
 				Map.class,
 				String.class
-		)
 		);
 	}
 
@@ -373,7 +354,8 @@ public class ConstraintHelper {
 	 *         type, false otherwise.
 	 */
 	private boolean isConstraintMetaAnnotation(AnnotationMirror annotationMirror) {
-		return annotationMirror.getAnnotationType().asElement().getSimpleName().contentEquals( "Constraint" );
+		return ( (TypeElement) annotationMirror.getAnnotationType().asElement() ).getQualifiedName()
+				.contentEquals( Javax.Validation.CONSTRAINT );
 	}
 
 	/**
@@ -652,7 +634,7 @@ public class ConstraintHelper {
 		);
 	}
 
-	private void registerAllowedTypesForBuiltInConstraint(String annotationType, Set<Class<?>> allowedTypes) {
+	private void registerAllowedTypesForBuiltInConstraint(String annotationType, Class<?>... allowedTypes) {
 
 		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
@@ -663,7 +645,7 @@ public class ConstraintHelper {
 		}
 	}
 
-	private void registerAllowedTypesForBuiltInConstraintByNames(String annotationType, Set<String> allowedTypes) {
+	private void registerAllowedTypesForBuiltInConstraintByNames(String annotationType, String... allowedTypes) {
 
 		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
