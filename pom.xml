@@ -78,6 +78,7 @@
         <module>integration</module>
         <module>annotation-processor</module>
         <module>archetype</module>
+        <module>performance</module>
     </modules>
 
     <properties>
