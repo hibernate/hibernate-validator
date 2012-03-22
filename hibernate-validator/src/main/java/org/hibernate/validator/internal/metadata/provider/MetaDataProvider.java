@@ -16,7 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.util.Set;
+import java.util.List;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -36,6 +36,11 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
  */
 public interface MetaDataProvider {
 	/**
+	 * Used as prefix for parameter names, if no explicit names are given.
+	 */
+	static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
+
+	/**
 	 * Returns the annotation processing options as configured by this provider.
 	 *
 	 * @return The annotation processing options as configured by this provider.
@@ -43,14 +48,14 @@ public interface MetaDataProvider {
 	AnnotationIgnores getAnnotationIgnores();
 
 	/**
-	 * Returns a set with the configurations for all types contained in the
-	 * given type's hierarchy (including implemented interfaces) as configured
-	 * by this provider.
+	 * Returns a list with the configurations for all types contained in the
+	 * given type's hierarchy (including implemented interfaces) starting at the
+	 * specified type.
 	 *
 	 * @param beanClass The type of interest.
 	 *
 	 * @return A set with the configurations for the complete hierarchy of the
 	 *         given type. May be empty, but never {@code null}.
 	 */
-	Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
+	List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
 }

@@ -56,11 +56,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  *
  * @author Gunnar Morling
  */
-public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBase {
+public class MetaDataProviderProgrammaticSource extends MetaDataProviderKeyedByClassName {
 
-	private static final Log log  = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
-	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
+	public MetaDataProviderProgrammaticSource(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
 		Contracts.assertNotNull( programmaticMappings );
 		ConstraintMappingContext mergedContext = createMergedMappingContext( programmaticMappings );
@@ -329,5 +329,13 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 				);
 			}
 		}
+	}
+
+	private Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>> constraintsByLocation() {
+		return new Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>>() {
+			public BeanConstraintLocation getPartition(ConfiguredConstraint<?, BeanConstraintLocation> constraint) {
+				return constraint.getLocation();
+			}
+		};
 	}
 }

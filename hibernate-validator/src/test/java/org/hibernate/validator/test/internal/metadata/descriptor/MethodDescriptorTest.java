@@ -33,8 +33,8 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository.Validat
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -46,14 +46,12 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testGetMethod() throws Exception {
-
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
 		assertEquals( methodDescriptor.getMethodName(), "foo" );
 	}
 
 	@Test
 	public void testIsCascaded() {
-
 		MethodDescriptor cascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
 		assertTrue( cascadingMethodDescriptor.isCascaded() );
 
@@ -63,7 +61,6 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testHasConstraints() {
-
 		MethodDescriptor constrainedMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "bar" );
 		assertTrue( constrainedMethodDescriptor.hasConstraints() );
 
@@ -73,7 +70,6 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testGetElementClass() {
-
 		//the return type as defined in the base type
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepository.class, "bar" );
 		assertEquals( methodDescriptor.getElementClass(), Customer.class );
@@ -85,7 +81,6 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testGetConstraintDescriptors() {
-
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "bar" );
 
 		assertEquals( methodDescriptor.getConstraintDescriptors().size(), 1 );
@@ -100,7 +95,6 @@ public class MethodDescriptorTest {
 
 	@Test(description = "HV-443")
 	public void testFindReturnValueConstraintLookingAt() {
-
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors = methodDescriptor.findConstraints()
@@ -117,7 +111,6 @@ public class MethodDescriptorTest {
 
 	@Test(description = "HV-443")
 	public void testFindParameterConstraintLookingAt() {
-
 		ParameterDescriptor parameterDescriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
 				"zap",
@@ -138,7 +131,6 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testFindConstraintMatchingGroups() {
-
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors = methodDescriptor.findConstraints()
@@ -151,7 +143,6 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testGetParameterConstraints() {
-
 		MethodDescriptor methodDescriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class, "createCustomer", CharSequence.class, String.class
 		);
@@ -171,7 +162,6 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testGetParameterConstraintsForParameterlessMethod() {
-
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
 
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterDescriptors();
