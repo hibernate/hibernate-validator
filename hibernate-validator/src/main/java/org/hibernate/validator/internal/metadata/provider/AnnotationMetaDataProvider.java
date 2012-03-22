@@ -54,15 +54,14 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 	private final AnnotationIgnores annotationIgnores;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
-
 		super( constraintHelper );
-
 		this.annotationIgnores = annotationIgnores;
 	}
 
@@ -71,15 +70,14 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	public BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
-
-		BeanConfiguration<?> configuration = configuredBeans.get( beanClass );
+		BeanConfiguration<?> configuration = super.getBeanConfiguration( beanClass );
 
 		if ( configuration != null ) {
 			return configuration;
 		}
 
 		configuration = retrieveBeanConfiguration( beanClass );
-		configuredBeans.put( beanClass, configuration );
+		addBeanConfiguration( beanClass, configuration );
 
 		return configuration;
 	}
@@ -90,7 +88,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 * @return Retrieves constraint related meta data from the annotations of the given type.
 	 */
 	private BeanConfiguration<?> retrieveBeanConfiguration(Class<?> beanClass) {
-
 		Set<ConstrainedElement> propertyMetaData = getPropertyMetaData( beanClass );
 		propertyMetaData.addAll( getMethodMetaData( beanClass ) );
 
@@ -118,13 +115,11 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	private List<Class<?>> getDefaultGroupSequence(Class<?> beanClass) {
-
 		GroupSequence groupSequenceAnnotation = beanClass.getAnnotation( GroupSequence.class );
 		return groupSequenceAnnotation != null ? Arrays.asList( groupSequenceAnnotation.value() ) : null;
 	}
 
 	private Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProviderClass(Class<?> beanClass) {
-
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
 		return groupSequenceProviderAnnotation != null ? groupSequenceProviderAnnotation.value() : null;
 	}
@@ -165,7 +160,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	private ConstrainedField findPropertyMetaData(Field field) {
-
 		Set<MetaConstraint<?>> constraints = convertToMetaConstraints(
 				findConstraints( field, ElementType.FIELD ),
 				field
@@ -192,7 +186,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	private Set<ConstrainedMethod> getMethodMetaData(Class<?> clazz) {
-
 		Set<ConstrainedMethod> methodMetaData = newHashSet();
 
 		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( clazz );
@@ -221,7 +214,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 *         given method.
 	 */
 	private ConstrainedMethod findMethodMetaData(Method method) {
-
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( method );
 		boolean isCascading = method.isAnnotationPresent( Valid.class );
 		Set<MetaConstraint<?>> constraints =
@@ -237,7 +229,6 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
-
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
 		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
@@ -270,7 +261,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 				//1. collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						method.getDeclaringClass(), oneAnnotation, ElementType.PARAMETER
+						oneAnnotation, ElementType.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					constraintsOfOneParameter.add(
@@ -315,7 +306,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 		for ( Annotation annotation : ( (AnnotatedElement) member ).getAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( member.getDeclaringClass(), annotation, type ) );
+			metaData.addAll( findConstraintAnnotations( annotation, type ) );
 		}
 
 		return metaData;
@@ -332,7 +323,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 		for ( Annotation annotation : beanClass.getAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( beanClass, annotation, ElementType.TYPE ) );
+			metaData.addAll( findConstraintAnnotations( annotation, ElementType.TYPE ) );
 		}
 		return metaData;
 	}
@@ -340,14 +331,13 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	/**
 	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
 	 *
-	 * @param clazz the class we are currently processing
 	 * @param annotation The annotation to examine
 	 * @param type the element type on which the annotation/constraint is placed on
 	 *
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
 	 *         single nor multi-valued annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Class<?> clazz, A annotation, ElementType type) {
+	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(A annotation, ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
@@ -362,7 +352,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		for ( Annotation constraint : constraints ) {
 			final ConstraintDescriptorImpl<?> constraintDescriptor = buildConstraintDescriptor(
-					clazz, constraint, type
+					constraint, type
 			);
 			constraintDescriptors.add( constraintDescriptor );
 		}
@@ -385,8 +375,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 		return new MetaConstraint<A>( descriptor, new MethodConstraintLocation( method ) );
 	}
 
-	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Class<?> clazz, A annotation, ElementType type) {
+	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(A annotation, ElementType type) {
 		return new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY );
 	}
-
 }
