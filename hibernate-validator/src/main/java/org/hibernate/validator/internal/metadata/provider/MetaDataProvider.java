@@ -22,10 +22,8 @@ import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 
 /**
- * <p>
  * A provider for constraint related meta data such as constraints, default
  * group sequences etc.
- * </p>
  * <p>
  * Implementations are based one different meta data sources such as XML,
  * programmatic mappings and annotations. Meta data providers only return meta
@@ -41,7 +39,7 @@ public interface MetaDataProvider {
 	 * Returns a set with all bean configurations by this provider.
 	 *
 	 * @return a set with all bean configurations by this provider. May be
-	 *         empty, but never <code>null</code>.
+	 *         empty, but never {@code null}.
 	 */
 	Set<BeanConfiguration<?>> getAllBeanConfigurations();
 
@@ -60,8 +58,7 @@ public interface MetaDataProvider {
 	 * @param beanClass The type of interest.
 	 *
 	 * @return A set with the configurations for the complete hierarchy of the
-	 *         given type. May be empty, but never <code>null</code>.
+	 *         given type. May be empty, but never {@code null}.
 	 */
 	Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
-
 }

@@ -36,11 +36,9 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * <p>
  * Represents the constraint related meta data for a JavaBeans property.
  * Abstracts from the concrete physical type of the underlying Java element(s)
  * (fields or getter methods).
- * </p>
  * <p>
  * In order to provide a unified access to all JavaBeans constraints also
  * class-level constraints are represented by this meta data type.
