@@ -85,9 +85,9 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	/**
-	 * Retrieves constraint related meta data from the annotations of the given type.
+	 * @param beanClass The bean class for which to retrieve the meta data
 	 *
-	 * @return
+	 * @return Retrieves constraint related meta data from the annotations of the given type.
 	 */
 	private BeanConfiguration<?> retrieveBeanConfiguration(Class<?> beanClass) {
 
