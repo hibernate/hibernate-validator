@@ -239,7 +239,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Returns a bean descriptor representing this meta data object. A new
 	 * descriptor instance is created with each invocation. The descriptor might
 	 * be cached internally in the future should that need arise.
-	 * 
+	 *
 	 * @return A bean descriptor for this meta data object.
 	 */
 	private BeanDescriptorImpl<T> getBeanDescriptorInternal() {
@@ -464,20 +464,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		public void add(BeanConfiguration<?> configuration) {
-
 			if ( configuration.getBeanClass().equals( beanClass ) ) {
-
-				if ( configuration.getDefaultGroupSequence() != null &&
-						( sequenceSource == null || configuration.getSource()
-								.getPriority() >= sequenceSource.getPriority() ) ) {
+				if ( configuration.getDefaultGroupSequence() != null
+						&& ( sequenceSource == null || configuration.getSource()
+						.getPriority() >= sequenceSource.getPriority() ) ) {
 
 					sequenceSource = configuration.getSource();
 					defaultGroupSequence = configuration.getDefaultGroupSequence();
 				}
 
-				if ( configuration.getDefaultGroupSequenceProvider() != null &&
-						( providerSource == null || configuration.getSource()
-								.getPriority() >= providerSource.getPriority() ) ) {
+				if ( configuration.getDefaultGroupSequenceProvider() != null
+						&& ( providerSource == null || configuration.getSource()
+						.getPriority() >= providerSource.getPriority() ) ) {
 
 					providerSource = configuration.getSource();
 					defaultGroupSequenceProvider = configuration.getDefaultGroupSequenceProvider();
@@ -530,30 +528,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private static class BuilderDelegate {
-
 		private final ConstraintHelper constraintHelper;
-
 		private MetaDataBuilder propertyBuilder;
-
 		private MethodMetaData.Builder methodBuilder;
 
 		public BuilderDelegate(ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
-
 			this.constraintHelper = constraintHelper;
 
 			switch ( constrainedElement.getKind() ) {
-
 				case FIELD:
-
 					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
 					propertyBuilder = new PropertyMetaData.Builder(
 							constrainedField,
 							constraintHelper
 					);
 					break;
-
 				case METHOD:
-
 					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 					methodBuilder = new MethodMetaData.Builder(
 							constrainedMethod,
@@ -567,9 +557,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						);
 					}
 					break;
-
 				case TYPE:
-
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
 					propertyBuilder = new PropertyMetaData.Builder(
 							constrainedType,
@@ -580,7 +568,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		public boolean add(ConstrainedElement constrainedElement) {
-
 			boolean added = false;
 
 			if ( methodBuilder != null && methodBuilder.accepts( constrainedElement ) ) {

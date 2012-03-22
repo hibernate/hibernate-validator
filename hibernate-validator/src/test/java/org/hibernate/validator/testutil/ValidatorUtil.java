@@ -57,7 +57,6 @@ public final class ValidatorUtil {
 	 * @return an instance of {@code Validator}.
 	 */
 	public static Validator getValidator() {
-		
 		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();
 		configuration.traversableResolver( new DummyTraversableResolver() );
 		

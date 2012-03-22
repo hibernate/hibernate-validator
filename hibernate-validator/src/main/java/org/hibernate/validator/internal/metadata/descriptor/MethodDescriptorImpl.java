@@ -29,7 +29,6 @@ import org.hibernate.validator.method.metadata.ParameterDescriptor;
  * @author Gunnar Morling
  */
 public class MethodDescriptorImpl extends ElementDescriptorImpl implements MethodDescriptor {
-
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
 
