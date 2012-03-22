@@ -16,13 +16,12 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -38,29 +37,23 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * Base implementation for all {@link MetaDataProvider}s.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public abstract class MetaDataProviderImplBase implements MetaDataProvider {
-
 	/**
 	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
 	protected static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
-
-	protected final Map<Class<?>, BeanConfiguration<?>> configuredBeans;
-
 	protected final ConstraintHelper constraintHelper;
+
+	private final Map<Class<?>, BeanConfiguration<?>> configuredBeans;
 
 	public MetaDataProviderImplBase(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
 		configuredBeans = newHashMap();
 	}
 
-	public Set<BeanConfiguration<?>> getAllBeanConfigurations() {
-		return new HashSet<BeanConfiguration<?>>( configuredBeans.values() );
-	}
-
 	public Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
-
 		Set<BeanConfiguration<?>> configurations = newHashSet();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
@@ -71,16 +64,21 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 		}
 
 		return configurations;
+	}
 
+	protected void addBeanConfiguration(Class<?> beanClass, BeanConfiguration<?> beanConfiguration) {
+		configuredBeans.put( beanClass, beanConfiguration );
 	}
 
 	protected BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
 		return configuredBeans.get( beanClass );
 	}
 
-	protected <T> BeanConfiguration<T> createBeanConfiguration(
-			ConfigurationSource source, Class<T> beanClass, Set<? extends ConstrainedElement> constrainableElements, List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
-
+	protected <T> BeanConfiguration<T> createBeanConfiguration(ConfigurationSource source,
+															   Class<T> beanClass,
+															   Set<? extends ConstrainedElement> constrainableElements,
+															   List<Class<?>> defaultGroupSequence,
+															   Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
 		return new BeanConfiguration<T>(
 				source,
 				beanClass,

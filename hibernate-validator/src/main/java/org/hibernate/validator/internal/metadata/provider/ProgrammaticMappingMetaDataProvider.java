@@ -93,7 +93,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 			constrainedElements.addAll( methodMetaData );
 
-			configuredBeans.put(
+			addBeanConfiguration(
 					clazz,
 					createBeanConfiguration(
 							ConfigurationSource.API,

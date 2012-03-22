@@ -52,10 +52,10 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 	private final AnnotationIgnores annotationIgnores;
 
 	/**
-	 * @param mappingStreams
+	 * @param constraintHelper the constraint helper
+	 * @param mappingStreams the input stream for the xml configuration
 	 */
 	public XmlConfigurationMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
-
 		super( constraintHelper );
 
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
@@ -70,7 +70,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 
 			Set<ConstrainedElement> constrainedElements = getConstrainedElements( constraintsByLocation, cascades );
 
-			configuredBeans.put(
+			addBeanConfiguration(
 					clazz,
 					createBeanConfiguration(
 							ConfigurationSource.XML,
@@ -83,6 +83,10 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		}
 
 		annotationIgnores = mappingParser.getAnnotationIgnores();
+	}
+
+	public AnnotationIgnores getAnnotationIgnores() {
+		return annotationIgnores;
 	}
 
 	private Set<ConstrainedElement> getConstrainedElements(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
@@ -128,14 +132,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		return propertyMetaData;
 	}
 
-	/**
-	 * @param mappingParser
-	 * @param clazz
-	 *
-	 * @return
-	 */
 	private Set<BeanConstraintLocation> getCascades(XmlMappingParser mappingParser, Class<?> clazz) {
-
 		Set<BeanConstraintLocation> theValue = newHashSet();
 
 		for ( Member member : mappingParser.getCascadedMembersForClass( clazz ) ) {
@@ -145,10 +142,6 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		return theValue;
 	}
 
-	public AnnotationIgnores getAnnotationIgnores() {
-		return annotationIgnores;
-	}
-
 	protected Partitioner<ConstraintLocation, MetaConstraint<?>> byLocation() {
 		return new Partitioner<ConstraintLocation, MetaConstraint<?>>() {
 			public ConstraintLocation getPartition(MetaConstraint<?> constraint) {
@@ -156,5 +149,4 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			}
 		};
 	}
-
 }

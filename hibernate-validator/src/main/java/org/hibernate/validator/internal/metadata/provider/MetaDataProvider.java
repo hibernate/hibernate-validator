@@ -32,17 +32,9 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
  * </p>
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public interface MetaDataProvider {
-
-	/**
-	 * Returns a set with all bean configurations by this provider.
-	 *
-	 * @return a set with all bean configurations by this provider. May be
-	 *         empty, but never {@code null}.
-	 */
-	Set<BeanConfiguration<?>> getAllBeanConfigurations();
-
 	/**
 	 * Returns the annotation processing options as configured by this provider.
 	 *
