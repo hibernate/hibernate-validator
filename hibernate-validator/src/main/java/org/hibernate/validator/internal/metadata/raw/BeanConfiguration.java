@@ -91,8 +91,9 @@ public class BeanConfiguration<T> {
 
 	@Override
 	public String toString() {
-		return "BeanConfiguration [source=" + source + ", beanClass="
-				+ beanClass + ", constrainedElements=" + constrainedElements
+		return "BeanConfiguration [beanClass=" + beanClass.getSimpleName()
+				+ ", source=" + source
+				+ ", constrainedElements=" + constrainedElements
 				+ ", defaultGroupSequence=" + defaultGroupSequence
 				+ ", defaultGroupSequenceProvider="
 				+ defaultGroupSequenceProvider + "]";

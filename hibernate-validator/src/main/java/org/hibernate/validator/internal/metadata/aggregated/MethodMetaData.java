@@ -41,11 +41,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * <p>
  * An aggregated view of the constraint related meta data for a given method and
  * all the methods in the inheritance hierarchy which it overrides or
  * implements.
- * </p>
  * <p>
  * Instances are retrieved by creating a {@link Builder} and adding all required
  * {@link ConstrainedMethod} objects to it. Instances are read-only after
@@ -107,15 +105,10 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
-
 		private Set<ConstrainedMethod> constrainedMethods = newHashSet();
-
 		private MethodConstraintLocation location;
-
 		private final Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
-
 		private boolean isCascading = false;
-
 		private boolean isConstrained = false;
 
 		/**
@@ -123,9 +116,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 *
 		 * @param constrainedMethod The base method for this builder. This is the lowest
 		 * method with a given signature within a type hierarchy.
+		 * @param constraintHelper the constraint helper
 		 */
 		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
-
 			super( constraintHelper );
 
 			location = constrainedMethod.getLocation();
@@ -136,20 +129,17 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * {@inheritDoc}
 		 */
 		public boolean accepts(ConstrainedElement constrainedElement) {
-
-			return
-					constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-							ReflectionHelper.haveSameSignature(
-									location.getMember(),
-									( (ConstrainedMethod) constrainedElement ).getLocation().getMember()
-							);
+			return constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
+					ReflectionHelper.haveSameSignature(
+							location.getMember(),
+							( (ConstrainedMethod) constrainedElement ).getLocation().getMember()
+					);
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		public void add(ConstrainedElement constrainedElement) {
-
 			ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 
 			constrainedMethods.add( constrainedMethod );
@@ -162,20 +152,18 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * {@inheritDoc}
 		 */
 		public MethodMetaData build() {
-
 			Method method = location.getMember();
 
-			return
-					new MethodMetaData(
-							method.getName(),
-							method.getReturnType(),
-							method.getParameterTypes(),
-							adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
-							findParameterMetaData(),
-							checkParameterConstraints(),
-							isCascading,
-							isConstrained
-					);
+			return new MethodMetaData(
+					method.getName(),
+					method.getReturnType(),
+					method.getParameterTypes(),
+					adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
+					findParameterMetaData(),
+					checkParameterConstraints(),
+					isCascading,
+					isConstrained
+			);
 		}
 
 		/**
@@ -326,8 +314,9 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	/**
 	 * Returns meta data for the specified parameter of the represented method.
 	 *
-	 * @return Meta data for the specified parameter. Will never be
-	 *         <code>null</code>.
+	 * @param parameterIndex the index of the parameter
+	 *
+	 * @return Meta data for the specified parameter. Will never be {@code null}.
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
@@ -378,7 +367,6 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 	@Override
 	public String toString() {
-
 		StringBuilder parameterBuilder = new StringBuilder();
 
 		for ( Class<?> oneParameterType : getParameterTypes() ) {
