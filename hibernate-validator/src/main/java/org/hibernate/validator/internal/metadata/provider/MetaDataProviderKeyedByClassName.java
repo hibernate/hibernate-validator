@@ -21,40 +21,34 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * Base implementation for all {@link MetaDataProvider}s.
+ * Base implementation for {@link MetaDataProvider}s which cache the {@code BeanConfiguration} by class name.
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public abstract class MetaDataProviderImplBase implements MetaDataProvider {
-	/**
-	 * Used as prefix for parameter names, if no explicit names are given.
-	 */
-	protected static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
+public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvider {
 	protected final ConstraintHelper constraintHelper;
+	// cached against the fqcn of a class. not a class instance itself (HV-479)
+	private final Map<String, BeanConfiguration<?>> configuredBeans;
 
-	private final Map<Class<?>, BeanConfiguration<?>> configuredBeans;
-
-	public MetaDataProviderImplBase(ConstraintHelper constraintHelper) {
+	public MetaDataProviderKeyedByClassName(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
-		configuredBeans = newHashMap();
+		this.configuredBeans = newHashMap();
 	}
 
-	public Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
-		Set<BeanConfiguration<?>> configurations = newHashSet();
+	public List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
+		List<BeanConfiguration<?>> configurations = newArrayList();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 			BeanConfiguration<?> configuration = getBeanConfiguration( oneHierarchyClass );
@@ -67,11 +61,12 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 	}
 
 	protected void addBeanConfiguration(Class<?> beanClass, BeanConfiguration<?> beanConfiguration) {
-		configuredBeans.put( beanClass, beanConfiguration );
+		configuredBeans.put( beanClass.getName(), beanConfiguration );
 	}
 
 	protected BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
-		return configuredBeans.get( beanClass );
+		Contracts.assertNotNull( beanClass );
+		return configuredBeans.get( beanClass.getName() );
 	}
 
 	protected <T> BeanConfiguration<T> createBeanConfiguration(ConfigurationSource source,
@@ -86,13 +81,5 @@ public abstract class MetaDataProviderImplBase implements MetaDataProvider {
 				defaultGroupSequence,
 				defaultGroupSequenceProvider
 		);
-	}
-
-	protected Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>> constraintsByLocation() {
-		return new Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>>() {
-			public BeanConstraintLocation getPartition(ConfiguredConstraint<?, BeanConstraintLocation> constraint) {
-				return constraint.getLocation();
-			}
-		};
 	}
 }

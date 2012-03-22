@@ -106,7 +106,6 @@ public final class CollectionHelper {
 	 *         partitioner.
 	 */
 	public static <K, V> Map<K, List<V>> partition(List<V> list, Partitioner<K, V> partitioner) {
-
 		if ( list == null ) {
 			return Collections.emptyMap();
 		}
@@ -141,7 +140,6 @@ public final class CollectionHelper {
 	 *         partitioner.
 	 */
 	public static <K, V> Map<K, Set<V>> partition(Set<V> set, Partitioner<K, V> partitioner) {
-
 		if ( set == null ) {
 			return Collections.emptyMap();
 		}
@@ -164,7 +162,6 @@ public final class CollectionHelper {
 	}
 
 	public interface Partitioner<K, V> {
-
 		K getPartition(V v);
 	}
 }

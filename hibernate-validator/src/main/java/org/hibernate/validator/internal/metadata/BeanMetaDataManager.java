@@ -24,19 +24,16 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProviderAnnotationSource;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
- * <p>
  * This manager is in charge of providing all constraint related meta data
  * required by the validation engine.
- * </p>
  * <p>
  * Actual retrieval of meta data is delegated to {@link MetaDataProvider}
  * implementations which load meta-data based e.g. based on annotations or XML.
@@ -82,7 +79,7 @@ public class BeanMetaDataManager {
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>();
 		AnnotationIgnores annotationIgnores = getAnnotationIgnoresNonDefaultProviders();
-		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
+		MetaDataProviderAnnotationSource defaultProvider = new MetaDataProviderAnnotationSource(
 				constraintHelper,
 				annotationIgnores
 		);
@@ -121,13 +118,9 @@ public class BeanMetaDataManager {
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, clazz );
 
-		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( clazz, true ) ) {
-			for ( MetaDataProvider provider : metaDataProviders ) {
-				for ( BeanConfiguration<?> oneConfiguration : provider.getBeanConfigurationForHierarchy(
-						oneHierarchyClass
-				) ) {
-					builder.add( oneConfiguration );
-				}
+		for ( MetaDataProvider provider : metaDataProviders ) {
+			for ( BeanConfiguration<?> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {
+				builder.add( beanConfiguration );
 			}
 		}
 

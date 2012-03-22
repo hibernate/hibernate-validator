@@ -48,6 +48,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -56,28 +57,43 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
-
+public class MetaDataProviderAnnotationSource implements MetaDataProvider {
+	private final ConstraintHelper constraintHelper;
+	private final SoftLimitMRUCache<Class<?>, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationIgnores annotationIgnores;
 
-	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
-		super( constraintHelper );
+	public MetaDataProviderAnnotationSource(ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
+		this.constraintHelper = constraintHelper;
 		this.annotationIgnores = annotationIgnores;
+		configuredBeans = new SoftLimitMRUCache<Class<?>, BeanConfiguration<?>>();
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
 		return null;
 	}
 
-	public BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
-		BeanConfiguration<?> configuration = super.getBeanConfiguration( beanClass );
+	public List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
+		List<BeanConfiguration<?>> configurations = newArrayList();
+
+		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+			BeanConfiguration<?> configuration = getBeanConfiguration( oneHierarchyClass );
+			if ( configuration != null ) {
+				configurations.add( configuration );
+			}
+		}
+
+		return configurations;
+	}
+
+	private BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
+		BeanConfiguration<?> configuration = configuredBeans.get( beanClass );
 
 		if ( configuration != null ) {
 			return configuration;
 		}
 
 		configuration = retrieveBeanConfiguration( beanClass );
-		addBeanConfiguration( beanClass, configuration );
+		configuredBeans.put( beanClass, configuration );
 
 		return configuration;
 	}
@@ -87,7 +103,7 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 	 *
 	 * @return Retrieves constraint related meta data from the annotations of the given type.
 	 */
-	private BeanConfiguration<?> retrieveBeanConfiguration(Class<?> beanClass) {
+	private <T> BeanConfiguration<T> retrieveBeanConfiguration(Class<T> beanClass) {
 		Set<ConstrainedElement> propertyMetaData = getPropertyMetaData( beanClass );
 		propertyMetaData.addAll( getMethodMetaData( beanClass ) );
 
@@ -104,14 +120,13 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 			propertyMetaData.add( classLevelMetaData );
 		}
 
-		return
-				createBeanConfiguration(
-						ConfigurationSource.ANNOTATION,
-						beanClass,
-						propertyMetaData,
-						getDefaultGroupSequence( beanClass ),
-						getDefaultGroupSequenceProviderClass( beanClass )
-				);
+		return new BeanConfiguration<T>(
+				ConfigurationSource.ANNOTATION,
+				beanClass,
+				propertyMetaData,
+				getDefaultGroupSequence( beanClass ),
+				getDefaultGroupSequenceProviderClass( beanClass )
+		);
 	}
 
 	private List<Class<?>> getDefaultGroupSequence(Class<?> beanClass) {
@@ -167,13 +182,12 @@ public class AnnotationMetaDataProvider extends MetaDataProviderImplBase {
 
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
 
-		return
-				new ConstrainedField(
-						ConfigurationSource.ANNOTATION,
-						new BeanConstraintLocation( field ),
-						constraints,
-						isCascading
-				);
+		return new ConstrainedField(
+				ConfigurationSource.ANNOTATION,
+				new BeanConstraintLocation( field ),
+				constraints,
+				isCascading
+		);
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
