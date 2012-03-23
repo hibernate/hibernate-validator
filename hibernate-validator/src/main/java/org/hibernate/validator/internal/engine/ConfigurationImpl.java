@@ -201,8 +201,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 
-		// reset the param holder
-		validationBootstrapParameters = new ValidationBootstrapParameters();
 		return factory;
 	}
 
