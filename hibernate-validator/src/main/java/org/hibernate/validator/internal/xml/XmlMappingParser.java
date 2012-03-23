@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.internal.xml;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -577,12 +579,27 @@ public class XmlMappingParser {
 		ConstraintMappingsType constraintMappings;
 		Schema schema = getMappingSchema();
 		try {
+			// check whether mark is supported, if so we can reset the stream in order to allow reuse of Configuration
+			boolean markSupported = in.markSupported();
+			if ( markSupported ) {
+				in.mark( Integer.MAX_VALUE );
+			}
+
 			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
-			StreamSource stream = new StreamSource( in );
+			StreamSource stream = new StreamSource( new CloseIgnoringInputStream( in ) );
 			JAXBElement<ConstraintMappingsType> root = unmarshaller.unmarshal( stream, ConstraintMappingsType.class );
 			constraintMappings = root.getValue();
+
+			if ( markSupported ) {
+				try {
+					in.reset();
+				}
+				catch ( IOException e ) {
+					log.debug( "Unable to reset input stream." );
+				}
+			}
 		}
 		catch ( JAXBException e ) {
 			throw log.getErrorParsingMappingFileException( e );
@@ -602,5 +619,17 @@ public class XmlMappingParser {
 			log.unableToCreateSchema( VALIDATION_MAPPING_XSD, e.getMessage() );
 		}
 		return schema;
+	}
+
+	// JAXB closes the underlying input stream
+	public class CloseIgnoringInputStream extends FilterInputStream {
+		public CloseIgnoringInputStream(InputStream in) {
+			super( in );
+		}
+
+		@Override
+		public void close() {
+			// do nothing
+		}
 	}
 }
