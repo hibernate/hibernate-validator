@@ -33,6 +33,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
@@ -45,9 +46,7 @@ import static org.testng.Assert.assertEquals;
 public class XmlMappingTest {
 
 	@Test
-	/**
-	 * HV-214
-	 */
+	@TestForIssue(jiraKey = "HV-214")
 	public void testConstraintInheritanceWithXmlConfiguration() {
 
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -62,9 +61,7 @@ public class XmlMappingTest {
 	}
 
 	@Test
-	/**
-	 * HV-252
-	 */
+	@TestForIssue(jiraKey = "HV-252")
 	public void testListOfString() {
 
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -86,9 +83,7 @@ public class XmlMappingTest {
 	}
 
 	@Test
-	/**
-	 * HV-262
-	 */
+	@TestForIssue(jiraKey = "HV-262")
 	public void testInterfaceConfiguration() {
 
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -102,9 +97,7 @@ public class XmlMappingTest {
 	}
 
 	@Test
-	/**
-	 * HV-262
-	 */
+	@TestForIssue(jiraKey = "HV-262")
 	public void testInterfaceImplementationConfiguration() {
 
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -118,9 +111,7 @@ public class XmlMappingTest {
 	}
 
 	@Test
-	/**
-	 * HV-263
-	 */
+	@TestForIssue(jiraKey = "HV-263")
 	public void testEmptyInterfaceConfiguration() {
 
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -133,10 +124,8 @@ public class XmlMappingTest {
 		assertEquals( violations.size(), 0 );
 	}
 
-	/**
-	 * HV-480
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-480")
 	public void testConstraintsFromXmlAndProgrammaticApiAddUp() {
 
 		//given
