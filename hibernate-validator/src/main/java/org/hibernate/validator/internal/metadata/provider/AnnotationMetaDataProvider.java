@@ -33,7 +33,7 @@ import javax.validation.Valid;
 
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -60,15 +60,15 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final ConstraintHelper constraintHelper;
 	private final SoftLimitMRUCache<Class<?>, BeanConfiguration<?>> configuredBeans;
-	private final AnnotationIgnores annotationIgnores;
+	private final AnnotationProcessingOptions annotationIgnores;
 
-	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
+	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationProcessingOptions annotationIgnores) {
 		this.constraintHelper = constraintHelper;
 		this.annotationIgnores = annotationIgnores;
 		configuredBeans = new SoftLimitMRUCache<Class<?>, BeanConfiguration<?>>();
 	}
 
-	public AnnotationIgnores getAnnotationIgnores() {
+	public AnnotationProcessingOptions getAnnotationIgnores() {
 		return null;
 	}
 

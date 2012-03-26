@@ -44,7 +44,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -74,14 +74,14 @@ public class XmlMappingParser {
 
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
-	private final AnnotationIgnores annotationIgnores;
+	private final AnnotationProcessingOptions annotationIgnores;
 	private final Map<Class<?>, Set<MetaConstraint<?>>> constraintMap;
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	public XmlMappingParser(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
-		this.annotationIgnores = new AnnotationIgnores();
+		this.annotationIgnores = new AnnotationProcessingOptions();
 		this.constraintMap = newHashMap();
 		this.cascadedMembers = newHashMap();
 		this.defaultSequences = newHashMap();
@@ -110,7 +110,7 @@ public class XmlMappingParser {
 		return processedClasses;
 	}
 
-	public final AnnotationIgnores getAnnotationIgnores() {
+	public final AnnotationProcessingOptions getAnnotationIgnores() {
 		return annotationIgnores;
 	}
 

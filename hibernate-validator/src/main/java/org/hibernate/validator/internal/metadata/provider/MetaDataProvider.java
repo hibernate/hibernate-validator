@@ -18,7 +18,7 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import java.util.List;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 
 /**
@@ -45,7 +45,7 @@ public interface MetaDataProvider {
 	 *
 	 * @return The annotation processing options as configured by this provider.
 	 */
-	AnnotationIgnores getAnnotationIgnores();
+	AnnotationProcessingOptions getAnnotationIgnores();
 
 	/**
 	 * Returns a list with the configurations for all types contained in the

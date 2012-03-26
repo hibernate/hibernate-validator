@@ -28,7 +28,7 @@ import java.util.Set;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -67,7 +67,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		initProgrammaticConfiguration( mergedContext );
 	}
 
-	public AnnotationIgnores getAnnotationIgnores() {
+	public AnnotationProcessingOptions getAnnotationIgnores() {
 		return null;
 	}
 

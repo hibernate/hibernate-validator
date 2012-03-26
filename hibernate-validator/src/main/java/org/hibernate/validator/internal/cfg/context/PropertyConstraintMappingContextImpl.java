@@ -38,14 +38,12 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 	private final Member member;
 
 	public PropertyConstraintMappingContextImpl(Class<?> beanClass, Member member, ConstraintMappingContext mapping) {
-
 		super( beanClass, mapping );
 
 		this.member = member;
 	}
 
 	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-
 		if ( member instanceof Field ) {
 			mapping.addConstraintConfig(
 					ConfiguredConstraint.forProperty(
@@ -63,8 +61,12 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 		return this;
 	}
 
-	public PropertyConstraintMappingContext valid() {
+	public PropertyConstraintMappingContext ignoreAnnotations() {
+		mapping.getAnnotationProcessingOptions().setIgnoreAnnotationsOnMember( member );
+		return this;
+	}
 
+	public PropertyConstraintMappingContext valid() {
 		if ( member instanceof Field ) {
 			mapping.addCascadeConfig( new BeanConstraintLocation( member ) );
 		}

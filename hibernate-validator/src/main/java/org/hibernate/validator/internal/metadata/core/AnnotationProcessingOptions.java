@@ -27,13 +27,13 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * An  {@code AnnotationIgnores} instance keeps track of annotations which should be ignored as configuration source.
+ * An  {@code AnnotationProcessingOptions} instance keeps track of annotations which should be ignored as configuration source.
  * The main validation source for Bean Validation is annotation and alternate configuration sources use this class
  * to override/ignore existing annotations.
  *
  * @author Hardy Ferentschik
  */
-public class AnnotationIgnores {
+public class AnnotationProcessingOptions {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -93,20 +93,6 @@ public class AnnotationIgnores {
 		return ignoreAnnotation;
 	}
 
-	private void logMessage(Member member, Class<?> clazz) {
-		String type;
-		if ( member instanceof Field ) {
-			type = "Field";
-		}
-		else {
-			type = "Property";
-		}
-
-		if ( log.isDebugEnabled() ) {
-			log.debugf( "%s level annotations are getting ignored for %s.%s.", type, clazz.getName(), member.getName() );
-		}
-	}
-
 	public void setIgnoreAnnotationsOnClass(Class<?> clazz, boolean b) {
 		ignoreAnnotationOnClass.put( clazz, b );
 	}
@@ -123,5 +109,19 @@ public class AnnotationIgnores {
 			log.debugf( "Class level annotation are getting ignored for %s.", clazz.getName() );
 		}
 		return ignoreAnnotation;
+	}
+
+	private void logMessage(Member member, Class<?> clazz) {
+		String type;
+		if ( member instanceof Field ) {
+			type = "Field";
+		}
+		else {
+			type = "Property";
+		}
+
+		if ( log.isDebugEnabled() ) {
+			log.debugf( "%s level annotations are getting ignored for %s.%s.", type, clazz.getName(), member.getName() );
+		}
 	}
 }

@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
@@ -50,7 +50,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  */
 public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
-	private final AnnotationIgnores annotationIgnores;
+	private final AnnotationProcessingOptions annotationIgnores;
 
 	/**
 	 * @param constraintHelper the constraint helper
@@ -86,7 +86,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		annotationIgnores = mappingParser.getAnnotationIgnores();
 	}
 
-	public AnnotationIgnores getAnnotationIgnores() {
+	public AnnotationProcessingOptions getAnnotationIgnores() {
 		return annotationIgnores;
 	}
 
