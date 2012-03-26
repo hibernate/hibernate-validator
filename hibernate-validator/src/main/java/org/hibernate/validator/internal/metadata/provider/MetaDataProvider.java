@@ -16,16 +16,14 @@
 */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.util.Set;
+import java.util.List;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 
 /**
- * <p>
  * A provider for constraint related meta data such as constraints, default
  * group sequences etc.
- * </p>
  * <p>
  * Implementations are based one different meta data sources such as XML,
  * programmatic mappings and annotations. Meta data providers only return meta
@@ -34,34 +32,30 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
  * </p>
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public interface MetaDataProvider {
-
 	/**
-	 * Returns a set with all bean configurations by this provider.
-	 *
-	 * @return a set with all bean configurations by this provider. May be
-	 *         empty, but never <code>null</code>.
+	 * Used as prefix for parameter names, if no explicit names are given.
 	 */
-	Set<BeanConfiguration<?>> getAllBeanConfigurations();
+	static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
 
 	/**
 	 * Returns the annotation processing options as configured by this provider.
 	 *
 	 * @return The annotation processing options as configured by this provider.
 	 */
-	AnnotationIgnores getAnnotationIgnores();
+	AnnotationProcessingOptions getAnnotationProcessingOptions();
 
 	/**
-	 * Returns a set with the configurations for all types contained in the
-	 * given type's hierarchy (including implemented interfaces) as configured
-	 * by this provider.
+	 * Returns a list with the configurations for all types contained in the
+	 * given type's hierarchy (including implemented interfaces) starting at the
+	 * specified type.
 	 *
 	 * @param beanClass The type of interest.
 	 *
 	 * @return A set with the configurations for the complete hierarchy of the
-	 *         given type. May be empty, but never <code>null</code>.
+	 *         given type. May be empty, but never {@code null}.
 	 */
-	Set<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
-
+	List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
 }

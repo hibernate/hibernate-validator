@@ -50,7 +50,6 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	 * @param parameterIndex The parameter index of the location to be created.
 	 */
 	public MethodConstraintLocation(Method method, int parameterIndex) {
-
 		Contracts.assertNotNull( method, MESSAGES.mustNotBeNull( "Method" ) );
 
 		this.method = method;
@@ -62,7 +61,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	}
 
 	public Type typeOfAnnotatedElement() {
-		Type t = null;
+		Type t;
 
 		if ( parameterIndex == null ) {
 			t = ReflectionHelper.typeOf( method );
@@ -87,7 +86,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	}
 
 	/**
-	 * The parameter index of this constraint location or <code>null</code> if
+	 * @return returns the parameter index of this constraint location or <code>null</code> if
 	 * this location represents a method return value.
 	 */
 	public Integer getParameterIndex() {

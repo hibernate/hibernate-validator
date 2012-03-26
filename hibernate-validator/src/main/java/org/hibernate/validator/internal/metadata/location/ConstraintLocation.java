@@ -39,7 +39,6 @@ public interface ConstraintLocation {
 	Type typeOfAnnotatedElement();
 
 	ElementType getElementType();
-	
+
 	Member getMember();
-	
 }

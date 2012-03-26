@@ -36,33 +36,29 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	public TypeConstraintMappingContextImpl(Class<?> beanClass, ConstraintMappingContext mapping) {
 		super( beanClass, mapping );
+		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
 	public TypeConstraintMappingContext<C> constraint(ConstraintDef<?, ?> definition) {
-
 		mapping.addConstraintConfig( ConfiguredConstraint.forType( definition, beanClass ) );
 		return this;
 	}
 
-	/**
-	 * Defines the default groups sequence for the bean class of this instance.
-	 *
-	 * @param defaultGroupSequence the default group sequence.
-	 *
-	 * @return Returns itself for method chaining.
-	 */
+	public TypeConstraintMappingContext<C> ignoreAnnotations() {
+		mapping.getAnnotationProcessingOptions().ignoreClassLevelConstraintAnnotations( beanClass, Boolean.TRUE );
+		return this;
+	}
+
+	public TypeConstraintMappingContext<C> ignoreAllAnnotations() {
+		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.TRUE );
+		return this;
+	}
+
 	public TypeConstraintMappingContext<C> defaultGroupSequence(Class<?>... defaultGroupSequence) {
 		mapping.addDefaultGroupSequence( beanClass, Arrays.asList( defaultGroupSequence ) );
 		return this;
 	}
 
-	/**
-	 * Defines the default group sequence provider for the bean class of this instance.
-	 *
-	 * @param defaultGroupSequenceProviderClass The default group sequence provider class.
-	 *
-	 * @return Returns itself for method chaining.
-	 */
 	public <T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingContext<C> defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
 		mapping.addDefaultGroupSequenceProvider( beanClass, defaultGroupSequenceProviderClass );
 		return this;

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -17,17 +17,16 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Constraint mapping creational context representing a property of a bean. Allows
- * to place constraints on the property, mark the property as cascadable and to
- * navigate to other constraint targets.
+ * Facet of a constraint mapping creational context which allows to configure how existing annotation should be
+ * treated.
  *
- * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Hardy Ferentschik
  */
-public interface PropertyConstraintMappingContext extends Constrainable<PropertyConstraintMappingContext>,
-		TypeTarget,
-		PropertyTarget,
-		MethodTarget,
-		Cascadable<PropertyConstraintMappingContext>,
-		AnnotationProcessingOptions<PropertyConstraintMappingContext> {
+public interface AnnotationProcessingOptions<C extends AnnotationProcessingOptions<C>> {
+	/**
+	 * Specifies that annotations specified on the configured type or property should be ignored.
+	 *
+	 * @return Returns itself for method chaining.
+	 */
+	C ignoreAnnotations();
 }

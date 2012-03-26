@@ -28,7 +28,7 @@ import java.util.Set;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -56,19 +56,21 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  *
  * @author Gunnar Morling
  */
-public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBase {
+public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
-	private static final Log log  = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
+	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	public ProgrammaticMappingMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
+	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
 		Contracts.assertNotNull( programmaticMappings );
 		ConstraintMappingContext mergedContext = createMergedMappingContext( programmaticMappings );
 		initProgrammaticConfiguration( mergedContext );
+		annotationProcessingOptions = mergedContext.getAnnotationProcessingOptions();
 	}
 
-	public AnnotationIgnores getAnnotationIgnores() {
-		return null;
+	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
+		return annotationProcessingOptions;
 	}
 
 	/**
@@ -93,7 +95,7 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 
 			constrainedElements.addAll( methodMetaData );
 
-			configuredBeans.put(
+			addBeanConfiguration(
 					clazz,
 					createBeanConfiguration(
 							ConfigurationSource.API,
@@ -275,6 +277,8 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 		for ( ConstraintMapping mapping : programmaticMappings ) {
 			ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
 
+			mergedContext.getAnnotationProcessingOptions().merge( context.getAnnotationProcessingOptions() );
+
 			for ( Set<ConfiguredConstraint<?, BeanConstraintLocation>> propertyConstraints : context.getConstraintConfig()
 					.values() ) {
 				for ( ConfiguredConstraint<?, BeanConstraintLocation> constraint : propertyConstraints ) {
@@ -329,5 +333,13 @@ public class ProgrammaticMappingMetaDataProvider extends MetaDataProviderImplBas
 				);
 			}
 		}
+	}
+
+	private Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>> constraintsByLocation() {
+		return new Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>>() {
+			public BeanConstraintLocation getPartition(ConfiguredConstraint<?, BeanConstraintLocation> constraint) {
+				return constraint.getLocation();
+			}
+		};
 	}
 }

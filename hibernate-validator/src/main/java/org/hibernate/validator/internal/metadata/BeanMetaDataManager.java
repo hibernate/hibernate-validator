@@ -18,27 +18,22 @@ package org.hibernate.validator.internal.metadata;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
-import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
- * <p>
  * This manager is in charge of providing all constraint related meta data
  * required by the validation engine.
- * </p>
  * <p>
  * Actual retrieval of meta data is delegated to {@link MetaDataProvider}
  * implementations which load meta-data based e.g. based on annotations or XML.
@@ -54,28 +49,21 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class BeanMetaDataManager {
-
-	/**
-	 * Default provider which is always used for meta data retrieval.
-	 */
-	private final MetaDataProvider defaultProvider;
-
 	/**
 	 * Additional metadata providers used for meta data retrieval if
 	 * the XML and/or programmatic configuration is used.
 	 */
-	private final List<MetaDataProvider> nonAnnotationMetaDataProviders;
+	private final List<MetaDataProvider> metaDataProviders;
 
+	/**
+	 * Helper for builtin constraints and their validator implementations
+	 */
 	private final ConstraintHelper constraintHelper;
 
 	/**
 	 * Used to cache the constraint meta data for validated entities
 	 */
-	private final BeanMetaDataCache beanMetaDataCache;
-
-	private AnnotationIgnores annotationIgnores;
-
-	private final Map<Class<?>, Set<BeanConfiguration<?>>> configurationsByClass;
+	private final SoftLimitMRUCache<Class<?>, BeanMetaData<?>> beanMetaDataCache;
 
 	public BeanMetaDataManager(ConstraintHelper constraintHelper, MetaDataProvider... metaDataProviders) {
 		this( constraintHelper, Arrays.asList( metaDataProviders ) );
@@ -83,28 +71,33 @@ public class BeanMetaDataManager {
 
 	/**
 	 * @param constraintHelper the constraint helper
-	 * @param metaDataProviders optional meta data provider used on top of the annotation based provider
+	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
 	 */
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> metaDataProviders) {
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> optionalMetaDataProviders) {
 		this.constraintHelper = constraintHelper;
-		this.nonAnnotationMetaDataProviders = metaDataProviders;
-
-		configurationsByClass = newHashMap();
-		beanMetaDataCache = new BeanMetaDataCache();
-
-		loadConfigurationsNonDefaultProviders();
-
-		defaultProvider = new AnnotationMetaDataProvider( constraintHelper, annotationIgnores );
+		this.metaDataProviders = newArrayList();
+		this.metaDataProviders.addAll( optionalMetaDataProviders );
+		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>();
+		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
+		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
+				constraintHelper,
+				annotationProcessingOptions
+		);
+		this.metaDataProviders.add( defaultProvider );
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		BeanMetaData<T> beanMetaData = beanMetaDataCache.getBeanMetaData( beanClass );
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
 
+		// create a new BeanMetaData in case none is cached
 		if ( beanMetaData == null ) {
-			addAll( defaultProvider.getBeanConfigurationForHierarchy( beanClass ) );
 			beanMetaData = createBeanMetaData( beanClass );
 
-			final BeanMetaData<T> cachedBeanMetaData = beanMetaDataCache.addBeanMetaData( beanClass, beanMetaData );
+			final BeanMetaData<T> cachedBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.put(
+					beanClass,
+					beanMetaData
+			);
 			if ( cachedBeanMetaData != null ) {
 				beanMetaData = cachedBeanMetaData;
 			}
@@ -125,9 +118,9 @@ public class BeanMetaDataManager {
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, clazz );
 
-		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( clazz, true ) ) {
-			for ( BeanConfiguration<?> oneConfiguration : configurationsByClass.get( oneHierarchyClass ) ) {
-				builder.add( oneConfiguration );
+		for ( MetaDataProvider provider : metaDataProviders ) {
+			for ( BeanConfiguration<?> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {
+				builder.add( beanConfiguration );
 			}
 		}
 
@@ -135,34 +128,14 @@ public class BeanMetaDataManager {
 	}
 
 	/**
-	 * Loads all {@link BeanConfiguration}s from the registered eager meta data
-	 * providers.
+	 * @return returns the annotation ignores from the non annotation based meta data providers
 	 */
-	private void loadConfigurationsNonDefaultProviders() {
-		for ( MetaDataProvider metaDataProvider : nonAnnotationMetaDataProviders ) {
-			//TODO GM: merge, if also programmatic provider has this option
-			if ( metaDataProvider.getAnnotationIgnores() != null ) {
-				annotationIgnores = metaDataProvider.getAnnotationIgnores();
-			}
-			addAll( metaDataProvider.getAllBeanConfigurations() );
+	private AnnotationProcessingOptions getAnnotationProcessingOptionsFromNonDefaultProviders() {
+		AnnotationProcessingOptions options = new AnnotationProcessingOptions();
+		for ( MetaDataProvider metaDataProvider : metaDataProviders ) {
+			options.merge( metaDataProvider.getAnnotationProcessingOptions() );
 		}
 
-		if ( annotationIgnores == null ) {
-			annotationIgnores = new AnnotationIgnores();
-		}
-	}
-
-	private void addAll(Set<BeanConfiguration<?>> configurations) {
-		for ( BeanConfiguration<?> beanConfiguration : configurations ) {
-
-			Set<BeanConfiguration<?>> configurationsForType = configurationsByClass.get( beanConfiguration.getBeanClass() );
-
-			if ( configurationsForType == null ) {
-				configurationsForType = newHashSet();
-				configurationsByClass.put( beanConfiguration.getBeanClass(), configurationsForType );
-			}
-
-			configurationsForType.add( beanConfiguration );
-		}
+		return options;
 	}
 }
