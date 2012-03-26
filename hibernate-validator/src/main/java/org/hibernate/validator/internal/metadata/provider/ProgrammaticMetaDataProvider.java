@@ -56,11 +56,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  *
  * @author Gunnar Morling
  */
-public class MetaDataProviderProgrammaticSource extends MetaDataProviderKeyedByClassName {
+public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	private static final Log log = LoggerFactory.make();
 
-	public MetaDataProviderProgrammaticSource(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
+	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
 		Contracts.assertNotNull( programmaticMappings );
 		ConstraintMappingContext mergedContext = createMergedMappingContext( programmaticMappings );

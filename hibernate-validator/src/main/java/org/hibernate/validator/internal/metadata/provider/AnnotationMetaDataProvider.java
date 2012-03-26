@@ -57,12 +57,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class MetaDataProviderAnnotationSource implements MetaDataProvider {
+public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final ConstraintHelper constraintHelper;
 	private final SoftLimitMRUCache<Class<?>, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationIgnores annotationIgnores;
 
-	public MetaDataProviderAnnotationSource(ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
+	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationIgnores annotationIgnores) {
 		this.constraintHelper = constraintHelper;
 		this.annotationIgnores = annotationIgnores;
 		configuredBeans = new SoftLimitMRUCache<Class<?>, BeanConfiguration<?>>();

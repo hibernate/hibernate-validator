@@ -29,8 +29,8 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProviderProgrammaticSource;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProviderXmlSource;
+import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -69,7 +69,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( !configurationState.getMappingStreams().isEmpty() ) {
 			metaDataProviders.add(
-					new MetaDataProviderXmlSource(
+					new XmlMetaDataProvider(
 							constraintHelper, configurationState.getMappingStreams()
 					)
 			);
@@ -80,7 +80,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			if ( hibernateSpecificConfig.getProgrammaticMappings().size() > 0 ) {
 				metaDataProviders.add(
-						new MetaDataProviderProgrammaticSource(
+						new ProgrammaticMetaDataProvider(
 								constraintHelper,
 								hibernateSpecificConfig.getProgrammaticMappings()
 						)
