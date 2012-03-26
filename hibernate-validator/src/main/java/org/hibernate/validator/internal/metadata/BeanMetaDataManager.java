@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProviderAnnotationSource;
+import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.SoftLimitMRUCache;
@@ -79,7 +79,7 @@ public class BeanMetaDataManager {
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>();
 		AnnotationIgnores annotationIgnores = getAnnotationIgnoresNonDefaultProviders();
-		MetaDataProviderAnnotationSource defaultProvider = new MetaDataProviderAnnotationSource(
+		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintHelper,
 				annotationIgnores
 		);

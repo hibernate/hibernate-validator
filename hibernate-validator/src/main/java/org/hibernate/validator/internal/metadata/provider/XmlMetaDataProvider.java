@@ -47,7 +47,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  *
  * @author Gunnar Morling
  */
-public class MetaDataProviderXmlSource extends MetaDataProviderKeyedByClassName {
+public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	private final AnnotationIgnores annotationIgnores;
 
@@ -55,7 +55,7 @@ public class MetaDataProviderXmlSource extends MetaDataProviderKeyedByClassName 
 	 * @param constraintHelper the constraint helper
 	 * @param mappingStreams the input stream for the xml configuration
 	 */
-	public MetaDataProviderXmlSource(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
+	public XmlMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
 		super( constraintHelper );
 
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
