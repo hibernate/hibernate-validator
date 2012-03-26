@@ -52,7 +52,8 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 	private final AnnotationIgnores annotationIgnores;
 
 	/**
-	 * @param mappingStreams
+	 * @param constraintHelper the constraint helper utility
+	 * @param mappingStreams the defined mapping streams
 	 */
 	public XmlConfigurationMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
 
