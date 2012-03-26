@@ -417,7 +417,7 @@
                     <configuration>
                         <defaultOutputDirectory>${project.build.directory}/generated-sources/logging</defaultOutputDirectory>
                         <processors>
-                            <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
+                            <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                         </processors>
                         <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.5 -target 1.5 -sourcepath ${project.build.directory}/generated-sources/jaxb -encoding UTF-8</compilerArguments>
                     </configuration>
@@ -434,9 +434,22 @@
                         <dependency>
                             <groupId>org.jboss.logging</groupId>
                             <artifactId>jboss-logging-processor</artifactId>
-                            <version>1.0.0.CR5</version>
+                            <version>1.0.1.Final</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                    <configuration>
+                        <!-- By default the "@" character is a delimiter, causing files containing
+                             that character to not be filtered properly -->
+                        <useDefaultDelimiters>false</useDefaultDelimiters>
+                        <delimiters>
+                            <delimiter>${*}</delimiter>
+                        </delimiters>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
