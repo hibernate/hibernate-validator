@@ -24,8 +24,7 @@ import javax.lang.model.element.TypeElement;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
-
-import static org.hibernate.validator.ap.util.TypeNames.Javax;
+import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 
 /**
  * Checks, that for each constraint annotation type, which is not a composed constraint,
@@ -49,7 +48,7 @@ public class ConstraintValidatorCheck extends AbstractConstraintCheck {
 	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
 		AnnotationMirror constraintMirror = annotationApiHelper.getMirror(
-				element.getAnnotationMirrors(), Javax.Validation.CONSTRAINT
+				element.getAnnotationMirrors(), BeanValidationTypes.CONSTRAINT
 		);
 		boolean atLeastOneValidatorGiven = !annotationApiHelper.getAnnotationArrayValue(
 				constraintMirror, "validatedBy"

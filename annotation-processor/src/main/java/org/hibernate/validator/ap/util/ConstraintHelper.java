@@ -34,8 +34,9 @@ import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
 import javax.lang.model.util.Types;
 
-import static org.hibernate.validator.ap.util.TypeNames.Javax;
-import static org.hibernate.validator.ap.util.TypeNames.Org;
+import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
+import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
+import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
 
 /**
  * Helper class that deals with all constraint-related stuff, such as
@@ -138,38 +139,38 @@ public class ConstraintHelper {
 
 		builtInConstraints = CollectionHelper.newHashMap();
 
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.ASSERT_FALSE, Boolean.class );
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.ASSERT_TRUE, Boolean.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_FALSE, Boolean.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_TRUE, Boolean.class );
 		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.DECIMAL_MAX,
+				BeanValidationTypes.DECIMAL_MAX,
 				Number.class,
 				String.class
 		);
 		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.DECIMAL_MIN,
+				BeanValidationTypes.DECIMAL_MIN,
 				Number.class,
 				String.class
 		);
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.DIGITS, Number.class, String.class );
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.FUTURE, Calendar.class, Date.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DIGITS, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraintByNames(
-				Javax.Validation.Constraints.FUTURE,
-				Org.Joda.Time.READABLE_PARTIAL,
-				Org.Joda.Time.READABLE_INSTANT
+				BeanValidationTypes.FUTURE,
+				JodaTypes.READABLE_PARTIAL,
+				JodaTypes.READABLE_INSTANT
 		);
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.MAX, Number.class, String.class );
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.MIN, Number.class, String.class );
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.NOT_NULL, Object.class );
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.NULL, Object.class );
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.PAST, Calendar.class, Date.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NULL, Object.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraintByNames(
-				Javax.Validation.Constraints.PAST,
-				Org.Joda.Time.READABLE_PARTIAL,
-				Org.Joda.Time.READABLE_INSTANT
+				BeanValidationTypes.PAST,
+				JodaTypes.READABLE_PARTIAL,
+				JodaTypes.READABLE_INSTANT
 		);
-		registerAllowedTypesForBuiltInConstraint( Javax.Validation.Constraints.PATTERN, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint(
-				Javax.Validation.Constraints.SIZE,
+				BeanValidationTypes.SIZE,
 				Object[].class,
 				boolean[].class,
 				byte[].class,
@@ -197,7 +198,7 @@ public class ConstraintHelper {
 	 *         otherwise.
 	 */
 	public boolean isConstraintAnnotation(Element element) {
-		return annotationApiHelper.getMirror( element.getAnnotationMirrors(), Javax.Validation.CONSTRAINT ) != null;
+		return annotationApiHelper.getMirror( element.getAnnotationMirrors(), BeanValidationTypes.CONSTRAINT ) != null;
 	}
 
 	/**
@@ -355,7 +356,7 @@ public class ConstraintHelper {
 	 */
 	private boolean isConstraintMetaAnnotation(AnnotationMirror annotationMirror) {
 		return ( (TypeElement) annotationMirror.getAnnotationType().asElement() ).getQualifiedName()
-				.contentEquals( Javax.Validation.CONSTRAINT );
+				.contentEquals( BeanValidationTypes.CONSTRAINT );
 	}
 
 	/**
@@ -416,7 +417,7 @@ public class ConstraintHelper {
 
 		return typeUtils.isSameType(
 				annotationMirror.getAnnotationType(),
-				annotationApiHelper.getDeclaredTypeByName( TypeNames.Javax.Validation.VALID )
+				annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.VALID )
 		);
 	}
 
@@ -433,7 +434,7 @@ public class ConstraintHelper {
 
 		return typeUtils.isSameType(
 				annotationMirror.getAnnotationType(),
-				annotationApiHelper.getDeclaredTypeByName( Org.Hibernate.Validator.Group.GROUP_SEQUENCE_PROVIDER )
+				annotationApiHelper.getDeclaredTypeByName( HibernateValidatorTypes.GROUP_SEQUENCE_PROVIDER )
 		);
 	}
 
@@ -573,7 +574,7 @@ public class ConstraintHelper {
 
 			for ( TypeMirror oneSuperType : superTypes ) {
 				if ( ( (TypeElement) typeUtils.asElement( oneSuperType ) ).getQualifiedName()
-						.contentEquals( Javax.Validation.CONSTRAINT_VALIDATOR ) ) {
+						.contentEquals( BeanValidationTypes.CONSTRAINT_VALIDATOR ) ) {
 
 					return oneSuperType;
 				}
@@ -608,7 +609,7 @@ public class ConstraintHelper {
 		List<? extends AnnotationMirror> annotationMirrors = annotationType.asElement().getAnnotationMirrors();
 
 		AnnotationMirror constraintMetaAnnotation = annotationApiHelper.getMirror(
-				annotationMirrors, Javax.Validation.CONSTRAINT
+				annotationMirrors, BeanValidationTypes.CONSTRAINT
 		);
 
 		if ( constraintMetaAnnotation == null ) {
@@ -683,7 +684,7 @@ public class ConstraintHelper {
 	private boolean isBuiltInConstraint(DeclaredType constraintAnnotationType) {
 
 		return
-				Javax.Validation.Constraints.NAME.contentEquals(
+				BeanValidationTypes.JAVAX_VALIDATION_CONSTRAINTS.contentEquals(
 						elementUtils.getPackageOf( constraintAnnotationType.asElement() ).getQualifiedName()
 				);
 	}

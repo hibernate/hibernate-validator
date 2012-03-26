@@ -33,9 +33,9 @@ import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 
 import static javax.lang.model.util.ElementFilter.methodsIn;
-import static org.hibernate.validator.ap.util.TypeNames.Javax;
 
 /**
  * Checks, that each constraint annotation type declares the members message(), groups() and payload() as
@@ -185,7 +185,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 		boolean typeHasExactlyOneTypeArgument = type.getTypeArguments().size() == 1;
 		boolean typeArgumentIsWildcardWithPayloadExtendsBound = validateWildcardBounds(
 				type.getTypeArguments().get( 0 ),
-				annotationApiHelper.getDeclaredTypeByName( Javax.Validation.PAYLOAD ),
+				annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.PAYLOAD ),
 				null
 		);
 

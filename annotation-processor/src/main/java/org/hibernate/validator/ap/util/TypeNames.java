@@ -25,82 +25,46 @@ package org.hibernate.validator.ap.util;
  */
 public class TypeNames {
 
-	private static String getName(String parent, String child) {
-		return parent + "." + child;
+	public static class BeanValidationTypes {
+
+		public static final String JAVAX_VALIDATION = "javax.validation";
+
+		public static final String CONSTRAINT = JAVAX_VALIDATION + ".Constraint";
+		public static final String CONSTRAINT_VALIDATOR = JAVAX_VALIDATION + ".ConstraintValidator";
+		public static final String GROUP_SEQUENCE = JAVAX_VALIDATION + ".GroupSequence";
+		public static final String PAYLOAD = JAVAX_VALIDATION + ".Payload";
+		public static final String VALID = JAVAX_VALIDATION + ".Valid";
+
+		public static final String JAVAX_VALIDATION_CONSTRAINTS = "javax.validation.constraints";
+
+		public final static String ASSERT_FALSE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertFalse";
+		public final static String ASSERT_TRUE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertTrue";
+		public final static String DECIMAL_MAX = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMax";
+		public final static String DECIMAL_MIN = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMin";
+		public final static String DIGITS = JAVAX_VALIDATION_CONSTRAINTS + ".Digits";
+		public final static String FUTURE = JAVAX_VALIDATION_CONSTRAINTS + ".Future";
+		public final static String MAX = JAVAX_VALIDATION_CONSTRAINTS + ".Max";
+		public final static String MIN = JAVAX_VALIDATION_CONSTRAINTS + ".Min";
+		public final static String NOT_NULL = JAVAX_VALIDATION_CONSTRAINTS + ".NotNull";
+		public final static String NULL = JAVAX_VALIDATION_CONSTRAINTS + ".Null";
+		public final static String PAST = JAVAX_VALIDATION_CONSTRAINTS + ".Past";
+		public final static String PATTERN = JAVAX_VALIDATION_CONSTRAINTS + ".Pattern";
+		public final static String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";
 	}
 
-	public static class Javax {
+	public static class HibernateValidatorTypes {
 
-		private static final String NAME = "javax";
+		private static final String ORG_HIBERNATE_VALIDATOR_GROUP = "org.hibernate.validator.group";
 
-		public static class Validation {
-
-			private static final String NAME = getName( Javax.NAME, "validation" );
-
-			public static final String CONSTRAINT = getName( NAME, "Constraint" );
-			public static final String CONSTRAINT_VALIDATOR = getName( NAME, "ConstraintValidator" );
-			public static final String GROUP_SEQUENCE = getName( NAME, "GroupSequence" );
-			public static final String PAYLOAD = getName( NAME, "Payload" );
-			public static final String VALID = getName( NAME, "Valid" );
-
-			public static class Constraints {
-
-				public static final String NAME = getName( Validation.NAME, "constraints" );
-
-				public final static String ASSERT_FALSE = getName( NAME, "AssertFalse" );
-				public final static String ASSERT_TRUE = getName( NAME, "AssertTrue" );
-				public final static String DECIMAL_MAX = getName( NAME, "DecimalMax" );
-				public final static String DECIMAL_MIN = getName( NAME, "DecimalMin" );
-				public final static String DIGITS = getName( NAME, "Digits" );
-				public final static String FUTURE = getName( NAME, "Future" );
-				public final static String MAX = getName( NAME, "Max" );
-				public final static String MIN = getName( NAME, "Min" );
-				public final static String NOT_NULL = getName( NAME, "NotNull" );
-				public final static String NULL = getName( NAME, "Null" );
-				public final static String PAST = getName( NAME, "Past" );
-				public final static String PATTERN = getName( NAME, "Pattern" );
-				public final static String SIZE = getName( NAME, "Size" );
-			}
-		}
+		public final static String GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".GroupSequenceProvider";
+		public final static String DEFAULT_GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".DefaultGroupSequenceProvider";
 	}
 
-	public static class Org {
+	public static class JodaTypes {
 
-		private static final String NAME = "org";
+		private static final String ORG_JODA_TIME = "org.joda.time";
 
-		public static class Hibernate {
-
-			private static final String NAME = getName( Org.NAME, "hibernate" );
-
-			public static class Validator {
-
-				private static final String NAME = getName( Hibernate.NAME, "validator" );
-
-				public static class Group {
-
-					private static final String NAME = getName( Validator.NAME, "group" );
-
-					public final static String GROUP_SEQUENCE_PROVIDER = getName( NAME, "GroupSequenceProvider" );
-					public final static String DEFAULT_GROUP_SEQUENCE_PROVIDER = getName(
-							NAME,
-							"DefaultGroupSequenceProvider"
-					);
-				}
-			}
-		}
-
-		public static class Joda {
-
-			private static final String NAME = getName( Org.NAME, "joda" );
-
-			public static class Time {
-
-				private static final String NAME = getName( Joda.NAME, "time" );
-
-				public final static String READABLE_PARTIAL = getName( NAME, "ReadablePartial" );
-				public final static String READABLE_INSTANT = getName( NAME, "ReadableInstant" );
-			}
-		}
+		public final static String READABLE_PARTIAL = ORG_JODA_TIME + ".ReadablePartial";
+		public final static String READABLE_INSTANT = ORG_JODA_TIME + ".ReadableInstant";
 	}
-
 }
