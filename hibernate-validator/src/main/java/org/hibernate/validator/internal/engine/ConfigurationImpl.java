@@ -135,6 +135,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @param stream XML mapping stream.
+	 * <p>
+	 * <b>Note</b>: In order to reuse the {@code ConfigurationInstance} to build multiple
+	 * validator factories a {@link java.io.BufferedInputStream} has to be provided.
+	 * </p>
+	 */
+
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
 
 		Contracts.assertNotNull( stream, MESSAGES.parameterMustNotBeNull( "stream" ) );
