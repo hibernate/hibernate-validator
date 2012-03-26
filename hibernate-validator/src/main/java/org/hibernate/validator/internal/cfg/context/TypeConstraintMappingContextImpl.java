@@ -36,7 +36,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	public TypeConstraintMappingContextImpl(Class<?> beanClass, ConstraintMappingContext mapping) {
 		super( beanClass, mapping );
-		mapping.getAnnotationProcessingOptions().setDefaultIgnoreAnnotation( beanClass, Boolean.FALSE );
+		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
 	public TypeConstraintMappingContext<C> constraint(ConstraintDef<?, ?> definition) {
@@ -45,7 +45,12 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	public TypeConstraintMappingContext<C> ignoreAnnotations() {
-		mapping.getAnnotationProcessingOptions().setIgnoreAnnotationsOnClass( beanClass, Boolean.TRUE );
+		mapping.getAnnotationProcessingOptions().ignoreClassLevelConstraintAnnotations( beanClass, Boolean.TRUE );
+		return this;
+	}
+
+	public TypeConstraintMappingContext<C> ignoreAllAnnotations() {
+		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.TRUE );
 		return this;
 	}
 

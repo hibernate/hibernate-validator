@@ -19,12 +19,13 @@ package org.hibernate.validator.internal.metadata.core;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * An  {@code AnnotationProcessingOptions} instance keeps track of annotations which should be ignored as configuration source.
@@ -39,20 +40,23 @@ public class AnnotationProcessingOptions {
 
 	/**
 	 * Keeps track whether the 'ignore-annotations' flag is set on bean level in the xml configuration. If 'ignore-annotations'
-	 * is not specified <code>true</code> is the default.
+	 * is not specified {@code true} is the default.
 	 */
-	private final Map<Class<?>, Boolean> ignoreAnnotationDefaults = new HashMap<Class<?>, Boolean>();
+	private final Map<Class<?>, Boolean> ignoreAnnotationDefaults = newHashMap();
 
 	/**
 	 * Keeps track of explicitly excluded members (fields and properties) for a given class. If a member appears in
-	 * the list mapped to a given class 'ignore-annotations' was explicitly set to <code>true</code> in the configuration
+	 * the list mapped to a given class 'ignore-annotations' was explicitly set to {@code true} in the configuration
 	 * for this class.
 	 */
-	private final Map<Class<?>, List<Member>> ignoreAnnotationOnMember = new HashMap<Class<?>, List<Member>>();
+	private final Map<Class<?>, List<Member>> propertyConstraintAnnotationIgnores = newHashMap();
 
-	private final Map<Class<?>, Boolean> ignoreAnnotationOnClass = new HashMap<Class<?>, Boolean>();
+	/**
+	 * Keeps track of explicitly excluded class level constraints.
+	 */
+	private final Map<Class<?>, Boolean> classConstraintAnnotationIgnores = newHashMap();
 
-	public void setDefaultIgnoreAnnotation(Class<?> clazz, Boolean b) {
+	public void ignoreAnnotationConstraintForClass(Class<?> clazz, Boolean b) {
 		if ( b == null ) {
 			ignoreAnnotationDefaults.put( clazz, Boolean.TRUE );
 		}
@@ -61,28 +65,28 @@ public class AnnotationProcessingOptions {
 		}
 	}
 
-	public boolean getDefaultIgnoreAnnotation(Class<?> clazz) {
+	public boolean areConstraintAnnotationsIgnored(Class<?> clazz) {
 		return ignoreAnnotationDefaults.containsKey( clazz ) && ignoreAnnotationDefaults.get( clazz );
 	}
 
-	public void setIgnoreAnnotationsOnMember(Member member) {
+	public void ignorePropertyLevelConstraintAnnotationsOnMember(Member member) {
 		Class<?> beanClass = member.getDeclaringClass();
-		if ( ignoreAnnotationOnMember.get( beanClass ) == null ) {
+		if ( propertyConstraintAnnotationIgnores.get( beanClass ) == null ) {
 			List<Member> tmpList = new ArrayList<Member>();
 			tmpList.add( member );
-			ignoreAnnotationOnMember.put( beanClass, tmpList );
+			propertyConstraintAnnotationIgnores.put( beanClass, tmpList );
 		}
 		else {
-			ignoreAnnotationOnMember.get( beanClass ).add( member );
+			propertyConstraintAnnotationIgnores.get( beanClass ).add( member );
 		}
 	}
 
-	public boolean isIgnoreAnnotations(Member member) {
+	public boolean arePropertyLevelConstraintAnnotationsIgnored(Member member) {
 		boolean ignoreAnnotation;
 		Class<?> clazz = member.getDeclaringClass();
-		List<Member> ignoreAnnotationForMembers = ignoreAnnotationOnMember.get( clazz );
+		List<Member> ignoreAnnotationForMembers = propertyConstraintAnnotationIgnores.get( clazz );
 		if ( ignoreAnnotationForMembers == null || !ignoreAnnotationForMembers.contains( member ) ) {
-			ignoreAnnotation = getDefaultIgnoreAnnotation( clazz );
+			ignoreAnnotation = areConstraintAnnotationsIgnored( clazz );
 		}
 		else {
 			ignoreAnnotation = ignoreAnnotationForMembers.contains( member );
@@ -93,22 +97,30 @@ public class AnnotationProcessingOptions {
 		return ignoreAnnotation;
 	}
 
-	public void setIgnoreAnnotationsOnClass(Class<?> clazz, boolean b) {
-		ignoreAnnotationOnClass.put( clazz, b );
+	public void ignoreClassLevelConstraintAnnotations(Class<?> clazz, boolean b) {
+		classConstraintAnnotationIgnores.put( clazz, b );
 	}
 
-	public boolean isIgnoreAnnotations(Class<?> clazz) {
+	public boolean areClassLevelConstraintAnnotationsIgnored(Class<?> clazz) {
 		boolean ignoreAnnotation;
-		if ( ignoreAnnotationOnClass.containsKey( clazz ) ) {
-			ignoreAnnotation = ignoreAnnotationOnClass.get( clazz );
+		if ( classConstraintAnnotationIgnores.containsKey( clazz ) ) {
+			ignoreAnnotation = classConstraintAnnotationIgnores.get( clazz );
 		}
 		else {
-			ignoreAnnotation = getDefaultIgnoreAnnotation( clazz );
+			ignoreAnnotation = areConstraintAnnotationsIgnored( clazz );
 		}
 		if ( log.isDebugEnabled() && ignoreAnnotation ) {
 			log.debugf( "Class level annotation are getting ignored for %s.", clazz.getName() );
 		}
 		return ignoreAnnotation;
+	}
+
+	public void merge(AnnotationProcessingOptions annotationProcessingOptions) {
+		this.ignoreAnnotationDefaults.putAll( annotationProcessingOptions.ignoreAnnotationDefaults );
+		this.propertyConstraintAnnotationIgnores
+				.putAll( annotationProcessingOptions.propertyConstraintAnnotationIgnores );
+		this.classConstraintAnnotationIgnores
+				.putAll( annotationProcessingOptions.classConstraintAnnotationIgnores );
 	}
 
 	private void logMessage(Member member, Class<?> clazz) {
@@ -121,7 +133,12 @@ public class AnnotationProcessingOptions {
 		}
 
 		if ( log.isDebugEnabled() ) {
-			log.debugf( "%s level annotations are getting ignored for %s.%s.", type, clazz.getName(), member.getName() );
+			log.debugf(
+					"%s level annotations are getting ignored for %s.%s.",
+					type,
+					clazz.getName(),
+					member.getName()
+			);
 		}
 	}
 }

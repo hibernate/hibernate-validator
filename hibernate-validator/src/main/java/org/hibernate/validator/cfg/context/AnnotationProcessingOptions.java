@@ -22,9 +22,9 @@ package org.hibernate.validator.cfg.context;
  *
  * @author Hardy Ferentschik
  */
-public interface AnnotationProcessing<C extends AnnotationProcessing<C>> {
+public interface AnnotationProcessingOptions<C extends AnnotationProcessingOptions<C>> {
 	/**
-	 * Specifies that annotations specified on the configured property should be ignored.
+	 * Specifies that annotations specified on the configured type or property should be ignored.
 	 *
 	 * @return Returns itself for method chaining.
 	 */

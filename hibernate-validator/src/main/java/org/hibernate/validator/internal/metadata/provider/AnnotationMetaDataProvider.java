@@ -60,16 +60,16 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final ConstraintHelper constraintHelper;
 	private final SoftLimitMRUCache<Class<?>, BeanConfiguration<?>> configuredBeans;
-	private final AnnotationProcessingOptions annotationIgnores;
+	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationProcessingOptions annotationIgnores) {
+	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
-		this.annotationIgnores = annotationIgnores;
+		this.annotationProcessingOptions = annotationProcessingOptions;
 		configuredBeans = new SoftLimitMRUCache<Class<?>, BeanConfiguration<?>>();
 	}
 
-	public AnnotationProcessingOptions getAnnotationIgnores() {
-		return null;
+	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
+		return new AnnotationProcessingOptions();
 	}
 
 	public List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
@@ -140,7 +140,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Class<?> clazz) {
-		if ( annotationIgnores.isIgnoreAnnotations( clazz ) ) {
+		if ( annotationProcessingOptions.areClassLevelConstraintAnnotationsIgnored( clazz ) ) {
 			return Collections.emptySet();
 		}
 
@@ -163,7 +163,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
-					annotationIgnores.isIgnoreAnnotations( field ) ||
+					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( field ) ||
 					field.isSynthetic() ) {
 
 				continue;
@@ -208,7 +208,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
-			if ( Modifier.isStatic( method.getModifiers() ) || annotationIgnores.isIgnoreAnnotations( method ) || method
+			if ( Modifier.isStatic( method.getModifiers() ) || annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored(
+					method
+			) || method
 					.isSynthetic() ) {
 				continue;
 			}

@@ -32,9 +32,16 @@ public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConst
 		TypeTarget,
 		PropertyTarget,
 		MethodTarget,
-		AnnotationProcessing<TypeConstraintMappingContext<C>> {
+		AnnotationProcessingOptions<TypeConstraintMappingContext<C>> {
 
 	public TypeConstraintMappingContext<C> ignoreAnnotations();
+
+	/**
+	 * Defines that all annotations for this type should be ignored.
+	 *
+	 * @return The current creational context following the method chaining pattern.
+	 */
+	public TypeConstraintMappingContext<C> ignoreAllAnnotations();
 
 	/**
 	 * Defines the default group sequence for current type.
@@ -43,8 +50,7 @@ public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConst
 	 *
 	 * @return The current creational context following the method chaining pattern.
 	 */
-	TypeConstraintMappingContext<C> defaultGroupSequence(
-			Class<?>... defaultGroupSequence);
+	TypeConstraintMappingContext<C> defaultGroupSequence(Class<?>... defaultGroupSequence);
 
 	/**
 	 * Defines the default group sequence provider for the current type.

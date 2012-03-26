@@ -72,14 +72,14 @@ public class XmlMappingParser {
 
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
-	private final AnnotationProcessingOptions annotationIgnores;
+	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final Map<Class<?>, Set<MetaConstraint<?>>> constraintMap;
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
 	public XmlMappingParser(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
-		this.annotationIgnores = new AnnotationProcessingOptions();
+		this.annotationProcessingOptions = new AnnotationProcessingOptions();
 		this.constraintMap = newHashMap();
 		this.cascadedMembers = newHashMap();
 		this.defaultSequences = newHashMap();
@@ -95,7 +95,7 @@ public class XmlMappingParser {
 			for ( BeanType bean : mapping.getBean() ) {
 				Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
 				checkClassHasNotBeenProcessed( processedClasses, beanClass );
-				annotationIgnores.setDefaultIgnoreAnnotation( beanClass, bean.getIgnoreAnnotations() );
+				annotationProcessingOptions.ignoreAnnotationConstraintForClass( beanClass, bean.getIgnoreAnnotations() );
 				parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
 				parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
 				parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
@@ -108,8 +108,8 @@ public class XmlMappingParser {
 		return processedClasses;
 	}
 
-	public final AnnotationProcessingOptions getAnnotationIgnores() {
-		return annotationIgnores;
+	public final AnnotationProcessingOptions getAnnotationProcessingOptions() {
+		return annotationProcessingOptions;
 	}
 
 	public final <T> Set<MetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
@@ -207,7 +207,7 @@ public class XmlMappingParser {
 			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.getIgnoreAnnotations() == null ? false : fieldType.getIgnoreAnnotations();
 			if ( ignoreFieldAnnotation ) {
-				annotationIgnores.setIgnoreAnnotationsOnMember( field );
+				annotationProcessingOptions.ignorePropertyLevelConstraintAnnotationsOnMember( field );
 			}
 
 			// valid
@@ -244,7 +244,7 @@ public class XmlMappingParser {
 			// ignore annotations
 			boolean ignoreGetterAnnotation = getterType.getIgnoreAnnotations() == null ? false : getterType.getIgnoreAnnotations();
 			if ( ignoreGetterAnnotation ) {
-				annotationIgnores.setIgnoreAnnotationsOnMember( method );
+				annotationProcessingOptions.ignorePropertyLevelConstraintAnnotationsOnMember( method );
 			}
 
 			// valid
@@ -269,7 +269,10 @@ public class XmlMappingParser {
 
 		// ignore annotation
 		if ( classType.getIgnoreAnnotations() != null ) {
-			annotationIgnores.setIgnoreAnnotationsOnClass( beanClass, classType.getIgnoreAnnotations() );
+			annotationProcessingOptions.ignoreClassLevelConstraintAnnotations(
+					beanClass,
+					classType.getIgnoreAnnotations()
+			);
 		}
 
 		// group sequence

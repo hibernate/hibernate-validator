@@ -49,7 +49,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  */
 public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
-	private final AnnotationProcessingOptions annotationIgnores;
+	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	/**
 	 * @param constraintHelper the constraint helper
@@ -82,11 +82,11 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 			);
 		}
 
-		annotationIgnores = mappingParser.getAnnotationIgnores();
+		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
-	public AnnotationProcessingOptions getAnnotationIgnores() {
-		return annotationIgnores;
+	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
+		return annotationProcessingOptions;
 	}
 
 	private Set<ConstrainedElement> getConstrainedElements(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
