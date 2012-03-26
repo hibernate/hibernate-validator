@@ -28,8 +28,13 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Gunnar Morling
  */
-public interface TypeConstraintMappingContext<C>
-		extends Constrainable<TypeConstraintMappingContext<C>>, TypeTarget, PropertyTarget, MethodTarget {
+public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConstraintMappingContext<C>>,
+		TypeTarget,
+		PropertyTarget,
+		MethodTarget,
+		AnnotationProcessing<TypeConstraintMappingContext<C>> {
+
+	public TypeConstraintMappingContext<C> ignoreAnnotations();
 
 	/**
 	 * Defines the default group sequence for current type.

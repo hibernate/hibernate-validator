@@ -51,10 +51,7 @@ public class ConstraintMapping {
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
 	public final <C> TypeConstraintMappingContext<C> type(Class<C> beanClass) {
-
 		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeMustNotBeNull() );
-
 		return new TypeConstraintMappingContextImpl<C>( beanClass, context );
 	}
-
 }

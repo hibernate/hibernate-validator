@@ -22,7 +22,7 @@ import java.util.List;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.core.AnnotationIgnores;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -78,7 +78,7 @@ public class BeanMetaDataManager {
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>();
-		AnnotationIgnores annotationIgnores = getAnnotationIgnoresNonDefaultProviders();
+		AnnotationProcessingOptions annotationIgnores = getAnnotationIgnoresNonDefaultProviders();
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintHelper,
 				annotationIgnores
@@ -130,8 +130,8 @@ public class BeanMetaDataManager {
 	/**
 	 * @return returns the annotation ignores from the non annotation based meta data providers
 	 */
-	private AnnotationIgnores getAnnotationIgnoresNonDefaultProviders() {
-		AnnotationIgnores ignores = null;
+	private AnnotationProcessingOptions getAnnotationIgnoresNonDefaultProviders() {
+		AnnotationProcessingOptions ignores = null;
 		for ( MetaDataProvider metaDataProvider : metaDataProviders ) {
 			//TODO GM: merge, if also programmatic provider has this option
 			if ( metaDataProvider.getAnnotationIgnores() != null ) {
@@ -140,7 +140,7 @@ public class BeanMetaDataManager {
 		}
 
 		if ( ignores == null ) {
-			ignores = new AnnotationIgnores();
+			ignores = new AnnotationProcessingOptions();
 		}
 		return ignores;
 	}

@@ -43,20 +43,17 @@ public abstract class ConstraintMappingContextImplBase {
 	protected final ConstraintMappingContext mapping;
 
 	public ConstraintMappingContextImplBase(Class<?> beanClass, ConstraintMappingContext mapping) {
-
 		this.beanClass = beanClass;
 		this.mapping = mapping;
 	}
 
 	public <C> TypeConstraintMappingContext<C> type(Class<C> type) {
-
 		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeMustNotBeNull() );
 
 		return new TypeConstraintMappingContextImpl<C>( type, mapping );
 	}
 
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
-
 		Contracts.assertNotNull( property, "The property name must not be null." );
 		Contracts.assertNotNull( elementType, "The element type must not be null." );
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
@@ -73,7 +70,6 @@ public abstract class ConstraintMappingContextImplBase {
 	}
 
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
-
 		Contracts.assertNotNull( name, MESSAGES.methodNameMustNotBeNull() );
 
 		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
@@ -91,5 +87,4 @@ public abstract class ConstraintMappingContextImplBase {
 
 		return new MethodConstraintMappingContextImpl( beanClass, method, mapping );
 	}
-
 }
