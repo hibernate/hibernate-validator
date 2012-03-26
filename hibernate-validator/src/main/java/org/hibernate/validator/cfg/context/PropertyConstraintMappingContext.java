@@ -29,5 +29,5 @@ public interface PropertyConstraintMappingContext extends Constrainable<Property
 		PropertyTarget,
 		MethodTarget,
 		Cascadable<PropertyConstraintMappingContext>,
-		AnnotationProcessing<PropertyConstraintMappingContext> {
+		AnnotationProcessingOptions<PropertyConstraintMappingContext> {
 }

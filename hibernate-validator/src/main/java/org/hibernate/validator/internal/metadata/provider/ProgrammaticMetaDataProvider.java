@@ -59,16 +59,18 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	private static final Log log = LoggerFactory.make();
+	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
 		Contracts.assertNotNull( programmaticMappings );
 		ConstraintMappingContext mergedContext = createMergedMappingContext( programmaticMappings );
 		initProgrammaticConfiguration( mergedContext );
+		annotationProcessingOptions = mergedContext.getAnnotationProcessingOptions();
 	}
 
-	public AnnotationProcessingOptions getAnnotationIgnores() {
-		return null;
+	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
+		return annotationProcessingOptions;
 	}
 
 	/**
@@ -274,6 +276,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		ConstraintMappingContext mergedContext = new ConstraintMappingContext();
 		for ( ConstraintMapping mapping : programmaticMappings ) {
 			ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
+
+			mergedContext.getAnnotationProcessingOptions().merge( context.getAnnotationProcessingOptions() );
 
 			for ( Set<ConfiguredConstraint<?, BeanConstraintLocation>> propertyConstraints : context.getConstraintConfig()
 					.values() ) {

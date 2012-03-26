@@ -78,10 +78,10 @@ public class BeanMetaDataManager {
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>();
-		AnnotationProcessingOptions annotationIgnores = getAnnotationIgnoresNonDefaultProviders();
+		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintHelper,
-				annotationIgnores
+				annotationProcessingOptions
 		);
 		this.metaDataProviders.add( defaultProvider );
 	}
@@ -130,18 +130,12 @@ public class BeanMetaDataManager {
 	/**
 	 * @return returns the annotation ignores from the non annotation based meta data providers
 	 */
-	private AnnotationProcessingOptions getAnnotationIgnoresNonDefaultProviders() {
-		AnnotationProcessingOptions ignores = null;
+	private AnnotationProcessingOptions getAnnotationProcessingOptionsFromNonDefaultProviders() {
+		AnnotationProcessingOptions options = new AnnotationProcessingOptions();
 		for ( MetaDataProvider metaDataProvider : metaDataProviders ) {
-			//TODO GM: merge, if also programmatic provider has this option
-			if ( metaDataProvider.getAnnotationIgnores() != null ) {
-				ignores = metaDataProvider.getAnnotationIgnores();
-			}
+			options.merge( metaDataProvider.getAnnotationProcessingOptions() );
 		}
 
-		if ( ignores == null ) {
-			ignores = new AnnotationProcessingOptions();
-		}
-		return ignores;
+		return options;
 	}
 }

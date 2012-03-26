@@ -45,7 +45,7 @@ public interface MetaDataProvider {
 	 *
 	 * @return The annotation processing options as configured by this provider.
 	 */
-	AnnotationProcessingOptions getAnnotationIgnores();
+	AnnotationProcessingOptions getAnnotationProcessingOptions();
 
 	/**
 	 * Returns a list with the configurations for all types contained in the
