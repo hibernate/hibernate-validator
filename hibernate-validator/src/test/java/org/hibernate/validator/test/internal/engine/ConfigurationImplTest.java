@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.test.internal.engine;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import javax.validation.Configuration;
@@ -69,7 +70,6 @@ public class ConfigurationImplTest {
 		assertTrue( factory2.getTraversableResolver() instanceof TestTraversableResolver );
 	}
 
-
 	@Test
 	@TestForIssue(jiraKey = "HV-563")
 	public void testReusableConfigurationWithInputStream() throws Exception {
@@ -79,6 +79,28 @@ public class ConfigurationImplTest {
 
 		try {
 			configuration.addMapping( mappingStream );
+			ValidatorFactory factory1 = configuration.buildValidatorFactory();
+			assertNotNull( factory1 );
+
+			ValidatorFactory factory2 = configuration.buildValidatorFactory();
+			assertNotNull( factory2 );
+
+			assertNotSame( factory1, factory2 );
+		}
+		finally {
+			mappingStream.close();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-563")
+	public void testReusableConfigurationWithNonResettableInputStream() throws Exception {
+		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();
+
+		InputStream mappingStream = ConfigurationImplTest.class.getResourceAsStream( "mapping.xml" );
+
+		try {
+			configuration.addMapping( new NonResettableInputStream( mappingStream ) );
 			ValidatorFactory factory1 = configuration.buildValidatorFactory();
 			assertNotNull( factory1 );
 
@@ -111,7 +133,7 @@ public class ConfigurationImplTest {
 		configuration.buildValidatorFactory();
 	}
 
-	public class TestTraversableResolver implements TraversableResolver {
+	private static class TestTraversableResolver implements TraversableResolver {
 
 		public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 			return true;
@@ -121,6 +143,18 @@ public class ConfigurationImplTest {
 			return true;
 		}
 	}
+
+	private static class NonResettableInputStream extends InputStream {
+
+		private InputStream delegate;
+
+		public NonResettableInputStream(InputStream delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public int read() throws IOException {
+			return delegate.read();
+		}
+	}
 }
-
-
