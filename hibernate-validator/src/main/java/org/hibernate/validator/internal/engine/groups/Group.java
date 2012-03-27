@@ -35,7 +35,7 @@ public class Group {
 		this.group = group;
 	}
 
-	public Class<?> getGroup() {
+	public Class<?> getDefiningClass() {
 		return group;
 	}
 
@@ -57,7 +57,7 @@ public class Group {
 	}
 
 	public boolean isDefaultGroup() {
-		return getGroup().getName().equals( Default.class.getName() );
+		return getDefiningClass().getName().equals( Default.class.getName() );
 	}
 
 	@Override

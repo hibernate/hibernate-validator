@@ -14,13 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.groups.groupchaingenerator;
-
-import javax.validation.GroupSequence;
+package org.hibernate.validator.test.internal.engine.groups.validationorder;
 
 /**
- * @author Hardy Ferentschik
+ * Group executed Last in the validation
+ *
+ * @author Emmanuel Bernard
  */
-@GroupSequence(value = CyclicGroupSequence2.class)
-public interface CyclicGroupSequence1 {
+public interface Last {
 }

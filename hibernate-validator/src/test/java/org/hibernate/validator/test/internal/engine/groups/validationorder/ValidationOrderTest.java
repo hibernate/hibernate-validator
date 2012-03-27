@@ -1,4 +1,4 @@
-package org.hibernate.validator.test.internal.engine.groups.groupchain;
+package org.hibernate.validator.test.internal.engine.groups.validationorder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,8 @@ import javax.validation.groups.Default;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.internal.engine.groups.DefaultValidationOrder;
 import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.groups.GroupOrder;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 
 import static org.testng.FileAssert.fail;
@@ -16,7 +16,7 @@ import static org.testng.FileAssert.fail;
 /**
  * @author Hardy Ferentschik
  */
-public class GroupOrderTest {
+public class ValidationOrderTest {
 	@Test
 	public void testAssertDefaultGroupSequenceIsExpandableWithDefaultAtEndOfSequence() {
 		// create a dummy sequence
@@ -31,7 +31,7 @@ public class GroupOrderTest {
 		sequence.add( c );
 		sequence.add( defaultGroup );
 
-		GroupOrder chain = new GroupOrder();
+		DefaultValidationOrder chain = new DefaultValidationOrder();
 		chain.insertSequence( new Sequence( TestSequence.class, sequence ) );
 
 		// create test default sequence
@@ -89,7 +89,7 @@ public class GroupOrderTest {
 		sequence.add( b );
 		sequence.add( c );
 
-		GroupOrder chain = new GroupOrder();
+		DefaultValidationOrder chain = new DefaultValidationOrder();
 		chain.insertSequence( new Sequence( TestSequence.class, sequence ) );
 
 		// create test default sequence
