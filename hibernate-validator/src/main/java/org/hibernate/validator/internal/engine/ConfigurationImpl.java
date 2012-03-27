@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -135,11 +136,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @param stream XML mapping stream.
+	 * <p>
+	 * <b>Note</b>: In order to reuse the {@code ConfigurationInstance} to build multiple
+	 * validator factories a {@link java.io.BufferedInputStream} has to be provided.
+	 * </p>
+	 */
 
+	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
 		Contracts.assertNotNull( stream, MESSAGES.parameterMustNotBeNull( "stream" ) );
 
-		validationBootstrapParameters.addMapping( stream );
+		validationBootstrapParameters.addMapping( stream.markSupported() ? stream : new BufferedInputStream(stream)  );
 		return this;
 	}
 
@@ -201,8 +211,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 
-		// reset the param holder
-		validationBootstrapParameters = new ValidationBootstrapParameters();
 		return factory;
 	}
 

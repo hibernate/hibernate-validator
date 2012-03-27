@@ -46,13 +46,15 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  * XML descriptors as defined by the Bean Validation API.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 
 	private final AnnotationIgnores annotationIgnores;
 
 	/**
-	 * @param mappingStreams
+	 * @param constraintHelper the constraint helper utility
+	 * @param mappingStreams the defined mapping streams
 	 */
 	public XmlConfigurationMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
 
@@ -66,7 +68,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation = partition(
 					mappingParser.getConstraintsForClass( clazz ), byLocation()
 			);
-			Set<BeanConstraintLocation> cascades = getCascades( mappingParser, clazz );
+			Set<ConstraintLocation> cascades = getCascades( mappingParser, clazz );
 
 			Set<ConstrainedElement> constrainedElements = getConstrainedElements( constraintsByLocation, cascades );
 
@@ -85,7 +87,7 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 		annotationIgnores = mappingParser.getAnnotationIgnores();
 	}
 
-	private Set<ConstrainedElement> getConstrainedElements(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<BeanConstraintLocation> cascades) {
+	private Set<ConstrainedElement> getConstrainedElements(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<ConstraintLocation> cascades) {
 
 		Set<ConstraintLocation> configuredLocations = new HashSet<ConstraintLocation>( cascades );
 		configuredLocations.addAll( constraintsByLocation.keySet() );
@@ -129,20 +131,20 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 	}
 
 	/**
-	 * @param mappingParser
-	 * @param clazz
+	 * @param mappingParser the xml parser
+	 * @param clazz the type for which to retrieve cascaded members
 	 *
-	 * @return
+	 * @return returns a set of cascaded constraints
 	 */
-	private Set<BeanConstraintLocation> getCascades(XmlMappingParser mappingParser, Class<?> clazz) {
+	private Set<ConstraintLocation> getCascades(XmlMappingParser mappingParser, Class<?> clazz) {
 
-		Set<BeanConstraintLocation> theValue = newHashSet();
+		Set<ConstraintLocation> cascadedConstraintSet = newHashSet();
 
 		for ( Member member : mappingParser.getCascadedMembersForClass( clazz ) ) {
-			theValue.add( new BeanConstraintLocation( member ) );
+			cascadedConstraintSet.add( new BeanConstraintLocation( member ) );
 		}
 
-		return theValue;
+		return cascadedConstraintSet;
 	}
 
 	public AnnotationIgnores getAnnotationIgnores() {
@@ -156,5 +158,4 @@ public class XmlConfigurationMetaDataProvider extends MetaDataProviderImplBase {
 			}
 		};
 	}
-
 }
