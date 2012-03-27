@@ -30,8 +30,8 @@ import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.Scope;
 
 import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.groups.GroupChain;
-import org.hibernate.validator.internal.engine.groups.GroupChainGenerator;
+import org.hibernate.validator.internal.engine.groups.GroupOrder;
+import org.hibernate.validator.internal.engine.groups.GroupOrderGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
@@ -145,8 +145,8 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 
 		private void findMatchingDescriptors(Set<ConstraintDescriptor<?>> matchingDescriptors) {
 			if ( !groups.isEmpty() ) {
-				GroupChain groupChain = new GroupChainGenerator().getGroupChainFor( groups );
-				Iterator<Group> groupIterator = groupChain.getGroupIterator();
+				GroupOrder groupOrder = new GroupOrderGenerator().getGroupOrderFor( groups );
+				Iterator<Group> groupIterator = groupOrder.getGroupIterator();
 				while ( groupIterator.hasNext() ) {
 					Group g = groupIterator.next();
 					addMatchingDescriptorsForGroup( g.getGroup(), matchingDescriptors );

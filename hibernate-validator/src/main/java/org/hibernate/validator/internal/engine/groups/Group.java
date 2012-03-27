@@ -24,31 +24,19 @@ import javax.validation.groups.Default;
  * @author Hardy Ferentschik
  */
 public class Group {
+	public static final Group DEFAULT_GROUP = new Group( Default.class );
+
 	/**
 	 * The actual group.
 	 */
 	private Class<?> group;
 
-	/**
-	 * The sequence the group is part of ({@code null}, if this group is not part of a sequence).
-	 */
-	private Class<?> sequence;
-
 	public Group(Class<?> group) {
-		this( group, null );
-	}
-
-	public Group(Class<?> group, Class<?> sequence) {
 		this.group = group;
-		this.sequence = sequence;
 	}
 
 	public Class<?> getGroup() {
 		return group;
-	}
-
-	public Class<?> getSequence() {
-		return sequence;
 	}
 
 	@Override

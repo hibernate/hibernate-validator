@@ -37,8 +37,9 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.groups.GroupChain;
-import org.hibernate.validator.internal.engine.groups.GroupChainGenerator;
+import org.hibernate.validator.internal.engine.groups.GroupOrder;
+import org.hibernate.validator.internal.engine.groups.GroupOrderGenerator;
+import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -78,7 +79,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	/**
 	 * Used to resolve the group execution order for a validate call.
 	 */
-	private final transient GroupChainGenerator groupChainGenerator;
+	private final transient GroupOrderGenerator groupOrderGenerator;
 
 	/**
 	 * Reference to shared {@code ConstraintValidatorFactory}.
@@ -114,14 +115,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.failFast = failFast;
 
-		groupChainGenerator = new GroupChainGenerator();
+		groupOrderGenerator = new GroupOrderGenerator();
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
-		GroupChain groupChain = determineGroupExecutionOrder( groups );
+		GroupOrder groupOrder = determineGroupExecutionOrder( groups );
 
 		ValidationContext<T, ConstraintViolation<T>> validationContext = ValidationContext.getContextForValidate(
 				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver(), failFast
@@ -129,7 +130,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext( object, PathImpl.createRootPath() );
 
-		return validateInContext( valueContext, validationContext, groupChain );
+		return validateInContext( valueContext, validationContext, groupOrder );
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
@@ -137,7 +138,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
 		sanityCheckPropertyPath( propertyName );
-		GroupChain groupChain = determineGroupExecutionOrder( groups );
+		GroupOrder groupOrder = determineGroupExecutionOrder( groups );
 
 		ValidationContext<T, ConstraintViolation<T>> context = ValidationContext.getContextForValidateProperty(
 				object,
@@ -147,7 +148,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				failFast
 		);
 
-		return validatePropertyInContext( context, PathImpl.createPathFromString( propertyName ), groupChain );
+		return validatePropertyInContext( context, PathImpl.createPathFromString( propertyName ), groupOrder );
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
@@ -155,7 +156,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
 
 		sanityCheckPropertyPath( propertyName );
-		GroupChain groupChain = determineGroupExecutionOrder( groups );
+		GroupOrder groupOrder = determineGroupExecutionOrder( groups );
 
 		ValidationContext<T, ConstraintViolation<T>> context = ValidationContext.getContextForValidateValue(
 				beanType,
@@ -165,7 +166,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				failFast
 		);
 
-		return validateValueInContext( context, value, PathImpl.createPathFromString( propertyName ), groupChain );
+		return validateValueInContext( context, value, PathImpl.createPathFromString( propertyName ), groupOrder );
 	}
 
 	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
@@ -173,7 +174,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
-		GroupChain groupChain = determineGroupExecutionOrder( groups );
+		GroupOrder groupOrder = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
 				method,
@@ -188,7 +189,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Object[] parameterValues = new Object[method.getParameterTypes().length];
 		parameterValues[parameterIndex] = parameterValue;
 
-		validateParametersInContext( context, object, parameterValues, groupChain );
+		validateParametersInContext( context, object, parameterValues, groupOrder );
 
 		return context.getFailingConstraints();
 	}
@@ -203,7 +204,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			return Collections.emptySet();
 		}
 
-		GroupChain groupChain = determineGroupExecutionOrder( groups );
+		GroupOrder groupOrder = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				method,
@@ -214,7 +215,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				failFast
 		);
 
-		validateParametersInContext( context, object, parameterValues, groupChain );
+		validateParametersInContext( context, object, parameterValues, groupOrder );
 
 		return context.getFailingConstraints();
 	}
@@ -223,7 +224,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
-		GroupChain groupChain = determineGroupExecutionOrder( groups );
+		GroupOrder groupOrder = determineGroupExecutionOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				method,
@@ -234,7 +235,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				failFast
 		);
 
-		validateReturnValueInContext( context, object, returnValue, groupChain );
+		validateReturnValueInContext( context, object, returnValue, groupOrder );
 
 		return context.getFailingConstraints();
 	}
@@ -260,7 +261,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private GroupChain determineGroupExecutionOrder(Class<?>[] groups) {
+	private GroupOrder determineGroupExecutionOrder(Class<?>[] groups) {
 
 		Contracts.assertNotNull( groups, MESSAGES.groupMustNotBeNull() );
 
@@ -270,7 +271,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			tmpGroups = DEFAULT_GROUP_ARRAY;
 		}
 
-		return groupChainGenerator.getGroupChainFor( Arrays.asList( tmpGroups ) );
+		return groupOrderGenerator.getGroupOrderFor( Arrays.asList( tmpGroups ) );
 	}
 
 	/**
@@ -278,25 +279,25 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 *
 	 * @param valueContext the current validation context
 	 * @param context the global validation context
-	 * @param groupChain Contains the information which and in which order groups have to be executed
+	 * @param groupOrder Contains the information which and in which order groups have to be executed
 	 * @param <T> The root bean type
 	 * @param <V> The type of the current object on the validation stack
 	 *
 	 * @return Set of constraint violations or the empty set if there were no violations.
 	 */
-	private <T, U, V, E extends ConstraintViolation<T>> Set<E> validateInContext(ValueContext<U, V> valueContext, ValidationContext<T, E> context, GroupChain groupChain) {
+	private <T, U, V, E extends ConstraintViolation<T>> Set<E> validateInContext(ValueContext<U, V> valueContext, ValidationContext<T, E> context, GroupOrder groupOrder) {
 		if ( valueContext.getCurrentBean() == null ) {
 			return Collections.emptySet();
 		}
 
 		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
+			groupOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
 		}
 
 		// process first single groups. For these we can optimise object traversal by first running all validations on the current bean
 		// before traversing the object.
-		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		Iterator<Group> groupIterator = groupOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
@@ -305,7 +306,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				return context.getFailingConstraints();
 			}
 		}
-		groupIterator = groupChain.getGroupIterator();
+		groupIterator = groupOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
@@ -316,10 +317,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		// now we process sequences. For sequences I have to traverse the object graph since I have to stop processing when an error occurs.
-		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		Iterator<Sequence> sequenceIterator = groupOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
-			List<Group> sequence = sequenceIterator.next();
-			for ( Group group : sequence ) {
+			Sequence sequence = sequenceIterator.next();
+			for ( Group group : sequence.getComposingGroups() ) {
 				int numberOfViolations = context.getFailingConstraints().size();
 				valueContext.setCurrentGroup( group.getGroup() );
 
@@ -581,7 +582,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			if ( !context.isAlreadyValidated(
 					value, valueContext.getCurrentGroup(), valueContext.getPropertyPath()
 			) ) {
-				GroupChain groupChain = groupChainGenerator.getGroupChainFor(
+				GroupOrder groupOrder = groupOrderGenerator.getGroupOrderFor(
 						Arrays.<Class<?>>asList( valueContext.getCurrentGroup() )
 				);
 
@@ -601,7 +602,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					newValueContext.setParameterName( valueContext.getParameterName() );
 				}
 
-				validateInContext( newValueContext, context, groupChain );
+				validateInContext( newValueContext, context, groupOrder );
 				if ( shouldFailFast( context ) ) {
 					return;
 				}
@@ -610,7 +611,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 	}
 
-	private <T, U, V> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T, ConstraintViolation<T>> context, PathImpl propertyPath, GroupChain groupChain) {
+	private <T, U, V> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T, ConstraintViolation<T>> context, PathImpl propertyPath, GroupOrder groupOrder) {
 		List<MetaConstraint<?>> metaConstraints = newArrayList();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
 		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
@@ -631,11 +632,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
+			groupOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
 		}
 
 		// process first single groups
-		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		Iterator<Group> groupIterator = groupOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
@@ -646,10 +647,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		// now process sequences, stop after the first erroneous group
-		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		Iterator<Sequence> sequenceIterator = groupOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
-			List<Group> sequence = sequenceIterator.next();
-			for ( Group group : sequence ) {
+			Sequence sequence = sequenceIterator.next();
+			for ( Group group : sequence.getComposingGroups() ) {
 				valueContext.setCurrentGroup( group.getGroup() );
 				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
 						valueContext, context, metaConstraints
@@ -666,7 +667,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return context.getFailingConstraints();
 	}
 
-	private <T, U, V> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T, ConstraintViolation<T>> context, V value, PathImpl propertyPath, GroupChain groupChain) {
+	private <T, U, V> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T, ConstraintViolation<T>> context, V value, PathImpl propertyPath, GroupOrder groupOrder) {
 		List<MetaConstraint<?>> metaConstraints = newArrayList();
 		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
 				context.getRootBeanClass(), null, propertyPath.iterator(), propertyPath, metaConstraints
@@ -679,11 +680,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
+			groupOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
 		}
 
 		// process first single groups
-		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		Iterator<Group> groupIterator = groupOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			Group group = groupIterator.next();
 			valueContext.setCurrentGroup( group.getGroup() );
@@ -694,10 +695,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		// now process sequences, stop after the first erroneous group
-		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		Iterator<Sequence> sequenceIterator = groupOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
-			List<Group> sequence = sequenceIterator.next();
-			for ( Group group : sequence ) {
+			Sequence sequence = sequenceIterator.next();
+			for ( Group group : sequence.getComposingGroups() ) {
 				valueContext.setCurrentGroup( group.getGroup() );
 				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
 						valueContext, context, metaConstraints
@@ -837,7 +838,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
-	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, GroupChain groupChain) {
+	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, GroupOrder groupOrder) {
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 
@@ -846,11 +847,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		methodMetaData.assertCorrectnessOfMethodParameterConstraints();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( object ) );
+			groupOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( object ) );
 		}
 
 		// process first single groups
-		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		Iterator<Group> groupIterator = groupOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
 			validateParametersForGroup( validationContext, object, parameterValues, groupIterator.next() );
 			if ( shouldFailFast( validationContext ) ) {
@@ -859,10 +860,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		// now process sequences, stop after the first erroneous group
-		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		Iterator<Sequence> sequenceIterator = groupOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
-			List<Group> sequence = sequenceIterator.next();
-			for ( Group group : sequence ) {
+			Sequence sequence = sequenceIterator.next();
+			for ( Group group : sequence.getComposingGroups() ) {
 				int numberOfFailingConstraint = validateParametersForGroup(
 						validationContext, object, parameterValues, group
 				);
@@ -998,15 +999,15 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, V value, GroupChain groupChain) {
+	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, V value, GroupOrder groupOrder) {
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( context.getRootBeanClass() );
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			groupChain.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( bean ) );
+			groupOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( bean ) );
 		}
 
-		Iterator<Group> groupIterator = groupChain.getGroupIterator();
+		Iterator<Group> groupIterator = groupOrder.getGroupIterator();
 
 		// process first single groups
 		while ( groupIterator.hasNext() ) {
@@ -1017,10 +1018,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		// now process sequences, stop after the first erroneous group
-		Iterator<List<Group>> sequenceIterator = groupChain.getSequenceIterator();
+		Iterator<Sequence> sequenceIterator = groupOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
-			List<Group> sequence = sequenceIterator.next();
-			for ( Group group : sequence ) {
+			Sequence sequence = sequenceIterator.next();
+			for ( Group group : sequence.getComposingGroups() ) {
 				int numberOfFailingConstraint = validateReturnValueForGroup(
 						context, bean, value, group
 				);
