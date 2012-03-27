@@ -34,8 +34,6 @@ public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConst
 		MethodTarget,
 		AnnotationProcessingOptions<TypeConstraintMappingContext<C>> {
 
-	public TypeConstraintMappingContext<C> ignoreAnnotations();
-
 	/**
 	 * Defines that all annotations for this type should be ignored.
 	 *

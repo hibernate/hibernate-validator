@@ -124,15 +124,15 @@ public class AnnotationProcessingOptions {
 	}
 
 	private void logMessage(Member member, Class<?> clazz) {
-		String type;
-		if ( member instanceof Field ) {
-			type = "Field";
-		}
-		else {
-			type = "Property";
-		}
-
 		if ( log.isDebugEnabled() ) {
+			String type;
+			if ( member instanceof Field ) {
+				type = "Field";
+			}
+			else {
+				type = "Property";
+			}
+
 			log.debugf(
 					"%s level annotations are getting ignored for %s.%s.",
 					type,

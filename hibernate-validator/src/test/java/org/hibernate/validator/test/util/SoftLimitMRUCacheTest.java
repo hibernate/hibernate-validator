@@ -50,13 +50,13 @@ public class SoftLimitMRUCacheTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testGetNullKey() {
-		SoftLimitMRUCache cache = new SoftLimitMRUCache<Integer, String>( 1, 10 );
+		SoftLimitMRUCache<Integer, String> cache = new SoftLimitMRUCache<Integer, String>( 1, 10 );
 		cache.get( null );
 	}
 
 	@Test()
 	public void testEmpty() {
-		SoftLimitMRUCache cache = new SoftLimitMRUCache<Integer, String>( 1, 10 );
+		SoftLimitMRUCache<Integer, String> cache = new SoftLimitMRUCache<Integer, String>( 1, 10 );
 		assertEquals( cache.size(), 0 );
 		assertEquals( cache.softSize(), 0 );
 
@@ -81,7 +81,7 @@ public class SoftLimitMRUCacheTest {
 
 	@Test
 	public void testConcurrentAccess() {
-		SoftLimitMRUCache cache = new SoftLimitMRUCache<Integer, String>( 1, 10 );
+		SoftLimitMRUCache<Integer, String> cache = new SoftLimitMRUCache<Integer, String>( 1, 10 );
 		barrier = new CyclicBarrier( THREAD_COUNT + 1 );
 
 		try {
@@ -98,10 +98,10 @@ public class SoftLimitMRUCacheTest {
 
 	}
 
-	class CacheClient implements Runnable {
-		private SoftLimitMRUCache cache;
+	private class CacheClient implements Runnable {
+		private SoftLimitMRUCache<Integer, String> cache;
 
-		CacheClient(SoftLimitMRUCache cache) {
+		CacheClient(SoftLimitMRUCache<Integer, String> cache) {
 			this.cache = cache;
 		}
 
@@ -124,5 +124,3 @@ public class SoftLimitMRUCacheTest {
 		}
 	}
 }
-
-

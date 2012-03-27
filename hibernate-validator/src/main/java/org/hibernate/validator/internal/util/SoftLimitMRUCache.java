@@ -202,7 +202,6 @@ public class SoftLimitMRUCache<K, V> implements Serializable {
 	private static class KeyedSoftReference<K, V> extends SoftReference<V> {
 		private final K key;
 
-		@SuppressWarnings({ "unchecked" })
 		private KeyedSoftReference(K key, V value, ReferenceQueue<V> q) {
 			super( value, q );
 			this.key = key;
@@ -213,7 +212,3 @@ public class SoftLimitMRUCache<K, V> implements Serializable {
 		}
 	}
 }
-
-
-
-
