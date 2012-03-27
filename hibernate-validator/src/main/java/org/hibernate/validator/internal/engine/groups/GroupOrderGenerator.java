@@ -32,11 +32,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public class GroupChainGenerator {
+public class GroupOrderGenerator {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final ConcurrentMap<Class<?>, List<Group>> resolvedSequences = new ConcurrentHashMap<Class<?>, List<Group>>();
+	private final ConcurrentMap<Class<?>, Sequence> resolvedSequences = new ConcurrentHashMap<Class<?>, Sequence>();
 
 	/**
 	 * Generates a chain of groups to be validated given the specified validation groups.
@@ -45,7 +45,7 @@ public class GroupChainGenerator {
 	 *
 	 * @return an instance of {@code GroupChain} defining the order in which validation has to occur.
 	 */
-	public GroupChain getGroupChainFor(Collection<Class<?>> groups) {
+	public GroupOrder getGroupOrderFor(Collection<Class<?>> groups) {
 		if ( groups == null || groups.size() == 0 ) {
 			throw log.getAtLeastOneGroupHasToBeSpecifiedException();
 		}
@@ -56,19 +56,19 @@ public class GroupChainGenerator {
 			}
 		}
 
-		GroupChain chain = new GroupChain();
+		GroupOrder order = new GroupOrder();
 		for ( Class<?> clazz : groups ) {
 			if ( isGroupSequence( clazz ) ) {
-				insertSequence( clazz, chain );
+				insertSequence( clazz, order );
 			}
 			else {
 				Group group = new Group( clazz );
-				chain.insertGroup( group );
-				insertInheritedGroups( clazz, chain );
+				order.insertGroup( group );
+				insertInheritedGroups( clazz, order );
 			}
 		}
 
-		return chain;
+		return order;
 	}
 
 	private boolean isGroupSequence(Class<?> clazz) {
@@ -81,7 +81,7 @@ public class GroupChainGenerator {
 	 * @param clazz The group interface
 	 * @param chain The group chain we are currently building.
 	 */
-	private void insertInheritedGroups(Class<?> clazz, GroupChain chain) {
+	private void insertInheritedGroups(Class<?> clazz, GroupOrder chain) {
 		for ( Class<?> inheritedGroup : clazz.getInterfaces() ) {
 			Group group = new Group( inheritedGroup );
 			chain.insertGroup( group );
@@ -89,64 +89,44 @@ public class GroupChainGenerator {
 		}
 	}
 
-	private void insertSequence(Class<?> clazz, GroupChain chain) {
-		List<Group> sequence = resolvedSequences.get( clazz );
+	private void insertSequence(Class<?> sequenceClass, GroupOrder groupOrder) {
+		Sequence sequence = resolvedSequences.get( sequenceClass );
 		if ( sequence == null ) {
-			sequence = resolveSequence( clazz, new ArrayList<Class<?>>() );
+			sequence = resolveSequence( sequenceClass, new ArrayList<Class<?>>() );
 			// we expand the inherited groups only after we determined whether the sequence is expandable
-			sequence = expandInheritedGroups( sequence );
+			sequence.expandInheritedGroups();
 
 			// cache already resolved sequences
-			final List<Group> cachedResolvedSequence = resolvedSequences.putIfAbsent( clazz, sequence );
+			final Sequence cachedResolvedSequence = resolvedSequences.putIfAbsent( sequenceClass, sequence );
 			if ( cachedResolvedSequence != null ) {
 				sequence = cachedResolvedSequence;
 			}
 		}
-		chain.insertSequence( sequence );
+		groupOrder.insertSequence( sequence );
 	}
 
-	private List<Group> expandInheritedGroups(List<Group> sequence) {
-		List<Group> expandedGroup = new ArrayList<Group>();
-		for ( Group group : sequence ) {
-			expandedGroup.add( group );
-			addInheritedGroups( group, expandedGroup );
-		}
-		return expandedGroup;
-	}
-
-	private void addInheritedGroups(Group group, List<Group> expandedGroups) {
-		for ( Class<?> inheritedGroup : group.getGroup().getInterfaces() ) {
-			if ( isGroupSequence( inheritedGroup ) ) {
-				throw log.getSequenceDefinitionsNotAllowedException();
-			}
-			Group g = new Group( inheritedGroup, group.getSequence() );
-			expandedGroups.add( g );
-			addInheritedGroups( g, expandedGroups );
-		}
-	}
-
-	private List<Group> resolveSequence(Class<?> group, List<Class<?>> processedSequences) {
-		if ( processedSequences.contains( group ) ) {
+	private Sequence resolveSequence(Class<?> sequenceClass, List<Class<?>> processedSequences) {
+		if ( processedSequences.contains( sequenceClass ) ) {
 			throw log.getCyclicDependencyInGroupsDefinitionException();
 		}
 		else {
-			processedSequences.add( group );
+			processedSequences.add( sequenceClass );
 		}
-		List<Group> resolvedGroupSequence = new ArrayList<Group>();
-		GroupSequence sequenceAnnotation = group.getAnnotation( GroupSequence.class );
+		List<Group> resolvedSequenceGroups = new ArrayList<Group>();
+		GroupSequence sequenceAnnotation = sequenceClass.getAnnotation( GroupSequence.class );
 		Class<?>[] sequenceArray = sequenceAnnotation.value();
 		for ( Class<?> clazz : sequenceArray ) {
 			if ( isGroupSequence( clazz ) ) {
-				List<Group> tmpSequence = resolveSequence( clazz, processedSequences );
-				addGroups( resolvedGroupSequence, tmpSequence );
+				Sequence tmpSequence = resolveSequence( clazz, processedSequences );
+				addGroups( resolvedSequenceGroups, tmpSequence.getComposingGroups() );
 			}
 			else {
 				List<Group> list = new ArrayList<Group>();
-				list.add( new Group( clazz, group ) );
-				addGroups( resolvedGroupSequence, list );
+				list.add( new Group( clazz ) );
+				addGroups( resolvedSequenceGroups, list );
 			}
 		}
-		return resolvedGroupSequence;
+		return new Sequence( sequenceClass, resolvedSequenceGroups );
 	}
 
 	private void addGroups(List<Group> resolvedGroupSequence, List<Group> groups) {

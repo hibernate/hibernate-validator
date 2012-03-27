@@ -29,8 +29,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.groups.GroupChain;
-import org.hibernate.validator.internal.engine.groups.GroupChainGenerator;
+import org.hibernate.validator.internal.engine.groups.GroupOrder;
+import org.hibernate.validator.internal.engine.groups.GroupOrderGenerator;
+import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.test.internal.engine.groups.groupchain.First;
 import org.hibernate.validator.test.internal.engine.groups.groupchain.Last;
 import org.hibernate.validator.test.internal.engine.groups.groupchain.Second;
@@ -40,44 +41,44 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author Hardy Ferentschik
  */
-public class GroupChainGeneratorTest {
+public class GroupOrderGenerationTest {
 
-	GroupChainGenerator generator;
+	GroupOrderGenerator generator;
 
 	@BeforeTest
 	public void init() {
-		generator = new GroupChainGenerator();
+		generator = new GroupOrderGenerator();
 	}
 
 	@Test(expectedExceptions = ValidationException.class)
 	public void testGroupChainForNonInterface() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( String.class );
-		generator.getGroupChainFor( groups );
+		generator.getGroupOrderFor( groups );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testGroupChainForNull() {
-		generator.getGroupChainFor( null );
+		generator.getGroupOrderFor( null );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testGroupChainForEmptySet() {
-		generator.getGroupChainFor( new HashSet<Class<?>>() );
+		generator.getGroupOrderFor( new HashSet<Class<?>>() );
 	}
 
 	@Test(expectedExceptions = ValidationException.class)
 	public void testCyclicGroupSequences() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( CyclicGroupSequence1.class );
-		generator.getGroupChainFor( groups );
+		generator.getGroupOrderFor( groups );
 	}
 
 	@Test(expectedExceptions = ValidationException.class)
 	public void testCyclicGroupSequence() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( CyclicGroupSequence.class );
-		generator.getGroupChainFor( groups );
+		generator.getGroupOrderFor( groups );
 	}
 
 	@Test
@@ -86,14 +87,14 @@ public class GroupChainGeneratorTest {
 		groups.add( First.class );
 		groups.add( Second.class );
 		groups.add( Last.class );
-		GroupChain chain = generator.getGroupChainFor( groups );
+		GroupOrder chain = generator.getGroupOrderFor( groups );
 		int count = countGroups( chain );
 		assertEquals( count, 3, "Wrong number of groups" );
 
 		groups.clear();
 		groups.add( First.class );
 		groups.add( First.class );
-		chain = generator.getGroupChainFor( groups );
+		chain = generator.getGroupOrderFor( groups );
 		count = countGroups( chain );
 		assertEquals( count, 1, "Wrong number of groups" );
 
@@ -101,7 +102,7 @@ public class GroupChainGeneratorTest {
 		groups.add( First.class );
 		groups.add( Last.class );
 		groups.add( First.class );
-		chain = generator.getGroupChainFor( groups );
+		chain = generator.getGroupOrderFor( groups );
 		count = countGroups( chain );
 		assertEquals( count, 2, "Wrong number of groups" );
 	}
@@ -110,36 +111,36 @@ public class GroupChainGeneratorTest {
 	public void testGroupDefiningSequencePartOfGroupComposingSequence() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( Sequence1.class );
-		generator.getGroupChainFor( groups );
+		generator.getGroupOrderFor( groups );
 	}
 
 	@Test(expectedExceptions = GroupDefinitionException.class)
 	public void testUnexpandableSequence() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( Sequence3.class );
-		generator.getGroupChainFor( groups );
+		generator.getGroupOrderFor( groups );
 	}
 
 	@Test
 	public void testExpandableSequenceWithInheritance() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( Sequence4.class );
-		generator.getGroupChainFor( groups );
+		generator.getGroupOrderFor( groups );
 	}
 
 	@Test
 	public void testSequenceResolution() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( Address.Complete.class );
-		GroupChain chain = generator.getGroupChainFor( groups );
-		Iterator<List<Group>> sequences = chain.getSequenceIterator();
-		List<Group> sequence = sequences.next();
+		GroupOrder chain = generator.getGroupOrderFor( groups );
+		Iterator<Sequence> sequences = chain.getSequenceIterator();
+		List<Group> sequence = sequences.next().getComposingGroups();
 
 		assertEquals( sequence.get( 0 ).getGroup(), Default.class, "Wrong group" );
 		assertEquals( sequence.get( 1 ).getGroup(), Address.HighLevelCoherence.class, "Wrong group" );
 	}
 
-	private int countGroups(GroupChain chain) {
+	private int countGroups(GroupOrder chain) {
 		Iterator<Group> groupIterator = chain.getGroupIterator();
 		int count = 0;
 		while ( groupIterator.hasNext() ) {

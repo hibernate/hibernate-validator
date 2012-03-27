@@ -17,7 +17,6 @@
 package org.hibernate.validator.internal.engine.groups;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,31 +25,33 @@ import javax.validation.groups.Default;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 /**
- * An instance of {@code GroupChain} defines the group order during one full validation call.
+ * An instance of {@code GroupOrder} defines the group order during one validation call.
  *
  * @author Hardy Ferentschik
  */
-public final class GroupChain {
-
+public final class GroupOrder {
 	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The list of single groups to be used this validation.
 	 */
-	private List<Group> groupList = new ArrayList<Group>();
+	private List<Group> groupList = newArrayList();
 
 	/**
-	 * The different sequences for this validation. The map contains the list of groups mapped to their sequence
+	 * The different sequences for this validation. The map contains the sequences mapped to their sequence
 	 * name.
 	 */
-	private Map<Class<?>, List<Group>> sequenceMap = new HashMap<Class<?>, List<Group>>();
+	private Map<Class<?>, Sequence> sequenceMap = newHashMap();
 
 	public Iterator<Group> getGroupIterator() {
 		return groupList.iterator();
 	}
 
-	public Iterator<List<Group>> getSequenceIterator() {
+	public Iterator<Sequence> getSequenceIterator() {
 		return sequenceMap.values().iterator();
 	}
 
@@ -60,32 +61,31 @@ public final class GroupChain {
 		}
 	}
 
-	public void insertSequence(List<Group> groups) {
-		if ( groups == null || groups.size() == 0 ) {
+	public void insertSequence(Sequence sequence) {
+		if ( sequence == null ) {
 			return;
 		}
 
-		if ( !sequenceMap.containsValue( groups ) ) {
-			sequenceMap.put( groups.get( 0 ).getSequence(), groups );
+		if ( !sequenceMap.containsKey( sequence.getSequence() ) ) {
+			sequenceMap.put( sequence.getSequence(), sequence );
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "GroupChain{" +
+		return "GroupOrder{" +
 				"groupList=" + groupList +
 				", sequenceMap=" + sequenceMap +
 				'}';
 	}
 
 	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) {
-		for ( Map.Entry<Class<?>, List<Group>> entry : sequenceMap.entrySet() ) {
-			Class<?> sequence = entry.getKey();
-			List<Group> groups = entry.getValue();
-			List<Group> defaultGroupList = buildTempGroupList( defaultGroupSequence, sequence );
-			int defaultGroupIndex = containsDefaultGroupAtIndex( sequence, groups );
+		for ( Map.Entry<Class<?>, Sequence> entry : sequenceMap.entrySet() ) {
+			List<Group> sequenceGroups = entry.getValue().getComposingGroups();
+			List<Group> defaultGroupList = buildTempGroupList( defaultGroupSequence );
+			int defaultGroupIndex = sequenceGroups.indexOf( Group.DEFAULT_GROUP );
 			if ( defaultGroupIndex != -1 ) {
-				ensureDefaultGroupSequenceIsExpandable( groups, defaultGroupList, defaultGroupIndex );
+				ensureDefaultGroupSequenceIsExpandable( sequenceGroups, defaultGroupList, defaultGroupIndex );
 			}
 		}
 	}
@@ -110,15 +110,10 @@ public final class GroupChain {
 		}
 	}
 
-	private int containsDefaultGroupAtIndex(Class<?> sequence, List<Group> groupList) {
-		Group defaultGroup = new Group( Default.class, sequence );
-		return groupList.indexOf( defaultGroup );
-	}
-
-	private List<Group> buildTempGroupList(List<Class<?>> defaultGroupSequence, Class<?> sequence) {
+	private List<Group> buildTempGroupList(List<Class<?>> defaultGroupSequence) {
 		List<Group> groups = new ArrayList<Group>();
 		for ( Class<?> clazz : defaultGroupSequence ) {
-			Group g = new Group( clazz, sequence );
+			Group g = new Group( clazz );
 			groups.add( g );
 		}
 		return groups;

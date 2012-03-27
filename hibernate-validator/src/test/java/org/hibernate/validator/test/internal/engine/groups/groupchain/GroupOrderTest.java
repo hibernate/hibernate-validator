@@ -8,31 +8,31 @@ import javax.validation.groups.Default;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.groups.GroupChain;
+import org.hibernate.validator.internal.engine.groups.GroupOrder;
+import org.hibernate.validator.internal.engine.groups.Sequence;
 
 import static org.testng.FileAssert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GroupChainTest {
+public class GroupOrderTest {
 	@Test
 	public void testAssertDefaultGroupSequenceIsExpandableWithDefaultAtEndOfSequence() {
 		// create a dummy sequence
-		Group a = new Group( GroupA.class, TestSequence.class );
-		Group b = new Group( GroupB.class, TestSequence.class );
-		Group c = new Group( GroupC.class, TestSequence.class );
-		Group defaultGroup = new Group(
-				Default.class, TestSequence.class
-		);
+		Group a = new Group( GroupA.class );
+		Group b = new Group( GroupB.class );
+		Group c = new Group( GroupC.class );
+		Group defaultGroup = new Group( Default.class );
+
 		List<Group> sequence = new ArrayList<Group>();
 		sequence.add( a );
 		sequence.add( b );
 		sequence.add( c );
 		sequence.add( defaultGroup );
 
-		GroupChain chain = new GroupChain();
-		chain.insertSequence( sequence );
+		GroupOrder chain = new GroupOrder();
+		chain.insertSequence( new Sequence( TestSequence.class, sequence ) );
 
 		// create test default sequence
 		List<Class<?>> defaultSequence = new ArrayList<Class<?>>();
@@ -78,20 +78,19 @@ public class GroupChainTest {
 	@Test
 	public void testAssertDefaultGroupSequenceIsExpandableWithDefaultAtBeginningOfSequence() {
 		// create a dummy sequence
-		Group a = new Group( GroupA.class, TestSequence.class );
-		Group b = new Group( GroupB.class, TestSequence.class );
-		Group c = new Group( GroupC.class, TestSequence.class );
-		Group defaultGroup = new Group(
-				Default.class, TestSequence.class
-		);
+		Group a = new Group( GroupA.class );
+		Group b = new Group( GroupB.class );
+		Group c = new Group( GroupC.class );
+		Group defaultGroup = new Group( Default.class );
+
 		List<Group> sequence = new ArrayList<Group>();
 		sequence.add( defaultGroup );
 		sequence.add( a );
 		sequence.add( b );
 		sequence.add( c );
 
-		GroupChain chain = new GroupChain();
-		chain.insertSequence( sequence );
+		GroupOrder chain = new GroupOrder();
+		chain.insertSequence( new Sequence( TestSequence.class, sequence ) );
 
 		// create test default sequence
 		List<Class<?>> defaultSequence = new ArrayList<Class<?>>();
@@ -134,7 +133,6 @@ public class GroupChainTest {
 		}
 	}
 }
-
 
 interface GroupC {
 }
