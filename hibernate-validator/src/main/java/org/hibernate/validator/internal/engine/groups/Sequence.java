@@ -45,7 +45,7 @@ public class Sequence {
 		return groups;
 	}
 
-	public Class<?> getSequence() {
+	public Class<?> getDefiningClass() {
 		return sequence;
 	}
 
@@ -108,7 +108,7 @@ public class Sequence {
 	 * @param expandedGroups The list into which to add all groups
 	 */
 	private void addInheritedGroups(Group group, List<Group> expandedGroups) {
-		for ( Class<?> inheritedGroup : group.getGroup().getInterfaces() ) {
+		for ( Class<?> inheritedGroup : group.getDefiningClass().getInterfaces() ) {
 			if ( isGroupSequence( inheritedGroup ) ) {
 				throw log.getSequenceDefinitionsNotAllowedException();
 			}

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.validation.groups.Default;
+import javax.validation.GroupDefinitionException;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -29,11 +29,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
- * An instance of {@code GroupOrder} defines the group order during one validation call.
+ * An instance of {@code ValidationOrder} defines the group order during one validation call.
  *
  * @author Hardy Ferentschik
  */
-public final class GroupOrder {
+public final class DefaultValidationOrder implements ValidationOrder {
 	private static final Log log = LoggerFactory.make();
 
 	/**
@@ -66,25 +66,35 @@ public final class GroupOrder {
 			return;
 		}
 
-		if ( !sequenceMap.containsKey( sequence.getSequence() ) ) {
-			sequenceMap.put( sequence.getSequence(), sequence );
+		if ( !sequenceMap.containsKey( sequence.getDefiningClass() ) ) {
+			sequenceMap.put( sequence.getDefiningClass(), sequence );
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "GroupOrder{" +
+		return "ValidationOrder{" +
 				"groupList=" + groupList +
 				", sequenceMap=" + sequenceMap +
 				'}';
 	}
 
-	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) {
+	/**
+	 * Asserts that the default group sequence of the validated bean can be expanded into the sequences which needs to
+	 * be validated.
+	 *
+	 * @param defaultGroupSequence the default group sequence of the bean currently validated
+	 *
+	 * @throws javax.validation.GroupDefinitionException in case {@code defaultGroupSequence} cannot be expanded into one of the group sequences
+	 * which need to be validated
+	 */
+	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence)
+			throws GroupDefinitionException {
 		for ( Map.Entry<Class<?>, Sequence> entry : sequenceMap.entrySet() ) {
 			List<Group> sequenceGroups = entry.getValue().getComposingGroups();
-			List<Group> defaultGroupList = buildTempGroupList( defaultGroupSequence );
 			int defaultGroupIndex = sequenceGroups.indexOf( Group.DEFAULT_GROUP );
 			if ( defaultGroupIndex != -1 ) {
+				List<Group> defaultGroupList = buildTempGroupList( defaultGroupSequence );
 				ensureDefaultGroupSequenceIsExpandable( sequenceGroups, defaultGroupList, defaultGroupIndex );
 			}
 		}
@@ -93,7 +103,7 @@ public final class GroupOrder {
 	private void ensureDefaultGroupSequenceIsExpandable(List<Group> groupList, List<Group> defaultGroupList, int defaultGroupIndex) {
 		for ( int i = 0; i < defaultGroupList.size(); i++ ) {
 			Group group = defaultGroupList.get( i );
-			if ( group.getGroup().equals( Default.class ) ) {
+			if ( Group.DEFAULT_GROUP.equals( group ) ) {
 				continue; // we don't have to consider the default group since it is the one we want to replace
 			}
 			int index = groupList.indexOf( group ); // check whether the sequence contains group of the default group sequence
