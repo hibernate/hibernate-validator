@@ -1,0 +1,171 @@
+/*
+* JBoss, Home of Professional Open Source
+* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+* by the @authors tag. See the copyright.txt in the distribution for a
+* full listing of individual contributors.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* http://www.apache.org/licenses/LICENSE-2.0
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+package org.hibernate.validator.test.internal.engine;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.validation.Configuration;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.testng.annotations.Test;
+
+import org.hibernate.validator.internal.constraintvalidators.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCollection;
+import org.hibernate.validator.internal.engine.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.testutil.TestForIssue;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+
+/**
+ * @author Hardy Ferentschik
+ */
+public class ConstraintValidatorCachingTest {
+
+	@Test
+	@TestForIssue(jiraKey = "HV-564")
+	public void testConstraintValidatorInstancesAreCached() {
+		Configuration config = getConfiguration();
+		OnceInstanceOnlyConstraintValidatorFactory constraintValidatorFactory = new OnceInstanceOnlyConstraintValidatorFactory();
+
+		config.constraintValidatorFactory( constraintValidatorFactory );
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Person john = new Person( "John Doe" );
+		john.setAge( 36 );
+		john.addAddress( new Address( "Mysterious Lane", "Mysterious" ) );
+
+		constraintValidatorFactory.assertSize( 0 );
+		Set<ConstraintViolation<Person>> violations = validator.validate( john );
+		assertNumberOfViolations( violations, 0 );
+		constraintValidatorFactory.assertSize( 3 );
+
+		// need to call validate twice to let the cache kick in
+		violations = validator.validate( john );
+		assertNumberOfViolations( violations, 0 );
+		constraintValidatorFactory.assertSize( 3 );
+
+		constraintValidatorFactory.assertKeyExists( SizeValidatorForCollection.class );
+		constraintValidatorFactory.assertKeyExists( MinValidatorForNumber.class );
+		constraintValidatorFactory.assertKeyExists( NotNullValidator.class );
+
+		// getting a new validator from the same factory should have the same instances cached
+		validator = factory.getValidator();
+		constraintValidatorFactory.assertSize( 3 );
+
+		violations = validator.validate( john );
+		assertNumberOfViolations( violations, 0 );
+		constraintValidatorFactory.assertSize( 3 );
+	}
+
+	public class OnceInstanceOnlyConstraintValidatorFactory implements ConstraintValidatorFactory {
+		ConstraintValidatorFactoryImpl factory = new ConstraintValidatorFactoryImpl();
+		Map<Class<?>, ConstraintValidator<?, ?>> instantiatedConstraintValidatorClasses = newHashMap();
+
+		OnceInstanceOnlyConstraintValidatorFactory() {
+		}
+
+		public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
+			T constraintValidator = factory.getInstance( key );
+			if ( instantiatedConstraintValidatorClasses.containsKey( key ) ) {
+				if ( instantiatedConstraintValidatorClasses.get( key ) != constraintValidator ) {
+					throw new IllegalStateException( "The ConstraintValidator instance should be cached: " + constraintValidator );
+				}
+			}
+			else {
+				instantiatedConstraintValidatorClasses.put( key, constraintValidator );
+			}
+
+			return constraintValidator;
+		}
+
+		public void assertKeyExists(Class<?> clazz) {
+			assertTrue(
+					instantiatedConstraintValidatorClasses.containsKey( clazz ),
+					"An constraint validator of type " + clazz.getName() + " should exist"
+			);
+		}
+
+		public void assertSize(int size) {
+			assertEquals(
+					size,
+					instantiatedConstraintValidatorClasses.size(),
+					"Wrong number of already cached constraint validator instances"
+			);
+		}
+	}
+
+	class Person {
+		@NotNull
+		String name;
+
+		@Min(1)
+		int age;
+
+		@Size(min = 1, max = 3)
+		List<Address> addresses;
+
+		Person(String name) {
+			this.name = name;
+			this.addresses = new ArrayList<Address>();
+		}
+
+		public int getAge() {
+			return age;
+		}
+
+		public void setAge(int age) {
+			this.age = age;
+		}
+
+		public void addAddress(Address address) {
+			addresses.add( address );
+		}
+
+
+		public List<Address> getAddresses() {
+			return addresses;
+		}
+	}
+
+	class Address {
+		String street;
+		String city;
+
+		Address(String street, String city) {
+			this.street = street;
+			this.city = city;
+		}
+	}
+}
+
+
