@@ -16,14 +16,19 @@
 */
 package org.hibernate.validator.test.internal.engine;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.Configuration;
+import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
+import javax.validation.Payload;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Min;
@@ -38,9 +43,15 @@ import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCol
 import org.hibernate.validator.internal.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -85,6 +96,15 @@ public class ConstraintValidatorCachingTest {
 		violations = validator.validate( john );
 		assertNumberOfViolations( violations, 0 );
 		constraintValidatorFactory.assertSize( 3 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-243")
+	public void testConstraintValidatorInstancesAreCachedPerConstraint() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<Foo>> violations = validator.validate( new Foo() );
+		assertNumberOfViolations( violations, 2 );
+		assertCorrectConstraintViolationMessages( violations, "size 10", "size 20" );
 	}
 
 	public class OnceInstanceOnlyConstraintValidatorFactory implements ConstraintValidatorFactory {
@@ -165,6 +185,51 @@ public class ConstraintValidatorCachingTest {
 			this.street = street;
 			this.city = city;
 		}
+	}
+
+	@Size(max = 20, message = "size 20")
+	@Constraint(validatedBy = { })
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface A {
+		public abstract String message() default "A";
+
+		public abstract Class<?>[] groups() default { };
+
+		public abstract Class<? extends Payload>[] payload() default { };
+	}
+
+	@Size(max = 10, message = "size 10")
+	@Constraint(validatedBy = { })
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface B {
+		public abstract String message() default "B";
+
+		public abstract Class<?>[] groups() default { };
+
+		public abstract Class<? extends Payload>[] payload() default { };
+	}
+
+	@A
+	@B
+	@Constraint(validatedBy = { })
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface C {
+		public abstract String message() default "C";
+
+		public abstract Class<?>[] groups() default { };
+
+		public abstract Class<? extends Payload>[] payload() default { };
+	}
+
+	class Foo {
+		@C
+		String value = "The quick brown fox jumps over the lazy dog";
 	}
 }
 
