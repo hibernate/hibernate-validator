@@ -73,11 +73,11 @@
     </mailingLists>
 
     <modules>
-        <module>hibernate-validator</module>
-        <module>hibernate-validator-tck-runner</module>
-        <module>hibernate-validator-integrationtest</module>
-        <module>hibernate-validator-annotation-processor</module>
-        <module>hibernate-validator-archetype</module>
+        <module>engine</module>
+        <module>tck-runner</module>
+        <module>integration</module>
+        <module>annotation-processor</module>
+        <module>archetype</module>
     </modules>
 
     <properties>
@@ -503,7 +503,7 @@
                 </property>
             </activation>
             <modules>
-                <module>hibernate-validator-documentation</module>
+                <module>documentation</module>
             </modules>
         </profile>
         <profile>
@@ -515,7 +515,7 @@
                 </property>
             </activation>
             <modules>
-                <module>hibernate-validator-distribution</module>
+                <module>distribution</module>
             </modules>
         </profile>
     </profiles>
