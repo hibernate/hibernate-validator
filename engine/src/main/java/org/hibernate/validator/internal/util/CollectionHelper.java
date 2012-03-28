@@ -25,12 +25,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Provides some methods for simplified collection instantiation.
  *
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Hardy Ferentschik
  */
 public final class CollectionHelper {
 
@@ -43,6 +45,14 @@ public final class CollectionHelper {
 
 	public static <K, V> HashMap<K, V> newHashMap(int size) {
 		return new HashMap<K, V>( size );
+	}
+
+	public static <K, V> ConcurrentHashMap<K, V> newConcurrentHashMap() {
+		return new ConcurrentHashMap<K, V>();
+	}
+
+	public static <K, V> ReadWriteMap<K, V> newReadWriteMap(Map<K, V> m) {
+		return new ReadWriteMap<K, V>( m );
 	}
 
 	public static <T> HashSet<T> newHashSet() {
@@ -65,12 +75,12 @@ public final class CollectionHelper {
 
 	public static <T> HashSet<T> newHashSet(Iterable<? extends T> iterable) {
 		HashSet<T> set = newHashSet();
-		for(T t : iterable) {
-			set.add(t);
+		for ( T t : iterable ) {
+			set.add( t );
 		}
 		return set;
 	}
-	
+
 	public static <T> ArrayList<T> newArrayList() {
 		return new ArrayList<T>();
 	}
