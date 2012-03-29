@@ -106,6 +106,10 @@ public class BeanMetaDataManager {
 		return beanMetaData;
 	}
 
+	public int numberOfCachedBeanMetaDataInstances() {
+		return beanMetaDataCache.softSize();
+	}
+
 	/**
 	 * Creates a {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaData} containing the meta data from all meta
 	 * data providers for the given type and its hierarchy.
