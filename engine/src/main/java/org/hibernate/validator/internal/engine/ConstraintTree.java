@@ -56,6 +56,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newReadWrit
 public class ConstraintTree<A extends Annotation> {
 	private static final Log log = LoggerFactory.make();
 
+	/**
+	 * The maximum number of  {@code ConstraintValidator} instances per {@code ConstraintValidatorFactory} and validated type.
+	 */
+	private static final int MAX_TYPE_CACHE_SIZE = 10;
+
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
 
@@ -65,11 +70,17 @@ public class ConstraintTree<A extends Annotation> {
 	private final ConstraintDescriptorImpl<A> descriptor;
 
 	/**
-	 * Cache for initialized {@code ConstraintValidator} instance. {@code ConstraintTree} is part of the {@code BeanMetaData}
-	 * which is cached on {@code ValidatorFactory} level. Really there is only one {@code ConstraintValidator} per {@code ConstraintTree},
-	 * but it could be that user classes get reloaded while the {@code ValidatorFactory} is still in use.
+	 * Cache for initialized {@code ConstraintValidator} instance per {@code ConstraintValidatorFactory} and validated type.
+	 * This is necessary, because via {@code aValidatorFactory.usingContext().constraintValidatorFactory(otherCVF)} it
+	 * is possible to create a {@code Validator} instance which is using a different constraint validator factory.
+	 * <p>
+	 * Also note, that {@code ConstraintTree} is part of the {@code BeanMetaData}
+	 * which is cached on {@code ValidatorFactory} level. In most cases there is only one {@code ConstraintValidator}
+	 * instance per {@code ConstraintTree}, unless {@code aValidatorFactory.usingContext().constraintValidatorFactory(otherCVF)} is
+	 * used or the user classes are getting reloaded.
+	 * </p>
 	 */
-	private final ReadWriteMap<Type, ConstraintValidator<A, ?>> constraintValidatorCache;
+	private final ReadWriteMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
@@ -78,7 +89,11 @@ public class ConstraintTree<A extends Annotation> {
 	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		this.constraintValidatorCache = newReadWriteMap( new LRUMap<Type, ConstraintValidator<A, ?>>( 1 ) );
+		this.constraintValidatorCache = newReadWriteMap(
+				new LRUMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>>(
+						MAX_TYPE_CACHE_SIZE
+				)
+		);
 
 		final Set<ConstraintDescriptorImpl<?>> composingConstraints = newHashSet();
 		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
@@ -310,13 +325,14 @@ public class ConstraintTree<A extends Annotation> {
 	@SuppressWarnings("unchecked")
 	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ConstraintValidatorFactory constraintFactory) {
 		ConstraintValidator<A, V> constraintValidator;
-		if ( constraintValidatorCache.get( validatedValueType ) == null ) {
+		ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey( constraintFactory, validatedValueType );
+		if ( constraintValidatorCache.get( key ) == null ) {
 			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
 			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass );
-			constraintValidatorCache.put( validatedValueType, constraintValidator );
+			constraintValidatorCache.put( key, constraintValidator );
 		}
 		else {
-			constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( validatedValueType );
+			constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
 			log.tracef( "Constraint validator %s found in cache.", constraintValidator );
 		}
 		return constraintValidator;
@@ -441,6 +457,44 @@ public class ConstraintTree<A extends Annotation> {
 		sb.append( ", isRoot=" ).append( parent == null );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private static final class ConstraintValidatorCacheKey {
+		private ConstraintValidatorFactory constraintValidatorFactory;
+		private Type validatedType;
+
+		private ConstraintValidatorCacheKey(ConstraintValidatorFactory constraintValidatorFactory, Type validatorType) {
+			this.constraintValidatorFactory = constraintValidatorFactory;
+			this.validatedType = validatorType;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+
+			ConstraintValidatorCacheKey that = (ConstraintValidatorCacheKey) o;
+
+			if ( constraintValidatorFactory != null ? !constraintValidatorFactory.equals( that.constraintValidatorFactory ) : that.constraintValidatorFactory != null ) {
+				return false;
+			}
+			if ( validatedType != null ? !validatedType.equals( that.validatedType ) : that.validatedType != null ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = constraintValidatorFactory != null ? constraintValidatorFactory.hashCode() : 0;
+			result = 31 * result + ( validatedType != null ? validatedType.hashCode() : 0 );
+			return result;
+		}
 	}
 
 	private static final class CompositionResult {

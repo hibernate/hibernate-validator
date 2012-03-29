@@ -54,6 +54,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 
 /**
@@ -99,6 +100,35 @@ public class ConstraintValidatorCachingTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-564")
+	public void testConstraintValidatorInstancesAreCachedPerConstraintValidatorFactory() {
+		Configuration config = getConfiguration();
+		OnceInstanceOnlyConstraintValidatorFactory constraintValidatorFactory1 = new OnceInstanceOnlyConstraintValidatorFactory();
+		OnceInstanceOnlyConstraintValidatorFactory constraintValidatorFactory2 = new OnceInstanceOnlyConstraintValidatorFactory();
+
+		config.constraintValidatorFactory( constraintValidatorFactory1 );
+		ValidatorFactory factory = config.buildValidatorFactory();
+		Validator validator = factory.getValidator();
+
+		Person john = new Person( "John Doe" );
+		john.setAge( 36 );
+		john.addAddress( new Address( "Mysterious Lane", "Mysterious" ) );
+
+		constraintValidatorFactory1.assertSize( 0 );
+		Set<ConstraintViolation<Person>> violations = validator.validate( john );
+		assertNumberOfViolations( violations, 0 );
+		constraintValidatorFactory1.assertSize( 3 );
+
+		// getting a new validator with a new constraint factory
+		validator = factory.usingContext().constraintValidatorFactory( constraintValidatorFactory2 ).getValidator();
+		constraintValidatorFactory2.assertSize( 0 );
+		violations = validator.validate( john );
+		assertNumberOfViolations( violations, 0 );
+		constraintValidatorFactory2.assertSize( 3 );
+		constraintValidatorFactory1.assertConstraintValidatorInstancesAreNotShared( constraintValidatorFactory2 );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HV-243")
 	public void testConstraintValidatorInstancesAreCachedPerConstraint() {
 		Validator validator = getValidator();
@@ -118,7 +148,7 @@ public class ConstraintValidatorCachingTest {
 			T constraintValidator = factory.getInstance( key );
 			if ( instantiatedConstraintValidatorClasses.containsKey( key ) ) {
 				if ( instantiatedConstraintValidatorClasses.get( key ) != constraintValidator ) {
-					throw new IllegalStateException( "The ConstraintValidator instance should be cached: " + constraintValidator );
+					fail( "The ConstraintValidator instance should be cached: " + constraintValidator );
 				}
 			}
 			else {
@@ -141,6 +171,14 @@ public class ConstraintValidatorCachingTest {
 					instantiatedConstraintValidatorClasses.size(),
 					"Wrong number of already cached constraint validator instances"
 			);
+		}
+
+		public void assertConstraintValidatorInstancesAreNotShared(OnceInstanceOnlyConstraintValidatorFactory otherFactory) {
+			for ( ConstraintValidator<?, ?> constraintValidator : instantiatedConstraintValidatorClasses.values() ) {
+				if ( otherFactory.instantiatedConstraintValidatorClasses.containsValue( constraintValidator ) ) {
+					fail( "The two constraint validator factories should not share any ConstraintValidator instances" );
+				}
+			}
 		}
 	}
 
