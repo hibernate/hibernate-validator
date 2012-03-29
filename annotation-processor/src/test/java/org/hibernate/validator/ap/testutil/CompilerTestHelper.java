@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+
 import javax.annotation.processing.Processor;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
@@ -30,11 +33,11 @@ import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
+import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.Configuration;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Infrastructure for unit tests based on the Java Compiler API.
@@ -170,30 +173,17 @@ public class CompilerTestHelper {
 	 */
 	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpectation... expectations) {
 
-		List<Diagnostic<? extends JavaFileObject>> diagnosticsList = diagnostics.getDiagnostics();
+		assertEquals(asExpectations(diagnostics.getDiagnostics()), CollectionHelper.asSet(expectations));
+	}
 
-		if ( expectations == null ) {
-			assertTrue( diagnosticsList.isEmpty() );
+	private static Set<DiagnosticExpectation> asExpectations(Collection<Diagnostic<? extends JavaFileObject>> diagnosticsList) {
+
+		Set<DiagnosticExpectation> theValue = CollectionHelper.newHashSet();
+
+		for (Diagnostic<? extends JavaFileObject> diagnostic : diagnosticsList) {
+			theValue.add(new DiagnosticExpectation(diagnostic.getKind(), diagnostic.getLineNumber()));
 		}
-		else {
 
-			if ( diagnosticsList.size() != expectations.length ) {
-
-				for ( Diagnostic<? extends JavaFileObject> oneDiagnostic : diagnosticsList ) {
-					System.out.println( oneDiagnostic );
-				}
-			}
-
-			assertEquals( diagnosticsList.size(), expectations.length, "Wrong number of diagnostics." );
-
-			int i = 0;
-			for ( DiagnosticExpectation oneExpectation : expectations ) {
-
-				assertEquals( diagnosticsList.get( i ).getKind(), oneExpectation.getKind() );
-				assertEquals( diagnosticsList.get( i ).getLineNumber(), oneExpectation.getLineNumber() );
-
-				i++;
-			}
-		}
+		return theValue;
 	}
 }

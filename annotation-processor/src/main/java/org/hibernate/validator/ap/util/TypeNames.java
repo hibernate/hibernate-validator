@@ -58,6 +58,16 @@ public class TypeNames {
 
 		public final static String GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".GroupSequenceProvider";
 		public final static String DEFAULT_GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".DefaultGroupSequenceProvider";
+
+		private static final String ORG_HIBERNATE_VALIDATOR_CONSTRAINTS = "org.hibernate.validator.constraints";
+
+		public final static String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
+		public final static String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
+		public final static String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
+		public final static String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";
+		public final static String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
+		public final static String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
+		public final static String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";
 	}
 
 	public static class JodaTypes {

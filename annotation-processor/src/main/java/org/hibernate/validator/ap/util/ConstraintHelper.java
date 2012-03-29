@@ -25,11 +25,11 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
 import javax.lang.model.util.Types;
@@ -125,20 +125,18 @@ public class ConstraintHelper {
 	 */
 	private Map<Name, Set<TypeMirror>> builtInConstraints;
 
-	private Elements elementUtils;
-
 	private Types typeUtils;
 
 	private AnnotationApiHelper annotationApiHelper;
 
-	public ConstraintHelper(Elements elementUtils, Types typeUtils, AnnotationApiHelper annotationApiHelper) {
+	public ConstraintHelper(Types typeUtils, AnnotationApiHelper annotationApiHelper) {
 
-		this.elementUtils = elementUtils;
 		this.typeUtils = typeUtils;
 		this.annotationApiHelper = annotationApiHelper;
 
 		builtInConstraints = CollectionHelper.newHashMap();
 
+		//register BV-defined constraints
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_FALSE, Boolean.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_TRUE, Boolean.class );
 		registerAllowedTypesForBuiltInConstraint(
@@ -184,6 +182,15 @@ public class ConstraintHelper {
 				Map.class,
 				String.class
 		);
+
+		//register HV-specific constraints
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LENGTH, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NOT_BLANK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SAFE_HTML, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.URL, CharSequence.class );
 	}
 
 	/**
@@ -287,17 +294,19 @@ public class ConstraintHelper {
 	 * @return Whether the given constraint annotation may be specified at
 	 *         elements of the given type.
 	 */
-	public ConstraintCheckResult checkConstraint(
-			DeclaredType constraintAnnotationType,
-			TypeMirror typeOfAnnotatedElement) {
+	public ConstraintCheckResult checkConstraint(DeclaredType constraintAnnotationType, TypeMirror typeOfAnnotatedElement) {
 
-		return isBuiltInConstraint( constraintAnnotationType ) ? checkBuiltInConstraint(
-				constraintAnnotationType, typeOfAnnotatedElement
-		)
-				: checkCustomConstraint(
+		//recursively check the composing constraints
+		ConstraintCheckResult composingConstraintsCheck = checkComposingConstraints(
 				constraintAnnotationType,
 				typeOfAnnotatedElement
 		);
+		if ( composingConstraintsCheck != ConstraintCheckResult.ALLOWED ) {
+			return composingConstraintsCheck;
+		}
+
+		//check the supported types of the constraint itself
+		return checkSupportedTypes( constraintAnnotationType, typeOfAnnotatedElement );
 	}
 
 	/**
@@ -339,10 +348,7 @@ public class ConstraintHelper {
 	 *         type, false otherwise.
 	 */
 	private boolean isConstraintAnnotation(AnnotationMirror annotationMirror) {
-		return isConstraintAnnotation(
-				annotationMirror.getAnnotationType()
-						.asElement()
-		);
+		return isConstraintAnnotation( annotationMirror.getAnnotationType().asElement() );
 	}
 
 	/**
@@ -355,8 +361,7 @@ public class ConstraintHelper {
 	 *         type, false otherwise.
 	 */
 	private boolean isConstraintMetaAnnotation(AnnotationMirror annotationMirror) {
-		return ( (TypeElement) annotationMirror.getAnnotationType().asElement() ).getQualifiedName()
-				.contentEquals( BeanValidationTypes.CONSTRAINT );
+		return getName( annotationMirror.getAnnotationType() ).contentEquals( BeanValidationTypes.CONSTRAINT );
 	}
 
 	/**
@@ -438,36 +443,9 @@ public class ConstraintHelper {
 		);
 	}
 
-	private ConstraintCheckResult checkBuiltInConstraint(DeclaredType builtInAnnotationType, TypeMirror typeOfAnnotatedElement) {
+	private ConstraintCheckResult checkComposingConstraints(DeclaredType constraintAnnotationType, TypeMirror typeOfAnnotatedElement) {
 
-		Set<TypeMirror> allowedTypes = getAllowedTypesForBuiltInConstraint( builtInAnnotationType );
-
-		for ( TypeMirror oneAllowedType : allowedTypes ) {
-			if ( typeUtils.isAssignable( typeOfAnnotatedElement, oneAllowedType ) ) {
-				return ConstraintCheckResult.ALLOWED;
-			}
-		}
-
-		return ConstraintCheckResult.DISALLOWED;
-	}
-
-	/**
-	 * Returns a set containing all those types, at which the specified custom
-	 * constraint-annotation is allowed.
-	 *
-	 * @param customAnnotationType A custom constraint type.
-	 * @param typeOfAnnotatedElement The type of the annotated element
-	 *
-	 * @return A set with all types supported by the given constraint. May be
-	 *         empty in case of constraint composition, if there is no common
-	 *         type supported by all composing constraints.
-	 */
-	private ConstraintCheckResult checkCustomConstraint(DeclaredType customAnnotationType, TypeMirror typeOfAnnotatedElement) {
-
-		Set<AnnotationMirror> composingConstraints = getComposingConstraints( customAnnotationType );
-		boolean isComposedConstraint = !composingConstraints.isEmpty();
-
-		for ( AnnotationMirror oneComposingConstraint : composingConstraints ) {
+		for ( AnnotationMirror oneComposingConstraint : getComposingConstraints( constraintAnnotationType ) ) {
 
 			ConstraintCheckResult annotationCheckResult = checkConstraint(
 					oneComposingConstraint.getAnnotationType(), typeOfAnnotatedElement
@@ -479,41 +457,67 @@ public class ConstraintHelper {
 
 		}
 
-		Set<TypeMirror> theValue = getSupportedTypes(
-				customAnnotationType,
-				typeOfAnnotatedElement
-		);
+		return ConstraintCheckResult.ALLOWED;
+	}
 
-		if ( theValue.size() > 1 ) {
+	private ConstraintCheckResult checkSupportedTypes(DeclaredType constraintAnnotationType, TypeMirror typeOfAnnotatedElement) {
+
+		Set<TypeMirror> supportedTypes = getSupportedTypes( constraintAnnotationType );
+		Set<TypeMirror> assignableTypes = getAssignableTypes( supportedTypes, typeOfAnnotatedElement );
+
+		//found more than one matching validator
+		if ( assignableTypes.size() > 1 ) {
 			return ConstraintCheckResult.MULTIPLE_VALIDATORS_FOUND;
 		}
-		else if ( theValue.size() == 1 || isComposedConstraint ) {
+		//found exactly one matching validator OR the constraint is completely composed
+		else if ( assignableTypes.size() == 1 ||
+				( supportedTypes.size() == 0 && !getComposingConstraints( constraintAnnotationType ).isEmpty() ) ) {
 			return ConstraintCheckResult.ALLOWED;
 		}
+		//found no matching validator
 		else {
 			return ConstraintCheckResult.DISALLOWED;
 		}
 	}
 
 	/**
-	 * <p> Returns a set with those types supported by the constraint validators
-	 * specified in the @Constraint meta-annotation of the given constraint
-	 * annotation type to which the specified type can be assigned. </p>
 	 * <p>
-	 * If multiple types from the same inheritance hierarchy (e.g. Collection
-	 * and Set) are supported by the validators, only the "lowest" one (e.g.
-	 * Set) will be part of the result.
+	 * Returns a set with the types supported by the given constraint annotation
+	 * type (as either retrieved from the validators given in the
+	 * {@code @Constraint} meta-annotation or from the map with built-in
+	 * constraints.
 	 * </p>
+	 * <p>
 	 *
 	 * @param constraintAnnotationType A constraint annotation type.
-	 * @param type A type.
 	 *
 	 * @return A set with the supported types.
 	 */
-	private Set<TypeMirror> getSupportedTypes(
-			DeclaredType constraintAnnotationType, TypeMirror type) {
+	private Set<TypeMirror> getSupportedTypes(DeclaredType constraintAnnotationType) {
 
-		Set<TypeMirror> theValue = CollectionHelper.newHashSet();
+		if ( isBuiltInConstraint( constraintAnnotationType ) ) {
+			return getSupportedTypesForBuiltInConstraint( constraintAnnotationType );
+		}
+		else {
+			return getSupportedTypesForCustomConstraint( constraintAnnotationType );
+		}
+	}
+
+	private Set<TypeMirror> getSupportedTypesForBuiltInConstraint(DeclaredType annotation) {
+
+		Name key = getName( annotation );
+		Set<TypeMirror> allowedTypes = builtInConstraints.get( key );
+
+		// create a mapping for the given annotation type if required
+		if ( allowedTypes == null ) {
+			allowedTypes = CollectionHelper.newHashSet();
+			builtInConstraints.put( key, allowedTypes );
+		}
+
+		return allowedTypes;
+	}
+
+	private Set<TypeMirror> getSupportedTypesForCustomConstraint(DeclaredType constraintAnnotationType) {
 
 		//the Constraint meta-annotation at the type declaration, e.g. "@Constraint(validatedBy = CheckCaseValidator.class)"
 		AnnotationMirror constraintMetaAnnotation = getConstraintMetaAnnotation( constraintAnnotationType );
@@ -523,16 +527,15 @@ public class ConstraintHelper {
 				constraintMetaAnnotation
 		);
 
+		Set<TypeMirror> supportedTypes = CollectionHelper.newHashSet();
+
 		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
 
 			TypeMirror supportedType = getSupportedType( oneValidatorClassReference );
-
-			if ( typeUtils.isAssignable( type, supportedType ) ) {
-				theValue.add( supportedType );
-			}
+			supportedTypes.add( supportedType );
 		}
 
-		return annotationApiHelper.keepLowestTypePerHierarchy( theValue );
+		return supportedTypes;
 	}
 
 	private TypeMirror getSupportedType(AnnotationValue oneValidatorClassReference) {
@@ -573,9 +576,7 @@ public class ConstraintHelper {
 		while ( !superTypes.isEmpty() ) {
 
 			for ( TypeMirror oneSuperType : superTypes ) {
-				if ( ( (TypeElement) typeUtils.asElement( oneSuperType ) ).getQualifiedName()
-						.contentEquals( BeanValidationTypes.CONSTRAINT_VALIDATOR ) ) {
-
+				if ( getName( typeUtils.asElement( oneSuperType ) ).contentEquals( BeanValidationTypes.CONSTRAINT_VALIDATOR ) ) {
 					return oneSuperType;
 				}
 
@@ -635,11 +636,36 @@ public class ConstraintHelper {
 		);
 	}
 
+	/**
+	 * Returns a set containing those types from the given set of types to which
+	 * the given type is assignable. If the given type can be assigned to
+	 * multiple types from the same inheritance hierarchy (e.g. Collection and
+	 * Set), only the "lowest" one (e.g. Set) will be part of the result.
+	 *
+	 * @param types The types to check.
+	 * @param type The type to check.
+	 *
+	 * @return A set containing those types from the given set of types to which
+	 *         the given type is assignable.
+	 */
+	private Set<TypeMirror> getAssignableTypes(Set<TypeMirror> types, TypeMirror type) {
+
+		Set<TypeMirror> theValue = CollectionHelper.newHashSet();
+
+		for ( TypeMirror supportedType : types ) {
+			if ( typeUtils.isAssignable( type, supportedType ) ) {
+				theValue.add( supportedType );
+			}
+		}
+
+		return annotationApiHelper.keepLowestTypePerHierarchy( theValue );
+	}
+
 	private void registerAllowedTypesForBuiltInConstraint(String annotationType, Class<?>... allowedTypes) {
 
 		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
-		Set<TypeMirror> allowedTypesForConstraint = getAllowedTypesForBuiltInConstraint( annotation );
+		Set<TypeMirror> allowedTypesForConstraint = getSupportedTypesForBuiltInConstraint( annotation );
 
 		for ( Class<?> oneAllowedType : allowedTypes ) {
 			allowedTypesForConstraint.add( annotationApiHelper.getMirrorForType( oneAllowedType ) );
@@ -650,25 +676,11 @@ public class ConstraintHelper {
 
 		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
-		Set<TypeMirror> allowedTypesForConstraint = getAllowedTypesForBuiltInConstraint( annotation );
+		Set<TypeMirror> allowedTypesForConstraint = getSupportedTypesForBuiltInConstraint( annotation );
 
 		for ( String oneAllowedType : allowedTypes ) {
 			allowedTypesForConstraint.add( annotationApiHelper.getDeclaredTypeByName( oneAllowedType ) );
 		}
-	}
-
-	private Set<TypeMirror> getAllowedTypesForBuiltInConstraint(DeclaredType annotation) {
-
-		Name key = annotation.asElement().getSimpleName();
-		Set<TypeMirror> allowedTypes = builtInConstraints.get( key );
-
-		// create a mapping for the given annotation type if required
-		if ( allowedTypes == null ) {
-			allowedTypes = CollectionHelper.newHashSet();
-			builtInConstraints.put( key, allowedTypes );
-		}
-
-		return allowedTypes;
 	}
 
 	/**
@@ -682,11 +694,20 @@ public class ConstraintHelper {
 	 *         false otherwise.
 	 */
 	private boolean isBuiltInConstraint(DeclaredType constraintAnnotationType) {
+		return builtInConstraints.containsKey( getName( constraintAnnotationType ) );
+	}
 
-		return
-				BeanValidationTypes.JAVAX_VALIDATION_CONSTRAINTS.contentEquals(
-						elementUtils.getPackageOf( constraintAnnotationType.asElement() ).getQualifiedName()
-				);
+	private Name getName(DeclaredType type) {
+		return getName( type.asElement() );
+	}
+
+	private Name getName(Element element) {
+		if ( element.getKind() == ElementKind.CLASS || element.getKind() == ElementKind.INTERFACE || element.getKind() == ElementKind.ANNOTATION_TYPE ) {
+			return ( (TypeElement) element ).getQualifiedName();
+		}
+		else {
+			return element.getSimpleName();
+		}
 	}
 
 	private Set<AnnotationMirror> getComposingConstraints(DeclaredType constraintAnnotationType) {
@@ -700,9 +721,17 @@ public class ConstraintHelper {
 			if ( isConstraintAnnotation( oneAnnotationMirror.getAnnotationType().asElement() ) ) {
 				theValue.add( oneAnnotationMirror );
 			}
+			else if ( isMultiValuedConstraint( oneAnnotationMirror ) ) {
+				List<? extends AnnotationValue> value = annotationApiHelper.getAnnotationArrayValue(
+						oneAnnotationMirror,
+						"value"
+				);
+				for ( AnnotationValue annotationValue : value ) {
+					theValue.add( (AnnotationMirror) annotationValue );
+				}
+			}
 		}
 
 		return theValue;
 	}
-
 }
