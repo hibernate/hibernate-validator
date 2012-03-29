@@ -47,4 +47,29 @@ public class DiagnosticExpectation {
 	public String toString() {
 		return "DiagnosticExpectation [kind=" + kind + ", lineNumber=" + lineNumber + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((kind == null) ? 0 : kind.hashCode());
+		result = prime * result + (int) (lineNumber ^ (lineNumber >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DiagnosticExpectation other = (DiagnosticExpectation) obj;
+		if (kind != other.kind)
+			return false;
+		if (lineNumber != other.lineNumber)
+			return false;
+		return true;
+	}
 }

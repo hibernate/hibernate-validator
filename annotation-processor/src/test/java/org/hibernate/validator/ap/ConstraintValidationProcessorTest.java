@@ -49,6 +49,7 @@ import org.hibernate.validator.ap.testmodel.customconstraints.CaseMode;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
 import org.hibernate.validator.ap.testmodel.customconstraints.FieldLevelValidationUsingCustomConstraints;
+import org.hibernate.validator.ap.testmodel.customconstraints.HibernateValidatorProvidedCustomConstraints;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.BazDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarBazDefaultGroupSequenceProvider;
 import org.hibernate.validator.ap.testmodel.groupsequenceprovider.FooBarDefaultGroupSequenceProvider;
@@ -91,6 +92,35 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics, new DiagnosticExpectation( Kind.ERROR, 53 ), new DiagnosticExpectation( Kind.ERROR, 59 )
+		);
+	}
+
+	/**
+	 * HV-567
+	 */
+	@Test
+	public void hibernateValidatorProvidedCustomConstraints() {
+
+		File sourceFile = compilerHelper.getSourceFile( HibernateValidatorProvidedCustomConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 58 ),
+				new DiagnosticExpectation( Kind.ERROR, 59 ),
+				new DiagnosticExpectation( Kind.ERROR, 60 ),
+				new DiagnosticExpectation( Kind.ERROR, 61 ),
+				new DiagnosticExpectation( Kind.ERROR, 62 ),
+				new DiagnosticExpectation( Kind.ERROR, 63 ),
+				new DiagnosticExpectation( Kind.ERROR, 64 ),
+				new DiagnosticExpectation( Kind.ERROR, 65 ),
+				new DiagnosticExpectation( Kind.ERROR, 66 ),
+				new DiagnosticExpectation( Kind.ERROR, 67 ),
+				new DiagnosticExpectation( Kind.ERROR, 68 ),
+				new DiagnosticExpectation( Kind.ERROR, 69 )
 		);
 	}
 
@@ -325,8 +355,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics, new DiagnosticExpectation(
-						Kind.ERROR, 32
-				)
+				Kind.ERROR, 32
+		)
 		);
 	}
 

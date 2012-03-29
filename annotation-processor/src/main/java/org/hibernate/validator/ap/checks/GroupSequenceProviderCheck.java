@@ -30,11 +30,11 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.Types;
-import javax.validation.GroupSequence;
 
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
+import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
 
 /**
  * Checks that the {@link org.hibernate.validator.group.GroupSequenceProvider} annotation definition is valid.
@@ -60,7 +60,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 	public GroupSequenceProviderCheck(AnnotationApiHelper annotationApiHelper, Types typeUtils) {
 		this.typeUtils = typeUtils;
 		this.annotationApiHelper = annotationApiHelper;
-		this.defaultGroupSequenceProviderType = annotationApiHelper.getMirrorForType( DefaultGroupSequenceProvider.class );
+		this.defaultGroupSequenceProviderType = annotationApiHelper.getDeclaredTypeByName( HibernateValidatorTypes.DEFAULT_GROUP_SEQUENCE_PROVIDER );
 	}
 
 	@Override
@@ -83,7 +83,10 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 		}
 
 		//this error should be raised only if the GroupSequenceProvider annotations is on a class
-		if ( element.getAnnotation( GroupSequence.class ) != null ) {
+		if ( annotationApiHelper.getMirror(
+				element.getAnnotationMirrors(),
+				BeanValidationTypes.GROUP_SEQUENCE
+		) != null ) {
 			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element,

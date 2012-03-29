@@ -62,7 +62,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 		);
 
 		ConstraintHelper constraintHelper = new ConstraintHelper(
-				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils(), annotationApiHelper
+				processingEnvironment.getTypeUtils(), annotationApiHelper
 		);
 
 		constraintCheckFactory = new ConstraintCheckFactory(
