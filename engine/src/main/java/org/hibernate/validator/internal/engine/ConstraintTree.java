@@ -19,12 +19,10 @@ package org.hibernate.validator.internal.engine;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -33,7 +31,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.LRUMap;
+import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -41,6 +39,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
@@ -52,9 +52,7 @@ import static org.hibernate.validator.constraints.CompositionType.OR;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
  */
 public class ConstraintTree<A extends Annotation> {
-
 	private static final Log log = LoggerFactory.make();
-	private static final int MAX_TYPE_CACHE_SIZE = 20;
 
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
@@ -65,13 +63,17 @@ public class ConstraintTree<A extends Annotation> {
 	private final ConstraintDescriptorImpl<A> descriptor;
 
 	/**
-	 * A maps of all available constraint validator classes for this constraint mapped to their validator types.
+	 * Cache for initialized {@code ConstraintValidator} instance per {@code ConstraintValidatorFactory} and validated type.
+	 * This is necessary, because via {@code aValidatorFactory.usingContext().constraintValidatorFactory(otherCVF)} it
+	 * is possible to create a {@code Validator} instance which is using a different constraint validator factory.
+	 * <p>
+	 * Also note, that {@code ConstraintTree} is part of the {@code BeanMetaData}
+	 * which is cached on {@code ValidatorFactory} level. In most cases there is only one {@code ConstraintValidator}
+	 * instance per {@code ConstraintTree}, unless {@code aValidatorFactory.usingContext().constraintValidatorFactory(otherCVF)} is
+	 * used or the user classes are getting reloaded.
+	 * </p>
 	 */
-	private final Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes;
-
-
-	private final Map<ValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
-	private final Map<Type, Type> suitableTypeMap;
+	private final SoftLimitMRUCache<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
@@ -80,9 +82,13 @@ public class ConstraintTree<A extends Annotation> {
 	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		this.constraintValidatorCache = new ConcurrentHashMap<ValidatorCacheKey, ConstraintValidator<A, ?>>();
+		// Using a hard limit of one. Assuming that the default constraint validator factory is used most it
+		// should be the one which is mainly hard referenced. Other constraint validator factories should be
+		// available for garbage collection
+		this.constraintValidatorCache =
+				new SoftLimitMRUCache<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>>( 1, 128 );
 
-		final Set<ConstraintDescriptorImpl<?>> composingConstraints = new HashSet<ConstraintDescriptorImpl<?>>();
+		final Set<ConstraintDescriptorImpl<?>> composingConstraints = newHashSet();
 		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
 			composingConstraints.add( (ConstraintDescriptorImpl<?>) composingConstraint );
 		}
@@ -93,9 +99,6 @@ public class ConstraintTree<A extends Annotation> {
 			ConstraintTree<?> treeNode = createConstraintTree( composingDescriptor );
 			children.add( treeNode );
 		}
-
-		availableValidatorTypes = TypeHelper.getValidatorsTypes( descriptor.getConstraintValidatorClasses() );
-		suitableTypeMap = Collections.synchronizedMap( new LRUMap<Type, Type>( MAX_TYPE_CACHE_SIZE ) );
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
@@ -297,7 +300,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	/**
-	 * @return {@code} true if the current constraint should be reportes as single violation, {@code false otherwise}.
+	 * @return {@code} true if the current constraint should be reported as single violation, {@code false otherwise}.
 	 *         When using negation, we only report the single top-level violation, as
 	 *         it is hard, especially for ALL_FALSE to give meaningful reports
 	 */
@@ -314,16 +317,10 @@ public class ConstraintTree<A extends Annotation> {
 	 */
 	@SuppressWarnings("unchecked")
 	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ConstraintValidatorFactory constraintFactory) {
-		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
-
-		// check if we have the default validator factory. If not we don't use caching (see HV-242)
-		if ( !( constraintFactory instanceof ConstraintValidatorFactoryImpl ) ) {
-			return createAndInitializeValidator( constraintFactory, validatorClass );
-		}
-
 		ConstraintValidator<A, V> constraintValidator;
-		ValidatorCacheKey key = new ValidatorCacheKey( constraintFactory, validatorClass );
-		if ( !constraintValidatorCache.containsKey( key ) ) {
+		ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey( constraintFactory, validatedValueType );
+		if ( constraintValidatorCache.get( key ) == null ) {
+			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
 			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass );
 			constraintValidatorCache.put( key, constraintValidator );
 		}
@@ -355,11 +352,16 @@ public class ConstraintTree<A extends Annotation> {
 	 * @return The class of a matching validator.
 	 */
 	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Type validatedValueType) {
+		Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
+				descriptor.getConstraintValidatorClasses()
+		);
+		Map<Type, Type> suitableTypeMap = newHashMap();
+
 		if ( suitableTypeMap.containsKey( validatedValueType ) ) {
 			return availableValidatorTypes.get( suitableTypeMap.get( validatedValueType ) );
 		}
 
-		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType );
+		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes );
 		resolveAssignableTypes( discoveredSuitableTypes );
 		verifyResolveWasUnique( validatedValueType, discoveredSuitableTypes );
 
@@ -393,7 +395,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private List<Type> findSuitableValidatorTypes(Type type) {
+	private List<Type> findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes) {
 		List<Type> determinedSuitableTypes = new ArrayList<Type>();
 		for ( Type validatorType : availableValidatorTypes.keySet() ) {
 			if ( TypeHelper.isAssignable( validatorType, type )
@@ -431,10 +433,7 @@ public class ConstraintTree<A extends Annotation> {
 		} while ( typesToRemove.size() > 0 );
 	}
 
-	private <V> void initializeConstraint
-			(ConstraintDescriptor<A>
-					 descriptor, ConstraintValidator<A, V>
-					constraintValidator) {
+	private <V> void initializeConstraint(ConstraintDescriptor<A> descriptor, ConstraintValidator<A, V> constraintValidator) {
 		try {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
@@ -453,13 +452,13 @@ public class ConstraintTree<A extends Annotation> {
 		return sb.toString();
 	}
 
-	private static final class ValidatorCacheKey {
+	private static final class ConstraintValidatorCacheKey {
 		private ConstraintValidatorFactory constraintValidatorFactory;
-		private Class<? extends ConstraintValidator<?, ?>> validatorType;
+		private Type validatedType;
 
-		private ValidatorCacheKey(ConstraintValidatorFactory constraintValidatorFactory, Class<? extends ConstraintValidator<?, ?>> validatorType) {
+		private ConstraintValidatorCacheKey(ConstraintValidatorFactory constraintValidatorFactory, Type validatorType) {
 			this.constraintValidatorFactory = constraintValidatorFactory;
-			this.validatorType = validatorType;
+			this.validatedType = validatorType;
 		}
 
 		@Override
@@ -471,12 +470,12 @@ public class ConstraintTree<A extends Annotation> {
 				return false;
 			}
 
-			ValidatorCacheKey that = (ValidatorCacheKey) o;
+			ConstraintValidatorCacheKey that = (ConstraintValidatorCacheKey) o;
 
 			if ( constraintValidatorFactory != null ? !constraintValidatorFactory.equals( that.constraintValidatorFactory ) : that.constraintValidatorFactory != null ) {
 				return false;
 			}
-			if ( validatorType != null ? !validatorType.equals( that.validatorType ) : that.validatorType != null ) {
+			if ( validatedType != null ? !validatedType.equals( that.validatedType ) : that.validatedType != null ) {
 				return false;
 			}
 
@@ -486,7 +485,7 @@ public class ConstraintTree<A extends Annotation> {
 		@Override
 		public int hashCode() {
 			int result = constraintValidatorFactory != null ? constraintValidatorFactory.hashCode() : 0;
-			result = 31 * result + ( validatorType != null ? validatorType.hashCode() : 0 );
+			result = 31 * result + ( validatedType != null ? validatedType.hashCode() : 0 );
 			return result;
 		}
 	}
