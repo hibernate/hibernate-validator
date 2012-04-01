@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.group;
+package org.hibernate.validator.spi.group;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -36,11 +36,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Hardy Ferentschik
  * @see javax.validation.GroupSequence
- * @deprecated Will be removed in a future release. Use {@link org.hibernate.validator.spi.group.GroupSequenceProvider} instead.
  */
 @Retention(RUNTIME)
 @Target({ TYPE })
-@Deprecated
 public @interface GroupSequenceProvider {
 
 	/**

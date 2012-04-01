@@ -19,7 +19,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -41,7 +41,7 @@ public class BeanConfiguration<T> {
 
 	private final List<Class<?>> defaultGroupSequence;
 
-	private final Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
+	private final DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
 	/**
 	 * Creates a new bean configuration.
@@ -60,7 +60,7 @@ public class BeanConfiguration<T> {
 			Class<T> beanClass,
 			Set<? extends ConstrainedElement> constrainedElements,
 			List<Class<?>> defaultGroupSequence,
-			Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
+			DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
 
 		this.source = source;
 		this.beanClass = beanClass;
@@ -85,7 +85,7 @@ public class BeanConfiguration<T> {
 		return defaultGroupSequence;
 	}
 
-	public Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProvider() {
+	public DefaultGroupSequenceProvider<? super T> getDefaultGroupSequenceProvider() {
 		return defaultGroupSequenceProvider;
 	}
 

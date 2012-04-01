@@ -154,7 +154,7 @@ public class BeanMetaDataManager {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, clazz );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
-			for ( BeanConfiguration<?> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {
+			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {
 				builder.add( beanConfiguration );
 			}
 		}
