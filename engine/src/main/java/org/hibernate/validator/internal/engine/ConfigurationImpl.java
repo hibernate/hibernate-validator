@@ -150,6 +150,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@SuppressWarnings("deprecation")
+	public final ConstraintMapping createConstraintMapping() {
+		//TODO: create internal implementation and return this
+		return new ConstraintMapping();
+	}
+
 	public final HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
 		Contracts.assertNotNull( mapping, MESSAGES.parameterMustNotBeNull( "mapping" ) );
 

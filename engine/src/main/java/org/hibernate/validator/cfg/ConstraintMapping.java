@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.cfg;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.context.TypeConstraintMappingContextImpl;
@@ -24,19 +25,42 @@ import org.hibernate.validator.internal.util.Contracts;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
- * Top level class for constraints configured via the programmatic API.
+ * Top level class for constraints configured via the programmatic API. This
+ * class is not intended to be inherited by clients. It will be converted into
+ * an interface in a future release.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ConstraintMapping {
+
+	/**
+	 * Not intended for public use.
+	 *
+	 * @deprecated Will be removed in a future release.
+	 */
+	@Deprecated
 	protected ConstraintMappingContext context;
 
+	/**
+	 * @deprecated This class will be converted into an interface in a future
+	 *             release. Use
+	 *             {@link HibernateValidatorConfiguration#createConstraintMapping()}
+	 *             instead to create new constraint mappings.
+	 */
+	@Deprecated
 	public ConstraintMapping() {
 		context = new ConstraintMappingContext();
 	}
 
+	/**
+	 * @deprecated This class will be converted into an interface in a future
+	 *             release. Use
+	 *             {@link HibernateValidatorConfiguration#createConstraintMapping()}
+	 *             instead to create new constraint mappings.
+	 */
+	@Deprecated
 	protected ConstraintMapping(ConstraintMapping original) {
 		this.context = original.context;
 	}
