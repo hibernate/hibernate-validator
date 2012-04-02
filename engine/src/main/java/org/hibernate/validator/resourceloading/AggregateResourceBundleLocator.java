@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -45,12 +46,33 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * list of source bundles.
 	 *
 	 * @param bundleNames A list with source bundle names. The returned bundle will
+	 * contain all keys from all source bundles. In case a key occurs
+	 * in multiple source bundles, the value will be taken from the
+	 * first bundle containing the key.
+	 * @param delegate A delegate resource bundle locator. The bundle returned by
+	 * this locator will be added to the aggregate bundle after all
+	 * source bundles.
+	 *
+	 * @deprecated Will be removed in a future release. Use
+	 *             {@link #AggregateResourceBundleLocator(List, ResourceBundleLocator)}
+	 *             instead.
+	 */
+	@Deprecated
+	public AggregateResourceBundleLocator(List<String> bundleNames, org.hibernate.validator.resourceloading.ResourceBundleLocator delegate) {
+		this( bundleNames, new Adapter( delegate ) );
+	}
+
+	/**
+	 * Creates a locator that delivers a resource bundle merged from the given
+	 * list of source bundles.
+	 *
+	 * @param bundleNames A list with source bundle names. The returned bundle will
 	 * contain all entries from all source bundles. In case a key occurs
 	 * in multiple source bundles, the value will be taken from the
 	 * first bundle containing the key.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames) {
-		this( bundleNames, null );
+		this( bundleNames, (ResourceBundleLocator) null );
 	}
 
 	/**
@@ -176,6 +198,20 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 
 		public T nextElement() {
 			return source.next();
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private static class Adapter implements org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
+
+		private final org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee;
+
+		public Adapter(org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee) {
+			this.adaptee = adaptee;
+		}
+
+		public ResourceBundle getResourceBundle(Locale locale) {
+			return adaptee.getResourceBundle( locale );
 		}
 	}
 }

@@ -19,7 +19,7 @@ package org.hibernate.validator;
 import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -78,8 +78,44 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * </pre>
 	 *
 	 * @return The default {@link ResourceBundleLocator}. Never null.
+	 *
+	 * @deprecated Will be removed in a future release. Use
+	 *             {@link #getDefaultBundleLocator()} instead.
 	 */
-	ResourceBundleLocator getDefaultResourceBundleLocator();
+	@Deprecated
+	org.hibernate.validator.resourceloading.ResourceBundleLocator getDefaultResourceBundleLocator();
+
+	/**
+	 * <p>
+	 * Returns the {@link ResourceBundleLocator} used by the
+	 * {@link Configuration#getDefaultMessageInterpolator() default message
+	 * interpolator} to load user-provided resource bundles. In conformance with
+	 * the specification this default locator retrieves the bundle
+	 * "ValidationMessages".
+	 * </p>
+	 * <p>
+	 * This locator can be used as delegate for custom locators when setting a
+	 * customized {@link org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator}:
+	 * </p>
+	 * <p/>
+	 * <pre>
+	 * {@code
+	 * 	HibernateValidatorConfiguration configure =
+	 *    Validation.byProvider(HibernateValidator.class).configure();
+	 * <p/>
+	 *  ResourceBundleLocator defaultResourceBundleLocator =
+	 *    configure.getDefaultBundleLocator();
+	 *  ResourceBundleLocator myResourceBundleLocator =
+	 *    new MyResourceBundleLocator(defaultResourceBundleLocator);
+	 * <p/>
+	 *  configure.messageInterpolator(
+	 *    new ResourceBundleMessageInterpolator(myResourceBundleLocator));
+	 * }
+	 * </pre>
+	 *
+	 * @return The default {@link ResourceBundleLocator}. Never null.
+	 */
+	ResourceBundleLocator getDefaultBundleLocator();
 
 	/**
 	 * Adds the specified {@link ConstraintMapping} instance to the configuration. Constraints configured in {@code mapping}

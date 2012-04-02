@@ -71,7 +71,7 @@ public class AggregateResourceBundleLocatorTest {
 		ResourceBundleLocator locator =
 				new AggregateResourceBundleLocator(
 						Arrays.asList( BUNDLE_NAME_1 ),
-						new PlatformResourceBundleLocator( BUNDLE_NAME_2 )
+						(ResourceBundleLocator) new PlatformResourceBundleLocator( BUNDLE_NAME_2 )
 				);
 
 		ResourceBundle resourceBundle = locator.getResourceBundle( Locale.ENGLISH );

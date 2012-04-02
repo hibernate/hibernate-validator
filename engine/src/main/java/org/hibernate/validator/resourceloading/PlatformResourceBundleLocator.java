@@ -31,7 +31,9 @@ import org.jboss.logging.Logger;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class PlatformResourceBundleLocator implements ResourceBundleLocator {
+@SuppressWarnings("deprecation")
+public class PlatformResourceBundleLocator
+		implements ResourceBundleLocator, org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
 	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
 	private String bundleName;
 

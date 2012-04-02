@@ -21,6 +21,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
 /**
  * A {@link ResourceBundleLocator} implementation that wraps around another
  * locator and caches values retrieved from that locator.
@@ -31,6 +33,20 @@ import java.util.concurrent.ConcurrentMap;
 public class CachingResourceBundleLocator extends DelegatingResourceBundleLocator {
 
 	private final ConcurrentMap<Locale, ResourceBundle> bundleCache = new ConcurrentHashMap<Locale, ResourceBundle>();
+
+	/**
+	 * Creates a new CachingResourceBundleLocator.
+	 *
+	 * @param delegate The locator from which the values actually will be retrieved.
+	 *
+	 * @deprecated Will be removed in a future release. Use
+	 *             {@link #CachingResourceBundleLocator(ResourceBundleLocator)}
+	 *             instead.
+	 */
+	@Deprecated
+	public CachingResourceBundleLocator(org.hibernate.validator.resourceloading.ResourceBundleLocator delegate) {
+		super( delegate );
+	}
 
 	/**
 	 * Creates a new CachingResourceBundleLocator.

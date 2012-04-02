@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
  * Resource bundle backed message interpolator.
@@ -81,11 +81,29 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final boolean cacheMessages;
 
 	public ResourceBundleMessageInterpolator() {
-		this( null );
+		this( (ResourceBundleLocator) null );
+	}
+
+	/**
+	 * @deprecated Will be removed in a future release. Use
+	 *             {@link #ResourceBundleMessageInterpolator(ResourceBundleLocator)} instead.
+	 */
+	@Deprecated
+	public ResourceBundleMessageInterpolator(org.hibernate.validator.resourceloading.ResourceBundleLocator userResourceBundleLocator) {
+		this( new Adapter( userResourceBundleLocator ) );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
 		this( userResourceBundleLocator, true );
+	}
+
+	/**
+	 * @deprecated Will be removed in a future release. Use
+	 *             {@link #ResourceBundleMessageInterpolator(ResourceBundleLocator, boolean)} instead.
+	 */
+	@Deprecated
+	public ResourceBundleMessageInterpolator(org.hibernate.validator.resourceloading.ResourceBundleLocator userResourceBundleLocator, boolean cacheMessages) {
+		this( new Adapter( userResourceBundleLocator ), cacheMessages );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cacheMessages) {
@@ -285,6 +303,20 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			int result = message != null ? message.hashCode() : 0;
 			result = 31 * result + ( locale != null ? locale.hashCode() : 0 );
 			return result;
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private static class Adapter implements org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
+
+		private final org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee;
+
+		public Adapter(org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee) {
+			this.adaptee = adaptee;
+		}
+
+		public ResourceBundle getResourceBundle(Locale locale) {
+			return adaptee.getResourceBundle( locale );
 		}
 	}
 }
