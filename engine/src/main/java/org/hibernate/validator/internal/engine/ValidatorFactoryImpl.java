@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.engine;
 
 import java.util.List;
+import java.util.Map;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -56,13 +57,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final boolean failFast;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
-
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		ConstraintHelper constraintHelper = new ConstraintHelper();
-
-		boolean tmpFailFast = false;
 
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 
@@ -75,6 +73,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 		}
 
+		Map<String, String> properties = configurationState.getProperties();
+
+		boolean tmpFailFast = false;
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
@@ -90,12 +91,21 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 		}
 		tmpFailFast = checkPropertiesForFailFast(
-				configurationState, tmpFailFast
+				properties, tmpFailFast
 		);
-
 		this.failFast = tmpFailFast;
 
-		metaDataManager = new BeanMetaDataManager( constraintHelper, metaDataProviders );
+		Integer hardRefLimit = checkProperty(
+				properties,
+				HibernateValidatorConfiguration.METADATA_CACHE_HARD_REF_LIMIT,
+				Integer.class
+		);
+		Integer softRefLimit = checkProperty(
+				properties,
+				HibernateValidatorConfiguration.METADATA_CACHE_SOFT_REF_LIMIT,
+				Integer.class
+		);
+		metaDataManager = new BeanMetaDataManager( constraintHelper, metaDataProviders, hardRefLimit, softRefLimit );
 	}
 
 	public Validator getValidator() {
@@ -131,9 +141,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 	}
 
-	private boolean checkPropertiesForFailFast(ConfigurationState configurationState, boolean programmaticConfiguredFailFast) {
+	private boolean checkPropertiesForFailFast(Map<String, String> properties, boolean programmaticConfiguredFailFast) {
 		boolean failFast = programmaticConfiguredFailFast;
-		String failFastPropValue = configurationState.getProperties().get( HibernateValidatorConfiguration.FAIL_FAST );
+		String failFastPropValue = properties.get( HibernateValidatorConfiguration.FAIL_FAST );
 		if ( failFastPropValue != null ) {
 			boolean tmpFailFast = Boolean.valueOf( failFastPropValue );
 			if ( programmaticConfiguredFailFast && !tmpFailFast ) {
@@ -142,5 +152,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			failFast = tmpFailFast;
 		}
 		return failFast;
+	}
+
+	private <T> T checkProperty(Map<String, String> properties, String propertyName, Class<T> type) {
+		String propertyValue = properties.get( propertyName );
+		T value = null;
+		if ( propertyValue != null ) {
+			try {
+				value = type.getConstructor( String.class ).newInstance( propertyValue );
+			}
+			catch ( Exception e ) {
+				throw log.getInvalidPropertyValue( propertyName, propertyValue, e );
+			}
+		}
+		return value;
 	}
 }

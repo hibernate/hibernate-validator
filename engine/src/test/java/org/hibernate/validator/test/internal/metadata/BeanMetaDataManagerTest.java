@@ -20,12 +20,14 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
 import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -43,15 +45,18 @@ public class BeanMetaDataManagerTest {
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
 		BeanMetaDataManager metaDataManager = new BeanMetaDataManager( new ConstraintHelper() );
 
-		for ( int i = 0; i < 200; i++ ) {
+		for ( int i = 0; i < 100; i++ ) {
 			Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
 			metaDataManager.getBeanMetaData( c );
 		}
 
-		assertEquals( metaDataManager.numberOfCachedBeanMetaDataInstances(), 200 );
+		assertEquals( metaDataManager.numberOfCachedBeanMetaDataInstances(), 100 );
 
 		try {
-			byte[] block = new byte[Integer.MAX_VALUE];
+			byte[][] buf = new byte[1024][];
+			for ( int i = 0; i < buf.length; i++ ) {
+				buf[i] = new byte[10 * 1024 * 1024];
+			}
 			fail( "The byte array allocation should have triggered a OutOfMemoryError" );
 		}
 		catch ( OutOfMemoryError ex ) {
@@ -61,12 +66,30 @@ public class BeanMetaDataManagerTest {
 		System.gc();
 
 		assertEquals(
-				metaDataManager.numberOfCachedBeanMetaDataInstances(), 128,
+				metaDataManager.numberOfCachedBeanMetaDataInstances(), 64,
 				"Only the hard referenced entries should be left. Soft references should have been garbage collected"
 		);
 	}
 
-	public class Fubar {
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testCustomMetaDataCacheSettings() throws Exception {
+		BeanMetaDataManager metaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				Collections.<MetaDataProvider>emptyList(),
+				1,
+				10
+		);
+
+		for ( int i = 0; i < 100; i++ ) {
+			Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
+			metaDataManager.getBeanMetaData( c );
+		}
+
+		assertEquals( metaDataManager.numberOfCachedBeanMetaDataInstances(), 10 );
+	}
+
+	public static class Fubar {
 		@NotNull
 		Object o;
 	}

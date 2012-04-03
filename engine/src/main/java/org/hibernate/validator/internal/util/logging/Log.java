@@ -422,4 +422,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 116, value = "%s")
 	IllegalArgumentException getIllegalArgumentException(String message);
+
+	@Message(id = 117, value = "Invalid value for property %s: %s")
+	ValidationException getInvalidPropertyValue(String propertyName, String propertyValue, @Cause Exception e);
 }

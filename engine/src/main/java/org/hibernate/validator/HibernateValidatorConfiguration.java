@@ -38,6 +38,18 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	final static String FAIL_FAST = "hibernate.validator.fail_fast";
 
 	/**
+	 * Maximum number of {@code BeanMetaData} instances to cache via hard references. This property is
+	 * experimental.
+	 */
+	final static String METADATA_CACHE_HARD_REF_LIMIT = "hibernate.validator.metadata_cache.hard_ref_limit";
+
+	/**
+	 * Maximum number of {@code BeanMetaData} instances to cache via soft references. This property is
+	 * experimental.
+	 */
+	final static String METADATA_CACHE_SOFT_REF_LIMIT = "hibernate.validator.metadata_cache.soft_ref_limit";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message

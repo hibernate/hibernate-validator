@@ -50,6 +50,16 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  */
 public class BeanMetaDataManager {
 	/**
+	 * The default maximum number of {@code BeanMetaData} instances to cache via hard references
+	 */
+	public static final int DEFAULT_HARD_REF_LIMIT = 64;
+
+	/**
+	 * The default maximum number of {@code BeanMetaData} instances to cache via hard references
+	 */
+	public static final int DEFAULT_SOFT_REF_LIMIT = 1024;
+
+	/**
 	 * Additional metadata providers used for meta data retrieval if
 	 * the XML and/or programmatic configuration is used.
 	 */
@@ -69,15 +79,36 @@ public class BeanMetaDataManager {
 		this( constraintHelper, Arrays.asList( metaDataProviders ) );
 	}
 
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> optionalMetaDataProviders) {
+		this( constraintHelper, optionalMetaDataProviders, DEFAULT_HARD_REF_LIMIT, DEFAULT_SOFT_REF_LIMIT );
+	}
+
 	/**
 	 * @param constraintHelper the constraint helper
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
+	 * @param hardRefLimit the maximum number of {@code BeanMetaData} instances to cache via hard references.
+	 * If {@code null} is passed  {@link #DEFAULT_HARD_REF_LIMIT} is used.
+	 * @param softRefLimit the maximum number of {@code BeanMetaData} instances to cache via soft references.
+	 * If {@code null} is passed  {@link #DEFAULT_SOFT_REF_LIMIT} is used.
 	 */
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> optionalMetaDataProviders) {
+	public BeanMetaDataManager(ConstraintHelper constraintHelper,
+							   List<MetaDataProvider> optionalMetaDataProviders,
+							   Integer hardRefLimit,
+							   Integer softRefLimit
+	) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
-		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>();
+
+		if ( hardRefLimit == null ) {
+			hardRefLimit = DEFAULT_HARD_REF_LIMIT;
+		}
+
+		if ( softRefLimit == null ) {
+			softRefLimit = DEFAULT_SOFT_REF_LIMIT;
+		}
+
+		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>( hardRefLimit, softRefLimit );
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintHelper,
