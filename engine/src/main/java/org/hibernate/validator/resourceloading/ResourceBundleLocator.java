@@ -40,7 +40,7 @@ import java.util.ResourceBundle;
  *             instead.
  */
 @Deprecated
-public interface ResourceBundleLocator {
+public interface ResourceBundleLocator extends org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
 
 	/**
 	 * Returns a resource bundle for the given locale.

@@ -254,11 +254,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@SuppressWarnings("deprecation")
 	public final org.hibernate.validator.resourceloading.ResourceBundleLocator getDefaultResourceBundleLocator() {
-		return new Adapter( getDefaultBundleLocator() );
-	}
-
-	public ResourceBundleLocator getDefaultBundleLocator() {
-		return defaultResourceBundleLocator;
+		return new Adapter( defaultResourceBundleLocator );
 	}
 
 	public final Set<ConstraintMapping> getProgrammaticMappings() {

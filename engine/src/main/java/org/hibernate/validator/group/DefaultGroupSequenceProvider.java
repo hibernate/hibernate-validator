@@ -43,7 +43,8 @@ import java.util.List;
  * @deprecated Will be removed in a future release. Use {@code org.hibernate.validator.spi.group.DefaultGroupSequenceProvider} instead.
  */
 @Deprecated
-public interface DefaultGroupSequenceProvider<T> {
+public interface DefaultGroupSequenceProvider<T>
+		extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<T> {
 
 	/**
 	 * This method returns the default group sequence for the given instance.

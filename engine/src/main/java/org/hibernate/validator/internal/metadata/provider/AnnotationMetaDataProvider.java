@@ -31,7 +31,7 @@ import java.util.Set;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 
-import org.hibernate.validator.internal.engine.groups.DefaultGroupSequenceProviderAdapter;
+import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
@@ -51,7 +51,6 @@ import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.spi.group.GroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -152,20 +151,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		if ( groupSequenceProviderAnnotation != null ) {
 			return newGroupSequenceProviderClassInstance( beanClass, groupSequenceProviderAnnotation.value() );
 		}
-		else {
-			org.hibernate.validator.group.GroupSequenceProvider deprecatedGroupSequenceProviderAnnotation = beanClass.getAnnotation(
-					org.hibernate.validator.group.GroupSequenceProvider.class
-			);
-
-			if ( deprecatedGroupSequenceProviderAnnotation != null ) {
-				return DefaultGroupSequenceProviderAdapter.getInstance(
-						newDeprecatedGroupSequenceProviderClassInstance(
-								beanClass,
-								deprecatedGroupSequenceProviderAnnotation.value()
-						)
-				);
-			}
-		}
 
 		return null;
 	}
@@ -179,23 +164,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
 
 				return (DefaultGroupSequenceProvider<? super T>) newInstance(
-						providerClass, "the default group sequence provider"
-				);
-			}
-		}
-
-		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass.getName() );
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T> newDeprecatedGroupSequenceProviderClassInstance(Class<T> beanClass, Class<?> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
-		for ( Method method : providerMethods ) {
-			Class<?>[] paramTypes = method.getParameterTypes();
-			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
-					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
-
-				return (org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T>) newInstance(
 						providerClass, "the default group sequence provider"
 				);
 			}
