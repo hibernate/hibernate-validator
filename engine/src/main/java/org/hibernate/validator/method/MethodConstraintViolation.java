@@ -19,21 +19,26 @@ package org.hibernate.validator.method;
 import java.lang.reflect.Method;
 import javax.validation.ConstraintViolation;
 
-
 /**
  * Describes the violation of a method-level constraint by providing access
  * to the method/parameter hosting the violated constraint etc.
  *
  * @author Gunnar Morling
  * @see MethodValidator
+ * @deprecated Will by replaced by equivalent functionality defined by the Bean
+ *             Validation 1.1 API as of Hibernate Validator 5.
  */
+@Deprecated
 public interface MethodConstraintViolation<T> extends ConstraintViolation<T> {
 
 	/**
 	 * The kind of a {@link MethodConstraintViolation}.
 	 *
 	 * @author Gunnar Morling
+	 * @deprecated Will by replaced by equivalent functionality defined by the
+	 *             Bean Validation 1.1 API as of Hibernate Validator 5.
 	 */
+	@Deprecated
 	public static enum Kind {
 
 		/**

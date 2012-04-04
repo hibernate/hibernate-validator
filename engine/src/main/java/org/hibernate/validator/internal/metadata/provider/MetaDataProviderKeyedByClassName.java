@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -47,11 +47,14 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 		this.configuredBeans = newHashMap();
 	}
 
-	public List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
-		List<BeanConfiguration<?>> configurations = newArrayList();
+	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
+		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
-			BeanConfiguration<?> configuration = getBeanConfiguration( oneHierarchyClass );
+			@SuppressWarnings("unchecked")
+			BeanConfiguration<? super T> configuration = (BeanConfiguration<? super T>) getBeanConfiguration(
+					oneHierarchyClass
+			);
 			if ( configuration != null ) {
 				configurations.add( configuration );
 			}
@@ -73,7 +76,7 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 															   Class<T> beanClass,
 															   Set<? extends ConstrainedElement> constrainableElements,
 															   List<Class<?>> defaultGroupSequence,
-															   Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
+															   DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
 		return new BeanConfiguration<T>(
 				source,
 				beanClass,

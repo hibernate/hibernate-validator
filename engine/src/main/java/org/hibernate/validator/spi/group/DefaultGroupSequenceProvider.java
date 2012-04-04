@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.group;
+package org.hibernate.validator.spi.group;
 
 import java.util.List;
 
@@ -40,11 +40,8 @@ import java.util.List;
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Hardy Ferentschik
- * @deprecated Will be removed in a future release. Use {@code org.hibernate.validator.spi.group.DefaultGroupSequenceProvider} instead.
  */
-@Deprecated
-public interface DefaultGroupSequenceProvider<T>
-		extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<T> {
+public interface DefaultGroupSequenceProvider<T> {
 
 	/**
 	 * This method returns the default group sequence for the given instance.

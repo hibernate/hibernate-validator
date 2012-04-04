@@ -31,7 +31,6 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -50,14 +49,13 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 import static org.hibernate.validator.internal.util.ReflectionHelper.computeAllImplementedInterfaces;
-import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
-import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -67,6 +65,7 @@ import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
+@SuppressWarnings("deprecation")
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static final Log log = LoggerFactory.make();
@@ -112,7 +111,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @see org.hibernate.validator.group.GroupSequenceProvider
 	 * @see DefaultGroupSequenceProvider
 	 */
-	private DefaultGroupSequenceProvider<T> defaultGroupSequenceProvider;
+	private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
 	/**
 	 * The class hierarchy for this class starting with the class itself going up the inheritance chain. Interfaces
@@ -130,7 +129,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	public BeanMetaDataImpl(Class<T> beanClass,
 							List<Class<?>> defaultGroupSequence,
-							Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider,
+							DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider,
 							Set<ConstraintMetaData> constraintMetaData) {
 
 		this.beanClass = beanClass;
@@ -298,14 +297,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
-	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider) {
+	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
 
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
 			throw log.getInvalidDefaultGroupSequenceDefinitionException();
 		}
 
 		if ( defaultGroupSequenceProvider != null ) {
-			this.defaultGroupSequenceProvider = newGroupSequenceProviderInstance( defaultGroupSequenceProvider );
+			this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
 		}
 		else if ( defaultGroupSequence != null && !defaultGroupSequence.isEmpty() ) {
 			setDefaultGroupSequence( defaultGroupSequence );
@@ -400,23 +399,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return defaultGroupSequenceProvider != null;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <U extends DefaultGroupSequenceProvider<?>> DefaultGroupSequenceProvider<T> newGroupSequenceProviderInstance(Class<U> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
-		for ( Method method : providerMethods ) {
-			Class<?>[] paramTypes = method.getParameterTypes();
-			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
-					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
-
-				return (DefaultGroupSequenceProvider<T>) newInstance(
-						providerClass, "the default group sequence provider"
-				);
-			}
-		}
-
-		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass.getName() );
-	}
-
 	private Partitioner<ElementType, MetaConstraint<?>> byElementType() {
 		return new Partitioner<ElementType, MetaConstraint<?>>() {
 			public ElementType getPartition(MetaConstraint<?> constraint) {
@@ -451,7 +433,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		private List<Class<?>> defaultGroupSequence;
 
-		private Class<? extends DefaultGroupSequenceProvider<?>> defaultGroupSequenceProvider;
+		private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
 
 		public BeanMetaDataBuilder(ConstraintHelper constraintHelper, Class<T> beanClass) {
@@ -463,7 +445,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			return new BeanMetaDataBuilder<T>( constraintHelper, beanClass );
 		}
 
-		public void add(BeanConfiguration<?> configuration) {
+		public void add(BeanConfiguration<? super T> configuration) {
 			if ( configuration.getBeanClass().equals( beanClass ) ) {
 				if ( configuration.getDefaultGroupSequence() != null
 						&& ( sequenceSource == null || configuration.getSource()

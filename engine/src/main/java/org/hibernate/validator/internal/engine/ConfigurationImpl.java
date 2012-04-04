@@ -20,7 +20,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -43,7 +45,7 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -139,13 +141,19 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
 		Contracts.assertNotNull( stream, MESSAGES.parameterMustNotBeNull( "stream" ) );
 
-		validationBootstrapParameters.addMapping( stream.markSupported() ? stream : new BufferedInputStream(stream)  );
+		validationBootstrapParameters.addMapping( stream.markSupported() ? stream : new BufferedInputStream( stream ) );
 		return this;
 	}
 
 	public final HibernateValidatorConfiguration failFast(boolean failFast) {
 		this.failFast = failFast;
 		return this;
+	}
+
+	@SuppressWarnings("deprecation")
+	public final ConstraintMapping createConstraintMapping() {
+		//TODO: create internal implementation and return this
+		return new ConstraintMapping();
 	}
 
 	public final HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {
@@ -244,8 +252,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return defaultConstraintValidatorFactory;
 	}
 
-	public final ResourceBundleLocator getDefaultResourceBundleLocator() {
-		return defaultResourceBundleLocator;
+	@SuppressWarnings("deprecation")
+	public final org.hibernate.validator.resourceloading.ResourceBundleLocator getDefaultResourceBundleLocator() {
+		return new Adapter( defaultResourceBundleLocator );
 	}
 
 	public final Set<ConstraintMapping> getProgrammaticMappings() {
@@ -317,6 +326,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			if ( validationBootstrapParameters.getConfigProperties().get( entry.getKey() ) == null ) {
 				validationBootstrapParameters.addConfigProperty( entry.getKey(), entry.getValue() );
 			}
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private static class Adapter implements org.hibernate.validator.resourceloading.ResourceBundleLocator {
+
+		private final org.hibernate.validator.spi.resourceloading.ResourceBundleLocator adaptee;
+
+		public Adapter(org.hibernate.validator.spi.resourceloading.ResourceBundleLocator adaptee) {
+			this.adaptee = adaptee;
+		}
+
+		public ResourceBundle getResourceBundle(Locale locale) {
+			return adaptee.getResourceBundle( locale );
 		}
 	}
 }

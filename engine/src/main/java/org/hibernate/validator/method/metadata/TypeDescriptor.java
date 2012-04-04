@@ -24,7 +24,10 @@ import javax.validation.metadata.ElementDescriptor;
  * Describes a constrained Java type and the constraints associated to it.
  *
  * @author Gunnar Morling
+ * @deprecated Will by replaced by equivalent functionality defined by the Bean
+ *             Validation 1.1 API as of Hibernate Validator 5.
  */
+@Deprecated
 public interface TypeDescriptor extends ElementDescriptor {
 
 	/**

@@ -19,6 +19,8 @@ package org.hibernate.validator.group;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -38,7 +40,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @see javax.validation.GroupSequence
  */
 @Retention(RUNTIME)
-@Target( { TYPE })
+@Target({ TYPE })
 public @interface GroupSequenceProvider {
 
 	/**

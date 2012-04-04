@@ -37,6 +37,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
+@SuppressWarnings("deprecation")
 public class ConstraintMappingContext {
 	private final Map<Class<?>, Set<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintConfig;
 	private final Map<Class<?>, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintConfig;
@@ -44,7 +45,8 @@ public class ConstraintMappingContext {
 	private final Map<Class<?>, Set<MethodConstraintLocation>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
-	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
+	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> deprecatedDefaultGroupSequenceProviders;
+	private final Map<Class<?>, Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public ConstraintMappingContext() {
@@ -54,6 +56,7 @@ public class ConstraintMappingContext {
 		this.methodCascadeConfig = newHashMap();
 		this.configuredClasses = newHashSet();
 		this.defaultGroupSequences = newHashMap();
+		this.deprecatedDefaultGroupSequenceProviders = newHashMap();
 		this.defaultGroupSequenceProviders = newHashMap();
 		this.annotationProcessingOptions = new AnnotationProcessingOptions();
 	}
@@ -112,8 +115,26 @@ public class ConstraintMappingContext {
 	 *
 	 * @return The default group sequence provider defined class or {@code null} if none.
 	 */
-	public final Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProvider(Class<?> beanType) {
-		return defaultGroupSequenceProviders.get( beanType );
+	public final <T> Class<? extends DefaultGroupSequenceProvider<? super T>> getDeprecatedDefaultGroupSequenceProvider(Class<T> beanType) {
+		@SuppressWarnings("unchecked")
+		Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends DefaultGroupSequenceProvider<? super T>>) deprecatedDefaultGroupSequenceProviders
+				.get( beanType );
+		return providerClass;
+	}
+
+	/**
+	 * Returns the class of the default group sequence provider defined
+	 * for the given bean type.
+	 *
+	 * @param beanType The bean type.
+	 *
+	 * @return The default group sequence provider defined class or {@code null} if none.
+	 */
+	public final <T> Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>> getDefaultGroupSequenceProvider(Class<T> beanType) {
+		@SuppressWarnings("unchecked")
+		Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>>) defaultGroupSequenceProviders
+				.get( beanType );
+		return providerClass;
 	}
 
 	@Override
@@ -160,7 +181,12 @@ public class ConstraintMappingContext {
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
 	}
 
-	public final <T extends DefaultGroupSequenceProvider<?>> void addDefaultGroupSequenceProvider(Class<?> beanClass, Class<T> defaultGroupSequenceProviderClass) {
+	public final <T> void addDeprecatedDefaultGroupSequenceProvider(Class<T> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> defaultGroupSequenceProviderClass) {
+		configuredClasses.add( beanClass );
+		deprecatedDefaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
+	}
+
+	public final <T> void addDefaultGroupSequenceProvider(Class<T> beanClass, Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>> defaultGroupSequenceProviderClass) {
 		configuredClasses.add( beanClass );
 		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
 	}

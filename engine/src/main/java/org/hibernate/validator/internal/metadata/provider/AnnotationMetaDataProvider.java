@@ -31,7 +31,6 @@ import java.util.Set;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -49,15 +48,24 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.SoftLimitMRUCache;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
+import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
 /**
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
+@SuppressWarnings("deprecation")
 public class AnnotationMetaDataProvider implements MetaDataProvider {
+
+	private static final Log log = LoggerFactory.make();
+
 	private final ConstraintHelper constraintHelper;
 	private final SoftLimitMRUCache<Class<?>, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
@@ -72,11 +80,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return new AnnotationProcessingOptions();
 	}
 
-	public List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass) {
-		List<BeanConfiguration<?>> configurations = newArrayList();
+	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
+		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
 		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
-			BeanConfiguration<?> configuration = getBeanConfiguration( oneHierarchyClass );
+			@SuppressWarnings("unchecked")
+			BeanConfiguration<? super T> configuration = (BeanConfiguration<? super T>) getBeanConfiguration(
+					oneHierarchyClass
+			);
 			if ( configuration != null ) {
 				configurations.add( configuration );
 			}
@@ -125,7 +136,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				beanClass,
 				propertyMetaData,
 				getDefaultGroupSequence( beanClass ),
-				getDefaultGroupSequenceProviderClass( beanClass )
+				getDefaultGroupSequenceProvider( beanClass )
 		);
 	}
 
@@ -134,9 +145,31 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return groupSequenceAnnotation != null ? Arrays.asList( groupSequenceAnnotation.value() ) : null;
 	}
 
-	private Class<? extends DefaultGroupSequenceProvider<?>> getDefaultGroupSequenceProviderClass(Class<?> beanClass) {
+	private <T> DefaultGroupSequenceProvider<? super T> getDefaultGroupSequenceProvider(Class<T> beanClass) {
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
-		return groupSequenceProviderAnnotation != null ? groupSequenceProviderAnnotation.value() : null;
+
+		if ( groupSequenceProviderAnnotation != null ) {
+			return newGroupSequenceProviderClassInstance( beanClass, groupSequenceProviderAnnotation.value() );
+		}
+
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass, Class<?> providerClass) {
+		Method[] providerMethods = getMethods( providerClass );
+		for ( Method method : providerMethods ) {
+			Class<?>[] paramTypes = method.getParameterTypes();
+			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
+					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
+
+				return (DefaultGroupSequenceProvider<? super T>) newInstance(
+						providerClass, "the default group sequence provider"
+				);
+			}
+		}
+
+		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass.getName() );
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Class<?> clazz) {

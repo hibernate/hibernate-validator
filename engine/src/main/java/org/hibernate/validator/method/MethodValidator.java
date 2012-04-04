@@ -122,7 +122,10 @@ import org.hibernate.validator.method.metadata.TypeDescriptor;
  * </p>
  *
  * @author Gunnar Morling
+ * @deprecated Will by replaced by equivalent functionality defined by the Bean
+ *             Validation 1.1 API as of Hibernate Validator 5.
  */
+@Deprecated
 public interface MethodValidator {
 
 	/**

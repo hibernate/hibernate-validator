@@ -31,6 +31,7 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
+@SuppressWarnings("deprecation")
 public final class TypeConstraintMappingContextImpl<C> extends ConstraintMappingContextImplBase
 		implements TypeConstraintMappingContext<C> {
 
@@ -60,7 +61,16 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	public <T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingContext<C> defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
-		mapping.addDefaultGroupSequenceProvider( beanClass, defaultGroupSequenceProviderClass );
+		@SuppressWarnings("unchecked")
+		Class<C> clazz = (Class<C>) beanClass;
+		mapping.addDeprecatedDefaultGroupSequenceProvider( clazz, defaultGroupSequenceProviderClass );
+		return this;
+	}
+
+	public TypeConstraintMappingContext<C> defaultGroupSequenceProviderClass(Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass) {
+		@SuppressWarnings("unchecked")
+		Class<C> clazz = (Class<C>) beanClass;
+		mapping.addDefaultGroupSequenceProvider( clazz, defaultGroupSequenceProviderClass );
 		return this;
 	}
 }

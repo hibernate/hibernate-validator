@@ -22,7 +22,10 @@ import javax.validation.metadata.ElementDescriptor;
  * Describes a constrained parameter and the constraints associated with it.
  *
  * @author Gunnar Morling
+ * @deprecated Will by replaced by equivalent functionality defined by the Bean
+ *             Validation 1.1 API as of Hibernate Validator 5.
  */
+@Deprecated
 public interface ParameterDescriptor extends ElementDescriptor {
 
 	/**

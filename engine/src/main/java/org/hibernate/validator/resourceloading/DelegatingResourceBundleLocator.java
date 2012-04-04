@@ -19,17 +19,40 @@ package org.hibernate.validator.resourceloading;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
 /**
  * Abstract base for all {@link ResourceBundleLocator} implementations, that
  * wish to delegate to some other locator.
  *
  * @author Gunnar Morling
  */
-public abstract class DelegatingResourceBundleLocator implements ResourceBundleLocator {
+@SuppressWarnings("deprecation")
+public abstract class DelegatingResourceBundleLocator
+		implements org.hibernate.validator.resourceloading.ResourceBundleLocator, org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
 
 	private final ResourceBundleLocator delegate;
 
-	public DelegatingResourceBundleLocator(ResourceBundleLocator delegate) {
+	/**
+	 * Creates a new {@link DelegatingResourceBundleLocator}.
+	 *
+	 * @param delegate The delegate.
+	 *
+	 * @deprecated Will be removed in a future release. Use
+	 *             {@link #DelegatingResourceBundleLocator(org.hibernate.validator.spi.resourceloading.ResourceBundleLocator)}
+	 *             instead.
+	 */
+	@Deprecated
+	public DelegatingResourceBundleLocator(org.hibernate.validator.resourceloading.ResourceBundleLocator delegate) {
+		this.delegate = new Adapter( delegate );
+	}
+
+	/**
+	 * Creates a new {@link DelegatingResourceBundleLocator}.
+	 *
+	 * @param delegate The delegate.
+	 */
+	public DelegatingResourceBundleLocator(org.hibernate.validator.spi.resourceloading.ResourceBundleLocator delegate) {
 		this.delegate = delegate;
 	}
 
@@ -37,4 +60,16 @@ public abstract class DelegatingResourceBundleLocator implements ResourceBundleL
 		return delegate == null ? null : delegate.getResourceBundle( locale );
 	}
 
+	private static class Adapter implements org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
+
+		private final org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee;
+
+		public Adapter(org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee) {
+			this.adaptee = adaptee;
+		}
+
+		public ResourceBundle getResourceBundle(Locale locale) {
+			return adaptee.getResourceBundle( locale );
+		}
+	}
 }

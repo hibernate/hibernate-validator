@@ -66,20 +66,33 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * {@code
 	 * 	HibernateValidatorConfiguration configure =
 	 *    Validation.byProvider(HibernateValidator.class).configure();
-	 * <p/>
+	 *
 	 *  ResourceBundleLocator defaultResourceBundleLocator =
-	 *    configure.getDefaultResourceBundleLocator();
+	 *    configure.getDefaultBundleLocator();
 	 *  ResourceBundleLocator myResourceBundleLocator =
 	 *    new MyResourceBundleLocator(defaultResourceBundleLocator);
-	 * <p/>
+	 *
 	 *  configure.messageInterpolator(
 	 *    new ResourceBundleMessageInterpolator(myResourceBundleLocator));
 	 * }
 	 * </pre>
-	 *
+	 * <p>
+	 * <b>Deprecation note:</b> The return type of this method will change to
+	 * {@link org.hibernate.validator.spi.resourceloading.ResourceBundleLocator} in a future release.
+	 * The return value of this method should be assigned to a variable of this type.
+	 * </p>
 	 * @return The default {@link ResourceBundleLocator}. Never null.
 	 */
+	@SuppressWarnings("deprecation")
 	ResourceBundleLocator getDefaultResourceBundleLocator();
+
+	/**
+	 * Creates a new constraint mapping which can be used to programmatically configure the constraints for given types. After
+	 * the mapping has been set up, it must be added to this configuration via {@link #addMapping(ConstraintMapping)}.
+	 *
+	 * @return A new constraint mapping.
+	 */
+	ConstraintMapping createConstraintMapping();
 
 	/**
 	 * Adds the specified {@link ConstraintMapping} instance to the configuration. Constraints configured in {@code mapping}

@@ -20,12 +20,14 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.validation.ValidationException;
 
-
 /**
  * Exception class to be thrown by integrators of HV's method level validation feature.
  *
  * @author Gunnar Morling
+ * @deprecated Will by replaced by equivalent functionality defined by the Bean
+ *             Validation 1.1 API as of Hibernate Validator 5.
  */
+@Deprecated
 public class MethodConstraintViolationException extends ValidationException {
 
 	private static final long serialVersionUID = 5694703022614920634L;

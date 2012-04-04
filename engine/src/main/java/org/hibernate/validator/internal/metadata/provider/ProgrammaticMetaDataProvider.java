@@ -28,6 +28,7 @@ import java.util.Set;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
+import org.hibernate.validator.internal.engine.groups.DefaultGroupSequenceProviderAdapter;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
@@ -44,8 +45,10 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -56,6 +59,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  *
  * @author Gunnar Morling
  */
+@SuppressWarnings("deprecation")
 public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	private static final Log log = LoggerFactory.make();
@@ -80,32 +84,68 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	 */
 	private void initProgrammaticConfiguration(ConstraintMappingContext context) {
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
-
-			Set<ConstrainedElement> constrainedElements =
-					retrievePropertyMetaData(
-							context.getConstraintConfig().get( clazz ),
-							context.getCascadeConfig().get( clazz )
-					);
-
-			Set<ConstrainedElement> methodMetaData =
-					retrieveMethodMetaData(
-							context.getMethodCascadeConfig().get( clazz ),
-							context.getMethodConstraintConfig().get( clazz )
-					);
-
-			constrainedElements.addAll( methodMetaData );
-
-			addBeanConfiguration(
-					clazz,
-					createBeanConfiguration(
-							ConfigurationSource.API,
-							clazz,
-							constrainedElements,
-							context.getDefaultSequence( clazz ),
-							context.getDefaultGroupSequenceProvider( clazz )
-					)
-			);
+			initClass( clazz, context );
 		}
+	}
+
+	private <T> void initClass(Class<T> clazz, ConstraintMappingContext context) {
+
+		Set<ConstrainedElement> constrainedElements =
+				retrievePropertyMetaData(
+						context.getConstraintConfig().get( clazz ),
+						context.getCascadeConfig().get( clazz )
+				);
+
+		Set<ConstrainedElement> methodMetaData =
+				retrieveMethodMetaData(
+						context.getMethodCascadeConfig().get( clazz ),
+						context.getMethodConstraintConfig().get( clazz )
+				);
+
+		constrainedElements.addAll( methodMetaData );
+
+		DefaultGroupSequenceProvider<? super T> sequenceProvider = getDefaultGroupSequenceProvider( clazz, context );
+
+		addBeanConfiguration(
+				clazz,
+				createBeanConfiguration(
+						ConfigurationSource.API,
+						clazz,
+						constrainedElements,
+						context.getDefaultSequence( clazz ),
+						sequenceProvider
+				)
+		);
+	}
+
+	private <T> DefaultGroupSequenceProvider<? super T> getDefaultGroupSequenceProvider(Class<T> beanType, ConstraintMappingContext context) {
+
+		Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = context.getDefaultGroupSequenceProvider(
+				beanType
+		);
+
+		//retrieve provider from new annotation
+		if ( providerClass != null ) {
+			DefaultGroupSequenceProvider<? super T> provider = ReflectionHelper.newInstance(
+					providerClass,
+					"default group sequence provider"
+			);
+			return provider;
+		}
+
+		Class<? extends org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T>> deprecatedProviderClass = context
+				.getDeprecatedDefaultGroupSequenceProvider( beanType );
+
+		//retrieve provider from deprecated annotation and wrap into adapter
+		if ( deprecatedProviderClass != null ) {
+			org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T> provider = ReflectionHelper.newInstance(
+					deprecatedProviderClass,
+					"default group sequence provider"
+			);
+			return DefaultGroupSequenceProviderAdapter.getInstance( provider );
+		}
+
+		return null;
 	}
 
 	private Set<ConstrainedElement> retrievePropertyMetaData(
@@ -313,25 +353,37 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private void mergeGroupSequenceAndGroupSequenceProvider(ConstraintMappingContext mergedContext, ConstraintMappingContext context) {
 		for ( Class<?> clazz : context.getConfiguredClasses() ) {
-			if ( context.getDefaultGroupSequenceProvider( clazz ) != null ) {
-				if ( mergedContext.getDefaultGroupSequenceProvider( clazz ) != null ) {
-					throw log.getMultipleDefinitionOfDefaultGroupSequenceProviderException();
-				}
-				mergedContext.addDefaultGroupSequenceProvider(
-						clazz,
-						context.getDefaultGroupSequenceProvider( clazz )
-				);
-			}
+			mergeSequenceAndProviderForClass( mergedContext, context, clazz );
+		}
+	}
 
-			if ( context.getDefaultSequence( clazz ) != null ) {
-				if ( mergedContext.getDefaultSequence( clazz ) != null ) {
-					throw log.getMultipleDefinitionOfDefaultGroupSequenceException();
-				}
-				mergedContext.addDefaultGroupSequence(
-						clazz,
-						context.getDefaultSequence( clazz )
-				);
+	private <T> void mergeSequenceAndProviderForClass(ConstraintMappingContext mergedContext, ConstraintMappingContext context, Class<T> clazz) {
+		if ( context.getDefaultGroupSequenceProvider( clazz ) != null ) {
+			if ( mergedContext.getDefaultGroupSequenceProvider( clazz ) != null ) {
+				throw log.getMultipleDefinitionOfDefaultGroupSequenceProviderException();
 			}
+			mergedContext.addDefaultGroupSequenceProvider(
+					clazz,
+					context.getDefaultGroupSequenceProvider( clazz )
+			);
+		}
+		if ( context.getDeprecatedDefaultGroupSequenceProvider( clazz ) != null ) {
+			if ( mergedContext.getDeprecatedDefaultGroupSequenceProvider( clazz ) != null ) {
+				throw log.getMultipleDefinitionOfDefaultGroupSequenceProviderException();
+			}
+			mergedContext.addDeprecatedDefaultGroupSequenceProvider(
+					clazz,
+					context.getDeprecatedDefaultGroupSequenceProvider( clazz )
+			);
+		}
+		if ( context.getDefaultSequence( clazz ) != null ) {
+			if ( mergedContext.getDefaultSequence( clazz ) != null ) {
+				throw log.getMultipleDefinitionOfDefaultGroupSequenceException();
+			}
+			mergedContext.addDefaultGroupSequence(
+					clazz,
+					context.getDefaultSequence( clazz )
+			);
 		}
 	}
 

@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.resourceloading;
+package org.hibernate.validator.spi.resourceloading;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -35,12 +35,8 @@ import java.util.ResourceBundle;
  * </p>
  *
  * @author Gunnar Morling
- * @deprecated Will be removed in a future release. Use
- *             {@link org.hibernate.validator.spi.resourceloading.ResourceBundleLocator}
- *             instead.
  */
-@Deprecated
-public interface ResourceBundleLocator extends org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
+public interface ResourceBundleLocator {
 
 	/**
 	 * Returns a resource bundle for the given locale.

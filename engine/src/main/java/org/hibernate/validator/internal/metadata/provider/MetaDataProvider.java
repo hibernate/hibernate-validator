@@ -57,5 +57,5 @@ public interface MetaDataProvider {
 	 * @return A set with the configurations for the complete hierarchy of the
 	 *         given type. May be empty, but never {@code null}.
 	 */
-	List<BeanConfiguration<?>> getBeanConfigurationForHierarchy(Class<?> beanClass);
+	<T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass);
 }

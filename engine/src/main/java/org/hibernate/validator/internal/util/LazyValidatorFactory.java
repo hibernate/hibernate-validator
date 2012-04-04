@@ -58,7 +58,10 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ *
+ * @deprecated Will be removed in a future release.
  */
+@Deprecated
 public class LazyValidatorFactory implements ValidatorFactory {
 	private static final Log log = LoggerFactory.make();
 	private final Configuration<?> configuration;

@@ -24,7 +24,10 @@ import javax.validation.metadata.ElementDescriptor;
  *
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @deprecated Will by replaced by equivalent functionality defined by the Bean
+ *             Validation 1.1 API as of Hibernate Validator 5.
  */
+@Deprecated
 public interface MethodDescriptor extends ElementDescriptor {
 
 	/**
