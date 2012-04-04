@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 4.3.0.Alpha1, 06.03.2011*
+*Version: 4.3.0.Beta1, 04.04.2011*
 
 
 ## What is it?
@@ -43,7 +43,7 @@ or
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.3.0.Alpha1</version>
+            <version>4.3.0.Beta1</version>
         </dependency>
 
 

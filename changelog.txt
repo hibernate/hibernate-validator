@@ -1,6 +1,26 @@
 Hibernate Validator Changelog
 =============================
 
+4.3.0.Beta1 (04.04.2012)
+------------------------
+
+** Bug
+    * [HV-563] - Enable Configuration#buildValidatorFactory() to be callable several times
+    * [HV-567] - @Email reported as "disallowed" for String field
+
+** Improvement
+    * [HV-457] - Simplify annotation processor setup in IDEs in regards to required dependencies
+    * [HV-463] - Revisit the class and implementation of Group/GroupChain
+    * [HV-479] - Implement an eviction strategy for BeanMetaDataCache
+    * [HV-517] - Establish the notion of AnnotationIgnores for programmatic API
+    * [HV-564] - Allow caching of ConstraintValidator instances also for custom ConstraintValidatorFactories
+    * [HV-566] - Shorten directory names
+
+** Task
+    * [HV-558] - Upgrade AS 7 dependencies
+    * [HV-561] - Determine and mark the API to be deprecated for HV5
+
+
 4.3.0.Alpha1 (06.03.2012)
 -------------------------
 
