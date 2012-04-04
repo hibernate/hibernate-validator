@@ -123,7 +123,7 @@
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>../hibernate-validator-documentation/target/docbook/publish</directory>
+            <directory>../documentation/target/docbook/publish</directory>
             <outputDirectory>docs/reference</outputDirectory>
         </fileSet>
 

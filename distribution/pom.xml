@@ -81,9 +81,9 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <sourcepath>
-                        ${basedir}/../hibernate-validator/src/main/java;
-                        ${basedir}/../hibernate-validator/target/generated-sources;
-                        ${basedir}/../hibernate-validator-annotation-processor/src/main/java
+                        ${basedir}/../engine/src/main/java;
+                        ${basedir}/../engine/target/generated-sources;
+                        ${basedir}/../annotation-processor/src/main/java
                     </sourcepath>
                     <links>
                         <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
