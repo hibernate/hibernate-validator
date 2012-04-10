@@ -16,12 +16,27 @@
 */
 package org.hibernate.validator.test.internal.constraintvalidators;
 
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.EmailDef;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidatorForProgrammaticMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -29,8 +44,10 @@ import static org.testng.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 public class EmailValidatorTest {
-
+	// http://stackoverflow.com/questions/406230/regular-expression-to-match-string-not-containing-a-word
+	private static final String noOrgEmailAddressRegexp = "^((?!\\.org).)*$";
 	private static EmailValidator validator;
+
 
 	@BeforeClass
 	public static void init() {
@@ -97,6 +114,44 @@ public class EmailValidatorTest {
 		isInvalidEmail( "θσερ.εχαμπλε.ψομ", "Email does not contain an @ character and should be invalid" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-554")
+	public void testEmailRegExp() {
+		final String email = "hardy@hibernate.org";
+
+		// ensure the plain email is valid
+		isValidEmail( email );
+
+
+		// add additional regexp constraint to email
+		Validator validator = ValidatorUtil.getValidator();
+		EmailContainer container = new EmailContainerAnnotated();
+		container.setEmail( email );
+		Set<ConstraintViolation<EmailContainer>> violations = validator.validate( container );
+		assertOrgAddressesAreNotValid( violations );
+
+		// now the same test with programmatic configuration
+		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( EmailContainerNoAnnotations.class )
+				.property( "email", METHOD )
+				.constraint(
+						new EmailDef().regexp( noOrgEmailAddressRegexp )
+								.message( "ORG addresses are not valid" )
+				);
+		validator = getValidatorForProgrammaticMapping( mapping );
+
+		container = new EmailContainerNoAnnotations();
+		container.setEmail( email );
+		violations = validator.validate( container );
+		assertOrgAddressesAreNotValid( violations );
+	}
+
+	private void assertOrgAddressesAreNotValid(Set<ConstraintViolation<EmailContainer>> violations) {
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "ORG addresses are not valid" );
+	}
+
 	private void isValidEmail(CharSequence email, String message) {
 		assertTrue( validator.isValid( email, null ), message );
 	}
@@ -111,5 +166,27 @@ public class EmailValidatorTest {
 
 	private void isInvalidEmail(CharSequence email) {
 		isInvalidEmail( email, "Expected a invalid email." );
+	}
+
+	private static abstract class EmailContainer {
+		public String email;
+
+		public void setEmail(String email) {
+			this.email = email;
+		}
+
+		public String getEmail() {
+			return email;
+		}
+	}
+
+	private static class EmailContainerAnnotated extends EmailContainer {
+		@Email(regexp = EmailValidatorTest.noOrgEmailAddressRegexp, message = "ORG addresses are not valid")
+		public String getEmail() {
+			return email;
+		}
+	}
+
+	private static class EmailContainerNoAnnotations extends EmailContainer {
 	}
 }

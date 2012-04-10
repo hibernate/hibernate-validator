@@ -78,7 +78,7 @@ public @interface URL {
 	int port() default -1;
 
 	/**
-	 * @return a regular expression the annotated must match. The default is any string ('.*')
+	 * @return an additional regular expression the annotated URL must match. The default is any string ('.*')
 	 */
 	@OverridesAttribute(constraint = Pattern.class, name = "regexp") String regexp() default ".*";
 
