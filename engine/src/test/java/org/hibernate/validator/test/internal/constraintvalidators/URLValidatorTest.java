@@ -144,8 +144,8 @@ public class URLValidatorTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HV-406")
-	public void testRegExp() {
+		 @TestForIssue(jiraKey = "HV-406")
+		 public void testRegExp() {
 		// first run the test with @URL configured via annotations
 		Validator validator = ValidatorUtil.getValidator();
 		URLContainer container = new URLContainerAnnotated();
