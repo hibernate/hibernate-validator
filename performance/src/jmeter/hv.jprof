@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config version="7.1.1">
+  <nextId id="182" />
+  <sessions>
+    <session id="181" name="HV Performance" recordCPUOnStartup="false" vmCannotExit="false" instrumentationType="1" samplingNoFilters="false" lineNumbers="false" samplingFrequency="5" timeType="1" disableCPUProfiling="false" recordAllocOnStartup="false" recordArrayAlloc="false" enableTriggersOnStartup="true" allocTreeRecordingType="1" disableMonitorContentions="false" componentDetection="true" chronoHeap="false" autoUpdatePeriodLong="5" autoUpdatePeriodShort="2" filteredPayloads="false" allUrls="false" payloadCap="50" eventCap="20000" showSystemThreads="false" utilConcurrentHandling="true" libraryDebugParameters="" exceptionalCap="5" exceptionalTimeType="4" autoTuneInstrumentation="true" autoTuneMaxAverage="100" autoTuneMinPerMille="10" samplingPayloadCallStacks="true" templateId="50" askForTemplate="false" autoUpdateAllocationViews="false" jdkName="" jdkId="" jdkMode="auto" compilationMode="auto" compilationTarget="1.6" type="2" hidden="false" host="127.0.0.1" port="8849" timeout="20" isExecuteStartCommand="false" startCommand="" isExecuteStopCommand="false" stopCommand="" jvmConfigurationId="100" workingDirectory="" isStartupWorkingDirectory="true" openBrowser="false" browserUrl="" vmArguments="" mainClass="" arguments="" consoleBufferSize="1000" nativeConsole="false" consoleSizeWidth="80" consoleSizeHeight="25" configSyncMode="1" configSyncCopyTarget="" configSyncCommand="" showUnprofiledJvms="true" showProfiledJvms="true" showBusyJvms="true" appletURL="" jnlpURL="" jwsDir="" nextScriptId="1">
+      <filters>
+        <group type="exclusive" name="Default excludes">
+          <filter type="exclusive" name="$Proxy" />
+          <filter type="exclusive" name="$javax." />
+          <filter type="exclusive" name="$java." />
+          <filter type="exclusive" name="__" />
+          <filter type="exclusive" name="allaire.jrun" />
+          <filter type="exclusive" name="antlr." />
+          <filter type="exclusive" name="AOPContainerProxy$" />
+          <filter type="exclusive" name="apple." />
+          <filter type="exclusive" name="atg" />
+          <filter type="exclusive" name="bsh" />
+          <filter type="exclusive" name="c8" />
+          <filter type="exclusive" name="com.acumenat." />
+          <filter type="exclusive" name="com.adventnet." />
+          <filter type="exclusive" name="com.apple." />
+          <filter type="exclusive" name="com.asn1c." />
+          <filter type="exclusive" name="com.bea" />
+          <filter type="exclusive" name="com.caucho" />
+          <filter type="exclusive" name="com.certicom." />
+          <filter type="exclusive" name="COM.cloudscape." />
+          <filter type="exclusive" name="com.ebay." />
+          <filter type="exclusive" name="com.evermind" />
+          <filter type="exclusive" name="com.ibm." />
+          <filter type="exclusive" name="com.incors." />
+          <filter type="exclusive" name="com.informix" />
+          <filter type="exclusive" name="com.intellij.rt." />
+          <filter type="exclusive" name="com.iplanet." />
+          <filter type="exclusive" name="com.jprofiler.agent." />
+          <filter type="exclusive" name="com.linar." />
+          <filter type="exclusive" name="com.livesoftware." />
+          <filter type="exclusive" name="com.mysql." />
+          <filter type="exclusive" name="com.netscape.server.http" />
+          <filter type="exclusive" name="COM.objectspace." />
+          <filter type="exclusive" name="com.octetstring." />
+          <filter type="exclusive" name="com.orionserver" />
+          <filter type="exclusive" name="com.phaos." />
+          <filter type="exclusive" name="com.pointbase." />
+          <filter type="exclusive" name="com.pramati" />
+          <filter type="exclusive" name="COM.rsa." />
+          <filter type="exclusive" name="com.rsa." />
+          <filter type="exclusive" name="com.saxon." />
+          <filter type="exclusive" name="com.solarmetric." />
+          <filter type="exclusive" name="com.sssw" />
+          <filter type="exclusive" name="com.sun." />
+          <filter type="exclusive" name="com.swiftmq." />
+          <filter type="exclusive" name="com.sybase" />
+          <filter type="exclusive" name="com.tivoli." />
+          <filter type="exclusive" name="com.unify" />
+          <filter type="exclusive" name="compressionFilters." />
+          <filter type="exclusive" name="edu.emory.mathcs.backport." />
+          <filter type="exclusive" name="EDU.oswego." />
+          <filter type="exclusive" name="filters." />
+          <filter type="exclusive" name="fr.dyade" />
+          <filter type="exclusive" name="gnu." />
+          <filter type="exclusive" name="interceptors." />
+          <filter type="exclusive" name="java." />
+          <filter type="exclusive" name="javassist." />
+          <filter type="exclusive" name="javax." />
+          <filter type="exclusive" name="javelin." />
+          <filter type="exclusive" name="javelinx." />
+          <filter type="exclusive" name="jrockit." />
+          <filter type="exclusive" name="jrun." />
+          <filter type="exclusive" name="jrun__" />
+          <filter type="exclusive" name="jrunx." />
+          <filter type="exclusive" name="jsp_servlet." />
+          <filter type="exclusive" name="junit." />
+          <filter type="exclusive" name="kodo." />
+          <filter type="exclusive" name="listeners." />
+          <filter type="exclusive" name="mx4j." />
+          <filter type="exclusive" name="net.sf.cglib." />
+          <filter type="exclusive" name="netscape." />
+          <filter type="exclusive" name="newatlanta.servletexec" />
+          <filter type="exclusive" name="oracle." />
+          <filter type="exclusive" name="org.apache." />
+          <filter type="exclusive" name="org.bouncycastle" />
+          <filter type="exclusive" name="org.codehaus.swizzle." />
+          <filter type="exclusive" name="org.dom4j." />
+          <filter type="exclusive" name="org.eclipse." />
+          <filter type="exclusive" name="org.enhydra" />
+          <filter type="exclusive" name="org.hibernate." />
+          <filter type="exclusive" name="org.hsql" />
+          <filter type="exclusive" name="org.ietf." />
+          <filter type="exclusive" name="org.jboss" />
+          <filter type="exclusive" name="org.jcp.xml" />
+          <filter type="exclusive" name="org.jdom." />
+          <filter type="exclusive" name="org.jnp." />
+          <filter type="exclusive" name="org.mozilla." />
+          <filter type="exclusive" name="org.netbeans." />
+          <filter type="exclusive" name="org.objectweb." />
+          <filter type="exclusive" name="org.omg." />
+          <filter type="exclusive" name="org.openide." />
+          <filter type="exclusive" name="org.osgi." />
+          <filter type="exclusive" name="org.quartz." />
+          <filter type="exclusive" name="org.springframework." />
+          <filter type="exclusive" name="org.tranql." />
+          <filter type="exclusive" name="org.w3c." />
+          <filter type="exclusive" name="org.xml." />
+          <filter type="exclusive" name="schema.system" />
+          <filter type="exclusive" name="schemacom_bea" />
+          <filter type="exclusive" name="schemaorg_apache_xmlbeans.system." />
+          <filter type="exclusive" name="serp." />
+          <filter type="exclusive" name="solid." />
+          <filter type="exclusive" name="ssa." />
+          <filter type="exclusive" name="sun." />
+          <filter type="exclusive" name="sunw." />
+          <filter type="exclusive" name="weblogic." />
+          <filter type="exclusive" name="workshop." />
+          <filter type="exclusive" name="org.mortbay." />
+          <filter type="exclusive" name="net.sf.ehcache." />
+          <filter type="exclusive" name="groovy." />
+          <filter type="exclusive" name="org.codehaus.groovy." />
+          <filter type="exclusive" name="org.codehaus.gant." />
+          <filter type="exclusive" name="GregorSamsa" />
+          <filter type="exclusive" name="coldfusion." />
+          <filter type="exclusive" name="com.adobe." />
+          <filter type="exclusive" name="org.jpedal." />
+          <filter type="exclusive" name="com.lowagie." />
+          <filter type="exclusive" name="flex." />
+          <filter type="exclusive" name="com.jnbridge." />
+          <filter type="exclusive" name="macromedia." />
+          <filter type="exclusive" name="flashgateway." />
+          <filter type="exclusive" name="com.opensymphony." />
+          <filter type="exclusive" name="com.gp." />
+          <filter type="exclusive" name="com.inzoom." />
+          <filter type="exclusive" name="org.apache.felix." />
+          <filter type="exclusive" name="org.jvnet." />
+          <filter type="exclusive" name="org.glassfish." />
+          <filter type="exclusive" name="com.ctc.wstx." />
+          <filter type="exclusive" name="org.codehaus.stax2." />
+          <filter type="exclusive" name="org.slf4j." />
+          <filter type="exclusive" name="oasis.names." />
+          <filter type="exclusive" name="bea." />
+          <filter type="exclusive" name="org.hornetq." />
+          <filter type="exclusive" name="grails." />
+          <filter type="exclusive" name="gant." />
+          <filter type="exclusive" name="org.grails." />
+          <filter type="exclusive" name="groovyjarjarasm." />
+          <filter type="exclusive" name="org.webtide." />
+          <filter type="exclusive" name="org.cometd." />
+          <filter type="exclusive" name="com.atomikos." />
+        </group>
+      </filters>
+      <exceptionalMethods>
+        <method className="java.awt.event.InvocationEvent" methodName="dispatch" signature="()V" />
+      </exceptionalMethods>
+      <ignoredMethods>
+        <method className="org.codehaus.groovy.runtime.callsite.CallSite" methodName="*" signature="" />
+      </ignoredMethods>
+      <triggers logTarget="stdout" logFile="" />
+      <probes>
+        <probe name="builtin.JdbcProbe" enabled="true" preparedStatementParameters="false" startProbeRecording="false" events="true" annotatePayloads="true" />
+        <probe name="builtin.PersistenceProbe" enabled="true" hibernate3="true" hibernate4="true" eclipseLink23="true" openJpa21="true" startProbeRecording="false" events="false" annotatePayloads="true" />
+        <probe name="builtin.JndiProbe" enabled="true" startProbeRecording="false" events="true" annotatePayloads="true" />
+        <probe name="builtin.JmsProbe" enabled="true" startProbeRecording="false" events="true" annotatePayloads="true">
+          <jmsResolver>
+            <script id="" compiledClassName="" lastModified="0" enabled="false">
+              <code />
+            </script>
+          </jmsResolver>
+        </probe>
+        <probe name="builtin.ServletProbe" enabled="true" resolution="1" retainedParameters="" urlSplitting="true" fullQuery="false" startProbeRecording="false" events="false" annotatePayloads="false">
+          <requestResolver>
+            <script id="" compiledClassName="" lastModified="0" enabled="false">
+              <code />
+            </script>
+          </requestResolver>
+        </probe>
+        <probe name="builtin.SocketProbe" enabled="true" startProbeRecording="false" events="false" annotatePayloads="false" />
+        <probe name="builtin.FileProbe" enabled="true" startProbeRecording="false" events="false" annotatePayloads="false" />
+        <probe name="builtin.ProcessProbe" enabled="true" startProbeRecording="false" events="false" annotatePayloads="false" />
+        <probe name="builtin.TrackingInterceptor" enabled="true" startProbeRecording="false" events="false" annotatePayloads="false" />
+      </probes>
+      <customProbes />
+      <viewSettings>
+        <invocationView showTime="true" showInherentTime="false" showInvocationCount="true" showAverage="false" isUsePercentageThreshold="false" percentageThreshold="0.01" showPercentageBar="true" alwaysShowFQN="true" alwaysShowSignature="false" percentageBase="2" scale="1" />
+        <hotspotsView showTime="true" showInherentTime="false" showInvocationCount="true" showAverage="false" isUsePercentageThreshold="false" percentageThreshold="0.01" showPercentageBar="true" alwaysShowFQN="true" alwaysShowSignature="false" percentageBase="2" scale="1" />
+        <callTracer percentageThreshold="100000" recordFiltered="false" timeDisplay="relativeToFirstTrace" showSignature="true" showClassNamesForMethods="false" />
+        <methodDistribution timeGridlines="3" scaleToFit="true" verticalGridlines="3" logarithmicValues="true" />
+        <threadsHistoryView timeGridlines="3" bookmarks="3" scaleToFit="false" background="2" monitorToolTips="true" showGroupNames="true" />
+        <monitorHistory blockingThreshold="1000" waitingThreshold="100000" />
+        <monitorHistoryTelemetry timeGridlines="3" bookmarks="3" scaleToFit="false" />
+        <threadsMonitorView showRunnable="true" showWaitingOnCondition="true" showWaitingOnMonitor="true" showNetIo="true" showDead="false" />
+        <methodGraph colorInformation="1" colorScaleBase="1" showSignature="false" usePercentageThreshold="false" percentageThreshold="0.01" showAverageTimes="false" />
+        <classMonitorView primaryMeasure="1" sizeScale="1" diffColumnOrder="2" differenceDisplayType="1" />
+        <allocationsMonitor cumulate="true" showPercentageBar="true" alwaysShowFQN="true" alwaysShowSignature="false" percentageBase="2" scale="1" />
+        <allocationHotspots diffColumnOrder="2" differenceDisplayType="1" showPercentageBar="true" alwaysShowFQN="true" alwaysShowSignature="false" percentageBase="2" scale="1" />
+        <heapWalkerView showViewHelperDialog="true" selectionStepsVisible="true" />
+        <heapWalkerClassesView primaryMeasure="1" sizeScale="1" />
+        <heapWalkerAllocationsView cumulate="true" showPercentageBar="true" alwaysShowFQN="true" alwaysShowSignature="false" percentageBase="2" scale="1" />
+        <heapWalkerBiggestObjectsView sizeScale="1" showObjectIds="true" showRetainedSizeBar="true" percentageBase="topLevel" />
+        <heapWalkerReferencesView sizeScale="1" showObjectIds="true" showObjectIdsInGraph="false" showDeclaringClassesInTree="true" instanceLimitGraph="100" instanceLimitTree="100" />
+        <heapWalkerChronoView timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" />
+        <classTracker timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" objectScopeSelection="all" livenessTypeSelection="Live objects">
+          <selections>
+            <classSelection name="org.hibernate.validator.internal.util.LRUMap" />
+          </selections>
+        </classTracker>
+        <probeTracker timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" graphType="1" />
+        <probeTelemetries timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" />
+        <probeTimeLine timeGridlines="3" bookmarks="3" scaleToFit="false" background="2" />
+        <probeHotspots showTime="true" showInherentTime="false" showInvocationCount="true" showAverage="false" isUsePercentageThreshold="false" percentageThreshold="0.01" showPercentageBar="true" alwaysShowFQN="true" alwaysShowSignature="false" percentageBase="2" scale="1" />
+        <objectStatistics timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" graphType="1" />
+        <classStatistics timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" graphType="1" />
+        <recordedThroughput timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" />
+        <heapStatistics timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" graphType="1" />
+        <threadsStatistics timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" graphType="1" />
+        <gcActivity timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" graphType="1" />
+        <cpuLoad timeGridlines="3" bookmarks="3" scaleToFit="false" verticalGridlines="3" graphType="1" />
+      </viewSettings>
+      <viewFilters>
+        <entry type="0" name="org.hibernate.validator.internal.metadata.BeanMetaDataManager" />
+        <entry type="0" name="BeanMetaDataManager" />
+        <entry type="0" name="org.hibernate.validator" />
+      </viewFilters>
+      <classPath />
+      <sourcePath />
+      <libraryPath />
+    </session>
+  </sessions>
+</config>
+

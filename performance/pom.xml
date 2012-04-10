@@ -25,13 +25,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-validator-perftest</artifactId>
+    <artifactId>hibernate-validator-performance</artifactId>
 
     <name>Hibernate Validator Performance Tests</name>
     <description>Hibernate Validator performance tests.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <profilingOptions>-agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait</profilingOptions>
+        <history.directory>${project.basedir}/history</history.directory>
     </properties>
 
     <dependencyManagement>
@@ -64,6 +66,8 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -77,10 +81,15 @@
                 <artifactId>chronos-jmeter-maven-plugin</artifactId>
                 <version>1.0-beta-3</version>
                 <configuration>
-                    <input>${basedir}/src/main/resources/hv.jmx</input>
+                    <input>${basedir}/src/jmeter</input>
                     <jMeterRemoteLocation>http://www.apache.org/dist/jmeter/binaries/apache-jmeter-2.6.zip</jMeterRemoteLocation>
                     <jmeterhome>${project.basedir}/jmeter</jmeterhome>
-                    <jmeterOutput>${project.basedir}/target/chronos/performancetest/hv.jtl</jmeterOutput>
+                    <jmeterOutput>${project.basedir}/target/chronos/performancetest</jmeterOutput>
+                    <historydir>${history.directory}</historydir>
+                    <heap>1024m</heap>
+                    <options>
+                        <option>${profilingOptions}</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>
@@ -91,6 +100,21 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>chronos-report-maven-plugin</artifactId>
                 <version>1.0-beta-3</version>
+                <!--<reportSets>-->
+                <!--<reportSet>-->
+                <!--<id>hv-perf</id>-->
+                <!--<configuration>-->
+                <!--<title>JMeter Load Test Report</title>-->
+                <!--<description>-->
+                <!--<![CDATA[Load Test Report]]>-->
+                <!--</description>-->
+                <!--</configuration>-->
+                <!--<reports>-->
+                <!--<report>report</report>-->
+                <!--<report>historyreport</report>-->
+                <!--</reports>-->
+                <!--</reportSet>-->
+                <!--</reportSets>-->
             </plugin>
         </plugins>
     </reporting>

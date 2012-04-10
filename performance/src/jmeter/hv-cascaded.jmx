@@ -17,20 +17,19 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">10</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">1000</stringProp>
         <stringProp name="ThreadGroup.ramp_time">10</stringProp>
-        <longProp name="ThreadGroup.start_time">1332326233000</longProp>
-        <longProp name="ThreadGroup.end_time">1332326233000</longProp>
+        <longProp name="ThreadGroup.start_time">1332340789000</longProp>
+        <longProp name="ThreadGroup.end_time">1332340789000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <JUnitSampler guiclass="JUnitTestSamplerGui" testclass="JUnitSampler" testname="Simple Validation" enabled="true">
-          <stringProp name="TestPlan.comments">A simple bean validation</stringProp>
+        <JUnitSampler guiclass="JUnitTestSamplerGui" testclass="JUnitSampler" testname="Cascaded Validation" enabled="true">
           <stringProp name="junitSampler.classname">org.hibernate.validator.perf.simple.SimpleValidationTest</stringProp>
           <stringProp name="junitsampler.constructorstring"></stringProp>
-          <stringProp name="junitsampler.method">testSimpleBeanValidation</stringProp>
+          <stringProp name="junitsampler.method">testCascadedValidation</stringProp>
           <stringProp name="junitsampler.pkg.filter"></stringProp>
           <stringProp name="junitsampler.success">Test successful</stringProp>
           <stringProp name="junitsampler.success.code">1000</stringProp>
@@ -39,76 +38,13 @@
           <stringProp name="junitsampler.error">An unexpected error occured</stringProp>
           <stringProp name="junitsampler.error.code">9999</stringProp>
           <stringProp name="junitsampler.exec.setup">false</stringProp>
-          <stringProp name="junitsampler.append.error">false</stringProp>
-          <stringProp name="junitsampler.append.exception">false</stringProp>
+          <stringProp name="junitsampler.append.error">true</stringProp>
+          <stringProp name="junitsampler.append.exception">true</stringProp>
           <boolProp name="junitsampler.junit4">true</boolProp>
+          <stringProp name="TestPlan.comments">A cascaded validation test</stringProp>
         </JUnitSampler>
         <hashTree/>
         <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
-          <boolProp name="ResultCollector.error_logging">false</boolProp>
-          <objProp>
-            <name>saveConfig</name>
-            <value class="SampleSaveConfiguration">
-              <time>true</time>
-              <latency>true</latency>
-              <timestamp>true</timestamp>
-              <success>true</success>
-              <label>true</label>
-              <code>true</code>
-              <message>true</message>
-              <threadName>true</threadName>
-              <dataType>true</dataType>
-              <encoding>false</encoding>
-              <assertions>true</assertions>
-              <subresults>true</subresults>
-              <responseData>false</responseData>
-              <samplerData>false</samplerData>
-              <xml>true</xml>
-              <fieldNames>false</fieldNames>
-              <responseHeaders>false</responseHeaders>
-              <requestHeaders>false</requestHeaders>
-              <responseDataOnError>false</responseDataOnError>
-              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-              <assertionsResultsToSave>0</assertionsResultsToSave>
-              <bytes>true</bytes>
-            </value>
-          </objProp>
-          <stringProp name="filename"></stringProp>
-        </ResultCollector>
-        <hashTree/>
-        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="false">
-          <boolProp name="ResultCollector.error_logging">false</boolProp>
-          <objProp>
-            <name>saveConfig</name>
-            <value class="SampleSaveConfiguration">
-              <time>true</time>
-              <latency>true</latency>
-              <timestamp>true</timestamp>
-              <success>true</success>
-              <label>true</label>
-              <code>true</code>
-              <message>true</message>
-              <threadName>true</threadName>
-              <dataType>true</dataType>
-              <encoding>false</encoding>
-              <assertions>true</assertions>
-              <subresults>true</subresults>
-              <responseData>false</responseData>
-              <samplerData>false</samplerData>
-              <xml>true</xml>
-              <fieldNames>false</fieldNames>
-              <responseHeaders>false</responseHeaders>
-              <requestHeaders>false</requestHeaders>
-              <responseDataOnError>false</responseDataOnError>
-              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-              <assertionsResultsToSave>0</assertionsResultsToSave>
-              <bytes>true</bytes>
-            </value>
-          </objProp>
-          <stringProp name="filename"></stringProp>
-        </ResultCollector>
-        <hashTree/>
-        <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Graph Results" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -141,13 +77,13 @@
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="false">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">10</stringProp>
+          <stringProp name="LoopController.loops">5</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">5</stringProp>
         <stringProp name="ThreadGroup.ramp_time">10</stringProp>
         <longProp name="ThreadGroup.start_time">1332340789000</longProp>
         <longProp name="ThreadGroup.end_time">1332340789000</longProp>
@@ -156,10 +92,10 @@
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <JUnitSampler guiclass="JUnitTestSamplerGui" testclass="JUnitSampler" testname="Cascaded Validation" enabled="true">
-          <stringProp name="junitSampler.classname">org.hibernate.validator.perf.simple.SimpleValidationTest</stringProp>
+        <JUnitSampler guiclass="JUnitTestSamplerGui" testclass="JUnitSampler" testname="Deep Validation" enabled="true">
+          <stringProp name="junitSampler.classname">org.hibernate.validator.perf.deep.DeepValidationTest</stringProp>
           <stringProp name="junitsampler.constructorstring"></stringProp>
-          <stringProp name="junitsampler.method">testCascadedValidation</stringProp>
+          <stringProp name="junitsampler.method">testDeepValidation</stringProp>
           <stringProp name="junitsampler.pkg.filter"></stringProp>
           <stringProp name="junitsampler.success">Test successful</stringProp>
           <stringProp name="junitsampler.success.code">1000</stringProp>
@@ -171,10 +107,42 @@
           <stringProp name="junitsampler.append.error">true</stringProp>
           <stringProp name="junitsampler.append.exception">true</stringProp>
           <boolProp name="junitsampler.junit4">true</boolProp>
-          <stringProp name="TestPlan.comments">A cascaded validation test</stringProp>
+          <stringProp name="TestPlan.comments">A deep validation test</stringProp>
         </JUnitSampler>
         <hashTree/>
         <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SplineVisualizer" testclass="ResultCollector" testname="Spline Visualizer" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
