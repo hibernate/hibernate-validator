@@ -17,6 +17,7 @@
 package org.hibernate.validator.ap;
 
 import java.io.File;
+import java.util.EnumSet;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 
@@ -24,7 +25,9 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
+import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
 import org.hibernate.validator.ap.testmodel.boxing.ValidLong;
@@ -67,6 +70,7 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.Size;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForCollection;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSerializable;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
+import org.hibernate.validator.ap.testutil.CompilerTestHelper.Library;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
@@ -124,6 +128,51 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		);
 	}
 
+	/**
+	 * HV-575. Make sure that the AP can be applied to projects which don't have
+	 * the BV API or Hibernate Validator on the class path without failing.
+	 */
+	@Test
+	public void modelWithoutConstraintsCanBeProcessedWithoutBvAndHvOnClassPath() {
+
+		File sourceFile = compilerHelper.getSourceFile( ModelWithoutConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile(
+						new ConstraintValidationProcessor(),
+						diagnostics,
+						EnumSet.noneOf( Library.class ),
+						sourceFile
+				);
+
+		assertTrue( compilationResult );
+	}
+
+	/**
+	 * HV-575. Make sure that @Past/@Future can be validated for JDK types, also
+	 * if JodaTime isn't available.
+	 */
+	@Test
+	public void modelWithDateConstraintsCanBeProcessedWithoutJodaTimeOnClassPath() {
+
+		File sourceFile = compilerHelper.getSourceFile( ModelWithDateConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile(
+						new ConstraintValidationProcessor(),
+						diagnostics,
+						EnumSet.of( Library.VALIDATION_API ),
+						sourceFile
+				);
+
+		assertFalse( compilationResult );
+
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 27 )
+		);
+	}
+
 	@Test
 	public void testThatProcessorOptionsAreEvaluated() {
 
@@ -132,7 +181,13 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		// compile with -AdiagnosticKind=Kind.WARNING and -Averbose=true
 		boolean compilationResult =
 				compilerHelper.compile(
-						new ConstraintValidationProcessor(), diagnostics, Kind.WARNING, true, false, sourceFile
+						new ConstraintValidationProcessor(),
+						diagnostics,
+						Kind.WARNING,
+						true,
+						false,
+						EnumSet.allOf( Library.class ),
+						sourceFile
 				);
 
 		// compilation succeeds as there are problems, but Kind.WARNING won't stop compilation
