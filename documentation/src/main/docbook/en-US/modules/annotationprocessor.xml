@@ -53,7 +53,7 @@
     the distribution bundle on <ulink
     url="http://sourceforge.net/projects/hibernate/files/hibernate-validator">Sourceforge</ulink>
     or in the JBoss Maven Repository (see <xref
-    linkend="example-jboss-maven-url" />) under the GAV
+    linkend="example-jboss-maven-url"/>) under the GAV
     org.hibernate:hibernate-validator-annotation-processor.</para>
   </note>
 
@@ -114,7 +114,7 @@
     controlled using the <ulink
     url="http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options">processor
     options</ulink> listed in table<xref
-    linkend="table_processor_options" />:</para>
+    linkend="table_processor_options"/>:</para>
 
     <table id="table_processor_options">
       <title>Hibernate Validator Annotation Processor options</title>
@@ -181,32 +181,17 @@
 
         <para>When compiling on the command line using <ulink
         url="http://java.sun.com/javase/6/docs/technotes/guides/javac/index.html">javac</ulink>,
-        specify the following JARs using the "processorpath" option:</para>
-
-        <itemizedlist>
-          <listitem>
-            <para>validation-api-&bvVersion;.jar</para>
-          </listitem>
-
-          <listitem>
-            <para>hibernate-validator-&version;.jar</para>
-          </listitem>
-
-          <listitem>
-            <para>hibernate-validator-annotation-processor-&version;.jar</para>
-          </listitem>
-        </itemizedlist>
-
-        <para>The following listing shows an example. The processor will be
-        detected automatically by the compiler and invoked during
-        compilation.</para>
+        specify the JAR hibernate-validator-annotation-processor-&version;.jar
+        using the "processorpath" option as shown in the following listing.
+        The processor will be detected automatically by the compiler and
+        invoked during compilation.</para>
 
         <example>
           <title>Using the annotation processor with javac</title>
 
           <programlisting>javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
    -cp /path/to/validation-api-&bvVersion;.jar \
-   -processorpath /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;:/path/to/hibernate-validator-annotation-processor-&version;.jar</programlisting>
+   -processorpath /path/to/hibernate-validator-annotation-processor-&version;.jar</programlisting>
         </example>
       </section>
 
@@ -226,7 +211,7 @@
        destdir="build/classes"
        classpath="/path/to/validation-api-&bvVersion;.jar"&gt;
        &lt;compilerarg value="-processorpath" /&gt;
-       &lt;compilerarg value="/path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;:/path/to/hibernate-validator-annotation-processor-&version;.jar"/&gt;
+       &lt;compilerarg value="/path/to/hibernate-validator-annotation-processor-&version;.jar"/&gt;
 &lt;/javac&gt;</programlisting>
         </example>
       </section>
@@ -276,7 +261,7 @@
     &lt;/pluginRepository&gt;
 &lt;/pluginRepositories&gt;
 ...                      </programlisting>
-          </example> Now disable the standard annotation processing performed
+          </example>Now disable the standard annotation processing performed
         by the compiler plugin and configure the annotation plugin by
         specifying an execution and adding the Hibernate Validator Annotation
         Processor as plugin dependency (that way the AP is not visible on the
@@ -349,21 +334,8 @@
 
           <listitem>
             <para>Go to "Java Compiler - Annotation Processing - Factory Path"
-            and add the following JARs:</para>
-
-            <itemizedlist>
-              <listitem>
-                <para>validation-api-&bvVersion;.jar</para>
-              </listitem>
-
-              <listitem>
-                <para>hibernate-validator-&version;.jar</para>
-              </listitem>
-
-              <listitem>
-                <para>hibernate-validator-annotation-processor-&version;.jar</para>
-              </listitem>
-            </itemizedlist>
+            and add the JAR
+            hibernate-validator-annotation-processor-&version;.jar</para>
           </listitem>
 
           <listitem>
@@ -377,7 +349,7 @@
         <mediaobject>
           <imageobject>
             <imagedata align="center" arch="" contentwidth="150mm"
-                       fileref="annotation_processor_eclipse.png" />
+                       fileref="annotation_processor_eclipse.png"/>
           </imageobject>
         </mediaobject>
       </section>
@@ -402,7 +374,7 @@
           <listitem>
             <para>Choose "Enable annotation processing" and enter the
             following as "Processor path":
-            /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-&version;.jar:/path/to/hibernate-validator-annotation-processor-&version;.jar</para>
+            /path/to/hibernate-validator-annotation-processor-&version;.jar</para>
           </listitem>
 
           <listitem>
@@ -423,7 +395,7 @@
         <mediaobject>
           <imageobject>
             <imagedata align="center" arch="" contentwidth="150mm"
-                       fileref="annotation_processor_intellij.png" />
+                       fileref="annotation_processor_intellij.png"/>
           </imageobject>
         </mediaobject>
       </section>
@@ -442,22 +414,8 @@
           </listitem>
 
           <listitem>
-            <para>Go to "Libraries", tab "Processor", and add the following
-            JARs:</para>
-
-            <itemizedlist>
-              <listitem>
-                <para>validation-api-&bvVersion;.jar</para>
-              </listitem>
-
-              <listitem>
-                <para>hibernate-validator-&version;.jar</para>
-              </listitem>
-
-              <listitem>
-                <para>hibernate-validator-annotation-processor-&version;.jar</para>
-              </listitem>
-            </itemizedlist>
+            <para>Go to "Libraries", tab "Processor", and add the JAR
+            hibernate-validator-annotation-processor-&version;.jar</para>
           </listitem>
 
           <listitem>
@@ -474,7 +432,7 @@
         <mediaobject>
           <imageobject>
             <imagedata align="center" arch="" contentwidth="150mm"
-                       fileref="annotation_processor_netbeans.png" />
+                       fileref="annotation_processor_netbeans.png"/>
           </imageobject>
         </mediaobject>
       </section>
