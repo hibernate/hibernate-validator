@@ -419,10 +419,7 @@ public class ConstraintHelper {
 	private boolean isGraphValidationAnnotation(
 			AnnotationMirror annotationMirror) {
 
-		return typeUtils.isSameType(
-				annotationMirror.getAnnotationType(),
-				annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.VALID )
-		);
+		return getName( annotationMirror.getAnnotationType() ).contentEquals( BeanValidationTypes.VALID );
 	}
 
 	/**
@@ -436,10 +433,7 @@ public class ConstraintHelper {
 	private boolean isGroupSequenceProviderAnnotation(
 			AnnotationMirror annotationMirror) {
 
-		return typeUtils.isSameType(
-				annotationMirror.getAnnotationType(),
-				annotationApiHelper.getDeclaredTypeByName( HibernateValidatorTypes.GROUP_SEQUENCE_PROVIDER )
-		);
+		return getName( annotationMirror.getAnnotationType() ).contentEquals( HibernateValidatorTypes.GROUP_SEQUENCE_PROVIDER );
 	}
 
 	private ConstraintCheckResult checkComposingConstraints(DeclaredType constraintAnnotationType, TypeMirror typeOfAnnotatedElement) {
@@ -664,10 +658,19 @@ public class ConstraintHelper {
 
 		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
+		if ( annotation == null ) {
+			return;
+		}
+
 		Set<TypeMirror> allowedTypesForConstraint = getSupportedTypesForBuiltInConstraint( annotation );
 
 		for ( Class<?> oneAllowedType : allowedTypes ) {
-			allowedTypesForConstraint.add( annotationApiHelper.getMirrorForType( oneAllowedType ) );
+
+			TypeMirror mirrorForType = annotationApiHelper.getMirrorForType( oneAllowedType );
+
+			if ( mirrorForType != null ) {
+				allowedTypesForConstraint.add( mirrorForType );
+			}
 		}
 	}
 
@@ -675,10 +678,19 @@ public class ConstraintHelper {
 
 		DeclaredType annotation = annotationApiHelper.getDeclaredTypeByName( annotationType );
 
+		if ( annotation == null ) {
+			return;
+		}
+
 		Set<TypeMirror> allowedTypesForConstraint = getSupportedTypesForBuiltInConstraint( annotation );
 
 		for ( String oneAllowedType : allowedTypes ) {
-			allowedTypesForConstraint.add( annotationApiHelper.getDeclaredTypeByName( oneAllowedType ) );
+
+			TypeMirror mirrorForType = annotationApiHelper.getDeclaredTypeByName( oneAllowedType );
+
+			if ( mirrorForType != null ) {
+				allowedTypesForConstraint.add( mirrorForType );
+			}
 		}
 	}
 
