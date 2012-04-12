@@ -26,6 +26,7 @@ import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.TypeElement;
 
@@ -106,6 +107,12 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 		);
 
 		for ( TypeElement oneAnnotation : annotations ) {
+
+			//Indicates that the annotation's type isn't on the class path of the compiled
+			//project. Let the compiler deal with that and print an appropriate error.
+			if ( oneAnnotation.getKind() != ElementKind.ANNOTATION_TYPE ) {
+				continue;
+			}
 
 			Set<? extends Element> elementsWithConstraintAnnotation =
 					roundEnvironment.getElementsAnnotatedWith( oneAnnotation );
