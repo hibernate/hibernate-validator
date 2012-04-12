@@ -173,6 +173,33 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		);
 	}
 
+	/**
+	 * HV-575. Missing classes shall not break the AP, instead the compiler
+	 * should display appropriate errors.
+	 */
+	@Test
+	public void missingClassesHandledByCompiler() {
+
+		File sourceFile = compilerHelper.getSourceFile( ModelWithDateConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile(
+						new ConstraintValidationProcessor(),
+						diagnostics,
+						EnumSet.noneOf( Library.class ),
+						sourceFile
+				);
+
+		assertFalse( compilationResult );
+
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 )
+		);
+	}
+
 	@Test
 	public void testThatProcessorOptionsAreEvaluated() {
 
