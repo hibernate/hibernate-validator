@@ -98,7 +98,7 @@ public class ConstraintHelper {
 		MULTI_VALUED_CONSTRAINT_ANNOTATION,
 
 		/**
-		 * Given annotation is the @Valid annotation.
+		 * Given annotation is the {@code @Valid} annotation.
 		 */
 		GRAPH_VALIDATION_ANNOTATION,
 
@@ -196,7 +196,7 @@ public class ConstraintHelper {
 	/**
 	 * Checks, whether the given type element represents a constraint annotation
 	 * or not. That's the case, if the given element is annotated with the
-	 * {@link Constraint} meta-annotation (which is only allowed at annotation
+	 * {@code @Constraint} meta-annotation (which is only allowed at annotation
 	 * declarations).
 	 *
 	 * @param element The element of interest.
@@ -235,7 +235,6 @@ public class ConstraintHelper {
 		else {
 			return AnnotationType.NO_CONSTRAINT_ANNOTATION;
 		}
-
 	}
 
 	/**
@@ -339,7 +338,7 @@ public class ConstraintHelper {
 	/**
 	 * Checks, whether the given annotation mirror represents a constraint
 	 * annotation or not. That's the case, if the given mirror is annotated with
-	 * the {@link Constraint} meta-annotation (which is only allowed at
+	 * the {@code @Constraint} meta-annotation (which is only allowed at
 	 * annotation declarations).
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
@@ -352,12 +351,12 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given annotation mirror represents the {@link javax.validation.Constraint}
+	 * Checks, whether the given annotation mirror represents the {@code @Constraint}
 	 * meta-annotation or not.
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
 	 *
-	 * @return True, if the given mirror represents the @Constraint meta-annotation
+	 * @return True, if the given mirror represents the {@code @Constraint} meta-annotation
 	 *         type, false otherwise.
 	 */
 	private boolean isConstraintMetaAnnotation(AnnotationMirror annotationMirror) {
@@ -410,11 +409,11 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given mirror represents the {@link Valid} annotation.
+	 * Checks, whether the given mirror represents the {@code Valid} annotation.
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
 	 *
-	 * @return True, if the given mirror represents the @Valid annotation, false
+	 * @return True, if the given mirror represents the {@code Valid} annotation, false
 	 *         otherwise.
 	 */
 	private boolean isGraphValidationAnnotation(
@@ -427,11 +426,11 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given mirror represents the {@link GroupSequenceProvider} annotation.
+	 * Checks, whether the given mirror represents the {@code @GroupSequenceProvider} annotation.
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
 	 *
-	 * @return True, if the given mirror represents the @GroupSequenceProvider annotation, false
+	 * @return True, if the given mirror represents the {@code @GroupSequenceProvider} annotation, false
 	 *         otherwise.
 	 */
 	private boolean isGroupSequenceProviderAnnotation(
@@ -595,7 +594,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Retrieves the {@link Constraint} meta-annotation from the given
+	 * Retrieves the {@code @Constraint} meta-annotation from the given
 	 * constraint annotation.
 	 *
 	 * @param annotationType A constraint type.
@@ -603,7 +602,7 @@ public class ConstraintHelper {
 	 * @return The Constraint meta-annotation.
 	 *
 	 * @throws IllegalArgumentException If the given constraint annotation type isn't annotated with
-	 * the {@link Constraint} meta-annotation.
+	 * the {@code @Constraint} meta-annotation.
 	 */
 	private AnnotationMirror getConstraintMetaAnnotation(DeclaredType annotationType) {
 
