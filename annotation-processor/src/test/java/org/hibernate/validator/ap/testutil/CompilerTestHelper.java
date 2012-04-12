@@ -21,9 +21,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.processing.Processor;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
@@ -32,6 +33,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.Configuration;
@@ -46,9 +48,35 @@ import static org.testng.Assert.assertEquals;
  */
 public class CompilerTestHelper {
 
+	/**
+	 * Dependencies which are used as class path elements for the compilation tasks.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public enum Library {
+
+		HIBERNATE_VALIDATOR( "hibernate-validator.jar" ),
+
+		VALIDATION_API( "validation-api.jar" ),
+
+		JODA_TIME( "joda-time.jar" );
+
+		private final String name;
+
+		private Library(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+	}
+
 	private final JavaCompiler compiler;
 
 	private final String sourceBaseDir;
+
+	private final String testLibraryDir;
 
 	public CompilerTestHelper(JavaCompiler compiler) {
 
@@ -64,6 +92,7 @@ public class CompilerTestHelper {
 		}
 
 		this.sourceBaseDir = basePath + "/src/test/java";
+		this.testLibraryDir = basePath + "/target/test-dependencies";
 	}
 
 	/**
@@ -82,31 +111,65 @@ public class CompilerTestHelper {
 	}
 
 	/**
-	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, File...)
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
 	public boolean compile(
 			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, File... sourceFiles) {
 
-		return compile( annotationProcessor, diagnostics, null, null, null, sourceFiles );
+		return compile(
+				annotationProcessor,
+				diagnostics,
+				null,
+				null,
+				null,
+				EnumSet.allOf( Library.class ),
+				sourceFiles
+		);
 	}
 
 	/**
-	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, File...)
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
 	public boolean compile(
 			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, File... sourceFiles) {
 
-		return compile( annotationProcessor, diagnostics, diagnosticKind, null, null, sourceFiles );
+		return compile(
+				annotationProcessor,
+				diagnostics,
+				diagnosticKind,
+				null,
+				null,
+				EnumSet.allOf( Library.class ),
+				sourceFiles
+		);
 	}
 
 	/**
-	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, File...)
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
 	public boolean compile(
 			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, boolean verbose, boolean allowMethodConstraints, File... sourceFiles) {
 
-		return compile( annotationProcessor, diagnostics, null, verbose, allowMethodConstraints, sourceFiles );
+		return compile(
+				annotationProcessor,
+				diagnostics,
+				null,
+				verbose,
+				allowMethodConstraints,
+				EnumSet.allOf( Library.class ),
+				sourceFiles
+		);
 	}
+
+	/**
+	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
+	 */
+	public boolean compile(
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, EnumSet<Library> dependencies, File... sourceFiles) {
+
+		return compile( annotationProcessor, diagnostics, null, null, null, dependencies, sourceFiles );
+	}
+
 
 	/**
 	 * Creates and executes a {@link CompilationTask} using the given input.
@@ -115,6 +178,9 @@ public class CompilerTestHelper {
 	 * @param diagnostics An diagnostics listener to be attached to the task.
 	 * @param diagnosticKind A value for the "diagnosticKind" option.
 	 * @param verbose A value for the "verbose" option.
+	 * @param allowMethodConstraints A value for the "methodConstraintsSupported" option.
+	 * @param dependencies A set with libraries which shall be added to the class path of
+	 * the compilation task.
 	 * @param sourceFiles The source files to be compiled.
 	 *
 	 * @return True, if the source files could be compiled successfully (meaning
@@ -122,7 +188,7 @@ public class CompilerTestHelper {
 	 *         any errors), false otherwise.
 	 */
 	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, Boolean verbose, Boolean allowMethodConstraints, File... sourceFiles) {
+			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, Boolean verbose, Boolean allowMethodConstraints, EnumSet<Library> dependencies, File... sourceFiles) {
 
 		StandardJavaFileManager fileManager =
 				compiler.getStandardFileManager( null, null, null );
@@ -131,7 +197,7 @@ public class CompilerTestHelper {
 
 		List<String> options = new ArrayList<String>();
 
-		options.addAll( Arrays.asList( "-classpath", System.getProperty( "java.class.path" ), "-d", "target" ) );
+		options.addAll( Arrays.asList( "-d", "target" ) );
 
 		if ( diagnosticKind != null ) {
 			options.add( String.format( "-A%s=%s", Configuration.DIAGNOSTIC_KIND_PROCESSOR_OPTION, diagnosticKind ) );
@@ -149,6 +215,13 @@ public class CompilerTestHelper {
 							allowMethodConstraints
 					)
 			);
+		}
+
+		try {
+			fileManager.setLocation( StandardLocation.CLASS_PATH, getDependenciesAsFiles( dependencies ) );
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException( e );
 		}
 
 		CompilationTask task = compiler.getTask( null, fileManager, diagnostics, options, null, compilationUnits );
@@ -173,17 +246,28 @@ public class CompilerTestHelper {
 	 */
 	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpectation... expectations) {
 
-		assertEquals(asExpectations(diagnostics.getDiagnostics()), CollectionHelper.asSet(expectations));
+		assertEquals( asExpectations( diagnostics.getDiagnostics() ), CollectionHelper.asSet( expectations ) );
 	}
 
 	private static Set<DiagnosticExpectation> asExpectations(Collection<Diagnostic<? extends JavaFileObject>> diagnosticsList) {
 
 		Set<DiagnosticExpectation> theValue = CollectionHelper.newHashSet();
 
-		for (Diagnostic<? extends JavaFileObject> diagnostic : diagnosticsList) {
-			theValue.add(new DiagnosticExpectation(diagnostic.getKind(), diagnostic.getLineNumber()));
+		for ( Diagnostic<? extends JavaFileObject> diagnostic : diagnosticsList ) {
+			theValue.add( new DiagnosticExpectation( diagnostic.getKind(), diagnostic.getLineNumber() ) );
 		}
 
 		return theValue;
+	}
+
+	private Set<File> getDependenciesAsFiles(EnumSet<Library> dependencies) {
+
+		Set<File> files = new HashSet<File>();
+
+		for ( Library oneDependency : dependencies ) {
+			files.add( new File( testLibraryDir + File.separator + oneDependency.getName() ) );
+		}
+
+		return files;
 	}
 }
