@@ -89,7 +89,7 @@ public class BeanConstraintLocation implements ConstraintLocation {
 		else {
 			t = ReflectionHelper.typeOf( member );
 			if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
-				t = ReflectionHelper.boxedType( t );
+				t = ReflectionHelper.boxedType( (Class<?>) t );
 			}
 		}
 

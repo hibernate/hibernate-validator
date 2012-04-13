@@ -31,6 +31,7 @@ import java.lang.reflect.WildcardType;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +55,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -69,6 +71,24 @@ public final class ReflectionHelper {
 	private static final Log log = LoggerFactory.make();
 
 	private static String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
+
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
+
+	static {
+		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
+
+		temp.put( boolean.class, Boolean.class );
+		temp.put( char.class, Character.class );
+		temp.put( double.class, Double.class );
+		temp.put( float.class, Float.class );
+		temp.put( long.class, Long.class );
+		temp.put( int.class, Integer.class );
+		temp.put( short.class, Short.class );
+		temp.put( byte.class, Byte.class );
+		temp.put( Void.TYPE, Void.TYPE );
+
+		PRIMITIVE_TO_WRAPPER_TYPES = Collections.unmodifiableMap( temp );
+	}
 
 	/**
 	 * Private constructor in order to avoid instantiation.
@@ -683,46 +703,26 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Returns the autoboxed type of a primitive type.
+	 * Returns the auto-boxed type of a primitive type.
 	 *
 	 * @param primitiveType the primitive type
 	 *
-	 * @return the autoboxed type of a primitive type.
+	 * @return the auto-boxed type of a primitive type. In case {@link Void} is
+	 *         passed (which is considered as primitive type by
+	 *         {@link Class#isPrimitive()}), {@link Void} will be returned.
 	 *
-	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not represent a primitive type.
+	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not
+	 * represent a primitive type.
 	 */
-	public static Class<?> boxedType(Type primitiveType) {
-		if ( !( primitiveType instanceof Class ) && !( (Class<?>) primitiveType ).isPrimitive() ) {
+	public static Class<?> boxedType(Class<?> primitiveType) {
+
+		Class<?> wrapperType = PRIMITIVE_TO_WRAPPER_TYPES.get( primitiveType );
+
+		if ( wrapperType == null ) {
 			throw log.getHasToBeAPrimitiveTypeException( primitiveType.getClass() );
 		}
 
-		if ( primitiveType == boolean.class ) {
-			return Boolean.class;
-		}
-		else if ( primitiveType == char.class ) {
-			return Character.class;
-		}
-		else if ( primitiveType == double.class ) {
-			return Double.class;
-		}
-		else if ( primitiveType == float.class ) {
-			return Float.class;
-		}
-		else if ( primitiveType == long.class ) {
-			return Long.class;
-		}
-		else if ( primitiveType == int.class ) {
-			return Integer.class;
-		}
-		else if ( primitiveType == short.class ) {
-			return Short.class;
-		}
-		else if ( primitiveType == byte.class ) {
-			return Byte.class;
-		}
-		else {
-			throw log.getUnhandledPrimitiveTypeException();
-		}
+		return wrapperType;
 	}
 
 	/**

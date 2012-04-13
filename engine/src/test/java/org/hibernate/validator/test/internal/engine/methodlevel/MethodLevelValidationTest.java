@@ -19,10 +19,7 @@ package org.hibernate.validator.test.internal.engine.methodlevel;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import javax.validation.UnexpectedTypeException;
 import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.BeforeMethod;
@@ -38,11 +35,11 @@ import org.hibernate.validator.test.internal.engine.methodlevel.service.Customer
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.RepositoryBase;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -70,15 +67,6 @@ public class MethodLevelValidationTest {
 
 	private void setUpValidator(Class<?>... groups) {
 		setUpValidator( null, groups );
-	}
-
-	@Test
-	public void testPath() {
-
-		Validator validator2 = Validation.buildDefaultValidatorFactory().getValidator();
-		Set<ConstraintViolation<Customer>> violations = validator2.validate( new Customer( null, null ) );
-		Path propertyPath = violations.iterator().next().getPropertyPath();
-		System.out.println( propertyPath );
 	}
 
 	@Test
@@ -636,6 +624,11 @@ public class MethodLevelValidationTest {
 	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
 		setUpValidator( CustomerRepository.ValidationGroup.class );
 		customerRepository.parameterConstraintInGroup( null );
+	}
+
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	public void voidMethodWithReturnValueConstraintCausesUnexpectedTypeException() {
+		customerRepository.voidMethodWithIllegalReturnValueConstraint();
 	}
 
 	@Test
