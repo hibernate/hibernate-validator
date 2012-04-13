@@ -346,9 +346,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 91, value = "%s has to be a primitive type.")
 	IllegalArgumentException getHasToBeAPrimitiveTypeException(Class<?> clazz);
 
-	@Message(id = 92, value = "Unhandled primitive type.")
-	RuntimeException getUnhandledPrimitiveTypeException();
-
 	@Message(id = 93, value = "null is an invalid type for a constraint validator.")
 	ValidationException getNullIsAnInvalidTypeForAConstraintValidatorException();
 

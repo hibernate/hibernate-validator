@@ -71,7 +71,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		}
 
 		if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
-			t = ReflectionHelper.boxedType( t );
+			t = ReflectionHelper.boxedType( (Class<?>) t );
 		}
 
 		return t;
