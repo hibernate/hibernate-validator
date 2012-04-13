@@ -684,12 +684,17 @@ public final class ReflectionHelper {
 
 	/**
 	 * Returns the autoboxed type of a primitive type.
-	 *
-	 * @param primitiveType the primitive type
-	 *
-	 * @return the autoboxed type of a primitive type.
-	 *
-	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not represent a primitive type.
+	 * 
+	 * @param primitiveType
+	 *            the primitive type
+	 * 
+	 * @return the autoboxed type of a primitive type. In case {@link Void} is
+	 *         passed (which is considered as primitive type by
+	 *         {@link Class#isPrimitive()}), {@link Void} will be returned.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             in case the parameter {@code primitiveType} does not
+	 *             represent a primitive type.
 	 */
 	public static Class<?> boxedType(Type primitiveType) {
 		if ( !( primitiveType instanceof Class ) && !( (Class<?>) primitiveType ).isPrimitive() ) {
@@ -719,6 +724,9 @@ public final class ReflectionHelper {
 		}
 		else if ( primitiveType == byte.class ) {
 			return Byte.class;
+		}
+		else if ( primitiveType == Void.TYPE ) {
+			return Void.TYPE;
 		}
 		else {
 			throw log.getUnhandledPrimitiveTypeException();
