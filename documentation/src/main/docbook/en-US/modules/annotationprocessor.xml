@@ -250,10 +250,10 @@
         have to add the project's own repository to your settings.xml or
         pom.xml:</para>
 
-        <para><example>
-            <title>Adding the Maven Annotation Plugin repository</title>
+        <example>
+          <title>Adding the Maven Annotation Plugin repository</title>
 
-            <programlisting>...
+          <programlisting>...
 &lt;pluginRepositories&gt;
     &lt;pluginRepository&gt;
         &lt;id&gt;maven-annotation-plugin-repo&lt;/id&gt;
@@ -261,11 +261,13 @@
     &lt;/pluginRepository&gt;
 &lt;/pluginRepositories&gt;
 ...                      </programlisting>
-          </example>Now disable the standard annotation processing performed
-        by the compiler plugin and configure the annotation plugin by
-        specifying an execution and adding the Hibernate Validator Annotation
-        Processor as plugin dependency (that way the AP is not visible on the
-        project's actual classpath):</para>
+        </example>
+
+        <para>Now disable the standard annotation processing performed by the
+        compiler plugin and configure the annotation plugin by specifying an
+        execution and adding the Hibernate Validator Annotation Processor as
+        plugin dependency (that way the AP is not visible on the project's
+        actual classpath):</para>
 
         <example>
           <title>Configuring the Maven Annotation Plugin</title>

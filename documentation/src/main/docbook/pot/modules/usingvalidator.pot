@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2011-11-14 10:37+0000\n"
+"POT-Creation-Date: 2012-04-14 09:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -1057,23 +1057,23 @@ msgstr ""
 #. Tag: para
 #: usingvalidator.xml:610
 #, no-c-format
-msgid "By default, constraints are evaluated in no particular order and this regardless of which groups they belong to. In some situations, however, it is useful to control the order of the constraint evaluation. In our example from <xref linkend=\"validator-usingvalidator-validationgroups\"/> we could for example require that first all default car constraints are passing before we check the road worthiness of the car. Finally before we drive away we check the actual driver constraints. In order to implement such an order one would define a new interface and annotate it with <classname>@GroupSequence</classname> defining the order in which the groups have to be validated."
+msgid "By default, constraints are evaluated in no particular order, regardless of which groups they belong to. In some situations, however, it is useful to control the order constraints are evaluated. In our example from <xref linkend=\"validator-usingvalidator-validationgroups\"/> we could for example require that first all default car constraints are passing before we check the road worthiness of the car. Finally before we drive away we check the actual driver constraints. In order to implement such an order one would define a new interface and annotate it with <classname>@GroupSequence</classname> defining the order in which the groups have to be validated."
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:623
+#: usingvalidator.xml:622
 #, no-c-format
-msgid "If at least one constraints fails in a sequenced group none of the constraints of the following groups in the sequence get validated."
+msgid "If at least one constraint fails in a sequenced group none of the constraints of the following groups in the sequence get validated."
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:629
+#: usingvalidator.xml:628
 #, no-c-format
 msgid "Interface with @GroupSequence"
 msgstr ""
 
 #. Tag: programlisting
-#: usingvalidator.xml:631
+#: usingvalidator.xml:630
 #, no-c-format
 msgid ""
       "@GroupSequence({Default.class, CarChecks.class, DriverChecks.class})\n"
@@ -1082,25 +1082,25 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:635
+#: usingvalidator.xml:634
 #, no-c-format
 msgid "Groups defining a sequence and groups composing a sequence must not be involved in a cyclic dependency either directly or indirectly, either through cascaded sequence definition or group inheritance. If a group containing such a circularity is evaluated, a <classname>GroupDefinitionException</classname> is raised."
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:639
+#: usingvalidator.xml:638
 #, no-c-format
 msgid "The usage of the new sequence could then look like in <xref linkend=\"example-group-sequence\"/>."
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:644
+#: usingvalidator.xml:643
 #, no-c-format
 msgid "Usage of a group sequence"
 msgstr ""
 
 #. Tag: programlisting
-#: usingvalidator.xml:646
+#: usingvalidator.xml:645
 #, no-c-format
 msgid ""
       "@Test\n"
@@ -1118,112 +1118,43 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:651
+#: usingvalidator.xml:650
 #, no-c-format
 msgid "Redefining the default group sequence of a class"
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:654
+#: usingvalidator.xml:653
 #, no-c-format
 msgid "@GroupSequence"
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:656
+#: usingvalidator.xml:655
 #, no-c-format
-msgid "The <classname>@GroupSequence</classname> annotation also fulfills a second purpose. It allows you to redefine what the <constant>Default</constant> group means for a given class. To redefine <classname>Default</classname> for a given class, add a <classname>@GroupSequence</classname> annotation to the class. The defined groups in the annotation express the sequence of groups that substitute <classname>Default</classname> for this class. <xref linkend=\"example-rental-car\"/> introduces a new class <classname>RentalCar</classname> with a redefined default group. With this definition the check for all three groups can be rewritten as seen in <xref linkend=\"example-testOrderedChecksWithRedefinedDefault\"/>."
+msgid "The <classname>@GroupSequence</classname> annotation also fulfills a second purpose. It allows you to redefine what the <constant>Default</constant> group means for a given class. To redefine <classname>Default</classname> for a given class, add a <classname>@GroupSequence</classname> annotation to the class. The defined groups in the annotation express the sequence of groups that substitute <classname>Default</classname> for this class. <xref linkend=\"example-rental-car\"/> introduces a new class <classname>RentalCar</classname> with a redefined default group. With this definition you can evaluate the constraints belonging to <classname>RentalChecks</classname>, <classname>CarChecks</classname> and <classname>RentalCar</classname> by just requesting the <classname>Default</classname> group as seen in <xref linkend=\"example-testCarIsRented\"/>."
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:670
+#: usingvalidator.xml:671
 #, no-c-format
 msgid "RentalCar with @GroupSequence"
 msgstr ""
 
 #. Tag: programlisting
-#: usingvalidator.xml:672
+#: usingvalidator.xml:673
 #, no-c-format
 msgid ""
-      "@GroupSequence({ RentalCar.class, CarChecks.class, DriverChecks.class })\n"
+      "@GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })\n"
       "public class RentalCar extends Car {\n"
-      "    private boolean rented;    \n"
+      "    @AssertFalse(message = \"The car is currently rented out\", groups = RentalChecks.class)\n"
+      "    private boolean rented;\n"
       "\n"
       "    public RentalCar(String manufacturer, String licencePlate, int seatCount) {\n"
       "        super( manufacturer, licencePlate, seatCount );\n"
       "    }\n"
       "\n"
-      "   public boolean isRented() {\n"
-      "        return rented;\n"
-      "    }\n"
-      "\n"
-      "    public void setRented(booelan rented) {\n"
-      "        this.rented = rented;\n"
-      "    }\n"
-      "}"
-msgstr ""
-
-#. Tag: title
-#: usingvalidator.xml:676
-#, no-c-format
-msgid "testOrderedChecksWithRedefinedDefault"
-msgstr ""
-
-#. Tag: programlisting
-#: usingvalidator.xml:678
-#, no-c-format
-msgid ""
-      "@Test\n"
-      "public void testOrderedChecksWithRedefinedDefault() {\n"
-      "    RentalCar rentalCar = new RentalCar( \"Morris\", \"DD-AB-123\", 2 );\n"
-      "    rentalCar.setPassedVehicleInspection( true );\n"
-      "\n"
-      "    Driver john = new Driver( \"John Doe\" );\n"
-      "    john.setAge( 18 );\n"
-      "    john.passedDrivingTest( true );\n"
-      "    rentalCar.setDriver( john );\n"
-      "\n"
-      "    assertEquals( 0, validator.validate( rentalCar, Default.class ).size() );\n"
-      "}"
-msgstr ""
-
-#. Tag: para
-#: usingvalidator.xml:682
-#, no-c-format
-msgid "Due to the fact that there cannot be a cyclic dependency in the group and group sequence definitions one cannot just add <classname>Default</classname> to the sequence redefining <classname>Default</classname> for a class. Instead the class itself should be added!"
-msgstr ""
-
-#. Tag: title
-#: usingvalidator.xml:691
-#, no-c-format
-msgid "@GroupSequenceProvider"
-msgstr ""
-
-#. Tag: para
-#: usingvalidator.xml:693
-#, no-c-format
-msgid "The <classname>@javax.validation.GroupSequence</classname> annotation is a standardized Bean Validation annotation. As seen in the previous section it allows you to statically redefine the default group sequence for a class. Hibernate Validator also offers a custom, non standardized annotation - <classname>org.hibernate.validator.group.GroupSequenceProvider </classname>- which allows for dynamic redefinition of the default group sequence. Using the rental car scenario again, one could dynamically add the driver checks depending on whether the car is rented or not. <xref linkend=\"example-rental-car-group-sequence-provider\"/> and <xref linkend=\"example-group-sequence-provider-implementation\"/> show how this use-case would be implemented."
-msgstr ""
-
-#. Tag: title
-#: usingvalidator.xml:708
-#, no-c-format
-msgid "RentalCar with @GroupSequenceProvider"
-msgstr ""
-
-#. Tag: programlisting
-#: usingvalidator.xml:710
-#, no-c-format
-msgid ""
-      "@GroupSequenceProvider(RentalCarGroupSequenceProvider.class)\n"
-      "public class RentalCar extends Car {\n"
-      "    private boolean rented;    \n"
-      "\n"
-      "    public RentalCar(String manufacturer, String licencePlate, int seatCount) {\n"
-      "        super( manufacturer, licencePlate, seatCount );\n"
-      "    }\n"
-      "\n"
-      "   public boolean isRented() {\n"
+      "    public boolean isRented() {\n"
       "        return rented;\n"
       "    }\n"
       "\n"
@@ -1234,22 +1165,110 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:714
+#: usingvalidator.xml:677
+#, no-c-format
+msgid "RentalCar with redefined default group"
+msgstr ""
+
+#. Tag: programlisting
+#: usingvalidator.xml:679
+#, no-c-format
+msgid ""
+      "/**\n"
+      " * Validating the default group leads to validation on the default group sequence of {@code RentalCar}.\n"
+      " */\n"
+      "@Test\n"
+      "public void carIsRented() {\n"
+      "  RentalCar rentalCar = new RentalCar( \"Morris\", \"DD-AB-123\", 2 );\n"
+      "  rentalCar.setPassedVehicleInspection( true );\n"
+      "  rentalCar.setRented( true );\n"
+      "\n"
+      "  Set&lt;ConstraintViolation&lt;RentalCar&gt;&gt; constraintViolations = validator.validate( rentalCar );\n"
+      "\n"
+      "  assertEquals( 1, constraintViolations.size() );\n"
+      "  assertEquals(\n"
+      "    \"Wrong message\",\n"
+      "    \"The car is currently rented out\",\n"
+      "    constraintViolations.iterator().next().getMessage()\n"
+      "  );\n"
+      "\n"
+      "  rentalCar.setRented( false );\n"
+      "  constraintViolations = validator.validate( rentalCar );\n"
+      "\n"
+      "  assertEquals( 0, constraintViolations.size() );\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: usingvalidator.xml:683
+#, no-c-format
+msgid "Due to the fact that there cannot be a cyclic dependency in the group and group sequence definitions one cannot just add <classname>Default</classname> to the sequence redefining <classname>Default</classname> for a class. Instead the class itself has to be added!"
+msgstr ""
+
+#. Tag: para
+#: usingvalidator.xml:691
+#, no-c-format
+msgid "The <classname>Default</classname> group sequence overriding is local to the class it is defined on and is not propagated to the associated objects. This means in particular that adding <classname>DriverChecks</classname> to the default group sequence of <classname>RentalCar</classname> would not have any effects. Only the group <classname>Default</classname> will be propagated to the driver association when validation a rental car instance."
+msgstr ""
+
+#. Tag: title
+#: usingvalidator.xml:702
+#, no-c-format
+msgid "@GroupSequenceProvider"
+msgstr ""
+
+#. Tag: para
+#: usingvalidator.xml:704
+#, no-c-format
+msgid "The <classname>@javax.validation.GroupSequence</classname> annotation is a standardized Bean Validation annotation. As seen in the previous section it allows you to statically redefine the default group sequence for a class. Hibernate Validator also offers a custom, non standardized annotation - <classname>org.hibernate.validator.group.GroupSequenceProvider </classname>- which allows for dynamic redefinition of the default group sequence. Using the rental car scenario again, one could dynamically add the <classname>CarChecks</classname> as seen in <xref linkend=\"example-rental-car-group-sequence-provider\"/> and <xref linkend=\"example-group-sequence-provider-implementation\"/>."
+msgstr ""
+
+#. Tag: title
+#: usingvalidator.xml:717
+#, no-c-format
+msgid "RentalCar with @GroupSequenceProvider"
+msgstr ""
+
+#. Tag: programlisting
+#: usingvalidator.xml:719
+#, no-c-format
+msgid ""
+      "@GroupSequenceProvider(RentalCarGroupSequenceProvider.class)\n"
+      "public class RentalCar extends Car {\n"
+      "    @AssertFalse(message = \"The car is currently rented out\", groups = RentalChecks.class)\n"
+      "    private boolean rented;\n"
+      "\n"
+      "    public RentalCar(String manufacturer, String licencePlate, int seatCount) {\n"
+      "        super( manufacturer, licencePlate, seatCount );\n"
+      "    }\n"
+      "\n"
+      "    public boolean isRented() {\n"
+      "        return rented;\n"
+      "    }\n"
+      "\n"
+      "    public void setRented(boolean rented) {\n"
+      "        this.rented = rented;\n"
+      "    }\n"
+      "}"
+msgstr ""
+
+#. Tag: title
+#: usingvalidator.xml:723
 #, no-c-format
 msgid "DefaultGroupSequenceProvider implementation"
 msgstr ""
 
 #. Tag: programlisting
-#: usingvalidator.xml:716
+#: usingvalidator.xml:725
 #, no-c-format
 msgid ""
       "public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvider&lt;RentalCar&gt; {\n"
       "    public List&lt;Class&lt;?&gt;&gt; getValidationGroups(RentalCar car) {\n"
       "        List&lt;Class&lt;?&gt;&gt; defaultGroupSequence = new ArrayList&lt;Class&lt;?&gt;&gt;();\n"
-      "        defaultGroupSequence.add( RentalCar.class, CarChecks.class );\n"
+      "        defaultGroupSequence.add( RentalCar.class );\n"
       "\n"
-      "        if ( car != null &amp;&amp; car.isRented() ) {\n"
-      "            defaultGroupSequence.add( DriverChecks.class );\n"
+      "        if ( car != null &amp;&amp; !car.isRented() ) {\n"
+      "            defaultGroupSequence.add( CarChecks.class );\n"
       "        }\n"
       "\n"
       "        return defaultGroupSequence;\n"
@@ -1258,458 +1277,554 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:723
+#: usingvalidator.xml:732
 #, no-c-format
 msgid "Built-in constraints"
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:725
+#: usingvalidator.xml:734
 #, no-c-format
-msgid "Hibernate Validator comprises a basic set of commonly used constraints. These are foremost the constraints defined by the Bean Validation specification (see <xref linkend=\"table-spec-constraints\"/>). Additionally, Hibernate Validator provides useful custom constraints (see <xref linkend=\"table-custom-constraints\"/>)."
+msgid "Hibernate Validator comprises a basic set of commonly used constraints. These are foremost the constraints defined by the Bean Validation specification (see <xref linkend=\"table-spec-constraints\"/>). Additionally, Hibernate Validator provides useful custom constraints (see <xref linkend=\"table-custom-constraints\"/> and <xref linkend=\"table-custom-country-constraints\"/>)."
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:732 usingvalidator.xml:751
+#: usingvalidator.xml:742 usingvalidator.xml:761
 #, no-c-format
 msgid "Bean Validation constraints"
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:734
+#: usingvalidator.xml:744
 #, no-c-format
 msgid "shows purpose and supported data types of all constraints specified in the Bean Validation API. All these constraints apply to the field/property level, there are no class-level constraints defined in the Bean Validation specification. If you are using the Hibernate object-relational mapper, some of the constraints are taken into account when creating the DDL for your model (see column \"Hibernate metadata impact\")."
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:743
+#: usingvalidator.xml:753
 #, no-c-format
 msgid "Hibernate Validator allows some constraints to be applied to more data types than required by the Bean Validation specification (e.g. @Max can be applied to <classname>Strings</classname>). Relying on this feature can impact portability of your application between Bean Validation providers."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:764 usingvalidator.xml:1019
+#: usingvalidator.xml:774 usingvalidator.xml:1034 usingvalidator.xml:1234
 #, no-c-format
 msgid "Annotation"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:766 usingvalidator.xml:1021
+#: usingvalidator.xml:776 usingvalidator.xml:1036 usingvalidator.xml:1236
 #, no-c-format
 msgid "Supported data types"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:768 usingvalidator.xml:1023
+#: usingvalidator.xml:778 usingvalidator.xml:1038 usingvalidator.xml:1238
 #, no-c-format
 msgid "<entry>Use</entry>"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:770 usingvalidator.xml:1025
+#: usingvalidator.xml:780 usingvalidator.xml:1040 usingvalidator.xml:1242
 #, no-c-format
 msgid "Hibernate metadata impact"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:776
+#: usingvalidator.xml:786
 #, no-c-format
 msgid "@AssertFalse"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:778 usingvalidator.xml:790
+#: usingvalidator.xml:788 usingvalidator.xml:800
 #, no-c-format
 msgid "<classname>Boolean</classname>, <classname>boolean</classname>"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:781
+#: usingvalidator.xml:791
 #, no-c-format
 msgid "Checks that the annotated element is <constant>false</constant>."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:784 usingvalidator.xml:796 usingvalidator.xml:815 usingvalidator.xml:834 usingvalidator.xml:869 usingvalidator.xml:927 usingvalidator.xml:943 usingvalidator.xml:955 usingvalidator.xml:981 usingvalidator.xml:1041 usingvalidator.xml:1052 usingvalidator.xml:1077 usingvalidator.xml:1090 usingvalidator.xml:1106 usingvalidator.xml:1123 usingvalidator.xml:1142 usingvalidator.xml:1160
+#: usingvalidator.xml:794 usingvalidator.xml:806 usingvalidator.xml:826 usingvalidator.xml:846 usingvalidator.xml:882 usingvalidator.xml:940 usingvalidator.xml:956 usingvalidator.xml:969 usingvalidator.xml:996 usingvalidator.xml:1056 usingvalidator.xml:1070 usingvalidator.xml:1107 usingvalidator.xml:1120 usingvalidator.xml:1133 usingvalidator.xml:1149 usingvalidator.xml:1166 usingvalidator.xml:1185 usingvalidator.xml:1203 usingvalidator.xml:1258 usingvalidator.xml:1272 usingvalidator.xml:1287
 #, no-c-format
 msgid "none"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:788
+#: usingvalidator.xml:798
 #, no-c-format
 msgid "@AssertTrue"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:793
+#: usingvalidator.xml:803
 #, no-c-format
 msgid "Checks that the annotated element is <constant>true</constant>."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:800
+#: usingvalidator.xml:810
 #, no-c-format
 msgid "@DecimalMax"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:802 usingvalidator.xml:821 usingvalidator.xml:840
+#: usingvalidator.xml:812 usingvalidator.xml:852
 #, no-c-format
-msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>String</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types. Additionally supported by HV: any sub-type of <classname>Number</classname>."
+msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>String</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types. Additionally supported by HV: any sub-type of <classname>Number</classname> and <classname>CharSequence</classname>."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:810
+#: usingvalidator.xml:821
 #, no-c-format
 msgid "The annotated element must be a number whose value must be lower or equal to the specified maximum. The parameter value is the string representation of the max value according to the <classname>BigDecimal</classname> string representation."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:819
+#: usingvalidator.xml:830
 #, no-c-format
 msgid "@DecimalMin"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:829
+#: usingvalidator.xml:832
+#, no-c-format
+msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>String</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types. Additionally supported by HV: any sub-type of <classname>Number </classname>and <classname>CharSequence</classname>."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:841
 #, no-c-format
 msgid "The annotated element must be a number whose value must be higher or equal to the specified minimum. The parameter value is the string representation of the min value according to the <classname>BigDecimal</classname> string representation."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:838
+#: usingvalidator.xml:850
 #, no-c-format
 msgid "@Digits(integer=, fraction=)"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:848
+#: usingvalidator.xml:861
 #, no-c-format
 msgid "Checks whether the annoted value is a number having up to <literal>integer</literal> digits and <literal>fraction</literal> fractional digits."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:852
+#: usingvalidator.xml:865
 #, no-c-format
 msgid "Define column precision and scale."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:856
+#: usingvalidator.xml:869
 #, no-c-format
 msgid "@Future"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:858 usingvalidator.xml:933
+#: usingvalidator.xml:871 usingvalidator.xml:946
 #, no-c-format
 msgid "<classname>java.util.Date</classname>, <classname>java.util.Calendar</classname>; Additionally supported by HV, if the <ulink url=\"http://joda-time.sourceforge.net/\">Joda Time</ulink> date/time API is on the class path: any implementations of <classname>ReadablePartial</classname> and <classname>ReadableInstant</classname>."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:866
+#: usingvalidator.xml:879
 #, no-c-format
 msgid "Checks whether the annotated date is in the future."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:873
+#: usingvalidator.xml:886
 #, no-c-format
 msgid "@Max"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:875 usingvalidator.xml:893
+#: usingvalidator.xml:888
 #, no-c-format
-msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types. Additionally supported by HV: <classname>String</classname> (the numeric value represented by a String is evaluated), any sub-type of <classname>Number</classname>."
+msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types. Additionally supported by HV: any sub-type of<classname>CharSequence</classname> (the numeric value represented by the character sequence is evaluated), any sub-type of <classname>Number</classname>."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:884
+#: usingvalidator.xml:897
 #, no-c-format
 msgid "Checks whether the annotated value is less than or equal to the specified maximum."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:887 usingvalidator.xml:905
+#: usingvalidator.xml:900 usingvalidator.xml:918
 #, no-c-format
 msgid "Add a check constraint on the column."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:891
+#: usingvalidator.xml:904
 #, no-c-format
 msgid "@Min"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:902
+#: usingvalidator.xml:906
+#, no-c-format
+msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types. Additionally supported by HV: any sub-type of <classname>CharSequence</classname> (the numeric value represented by the char sequence is evaluated), any sub-type of <classname>Number</classname>."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:915
 #, no-c-format
 msgid "Checks whether the annotated value is higher than or equal to the specified minimum."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:909
+#: usingvalidator.xml:922
 #, no-c-format
 msgid "@NotNull"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:911 usingvalidator.xml:922 usingvalidator.xml:1129
+#: usingvalidator.xml:924 usingvalidator.xml:935 usingvalidator.xml:1172
 #, no-c-format
 msgid "Any type"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:913
+#: usingvalidator.xml:926
 #, no-c-format
 msgid "Checks that the annotated value is not <constant>null.</constant>"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:916
+#: usingvalidator.xml:929
 #, no-c-format
 msgid "Column(s) are not null."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:920
+#: usingvalidator.xml:933
 #, no-c-format
 msgid "@Null"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:924
+#: usingvalidator.xml:937
 #, no-c-format
 msgid "Checks that the annotated value is <constant>null.</constant>"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:931
+#: usingvalidator.xml:944
 #, no-c-format
 msgid "@Past"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:941
+#: usingvalidator.xml:954
 #, no-c-format
 msgid "Checks whether the annotated date is in the past."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:947
+#: usingvalidator.xml:960
 #, no-c-format
 msgid "@Pattern(regex=, flag=)"
 msgstr ""
 
-#. Tag: classname
-#: usingvalidator.xml:949 usingvalidator.xml:1033 usingvalidator.xml:1047 usingvalidator.xml:1058 usingvalidator.xml:1070 usingvalidator.xml:1148
-#, no-c-format
-msgid "String"
-msgstr ""
-
 #. Tag: entry
-#: usingvalidator.xml:951
+#: usingvalidator.xml:962
 #, no-c-format
-msgid "Checks if the annotated string matches the regular expression <parameter>regex</parameter> considering the given flag <parameter>match</parameter>."
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:959
-#, no-c-format
-msgid "@Size(min=, max=)"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:961
-#, no-c-format
-msgid "<classname>String</classname>, <classname>Collection</classname>, <classname>Map</classname> and <classname>arrays</classname>"
+msgid "<classname>String</classname>. Additionally supported by HV: any sub-type of <classname>CharSequence</classname>."
 msgstr ""
 
 #. Tag: entry
 #: usingvalidator.xml:965
 #, no-c-format
+msgid "Checks if the annotated string matches the regular expression <parameter>regex</parameter> considering the given flag <parameter>match</parameter>."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:973
+#, no-c-format
+msgid "@Size(min=, max=)"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:975
+#, no-c-format
+msgid "<classname>String</classname>, <classname>Collection</classname>, <classname>Map</classname> and <classname>arrays</classname>. Additionally supported by HV: any sub-type of <classname>CharSequence</classname>."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:980
+#, no-c-format
 msgid "Checks if the annotated element's size is between min and max (inclusive)."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:968 usingvalidator.xml:1064
+#: usingvalidator.xml:983 usingvalidator.xml:1082
 #, no-c-format
 msgid "Column length will be set to max."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:972
+#: usingvalidator.xml:987
 #, no-c-format
 msgid "@Valid"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:974
+#: usingvalidator.xml:989
 #, no-c-format
 msgid "Any non-primitive type"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:976
+#: usingvalidator.xml:991
 #, no-c-format
 msgid "Performs validation recursively on the associated object. If the object is a collection or an array, the elements are validated recursively. If the object is a map, the value elements are validated recursively."
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:988
+#: usingvalidator.xml:1003
 #, no-c-format
 msgid "On top of the parameters indicated in <xref linkend=\"table-spec-constraints\"/> each constraint supports the parameters <parameter>message</parameter>, <parameter>groups</parameter> and <parameter>payload</parameter>. This is a requirement of the Bean Validation specification."
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:997
+#: usingvalidator.xml:1012
 #, no-c-format
 msgid "Additional constraints"
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:999
+#: usingvalidator.xml:1014
 #, no-c-format
 msgid "In addition to the constraints defined by the Bean Validation API Hibernate Validator provides several useful custom constraints which are listed in <xref linkend=\"table-custom-constraints\"/>. With one exception also these constraints apply to the field/property level, only @ScriptAssert is a class-level constraint."
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:1006
+#: usingvalidator.xml:1021
 #, no-c-format
-msgid "Custom constraints provided by Hibernate Validator"
+msgid "Custom constraints"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1031
+#: usingvalidator.xml:1046
 #, no-c-format
 msgid "@CreditCardNumber"
 msgstr ""
 
-#. Tag: entry
-#: usingvalidator.xml:1035
-#, no-c-format
-msgid "Checks that the annotated string passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also <ulink url=\"http://www.merriampark.com/anatomycc.htm\">Anatomy of Credit Card Numbers</ulink>."
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1045
-#, no-c-format
-msgid "@Email"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1049
-#, no-c-format
-msgid "Checks whether the specified string is a valid email address."
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1056
-#, no-c-format
-msgid "@Length(min=, max=)"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1060
-#, no-c-format
-msgid "Validates that the annotated string is between <parameter>min</parameter> and <parameter>max</parameter> included."
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1068
-#, no-c-format
-msgid "@NotBlank"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1072
-#, no-c-format
-msgid "Checks that the annotated string is not null and the trimmed length is greater than 0. The difference to @NotEmpty is that this constraint can only be applied on strings and that trailing whitespaces are ignored."
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1081
-#, no-c-format
-msgid "@NotEmpty"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1083
-#, no-c-format
-msgid "<classname>String</classname>, <classname>Collection</classname>, <classname>Map</classname> and arrays"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1087
-#, no-c-format
-msgid "Checks whether the annotated element is not <constant>null</constant> nor empty."
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1094
-#, no-c-format
-msgid "@Range(min=, max=)"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1096
-#, no-c-format
-msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>String</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types"
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1103
-#, no-c-format
-msgid "Checks whether the annotated value lies between (inclusive) the specified minimum and maximum."
-msgstr ""
-
-#. Tag: entry
-#: usingvalidator.xml:1110
-#, no-c-format
-msgid "@SafeHtml(whitelistType=, additionalTags=)"
-msgstr ""
-
 #. Tag: classname
-#: usingvalidator.xml:1112
+#: usingvalidator.xml:1048 usingvalidator.xml:1062 usingvalidator.xml:1076 usingvalidator.xml:1089 usingvalidator.xml:1113 usingvalidator.xml:1155 usingvalidator.xml:1191 usingvalidator.xml:1250 usingvalidator.xml:1264 usingvalidator.xml:1278
 #, no-c-format
 msgid "CharSequence"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1114
+#: usingvalidator.xml:1050
 #, no-c-format
-msgid "Checks whether the annotated value contains potentially malicious fragments such as <code>&lt;script/&gt;</code>. In order to use this constraint, the <ulink url=\"http://jsoup.org/\">jsoup</ulink> library must be part of the class path. With the <parameter>whitelistType</parameter> attribute predefined whitelist types can be chosen. You can also specify additional html tags for the whitelist with the <parameter>additionalTags</parameter> attribute."
+msgid "Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also <ulink url=\"http://www.merriampark.com/anatomycc.htm\">Anatomy of Credit Card Numbers</ulink>."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1127
+#: usingvalidator.xml:1060
 #, no-c-format
-msgid "@ScriptAssert(lang=, script=, alias=)"
+msgid "@Email"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1131
+#: usingvalidator.xml:1064
 #, no-c-format
-msgid "Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 (\"Scripting for the Java<superscript>TM</superscript> Platform\") must part of the class path. This is automatically the case when running on Java 6. For older Java versions, the JSR 223 RI can be added manually to the class path.The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path."
+msgid "Checks whether the specified character sequence is a valid email address. The optional parameters <parameter>regexp</parameter> and <parameter>flags</parameter> allow to specify an additional regular expression (including regular expression flags) which the email must match."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1074
+#, no-c-format
+msgid "@Length(min=, max=)"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1078
+#, no-c-format
+msgid "Validates that the annotated character sequence is between <parameter>min</parameter> and <parameter>max</parameter> included."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1086
+#, no-c-format
+msgid "@ModCheck(modType=, multiplier=, startIndex=, endIndex=, checkDigitPosition=, ignoreNonDigitCharacters=)"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1091
+#, no-c-format
+msgid "Checks that the digits within the annotated character sequence pass the mod 10 or mod 11 checksum algorithm. <constant>modType</constant> is used to select the modulo type and the <constant>multiplier</constant> determines the algorithm specific multiplier (see also <ulink url=\"http://en.wikipedia.org/wiki/Luhn_algorithm\">Luhn algorithm</ulink>). <constant>startIndex</constant> and <constant>endIndex</constant> allow to only run the modulo algorithm on the specified sub-string. <constant>checkDigitPosition</constant> allows to use an arbitrary digit within the character sequence to be the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, <constant>ignoreNonDigitCharacters</constant> allows to ignore non digit characters."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1111
+#, no-c-format
+msgid "@NotBlank"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1115
+#, no-c-format
+msgid "Checks that the annotated character sequence is not null and the trimmed length is greater than 0. The difference to @NotEmpty is that this constraint can only be applied on strings and that trailing whitespaces are ignored."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1124
+#, no-c-format
+msgid "@NotEmpty"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1126
+#, no-c-format
+msgid "<classname>CharSequence</classname>, <classname>Collection</classname>, <classname>Map</classname> and arrays"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1130
+#, no-c-format
+msgid "Checks whether the annotated element is not <constant>null</constant> nor empty."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1137
+#, no-c-format
+msgid "@Range(min=, max=)"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1139
+#, no-c-format
+msgid "<classname>BigDecimal</classname>, <classname>BigInteger</classname>, <classname>CharSequence</classname>, <classname>byte</classname>, <classname>short</classname>, <classname>int</classname>, <classname>long</classname> and the respective wrappers of the primitive types"
 msgstr ""
 
 #. Tag: entry
 #: usingvalidator.xml:1146
 #, no-c-format
+msgid "Checks whether the annotated value lies between (inclusive) the specified minimum and maximum."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1153
+#, no-c-format
+msgid "@SafeHtml(whitelistType=, additionalTags=)"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1157
+#, no-c-format
+msgid "Checks whether the annotated value contains potentially malicious fragments such as <code>&lt;script/&gt;</code>. In order to use this constraint, the <ulink url=\"http://jsoup.org/\">jsoup</ulink> library must be part of the class path. With the <parameter>whitelistType</parameter> attribute predefined whitelist types can be chosen. You can also specify additional html tags for the whitelist with the <parameter>additionalTags</parameter> attribute."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1170
+#, no-c-format
+msgid "@ScriptAssert(lang=, script=, alias=)"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1174
+#, no-c-format
+msgid "Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 (\"Scripting for the Java<superscript>TM</superscript> Platform\") must part of the class path. This is automatically the case when running on Java 6. For older Java versions, the JSR 223 RI can be added manually to the class path.The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1189
+#, no-c-format
 msgid "@URL(protocol=, host=, port=, regexp=, flags=)"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1150
+#: usingvalidator.xml:1193
 #, no-c-format
-msgid "Checks if the annotated string is a valid URL according to RFC2396. If any of the optional parameters <parameter>protocol</parameter>, <parameter>host</parameter> or <parameter>port</parameter> are specified, the corresponding URL fragments must match the specified values. The optional parameters <parameter>regexp</parameter> and <parameter>flags</parameter> allow to specify an additional regular expression (including regular expression flags) which the URL must match."
+msgid "Checks if the annotated character sequence is a valid URL according to RFC2396. If any of the optional parameters <parameter>protocol</parameter>, <parameter>host</parameter> or <parameter>port</parameter> are specified, the corresponding URL fragments must match the specified values. The optional parameters <parameter>regexp</parameter> and <parameter>flags</parameter> allow to specify an additional regular expression (including regular expression flags) which the URL must match."
+msgstr ""
+
+#. Tag: title
+#: usingvalidator.xml:1210
+#, no-c-format
+msgid "Country specific constraints"
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:1166
+#: usingvalidator.xml:1212
 #, no-c-format
-msgid "In some cases neither the Bean Validation constraints nor the custom constraints provided by Hibernate Validator will fulfill your requirements completely. In this case you can literally in a minute write your own constraints. We will discuss this in <xref linkend=\"validator-customconstraints\"/>."
+msgid "Hibernate Validator offers also some country specific constraints, e.g. for the validation of social security numbers."
+msgstr ""
+
+#. Tag: para
+#: usingvalidator.xml:1214
+#, no-c-format
+msgid "If you have to implement a country specific constraint, consider making it a contribution to Hibernate Validator!"
+msgstr ""
+
+#. Tag: title
+#: usingvalidator.xml:1219
+#, no-c-format
+msgid "Custom country specific constraints"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1240
+#, no-c-format
+msgid "Country"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1248
+#, no-c-format
+msgid "@CNPJ"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1252
+#, no-c-format
+msgid "Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Juríeddica)"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1256 usingvalidator.xml:1270 usingvalidator.xml:1285
+#, no-c-format
+msgid "Brazil"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1262
+#, no-c-format
+msgid "@CPF"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1266
+#, no-c-format
+msgid "Checks that the annotated character sequence represents a Brazilian individual taxpayer registry number (Cadastro de Pessoa Fídsica)."
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1276
+#, no-c-format
+msgid "@TituloEleitoral"
+msgstr ""
+
+#. Tag: entry
+#: usingvalidator.xml:1280
+#, no-c-format
+msgid "Checks that the annotated character sequence represents a Brazilian voter ID card number (<ulink url=\"http://ghiorzi.org/cgcancpf.htm\">Título Eleitoral</ulink>)."
+msgstr ""
+
+#. Tag: para
+#: usingvalidator.xml:1294
+#, no-c-format
+msgid "In some cases neither the Bean Validation constraints nor the custom constraints provided by Hibernate Validator will fulfill your requirements. In this case you can easily write your own constraint. We will discuss this in <xref linkend=\"validator-customconstraints\"/>."
 msgstr ""
 
