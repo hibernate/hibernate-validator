@@ -18,6 +18,7 @@ package org.hibernate.validator.ap;
 
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -217,7 +218,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 
 				if ( verbose ) {
 					messager.getDelegate()
-							.printMessage( Kind.NOTE, e.getMessage(), annotatedElement, oneAnnotationMirror );
+							.printMessage( Kind.NOTE, e.getMessage() != null ? e.getMessage() : e.toString(), annotatedElement, oneAnnotationMirror );
 				}
 			}
 		}

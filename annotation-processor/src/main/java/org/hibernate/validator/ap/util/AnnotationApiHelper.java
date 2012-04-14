@@ -129,13 +129,17 @@ public class AnnotationApiHelper {
 			return null;
 		}
 
-		TypeMirror mirrorForAnnotation = elementUtils.getTypeElement( annotationTypeName ).asType();
+		TypeElement typeElement = elementUtils.getTypeElement( annotationTypeName );
+
+		if ( typeElement == null ) {
+			return null;
+		}
 
 		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
 
 			if ( typeUtils.isSameType(
 					oneAnnotationMirror.getAnnotationType(),
-					mirrorForAnnotation
+					typeElement.asType()
 			) ) {
 				return oneAnnotationMirror;
 			}
