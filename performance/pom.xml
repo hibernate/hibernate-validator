@@ -36,16 +36,6 @@
         <history.directory>${project.basedir}/history</history.directory>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.8.2</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -54,6 +44,14 @@
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -66,8 +64,6 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -100,21 +96,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>chronos-report-maven-plugin</artifactId>
                 <version>1.0-beta-3</version>
-                <!--<reportSets>-->
-                <!--<reportSet>-->
-                <!--<id>hv-perf</id>-->
-                <!--<configuration>-->
-                <!--<title>JMeter Load Test Report</title>-->
-                <!--<description>-->
-                <!--<![CDATA[Load Test Report]]>-->
-                <!--</description>-->
-                <!--</configuration>-->
-                <!--<reports>-->
-                <!--<report>report</report>-->
-                <!--<report>historyreport</report>-->
-                <!--</reports>-->
-                <!--</reportSet>-->
-                <!--</reportSets>-->
             </plugin>
         </plugins>
     </reporting>
