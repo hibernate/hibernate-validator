@@ -31,12 +31,12 @@ import javax.validation.constraints.Size;
  * @author Hardy Ferentschik
  */
 public class TestEntity {
-	public static final int MAX_DEPTH = 100;
-	
+	public static final int MAX_DEPTH = 32;
+
 	public TestEntity(Random random, int depth) {
-		if(depth <= MAX_DEPTH) {
-			int randomNumber = random.nextInt(2);
-			if(randomNumber == 1) {
+		if ( depth <= MAX_DEPTH ) {
+			int randomNumber = random.nextInt( 2 );
+			if ( randomNumber == 1 ) {
 				depth++;
 				testEntity = new TestEntity( random, depth );
 			}
@@ -63,7 +63,7 @@ public class TestEntity {
 
 	@NotNull
 	private String value7;
-	
+
 	@Valid
 	private TestEntity testEntity;
 }

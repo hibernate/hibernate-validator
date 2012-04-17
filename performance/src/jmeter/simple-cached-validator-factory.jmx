@@ -17,7 +17,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">10</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">1000</stringProp>
         <stringProp name="ThreadGroup.ramp_time">10</stringProp>
         <longProp name="ThreadGroup.start_time">1332326233000</longProp>
         <longProp name="ThreadGroup.end_time">1332326233000</longProp>
@@ -28,9 +28,9 @@
       <hashTree>
         <JUnitSampler guiclass="JUnitTestSamplerGui" testclass="JUnitSampler" testname="Simple Validation (Shared Validator Factory)" enabled="true">
           <stringProp name="TestPlan.comments">A simple bean validation</stringProp>
-          <stringProp name="junitSampler.classname">org.hibernate.validator.performance.statistical.StatisticalValidationTest</stringProp>
+          <stringProp name="junitSampler.classname">org.hibernate.validator.performance.simple.SimpleValidationTest</stringProp>
           <stringProp name="junitsampler.constructorstring"></stringProp>
-          <stringProp name="junitsampler.method">testValidationWithStatisticalGraphDepthAndConstraintValidator</stringProp>
+          <stringProp name="junitsampler.method">testSimpleBeanValidation</stringProp>
           <stringProp name="junitsampler.pkg.filter"></stringProp>
           <stringProp name="junitsampler.success">Test successful</stringProp>
           <stringProp name="junitsampler.success.code">1000</stringProp>
@@ -108,7 +108,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="false">
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
           <boolProp name="ResultCollector.error_logging">true</boolProp>
           <objProp>
             <name>saveConfig</name>

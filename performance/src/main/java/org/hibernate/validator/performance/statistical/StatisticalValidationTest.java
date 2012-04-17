@@ -43,6 +43,7 @@ public class StatisticalValidationTest {
 
 	private ValidatorFactory factory;
 	private Validator validator;
+	private TestEntity[] entitiesUnderTest = new TestEntity[NUMBER_OF_TEST_ENTITIES];
 
 	@Before
 	public void setUp() throws Exception {
@@ -60,13 +61,16 @@ public class StatisticalValidationTest {
 		}
 
 		validator = factory.getValidator();
+
+		for ( int i = 0; i < NUMBER_OF_TEST_ENTITIES; i++ ) {
+			entitiesUnderTest[i] = new TestEntity( random, 0 );
+		}
 	}
 
 	@Test
 	public void testValidationWithStatisticalGraphDepthAndConstraintValidator() throws Exception {
 		for ( int i = 0; i < NUMBER_OF_TEST_ENTITIES; i++ ) {
-			TestEntity entityUnderTest = new TestEntity( random, 0 );
-			Set<ConstraintViolation<TestEntity>> violations = validator.validate( entityUnderTest );
+			Set<ConstraintViolation<TestEntity>> violations = validator.validate( entitiesUnderTest[i] );
 			assertEquals( StatisticalConstraintValidator.threadLocalCounter.get().get(), violations.size() );
 			StatisticalConstraintValidator.threadLocalCounter.get().getAndSet( 0 );
 		}
