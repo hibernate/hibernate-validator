@@ -32,18 +32,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <profilingOptions>-agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait</profilingOptions>
+        <!--<profilingOptions>-agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait</profilingOptions>-->
         <history.directory>${project.basedir}/history</history.directory>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -52,10 +48,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -83,13 +75,21 @@
                     <jmeterOutput>${project.basedir}/target/chronos/performancetest</jmeterOutput>
                     <historydir>${history.directory}</historydir>
                     <heap>1024m</heap>
-                    <options>
-                        <option>${profilingOptions}</option>
-                    </options>
+                    <loggc>false</loggc>
+                    <jmeterVariables>
+                        <property>
+                            <name>validator</name>
+                            <value>${validator.version}</value>
+                        </property>
+                    </jmeterVariables>
+                    <!--<options>-->
+                    <!--<option>${profilingOptions}</option>-->
+                    <!--</options>-->
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
     <reporting>
         <plugins>
             <plugin>
@@ -99,4 +99,48 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <profiles>
+        <profile>
+            <id>hv-4.3</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-4.3</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </dependency>
+            </dependencies>
+            <properties>
+                <validator.version>4.3</validator.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>hv-4.2</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-4.2</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>4.2.0.Final</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <validator.version>4.2</validator.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

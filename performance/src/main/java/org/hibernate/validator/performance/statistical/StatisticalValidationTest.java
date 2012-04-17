@@ -17,7 +17,6 @@
 package org.hibernate.validator.performance.statistical;
 
 import java.io.InputStream;
-import java.util.Random;
 import java.util.Set;
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
@@ -38,7 +37,6 @@ import static junit.framework.Assert.assertNotNull;
  * @author Hardy Ferentschik
  */
 public class StatisticalValidationTest {
-	private static final Random random = new Random();
 	private static final int NUMBER_OF_TEST_ENTITIES = 100;
 
 	private ValidatorFactory factory;
@@ -63,7 +61,7 @@ public class StatisticalValidationTest {
 		validator = factory.getValidator();
 
 		for ( int i = 0; i < NUMBER_OF_TEST_ENTITIES; i++ ) {
-			entitiesUnderTest[i] = new TestEntity( random, 0 );
+			entitiesUnderTest[i] = new TestEntity( i % 10 );
 		}
 	}
 
@@ -71,8 +69,8 @@ public class StatisticalValidationTest {
 	public void testValidationWithStatisticalGraphDepthAndConstraintValidator() throws Exception {
 		for ( int i = 0; i < NUMBER_OF_TEST_ENTITIES; i++ ) {
 			Set<ConstraintViolation<TestEntity>> violations = validator.validate( entitiesUnderTest[i] );
-			assertEquals( StatisticalConstraintValidator.threadLocalCounter.get().get(), violations.size() );
-			StatisticalConstraintValidator.threadLocalCounter.get().getAndSet( 0 );
+			assertEquals( StatisticalConstraintValidator.threadLocalCounter.get().getFailures(), violations.size() );
+			StatisticalConstraintValidator.threadLocalCounter.get().reset();
 		}
 	}
 }

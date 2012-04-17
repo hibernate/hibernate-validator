@@ -17,8 +17,6 @@
 package org.hibernate.validator.performance.statistical;
 
 import java.lang.annotation.Annotation;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -26,10 +24,11 @@ import javax.validation.ConstraintValidatorContext;
  * @author Hardy Ferentschik
  */
 public class StatisticalConstraintValidator implements ConstraintValidator<Annotation, Object> {
-	private final Random randomGenerator = new Random();
-	public static final ThreadLocal<AtomicInteger> threadLocalCounter = new ThreadLocal<AtomicInteger>() {
-		protected AtomicInteger initialValue() {
-			return new AtomicInteger( 0 );
+	private static final float FAILURE_RATE = 0.25f;
+
+	public static final ThreadLocal<Counter> threadLocalCounter = new ThreadLocal<Counter>() {
+		protected Counter initialValue() {
+			return new Counter();
 		}
 	};
 
@@ -37,11 +36,40 @@ public class StatisticalConstraintValidator implements ConstraintValidator<Annot
 	}
 
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
-		int random = randomGenerator.nextInt( 2 );
-		if ( random == 0 ) {
-			threadLocalCounter.get().incrementAndGet();
+		return threadLocalCounter.get().incrementCount();
+	}
+
+	public static class Counter {
+		private int totalCount = 0;
+		private int failures = 0;
+
+		public int getFailures() {
+			return failures;
 		}
-		return random != 0;
+
+		public boolean incrementCount() {
+			totalCount++;
+			if ( totalCount * FAILURE_RATE > failures ) {
+				failures++;
+				return false;
+			}
+			return true;
+		}
+
+		public void reset() {
+			totalCount = 0;
+			failures = 0;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append( "Counter" );
+			sb.append( "{totalCount=" ).append( totalCount );
+			sb.append( ", failures=" ).append( failures );
+			sb.append( '}' );
+			return sb.toString();
+		}
 	}
 }
 

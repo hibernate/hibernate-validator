@@ -37,4 +37,29 @@
             <value>org.hibernate.validator.performance.statistical.StatisticalConstraintValidator</value>
         </validated-by>
     </constraint-definition>
+    <constraint-definition annotation="javax.validation.constraints.DecimalMin">
+        <validated-by include-existing-validators="false">
+            <value>org.hibernate.validator.performance.statistical.StatisticalConstraintValidator</value>
+        </validated-by>
+    </constraint-definition>
+    <constraint-definition annotation="javax.validation.constraints.DecimalMax">
+        <validated-by include-existing-validators="false">
+            <value>org.hibernate.validator.performance.statistical.StatisticalConstraintValidator</value>
+        </validated-by>
+    </constraint-definition>
+    <constraint-definition annotation="javax.validation.constraints.AssertTrue">
+        <validated-by include-existing-validators="false">
+            <value>org.hibernate.validator.performance.statistical.StatisticalConstraintValidator</value>
+        </validated-by>
+    </constraint-definition>
+    <constraint-definition annotation="javax.validation.constraints.AssertFalse">
+        <validated-by include-existing-validators="false">
+            <value>org.hibernate.validator.performance.statistical.StatisticalConstraintValidator</value>
+        </validated-by>
+    </constraint-definition>
+    <constraint-definition annotation="javax.validation.constraints.Pattern">
+        <validated-by include-existing-validators="false">
+            <value>org.hibernate.validator.performance.statistical.StatisticalConstraintValidator</value>
+        </validated-by>
+    </constraint-definition>
 </constraint-mappings>
