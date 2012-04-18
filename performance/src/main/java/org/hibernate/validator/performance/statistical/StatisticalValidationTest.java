@@ -27,9 +27,6 @@ import javax.validation.ValidatorFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
@@ -45,9 +42,7 @@ public class StatisticalValidationTest {
 
 	@Before
 	public void setUp() throws Exception {
-		final Configuration<HibernateValidatorConfiguration> configuration = Validation.byProvider( HibernateValidator.class )
-				.configure();
-
+		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
 		InputStream mappingStream = StatisticalValidationTest.class.getResourceAsStream( "mapping.xml" );
 		try {
 			configuration.addMapping( mappingStream );

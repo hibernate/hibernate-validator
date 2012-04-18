@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.performance.simple;
+package org.hibernate.validator.performance.cascaded;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,17 +34,17 @@ import static junit.framework.Assert.assertEquals;
  * @author Hardy Ferentschik
  */
 public class CascadedValidationTest {
-	private ValidatorFactory factory;
 	private Validator validator;
 
 	@Before
 	public void setUp() {
-		factory = Validation.buildDefaultValidatorFactory();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
 	}
 
 	@Test
 	public void testCascadedValidation() {
+		// TODO graphs needs to be generated and deeper
 		Person kermit = new Person( "kermit" );
 		Person piggy = new Person( "miss piggy" );
 		Person gonzo = new Person( "gonzo" );

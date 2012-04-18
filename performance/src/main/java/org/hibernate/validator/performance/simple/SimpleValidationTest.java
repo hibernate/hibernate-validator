@@ -16,14 +16,13 @@
 */
 package org.hibernate.validator.performance.simple;
 
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -48,68 +47,29 @@ public class SimpleValidationTest {
 			"Olivia",
 			"William"
 	};
-	private ValidatorFactory factory;
 	private Validator validator;
 	private Random random;
 
 	@Before
 	public void setUp() {
-		factory = Validation.buildDefaultValidatorFactory();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
 		random = new Random();
 	}
 
 	@Test
 	public void testSimpleBeanValidation() {
-		int expectedViolationCount = 0;
-
-		String name = names[random.nextInt( 10 )];
-		if ( name == null ) {
-			expectedViolationCount++;
-		}
-
-		int randomAge = random.nextInt( 100 );
-		if ( randomAge < 18 ) {
-			expectedViolationCount++;
-		}
-
-		Driver driver = new Driver( name, randomAge );
-		Set<ConstraintViolation<Driver>> violations = validator.validate( driver );
-		assertEquals( expectedViolationCount, violations.size() );
+		DriverSetup driverSetup = new DriverSetup();
+		Set<ConstraintViolation<Driver>> violations = validator.validate( driverSetup.getDriver() );
+		assertEquals( driverSetup.getExpectedViolationCount(), violations.size() );
 	}
 
 	@Test
 	public void testSimpleBeanValidationRecreatingValidatorFactory() {
-		int expectedViolationCount = 0;
-
-		String name = names[random.nextInt( 10 )];
-		if ( name == null ) {
-			expectedViolationCount++;
-		}
-
-		int randomAge = random.nextInt( 100 );
-		if ( randomAge < 18 ) {
-			expectedViolationCount++;
-		}
-
-		Driver driver = new Driver( name, randomAge );
+		DriverSetup driverSetup = new DriverSetup();
 		Validator localValidator = Validation.buildDefaultValidatorFactory().getValidator();
-		Set<ConstraintViolation<Driver>> violations = localValidator.validate( driver );
-		assertEquals( expectedViolationCount, violations.size() );
-	}
-
-	@Test
-	public void testCascadedValidation() {
-		Person kermit = new Person( "kermit" );
-		Person piggy = new Person( "miss piggy" );
-		Person gonzo = new Person( "gonzo" );
-
-		kermit.addFriend( piggy ).addFriend( gonzo );
-		piggy.addFriend( kermit ).addFriend( gonzo );
-		gonzo.addFriend( kermit ).addFriend( piggy );
-
-		Set<ConstraintViolation<Person>> violations = validator.validate( kermit );
-		assertEquals( 0, violations.size() );
+		Set<ConstraintViolation<Driver>> violations = localValidator.validate( driverSetup.getDriver() );
+		assertEquals( driverSetup.getExpectedViolationCount(), violations.size() );
 	}
 
 	public class Driver {
@@ -119,9 +79,13 @@ public class SimpleValidationTest {
 		@Min(18)
 		int age;
 
-		public Driver(String name, int age) {
+		@AssertTrue
+		private boolean hasDrivingLicense;
+
+		public Driver(String name, int age, boolean hasDrivingLicense) {
 			this.name = name;
 			this.age = age;
+			this.hasDrivingLicense = hasDrivingLicense;
 		}
 
 		@Override
@@ -130,25 +94,44 @@ public class SimpleValidationTest {
 			sb.append( "Driver" );
 			sb.append( "{name='" ).append( name ).append( '\'' );
 			sb.append( ", age=" ).append( age );
+			sb.append( ", hasDrivingLicense=" ).append( hasDrivingLicense );
 			sb.append( '}' );
 			return sb.toString();
 		}
 	}
 
-	public class Person {
-		@NotNull
-		String name;
+	private class DriverSetup {
+		private int expectedViolationCount;
+		private Driver driver;
 
-		@Valid
-		Set<Person> friends = new HashSet<Person>();
+		public DriverSetup() {
+			expectedViolationCount = 0;
 
-		public Person(String name) {
-			this.name = name;
+			String name = names[random.nextInt( 10 )];
+			if ( name == null ) {
+				expectedViolationCount++;
+			}
+
+			int randomAge = random.nextInt( 100 );
+			if ( randomAge < 18 ) {
+				expectedViolationCount++;
+			}
+
+			int rand = random.nextInt( 2 );
+			boolean hasLicense = rand == 1;
+			if ( !hasLicense ) {
+				expectedViolationCount++;
+			}
+
+			driver = new Driver( name, randomAge, hasLicense );
 		}
 
-		public Person addFriend(Person friend) {
-			friends.add( friend );
-			return this;
+		public int getExpectedViolationCount() {
+			return expectedViolationCount;
+		}
+
+		public Driver getDriver() {
+			return driver;
 		}
 	}
 }
