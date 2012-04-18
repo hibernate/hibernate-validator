@@ -94,18 +94,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				properties, tmpFailFast
 		);
 		this.failFast = tmpFailFast;
-
-		Integer hardRefLimit = checkProperty(
-				properties,
-				HibernateValidatorConfiguration.METADATA_CACHE_HARD_REF_LIMIT,
-				Integer.class
-		);
-		Integer softRefLimit = checkProperty(
-				properties,
-				HibernateValidatorConfiguration.METADATA_CACHE_SOFT_REF_LIMIT,
-				Integer.class
-		);
-		metaDataManager = new BeanMetaDataManager( constraintHelper, metaDataProviders, hardRefLimit, softRefLimit );
+		metaDataManager = new BeanMetaDataManager( constraintHelper, metaDataProviders );
 	}
 
 	public Validator getValidator() {
@@ -152,19 +141,5 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			failFast = tmpFailFast;
 		}
 		return failFast;
-	}
-
-	private <T> T checkProperty(Map<String, String> properties, String propertyName, Class<T> type) {
-		String propertyValue = properties.get( propertyName );
-		T value = null;
-		if ( propertyValue != null ) {
-			try {
-				value = type.getConstructor( String.class ).newInstance( propertyValue );
-			}
-			catch ( Exception e ) {
-				throw log.getInvalidPropertyValue( propertyName, propertyValue, e );
-			}
-		}
-		return value;
 	}
 }
