@@ -33,7 +33,7 @@ import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -103,8 +103,8 @@ public class BeanMetaDataManager {
 				DEFAULT_INITIAL_CAPACITY,
 				DEFAULT_LOAD_FACTOR,
 				DEFAULT_CONCURRENCY_LEVEL,
-				WEAK,
-				WEAK,
+				SOFT,
+				SOFT,
 				EnumSet.of( IDENTITY_COMPARISONS )
 		);
 

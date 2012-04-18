@@ -51,7 +51,7 @@ public class BeanMetaDataManagerTest {
 				BeanMetaData meta = metaDataManager.getBeanMetaData( c );
 				assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
 				lastIterationsBean = meta.getBeanClass();
-				log.debug( "Number of cached instances: " + metaDataManager.numberOfCachedBeanMetaDataInstances() );
+				log.info( "Number of cached instances: " + metaDataManager.numberOfCachedBeanMetaDataInstances() );
 			}
 		}
 		catch ( OutOfMemoryError e ) {

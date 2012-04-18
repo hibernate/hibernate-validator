@@ -31,7 +31,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.SoftLimitMRUCache;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -41,6 +41,7 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
@@ -53,6 +54,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ConstraintTree<A extends Annotation> {
 	private static final Log log = LoggerFactory.make();
+
+	/**
+	 * The default initial capacity for this cache.
+	 */
+	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
@@ -73,7 +79,7 @@ public class ConstraintTree<A extends Annotation> {
 	 * used or the user classes are getting reloaded.
 	 * </p>
 	 */
-	private final SoftLimitMRUCache<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
+	private final ConcurrentReferenceHashMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
@@ -82,11 +88,12 @@ public class ConstraintTree<A extends Annotation> {
 	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		// Using a hard limit of one. Assuming that the default constraint validator factory is used most it
-		// should be the one which is mainly hard referenced. Other constraint validator factories should be
-		// available for garbage collection
 		this.constraintValidatorCache =
-				new SoftLimitMRUCache<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>>( 1, 128 );
+				new ConcurrentReferenceHashMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>>(
+						DEFAULT_INITIAL_CAPACITY,
+						SOFT,
+						SOFT
+				);
 
 		final Set<ConstraintDescriptorImpl<?>> composingConstraints = newHashSet();
 		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
