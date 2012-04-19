@@ -23,8 +23,6 @@ import java.lang.reflect.Type;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 /**
  * A {@link ConstraintLocation} implementation that represents a method
  * parameter or return value.
@@ -36,8 +34,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	private final Integer parameterIndex;
 
 	public MethodConstraintLocation(Method method) {
-
-		Contracts.assertNotNull( method, MESSAGES.mustNotBeNull( "Method" ) );
+		Contracts.assertValueNotNull( method, "method" );
 
 		this.method = method;
 		this.parameterIndex = null;
@@ -50,7 +47,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	 * @param parameterIndex The parameter index of the location to be created.
 	 */
 	public MethodConstraintLocation(Method method, int parameterIndex) {
-		Contracts.assertNotNull( method, MESSAGES.mustNotBeNull( "Method" ) );
+		Contracts.assertValueNotNull( method, "method" );
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;
@@ -87,7 +84,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 
 	/**
 	 * @return returns the parameter index of this constraint location or <code>null</code> if
-	 * this location represents a method return value.
+	 *         this location represents a method return value.
 	 */
 	public Integer getParameterIndex() {
 		return parameterIndex;
@@ -147,5 +144,4 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		}
 		return true;
 	}
-
 }

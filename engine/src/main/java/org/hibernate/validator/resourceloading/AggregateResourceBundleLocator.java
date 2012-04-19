@@ -29,8 +29,6 @@ import java.util.ResourceBundle;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 /**
  * A {@link ResourceBundleLocator} implementation that provides access
  * to multiple source {@link ResourceBundle}s by merging them into one
@@ -90,7 +88,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate) {
 		super( delegate );
 
-		Contracts.assertNotNull( bundleNames, MESSAGES.mustNotBeNull( "bundleNames" ) );
+		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
 
 		List<String> tmpBundleNames = new ArrayList<String>();
 		tmpBundleNames.addAll( bundleNames );

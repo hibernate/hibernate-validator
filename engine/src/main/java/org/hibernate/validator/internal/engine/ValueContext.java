@@ -22,8 +22,6 @@ import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.Contracts;
 
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
  * method invocation.
@@ -165,7 +163,7 @@ public class ValueContext<T, V> {
 	 */
 	public final void appendNode(String node) {
 
-		Contracts.assertNotNull( node, MESSAGES.mustNotBeNull( "node" ) );
+		Contracts.assertValueNotNull( node, "node" );
 
 		propertyPath = PathImpl.createCopy( propertyPath );
 		propertyPath.addNode( node );
