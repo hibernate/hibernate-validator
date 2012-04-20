@@ -17,6 +17,9 @@ buildSrc/.gradle
 test-output
 */test-output
 
+# Jmeter directory from perf test
+*/jmeter
+
 # IntelliJ specific files/directories
 /out
 .idea

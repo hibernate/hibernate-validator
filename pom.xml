@@ -78,6 +78,7 @@
         <module>integration</module>
         <module>annotation-processor</module>
         <module>archetype</module>
+        <module>performance</module>
     </modules>
 
     <properties>
@@ -142,6 +143,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>3.6.0.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.2</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>

@@ -22,24 +22,33 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+
 /**
  * A {@link ValidationContext} implementation which creates and manages violations of type {@link ConstraintViolation}.
- * 
- * @author Gunnar Morling
  *
  * @param <T> The type of the root bean for which this context is created.
+ *
+ * @author Gunnar Morling
  */
-public class StandardValidationContext <T> extends ValidationContext<T, ConstraintViolation<T>> {
+public class StandardValidationContext<T> extends ValidationContext<T, ConstraintViolation<T>> {
 
 	protected StandardValidationContext(Class<T> rootBeanClass, T rootBean,
-			MessageInterpolator messageInterpolator,
-			ConstraintValidatorFactory constraintValidatorFactory,
-			TraversableResolver traversableResolver,
-			boolean failFast) {
-		
-		super(rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast);
+										MessageInterpolator messageInterpolator,
+										ConstraintValidatorFactory constraintValidatorFactory,
+										TraversableResolver traversableResolver,
+										boolean failFast) {
+
+		super(
+				rootBeanClass,
+				rootBean,
+				messageInterpolator,
+				constraintValidatorFactory,
+				traversableResolver,
+				failFast
+		);
 	}
-	
+
 	@Override
 	public <U, V> ConstraintViolation<T> createConstraintViolation(
 			ValueContext<U, V> localContext, MessageAndPath messageAndPath,
@@ -50,7 +59,7 @@ public class StandardValidationContext <T> extends ValidationContext<T, Constrai
 				messageTemplate,
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
-		
+
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
