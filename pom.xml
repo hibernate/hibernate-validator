@@ -85,6 +85,7 @@
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.6.1</slf4j.version>
+        <org.codehaus.mojo.chronos.version>1.0-beta-3</org.codehaus.mojo.chronos.version>
     </properties>
 
     <dependencyManagement>
@@ -456,6 +457,11 @@
                             <delimiter>${*}</delimiter>
                         </delimiters>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>chronos-jmeter-maven-plugin</artifactId>
+                    <version>${org.codehaus.mojo.chronos.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

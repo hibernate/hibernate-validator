@@ -22,8 +22,6 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-
 /**
  * A {@link ValidationContext} implementation which creates and manages violations of type {@link ConstraintViolation}.
  *

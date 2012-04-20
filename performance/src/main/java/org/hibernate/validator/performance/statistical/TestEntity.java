@@ -36,6 +36,7 @@ import javax.validation.constraints.Size;
 /**
  * @author Hardy Ferentschik
  */
+@SuppressWarnings("unused")
 public class TestEntity {
 	public static final int MAX_DEPTH = 10;
 	private static final Calendar cal = GregorianCalendar.getInstance();

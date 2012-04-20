@@ -1,6 +1,6 @@
 # Performance test for Hibernate Validator
 
-The tests are written as JUnit tests. They can be developed and tests as usual in your IDE. However, they are not
+The tests are written as JUnit tests. They can be developed and executed as usual in your IDE. However, they are not
 run as unit tests during a _mvn test_. Instead, to execute the performance tests [Apache JMeter](http://jmeter.apache.org/)
 and the [chronos-jmeter-maven-plugin](http://mojo.codehaus.org/chronos/chronos-jmeter-maven-plugin) is used.
 
@@ -29,7 +29,7 @@ To run or configure a test via the GUI you run:
 
     > mvn chronos-jmeter:jmetergui -P hv-4.3 &
 
-Then open a JMeter test file from _src/jmx_ and run the test
+Then open a JMeter test file from _src/jmx_ and run the test.
 
 ### Using the maven build
 

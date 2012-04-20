@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ JBoss, Home of Professional Open Source
-  ~ Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+  ~ Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
   ~ by the @authors tag. See the copyright.txt in the distribution for a
   ~ full listing of individual contributors.
   ~
@@ -31,7 +31,6 @@
     <description>Hibernate Validator performance tests.</description>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--<profilingOptions>-agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait</profilingOptions>-->
         <history.directory>${project.basedir}/history</history.directory>
     </properties>
@@ -67,7 +66,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>chronos-jmeter-maven-plugin</artifactId>
-                <version>1.0-beta-3</version>
                 <configuration>
                     <input>${basedir}/src/jmx</input>
                     <jMeterRemoteLocation>http://www.apache.org/dist/jmeter/binaries/apache-jmeter-2.6.zip</jMeterRemoteLocation>
@@ -95,7 +93,9 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>chronos-report-maven-plugin</artifactId>
-                <version>1.0-beta-3</version>
+                <!-- Can't retrieve reporting plug-in version from pluginManagement
+                     (see http://jira.codehaus.org/browse/MSITE-443) -->
+                <version>${org.codehaus.mojo.chronos.version}</version>
             </plugin>
         </plugins>
     </reporting>
