@@ -34,7 +34,6 @@ import org.hibernate.validator.internal.util.Contracts;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -119,7 +118,8 @@ public class BeanMetaDataManager {
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeCannotBeNull() );
+		// TODO - Avoid usages of Messages class until https://issues.jboss.org/browse/LOGTOOL-45 is resolved (HF)
+		Contracts.assertNotNull( beanClass, "The bean type cannot be null." );
 
 		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
 
