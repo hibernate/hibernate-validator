@@ -38,27 +38,38 @@ import static org.testng.Assert.fail;
  */
 public class BeanMetaDataManagerTest {
 	private static final Log log = LoggerFactory.make();
-	private static final int MAX_ENTITY_COUNT = 1000;
+	// high enough to force a OutOfMemoryError in case references are not freed
+	private static final int MAX_ENTITY_COUNT = 100000;
 
 	@Test
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
 		BeanMetaDataManager metaDataManager = new BeanMetaDataManager( new ConstraintHelper() );
 
 		Class<?> lastIterationsBean = null;
-		try {
-			for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
-				Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
-				BeanMetaData meta = metaDataManager.getBeanMetaData( c );
-				assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
-				lastIterationsBean = meta.getBeanClass();
-				log.info( "Number of cached instances: " + metaDataManager.numberOfCachedBeanMetaDataInstances() );
+		int totalCreatedMetaDataInstances = 0;
+		int cachedBeanMetaDataInstances = 0;
+		for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
+			Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
+			BeanMetaData meta = metaDataManager.getBeanMetaData( c );
+			assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
+			lastIterationsBean = meta.getBeanClass();
+			totalCreatedMetaDataInstances++;
+			cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
+
+			if ( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) {
+				log.debug( "Garbage collection occurred and some metadata instances got garbage collected!" );
+				log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
+				log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
+				break;
 			}
 		}
-		catch ( OutOfMemoryError e ) {
-			fail( "Cache entries should automatically be garbage collected when needed" );
+
+		if ( cachedBeanMetaDataInstances >= totalCreatedMetaDataInstances ) {
+			fail( "Metadata instances should be garbage collectible" );
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public static class Fubar {
 		@NotNull
 		Object o;
