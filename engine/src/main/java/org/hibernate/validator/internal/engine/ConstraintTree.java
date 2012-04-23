@@ -324,15 +324,15 @@ public class ConstraintTree<A extends Annotation> {
 	 */
 	@SuppressWarnings("unchecked")
 	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ConstraintValidatorFactory constraintFactory) {
-		ConstraintValidator<A, V> constraintValidator;
-		ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey( constraintFactory, validatedValueType );
-		if ( constraintValidatorCache.get( key ) == null ) {
+
+		final ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey( constraintFactory, validatedValueType );
+		ConstraintValidator<A, V> constraintValidator =  (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
+		if ( constraintValidator == null ) {
 			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
 			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass );
 			constraintValidatorCache.put( key, constraintValidator );
 		}
 		else {
-			constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
 			log.tracef( "Constraint validator %s found in cache.", constraintValidator );
 		}
 		return constraintValidator;
