@@ -27,7 +27,7 @@
 
     <artifactId>hibernate-validator</artifactId>
 
-    <name>Hibernate Validator</name>
+    <name>Hibernate Validator Engine</name>
     <description>Hibernate's Bean Validation (JSR-303) reference implementation.</description>
 
     <distributionManagement>
@@ -94,6 +94,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
             <scope>test</scope>
@@ -120,8 +125,8 @@
         <jdbc.driver>org.h2.Driver</jdbc.driver>
         <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
         <jdbc.user>sa</jdbc.user>
-        <jdbc.pass />
-        <jdbc.isolation />
+        <jdbc.pass/>
+        <jdbc.isolation/>
     </properties>
 
     <build>
