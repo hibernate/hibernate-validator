@@ -121,7 +121,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	public final <T, U, V, E extends ConstraintViolation<T>> boolean validateConstraints(ValidationContext<T, E> executionContext, ValueContext<U, V> valueContext) {
-		Set<E> constraintViolations = new HashSet<E>();
+		Set<E> constraintViolations = CollectionHelper.newHashSet();
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
 			executionContext.addConstraintFailures( constraintViolations );
@@ -161,13 +161,12 @@ public class ConstraintTree<A extends Annotation> {
 					valueContext.getPropertyPath(), descriptor
 			);
 
-			localViolationList.addAll(
-					validateSingleConstraint(
-							executionContext,
-							valueContext,
-							constraintValidatorContext,
-							validator
-					)
+			validateSingleConstraint(
+					executionContext,
+					valueContext,
+					constraintValidatorContext,
+					validator,
+					localViolationList
 			);
 
 			// We re-evaluate the boolean composition by taking into consideration also the violations
@@ -240,7 +239,7 @@ public class ConstraintTree<A extends Annotation> {
 																									   Set<E> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
 		for ( ConstraintTree<?> tree : getChildren() ) {
-			Set<E> tmpViolationList = new HashSet<E>();
+			Set<E> tmpViolationList = CollectionHelper.newHashSet();
 			tree.validateConstraints( executionContext, valueContext, tmpViolationList );
 			constraintViolations.addAll( tmpViolationList );
 
@@ -285,9 +284,9 @@ public class ConstraintTree<A extends Annotation> {
 	private <T, U, V, E extends ConstraintViolation<T>> Set<E> validateSingleConstraint(ValidationContext<T, E> executionContext,
 																						ValueContext<U, V> valueContext,
 																						ConstraintValidatorContextImpl constraintValidatorContext,
-																						ConstraintValidator<A, V> validator) {
+																						ConstraintValidator<A, V> validator,
+																						Set<E> constraintViolations) {
 		boolean isValid;
-		Set<E> cv = new HashSet<E>();
 		try {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
@@ -297,13 +296,13 @@ public class ConstraintTree<A extends Annotation> {
 		if ( !isValid ) {
 			//We do not add them these violations yet, since we don't know how they are
 			//going to influence the final boolean evaluation
-			cv.addAll(
+			constraintViolations.addAll(
 					executionContext.createConstraintViolations(
 							valueContext, constraintValidatorContext
 					)
 			);
 		}
-		return cv;
+		return constraintViolations;
 	}
 
 	/**
@@ -325,8 +324,11 @@ public class ConstraintTree<A extends Annotation> {
 	@SuppressWarnings("unchecked")
 	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ConstraintValidatorFactory constraintFactory) {
 
-		final ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey( constraintFactory, validatedValueType );
-		ConstraintValidator<A, V> constraintValidator =  (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
+		final ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey(
+				constraintFactory,
+				validatedValueType
+		);
+		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
 		if ( constraintValidator == null ) {
 			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
 			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass );
