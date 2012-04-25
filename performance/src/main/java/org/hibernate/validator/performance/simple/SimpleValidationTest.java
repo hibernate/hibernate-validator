@@ -26,7 +26,7 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -47,11 +47,12 @@ public class SimpleValidationTest {
 			"Olivia",
 			"William"
 	};
-	private Validator validator;
-	private Random random;
 
-	@Before
-	public void setUp() {
+	private static Validator validator;
+	private static Random random;
+
+	@BeforeClass
+	public static void setUpValidatorFactory() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
 		random = new Random();

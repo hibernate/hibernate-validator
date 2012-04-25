@@ -36,9 +36,11 @@ import org.hibernate.validator.internal.util.IdentitySet;
 
 /**
  * Context object keeping track of all important data for a top level {@link javax.validation.Validator#validate(Object, Class[])} },
- * {@link javax.validation.Validator#validateValue(Class, String, Object, Class[])}  } or {@link javax.validation.Validator#validateProperty(Object, String, Class[])}  call.
- * <p/>
- * we use this object to collect all failing constraints, but also to cache the caching traversable resolver for a full stack call.
+ * {@link javax.validation.Validator#validateValue(Class, String, Object, Class[])}  }
+ * or {@link javax.validation.Validator#validateProperty(Object, String, Class[])}  call.
+ * <p>
+ * We use this object to collect all failing constraints, but also to cache the caching traversable resolver for a full stack call.
+ * </p>
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
@@ -178,10 +180,6 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public final TraversableResolver getTraversableResolver() {
 		return traversableResolver;
-	}
-
-	public final MessageInterpolator getMessageInterpolator() {
-		return messageInterpolator;
 	}
 
 	public final boolean isFailFastModeEnabled() {

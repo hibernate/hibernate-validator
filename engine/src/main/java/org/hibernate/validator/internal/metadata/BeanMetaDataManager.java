@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.metadata;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -27,9 +28,12 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
-import org.hibernate.validator.internal.util.SoftLimitMRUCache;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
+import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -50,14 +54,19 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  */
 public class BeanMetaDataManager {
 	/**
-	 * The default maximum number of {@code BeanMetaData} instances to cache via hard references
+	 * The default initial capacity for this cache.
 	 */
-	public static final int DEFAULT_HARD_REF_LIMIT = 64;
+	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	/**
-	 * The default maximum number of {@code BeanMetaData} instances to cache via hard references
+	 * The default load factor for this cache.
 	 */
-	public static final int DEFAULT_SOFT_REF_LIMIT = 1024;
+	static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+	/**
+	 * The default concurrency level for this cache.
+	 */
+	static final int DEFAULT_CONCURRENCY_LEVEL = 16;
 
 	/**
 	 * Additional metadata providers used for meta data retrieval if
@@ -73,42 +82,32 @@ public class BeanMetaDataManager {
 	/**
 	 * Used to cache the constraint meta data for validated entities
 	 */
-	private final SoftLimitMRUCache<Class<?>, BeanMetaData<?>> beanMetaDataCache;
+	private final ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>> beanMetaDataCache;
 
 	public BeanMetaDataManager(ConstraintHelper constraintHelper, MetaDataProvider... metaDataProviders) {
 		this( constraintHelper, Arrays.asList( metaDataProviders ) );
 	}
 
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, List<MetaDataProvider> optionalMetaDataProviders) {
-		this( constraintHelper, optionalMetaDataProviders, DEFAULT_HARD_REF_LIMIT, DEFAULT_SOFT_REF_LIMIT );
-	}
-
 	/**
 	 * @param constraintHelper the constraint helper
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
-	 * @param hardRefLimit the maximum number of {@code BeanMetaData} instances to cache via hard references.
-	 * If {@code null} is passed  {@link #DEFAULT_HARD_REF_LIMIT} is used.
-	 * @param softRefLimit the maximum number of {@code BeanMetaData} instances to cache via soft references.
-	 * If {@code null} is passed  {@link #DEFAULT_SOFT_REF_LIMIT} is used.
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
-							   List<MetaDataProvider> optionalMetaDataProviders,
-							   Integer hardRefLimit,
-							   Integer softRefLimit
-	) {
+							   List<MetaDataProvider> optionalMetaDataProviders) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 
-		if ( hardRefLimit == null ) {
-			hardRefLimit = DEFAULT_HARD_REF_LIMIT;
-		}
+		this.beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
+				DEFAULT_INITIAL_CAPACITY,
+				DEFAULT_LOAD_FACTOR,
+				DEFAULT_CONCURRENCY_LEVEL,
+				SOFT,
+				SOFT,
+				EnumSet.of( IDENTITY_COMPARISONS )
+		);
 
-		if ( softRefLimit == null ) {
-			softRefLimit = DEFAULT_SOFT_REF_LIMIT;
-		}
 
-		this.beanMetaDataCache = new SoftLimitMRUCache<Class<?>, BeanMetaData<?>>( hardRefLimit, softRefLimit );
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintHelper,
@@ -119,13 +118,16 @@ public class BeanMetaDataManager {
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
+		// TODO - Avoid usages of Messages class until https://issues.jboss.org/browse/LOGTOOL-45 is resolved (HF)
+		Contracts.assertNotNull( beanClass, "The bean type cannot be null." );
+
 		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
 
 		// create a new BeanMetaData in case none is cached
 		if ( beanMetaData == null ) {
 			beanMetaData = createBeanMetaData( beanClass );
 
-			final BeanMetaData<T> cachedBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.put(
+			final BeanMetaData<T> cachedBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.putIfAbsent(
 					beanClass,
 					beanMetaData
 			);
@@ -137,8 +139,9 @@ public class BeanMetaDataManager {
 		return beanMetaData;
 	}
 
+
 	public int numberOfCachedBeanMetaDataInstances() {
-		return beanMetaDataCache.softSize();
+		return beanMetaDataCache.size();
 	}
 
 	/**

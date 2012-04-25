@@ -694,8 +694,8 @@ public final class ReflectionHelper {
 	 */
 	public static boolean haveSameSignature(Method method1, Method method2) {
 
-		Contracts.assertNotNull( method1, MESSAGES.mustNotBeNull( "method1" ) );
-		Contracts.assertNotNull( method2, MESSAGES.mustNotBeNull( "method2" ) );
+		Contracts.assertValueNotNull( method1, "method1" );
+		Contracts.assertValueNotNull( method2, "method2" );
 
 		return
 				method1.getName().equals( method2.getName() ) &&

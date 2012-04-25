@@ -31,7 +31,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.SoftLimitMRUCache;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -41,6 +41,7 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
@@ -53,6 +54,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ConstraintTree<A extends Annotation> {
 	private static final Log log = LoggerFactory.make();
+
+	/**
+	 * The default initial capacity for this cache.
+	 */
+	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
@@ -73,7 +79,7 @@ public class ConstraintTree<A extends Annotation> {
 	 * used or the user classes are getting reloaded.
 	 * </p>
 	 */
-	private final SoftLimitMRUCache<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
+	private final ConcurrentReferenceHashMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
 
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
@@ -82,11 +88,12 @@ public class ConstraintTree<A extends Annotation> {
 	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		// Using a hard limit of one. Assuming that the default constraint validator factory is used most it
-		// should be the one which is mainly hard referenced. Other constraint validator factories should be
-		// available for garbage collection
 		this.constraintValidatorCache =
-				new SoftLimitMRUCache<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>>( 1, 128 );
+				new ConcurrentReferenceHashMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>>(
+						DEFAULT_INITIAL_CAPACITY,
+						SOFT,
+						SOFT
+				);
 
 		final Set<ConstraintDescriptorImpl<?>> composingConstraints = newHashSet();
 		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
@@ -114,7 +121,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	public final <T, U, V, E extends ConstraintViolation<T>> boolean validateConstraints(ValidationContext<T, E> executionContext, ValueContext<U, V> valueContext) {
-		Set<E> constraintViolations = new HashSet<E>();
+		Set<E> constraintViolations = CollectionHelper.newHashSet();
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
 			executionContext.addConstraintFailures( constraintViolations );
@@ -154,13 +161,12 @@ public class ConstraintTree<A extends Annotation> {
 					valueContext.getPropertyPath(), descriptor
 			);
 
-			localViolationList.addAll(
-					validateSingleConstraint(
-							executionContext,
-							valueContext,
-							constraintValidatorContext,
-							validator
-					)
+			validateSingleConstraint(
+					executionContext,
+					valueContext,
+					constraintValidatorContext,
+					validator,
+					localViolationList
 			);
 
 			// We re-evaluate the boolean composition by taking into consideration also the violations
@@ -233,7 +239,7 @@ public class ConstraintTree<A extends Annotation> {
 																									   Set<E> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
 		for ( ConstraintTree<?> tree : getChildren() ) {
-			Set<E> tmpViolationList = new HashSet<E>();
+			Set<E> tmpViolationList = CollectionHelper.newHashSet();
 			tree.validateConstraints( executionContext, valueContext, tmpViolationList );
 			constraintViolations.addAll( tmpViolationList );
 
@@ -278,9 +284,9 @@ public class ConstraintTree<A extends Annotation> {
 	private <T, U, V, E extends ConstraintViolation<T>> Set<E> validateSingleConstraint(ValidationContext<T, E> executionContext,
 																						ValueContext<U, V> valueContext,
 																						ConstraintValidatorContextImpl constraintValidatorContext,
-																						ConstraintValidator<A, V> validator) {
+																						ConstraintValidator<A, V> validator,
+																						Set<E> constraintViolations) {
 		boolean isValid;
-		Set<E> cv = new HashSet<E>();
 		try {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
@@ -290,13 +296,13 @@ public class ConstraintTree<A extends Annotation> {
 		if ( !isValid ) {
 			//We do not add them these violations yet, since we don't know how they are
 			//going to influence the final boolean evaluation
-			cv.addAll(
+			constraintViolations.addAll(
 					executionContext.createConstraintViolations(
 							valueContext, constraintValidatorContext
 					)
 			);
 		}
-		return cv;
+		return constraintViolations;
 	}
 
 	/**
@@ -317,15 +323,18 @@ public class ConstraintTree<A extends Annotation> {
 	 */
 	@SuppressWarnings("unchecked")
 	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ConstraintValidatorFactory constraintFactory) {
-		ConstraintValidator<A, V> constraintValidator;
-		ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey( constraintFactory, validatedValueType );
-		if ( constraintValidatorCache.get( key ) == null ) {
+
+		final ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey(
+				constraintFactory,
+				validatedValueType
+		);
+		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
+		if ( constraintValidator == null ) {
 			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
 			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass );
 			constraintValidatorCache.put( key, constraintValidator );
 		}
 		else {
-			constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
 			log.tracef( "Constraint validator %s found in cache.", constraintValidator );
 		}
 		return constraintValidator;

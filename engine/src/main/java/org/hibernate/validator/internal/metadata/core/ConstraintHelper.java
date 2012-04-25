@@ -87,6 +87,7 @@ import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCha
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.URLValidator;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -103,16 +104,12 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Gunnar Morling
  */
 public class ConstraintHelper {
-
 	private static final Log log = LoggerFactory.make();
-
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
-
 	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
-			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>>();
-
+			CollectionHelper.newConcurrentHashMap();
 	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitions =
-			new ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>>();
+			CollectionHelper.newConcurrentHashMap();
 
 	public ConstraintHelper() {
 		List<Class<? extends ConstraintValidator<?, ?>>> constraintList = newArrayList();

@@ -25,7 +25,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -34,10 +34,10 @@ import static junit.framework.Assert.assertEquals;
  * @author Hardy Ferentschik
  */
 public class CascadedValidationTest {
-	private Validator validator;
+	private static Validator validator;
 
-	@Before
-	public void setUp() {
+	@BeforeClass
+	public static void setupValidatorInstance() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
 	}

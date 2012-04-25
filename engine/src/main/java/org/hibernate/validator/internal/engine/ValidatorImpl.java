@@ -392,16 +392,16 @@ public class ValidatorImpl implements Validator, MethodValidator {
 					}
 					validationSuccessful = validationSuccessful && tmp;
 					valueContext.setPropertyPath( currentPath );
-					validationContext.markProcessed(
-							valueContext.getCurrentBean(),
-							valueContext.getCurrentGroup(),
-							valueContext.getPropertyPath()
-					);
 				}
 				if ( !validationSuccessful ) {
 					break;
 				}
 			}
+			validationContext.markProcessed(
+					valueContext.getCurrentBean(),
+					valueContext.getCurrentGroup(),
+					valueContext.getPropertyPath()
+			);
 
 			// all constraints in the hierarchy has been validated, stop validation.
 			if ( defaultGroupSequenceIsRedefined ) {

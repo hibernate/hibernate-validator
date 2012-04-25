@@ -46,14 +46,15 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.SoftLimitMRUCache;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
 import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
@@ -63,17 +64,24 @@ import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance
  */
 @SuppressWarnings("deprecation")
 public class AnnotationMetaDataProvider implements MetaDataProvider {
-
 	private static final Log log = LoggerFactory.make();
+	/**
+	 * The default initial capacity for this cache.
+	 */
+	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	private final ConstraintHelper constraintHelper;
-	private final SoftLimitMRUCache<Class<?>, BeanConfiguration<?>> configuredBeans;
+	private final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = annotationProcessingOptions;
-		configuredBeans = new SoftLimitMRUCache<Class<?>, BeanConfiguration<?>>();
+		configuredBeans = new ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>>(
+				DEFAULT_INITIAL_CAPACITY,
+				SOFT,
+				SOFT
+		);
 	}
 
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {

@@ -51,10 +51,6 @@ public final class CollectionHelper {
 		return new ConcurrentHashMap<K, V>();
 	}
 
-	public static <K, V> ReadWriteMap<K, V> newReadWriteMap(Map<K, V> m) {
-		return new ReadWriteMap<K, V>( m );
-	}
-
 	public static <T> HashSet<T> newHashSet() {
 		return new HashSet<T>();
 	}

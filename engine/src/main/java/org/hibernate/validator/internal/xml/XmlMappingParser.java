@@ -88,21 +88,36 @@ public class XmlMappingParser {
 	}
 
 	public final void parse(Set<InputStream> mappingStreams) {
-		for ( InputStream in : mappingStreams ) {
-			ConstraintMappingsType mapping = getValidationConfig( in );
-			String defaultPackage = mapping.getDefaultPackage();
 
-			parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
+		Schema schema = getMappingSchema();
 
-			for ( BeanType bean : mapping.getBean() ) {
-				Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
-				checkClassHasNotBeenProcessed( processedClasses, beanClass );
-				annotationProcessingOptions.ignoreAnnotationConstraintForClass( beanClass, bean.getIgnoreAnnotations() );
-				parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
-				parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
-				parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
-				processedClasses.add( beanClass );
+		try {
+			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
+			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			unmarshaller.setSchema( schema );
+
+			for ( InputStream in : mappingStreams ) {
+				ConstraintMappingsType mapping = getValidationConfig( in, unmarshaller );
+				String defaultPackage = mapping.getDefaultPackage();
+
+				parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
+
+				for ( BeanType bean : mapping.getBean() ) {
+					Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
+					checkClassHasNotBeenProcessed( processedClasses, beanClass );
+					annotationProcessingOptions.ignoreAnnotationConstraintForClass(
+							beanClass,
+							bean.getIgnoreAnnotations()
+					);
+					parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
+					parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
+					parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
+					processedClasses.add( beanClass );
+				}
 			}
+		}
+		catch ( JAXBException e ) {
+			throw log.getErrorParsingMappingFileException( e );
 		}
 	}
 
@@ -578,9 +593,22 @@ public class XmlMappingParser {
 		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
-	private ConstraintMappingsType getValidationConfig(InputStream in) {
+	private Schema getMappingSchema() {
+		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlMappingParser.class );
+		URL schemaUrl = loader.getResource( VALIDATION_MAPPING_XSD );
+		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
+		Schema schema = null;
+		try {
+			schema = sf.newSchema( schemaUrl );
+		}
+		catch ( SAXException e ) {
+			log.unableToCreateSchema( VALIDATION_MAPPING_XSD, e.getMessage() );
+		}
+		return schema;
+	}
+
+	private ConstraintMappingsType getValidationConfig(InputStream in, Unmarshaller unmarshaller) {
 		ConstraintMappingsType constraintMappings;
-		Schema schema = getMappingSchema();
 		try {
 			// check whether mark is supported, if so we can reset the stream in order to allow reuse of Configuration
 			boolean markSupported = in.markSupported();
@@ -588,9 +616,6 @@ public class XmlMappingParser {
 				in.mark( Integer.MAX_VALUE );
 			}
 
-			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
-			unmarshaller.setSchema( schema );
 			StreamSource stream = new StreamSource( new CloseIgnoringInputStream( in ) );
 			JAXBElement<ConstraintMappingsType> root = unmarshaller.unmarshal( stream, ConstraintMappingsType.class );
 			constraintMappings = root.getValue();
@@ -610,19 +635,6 @@ public class XmlMappingParser {
 		return constraintMappings;
 	}
 
-	private Schema getMappingSchema() {
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlMappingParser.class );
-		URL schemaUrl = loader.getResource( VALIDATION_MAPPING_XSD );
-		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
-		Schema schema = null;
-		try {
-			schema = sf.newSchema( schemaUrl );
-		}
-		catch ( SAXException e ) {
-			log.unableToCreateSchema( VALIDATION_MAPPING_XSD, e.getMessage() );
-		}
-		return schema;
-	}
 
 	// JAXB closes the underlying input stream
 	public class CloseIgnoringInputStream extends FilterInputStream {

@@ -37,9 +37,34 @@ public final class Contracts {
 		assertNotNull( o, MESSAGES.mustNotBeNull() );
 	}
 
+	/**
+	 * Asserts that the given object is not {@code null}.
+	 *
+	 * @param o The object to check.
+	 * @param message A message text which will be used as message of the resulting
+	 * exception if the given object is {@code null}.
+	 *
+	 * @throws IllegalArgumentException In case the given object is {@code null}.
+	 */
 	public static void assertNotNull(Object o, String message) {
 		if ( o == null ) {
 			throw log.getIllegalArgumentException( message );
+		}
+	}
+
+	/**
+	 * Asserts that the given object is not {@code null}.
+	 *
+	 * @param o The object to check.
+	 * @param name The name of the value to check. A message of the form
+	 * "&lt;name&gt; must not be null" will be used as message of
+	 * the resulting exception if the given object is {@code null}.
+	 *
+	 * @throws IllegalArgumentException In case the given object is {@code null}.
+	 */
+	public static void assertValueNotNull(Object o, String name) {
+		if ( o == null ) {
+			throw log.getIllegalArgumentException( MESSAGES.mustNotBeNull( name ) );
 		}
 	}
 

@@ -20,75 +20,56 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collections;
 import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.FileAssert.fail;
-
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
 public class BeanMetaDataManagerTest {
 	private static final Log log = LoggerFactory.make();
+	// high enough to force a OutOfMemoryError in case references are not freed
+	private static final int MAX_ENTITY_COUNT = 100000;
 
 	@Test
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
 		BeanMetaDataManager metaDataManager = new BeanMetaDataManager( new ConstraintHelper() );
 
-		for ( int i = 0; i < 100; i++ ) {
+		Class<?> lastIterationsBean = null;
+		int totalCreatedMetaDataInstances = 0;
+		int cachedBeanMetaDataInstances = 0;
+		for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
 			Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
-			metaDataManager.getBeanMetaData( c );
-		}
+			BeanMetaData meta = metaDataManager.getBeanMetaData( c );
+			assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
+			lastIterationsBean = meta.getBeanClass();
+			totalCreatedMetaDataInstances++;
+			cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
 
-		assertEquals( metaDataManager.numberOfCachedBeanMetaDataInstances(), 100 );
-
-		try {
-			byte[][] buf = new byte[1024][];
-			for ( int i = 0; i < buf.length; i++ ) {
-				buf[i] = new byte[10 * 1024 * 1024];
+			if ( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) {
+				log.debug( "Garbage collection occurred and some metadata instances got garbage collected!" );
+				log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
+				log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
+				break;
 			}
-			fail( "The byte array allocation should have triggered a OutOfMemoryError" );
 		}
-		catch ( OutOfMemoryError ex ) {
-			log.debug( "Successfully forced a OutOfMemoryError" );
-		}
-		// not really reliable. if we get problems with this test we might have to disable it
-		System.gc();
 
-		assertEquals(
-				metaDataManager.numberOfCachedBeanMetaDataInstances(), 64,
-				"Only the hard referenced entries should be left. Soft references should have been garbage collected"
-		);
+		if ( cachedBeanMetaDataInstances >= totalCreatedMetaDataInstances ) {
+			fail( "Metadata instances should be garbage collectible" );
+		}
 	}
 
-	@Test
-	@SuppressWarnings("unchecked")
-	public void testCustomMetaDataCacheSettings() throws Exception {
-		BeanMetaDataManager metaDataManager = new BeanMetaDataManager(
-				new ConstraintHelper(),
-				Collections.<MetaDataProvider>emptyList(),
-				1,
-				10
-		);
-
-		for ( int i = 0; i < 100; i++ ) {
-			Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
-			metaDataManager.getBeanMetaData( c );
-		}
-
-		assertEquals( metaDataManager.numberOfCachedBeanMetaDataInstances(), 10 );
-	}
-
+	@SuppressWarnings("unused")
 	public static class Fubar {
 		@NotNull
 		Object o;

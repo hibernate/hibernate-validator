@@ -38,7 +38,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class PathImpl implements Path, Serializable {
-
 	private static final long serialVersionUID = 7564511574909882392L;
 	private static final Log log = LoggerFactory.make();
 
@@ -76,7 +75,6 @@ public final class PathImpl implements Path, Serializable {
 	 * {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
-
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
@@ -95,7 +93,6 @@ public final class PathImpl implements Path, Serializable {
 	 * @return A path representing the specified method parameter.
 	 */
 	public static PathImpl createPathForMethodParameter(Method method, String parameterName) {
-
 		Contracts.assertNotNull( method, "A method is required to create a method parameter path." );
 		Contracts.assertNotNull( parameterName, "A parameter name is required to create a method parameter path." );
 
@@ -106,19 +103,11 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public static PathImpl createPathForMethodReturnValue(Method method) {
-
 		Contracts.assertNotNull( method, "A method is required to create a method return value path." );
 
 		PathImpl path = createRootPath();
 		path.addMethodReturnValueNode( method );
 
-		return path;
-	}
-
-
-	public static PathImpl createNewPath(String name) {
-		PathImpl path = new PathImpl();
-		path.addNode( name );
 		return path;
 	}
 
@@ -139,7 +128,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public final NodeImpl addNode(String nodeName) {
-		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -147,7 +136,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private NodeImpl addMethodParameterNode(Method method, String parameterName) {
-		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new MethodParameterNodeImpl( method, parameterName, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -155,7 +144,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private NodeImpl addMethodReturnValueNode(Method method) {
-		NodeImpl parent = nodeList.size() == 0 ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new MethodReturnValueNodeImpl( method, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -163,27 +152,24 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public final NodeImpl makeLeafNodeIterable() {
-		NodeImpl leafNode = getLeafNode();
-		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, null );
-		nodeList.remove( leafNode );
+		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, null );
+		nodeList.remove( nodeList.size() -1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
 
 	public final NodeImpl setLeafNodeIndex(Integer index) {
-		NodeImpl leafNode = getLeafNode();
-		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, index, null );
-		nodeList.remove( leafNode );
+		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, index, null );
+		nodeList.remove( nodeList.size() -1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
 
 	public final NodeImpl setLeafNodeMapKey(Object key) {
-		NodeImpl leafNode = getLeafNode();
-		currentLeafNode = new NodeImpl( leafNode.getName(), leafNode.getParent(), true, null, key );
-		nodeList.remove( leafNode );
+		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, key );
+		nodeList.remove( nodeList.size() -1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
@@ -235,17 +221,54 @@ public final class PathImpl implements Path, Serializable {
 		}
 
 		PathImpl path = (PathImpl) o;
-		if ( nodeList != null && !nodeList.equals( path.nodeList ) ) {
-			return false;
-		}
-		if ( nodeList == null && path.nodeList != null ) {
-			return false;
-		}
 
+		// testing equality using the Path API
+		Iterator<Path.Node> p1Iterator = this.iterator();
+		Iterator<Path.Node> p2Iterator = path.iterator();
+		while ( p1Iterator.hasNext() ) {
+			Path.Node p1Node = p1Iterator.next();
+			if ( !p2Iterator.hasNext() ) {
+				return false;
+			}
+			Path.Node p2Node = p2Iterator.next();
+
+			// do the comparison on the node values
+			if ( p2Node.getName() == null ) {
+				if ( p1Node.getName() != null ) {
+					return false;
+				}
+			}
+			else if ( !p2Node.getName().equals( p1Node.getName() ) ) {
+				return false;
+			}
+
+			if ( p2Node.isInIterable() != p1Node.isInIterable() ) {
+				return false;
+			}
+
+			if ( p2Node.getIndex() == null ) {
+				if ( p1Node.getIndex() != null ) {
+					return false;
+				}
+			}
+			else if ( !p2Node.getIndex().equals( p1Node.getIndex() ) ) {
+				return false;
+			}
+
+			if ( p2Node.getKey() == null ) {
+				if ( p1Node.getKey() != null ) {
+					return false;
+				}
+			}
+			else if ( !p2Node.getKey().equals( p1Node.getKey() ) ) {
+				return false;
+			}
+		}
 		return true;
 	}
 
 	@Override
+	// deferred hash code building
 	public int hashCode() {
 		if ( hashCode == -1 ) {
 			buildHashCode();
@@ -253,8 +276,16 @@ public final class PathImpl implements Path, Serializable {
 		return hashCode;
 	}
 
+	// custom hashCode based on the string representation of a path. Don't rely on the hashCode of the NodeImpl
+	// instances, because they are based on the default (reference based) implementation
 	public void buildHashCode() {
-		hashCode = nodeList != null ? nodeList.hashCode() : 0;
+		hashCode = toString().hashCode();
+	}
+
+	private static PathImpl createNewPath(String name) {
+		PathImpl path = new PathImpl();
+		path.addNode( name );
+		return path;
 	}
 
 	/**
@@ -263,16 +294,8 @@ public final class PathImpl implements Path, Serializable {
 	 * @param path the path to make a copy of.
 	 */
 	private PathImpl(PathImpl path) {
-		this.nodeList = new ArrayList<Node>();
-		NodeImpl parent = null;
-		NodeImpl node = null;
-		for ( int i = 0; i < path.nodeList.size(); i++ ) {
-			node = (NodeImpl) path.nodeList.get( i );
-			NodeImpl newNode = new NodeImpl( node, parent );
-			this.nodeList.add( newNode );
-			parent = newNode;
-		}
-		currentLeafNode = node;
+		this( path.nodeList );
+		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
 	}
 
 	private PathImpl() {
@@ -281,8 +304,8 @@ public final class PathImpl implements Path, Serializable {
 
 	private PathImpl(List<Node> nodeList) {
 		this.nodeList = new ArrayList<Node>();
-		for ( Node node : nodeList ) {
-			this.nodeList.add( node );
+		for ( int i = 0; i < nodeList.size(); i++ ) {
+			this.nodeList.add( nodeList.get( i ) );
 		}
 	}
 
@@ -357,5 +380,4 @@ public final class PathImpl implements Path, Serializable {
 		}
 		return true;
 	}
-
 }
