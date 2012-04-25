@@ -31,7 +31,7 @@
     <description>Hibernate Validator performance tests.</description>
 
     <properties>
-        <!--<profilingOptions>-agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait</profilingOptions>-->
+        <profilingOptions>-agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
     </properties>
 
