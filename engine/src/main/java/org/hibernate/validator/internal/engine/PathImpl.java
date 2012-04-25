@@ -153,7 +153,7 @@ public final class PathImpl implements Path, Serializable {
 
 	public final NodeImpl makeLeafNodeIterable() {
 		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, null );
-		nodeList.remove( nodeList.size() -1 );
+		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
@@ -161,7 +161,7 @@ public final class PathImpl implements Path, Serializable {
 
 	public final NodeImpl setLeafNodeIndex(Integer index) {
 		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, index, null );
-		nodeList.remove( nodeList.size() -1 );
+		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
@@ -169,7 +169,7 @@ public final class PathImpl implements Path, Serializable {
 
 	public final NodeImpl setLeafNodeMapKey(Object key) {
 		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, key );
-		nodeList.remove( nodeList.size() -1 );
+		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
@@ -212,57 +212,24 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
 			return true;
 		}
-		if ( o == null || getClass() != o.getClass() ) {
+		if ( obj == null ) {
 			return false;
 		}
-
-		PathImpl path = (PathImpl) o;
-
-		// testing equality using the Path API
-		Iterator<Path.Node> p1Iterator = this.iterator();
-		Iterator<Path.Node> p2Iterator = path.iterator();
-		while ( p1Iterator.hasNext() ) {
-			Path.Node p1Node = p1Iterator.next();
-			if ( !p2Iterator.hasNext() ) {
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		PathImpl other = (PathImpl) obj;
+		if ( nodeList == null ) {
+			if ( other.nodeList != null ) {
 				return false;
 			}
-			Path.Node p2Node = p2Iterator.next();
-
-			// do the comparison on the node values
-			if ( p2Node.getName() == null ) {
-				if ( p1Node.getName() != null ) {
-					return false;
-				}
-			}
-			else if ( !p2Node.getName().equals( p1Node.getName() ) ) {
-				return false;
-			}
-
-			if ( p2Node.isInIterable() != p1Node.isInIterable() ) {
-				return false;
-			}
-
-			if ( p2Node.getIndex() == null ) {
-				if ( p1Node.getIndex() != null ) {
-					return false;
-				}
-			}
-			else if ( !p2Node.getIndex().equals( p1Node.getIndex() ) ) {
-				return false;
-			}
-
-			if ( p2Node.getKey() == null ) {
-				if ( p1Node.getKey() != null ) {
-					return false;
-				}
-			}
-			else if ( !p2Node.getKey().equals( p1Node.getKey() ) ) {
-				return false;
-			}
+		}
+		else if ( !nodeList.equals( other.nodeList ) ) {
+			return false;
 		}
 		return true;
 	}
@@ -271,15 +238,18 @@ public final class PathImpl implements Path, Serializable {
 	// deferred hash code building
 	public int hashCode() {
 		if ( hashCode == -1 ) {
-			buildHashCode();
+			hashCode = buildHashCode();
 		}
+
 		return hashCode;
 	}
 
-	// custom hashCode based on the string representation of a path. Don't rely on the hashCode of the NodeImpl
-	// instances, because they are based on the default (reference based) implementation
-	public void buildHashCode() {
-		hashCode = toString().hashCode();
+	private int buildHashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ( ( nodeList == null ) ? 0 : nodeList.hashCode() );
+		return result;
 	}
 
 	private static PathImpl createNewPath(String name) {
@@ -303,10 +273,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private PathImpl(List<Node> nodeList) {
-		this.nodeList = new ArrayList<Node>();
-		for ( int i = 0; i < nodeList.size(); i++ ) {
-			this.nodeList.add( nodeList.get( i ) );
-		}
+		this.nodeList = new ArrayList<Node>( nodeList );
 	}
 
 	private static PathImpl parseProperty(String property) {
