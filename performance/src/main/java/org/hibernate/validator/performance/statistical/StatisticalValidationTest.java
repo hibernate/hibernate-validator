@@ -24,7 +24,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -36,12 +36,12 @@ import static junit.framework.Assert.assertNotNull;
 public class StatisticalValidationTest {
 	private static final int NUMBER_OF_TEST_ENTITIES = 100;
 
-	private ValidatorFactory factory;
-	private Validator validator;
-	private TestEntity[] entitiesUnderTest = new TestEntity[NUMBER_OF_TEST_ENTITIES];
+	private static Validator validator;
+	private static TestEntity[] entitiesUnderTest = new TestEntity[NUMBER_OF_TEST_ENTITIES];
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUpValidatorFactory() throws Exception {
+		ValidatorFactory factory;
 		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
 		InputStream mappingStream = StatisticalValidationTest.class.getResourceAsStream( "mapping.xml" );
 		try {
