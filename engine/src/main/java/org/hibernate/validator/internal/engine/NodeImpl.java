@@ -35,7 +35,6 @@ public class NodeImpl implements Path.Node, Serializable {
 	private final boolean isIterable;
 	private final Integer index;
 	private final Object key;
-	private final int hashCode;
 	private String asString;
 
 	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key) {
@@ -44,13 +43,6 @@ public class NodeImpl implements Path.Node, Serializable {
 		this.index = index;
 		this.key = key;
 		this.isIterable = indexable;
-
-		// implementation is immutable. pre-calculating toString and hashCode
-		this.hashCode = buildHashCode();
-	}
-
-	NodeImpl(NodeImpl node, NodeImpl parent) {
-		this( node.name, parent, node.isIterable, node.index, node.key );
 	}
 
 	public final String getName() {
@@ -58,12 +50,7 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	public final boolean isInIterable() {
-		if ( parent == null ) {
-			return false;
-		}
-		else {
-			return parent.isIterable();
-		}
+		return parent != null && parent.isIterable();
 	}
 
 	public final boolean isIterable() {
@@ -102,46 +89,6 @@ public class NodeImpl implements Path.Node, Serializable {
 			asString = buildToString();
 		}
 		return asString;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != o.getClass() ) {
-			return false;
-		}
-
-		NodeImpl node = (NodeImpl) o;
-
-		if ( isIterable != node.isIterable ) {
-			return false;
-		}
-		if ( index != null ? !index.equals( node.index ) : node.index != null ) {
-			return false;
-		}
-		if ( key != null ? !key.equals( node.key ) : node.key != null ) {
-			return false;
-		}
-		if ( name != null ? !name.equals( node.name ) : node.name != null ) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return hashCode;
-	}
-
-	private int buildHashCode() {
-		int result = name != null ? name.hashCode() : 0;
-		result = 31 * result + ( isIterable ? 1 : 0 );
-		result = 31 * result + ( index != null ? index.hashCode() : 0 );
-		result = 31 * result + ( key != null ? key.hashCode() : 0 );
-		return result;
 	}
 
 	private String buildToString() {
