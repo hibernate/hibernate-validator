@@ -62,9 +62,8 @@
 
     <para>The Hibernate Validator Annotation Processor is based on the
     "Pluggable Annotation Processing API" as defined by <ulink
-    url="http://jcp.org/en/jsr/detail?id=269">JSR 269</ulink>. This API is
-    part of the Java Platform since Java 6. So be sure to use this or a later
-    version.</para>
+    url="http://jcp.org/en/jsr/detail?id=269">JSR 269</ulink> which is
+    part of the Java Platform since Java 6.</para>
   </section>
 
   <section id="validator-annotationprocessor-features">

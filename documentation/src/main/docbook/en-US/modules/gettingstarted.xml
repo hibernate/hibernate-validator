@@ -29,7 +29,7 @@
 
   <itemizedlist>
     <listitem>
-      <para>A JDK &gt;= 5</para>
+      <para>A JDK &gt;= 6</para>
     </listitem>
 
     <listitem>
@@ -64,29 +64,6 @@
       Local Settings Model</ulink>.</para>
     </listitem>
   </itemizedlist>
-
-  <note>
-    <para>Hibernate Validator uses JAXB for XML parsing. JAXB is part of the
-    Java Class Library since Java 6 which means that if you run Hibernate
-    Validator with Java 5 you will have to add additional JAXB dependencies.
-    Using Maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;
-    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;
-    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;
-    &lt;version&gt;2.2&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;
-    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;
-    &lt;version&gt;2.1.12&lt;/version&gt;
-&lt;/dependency&gt;
-</programlisting> if you are using the SourceForge package you find the
-    necessary libraries in the <filename>lib/jdk5</filename> directory. In
-    case you are not using the XML configuration you can also disable it
-    explicitly by calling
-    <methodname>Configuration.ignoreXmlConfiguration()</methodname> during
-    <classname>ValidationFactory</classname> creation. In this case the JAXB
-    dependencies are not needed.</para>
-  </note>
 
   <section id="validator-gettingstarted-createproject">
     <title>Setting up a new Maven project</title>
