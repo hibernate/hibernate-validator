@@ -48,14 +48,6 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>dist/lib/jdk5</outputDirectory>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <includes>
-                <include>javax.xml.bind:jaxb-api</include>
-                <include>com.sun.xml.bind:jaxb-impl</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
             <outputDirectory>dist/lib/optional</outputDirectory>
             <includes>
                 <include>org.slf4j:slf4j-api</include>
