@@ -48,16 +48,6 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <scope>test</scope>
@@ -313,14 +303,14 @@
                                             <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>org.slf4j</groupId>
-                                            <artifactId>slf4j-simple</artifactId>
+                                            <groupId>org.jboss.logging</groupId>
+                                            <artifactId>jboss-logging</artifactId>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>org.slf4j</groupId>
-                                            <artifactId>slf4j-api</artifactId>
+                                            <groupId>log4j</groupId>
+                                            <artifactId>log4j</artifactId>
                                             <overWrite>true</overWrite>
                                             <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
                                         </artifactItem>

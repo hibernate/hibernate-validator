@@ -41,14 +41,6 @@
             <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
@@ -115,8 +107,8 @@
                     <artifactId>hibernate-validator</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>org.jboss.logging</groupId>
-                    <artifactId>jboss-logging</artifactId>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
                 </dependency>
             </dependencies>
             <properties>
@@ -137,6 +129,11 @@
                     <artifactId>hibernate-validator</artifactId>
                     <version>4.2.0.Final</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>1.6.1</version>
+                </dependency>
             </dependencies>
             <properties>
                 <validator.version>HV 4.2.0.Final</validator.version>
@@ -155,6 +152,11 @@
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
                     <version>4.1.0.Final</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <version>1.5.6</version>
                 </dependency>
             </dependencies>
             <properties>

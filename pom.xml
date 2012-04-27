@@ -84,7 +84,6 @@
     <properties>
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4j.version>1.6.1</slf4j.version>
         <org.codehaus.mojo.chronos.version>1.0-beta-3</org.codehaus.mojo.chronos.version>
     </properties>
 
@@ -111,19 +110,9 @@
                 <version>1.6</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
