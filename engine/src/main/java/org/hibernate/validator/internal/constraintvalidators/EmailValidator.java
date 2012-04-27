@@ -17,10 +17,6 @@ import org.hibernate.validator.constraints.Email;
  * <a href="http://www.regular-expressions.info/email.html">article</a> discusses it is not necessarily practical to
  * implement a 100% compliant email validator. This implementation is a trade-off trying to match most email while ignoring
  * for example emails with double quotes or comments.
- * </p>
- * <p>
- * Note: This validator required Java 6, because it uses {@code java.lang.IDN} to support internationalized domain names (IDNs).
- * </p>
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
