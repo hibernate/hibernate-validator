@@ -30,13 +30,10 @@ JDK 1.6 or above.
 ## Using Hibernate Validator
 
 * In case you use the distribution archive from the download site, copy dist/hibernate-validator-<version>.jar together with all
-jar files from dist/lib/required into the classpath of your application. You can switch the slf4j binding jars for log4j
-(log4j-<version>.jar and slf4j-log4j12-<version>.jar) with the slf4j binding files of your choice. See http://www.slf4j.org/manual.html
-    In case you are using Java 5 you have to also include all the jar files from the dist/lib/jdk5 directory.
-    The jar files contain the classes needed for JAXB. If you don't use the xml configuration and XML configuration
-    is disabled via Configuration.ignoreXmlConfiguration the jar files from the dist/lib/jdk5 directory don't have to be added.
-
-or 
+jar files from dist/lib/required into the classpath of your application. For the purposes of logging, Hibernate Validator uses
+the JBoss Logging API, an abstraction layer which supports several logging solutions such (e.g. log4j or the logging framework
+provided by the JDK) as implementation. Just add a supported logging library to the classpath (e.g. log4j-<version>.jar) and JBoss
+Logging will delegate any log requests to that provider.
 
 * Add the following to your maven or ivy dependency list (Hibernate Validator can be found in the [JBoss Maven repository](http://repository.jboss.org/nexus/content/groups/public-jboss)):
 
