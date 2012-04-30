@@ -32,44 +32,43 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * routines, that depend on multiple attributes of the annotated element.
  * </p>
  * <p>
- * For evaluation of expressions the Java Scripting API as defined by <a
- * href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a>
- * ("Scripting for the Java<sup>TM</sup> Platform") is used. Therefore an
- * implementation of that API must part of the class path. This is automatically
- * the case when running on Java 6. For older Java versions, the JSR 223 RI can
- * be added manually to the class path.
+ * Script expressions can be written in any scripting or expression language,
+ * for which a <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a>
+ * ("Scripting for the Java<sup>TM</sup> Platform") compatible engine can be
+ * found on the class path. The following listing shows an example using the
+ * JavaScript engine, which comes with the JDK:
  * </p>
- * The expressions to be evaluated can be written in any scripting or expression
- * language, for which a JSR 223 compatible engine can be found in the class
- * path. The following listing shows an example using the JavaScript engine,
- * which comes with Java 6: </p>
  * <p/>
+ *
  * <pre>
- * &#064;ScriptAssert(lang = &quot;javascript&quot;, script = &quot;_this.startDate.before(_this.endDate)&quot;)
+ * {@code @ScriptAssert(lang = "javascript", script = "_this.startDate.before(_this.endDate)")
  * public class CalendarEvent {
- * <p/>
+ *
  * 	private Date startDate;
- * <p/>
+ *
  * 	private Date endDate;
- * <p/>
+ *
  * 	//...
- * <p/>
+ *
+ * }
  * }
  * </pre>
  * <p>
- * Using a real expression language in conjunction with a shorter object alias allows
- * for very compact expressions:
+ * Using a real expression language in conjunction with a shorter object alias
+ * allows for very compact expressions:
  * </p>
+ *
  * <pre>
- * &#064;ScriptAssert(lang = &quot;jexl&quot;, script = &quot;_.startDate &lt; _.endDate&quot;, alias = &quot;_&quot;)
+ * {@code @ScriptAssert(lang = "jexl", script = "_.startDate > _.endDate", alias = "_")
  * public class CalendarEvent {
- * <p/>
+ *
  * 	private Date startDate;
- * <p/>
+ *
  * 	private Date endDate;
- * <p/>
+ *
  * 	//...
- * <p/>
+ *
+ * }
  * }
  * </pre>
  * <p>
