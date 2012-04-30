@@ -49,22 +49,6 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
         </dependency>
-        <!--
-        Provided dependencies.
-        JAXB is needed when running on Java5. In this environment these dependencies have to be added (unless
-        xml configuration is explicitly disabled via Configuration.ignoreXmlConfiguration)
-        On Java6 jaxb is part of the runtime environment                                                                                                           
-        -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
         <!--
         Optional dependencies
@@ -278,7 +262,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <links>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+                        <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
                     </links>
                     <packagesheader>Hibernate Validator Packages</packagesheader>

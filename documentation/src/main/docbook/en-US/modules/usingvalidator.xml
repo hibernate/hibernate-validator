@@ -1528,9 +1528,7 @@ public class RentalCar extends Car {
               constraint, an implementation of the Java Scripting API as
               defined by JSR 223 ("Scripting for the
               Java<superscript>TM</superscript> Platform") must part of the
-              class path. This is automatically the case when running on Java
-              6. For older Java versions, the JSR 223 RI can be added manually
-              to the class path.The expressions to be evaluated can be written
+              class path. The expressions to be evaluated can be written
               in any scripting or expression language, for which a JSR 223
               compatible engine can be found in the class path.</entry>
 
