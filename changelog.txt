@@ -1,6 +1,24 @@
 Hibernate Validator Changelog
 =============================
 
+4.3.0.CR1 (30.04.2012)
+----------------------
+
+** Bug
+    * [HV-572] - Ensure the docs directory gets properly included into the distribution
+    * [HV-573] - Need graceful handling of return value constraint applied to method with void return type
+    * [HV-574] - Annotations processing fails with 4.3.0 Beta1
+    * [HV-575] - NPE in annotation processor ConstraintHelper.getName()
+
+** Improvement
+    * [HV-538] - Perform a profiling of the HV code in order to identify performance bottlenecks
+    * [HV-554] -  Regular Expression for @Email
+
+** Task
+    * [HV-100] - Implement a performance test harness for Bean Validation
+    * [HV-569] - Switch to Java 6
+
+
 4.3.0.Beta1 (04.04.2012)
 ------------------------
 
