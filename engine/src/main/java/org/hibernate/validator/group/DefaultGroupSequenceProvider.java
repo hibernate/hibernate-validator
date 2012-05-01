@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Hardy Ferentschik
- * @deprecated Will be removed in a future release. Use {@code org.hibernate.validator.spi.group.DefaultGroupSequenceProvider} instead.
+ * @deprecated Will be removed in a future release. Use {@link org.hibernate.validator.spi.group.DefaultGroupSequenceProvider} instead.
  */
 @Deprecated
 public interface DefaultGroupSequenceProvider<T>

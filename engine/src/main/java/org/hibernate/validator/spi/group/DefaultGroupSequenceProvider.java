@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * This class defines the dynamic group sequence provider contract.
  * <p>
- * In order to redefine dynamically the default group sequence for a type T, the {@link GroupSequenceProvider} annotation
+ * In order to redefine dynamically the default group sequence for a type T, the {@link org.hibernate.validator.group.GroupSequenceProvider} annotation
  * must be placed on T, specifying as its value a concrete implementation of {@code DefaultGroupSequenceProvider}, which
  * must be parametrized with the type T.
  * </p>

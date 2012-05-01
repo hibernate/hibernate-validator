@@ -28,7 +28,7 @@ import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 
 /**
  * Checks, that for each constraint annotation type, which is not a composed constraint,
- * a validator implementation is specified using {@link Constraint} annotation.
+ * a validator implementation is specified using the {@link javax.validation.Constraint} annotation.
  *
  * @author Gunnar Morling
  */

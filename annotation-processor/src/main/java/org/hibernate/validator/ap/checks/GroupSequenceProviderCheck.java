@@ -19,6 +19,7 @@ package org.hibernate.validator.ap.checks;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -42,10 +43,10 @@ import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
  * This check ensure that :
  * <ul>
  * <li>The annotation is not defined on an interface.</li>
- * <li>The annotation defines an implementation class of {@link DefaultGroupSequenceProvider}, not an interface or an abstract class.</li>
+ * <li>The annotation defines an implementation class of {@link org.hibernate.validator.group.DefaultGroupSequenceProvider}, not an interface or an abstract class.</li>
  * <li>The annotation defines a class with a public default constructor.</li>
  * <li>The annotation defines a default group sequence provider class for a (super-)type of the annotated class.</li>
- * <li>The class hosting the annotation is not already annotated with {@linkplain GroupSequence @GroupSequence}.</li>
+ * <li>The class hosting the annotation is not already annotated with {@link javax.validation.GroupSequence}.</li>
  * </ul>
  * </p>
  *
@@ -188,7 +189,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 	 *
 	 * @param typeMirror The {@code TypeMirror} instance.
 	 *
-	 * @return The generic type or {@code null} if the given type doesn't implement the {@link DefaultGroupSequenceProvider} interface.
+	 * @return The generic type or {@code null} if the given type doesn't implement the {@link org.hibernate.validator.group.DefaultGroupSequenceProvider} interface.
 	 */
 	private TypeMirror retrieveGenericProviderType(TypeMirror typeMirror) {
 		return typeMirror.accept(
