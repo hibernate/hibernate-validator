@@ -87,7 +87,7 @@ public class IntegrationTestUtil {
 	public static Collection<JavaArchive> bundleLoggingDependencies() {
 		return DependencyResolvers.use( MavenDependencyResolver.class )
 				.loadMetadataFromPom( "pom.xml" )
-				.artifact( "org.slf4j:slf4j-log4j12" )
+				.artifact( "log4j:log4j" )
 				.resolveAs( JavaArchive.class );
 	}
 }
