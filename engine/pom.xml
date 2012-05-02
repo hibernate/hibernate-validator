@@ -109,8 +109,8 @@
         <jdbc.driver>org.h2.Driver</jdbc.driver>
         <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
         <jdbc.user>sa</jdbc.user>
-        <jdbc.pass />
-        <jdbc.isolation />
+        <jdbc.pass/>
+        <jdbc.isolation/>
     </properties>
 
     <build>
@@ -135,10 +135,6 @@
             </testResource>
         </testResources>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
@@ -262,22 +258,13 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <links>
-                        <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
+                        <link>http://docs.oracle.com/javase/6/docs/api</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
                     </links>
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
                     <windowtitle>Hibernate Validator ${project.version}</windowtitle>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
