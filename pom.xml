@@ -192,14 +192,6 @@
                     </rules>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.2.1</version>
-                <configuration>
-                    <goals>deploy</goals>
-                </configuration>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -286,7 +278,6 @@
                         <preparationGoals>clean install</preparationGoals>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
-                        <useReleaseProfile>true</useReleaseProfile>
                     </configuration>
                 </plugin>
                 <plugin>
