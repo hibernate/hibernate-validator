@@ -129,6 +129,8 @@ public class ConstraintHelper {
 	 */
 	private final Map<Name, Set<TypeMirror>> supportedTypesByConstraint;
 
+	private final Map<Name, AnnotationType> annotationTypeCache;
+
 	private final Types typeUtils;
 
 	private final AnnotationApiHelper annotationApiHelper;
@@ -138,6 +140,7 @@ public class ConstraintHelper {
 		this.typeUtils = typeUtils;
 		this.annotationApiHelper = annotationApiHelper;
 
+		annotationTypeCache = CollectionHelper.newHashMap();
 		supportedTypesByConstraint = CollectionHelper.newHashMap();
 
 		//register BV-defined constraints
@@ -221,24 +224,36 @@ public class ConstraintHelper {
 	 */
 	public AnnotationType getAnnotationType(AnnotationMirror annotationMirror) {
 
+		Name key = getName( annotationMirror.getAnnotationType() );
+
+		AnnotationType annotationType = annotationTypeCache.get( key );
+
+		if ( annotationType != null ) {
+			return annotationType;
+		}
+
 		if ( isConstraintAnnotation( annotationMirror ) ) {
-			return AnnotationType.CONSTRAINT_ANNOTATION;
+			annotationType = AnnotationType.CONSTRAINT_ANNOTATION;
 		}
 		else if ( isMultiValuedConstraint( annotationMirror ) ) {
-			return AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION;
+			annotationType = AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION;
 		}
 		else if ( isGraphValidationAnnotation( annotationMirror ) ) {
-			return AnnotationType.GRAPH_VALIDATION_ANNOTATION;
+			annotationType = AnnotationType.GRAPH_VALIDATION_ANNOTATION;
 		}
 		else if ( isConstraintMetaAnnotation( annotationMirror ) ) {
-			return AnnotationType.CONSTRAINT_META_ANNOTATION;
+			annotationType = AnnotationType.CONSTRAINT_META_ANNOTATION;
 		}
 		else if ( isGroupSequenceProviderAnnotation( annotationMirror ) ) {
-			return AnnotationType.GROUP_SEQUENCE_PROVIDER_ANNOTATION;
+			annotationType = AnnotationType.GROUP_SEQUENCE_PROVIDER_ANNOTATION;
 		}
 		else {
-			return AnnotationType.NO_CONSTRAINT_ANNOTATION;
+			annotationType = AnnotationType.NO_CONSTRAINT_ANNOTATION;
 		}
+
+		annotationTypeCache.put( key, annotationType );
+
+		return annotationType;
 	}
 
 	/**
