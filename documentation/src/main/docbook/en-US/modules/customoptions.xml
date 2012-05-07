@@ -38,7 +38,7 @@
     <title>Public API</title>
 
     <para>Let's start, however, with a look at the public API of Hibernate
-    Validator. <xref linkend="validator-public-api" /> lists all packages
+    Validator. <xref linkend="validator-public-api"/> lists all packages
     belonging to this API and describes their purpose.</para>
 
     <para>Any packages not listed in that table are internal packages of
@@ -71,7 +71,7 @@
             <entry>This package contains the classes used by the Bean
             Validation bootstrap mechanism (eg. validation provider,
             configuration class). For more details see <xref
-            linkend="validator-bootstrapping" />.</entry>
+            linkend="validator-bootstrapping"/>.</entry>
           </row>
 
           <row>
@@ -86,33 +86,36 @@
             <classname>ConstraintMapping</classname> class and in package
             <package>org.hibernate.validator.cfg.defs</package> all constraint
             definitions. For more details see <xref
-            linkend="programmaticapi" />.</entry>
+            linkend="programmaticapi"/>.</entry>
           </row>
 
           <row>
-            <entry><package>org.hibernate.validator.constraints</package></entry>
+            <entry><package>org.hibernate.validator.constraints</package>,
+            <package>org.hibernate.validator.constraints.br</package></entry>
 
             <entry>In addition to Bean Validation constraints, Hibernate
-            Validator provides some useful custom constraints. This package
-            contains all custom annotation classes. For more details see <xref
-            linkend="validator-defineconstraints-hv-constraints" />.</entry>
+            Validator provides some useful custom constraints. These packages
+            contain all custom annotation classes. For more details see <xref
+            linkend="validator-defineconstraints-hv-constraints"/>.</entry>
           </row>
 
           <row>
-            <entry><package>org.hibernate.validator.group</package></entry>
+            <entry><package>org.hibernate.validator.group</package>,
+            <package>org.hibernate.validator.spi.group</package></entry>
 
             <entry>With Hibernate Validator you can define dynamic default
-            group sequences in function of the validated object state. This
-            package contains all classes needed to use this feature
+            group sequences in function of the validated object state. These
+            packages contain all classes needed to use this feature
             (<classname>GroupSequenceProvider</classname> annotation and
             <classname>DefaultGroupSequenceProvider</classname> contract). For
             more details see <xref
-            linkend="section-default-group-class" />.</entry>
+            linkend="section-default-group-class"/>.</entry>
           </row>
 
           <row>
             <entry><package>org.hibernate.validator.messageinterpolation</package>,
-            <package>org.hibernate.validator.resourceloading</package></entry>
+            <package>org.hibernate.validator.resourceloading</package>,
+            <package>org.hibernate.validator.spi.resourceloading</package></entry>
 
             <entry>These packages contain the classes related to constraint
             message interpolation. The first package contains two
@@ -120,13 +123,13 @@
             first one,
             <classname>ValueFormatterMessageInterpolator</classname> allows to
             interpolate the validated value into the constraint message, see
-            <xref linkend="section-message-interpolator" />. The second
+            <xref linkend="section-message-interpolator"/>. The second
             implementation named
             <classname>ResourceBundleMessageInterpolator</classname> is the
             implementation used by default by Hibernate Validator. This
             implementation relies on a
             <classname>ResourceBundleLocator</classname>, see <xref
-            linkend="section-resource-bundle-locator" />. Hibernate Validator
+            linkend="section-resource-bundle-locator"/>. Hibernate Validator
             provides different <classname>ResourceBundleLocator</classname>
             implementations located in the package
             <package>org.hibernate.validator.resourceloading</package>.</entry>
@@ -148,6 +151,16 @@
         </tbody>
       </tgroup>
     </table>
+
+    <note>
+      <para>The public packages of Hibernate Validator fall into two
+      categories: while the actual API parts are intended to be
+      <emphasis>invoked</emphasis> or <emphasis>used</emphasis> by clients
+      (e.g. the API for programmatic constraint declaration or the custom
+      constraints), the SPI (service provider interface) packages contain
+      interfaces which are intended to be <emphasis>implemented</emphasis> by
+      clients (e.g. <classname>ResourceBundleLocator</classname>).</para>
+    </note>
   </section>
 
   <section>
@@ -158,9 +171,9 @@
     occurs. This is called the <emphasis>fail fast mode</emphasis> and can be
     useful for validation of large object graphs where one is only interested
     whether there is a constraint violation or not. <xref
-    linkend="example-fail-fast-property" />, <xref
-    linkend="example-fail-fast-configuration" /> and <xref
-    linkend="example-fail-fast-factory" /> show multiple ways to enable the
+    linkend="example-fail-fast-property"/>, <xref
+    linkend="example-fail-fast-configuration"/> and <xref
+    linkend="example-fail-fast-factory"/> show multiple ways to enable the
     fail fast mode.</para>
 
     <example floatstyle="" id="example-fail-fast-property">
@@ -263,7 +276,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     <section>
       <title>Defining method-level constraints</title>
 
-      <para><xref lang="" linkend="example-method-constraints" /> demonstrates
+      <para><xref lang="" linkend="example-method-constraints"/> demonstrates
       the definition of method-level constraints.<example
           id="example-method-constraints">
           <title>Using method-level constraints</title>
@@ -303,7 +316,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
       <para>Using the <classname>@Valid</classname> annotation it's also
       possible to define that a cascaded validation of parameter or return
       value objects shall be performed. An example can be found in <xref
-      lang="" linkend="example-cascaded-method-constraints" />.</para>
+      lang="" linkend="example-cascaded-method-constraints"/>.</para>
 
       <example id="example-cascaded-method-constraints">
         <title>Cascaded validation of method-level constraints</title>
@@ -345,7 +358,7 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
         engine, a
         <classname>javax.validation.ConstraintDeclarationException</classname>
         will be thrown. In <xref lang=""
-        linkend="example-illegal-method-constraints" /> some examples for
+        linkend="example-illegal-method-constraints"/> some examples for
         illegal parameter constraints declarations are shown.</para>
 
         <example id="example-illegal-method-constraints">
@@ -392,10 +405,10 @@ public class CarImpl implements ICar {
       the interface
       <classname>org.hibernate.validator.method.MethodValidator</classname>.</para>
 
-      <para>As shown in <xref lang="" linkend="example-methodvalidator" />
-      this interface defines methods for the evaluation of parameter as well
-      as return value constraints and for retrieving an extended type
-      descriptor providing method constraint related meta data.</para>
+      <para>As shown in <xref lang="" linkend="example-methodvalidator"/> this
+      interface defines methods for the evaluation of parameter as well as
+      return value constraints and for retrieving an extended type descriptor
+      providing method constraint related meta data.</para>
 
       <example id="example-methodvalidator">
         <title>The <classname>MethodValidator</classname> interface</title>
@@ -415,7 +428,7 @@ public class CarImpl implements ICar {
       <para>To retrieve a method validator get hold of an instance of HV's
       <classname>javax.validation.Validator</classname> implementation and
       unwrap it to <classname>MethodValidator</classname> as shown in <xref
-      lang="" linkend="example-retrieving-methodvalidator" />.</para>
+      lang="" linkend="example-retrieving-methodvalidator"/>.</para>
 
       <example id="example-retrieving-methodvalidator">
         <title>Retrieving a <classname>MethodValidator</classname>
@@ -432,7 +445,7 @@ public class CarImpl implements ICar {
       <classname>MethodValidator</classname> each return a
       <classname>Set&lt;MethodConstraintViolation&gt;</classname>. The type
       <classname>MethodConstraintViolation</classname> (see <xref lang=""
-      linkend="example-methodconstraintviolation" />) extends
+      linkend="example-methodconstraintviolation"/>) extends
       <classname>javax.validation.ConstraintViolation</classname> and provides
       additional method level validation specific information such as the
       method and index of the parameter which caused the constraint
@@ -488,14 +501,14 @@ public class CarImpl implements ICar {
     <section>
       <title>Retrieving method-level constraint meta data</title>
 
-      <para>As outlined in <xref lang="" linkend="validator-metadata-api" />
+      <para>As outlined in <xref lang="" linkend="validator-metadata-api"/>
       the Bean Validation API provides rich capabilities for retrieving
       constraint related meta data. Hibernate Validator extends this API and
       allows to retrieve constraint meta data also for method-level
       constraints.</para>
 
-      <para><xref lang="" linkend="example-method-level-meta-data" /> shows
-      how to use this extended API to retrieve constraint meta data for the
+      <para><xref lang="" linkend="example-method-level-meta-data"/> shows how
+      to use this extended API to retrieve constraint meta data for the
       <methodname>rentCar()</methodname> method from the
       <classname>RentalStation</classname> type.</para>
 
@@ -547,7 +560,7 @@ assertEquals(startDateParameter.findConstraints().getConstraintDescriptors().siz
     package<package> org.hibernate.validator.cfg</package>. Starting with the
     instantiation of a new <classname>ConstraintMapping</classname>,
     constraints can be defined in a fluent manner as shown in <xref lang=""
-    linkend="example-constraint-mapping" />.</para>
+    linkend="example-constraint-mapping"/>.</para>
 
     <para><example id="example-constraint-mapping">
         <title>Programmatic constraint definition</title>
@@ -577,7 +590,7 @@ mapping.type( Car.class )
     <para>For custom constraints you can either create your own definition
     classes extending <classname>ConstraintDef</classname> or you can use
     <classname>GenericConstraintDef</classname> as seen in <xref
-    linkend="example-generic-constraint-mapping" />.</para>
+    linkend="example-generic-constraint-mapping"/>.</para>
 
     <para><example id="example-generic-constraint-mapping">
         <title>Programmatic constraint definition using
@@ -591,7 +604,7 @@ mapping.type( Car.class )
 
     <para>Not only standard class- and property-level constraints but also
     method constraints can be configured using the API. As shown in <xref
-    lang="" linkend="example-method-constraint-mapping" /> methods are
+    lang="" linkend="example-method-constraint-mapping"/> methods are
     identified by their name and their parameters (if there are any). Having
     selected a method, constraints can be placed on the method's parameters
     and/or return value.</para>
@@ -617,7 +630,7 @@ mapping.type( Car.class )
     <para>Using the API it's also possible to mark properties, method
     parameters and method return values as cascading (equivalent to annotating
     them with <classname>@Valid</classname>). An example can be found in <xref
-    lang="" linkend="example-cascading-constraints" />.</para>
+    lang="" linkend="example-cascading-constraints"/>.</para>
 
     <para><example id="example-cascading-constraints">
         <title>Marking constraints for cascaded validation</title>
@@ -642,7 +655,7 @@ mapping.type( Car.class )
 
     <para>Last but not least you can configure the default group sequence or
     the default group sequence provider of a type as shown in <xref lang=""
-    linkend="example-sequences" />.<example id="example-sequences">
+    linkend="example-sequences"/>.<example id="example-sequences">
         <title>Configuration of default group sequence and default group
         sequence provider</title>
 
@@ -657,7 +670,7 @@ mapping.type( Car.class )
     be passed to the configuration. Since the programmatic API is not part of
     the official Bean Validation specification you need to get hold of a
     <classname>HibernateValidatorConfiguration</classname> instance as shown
-    in <xref linkend="example-hibernate-specific-config" />.</para>
+    in <xref linkend="example-hibernate-specific-config"/>.</para>
 
     <para><example id="example-hibernate-specific-config">
         <title>Creating a Hibernate Validator specific configuration</title>
@@ -676,7 +689,7 @@ Validator validator = factory.getValidator();</programlisting>
     <title>Boolean composition for constraint composition</title>
 
     <para>As per Bean Validation specification the constraints of a composed
-    constraint (see <xref linkend="section-constraint-composition" />) are all
+    constraint (see <xref linkend="section-constraint-composition"/>) are all
     combined via a logical <emphasis>AND</emphasis>. This means all of the
     composing constraints need to return <constant>true</constant> in order
     for an overall successful validation. Hibernate Validator offers an
@@ -687,7 +700,7 @@ Validator validator = factory.getValidator();</programlisting>
     <classname>CompositionType</classname> with its values
     <emphasis>AND</emphasis>, <emphasis>OR</emphasis> and
     <emphasis>ALL_FALSE</emphasis>. <xref
-    linkend="example-boolean-constraint-composition" /> shows how to build a
+    linkend="example-boolean-constraint-composition"/> shows how to build a
     composing constraint where only one of the constraints has to be
     successful in order to pass the validation. Either the validated string is
     all lowercased or it is between two and three characters long.</para>
