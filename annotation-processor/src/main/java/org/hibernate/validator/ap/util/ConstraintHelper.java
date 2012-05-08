@@ -131,6 +131,11 @@ public class ConstraintHelper {
 
 	private final Map<Name, AnnotationType> annotationTypeCache;
 
+	/**
+	 * Caches composing constraints.
+	 */
+	private final Map<Name, Set<AnnotationMirror>> composingConstraintsByConstraints;
+
 	private final Types typeUtils;
 
 	private final AnnotationApiHelper annotationApiHelper;
@@ -142,6 +147,7 @@ public class ConstraintHelper {
 
 		annotationTypeCache = CollectionHelper.newHashMap();
 		supportedTypesByConstraint = CollectionHelper.newHashMap();
+		composingConstraintsByConstraints = CollectionHelper.newHashMap();
 
 		//register BV-defined constraints
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_FALSE, Boolean.class );
@@ -704,27 +710,40 @@ public class ConstraintHelper {
 
 	private Set<AnnotationMirror> getComposingConstraints(DeclaredType constraintAnnotationType) {
 
-		Set<AnnotationMirror> theValue = CollectionHelper.newHashSet();
+		Name key = getName( constraintAnnotationType );
+
+		Set<AnnotationMirror> composingConstraints = composingConstraintsByConstraints.get( key );
+
+		if( composingConstraints != null ) {
+			return composingConstraints;
+		}
+
+		composingConstraints = CollectionHelper.newHashSet();
 
 		List<? extends AnnotationMirror> annotationMirrors = constraintAnnotationType.asElement()
 				.getAnnotationMirrors();
 
 		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
-			if ( isConstraintAnnotation( oneAnnotationMirror.getAnnotationType().asElement() ) ) {
-				theValue.add( oneAnnotationMirror );
+
+			AnnotationType annotationType = getAnnotationType(oneAnnotationMirror);
+
+			if ( annotationType == AnnotationType.CONSTRAINT_ANNOTATION ) {
+				composingConstraints.add( oneAnnotationMirror );
 			}
-			else if ( isMultiValuedConstraint( oneAnnotationMirror ) ) {
+			else if ( annotationType == AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION ) {
 				List<? extends AnnotationValue> value = annotationApiHelper.getAnnotationArrayValue(
 						oneAnnotationMirror,
 						"value"
 				);
 				for ( AnnotationValue annotationValue : value ) {
-					theValue.add( (AnnotationMirror) annotationValue );
+					composingConstraints.add( (AnnotationMirror) annotationValue );
 				}
 			}
 		}
 
-		return theValue;
+		composingConstraintsByConstraints.put( key, composingConstraints );
+
+		return composingConstraints;
 	}
 
 	private List<TypeMirror> asMirrors(Class<?>... types) {
