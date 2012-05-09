@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2011-11-14 10:37+0000\n"
+"POT-Creation-Date: 2012-05-09 09:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 #. Tag: para
 #: gettingstarted.xml:32
 #, no-c-format
-msgid "A JDK &gt;= 5"
+msgid "A JDK &gt;= 6"
 msgstr ""
 
 #. Tag: ulink
@@ -62,43 +62,49 @@ msgid ""
       "&lt;/repositories&gt;        </programlisting> </example>More information about <filename>settings.xml</filename> can be found in the <ulink url=\"http://maven.apache.org/ref/2.0.8/maven-settings/settings.html\">Maven Local Settings Model</ulink>."
 msgstr ""
 
-#. Tag: para
+#. Tag: title
 #: gettingstarted.xml:58
 #, no-c-format
-msgid ""
-      "Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java Class Library since Java 6 which means that if you run Hibernate Validator with Java 5 you will have to add additional JAXB dependencies. Using Maven you have to add the following dependencies:<programlisting>&lt;dependency&gt;\n"
-      "    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
-      "    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
-      "    &lt;version&gt;2.2&lt;/version&gt;\n"
-      "&lt;/dependency&gt;\n"
-      "&lt;dependency&gt;\n"
-      "    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;\n"
-      "    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;\n"
-      "    &lt;version&gt;2.1.12&lt;/version&gt;\n"
-      "&lt;/dependency&gt;\n"
-      "</programlisting> if you are using the SourceForge package you find the necessary libraries in the <filename>lib/jdk5</filename> directory. In case you are not using the XML configuration you can also disable it explicitly by calling <methodname>Configuration.ignoreXmlConfiguration()</methodname> during <classname>ValidationFactory</classname> creation. In this case the JAXB dependencies are not needed."
-msgstr ""
-
-#. Tag: title
-#: gettingstarted.xml:71
-#, no-c-format
-msgid "Setting up a new Maven project"
+msgid "Project set up"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:73
+#: gettingstarted.xml:60
 #, no-c-format
-msgid "Start by creating new Maven project using the Maven archetype plugin as follows:"
+msgid "In order to use Hibernate Validator within an existing Maven project, simply add the following dependency to your <filename>pom.xml</filename>:"
 msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:77
+#: gettingstarted.xml:63
+#, no-c-format
+msgid "Maven dependency of Hibernate Validator"
+msgstr ""
+
+#. Tag: programlisting
+#: gettingstarted.xml:65
+#, no-c-format
+msgid ""
+      "&lt;dependency&gt;\n"
+      "    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;\n"
+      "    &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;\n"
+      "    &lt;version&gt;&version;&lt;/version&gt;\n"
+      "&lt;/dependency&gt;"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:68
+#, no-c-format
+msgid "Alternatively, you can start by creating a sample project using Hibernate Validator's Quickstart Maven archetype as follows:"
+msgstr ""
+
+#. Tag: title
+#: gettingstarted.xml:72
 #, no-c-format
 msgid "Using Maven's archetype plugin to create a sample project using Hibernate Validator"
 msgstr ""
 
 #. Tag: programlisting
-#: gettingstarted.xml:80
+#: gettingstarted.xml:75
 #, no-c-format
 msgid ""
       "mvn archetype:generate -DarchetypeGroupId=org.hibernate \\\n"
@@ -110,27 +116,33 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:83
+#: gettingstarted.xml:78
 #, no-c-format
 msgid "Maven will create your project in the directory hv-quickstart. Change into this directory and run:"
 msgstr ""
 
 #. Tag: programlisting
-#: gettingstarted.xml:86
+#: gettingstarted.xml:81
 #, no-c-format
 msgid "mvn test"
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:86
+#: gettingstarted.xml:81
 #, no-c-format
-msgid "Maven will compile the example code and run the implemented unit tests. Let's have a look at the actual code."
+msgid "Maven will compile the example code and run the implemented unit tests. Let's have a look at the actual code in the next section."
 msgstr ""
 
 #. Tag: para
-#: gettingstarted.xml:91
+#: gettingstarted.xml:86
 #, no-c-format
-msgid "From version 4.2.0.Beta2, the maven command <command>mvn archetype:create</command> will be no longer supported and will fail. You should use the command described in the above listing. If you want more details, look at <ulink url=\"http://maven.apache.org/archetype/maven-archetype-plugin/\"> Maven Archetype plugin</ulink> page."
+msgid "For the purposes of logging, Hibernate Validator uses the JBoss Logging API. This is an abstraction layer which supports several known logging solutions (e.g. log4j or the logging framework provided by the JDK) as implementation. Just add your preferred logging library to the classpath and all log requests from Hibernate Validator will automatically be delegated to that logging provider."
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:93
+#, no-c-format
+msgid "Alternatively, you can explicitely specify a provider using the system property <varname>org.jboss.logging.provider</varname>. Supported values currently are <varname>jboss</varname>, <varname>jdk</varname>, <varname>log4j</varname> and <varname>slf4j</varname>."
 msgstr ""
 
 #. Tag: title

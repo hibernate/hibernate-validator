@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2011-11-14 10:37+0000\n"
+"POT-Creation-Date: 2012-05-09 09:42+0000\n"
 "PO-Revision-Date: 2010-08-24 00:50+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
@@ -80,25 +80,25 @@ msgstr "前提条件"
 
 #. Tag: para
 #: annotationprocessor.xml:63
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "The Hibernate Validator Annotation Processor is based on the \"Pluggable "
 "Annotation Processing API\" as defined by <ulink url=\"http://jcp.org/en/jsr/"
-"detail?id=269\">JSR 269</ulink>. This API is part of the Java Platform since "
-"Java 6. So be sure to use this or a later version."
+"detail?id=269\">JSR 269</ulink> which is part of the Java Platform since "
+"Java 6."
 msgstr ""
 "Hibernate Validator的标注处理器是基于<ulink url=\"http://jcp.org/en/jsr/"
 "detail?id=269\">JSR 269</ulink>所定义的\"可插入式标注处理API\"的. 这个API从"
 "Java 6开始已经是Java 平台的一部分了, 所以请确保使用这个或者以后的版本."
 
 #. Tag: title
-#: annotationprocessor.xml:71
+#: annotationprocessor.xml:70
 #, no-c-format
 msgid "Features"
 msgstr "特性"
 
 #. Tag: para
-#: annotationprocessor.xml:73
+#: annotationprocessor.xml:72
 #, fuzzy, no-c-format
 msgid ""
 "As of Hibernate Validator &version; the Hibernate Validator Annotation "
@@ -106,27 +106,27 @@ msgid ""
 msgstr "Hibernate Validator 4.1中的标注处理器可以检查:"
 
 #. Tag: para
-#: annotationprocessor.xml:78
+#: annotationprocessor.xml:77
 #, no-c-format
 msgid ""
 "constraint annotations are allowed for the type of the annotated element"
 msgstr "应用了约束标注的属性的类型是否被该约束所支持"
 
 #. Tag: para
-#: annotationprocessor.xml:83
+#: annotationprocessor.xml:82
 #, fuzzy, no-c-format
 msgid ""
 "only non-static fields or methods are annotated with constraint annotations"
 msgstr "只有非静态字段或者方法才能够应用约束条件标注."
 
 #. Tag: para
-#: annotationprocessor.xml:88
+#: annotationprocessor.xml:87
 #, fuzzy, no-c-format
 msgid "only non-primitive fields or methods are annotated with @Valid"
 msgstr "只有非原始类型的属性或字段才能够应用@Valid标注"
 
 #. Tag: para
-#: annotationprocessor.xml:93
+#: annotationprocessor.xml:92
 #, fuzzy, no-c-format
 msgid ""
 "only such methods are annotated with constraint annotations which are valid "
@@ -136,7 +136,7 @@ msgstr ""
 "are constraint annotations themselves"
 
 #. Tag: para
-#: annotationprocessor.xml:99
+#: annotationprocessor.xml:98
 #, no-c-format
 msgid ""
 "only such annotation types are annotated with constraint annotations which "
@@ -146,7 +146,7 @@ msgstr ""
 "are constraint annotations themselves"
 
 #. Tag: para
-#: annotationprocessor.xml:104
+#: annotationprocessor.xml:103
 #, no-c-format
 msgid ""
 "definition of dynamic default group sequence with @GroupSequenceProvider is "
@@ -154,13 +154,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: annotationprocessor.xml:111
+#: annotationprocessor.xml:110
 #, no-c-format
 msgid "Options"
 msgstr "配置项"
 
 #. Tag: para
-#: annotationprocessor.xml:113
+#: annotationprocessor.xml:112
 #, no-c-format
 msgid ""
 "The behavior of the Hibernate Validator Annotation Processor can be "
@@ -174,31 +174,31 @@ msgstr ""
 "ulink>加以控制."
 
 #. Tag: title
-#: annotationprocessor.xml:120
+#: annotationprocessor.xml:119
 #, no-c-format
 msgid "Hibernate Validator Annotation Processor options"
 msgstr "Hibernate Validator 标注处理器配置项"
 
 #. Tag: entry
-#: annotationprocessor.xml:125
+#: annotationprocessor.xml:124
 #, no-c-format
 msgid "Option"
 msgstr "配置项"
 
 #. Tag: entry
-#: annotationprocessor.xml:127
+#: annotationprocessor.xml:126
 #, no-c-format
 msgid "Explanation"
 msgstr "功能"
 
 #. Tag: varname
-#: annotationprocessor.xml:133
+#: annotationprocessor.xml:132
 #, no-c-format
 msgid "diagnosticKind"
 msgstr "diagnosticKind"
 
 #. Tag: entry
-#: annotationprocessor.xml:135
+#: annotationprocessor.xml:134
 #, no-c-format
 msgid ""
 "Controls how constraint problems are reported. Must be the string "
@@ -213,13 +213,13 @@ msgstr ""
 "让编译过程终止, 默认是<classname>ERROR</classname>."
 
 #. Tag: varname
-#: annotationprocessor.xml:145
+#: annotationprocessor.xml:144
 #, no-c-format
 msgid "methodConstraintsSupported"
 msgstr ""
 
 #. Tag: entry
-#: annotationprocessor.xml:147
+#: annotationprocessor.xml:146
 #, no-c-format
 msgid ""
 "Controls whether constraints are allowed at methods of any kind. Must be set "
@@ -230,13 +230,13 @@ msgid ""
 msgstr ""
 
 #. Tag: varname
-#: annotationprocessor.xml:156
+#: annotationprocessor.xml:155
 #, no-c-format
 msgid "verbose"
 msgstr "verbose"
 
 #. Tag: entry
-#: annotationprocessor.xml:158
+#: annotationprocessor.xml:157
 #, fuzzy, no-c-format
 msgid ""
 "Controls whether detailed processing information shall be displayed or not, "
@@ -247,13 +247,13 @@ msgstr ""
 "varname>或<varname>false</varname>, 默认是<varname>false</varname>."
 
 #. Tag: title
-#: annotationprocessor.xml:169
+#: annotationprocessor.xml:168
 #, no-c-format
 msgid "Using the Annotation Processor"
 msgstr "使用标注处理器"
 
 #. Tag: para
-#: annotationprocessor.xml:171
+#: annotationprocessor.xml:170
 #, no-c-format
 msgid ""
 "This section shows in detail how to integrate the Hibernate Validator "
@@ -264,73 +264,45 @@ msgstr ""
 "Maven)以及IDE (Eclipse, IntelliJ IDEA, NetBeans)集成."
 
 #. Tag: title
-#: annotationprocessor.xml:177
+#: annotationprocessor.xml:176
 #, no-c-format
 msgid "Command line builds"
 msgstr "命令行编译"
 
 #. Tag: title
-#: annotationprocessor.xml:180
+#: annotationprocessor.xml:179
 #, no-c-format
 msgid "javac"
 msgstr "javac"
 
 #. Tag: para
-#: annotationprocessor.xml:182
-#, no-c-format
+#: annotationprocessor.xml:181
+#, fuzzy, no-c-format
 msgid ""
 "When compiling on the command line using <ulink url=\"http://java.sun.com/"
 "javase/6/docs/technotes/guides/javac/index.html\">javac</ulink>, specify the "
-"following JARs using the \"processorpath\" option:"
+"JAR hibernate-validator-annotation-processor-&version;.jar using the "
+"\"processorpath\" option as shown in the following listing. The processor "
+"will be detected automatically by the compiler and invoked during "
+"compilation."
 msgstr ""
 "当使用命令行(<ulink url=\"http://java.sun.com/javase/6/docs/technotes/guides/"
 "javac/index.html\">javac</ulink>)编译的时候, 通过\"processorpath\"属性指定下"
 "列jar:"
 
-#. Tag: para
-#: annotationprocessor.xml:188 annotationprocessor.xml:303
-#: annotationprocessor.xml:397
-#, no-c-format
-msgid "validation-api-&bvVersion;.jar"
-msgstr "validation-api-&bvVersion;.jar"
-
-#. Tag: para
-#: annotationprocessor.xml:192 annotationprocessor.xml:307
-#: annotationprocessor.xml:401
-#, fuzzy, no-c-format
-msgid "hibernate-validator-&version;.jar"
-msgstr "hibernate-validator-annotation-processor-&version;.jar"
-
-#. Tag: para
-#: annotationprocessor.xml:196 annotationprocessor.xml:311
-#: annotationprocessor.xml:405
-#, no-c-format
-msgid "hibernate-validator-annotation-processor-&version;.jar"
-msgstr "hibernate-validator-annotation-processor-&version;.jar"
-
-#. Tag: para
-#: annotationprocessor.xml:200
-#, no-c-format
-msgid ""
-"The following listing shows an example. The processor will be detected "
-"automatically by the compiler and invoked during compilation."
-msgstr ""
-"下面显示了一个具体的示例. 这样, 标注处理器就会自动被编译器检测到并且调用."
-
 #. Tag: title
-#: annotationprocessor.xml:205
+#: annotationprocessor.xml:189
 #, no-c-format
 msgid "Using the annotation processor with javac"
 msgstr "在javac中使用标注处理器"
 
 #. Tag: programlisting
-#: annotationprocessor.xml:207
+#: annotationprocessor.xml:191
 #, fuzzy, no-c-format
 msgid ""
 "javac src/main/java/org/hibernate/validator/ap/demo/Car.java \\\n"
 "   -cp /path/to/validation-api-&bvVersion;.jar \\\n"
-"   -processorpath /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-"
-"validator-&version;:/path/to/hibernate-validator-annotation-processor-"
+"   -processorpath /path/to/hibernate-validator-annotation-processor-"
 "&version;.jar"
 msgstr ""
 "javac src/main/java/org/hibernate/validator/ap/demo/Car.java \\\n"
@@ -339,13 +311,13 @@ msgstr ""
 "validator-annotation-processor-&version;.jar"
 
 #. Tag: title
-#: annotationprocessor.xml:212
+#: annotationprocessor.xml:196
 #, no-c-format
 msgid "Apache Ant"
 msgstr "Apache Ant"
 
 #. Tag: para
-#: annotationprocessor.xml:214
+#: annotationprocessor.xml:198
 #, no-c-format
 msgid ""
 "Similar to directly working with javac, the annotation processor can be "
@@ -358,21 +330,20 @@ msgstr ""
 "\">javac task</ulink>中添加上面例子中的参数:"
 
 #. Tag: title
-#: annotationprocessor.xml:221
+#: annotationprocessor.xml:205
 #, no-c-format
 msgid "Using the annotation processor with Ant"
 msgstr "在Ant中使用标注处理器"
 
 #. Tag: programlisting
-#: annotationprocessor.xml:223
+#: annotationprocessor.xml:207
 #, fuzzy, no-c-format
 msgid ""
 "&lt;javac srcdir=\"src/main\"\n"
 "       destdir=\"build/classes\"\n"
 "       classpath=\"/path/to/validation-api-&bvVersion;.jar\"&gt;\n"
 "       &lt;compilerarg value=\"-processorpath\" /&gt;\n"
-"       &lt;compilerarg value=\"/path/to/validation-api-&bvVersion;.jar:/path/"
-"to/hibernate-validator-&version;:/path/to/hibernate-validator-annotation-"
+"       &lt;compilerarg value=\"/path/to/hibernate-validator-annotation-"
 "processor-&version;.jar\"/&gt;\n"
 "&lt;/javac&gt;"
 msgstr ""
@@ -385,13 +356,13 @@ msgstr ""
 "&lt;/javac&gt;"
 
 #. Tag: title
-#: annotationprocessor.xml:228
+#: annotationprocessor.xml:212
 #, no-c-format
 msgid "Maven"
 msgstr "Maven"
 
 #. Tag: para
-#: annotationprocessor.xml:230
+#: annotationprocessor.xml:214
 #, no-c-format
 msgid ""
 "There are several options for integrating the annotation processor with "
@@ -404,13 +375,13 @@ msgstr ""
 "项目当中:"
 
 #. Tag: title
-#: annotationprocessor.xml:236
+#: annotationprocessor.xml:220
 #, no-c-format
 msgid "Adding the HV Annotation Processor as dependency"
 msgstr "添加HV 标注处理器为依赖"
 
 #. Tag: programlisting
-#: annotationprocessor.xml:238
+#: annotationprocessor.xml:222
 #, no-c-format
 msgid ""
 "...\n"
@@ -434,7 +405,7 @@ msgstr ""
 "..."
 
 #. Tag: para
-#: annotationprocessor.xml:241
+#: annotationprocessor.xml:225
 #, no-c-format
 msgid ""
 "The processor will then be executed automatically by the compiler. This "
@@ -447,7 +418,7 @@ msgstr ""
 "url=\"http://jira.codehaus.org/browse/MCOMPILER-66\">MCOMPILER-66</ulink>)."
 
 #. Tag: para
-#: annotationprocessor.xml:247
+#: annotationprocessor.xml:231
 #, no-c-format
 msgid ""
 "Another option is using the <ulink url=\"http://code.google.com/p/maven-"
@@ -462,13 +433,13 @@ msgstr ""
 "添加到你的settings.xml 或 pom.xml中:"
 
 #. Tag: title
-#: annotationprocessor.xml:255
+#: annotationprocessor.xml:239
 #, no-c-format
 msgid "Adding the Maven Annotation Plugin repository"
 msgstr "添加Maven Annotation Plugin的仓库"
 
 #. Tag: programlisting
-#: annotationprocessor.xml:257
+#: annotationprocessor.xml:241
 #, no-c-format
 msgid ""
 "...\n"
@@ -492,7 +463,7 @@ msgstr ""
 "..."
 
 #. Tag: para
-#: annotationprocessor.xml:258
+#: annotationprocessor.xml:244
 #, no-c-format
 msgid ""
 "Now disable the standard annotation processing performed by the compiler "
@@ -506,13 +477,13 @@ msgstr ""
 "了):"
 
 #. Tag: title
-#: annotationprocessor.xml:265
+#: annotationprocessor.xml:251
 #, no-c-format
 msgid "Configuring the Maven Annotation Plugin"
 msgstr "配置Maven Annotation Plugin"
 
 #. Tag: programlisting
-#: annotationprocessor.xml:267
+#: annotationprocessor.xml:253
 #, no-c-format
 msgid ""
 "...\n"
@@ -584,19 +555,19 @@ msgstr ""
 "..."
 
 #. Tag: title
-#: annotationprocessor.xml:273
+#: annotationprocessor.xml:259
 #, no-c-format
 msgid "IDE builds"
 msgstr "IDE集成"
 
 #. Tag: title
-#: annotationprocessor.xml:276
+#: annotationprocessor.xml:262
 #, no-c-format
 msgid "Eclipse"
 msgstr "Eclipse"
 
 #. Tag: para
-#: annotationprocessor.xml:278
+#: annotationprocessor.xml:264
 #, no-c-format
 msgid ""
 "Do the following to use the annotation processor within the <ulink url="
@@ -606,13 +577,13 @@ msgstr ""
 "用标注处理器:"
 
 #. Tag: para
-#: annotationprocessor.xml:283 annotationprocessor.xml:388
+#: annotationprocessor.xml:269 annotationprocessor.xml:361
 #, no-c-format
 msgid "Right-click your project, choose \"Properties\""
 msgstr "右键点击你的项目, 然后选择\"属性\""
 
 #. Tag: para
-#: annotationprocessor.xml:287
+#: annotationprocessor.xml:273
 #, no-c-format
 msgid ""
 "Go to \"Java Compiler\" and make sure, that \"Compiler compliance level\" is "
@@ -622,7 +593,7 @@ msgstr ""
 "注处理器的."
 
 #. Tag: para
-#: annotationprocessor.xml:293
+#: annotationprocessor.xml:279
 #, no-c-format
 msgid ""
 "Go to \"Java Compiler - Annotation Processing\" and choose \"Enable "
@@ -633,23 +604,23 @@ msgstr ""
 "什么:("
 
 #. Tag: para
-#: annotationprocessor.xml:298
-#, no-c-format
+#: annotationprocessor.xml:284
+#, fuzzy, no-c-format
 msgid ""
 "Go to \"Java Compiler - Annotation Processing - Factory Path\" and add the "
-"following JARs:"
+"JAR hibernate-validator-annotation-processor-&version;.jar"
 msgstr ""
 "到\"Java Compiler - Annotation Processing - Factory Path\"页面, 然后添加下面"
 "的jar文件:"
 
 #. Tag: para
-#: annotationprocessor.xml:317
+#: annotationprocessor.xml:290
 #, no-c-format
 msgid "Confirm the workspace rebuild"
 msgstr "确认工作空间重新编译"
 
 #. Tag: para
-#: annotationprocessor.xml:321
+#: annotationprocessor.xml:294
 #, no-c-format
 msgid ""
 "You now should see any annotation problems as regular error markers within "
@@ -659,13 +630,13 @@ msgstr ""
 "\"问题\"视图:"
 
 #. Tag: title
-#: annotationprocessor.xml:333
+#: annotationprocessor.xml:306
 #, no-c-format
 msgid "IntelliJ IDEA"
 msgstr "IntelliJ IDEA"
 
 #. Tag: para
-#: annotationprocessor.xml:335
+#: annotationprocessor.xml:308
 #, no-c-format
 msgid ""
 "The following steps must be followed to use the annotation processor within "
@@ -676,32 +647,31 @@ msgstr ""
 "IDEA</ulink> (9.0及以上):中使用标注处理器:"
 
 #. Tag: para
-#: annotationprocessor.xml:341
+#: annotationprocessor.xml:314
 #, no-c-format
 msgid "Go to \"File\", then \"Settings\","
 msgstr "选择 \"File\", 然后 \"Settings\","
 
 #. Tag: para
-#: annotationprocessor.xml:345
+#: annotationprocessor.xml:318
 #, no-c-format
 msgid "Expand the node \"Compiler\", then \"Annotation Processors\""
 msgstr "展开\"Compiler\"节点, 然后点击\"Annotation Processors\""
 
 #. Tag: para
-#: annotationprocessor.xml:350
+#: annotationprocessor.xml:323
 #, fuzzy, no-c-format
 msgid ""
 "Choose \"Enable annotation processing\" and enter the following as "
-"\"Processor path\": /path/to/validation-api-&bvVersion;.jar:/path/to/"
-"hibernate-validator-&version;.jar:/path/to/hibernate-validator-annotation-"
-"processor-&version;.jar"
+"\"Processor path\": /path/to/hibernate-validator-annotation-processor-"
+"&version;.jar"
 msgstr ""
 "选中 \"Enable annotation processing\" 并且输入下面的内容作为\"Processor path"
 "\": /path/to/validation-api-&bvVersion;.jar:/path/to/hibernate-validator-"
 "annotation-processor-&version;.jar"
 
 #. Tag: para
-#: annotationprocessor.xml:356
+#: annotationprocessor.xml:329
 #, no-c-format
 msgid ""
 "Add the processor's fully qualified name <classname>org.hibernate.validator."
@@ -712,26 +682,26 @@ msgstr ""
 "ConstraintValidationProcessor</classname>到\"Annotation Processors\"列表"
 
 #. Tag: para
-#: annotationprocessor.xml:362
+#: annotationprocessor.xml:335
 #, no-c-format
 msgid "If applicable add you module to the \"Processed Modules\" list"
 msgstr "如果需要的话, 添加你的模块到\"Processed Modules\"列表"
 
 #. Tag: para
-#: annotationprocessor.xml:367
+#: annotationprocessor.xml:340
 #, no-c-format
 msgid ""
 "Rebuilding your project then should show any erronous constraint annotations:"
 msgstr "重新编译你的项目, 然后应该能看到关于约束标注的错误信息了:"
 
 #. Tag: title
-#: annotationprocessor.xml:379
+#: annotationprocessor.xml:352
 #, no-c-format
 msgid "NetBeans"
 msgstr "NetBeans"
 
 #. Tag: para
-#: annotationprocessor.xml:381
+#: annotationprocessor.xml:354
 #, no-c-format
 msgid ""
 "Starting with version 6.9, also the <ulink url=\"http://www.netbeans.org/"
@@ -742,13 +712,15 @@ msgstr ""
 "支持标注处理了. 可以通过下面的步骤来启用它:"
 
 #. Tag: para
-#: annotationprocessor.xml:392
+#: annotationprocessor.xml:365
 #, fuzzy, no-c-format
-msgid "Go to \"Libraries\", tab \"Processor\", and add the following JARs:"
-msgstr "选择\"Libraries\"的\"Processor\"选项卡, 然后添加下面两个jar文件:"
+msgid ""
+"Go to \"Libraries\", tab \"Processor\", and add the JAR hibernate-validator-"
+"annotation-processor-&version;.jar"
+msgstr "hibernate-validator-annotation-processor-&version;.jar"
 
 #. Tag: para
-#: annotationprocessor.xml:411
+#: annotationprocessor.xml:370
 #, no-c-format
 msgid ""
 "Go to \"Build - Compiling\", select \"Enable Annotation Processing\" and "
@@ -762,7 +734,7 @@ msgstr ""
 "classname>."
 
 #. Tag: para
-#: annotationprocessor.xml:418
+#: annotationprocessor.xml:377
 #, no-c-format
 msgid ""
 "Any constraint annotation problems will then be marked directly within the "
@@ -770,19 +742,19 @@ msgid ""
 msgstr "所有的约束标注问题应该都会在编辑器里面直接被标记出来了:"
 
 #. Tag: title
-#: annotationprocessor.xml:432
+#: annotationprocessor.xml:391
 #, no-c-format
 msgid "Known issues"
 msgstr "已知问题"
 
 #. Tag: para
-#: annotationprocessor.xml:434
+#: annotationprocessor.xml:393
 #, no-c-format
 msgid "The following known issues exist as of May 2010:"
 msgstr "以下是截止到2010年五月我们发现(但尚未解决)的问题:"
 
 #. Tag: para
-#: annotationprocessor.xml:438
+#: annotationprocessor.xml:397
 #, no-c-format
 msgid ""
 "<ulink url=\"http://opensource.atlassian.com/projects/hibernate/browse/"
@@ -798,7 +770,7 @@ msgstr ""
 "processor."
 
 #. Tag: para
-#: annotationprocessor.xml:446
+#: annotationprocessor.xml:405
 #, no-c-format
 msgid ""
 "Sometimes custom constraints can't be <ulink url=\"http://opensource."
@@ -813,13 +785,30 @@ msgstr ""
 "进一步的研究."
 
 #. Tag: para
-#: annotationprocessor.xml:455
+#: annotationprocessor.xml:414
 #, no-c-format
 msgid ""
 "When using the processor within Eclipse, the check of dynamic default group "
 "sequence definitions doesn't work. After further investigation, it seems to "
 "be an issue with the Eclipse JSR 269 API implementation."
 msgstr ""
+
+#~ msgid "validation-api-&bvVersion;.jar"
+#~ msgstr "validation-api-&bvVersion;.jar"
+
+#, fuzzy
+#~ msgid "hibernate-validator-&version;.jar"
+#~ msgstr "hibernate-validator-annotation-processor-&version;.jar"
+
+#~ msgid ""
+#~ "The following listing shows an example. The processor will be detected "
+#~ "automatically by the compiler and invoked during compilation."
+#~ msgstr ""
+#~ "下面显示了一个具体的示例. 这样, 标注处理器就会自动被编译器检测到并且调用."
+
+#, fuzzy
+#~ msgid "Go to \"Libraries\", tab \"Processor\", and add the following JARs:"
+#~ msgstr "选择\"Libraries\"的\"Processor\"选项卡, 然后添加下面两个jar文件:"
 
 #~ msgid "Annotation Processor (EXPERIMENTAL)"
 #~ msgstr "标注处理器(实验)"

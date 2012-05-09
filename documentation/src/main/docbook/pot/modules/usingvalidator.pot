@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2012-04-14 09:37+0000\n"
+"POT-Creation-Date: 2012-05-09 09:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -1307,25 +1307,25 @@ msgid "Hibernate Validator allows some constraints to be applied to more data ty
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:774 usingvalidator.xml:1034 usingvalidator.xml:1234
+#: usingvalidator.xml:774 usingvalidator.xml:1034 usingvalidator.xml:1232
 #, no-c-format
 msgid "Annotation"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:776 usingvalidator.xml:1036 usingvalidator.xml:1236
+#: usingvalidator.xml:776 usingvalidator.xml:1036 usingvalidator.xml:1234
 #, no-c-format
 msgid "Supported data types"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:778 usingvalidator.xml:1038 usingvalidator.xml:1238
+#: usingvalidator.xml:778 usingvalidator.xml:1038 usingvalidator.xml:1236
 #, no-c-format
 msgid "<entry>Use</entry>"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:780 usingvalidator.xml:1040 usingvalidator.xml:1242
+#: usingvalidator.xml:780 usingvalidator.xml:1040 usingvalidator.xml:1240
 #, no-c-format
 msgid "Hibernate metadata impact"
 msgstr ""
@@ -1349,7 +1349,7 @@ msgid "Checks that the annotated element is <constant>false</constant>."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:794 usingvalidator.xml:806 usingvalidator.xml:826 usingvalidator.xml:846 usingvalidator.xml:882 usingvalidator.xml:940 usingvalidator.xml:956 usingvalidator.xml:969 usingvalidator.xml:996 usingvalidator.xml:1056 usingvalidator.xml:1070 usingvalidator.xml:1107 usingvalidator.xml:1120 usingvalidator.xml:1133 usingvalidator.xml:1149 usingvalidator.xml:1166 usingvalidator.xml:1185 usingvalidator.xml:1203 usingvalidator.xml:1258 usingvalidator.xml:1272 usingvalidator.xml:1287
+#: usingvalidator.xml:794 usingvalidator.xml:806 usingvalidator.xml:826 usingvalidator.xml:846 usingvalidator.xml:882 usingvalidator.xml:940 usingvalidator.xml:956 usingvalidator.xml:969 usingvalidator.xml:996 usingvalidator.xml:1056 usingvalidator.xml:1070 usingvalidator.xml:1107 usingvalidator.xml:1120 usingvalidator.xml:1133 usingvalidator.xml:1149 usingvalidator.xml:1166 usingvalidator.xml:1183 usingvalidator.xml:1201 usingvalidator.xml:1256 usingvalidator.xml:1270 usingvalidator.xml:1285
 #, no-c-format
 msgid "none"
 msgstr ""
@@ -1619,7 +1619,7 @@ msgid "@CreditCardNumber"
 msgstr ""
 
 #. Tag: classname
-#: usingvalidator.xml:1048 usingvalidator.xml:1062 usingvalidator.xml:1076 usingvalidator.xml:1089 usingvalidator.xml:1113 usingvalidator.xml:1155 usingvalidator.xml:1191 usingvalidator.xml:1250 usingvalidator.xml:1264 usingvalidator.xml:1278
+#: usingvalidator.xml:1048 usingvalidator.xml:1062 usingvalidator.xml:1076 usingvalidator.xml:1089 usingvalidator.xml:1113 usingvalidator.xml:1155 usingvalidator.xml:1189 usingvalidator.xml:1248 usingvalidator.xml:1262 usingvalidator.xml:1276
 #, no-c-format
 msgid "CharSequence"
 msgstr ""
@@ -1735,95 +1735,95 @@ msgstr ""
 #. Tag: entry
 #: usingvalidator.xml:1174
 #, no-c-format
-msgid "Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 (\"Scripting for the Java<superscript>TM</superscript> Platform\") must part of the class path. This is automatically the case when running on Java 6. For older Java versions, the JSR 223 RI can be added manually to the class path.The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path."
+msgid "Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 (\"Scripting for the Java<superscript>TM</superscript> Platform\") must part of the class path. The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1189
+#: usingvalidator.xml:1187
 #, no-c-format
 msgid "@URL(protocol=, host=, port=, regexp=, flags=)"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1193
+#: usingvalidator.xml:1191
 #, no-c-format
 msgid "Checks if the annotated character sequence is a valid URL according to RFC2396. If any of the optional parameters <parameter>protocol</parameter>, <parameter>host</parameter> or <parameter>port</parameter> are specified, the corresponding URL fragments must match the specified values. The optional parameters <parameter>regexp</parameter> and <parameter>flags</parameter> allow to specify an additional regular expression (including regular expression flags) which the URL must match."
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:1210
+#: usingvalidator.xml:1208
 #, no-c-format
 msgid "Country specific constraints"
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:1212
+#: usingvalidator.xml:1210
 #, no-c-format
 msgid "Hibernate Validator offers also some country specific constraints, e.g. for the validation of social security numbers."
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:1214
+#: usingvalidator.xml:1212
 #, no-c-format
 msgid "If you have to implement a country specific constraint, consider making it a contribution to Hibernate Validator!"
 msgstr ""
 
 #. Tag: title
-#: usingvalidator.xml:1219
+#: usingvalidator.xml:1217
 #, no-c-format
 msgid "Custom country specific constraints"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1240
+#: usingvalidator.xml:1238
 #, no-c-format
 msgid "Country"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1248
+#: usingvalidator.xml:1246
 #, no-c-format
 msgid "@CNPJ"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1252
+#: usingvalidator.xml:1250
 #, no-c-format
 msgid "Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Juríeddica)"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1256 usingvalidator.xml:1270 usingvalidator.xml:1285
+#: usingvalidator.xml:1254 usingvalidator.xml:1268 usingvalidator.xml:1283
 #, no-c-format
 msgid "Brazil"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1262
+#: usingvalidator.xml:1260
 #, no-c-format
 msgid "@CPF"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1266
+#: usingvalidator.xml:1264
 #, no-c-format
 msgid "Checks that the annotated character sequence represents a Brazilian individual taxpayer registry number (Cadastro de Pessoa Fídsica)."
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1276
+#: usingvalidator.xml:1274
 #, no-c-format
 msgid "@TituloEleitoral"
 msgstr ""
 
 #. Tag: entry
-#: usingvalidator.xml:1280
+#: usingvalidator.xml:1278
 #, no-c-format
 msgid "Checks that the annotated character sequence represents a Brazilian voter ID card number (<ulink url=\"http://ghiorzi.org/cgcancpf.htm\">Título Eleitoral</ulink>)."
 msgstr ""
 
 #. Tag: para
-#: usingvalidator.xml:1294
+#: usingvalidator.xml:1292
 #, no-c-format
 msgid "In some cases neither the Bean Validation constraints nor the custom constraints provided by Hibernate Validator will fulfill your requirements. In this case you can easily write your own constraint. We will discuss this in <xref linkend=\"validator-customconstraints\"/>."
 msgstr ""

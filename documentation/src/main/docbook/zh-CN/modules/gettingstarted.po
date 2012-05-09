@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2011-11-14 10:37+0000\n"
+"POT-Creation-Date: 2012-05-09 09:42+0000\n"
 "PO-Revision-Date: 2010-07-07 03:33+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
@@ -32,8 +32,8 @@ msgstr ""
 
 #. Tag: para
 #: gettingstarted.xml:32
-#, no-c-format
-msgid "A JDK &gt;= 5"
+#, fuzzy, no-c-format
+msgid "A JDK &gt;= 6"
 msgstr "A JDK &gt;= 5"
 
 #. Tag: ulink
@@ -90,62 +90,47 @@ msgstr ""
 "xml</filename> 的信息请参考<ulink url=\"http://maven.apache.org/ref/2.0.8/"
 "maven-settings/settings.html\">Maven Local Settings Model</ulink>."
 
-#. Tag: para
+#. Tag: title
 #: gettingstarted.xml:58
-#, fuzzy, no-c-format
-msgid ""
-"Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java "
-"Class Library since Java 6 which means that if you run Hibernate Validator "
-"with Java 5 you will have to add additional JAXB dependencies. Using Maven "
-"you have to add the following dependencies:<programlisting>&lt;"
-"dependency&gt;\n"
-"    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
-"    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
-"    &lt;version&gt;2.2&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"&lt;dependency&gt;\n"
-"    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;\n"
-"    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;\n"
-"    &lt;version&gt;2.1.12&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"</programlisting> if you are using the SourceForge package you find the "
-"necessary libraries in the <filename>lib/jdk5</filename> directory. In case "
-"you are not using the XML configuration you can also disable it explicitly "
-"by calling <methodname>Configuration.ignoreXmlConfiguration()</methodname> "
-"during <classname>ValidationFactory</classname> creation. In this case the "
-"JAXB dependencies are not needed."
+#, no-c-format
+msgid "Project set up"
 msgstr ""
-"Hibernate Validator 使用JAXB 来解析XML. JAXB 已经被集成进Java 6了, 所以,如果"
-"你要在Java 5上使用Hibernate Validator的话, 那么,还需要添加额外的JAXB的依赖. "
-"如果你使用Maven的话,你可以把下面的内容添加到pom当中:<programlisting>&lt;"
-"dependency&gt;\n"
-"    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
-"    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
-"    &lt;version&gt;2.2&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"&lt;dependency&gt;\n"
-"    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;\n"
-"    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;\n"
-"    &lt;version&gt;2.1.12&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"</programlisting>"
+
+#. Tag: para
+#: gettingstarted.xml:60
+#, no-c-format
+msgid ""
+"In order to use Hibernate Validator within an existing Maven project, simply "
+"add the following dependency to your <filename>pom.xml</filename>:"
+msgstr ""
 
 #. Tag: title
-#: gettingstarted.xml:71
+#: gettingstarted.xml:63
 #, no-c-format
-msgid "Setting up a new Maven project"
-msgstr "第一个Maven项目"
+msgid "Maven dependency of Hibernate Validator"
+msgstr ""
 
-#. Tag: para
-#: gettingstarted.xml:73
+#. Tag: programlisting
+#: gettingstarted.xml:65
 #, no-c-format
 msgid ""
-"Start by creating new Maven project using the Maven archetype plugin as "
-"follows:"
+"&lt;dependency&gt;\n"
+"    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;\n"
+"    &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;\n"
+"    &lt;version&gt;&version;&lt;/version&gt;\n"
+"&lt;/dependency&gt;"
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:68
+#, fuzzy, no-c-format
+msgid ""
+"Alternatively, you can start by creating a sample project using Hibernate "
+"Validator's Quickstart Maven archetype as follows:"
 msgstr "使用Maven archetype插件来创建一个新的Maven 项目"
 
 #. Tag: title
-#: gettingstarted.xml:77
+#: gettingstarted.xml:72
 #, no-c-format
 msgid ""
 "Using Maven's archetype plugin to create a sample project using Hibernate "
@@ -153,7 +138,7 @@ msgid ""
 msgstr "使用Maven archetype 插件来创建一个简单的基于Hibernate Validator的项目"
 
 #. Tag: programlisting
-#: gettingstarted.xml:80
+#: gettingstarted.xml:75
 #, fuzzy, no-c-format
 msgid ""
 "mvn archetype:generate -DarchetypeGroupId=org.hibernate \\\n"
@@ -173,7 +158,7 @@ msgstr ""
 "                     -DartifactId=hv-quickstart"
 
 #. Tag: para
-#: gettingstarted.xml:83
+#: gettingstarted.xml:78
 #, no-c-format
 msgid ""
 "Maven will create your project in the directory hv-quickstart. Change into "
@@ -181,29 +166,40 @@ msgid ""
 msgstr "Maven 将会把你的项目创建在hv-quickstart目录中. 进入这个目录并且执行:"
 
 #. Tag: programlisting
-#: gettingstarted.xml:86
+#: gettingstarted.xml:81
 #, no-c-format
 msgid "mvn test"
 msgstr "mvn test"
 
 #. Tag: para
-#: gettingstarted.xml:86
-#, no-c-format
+#: gettingstarted.xml:81
+#, fuzzy, no-c-format
 msgid ""
 "Maven will compile the example code and run the implemented unit tests. "
-"Let's have a look at the actual code."
+"Let's have a look at the actual code in the next section."
 msgstr ""
 "这样, Maven会编译示例代码并且运行单元测试, 接下来,让我们看看生成的代码."
 
 #. Tag: para
-#: gettingstarted.xml:91
+#: gettingstarted.xml:86
 #, no-c-format
 msgid ""
-"From version 4.2.0.Beta2, the maven command <command>mvn archetype:create</"
-"command> will be no longer supported and will fail. You should use the "
-"command described in the above listing. If you want more details, look at "
-"<ulink url=\"http://maven.apache.org/archetype/maven-archetype-plugin/\"> "
-"Maven Archetype plugin</ulink> page."
+"For the purposes of logging, Hibernate Validator uses the JBoss Logging API. "
+"This is an abstraction layer which supports several known logging solutions "
+"(e.g. log4j or the logging framework provided by the JDK) as implementation. "
+"Just add your preferred logging library to the classpath and all log "
+"requests from Hibernate Validator will automatically be delegated to that "
+"logging provider."
+msgstr ""
+
+#. Tag: para
+#: gettingstarted.xml:93
+#, no-c-format
+msgid ""
+"Alternatively, you can explicitely specify a provider using the system "
+"property <varname>org.jboss.logging.provider</varname>. Supported values "
+"currently are <varname>jboss</varname>, <varname>jdk</varname>, "
+"<varname>log4j</varname> and <varname>slf4j</varname>."
 msgstr ""
 
 #. Tag: title
@@ -597,3 +593,44 @@ msgstr ""
 "Validator, 请继续阅读<xref linkend=\"validator-usingvalidator\"/>.  如果您的"
 "应用程序有特殊的校验需求,请参考 <xref linkend=\"validator-customconstraints"
 "\"/>."
+
+#, fuzzy
+#~ msgid ""
+#~ "Hibernate Validator uses JAXB for XML parsing. JAXB is part of the Java "
+#~ "Class Library since Java 6 which means that if you run Hibernate "
+#~ "Validator with Java 5 you will have to add additional JAXB dependencies. "
+#~ "Using Maven you have to add the following dependencies:"
+#~ "<programlisting>&lt;dependency&gt;\n"
+#~ "    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
+#~ "    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
+#~ "    &lt;version&gt;2.2&lt;/version&gt;\n"
+#~ "&lt;/dependency&gt;\n"
+#~ "&lt;dependency&gt;\n"
+#~ "    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;\n"
+#~ "    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;\n"
+#~ "    &lt;version&gt;2.1.12&lt;/version&gt;\n"
+#~ "&lt;/dependency&gt;\n"
+#~ "</programlisting> if you are using the SourceForge package you find the "
+#~ "necessary libraries in the <filename>lib/jdk5</filename> directory. In "
+#~ "case you are not using the XML configuration you can also disable it "
+#~ "explicitly by calling <methodname>Configuration.ignoreXmlConfiguration()</"
+#~ "methodname> during <classname>ValidationFactory</classname> creation. In "
+#~ "this case the JAXB dependencies are not needed."
+#~ msgstr ""
+#~ "Hibernate Validator 使用JAXB 来解析XML. JAXB 已经被集成进Java 6了, 所以,如"
+#~ "果你要在Java 5上使用Hibernate Validator的话, 那么,还需要添加额外的JAXB的依"
+#~ "赖. 如果你使用Maven的话,你可以把下面的内容添加到pom当中:"
+#~ "<programlisting>&lt;dependency&gt;\n"
+#~ "    &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;\n"
+#~ "    &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;\n"
+#~ "    &lt;version&gt;2.2&lt;/version&gt;\n"
+#~ "&lt;/dependency&gt;\n"
+#~ "&lt;dependency&gt;\n"
+#~ "    &lt;groupId&gt;com.sun.xml.bind&lt;/groupId&gt;\n"
+#~ "    &lt;artifactId&gt;jaxb-impl&lt;/artifactId&gt;\n"
+#~ "    &lt;version&gt;2.1.12&lt;/version&gt;\n"
+#~ "&lt;/dependency&gt;\n"
+#~ "</programlisting>"
+
+#~ msgid "Setting up a new Maven project"
+#~ msgstr "第一个Maven项目"
