@@ -1,6 +1,18 @@
 Hibernate Validator Changelog
 =============================
 
+4.3.0.Final (09.05.2012)
+------------------------
+
+** Improvement
+    * [HV-568] - Perform a profiling of the annotation processor code and make use of caching where appropriate
+    * [HV-577] - Include javadoc jar in Maven repo
+
+** Task
+    * [HV-578] - Remove remaining references to slf4j
+    * [HV-580] - Remove deprecation of package org.hibernate.validator.group
+
+
 4.3.0.CR1 (30.04.2012)
 ----------------------
 

@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 4.3.0.CR1, 30.04.2011*
+*Version: 4.3.0.Final, 09.05.2012*
 
 
 ## What is it?
@@ -40,7 +40,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.3.0.CR1</version>
+            <version>4.3.0.Final</version>
         </dependency>
 
 
