@@ -24,8 +24,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.validation.ConfigurationSource;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
@@ -138,6 +140,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration parameterNameProvider(ParameterNameProvider parameterNameProvider) {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
 		Contracts.assertNotNull( stream, MESSAGES.parameterMustNotBeNull( "stream" ) );
 
@@ -236,6 +244,18 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getTraversableResolver();
 	}
 
+	@Override
+	public ConfigurationSource getConfigurationSource() {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
+	@Override
+	public ParameterNameProvider getParameterNameProvider() {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
 	public final Map<String, String> getProperties() {
 		return validationBootstrapParameters.getConfigProperties();
 	}
@@ -255,6 +275,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@SuppressWarnings("deprecation")
 	public final org.hibernate.validator.resourceloading.ResourceBundleLocator getDefaultResourceBundleLocator() {
 		return new Adapter( defaultResourceBundleLocator );
+	}
+
+	@Override
+	public ParameterNameProvider getDefaultParameterNameProvider() {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
 	}
 
 	public final Set<ConstraintMapping> getProgrammaticMappings() {

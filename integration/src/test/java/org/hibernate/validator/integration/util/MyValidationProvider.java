@@ -19,6 +19,7 @@ package org.hibernate.validator.integration.util;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
@@ -67,6 +68,14 @@ public class MyValidationProvider implements ValidationProvider<MyValidatorConfi
 		}
 
 		public <T> T unwrap(Class<T> type) {
+			throw new UnsupportedOperationException();
+		}
+
+		public ParameterNameProvider getParameterNameProvider() {
+			throw new UnsupportedOperationException();
+		}
+
+		public void close() {
 			throw new UnsupportedOperationException();
 		}
 	}

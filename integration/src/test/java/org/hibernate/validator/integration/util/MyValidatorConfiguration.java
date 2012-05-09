@@ -18,8 +18,10 @@ package org.hibernate.validator.integration.util;
 
 import java.io.InputStream;
 import javax.validation.Configuration;
+import javax.validation.ConfigurationSource;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
@@ -77,6 +79,18 @@ public class MyValidatorConfiguration implements Configuration<MyValidatorConfig
 
 	public ValidatorFactory buildValidatorFactory() {
 		return provider.buildValidatorFactory( null );
+	}
+
+	public MyValidatorConfiguration parameterNameProvider(ParameterNameProvider parameterNameProvider) {
+		throw new UnsupportedOperationException();
+	}
+
+	public ParameterNameProvider getDefaultParameterNameProvider() {
+		throw new UnsupportedOperationException();
+	}
+
+	public ConfigurationSource getConfigurationSource() {
+		throw new UnsupportedOperationException();
 	}
 }
 

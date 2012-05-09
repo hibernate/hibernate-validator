@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.spi.ConfigurationState;
@@ -128,6 +129,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				metaDataManager,
 				failFast
 		);
+	}
+
+	@Override
+	public ParameterNameProvider getParameterNameProvider() {
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
+	@Override
+	public void close() {
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	private boolean checkPropertiesForFailFast(Map<String, String> properties, boolean programmaticConfiguredFailFast) {

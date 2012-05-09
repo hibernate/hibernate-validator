@@ -30,6 +30,7 @@ import java.util.WeakHashMap;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
@@ -58,7 +59,6 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- *
  * @deprecated Will be removed in a future release.
  */
 @Deprecated
@@ -227,5 +227,17 @@ public class LazyValidatorFactory implements ValidatorFactory {
 
 			return providerNames;
 		}
+	}
+
+	@Override
+	public ParameterNameProvider getParameterNameProvider() {
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
+	@Override
+	public void close() {
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 }

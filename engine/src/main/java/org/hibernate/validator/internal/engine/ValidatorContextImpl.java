@@ -18,8 +18,10 @@ package org.hibernate.validator.internal.engine;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
+import javax.validation.ValidatorContext;
 
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -86,6 +88,12 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 			this.constraintValidatorFactory = factory;
 		}
 		return this;
+	}
+
+	@Override
+	public ValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
 	}
 
 	public HibernateValidatorContext failFast(boolean failFast) {

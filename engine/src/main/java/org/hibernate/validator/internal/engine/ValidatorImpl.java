@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -37,9 +38,9 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.groups.Group;
+import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -52,7 +53,6 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.method.MethodConstraintViolation;
-import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -67,7 +67,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public class ValidatorImpl implements Validator, MethodValidator {
+public class ValidatorImpl implements Validator {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -220,7 +220,25 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return context.getFailingConstraints();
 	}
 
-	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<T> constructor, Object[] parameterValues, Class<?>... groups) {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<T> constructor, T createdObject, Class<?>... groups) {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
+	public <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
 
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
@@ -237,7 +255,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 		validateReturnValueInContext( context, object, returnValue, validationOrder );
 
-		return context.getFailingConstraints();
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+//		return context.getFailingConstraints();
 	}
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {

@@ -88,6 +88,12 @@ public class ValidationTest {
 						}
 						return new ConstraintValidatorFactoryImpl().getInstance( key );
 					}
+
+					@Override
+					public void releaseInstance(ConstraintValidator<?, ?> instance) {
+						// TODO HV-571
+						throw new IllegalArgumentException( "Not yet implemented" );
+					}
 				}
 		);
 		factory = configuration.buildValidatorFactory();

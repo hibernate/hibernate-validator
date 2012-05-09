@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
@@ -47,7 +48,6 @@ import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
@@ -182,7 +182,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	public TypeDescriptor getTypeDescriptor() {
-		return getBeanDescriptorInternal();
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not implemented, will be removed." );
 	}
 
 	public Set<Member> getCascadedMembers() {
@@ -283,18 +284,20 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private Map<String, MethodDescriptor> getMethodsAsDescriptors() {
-		Map<String, MethodDescriptor> theValue = newHashMap();
-
-		for ( Entry<String, MethodMetaData> oneMethod : methodMetaData.entrySet() ) {
-			theValue.put(
-					oneMethod.getKey(), oneMethod.getValue().asDescriptor(
-					defaultGroupSequenceIsRedefined(),
-					getDefaultGroupSequence( null )
-			)
-			);
-		}
-
-		return theValue;
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+//		Map<String, MethodDescriptor> theValue = newHashMap();
+//
+//		for ( Entry<String, MethodMetaData> oneMethod : methodMetaData.entrySet() ) {
+//			theValue.put(
+//					oneMethod.getKey(), oneMethod.getValue().asDescriptor(
+//					defaultGroupSequenceIsRedefined(),
+//					getDefaultGroupSequence( null )
+//			)
+//			);
+//		}
+//
+//		return theValue;
 	}
 
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {

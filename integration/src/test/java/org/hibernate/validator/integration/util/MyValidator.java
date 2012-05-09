@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.integration.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -25,6 +27,7 @@ import javax.validation.metadata.BeanDescriptor;
  * @author Hardy Ferentschik
  */
 public class MyValidator implements Validator {
+
 	public <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 		throw new UnsupportedOperationException();
 	}
@@ -37,6 +40,22 @@ public class MyValidator implements Validator {
 		throw new UnsupportedOperationException();
 	}
 
+	public <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
+		throw new UnsupportedOperationException();
+	}
+
+	public <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
+		throw new UnsupportedOperationException();
+	}
+
+	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<T> constructor, Object[] parameterValues, Class<?>... groups) {
+		throw new UnsupportedOperationException();
+	}
+
+	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<T> constructor, T createdObject, Class<?>... groups) {
+		throw new UnsupportedOperationException();
+	}
+
 	public BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		throw new UnsupportedOperationException();
 	}
@@ -45,5 +64,3 @@ public class MyValidator implements Validator {
 		throw new UnsupportedOperationException();
 	}
 }
-
-

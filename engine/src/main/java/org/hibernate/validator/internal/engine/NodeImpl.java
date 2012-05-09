@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.io.Serializable;
 import javax.validation.Path;
+import javax.validation.metadata.ElementDescriptor;
 
 /**
  * Immutable implementation of a {@code Path.Node}.
@@ -80,6 +81,12 @@ public class NodeImpl implements Path.Node, Serializable {
 
 	public final NodeImpl getParent() {
 		return parent;
+	}
+
+	@Override
+	public ElementDescriptor getElementDescriptor() {
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override

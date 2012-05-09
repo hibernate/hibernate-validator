@@ -32,4 +32,10 @@ public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactor
 	public final <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 		return ReflectionHelper.newInstance( key, "ConstraintValidator" );
 	}
+
+	@Override
+	public void releaseInstance(ConstraintValidator<?, ?> instance) {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
 }

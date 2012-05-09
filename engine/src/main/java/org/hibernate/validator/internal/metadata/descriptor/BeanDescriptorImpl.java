@@ -24,14 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.method.metadata.MethodDescriptor;
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -42,7 +40,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor, TypeDescriptor {
+public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
 	private final Map<String, PropertyDescriptor> constrainedProperties;
 	private final Map<String, MethodDescriptor> methods;
 	private final Set<MethodDescriptor> constrainedMethods;
@@ -72,6 +70,18 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		return new HashSet<PropertyDescriptor>( constrainedProperties.values() );
 	}
 
+	@Override
+	public ConstructorDescriptor getConstraintsForConstructor(Class<?>... parameterTypes) {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
+	@Override
+	public Set<ConstructorDescriptor> getConstrainedConstructors() {
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+	}
+
 	//TypeDescriptor methods
 
 	public boolean isTypeConstrained() {
@@ -96,21 +106,22 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	private Set<MethodDescriptor> getConstrainedMethods(Collection<MethodDescriptor> methods) {
-		Set<MethodDescriptor> theValue = newHashSet();
-
-		for ( MethodDescriptor oneMethod : methods ) {
-			if ( oneMethod.hasConstraints() || oneMethod.isCascaded() ) {
-				theValue.add( oneMethod );
-			}
-
-			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
-				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
-					theValue.add( oneMethod );
-				}
-			}
-		}
-
-		return theValue;
+		// TODO HV-571
+		throw new IllegalArgumentException( "Not yet implemented" );
+//		Set<MethodDescriptor> theValue = newHashSet();
+//
+//		for ( MethodDescriptor oneMethod : methods ) {
+//			if ( oneMethod.hasConstraints() || oneMethod.isCascaded() ) {
+//				theValue.add( oneMethod );
+//			}
+//
+//			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
+//				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
+//					theValue.add( oneMethod );
+//				}
+//			}
+//		}
+//
+//		return theValue;
 	}
-
 }

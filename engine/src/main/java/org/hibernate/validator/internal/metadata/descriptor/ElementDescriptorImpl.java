@@ -80,6 +80,18 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 		return new ConstraintFinderImpl();
 	}
 
+	@Override
+	public Kind getKind() {
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
+	@Override
+	public <T extends ElementDescriptor> T as(Class<T> descriptorType) {
+		// TODO HV-571
+		throw new UnsupportedOperationException( "Not yet implemented" );
+	}
+
 	protected static Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
 		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
 

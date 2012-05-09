@@ -28,11 +28,12 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * A module test that shows the different bootstrap possibilities of Hibernate Validator.
@@ -101,6 +102,11 @@ public class BootstrapTest {
 
 		public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 			return null;
+		}
+
+		public void releaseInstance(ConstraintValidator<?, ?> instance) {
+			// TODO HV-571
+			throw new UnsupportedOperationException( "Not yet implemented" );
 		}
 	}
 }

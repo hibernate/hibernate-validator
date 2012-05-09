@@ -180,6 +180,12 @@ public class ConstraintValidatorCachingTest {
 				}
 			}
 		}
+
+		@Override
+		public void releaseInstance(ConstraintValidator<?, ?> instance) {
+			// TODO HV-571
+			throw new IllegalArgumentException( "Not yet implemented" );
+		}
 	}
 
 	class Person {
