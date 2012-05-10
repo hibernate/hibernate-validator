@@ -1,0 +1,168 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="JSR-303-TCK" verbose="1">
+    <test name="JSR-303-TCK">
+        <method-selectors>
+            <method-selector>
+                <selector-class name="org.jboss.testharness.impl.testng.DisableIntegrationTestsMethodSelector"/>
+            </method-selector>
+            <method-selector>
+                <selector-class name="org.jboss.testharness.impl.testng.ExcludeIncontainerUnderInvestigationMethodSelector"/>
+            </method-selector>
+        </method-selectors>
+        <groups>
+            <run>
+                <exclude name="underInvestigation"/>
+                <exclude name="ri-broken"/>
+                <exclude name="jboss-as-broken"/>
+                <exclude name="broken"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="org.hibernate.jsr303.tck.tests"/>
+        </packages>
+
+        <classes>
+            <class name="org.hibernate.jsr303.tck.tests.constraints.constraintcomposition.ConstraintCompositionTest">
+                <methods>
+                    <exclude name="testAttributesDefinedOnComposingConstraints"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.constraints.constraintdefinition.ConstraintDefinitionsTest">
+                <methods>
+                    <exclude name="test.*"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.constraints.customconstraint.CustomConstraintValidatorTest">
+                <methods>
+                    <exclude name="testRightValidatorIsSelectedAndInitializedCalled"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.constraints.groups.GroupTest">
+                <methods>
+                    <exclude name="testConstraintCanBelongToMoreThanOneGroup"/>
+                    <exclude name="testConstraintWithNoExplicitlySpecifiedGroupBelongsToDefault"/>
+                    <exclude name="testImplicitGrouping"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.constraints.groups.inheritance.GroupInheritanceTest">
+                <methods>
+                    <exclude name="testGroupMembership"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.constraints.inheritance.ConstraintInheritanceTest">
+                <methods>
+                    <exclude name="testConstraintsOnInterfaceAreInherited"/>
+                    <exclude name="testConstraintsOnSuperClassAreInherited"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.metadata.BeanDescriptorTest">
+                <methods>
+                    <exclude name="test.*"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.metadata.ConstraintDescriptorTest">
+                <methods>
+                    <exclude name="test.*"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.metadata.ElementDescriptorTest">
+                <methods>
+                    <exclude name="test.*"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.metadata.PropertyDescriptorTest">
+                <methods>
+                    <exclude name="test.*"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.validation.ValidateTest">
+                <methods>
+                    <exclude name="testConstraintDescriptorWithoutExplicitGroup"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.DuplicateConfigurationTest">
+                <methods>
+                    <exclude name="testXmlConfiguredConstraintExposesCorrespondingAnnotationViaMetadata"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.XmlConfigurationTest">
+                <methods>
+                    <exclude name="testElementConversionInXmlConfiguredConstraint"/>
+                    <exclude name="testMappingFilesAddedViaConfigurationGetAddedToXmlConfiguredMappings"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.ConfigurationViaXmlAndAnnotationsTest">
+                <methods>
+                    <exclude name="testEntityConfiguredViaAnnotationsAndXml"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.ConstraintDeclarationTest">
+                <methods>
+                    <exclude name="testConstraintAnnotationsArePerDefaultIgnoredForXmlConfiguredEntities"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.fieldlevel.ExcludeFieldLevelAnnotationsDueToBeanDefaultsTest">
+                <methods>
+                    <exclude name="testIgnoreAnnotations"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.fieldlevel.FieldLevelOverridingTest">
+                <methods>
+                    <exclude name="testCascadedConfiguration"/>
+                    <exclude name="testIgnoreAnnotations"/>
+                    <exclude name="testIncludeAnnotations"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.fieldlevel.IncludeFieldLevelAnnotationsDueToBeanDefaultsTest">
+                <methods>
+                    <exclude name="testAnnotationsIncluded"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.propertylevel.ExcludePropertyLevelAnnotationsDueToBeanDefaultsTest">
+                <methods>
+                    <exclude name="testIgnoreAnnotations"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.propertylevel.IncludePropertyLevelAnnotationsDueToBeanDefaultsTest">
+                <methods>
+                    <exclude name="testAnnotationsIncluded"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdeclaration.propertylevel.PropertyLevelOverridingTest">
+                <methods>
+                    <exclude name="testCascadedConfiguration"/>
+                    <exclude name="testIgnoreAnnotations"/>
+                    <exclude name="testIncludeAnnotations"/>
+                </methods>
+            </class>
+
+            <class name="org.hibernate.jsr303.tck.tests.xmlconfiguration.constraintdefinition.XmlConfiguredConstraintValidatorTest">
+                <methods>
+                    <exclude name="testExcludeExistingValidators"/>
+                    <exclude name="testIncludeExistingValidators"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

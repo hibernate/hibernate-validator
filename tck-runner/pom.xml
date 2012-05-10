@@ -147,7 +147,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-suite.xml</suiteXmlFile>
+                        <!--<suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-suite.xml</suiteXmlFile>-->
+                        <suiteXmlFile>${basedir}/src/test/suite/tmp-jsr303-tck-suite.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <argLine>-Xmx128m</argLine>
                     <forkMode>once</forkMode>
