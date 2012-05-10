@@ -33,6 +33,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.testutil.CountValidationCalls;
 import org.hibernate.validator.testutil.CountValidationCallsValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
@@ -46,8 +47,8 @@ import static org.testng.Assert.assertTrue;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ValidatorTest {
-
-	@Test(description = "HV-429")
+	@Test
+	@TestForIssue(jiraKey = "HV-429")
 	public void testValidatePropertyWithRedefinedDefaultGroupOnMainEntity() {
 		Validator validator = getValidator();
 		A testInstance = new A();
@@ -58,7 +59,8 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "c.id" );
 	}
 
-	@Test(description = "HV-429")
+	@Test
+	@TestForIssue(jiraKey = "HV-429")
 	public void testValidatePropertyWithRedefinedDefaultGroupOnSuperClass() {
 		Validator validator = getValidator();
 		A testInstance = new A();
@@ -69,7 +71,8 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "d.e" );
 	}
 
-	@Test(description = "HV-429")
+	@Test
+	@TestForIssue(jiraKey = "HV-429")
 	public void testValidateValueWithRedefinedDefaultGroupOnMainEntity() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue( A.class, "c.id", "aaa" );
@@ -77,7 +80,8 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "c.id" );
 	}
 
-	@Test(description = "HV-429")
+	@Test
+	@TestForIssue(jiraKey = "HV-429")
 	public void testValidateValueWithRedefinedDefaultGroupOnSuperClass() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<A>> constraintViolations = validator.validateValue( A.class, "d.e", "aa" );
@@ -85,7 +89,8 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "d.e" );
 	}
 
-	@Test(description = "HV-376")
+	@Test
+	@TestForIssue(jiraKey = "HV-376")
 	public void testValidatePropertyWithCurrencySymbol() {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
@@ -93,7 +98,8 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	@Test(description = "HV-376")
+	@Test
+	@TestForIssue(jiraKey = "HV-376")
 	public void testValidateValueWithCurrencySymbol() {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
@@ -103,7 +109,8 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	@Test(description = "HV-208")
+	@Test
+	@TestForIssue(jiraKey = "HV-208")
 	public void testPropertyPathDoesNotStartWithLeadingDot() {
 		Validator validator = getValidator();
 		A testInstance = new A();
@@ -112,14 +119,16 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "b" );
 	}
 
-	@Test(description = "HV-372")
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@TestForIssue(jiraKey = "HV-372")
 	public void testHasBoolean() {
 		Validator validator = getValidator();
 		BeanDescriptor beanDescr = validator.getConstraintsForClass( B.class );
 		assertTrue( beanDescr.isBeanConstrained() );
 	}
 
-	@Test(description = "HV-466")
+	@Test
+	@TestForIssue(jiraKey = "HV-466")
 	public void testValidateInterfaceConstraintsAreValidatedOneTime() {
 		CountValidationCallsValidator.init();
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validate( new H() );
@@ -128,7 +137,8 @@ public class ValidatorTest {
 		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 2 );
 	}
 
-	@Test(description = "HV-466")
+	@Test
+	@TestForIssue(jiraKey = "HV-466")
 	public void testValidatePropertyInterfaceConstraintsAreValidatedOneTime() {
 		CountValidationCallsValidator.init();
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateProperty( new H(), "foo" );
@@ -137,7 +147,8 @@ public class ValidatorTest {
 		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
 	}
 
-	@Test(description = "HV-466")
+	@Test
+	@TestForIssue(jiraKey = "HV-466")
 	public void testValidateValueInterfaceConstraintsAreValidatedOneTime() {
 		CountValidationCallsValidator.init();
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateValue( H.class, "foo", null );
@@ -146,7 +157,8 @@ public class ValidatorTest {
 		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
 	}
 
-	@Test(description = "HV-468")
+	@Test
+	@TestForIssue(jiraKey = "HV-468")
 	public void testPropertyPath() {
 		Validator validator = getValidator();
 		Foo foo = new Foo();
@@ -169,7 +181,7 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 
-	    // using validateProperty (which is used by JSF) to validate explicitly (no violation, because there is no
+		// using validateProperty (which is used by JSF) to validate explicitly (no violation, because there is no
 		// property foo Validator knows about
 		constraintViolations = getValidator().validateProperty( new NotFollowingJavaBeanNotation(), "foo" );
 		assertNumberOfViolations( constraintViolations, 0 );
@@ -195,7 +207,7 @@ public class ValidatorTest {
 		}
 	}
 
-	@GroupSequence( { TestGroup.class, C.class })
+	@GroupSequence({ TestGroup.class, C.class })
 	class C {
 		@Pattern(regexp = "[0-9]+", groups = TestGroup.class)
 		@Length(min = 2)
@@ -206,7 +218,7 @@ public class ValidatorTest {
 		}
 	}
 
-	@GroupSequence( { TestGroup.class, E.class })
+	@GroupSequence({ TestGroup.class, E.class })
 	class E {
 		String e;
 

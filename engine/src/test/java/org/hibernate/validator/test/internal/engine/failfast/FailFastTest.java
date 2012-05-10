@@ -80,7 +80,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationDefaultBehaviour() {
 
@@ -106,7 +106,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationOnConfiguration() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -141,7 +141,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -188,7 +188,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationSetWithProperty() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );

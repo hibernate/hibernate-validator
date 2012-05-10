@@ -31,10 +31,10 @@ import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getTypeDescriptor;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.testutil.ValidatorUtil.getTypeDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -45,6 +45,7 @@ import static org.testng.Assert.assertTrue;
  *
  * @author Gunnar Morling
  */
+@Test(groups = "BV-1.1-Migration-Test-Failure")
 public class TypeDescriptorTest {
 
 	@Test
@@ -140,8 +141,8 @@ public class TypeDescriptorTest {
 	}
 
 
-	 // A method descriptor can be retrieved by specifying an overridden method
-	 // from a base type.
+	// A method descriptor can be retrieved by specifying an overridden method
+	// from a base type.
 	@Test
 	public void testGetConstraintsForOverriddenMethod() throws Exception {
 
@@ -151,9 +152,9 @@ public class TypeDescriptorTest {
 		assertNotNull( methodDescriptor );
 	}
 
-	 // A method descriptor can be retrieved by specifying a method from a base
-	 // type (qux() is not defined on CustomerRepositoryExt, but only on
-	 // CustomerRepository).
+	// A method descriptor can be retrieved by specifying a method from a base
+	// type (qux() is not defined on CustomerRepositoryExt, but only on
+	// CustomerRepository).
 	@Test
 	public void testGetConstraintsForMethodFromBaseType() throws Exception {
 
@@ -262,5 +263,4 @@ public class TypeDescriptorTest {
 
 		}
 	}
-
 }

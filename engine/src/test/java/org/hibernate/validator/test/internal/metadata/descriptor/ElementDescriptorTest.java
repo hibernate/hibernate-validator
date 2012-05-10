@@ -32,6 +32,7 @@ import org.hibernate.validator.test.internal.metadata.ChildWithoutAtValid2;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.Order;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
@@ -45,6 +46,7 @@ import static org.testng.Assert.fail;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
+@Test(groups = "BV-1.1-Migration-Test-Failure")
 public class ElementDescriptorTest {
 
 	@Test
@@ -74,20 +76,16 @@ public class ElementDescriptorTest {
 		assertEquals( constraintDescriptors.size(), 0 );
 	}
 
-	/**
-	 * HV-95
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-95")
 	public void testElementDescriptorForProperty() {
 		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
 		assertTrue( constraintDescriptors.size() == 1, "There should be a descriptor" );
 	}
 
-	/**
-	 * HV-95
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-95")
 	public void testElementDescriptorImmutable() {
 		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();

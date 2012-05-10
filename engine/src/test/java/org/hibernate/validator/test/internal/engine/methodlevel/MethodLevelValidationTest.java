@@ -48,6 +48,7 @@ import static org.testng.Assert.fail;
  *
  * @author Gunnar Morling
  */
+@Test(groups = "BV-1.1-Migration-Test-Failure")
 public class MethodLevelValidationTest {
 
 	private CustomerRepository customerRepository;

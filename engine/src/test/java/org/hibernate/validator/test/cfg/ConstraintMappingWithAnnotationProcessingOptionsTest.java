@@ -49,6 +49,7 @@ import static org.testng.AssertJUnit.assertTrue;
  *
  * @author Hardy Ferentschik
  */
+@Test(groups = "BV-1.1-Migration-Test-Failure")
 public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 
 	@Test

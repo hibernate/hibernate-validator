@@ -43,7 +43,7 @@ import static org.testng.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 public class MultipleConstraintMappingsTest {
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	@TestForIssue(jiraKey = "HV-500")
 	public void testMultipleConstraintMappings() {
 		ConstraintMapping marathonMapping = new ConstraintMapping();
@@ -75,7 +75,7 @@ public class MultipleConstraintMappingsTest {
 		);
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	@TestForIssue(jiraKey = "HV-500")
 	public void testMultipleConstraintMappingsWithSameConfig() {
 		ConstraintMapping marathonMapping1 = new ConstraintMapping();

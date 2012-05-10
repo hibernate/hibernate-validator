@@ -46,6 +46,7 @@ import static org.testng.Assert.fail;
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
+@Test(groups = "BV-1.1-Migration-Test-Failure")
 public class MethodConstraintMappingTest {
 
 	private GreetingService wrappedObject;

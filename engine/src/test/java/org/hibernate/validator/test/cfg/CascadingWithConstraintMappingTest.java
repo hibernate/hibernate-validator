@@ -26,10 +26,11 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -37,7 +38,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
 public class CascadingWithConstraintMappingTest {
-	@Test(description = "HV-433")
+	@Test
+	@TestForIssue(jiraKey = "HV-433")
 	public void testProgrammaticCascadingValidationFieldAccess() {
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
@@ -54,11 +56,14 @@ public class CascadingWithConstraintMappingTest {
 
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
-		assertNumberOfViolations( violations, 1 );
+		assertNumberOfViolations( violations, 1 )
+		;
+
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
-	@Test(description = "HV-433")
+	@Test
+	@TestForIssue(jiraKey = "HV-433")
 	public void testProgrammaticCascadingValidationMethodAccess() {
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
@@ -79,7 +84,8 @@ public class CascadingWithConstraintMappingTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
-	@Test(description = "HV-433")
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@TestForIssue(jiraKey = "HV-433")
 	public void testProgrammaticCascadingMethodValidation() {
 		ConstraintMapping newMapping = new ConstraintMapping();
 		newMapping
