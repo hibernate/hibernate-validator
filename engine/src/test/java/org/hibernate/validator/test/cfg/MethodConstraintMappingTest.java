@@ -36,8 +36,8 @@ import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ValidatorUtil.getMethodValidatorForMapping;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidatorForProgrammaticMapping;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
@@ -107,7 +107,7 @@ public class MethodConstraintMappingTest {
 				.returnValue()
 				.valid();
 
-		getMethodValidatorForMapping( mapping );
+		getValidatorForProgrammaticMapping( mapping );
 	}
 
 	@Test(
@@ -121,7 +121,7 @@ public class MethodConstraintMappingTest {
 				.parameter( 1 )
 				.valid();
 
-		getMethodValidatorForMapping( mapping );
+		getValidatorForProgrammaticMapping( mapping );
 	}
 
 	@Test(

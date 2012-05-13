@@ -28,7 +28,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ValidatorUtil.getMethodValidator;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
@@ -46,7 +45,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
 
-		getMethodValidator().validateAllParameters(
+		getValidator().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -57,7 +56,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void atValidAddedInSubTypeCausesDeclarationException() {
 
-		getMethodValidator().validateAllParameters(
+		getValidator().validateParameters(
 				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -68,7 +67,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
 
-		getMethodValidator().validateAllParameters(
+		getValidator().validateParameters(
 				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -79,7 +78,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
 
-		getMethodValidator().validateAllParameters(
+		getValidator().validateParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -97,7 +96,7 @@ public class IllegalMethodParameterConstraintsTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 
 		//but method validation fails due to illegal parameter constraints being defined
-		getMethodValidator().validateAllParameters(
+		getValidator().validateParameters(
 				qux, QuxImpl.class.getDeclaredMethod( "qux", String.class ), new Object[] { }
 		);
 	}

@@ -44,7 +44,6 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.method.MethodConstraintViolationException;
-import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
@@ -113,9 +112,8 @@ public class FailFastTest {
 		final ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
-		final MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
-		TestService service = getValidatingProxy( new TestServiceImpl(), methodValidator );
+		TestService service = getValidatingProxy( new TestServiceImpl(), validator );
 
 		try {
 			service.testMethod( "a", null );
@@ -152,9 +150,8 @@ public class FailFastTest {
 						.usingContext()
 						.failFast( true )
 						.getValidator();
-		final MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
-		TestService service = getValidatingProxy( new TestServiceImpl(), methodValidator );
+		TestService service = getValidatingProxy( new TestServiceImpl(), validator );
 
 		try {
 			service.testMethod( " ", null );
@@ -196,9 +193,8 @@ public class FailFastTest {
 				.buildValidatorFactory();
 
 		final Validator validator = factory.getValidator();
-		final MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
-		TestService service = getValidatingProxy( new TestServiceImpl(), methodValidator );
+		TestService service = getValidatingProxy( new TestServiceImpl(), validator );
 
 		try {
 			service.testMethod( " ", null );

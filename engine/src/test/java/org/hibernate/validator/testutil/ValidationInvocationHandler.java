@@ -18,11 +18,11 @@ package org.hibernate.validator.testutil;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Set;
-
-import org.hibernate.validator.method.MethodConstraintViolation;
-import org.hibernate.validator.method.MethodConstraintViolationException;
-import org.hibernate.validator.method.MethodValidator;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 /**
  * An invocation handler used to test method-level validation.
@@ -33,11 +33,11 @@ public class ValidationInvocationHandler implements InvocationHandler {
 
 	private final Object wrapped;
 
-	private final MethodValidator validator;
+	private final Validator validator;
 
 	private final Class<?>[] groups;
 
-	public ValidationInvocationHandler(Object wrapped, MethodValidator validator, Class<?>... groups) {
+	public ValidationInvocationHandler(Object wrapped, Validator validator, Class<?>... groups) {
 
 		this.wrapped = wrapped;
 		this.validator = validator;
@@ -46,7 +46,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-		Set<MethodConstraintViolation<Object>> constraintViolations = validator.validateAllParameters(
+		Set<ConstraintViolation<Object>> constraintViolations = validator.validateParameters(
 				wrapped,
 				method,
 				args,
@@ -54,7 +54,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 		);
 
 		if ( !constraintViolations.isEmpty() ) {
-			throw new MethodConstraintViolationException( constraintViolations );
+			throw new ConstraintViolationException( new HashSet<ConstraintViolation<?>>( constraintViolations ) );
 		}
 
 		Object result = method.invoke( wrapped, args );
@@ -62,7 +62,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 		constraintViolations = validator.validateReturnValue( wrapped, method, result, groups );
 
 		if ( !constraintViolations.isEmpty() ) {
-			throw new MethodConstraintViolationException( constraintViolations );
+			throw new ConstraintViolationException( new HashSet<ConstraintViolation<?>>( constraintViolations ) );
 		}
 
 		return result;

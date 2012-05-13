@@ -28,7 +28,7 @@ import javax.validation.spi.ValidationProvider;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.method.MethodValidator;
+import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.method.metadata.MethodDescriptor;
 import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
@@ -79,20 +79,6 @@ public final class ValidatorUtil {
 			config.addMapping( mapping );
 		}
 		return config.buildValidatorFactory().getValidator();
-	}
-
-	/**
-	 * Returns an instance of {@code MethodValidator} which can be used to validate method constraints. This validator
-	 * is constructed by getting an instance of {@code Validator} with the method {@link ValidatorUtil#getValidator()}.
-	 *
-	 * @return an instance of {@code MethodValidator}.
-	 */
-	public static MethodValidator getMethodValidator() {
-		return getValidator().unwrap( MethodValidator.class );
-	}
-
-	public static MethodValidator getMethodValidatorForMapping(ConstraintMapping... mappings) {
-		return getValidatorForProgrammaticMapping( mappings ).unwrap( MethodValidator.class );
 	}
 
 	/**
@@ -165,7 +151,7 @@ public final class ValidatorUtil {
 	 * @return an instance of {@code TypeDescriptor} for the given type, never {@code null}
 	 */
 	public static TypeDescriptor getTypeDescriptor(Class<?> clazz) {
-		return getMethodValidator().getConstraintsForType( clazz );
+		return getValidator().unwrap( ValidatorImpl.class ).getConstraintsForType( clazz );
 	}
 
 	/**
@@ -204,15 +190,15 @@ public final class ValidatorUtil {
 	}
 
 	public static <T, I extends T> T getValidatingProxy(I implementor) {
-		return getValidatingProxy( implementor, getMethodValidatorForMapping() );
+		return getValidatingProxy( implementor, getValidatorForProgrammaticMapping() );
 	}
 
 	public static <T, I extends T> T getValidatingProxy(I implementor, Class<?>... validationGroups) {
-		return getValidatingProxy( implementor, getMethodValidatorForMapping(), validationGroups );
+		return getValidatingProxy( implementor, getValidatorForProgrammaticMapping(), validationGroups );
 	}
 
 	public static <T, I extends T> T getValidatingProxy(I implementor, ConstraintMapping... mappings) {
-		return getValidatingProxy( implementor, getMethodValidatorForMapping( mappings ) );
+		return getValidatingProxy( implementor, getValidatorForProgrammaticMapping( mappings ) );
 	}
 
 	/**
@@ -228,7 +214,7 @@ public final class ValidatorUtil {
 	 * @return A proxy performing an automatic method validation.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T, I extends T> T getValidatingProxy(I implementor, MethodValidator methodValidator, Class<?>... validationGroups) {
+	public static <T, I extends T> T getValidatingProxy(I implementor, Validator methodValidator, Class<?>... validationGroups) {
 
 		InvocationHandler handler = new ValidationInvocationHandler(
 				implementor, methodValidator, validationGroups
