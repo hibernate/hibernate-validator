@@ -52,7 +52,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -169,7 +168,8 @@ public class ValidatorImpl implements Validator {
 		return validateValueInContext( context, value, PathImpl.createPathFromString( propertyName ), validationOrder );
 	}
 
-	public final <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
@@ -193,12 +193,6 @@ public class ValidatorImpl implements Validator {
 		validateParametersInContext( context, object, parameterValues, validationOrder );
 
 		return context.getFailingConstraints();
-	}
-
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
 	}
 
 	@Override

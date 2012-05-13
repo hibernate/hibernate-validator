@@ -36,7 +36,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
  *
  * @author Gunnar Morling
  */
-@Test(groups = "BV-1.1-Migration-Test-Failure")
+@Test
 public class IllegalMethodParameterConstraintsTest {
 
 	@Test(

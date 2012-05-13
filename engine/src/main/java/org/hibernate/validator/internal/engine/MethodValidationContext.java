@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.reflect.Method;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -32,7 +33,7 @@ import org.hibernate.validator.method.MethodConstraintViolation;
  *
  * @author Gunnar Morling
  */
-public class MethodValidationContext<T> extends ValidationContext<T, MethodConstraintViolation<T>> {
+public class MethodValidationContext<T> extends ValidationContext<T, ConstraintViolation<T>> {
 
 	/**
 	 * The method of the current validation call.
@@ -72,7 +73,14 @@ public class MethodValidationContext<T> extends ValidationContext<T, MethodConst
 									  TraversableResolver traversableResolver,
 									  boolean failFast) {
 
-		super( rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast );
+		super(
+				rootBeanClass,
+				rootBean,
+				messageInterpolator,
+				constraintValidatorFactory,
+				traversableResolver,
+				failFast
+		);
 
 		this.method = method;
 		this.parameterIndex = parameterIndex;
@@ -87,7 +95,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, MethodConst
 	}
 
 	@Override
-	public <U, V> MethodConstraintViolation<T> createConstraintViolation(
+	public <U, V> ConstraintViolation<T> createConstraintViolation(
 			ValueContext<U, V> localContext, MessageAndPath messageAndPath,
 			ConstraintDescriptor<?> descriptor) {
 
