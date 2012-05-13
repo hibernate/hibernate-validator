@@ -27,8 +27,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.method.MethodConstraintViolation;
-import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
@@ -96,13 +94,12 @@ public class CascadingWithConstraintMappingTest {
 				.property( "c", METHOD )
 				.valid();
 		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( newMapping );
-		MethodValidator methodValidator = validator.unwrap( MethodValidator.class );
 
 		B b = new B();
 		b.c = new C();
 		Method method = ReflectionHelper.getMethod( B.class, "getC" );
 
-		Set<MethodConstraintViolation<B>> violations = methodValidator.validateReturnValue(
+		Set<ConstraintViolation<B>> violations = validator.validateReturnValue(
 				b, method, b.getC()
 		);
 

@@ -32,8 +32,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.method.MethodConstraintViolation;
-import org.hibernate.validator.method.MethodValidator;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -46,12 +44,9 @@ public class DefaultGroupSequenceProviderTest {
 
 	private static Validator validator;
 
-	private static MethodValidator methodValidator;
-
 	@BeforeClass
 	public static void init() {
 		validator = getValidator();
-		methodValidator = validator.unwrap( MethodValidator.class );
 	}
 
 	@Test(
@@ -126,13 +121,13 @@ public class DefaultGroupSequenceProviderTest {
 		C c = new CImpl();
 		Method fooMethod = C.class.getDeclaredMethod( "foo", String.class );
 
-		Set<MethodConstraintViolation<C>> violations = methodValidator.validateReturnValue(
+		Set<ConstraintViolation<C>> violations = validator.validateReturnValue(
 				c, fooMethod, c.foo( null )
 		);
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 
-		violations = methodValidator.validateReturnValue( c, fooMethod, c.foo( "foo" ) );
+		violations = validator.validateReturnValue( c, fooMethod, c.foo( "foo" ) );
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
 	}
