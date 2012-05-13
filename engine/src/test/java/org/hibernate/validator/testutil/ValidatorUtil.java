@@ -59,7 +59,7 @@ public final class ValidatorUtil {
 	public static Validator getValidator() {
 		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();
 		configuration.traversableResolver( new DummyTraversableResolver() );
-		
+
 		return configuration.buildValidatorFactory().getValidator();
 	}
 
@@ -211,16 +211,8 @@ public final class ValidatorUtil {
 		return getValidatingProxy( implementor, getMethodValidatorForMapping(), validationGroups );
 	}
 
-	public static <T, I extends T> T getValidatingProxy(I implementor, Integer parameterIndex, Class<?>... validationGroups) {
-		return getValidatingProxy( implementor, getMethodValidatorForMapping(), parameterIndex, validationGroups );
-	}
-
 	public static <T, I extends T> T getValidatingProxy(I implementor, ConstraintMapping... mappings) {
 		return getValidatingProxy( implementor, getMethodValidatorForMapping( mappings ) );
-	}
-
-	public static <T, I extends T> T getValidatingProxy(I implementor, MethodValidator methodValidator, Class<?>... validationGroups) {
-		return getValidatingProxy( implementor, methodValidator, null, validationGroups );
 	}
 
 	/**
@@ -236,10 +228,10 @@ public final class ValidatorUtil {
 	 * @return A proxy performing an automatic method validation.
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T, I extends T> T getValidatingProxy(I implementor, MethodValidator methodValidator, Integer parameterIndex, Class<?>... validationGroups) {
+	public static <T, I extends T> T getValidatingProxy(I implementor, MethodValidator methodValidator, Class<?>... validationGroups) {
 
 		InvocationHandler handler = new ValidationInvocationHandler(
-				implementor, methodValidator, parameterIndex, validationGroups
+				implementor, methodValidator, validationGroups
 		);
 
 		return (T) Proxy.newProxyInstance(

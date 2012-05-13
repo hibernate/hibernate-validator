@@ -169,31 +169,6 @@ public class ValidatorImpl implements Validator {
 		return validateValueInContext( context, value, PathImpl.createPathFromString( propertyName ), validationOrder );
 	}
 
-	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
-
-		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
-		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
-
-		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
-
-		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameter(
-				method,
-				parameterIndex,
-				object,
-				messageInterpolator,
-				constraintValidatorFactory,
-				getCachingTraversableResolver(),
-				failFast
-		);
-
-		Object[] parameterValues = new Object[method.getParameterTypes().length];
-		parameterValues[parameterIndex] = parameterValue;
-
-		validateParametersInContext( context, object, parameterValues, validationOrder );
-
-		return context.getFailingConstraints();
-	}
-
 	public final <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );

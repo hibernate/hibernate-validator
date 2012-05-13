@@ -60,14 +60,10 @@ public class MethodLevelValidationTest {
 		setUpValidator();
 	}
 
-	private void setUpValidator(Integer parameterIndex, Class<?>... groups) {
-		repositoryBase = customerRepository = getValidatingProxy(
-				new CustomerRepositoryImpl(), parameterIndex, groups
-		);
-	}
-
 	private void setUpValidator(Class<?>... groups) {
-		setUpValidator( null, groups );
+		repositoryBase = customerRepository = getValidatingProxy(
+				new CustomerRepositoryImpl(), groups
+		);
 	}
 
 	@Test
@@ -363,63 +359,6 @@ public class MethodLevelValidationTest {
 	@Test
 	public void parameterValidationOfParameterlessMethod() {
 		customerRepository.boz();
-	}
-
-	/**
-	 * The constraints at both parameters are violated, but as only the 2nd
-	 * parameter is validated, only one constraint violation is expected.
-	 */
-	@Test
-	public void singleParameterValidation() {
-
-		setUpValidator( 1 );
-
-		try {
-			customerRepository.findCustomerByAgeAndName( 1, null );
-			fail( "Expected MethodConstraintViolationException wasn't thrown." );
-		}
-		catch ( MethodConstraintViolationException e ) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
-			assertEquals( constraintViolation.getMethod().getName(), "findCustomerByAgeAndName" );
-			assertEquals( constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class );
-			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 1 ) );
-			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#findCustomerByAgeAndName(arg1)"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-		}
-	}
-
-	@Test
-	public void cascadingSingleParameterValidation() {
-
-		setUpValidator( 1 );
-
-		try {
-			customerRepository.cascadingParameter( null, new Customer( null ) );
-			fail( "Expected MethodConstraintViolationException wasn't thrown." );
-		}
-		catch ( MethodConstraintViolationException e ) {
-
-			assertEquals( e.getConstraintViolations().size(), 1 );
-
-			MethodConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
-			assertEquals( constraintViolation.getMethod().getName(), "cascadingParameter" );
-			assertEquals( constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class );
-			assertEquals( constraintViolation.getParameterIndex(), Integer.valueOf( 1 ) );
-			assertEquals( constraintViolation.getKind(), Kind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(), "CustomerRepository#cascadingParameter(arg1).name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-		}
 	}
 
 	@Test
