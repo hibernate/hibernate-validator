@@ -20,6 +20,7 @@ import java.lang.annotation.ElementType;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -31,7 +32,6 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
@@ -46,7 +46,7 @@ import static org.testng.Assert.fail;
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-@Test(groups = "BV-1.1-Migration-Test-Failure")
+@Test
 public class MethodConstraintMappingTest {
 
 	private GreetingService wrappedObject;
@@ -70,7 +70,7 @@ public class MethodConstraintMappingTest {
 			service.greet( new User( "foo" ) );
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
 			assertCorrectPropertyPaths( e, "GreetingService#greet().message" );
 		}
@@ -90,7 +90,7 @@ public class MethodConstraintMappingTest {
 			service.greet( new User( null ) );
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
 			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0).name" );
 		}
@@ -174,7 +174,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
 			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)" );
@@ -195,7 +195,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10"
@@ -220,7 +220,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
@@ -246,7 +246,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 1 and 10"
@@ -270,7 +270,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
@@ -296,7 +296,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
 			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)" );
@@ -307,7 +307,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
 			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0).name" );
@@ -329,7 +329,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "size must be between 1 and 10" );
 			assertCorrectPropertyPaths( e, "GreetingService#greet()" );
@@ -352,7 +352,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
@@ -376,7 +376,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10"
@@ -400,7 +400,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
@@ -423,7 +423,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "may not be null"
@@ -446,7 +446,7 @@ public class MethodConstraintMappingTest {
 
 			fail( "Expected exception wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e, "may not be null"

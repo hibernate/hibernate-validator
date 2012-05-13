@@ -22,9 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
-
-import org.hibernate.validator.method.MethodConstraintViolationException;
 
 import static org.hibernate.validator.internal.engine.PathImpl.createPathFromString;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -67,7 +66,7 @@ public final class ConstraintViolationAssert {
 		assertEquals( actualMessages, expectedMessagesAsList );
 	}
 
-	public static void assertCorrectConstraintViolationMessages(MethodConstraintViolationException e, String... expectedMessages) {
+	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e, String... expectedMessages) {
 		assertCorrectConstraintViolationMessages( e.getConstraintViolations(), expectedMessages );
 	}
 
@@ -119,7 +118,7 @@ public final class ConstraintViolationAssert {
 		assertEquals( actualPaths, expectedPathsAsList );
 	}
 
-	public static void assertCorrectPropertyPaths(MethodConstraintViolationException e, String... expectedPropertyPaths) {
+	public static void assertCorrectPropertyPaths(ConstraintViolationException e, String... expectedPropertyPaths) {
 		assertCorrectPropertyPaths( e.getConstraintViolations(), expectedPropertyPaths );
 	}
 

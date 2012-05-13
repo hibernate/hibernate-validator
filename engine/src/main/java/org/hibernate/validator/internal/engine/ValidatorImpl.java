@@ -224,9 +224,7 @@ public class ValidatorImpl implements Validator {
 
 		validateReturnValueInContext( context, object, returnValue, validationOrder );
 
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
-//		return context.getFailingConstraints();
+		return context.getFailingConstraints();
 	}
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {

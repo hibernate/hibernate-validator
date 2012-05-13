@@ -82,7 +82,7 @@ public class CascadingWithConstraintMappingTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	@TestForIssue(jiraKey = "HV-433")
 	public void testProgrammaticCascadingMethodValidation() {
 		ConstraintMapping newMapping = new ConstraintMapping();
