@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.engine.methodlevel;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.ConstraintViolationException;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.constraints.NotNull;
 
@@ -133,7 +134,7 @@ public class MethodLevelValidationTest {
 			customerRepository.findCustomerByAgeAndName( 1, null );
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertEquals( e.getConstraintViolations().size(), 2 );
 			assertCorrectConstraintViolationMessages(
@@ -528,7 +529,7 @@ public class MethodLevelValidationTest {
 			customerRepository.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
@@ -545,7 +546,7 @@ public class MethodLevelValidationTest {
 			repositoryBase.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
@@ -560,7 +561,7 @@ public class MethodLevelValidationTest {
 		customerRepository.parameterConstraintInGroup( null );
 	}
 
-	@Test(expectedExceptions = MethodConstraintViolationException.class)
+	@Test(expectedExceptions = ConstraintViolationException.class)
 	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
 		setUpValidator( CustomerRepository.ValidationGroup.class );
 		customerRepository.parameterConstraintInGroup( null );
