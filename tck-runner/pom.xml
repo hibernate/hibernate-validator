@@ -35,7 +35,7 @@
         <arquillian.version>1.0.0.CR7</arquillian.version>
         <jbossas.version>7.1.0.Beta1b</jbossas.version>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug />
+        <remote.debug/>
     </properties>
 
     <dependencies>
@@ -110,6 +110,13 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -250,7 +257,7 @@
                                 <validation.provider>${validation.provider}</validation.provider>
                             </systemPropertyVariables>
                             <environmentVariables>
-                                 <JBOSS_HOME>${project.build.directory}/jboss-as-${jbossas.version}</JBOSS_HOME>
+                                <JBOSS_HOME>${project.build.directory}/jboss-as-${jbossas.version}</JBOSS_HOME>
                             </environmentVariables>
                         </configuration>
                     </plugin>
