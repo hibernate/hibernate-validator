@@ -147,6 +147,12 @@ public class EmailValidatorTest {
 		assertOrgAddressesAreNotValid( violations );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-591")
+	public void testEmailAddressLength() {
+		isValidEmail( "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@hibernate.org" );
+	}
+
 	private void assertOrgAddressesAreNotValid(Set<ConstraintViolation<EmailContainer>> violations) {
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "ORG addresses are not valid" );
@@ -168,6 +174,7 @@ public class EmailValidatorTest {
 		isInvalidEmail( email, "Expected a invalid email." );
 	}
 
+	@SuppressWarnings("unused")
 	private static abstract class EmailContainer {
 		public String email;
 
