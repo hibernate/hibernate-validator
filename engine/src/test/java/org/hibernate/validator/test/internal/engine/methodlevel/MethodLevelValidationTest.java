@@ -50,7 +50,7 @@ import static org.testng.Assert.fail;
  *
  * @author Gunnar Morling
  */
-@Test(groups = "BV-1.1-Migration-Test-Failure")
+@Test
 public class MethodLevelValidationTest {
 	private CustomerRepository customerRepository;
 	private RepositoryBase<Customer> repositoryBase;
@@ -286,7 +286,7 @@ public class MethodLevelValidationTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), "may not be null" );
 			assertMethodNameParameterIndexAndElementKind( constraintViolation, "findById", 0, PARAMETER );
-// TODO
+// TODO - HV-571
 //			assertEquals( constraintViolation.getMethod().getDeclaringClass(), RepositoryBase.class );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 		}
@@ -304,7 +304,7 @@ public class MethodLevelValidationTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), "may not be null" );
 			assertMethodNameParameterIndexAndElementKind( constraintViolation, "foo", 0, PARAMETER );
-// TODO
+// TODO - HV-571
 //			assertEquals( constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 		}
@@ -322,7 +322,7 @@ public class MethodLevelValidationTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertEquals( constraintViolation.getMessage(), "may not be null" );
 			assertMethodNameParameterIndexAndElementKind( constraintViolation, "bar", 0, PARAMETER );
-// TODO
+// TODO - HV-571
 //			assertEquals( constraintViolation.getMethod().getDeclaringClass(), CustomerRepository.class );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getPropertyPath().toString(), "CustomerRepository#bar(arg0).name" );

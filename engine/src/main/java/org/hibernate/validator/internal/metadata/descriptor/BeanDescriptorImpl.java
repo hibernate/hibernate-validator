@@ -26,10 +26,12 @@ import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.util.Contracts;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -45,7 +47,12 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	private final Map<String, MethodDescriptor> methods;
 	private final Set<MethodDescriptor> constrainedMethods;
 
-	public BeanDescriptorImpl(Class<T> beanClass, Set<ConstraintDescriptorImpl<?>> classLevelConstraints, Map<String, PropertyDescriptor> properties, Map<String, MethodDescriptor> methods, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public BeanDescriptorImpl(Class<T> beanClass,
+							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
+							  Map<String, PropertyDescriptor> properties,
+							  Map<String, MethodDescriptor> methods,
+							  boolean defaultGroupSequenceRedefined,
+							  List<Class<?>> defaultGroupSequence) {
 		super( beanClass, classLevelConstraints, false, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.constrainedProperties = Collections.unmodifiableMap( properties );
@@ -58,7 +65,6 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
-
 		assertNotNull( propertyName, "The property name cannot be null" );
 
 		return constrainedProperties.get( propertyName );
@@ -94,22 +100,20 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	private Set<MethodDescriptor> getConstrainedMethods(Collection<MethodDescriptor> methods) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
-//		Set<MethodDescriptor> theValue = newHashSet();
-//
-//		for ( MethodDescriptor oneMethod : methods ) {
-//			if ( oneMethod.hasConstraints() || oneMethod.isCascaded() ) {
-//				theValue.add( oneMethod );
-//			}
-//
-//			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
-//				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
-//					theValue.add( oneMethod );
-//				}
-//			}
-//		}
-//
-//		return theValue;
+		Set<MethodDescriptor> theValue = newHashSet();
+
+		for ( MethodDescriptor oneMethod : methods ) {
+			if ( oneMethod.hasConstraints() ) {
+				theValue.add( oneMethod );
+			}
+
+			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
+				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
+					theValue.add( oneMethod );
+				}
+			}
+		}
+
+		return theValue;
 	}
 }

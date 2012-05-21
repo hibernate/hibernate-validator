@@ -51,8 +51,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence.",
-			groups = "BV-1.1-Migration-Test-Failure"
+			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
 	)
 	public void testNullProviderDefaultGroupSequence() {
 		validator.validate( new A() );
@@ -60,8 +59,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence.",
-			groups = "BV-1.1-Migration-Test-Failure"
+			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
 	)
 	public void testNotValidProviderDefaultGroupSequenceDefinition() {
 		validator.validate( new B() );
@@ -69,14 +67,13 @@ public class DefaultGroupSequenceProviderTest {
 
 	@Test(
 			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The default group sequence provider defined for .* has the wrong type",
-			groups = "BV-1.1-Migration-Test-Failure"
+			expectedExceptionsMessageRegExp = "HV[0-9]*: The default group sequence provider defined for .* has the wrong type"
 	)
 	public void testDefinitionOfDefaultGroupSequenceProviderWithWrongType() {
 		validator.validate( new D() );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testValidateUserProviderDefaultGroupSequence() {
 		User user = new User( "$password" );
 		Set<ConstraintViolation<User>> violations = validator.validate( user );
@@ -91,7 +88,7 @@ public class DefaultGroupSequenceProviderTest {
 		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testValidatePropertyUserProviderDefaultGroupSequence() {
 		User user = new User( "$password" );
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( user, "password" );
@@ -106,7 +103,7 @@ public class DefaultGroupSequenceProviderTest {
 		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testValidateValueUserProviderDefaultGroupSequence() {
 		Set<ConstraintViolation<User>> violations = validator.validateValue(
 				User.class, "password", "$password"
@@ -116,7 +113,7 @@ public class DefaultGroupSequenceProviderTest {
 		assertCorrectConstraintViolationMessages( violations, "must match \"\\w+\"" );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testValidateReturnValueProviderDefaultGroupSequence() throws NoSuchMethodException {
 		C c = new CImpl();
 		Method fooMethod = C.class.getDeclaredMethod( "foo", String.class );

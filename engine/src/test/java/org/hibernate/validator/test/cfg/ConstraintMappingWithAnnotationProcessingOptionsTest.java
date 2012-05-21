@@ -49,9 +49,8 @@ import static org.testng.AssertJUnit.assertTrue;
  *
  * @author Hardy Ferentschik
  */
-@Test(groups = "BV-1.1-Migration-Test-Failure")
+@Test
 public class ConstraintMappingWithAnnotationProcessingOptionsTest {
-
 	@Test
 	public void testIgnoreAllAnnotationsOnType() {
 		ConstraintMapping mapping = new ConstraintMapping();

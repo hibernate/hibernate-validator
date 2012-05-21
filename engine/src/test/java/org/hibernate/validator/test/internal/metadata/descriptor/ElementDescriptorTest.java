@@ -46,7 +46,7 @@ import static org.testng.Assert.fail;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@Test(groups = "BV-1.1-Migration-Test-Failure")
+@Test
 public class ElementDescriptorTest {
 
 	@Test

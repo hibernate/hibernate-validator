@@ -119,7 +119,7 @@ public class ValidatorTest {
 		assertCorrectPropertyPaths( constraintViolations, "b" );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testIsBeanConstrained() {
 		Validator validator = getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( B.class );
@@ -273,7 +273,6 @@ public class ValidatorTest {
 
 	class H extends G implements F {
 	}
-
 
 	class Foo {
 		@Valid

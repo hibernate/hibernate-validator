@@ -42,7 +42,7 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Gunnar Morling
  */
-@Test(groups = "BV-1.1-Migration-Test-Failure")
+@Test
 public class MethodDescriptorTest {
 
 	@Test

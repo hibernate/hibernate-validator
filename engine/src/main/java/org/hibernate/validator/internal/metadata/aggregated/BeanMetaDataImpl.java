@@ -280,8 +280,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<String, MethodDescriptor> methodDescriptors = newHashMap();
 
 		for ( Entry<String, MethodMetaData> entry : methodMetaData.entrySet() ) {
-			entry.getValue().asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) );
-			methodDescriptors.put( entry.getKey(), null );
+			MethodDescriptor descriptor = entry.getValue().asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) );
+			methodDescriptors.put( entry.getKey(), descriptor );
 		}
 
 		return methodDescriptors;

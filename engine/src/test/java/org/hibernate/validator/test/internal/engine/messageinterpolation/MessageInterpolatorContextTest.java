@@ -49,7 +49,7 @@ import static org.testng.Assert.assertTrue;
  */
 public class MessageInterpolatorContextTest {
 
-	@org.testng.annotations.Test(groups = "BV-1.1-Migration-Test-Failure")
+	@org.testng.annotations.Test
 	public void testInterpolatorContext() throws Exception {
 		// use programmatic mapping api to configure constraint
 		ConstraintMapping mapping = new ConstraintMapping();

@@ -64,7 +64,6 @@ import static org.testng.Assert.fail;
  */
 public class FailFastTest {
 	private static final Log log = LoggerFactory.make();
-
 	private final A testInstance = new A();
 
 	@Test
@@ -79,10 +78,9 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationDefaultBehaviour() {
-
 		TestService service = getValidatingProxy( new TestServiceImpl() );
 
 		try {
@@ -105,7 +103,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationOnConfiguration() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -139,7 +137,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationSetOnValidatorFactory() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -185,7 +183,7 @@ public class FailFastTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationSetWithProperty() {
 		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
@@ -246,6 +244,7 @@ public class FailFastTest {
 		assertCorrectConstraintViolationMessages( constraintViolations, "Bar constraint failed!" );
 	}
 
+	@SuppressWarnings("unused")
 	public void testFailSafePerformance() {
 		final Validator regularValidator = ValidatorUtil.getConfiguration().buildValidatorFactory().getValidator();
 		final Validator failFastValidator = ValidatorUtil.getConfiguration()
@@ -306,6 +305,7 @@ public class FailFastTest {
 		@NotNull
 		String b;
 
+		@SuppressWarnings("unused")
 		@NotNull
 		@Email
 		String c;
