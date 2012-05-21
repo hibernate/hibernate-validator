@@ -18,13 +18,14 @@ package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.util.List;
 import java.util.Set;
+import javax.validation.metadata.ParameterDescriptor;
 
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 /**
  * Describes a validated method parameter.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
 
@@ -32,11 +33,16 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 
 	public ParameterDescriptorImpl(Class<?> type, int index, Set<ConstraintDescriptorImpl<?>> constraints, boolean isCascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		super( type, constraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
-
 		this.index = index;
 	}
 
+	@Override
 	public int getIndex() {
 		return index;
+	}
+
+	@Override
+	public String getName() {
+		return null;
 	}
 }

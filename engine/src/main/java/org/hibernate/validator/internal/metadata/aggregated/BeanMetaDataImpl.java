@@ -48,7 +48,6 @@ import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -181,11 +180,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return getBeanDescriptorInternal();
 	}
 
-	public TypeDescriptor getTypeDescriptor() {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not implemented, will be removed." );
-	}
-
 	public Set<Member> getCascadedMembers() {
 		return cascadedMembers;
 	}
@@ -243,7 +237,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @return A bean descriptor for this meta data object.
 	 */
 	private BeanDescriptorImpl<T> getBeanDescriptorInternal() {
-
 		return new BeanDescriptorImpl<T>(
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
@@ -284,20 +277,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private Map<String, MethodDescriptor> getMethodsAsDescriptors() {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
-//		Map<String, MethodDescriptor> theValue = newHashMap();
-//
-//		for ( Entry<String, MethodMetaData> oneMethod : methodMetaData.entrySet() ) {
-//			theValue.put(
-//					oneMethod.getKey(), oneMethod.getValue().asDescriptor(
-//					defaultGroupSequenceIsRedefined(),
-//					getDefaultGroupSequence( null )
-//			)
-//			);
-//		}
-//
-//		return theValue;
+		Map<String, MethodDescriptor> methodDescriptors = newHashMap();
+
+		for ( Entry<String, MethodMetaData> entry : methodMetaData.entrySet() ) {
+			entry.getValue().asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) );
+			methodDescriptors.put( entry.getKey(), null );
+		}
+
+		return methodDescriptors;
 	}
 
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {

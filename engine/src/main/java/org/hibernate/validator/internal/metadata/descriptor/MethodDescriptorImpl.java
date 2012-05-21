@@ -19,9 +19,9 @@ package org.hibernate.validator.internal.metadata.descriptor;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import org.hibernate.validator.method.metadata.MethodDescriptor;
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
+import javax.validation.metadata.ReturnValueDescriptor;
 
 /**
  * Describes a validated method.
@@ -39,12 +39,18 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		this.parameters = Collections.unmodifiableList( parameters );
 	}
 
-	public String getMethodName() {
+	@Override
+	public String getName() {
 		return name;
 	}
 
+	@Override
 	public List<ParameterDescriptor> getParameterDescriptors() {
 		return parameters;
 	}
 
+	@Override
+	public ReturnValueDescriptor getReturnValueDescriptor() {
+		return null;
+	}
 }

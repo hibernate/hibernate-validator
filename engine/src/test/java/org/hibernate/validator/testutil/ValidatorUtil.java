@@ -22,16 +22,15 @@ import java.util.Locale;
 import javax.validation.Configuration;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.method.metadata.MethodDescriptor;
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
@@ -144,14 +143,14 @@ public final class ValidatorUtil {
 	}
 
 	/**
-	 * Returns the {@code TypeDescriptor} corresponding to the given type.
+	 * Returns the {@code BeanDescriptor} corresponding to the given type.
 	 *
 	 * @param clazz The type.
 	 *
-	 * @return an instance of {@code TypeDescriptor} for the given type, never {@code null}
+	 * @return an instance of {@code BeanDescriptor} for the given type, never {@code null}
 	 */
-	public static TypeDescriptor getTypeDescriptor(Class<?> clazz) {
-		return getValidator().unwrap( ValidatorImpl.class ).getConstraintsForType( clazz );
+	public static BeanDescriptor getBeanDescriptor(Class<?> clazz) {
+		return getValidator().getConstraintsForClass( clazz );
 	}
 
 	/**
@@ -162,11 +161,9 @@ public final class ValidatorUtil {
 	 * @param parameterTypes The method parameter types.
 	 *
 	 * @return an instance of {@code MethodDescriptor} for the given method signature or {@code null} if does not exists.
-	 *
-	 * @see TypeDescriptor#getConstraintsForMethod(String, Class[])
 	 */
 	public static MethodDescriptor getMethodDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-		return getTypeDescriptor( clazz ).getConstraintsForMethod( methodName, parameterTypes );
+		return getBeanDescriptor( clazz ).getConstraintsForMethod( methodName, parameterTypes );
 	}
 
 	/**
@@ -208,14 +205,12 @@ public final class ValidatorUtil {
 	 * @param <I> The type of the object to be proxied.
 	 * @param implementor The object to be proxied.
 	 * @param methodValidator The validator to use for method validation.
-	 * @param parameterIndex Optionally the index of the parameter to which validation shall apply.
 	 * @param validationGroups Optionally the groups which shall be evaluated.
 	 *
 	 * @return A proxy performing an automatic method validation.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T, I extends T> T getValidatingProxy(I implementor, Validator methodValidator, Class<?>... validationGroups) {
-
 		InvocationHandler handler = new ValidationInvocationHandler(
 				implementor, methodValidator, validationGroups
 		);

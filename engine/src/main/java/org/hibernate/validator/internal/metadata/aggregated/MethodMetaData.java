@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -34,8 +36,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.method.metadata.MethodDescriptor;
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -62,7 +62,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	private static final Log log = LoggerFactory.make();
 
 	private final Class<?>[] parameterTypes;
-	private final List<ParameterMetaData> parameterMetaData;
+	private final List<ParameterMetaData> parameterMetaDataList;
 
 	/**
 	 * A declaration exception in case this method contains any illegal method
@@ -94,7 +94,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		);
 
 		this.parameterTypes = parameterTypes;
-		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
+		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
 	}
 
@@ -320,11 +320,11 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 
-		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
+		if ( parameterIndex < 0 || parameterIndex > parameterMetaDataList.size() - 1 ) {
 			throw log.getInvalidMethodParameterIndexException( getName(), parameterIndex );
 		}
 
-		return parameterMetaData.get( parameterIndex );
+		return parameterMetaDataList.get( parameterIndex );
 	}
 
 	/**
@@ -336,7 +336,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 *         parameterless method), but never <code>null</code>.
 	 */
 	public List<ParameterMetaData> getAllParameterMetaData() {
-		return parameterMetaData;
+		return parameterMetaDataList;
 	}
 
 	public Class<?>[] getParameterTypes() {
@@ -358,8 +358,8 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		List<ParameterDescriptor> theValue = newArrayList();
 
-		for ( ParameterMetaData oneParameter : parameterMetaData ) {
-			theValue.add( oneParameter.asDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ) );
+		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
+			theValue.add( parameterMetaData.asDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ) );
 		}
 
 		return theValue;

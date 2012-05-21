@@ -21,12 +21,12 @@ import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.Scope;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.method.metadata.MethodDescriptor;
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
@@ -48,17 +48,18 @@ public class MethodDescriptorTest {
 	@Test
 	public void testGetMethod() throws Exception {
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
-		assertEquals( methodDescriptor.getMethodName(), "foo" );
+		assertEquals( methodDescriptor.getName(), "foo" );
 	}
 
-	@Test
-	public void testIsCascaded() {
-		MethodDescriptor cascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
-		assertTrue( cascadingMethodDescriptor.isCascaded() );
-
-		MethodDescriptor nonCascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
-		assertFalse( nonCascadingMethodDescriptor.isCascaded() );
-	}
+// TODO - HV-571
+//	@Test
+//	public void testIsCascaded() {
+//		MethodDescriptor cascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
+//		assertTrue( cascadingMethodDescriptor.isCascaded() );
+//
+//		MethodDescriptor nonCascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
+//		assertFalse( nonCascadingMethodDescriptor.isCascaded() );
+//	}
 
 	@Test
 	public void testHasConstraints() {

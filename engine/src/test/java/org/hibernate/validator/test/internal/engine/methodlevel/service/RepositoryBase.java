@@ -26,7 +26,6 @@ import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
  * @author Gunnar Morling
  */
 public interface RepositoryBase<T> {
-
 	/**
 	 * Used to test, that constraints at methods from base interfaces/classes are evaluated.
 	 */

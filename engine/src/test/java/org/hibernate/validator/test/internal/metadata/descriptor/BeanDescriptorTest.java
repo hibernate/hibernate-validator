@@ -22,99 +22,82 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.MethodDescriptor;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.method.metadata.MethodDescriptor;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.hibernate.validator.testutil.ValidatorUtil.getTypeDescriptor;
+import static org.hibernate.validator.testutil.ValidatorUtil.getBeanDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Unit test for {@link TypeDescriptor} and its creation.
+ * Unit test for {@link BeanDescriptor} and its creation.
  *
  * @author Gunnar Morling
  */
 @Test(groups = "BV-1.1-Migration-Test-Failure")
-public class TypeDescriptorTest {
+public class BeanDescriptorTest {
 
 	@Test
 	public void testGetElementClass() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		assertEquals( descriptor.getElementClass(), CustomerRepository.class );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForUnconstrainedType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( UnconstrainedType.class );
-
-		assertFalse( descriptor.isTypeConstrained() );
+		BeanDescriptor descriptor = getBeanDescriptor( UnconstrainedType.class );
+		assertFalse( descriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForBeanConstrainedType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
-
-		assertTrue( descriptor.isTypeConstrained() );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
+		assertTrue( descriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForParameterConstrainedType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( ParameterConstrainedType.class );
-
-		assertTrue( descriptor.isTypeConstrained() );
+		BeanDescriptor descriptor = getBeanDescriptor( ParameterConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForReturnValueConstrainedType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( ReturnValueConstrainedType.class );
-
-		assertTrue( descriptor.isTypeConstrained() );
+		BeanDescriptor descriptor = getBeanDescriptor( ReturnValueConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForCascadingParameterType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CascadingParameterType.class );
-
-		assertTrue( descriptor.isTypeConstrained() );
+		BeanDescriptor descriptor = getBeanDescriptor( CascadingParameterType.class );
+		assertTrue( descriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForCascadingReturnValueType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CascadingReturnValueType.class );
-
-		assertTrue( descriptor.isTypeConstrained() );
+		BeanDescriptor descriptor = getBeanDescriptor( CascadingReturnValueType.class );
+		assertTrue( descriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForDerivedConstrainedType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( DerivedConstrainedType.class );
-
-		assertTrue( descriptor.isTypeConstrained() );
+		BeanDescriptor descriptor = getBeanDescriptor( DerivedConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained() );
 	}
 
 	@Test
 	public void testGetConstraintDescriptors() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = descriptor.getConstraintDescriptors();
 
 		assertEquals( constraintDescriptors.size(), 1 );
@@ -123,9 +106,7 @@ public class TypeDescriptorTest {
 
 	@Test
 	public void testGetBeanDescriptor() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
-		BeanDescriptor beanDescriptor = descriptor.getBeanDescriptor();
+		BeanDescriptor beanDescriptor = getBeanDescriptor( CustomerRepository.class );
 
 		assertNotNull( beanDescriptor );
 		assertEquals( beanDescriptor.getElementClass(), CustomerRepository.class );
@@ -133,20 +114,17 @@ public class TypeDescriptorTest {
 
 	@Test
 	public void testGetConstraintsForMethod() throws Exception {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "foo" );
 
 		assertNotNull( methodDescriptor );
 	}
 
-
 	// A method descriptor can be retrieved by specifying an overridden method
 	// from a base type.
 	@Test
 	public void testGetConstraintsForOverriddenMethod() throws Exception {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
 		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "foo" );
 
 		assertNotNull( methodDescriptor );
@@ -157,8 +135,7 @@ public class TypeDescriptorTest {
 	// CustomerRepository).
 	@Test
 	public void testGetConstraintsForMethodFromBaseType() throws Exception {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
 		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "qux" );
 
 		assertNotNull( methodDescriptor );
@@ -166,22 +143,19 @@ public class TypeDescriptorTest {
 
 	@Test
 	public void testGetConstraintsForUnknownMethod() throws Exception {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		assertNull( descriptor.getConstraintsForMethod( "zap" ) );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testGetConstraintsFailsForNullMethod() throws Exception {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		descriptor.getConstraintsForMethod( null );
 	}
 
 	@Test
 	public void testGetConstrainedMethods() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepository.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
 		assertEquals( constrainedMethods.size(), 6 );
@@ -193,8 +167,7 @@ public class TypeDescriptorTest {
 
 	@Test
 	public void testGetConstrainedMethodsForDerivedType() {
-
-		TypeDescriptor descriptor = getTypeDescriptor( CustomerRepositoryExt.class );
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
 		assertEquals( constrainedMethods.size(), 7 );
@@ -205,26 +178,22 @@ public class TypeDescriptorTest {
 	}
 
 	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {
-
-		Set<String> theValue = newHashSet();
+		Set<String> methodNames = newHashSet();
 
 		for ( MethodDescriptor methodDescriptor : descriptors ) {
-			theValue.add( methodDescriptor.getMethodName() );
+			methodNames.add( methodDescriptor.getName() );
 		}
 
-		return theValue;
+		return methodNames;
 	}
 
 	private static class UnconstrainedType {
-
 		@SuppressWarnings("unused")
 		public void foo(String foo) {
-
 		}
 	}
 
 	private static class ParameterConstrainedType {
-
 		@SuppressWarnings("unused")
 		public void foo(@NotNull String foo) {
 
@@ -232,7 +201,6 @@ public class TypeDescriptorTest {
 	}
 
 	private static class CascadingParameterType {
-
 		@SuppressWarnings("unused")
 		public void foo(@Valid List<String> foo) {
 
@@ -240,7 +208,6 @@ public class TypeDescriptorTest {
 	}
 
 	private static class ReturnValueConstrainedType {
-
 		@NotNull
 		@SuppressWarnings("unused")
 		public String foo(String foo) {
@@ -249,7 +216,6 @@ public class TypeDescriptorTest {
 	}
 
 	private static class CascadingReturnValueType {
-
 		@Valid
 		@SuppressWarnings("unused")
 		public List<String> foo(String foo) {
@@ -258,9 +224,7 @@ public class TypeDescriptorTest {
 	}
 
 	private static class DerivedConstrainedType extends ParameterConstrainedType {
-
 		public void foo(String foo) {
-
 		}
 	}
 }

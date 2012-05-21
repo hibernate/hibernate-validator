@@ -120,11 +120,10 @@ public class ValidatorTest {
 	}
 
 	@Test(groups = "BV-1.1-Migration-Test-Failure")
-	@TestForIssue(jiraKey = "HV-372")
-	public void testHasBoolean() {
+	public void testIsBeanConstrained() {
 		Validator validator = getValidator();
-		BeanDescriptor beanDescr = validator.getConstraintsForClass( B.class );
-		assertTrue( beanDescr.isBeanConstrained() );
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( B.class );
+		assertTrue( beanDescriptor.isBeanConstrained() );
 	}
 
 	@Test
@@ -187,6 +186,7 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
+	@SuppressWarnings("unused")
 	class A {
 		@NotNull
 		String b;
@@ -198,6 +198,7 @@ public class ValidatorTest {
 		D d;
 	}
 
+	@SuppressWarnings("unused")
 	class B {
 		private boolean b;
 
@@ -251,6 +252,7 @@ public class ValidatorTest {
 	interface TestGroup {
 	}
 
+	@SuppressWarnings("unused")
 	interface F {
 		@CountValidationCalls
 		String getFoo();
@@ -283,11 +285,13 @@ public class ValidatorTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	class Bar {
 		@NotNull
 		String alwaysNull;
 	}
 
+	@SuppressWarnings("unused")
 	class NotFollowingJavaBeanNotation {
 		@NotNull
 		String m_foo;

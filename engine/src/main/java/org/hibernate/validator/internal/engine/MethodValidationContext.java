@@ -23,11 +23,9 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.method.MethodConstraintViolation;
-
 /**
  * A {@link ValidationContext} implementation which creates and manages
- * violations of type {@link MethodConstraintViolation}.
+ * method validation violations.
  *
  * @param <T> The type of the root bean for which this context is created.
  *
@@ -104,12 +102,11 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 				messageTemplate,
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
-		return new MethodConstraintViolationImpl<T>(
+
+        // TODO - HV-571
+		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
-				method,
-				localContext.getParameterIndex(),
-				localContext.getParameterName(),
 				getRootBeanClass(),
 				getRootBean(),
 				localContext.getCurrentBean(),
@@ -118,5 +115,19 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 				descriptor,
 				localContext.getElementType()
 		);
+//		return new MethodConstraintViolationImpl<T>(
+//				messageTemplate,
+//				interpolatedMessage,
+//				method,
+//				localContext.getParameterIndex(),
+//				localContext.getParameterName(),
+//				getRootBeanClass(),
+//				getRootBean(),
+//				localContext.getCurrentBean(),
+//				localContext.getCurrentValidatedValue(),
+//				messageAndPath.getPath(),
+//				descriptor,
+//				localContext.getElementType()
+//		);
 	}
 }

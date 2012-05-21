@@ -19,12 +19,12 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.Scope;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;

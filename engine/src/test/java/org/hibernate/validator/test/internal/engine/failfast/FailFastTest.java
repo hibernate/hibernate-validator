@@ -24,6 +24,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -43,7 +44,6 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.method.MethodConstraintViolationException;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
@@ -89,7 +89,7 @@ public class FailFastTest {
 			service.testMethod( " ", null );
 			fail();
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 			assertNumberOfViolations( e.getConstraintViolations(), 3 );
 		}
 	}
@@ -119,7 +119,7 @@ public class FailFastTest {
 			service.testMethod( "a", null );
 			fail();
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 		}
 	}
@@ -157,7 +157,7 @@ public class FailFastTest {
 			service.testMethod( " ", null );
 			fail();
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 		}
 	}
@@ -200,7 +200,7 @@ public class FailFastTest {
 			service.testMethod( " ", null );
 			fail();
 		}
-		catch ( MethodConstraintViolationException e ) {
+		catch ( ConstraintViolationException e ) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 		}
 	}

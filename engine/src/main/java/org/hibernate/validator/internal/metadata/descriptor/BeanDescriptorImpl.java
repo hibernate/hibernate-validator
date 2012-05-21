@@ -53,8 +53,6 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		this.constrainedMethods = Collections.unmodifiableSet( getConstrainedMethods( methods.values() ) );
 	}
 
-	//BeanDescriptor methods
-
 	public final boolean isBeanConstrained() {
 		return hasConstraints() || !constrainedProperties.isEmpty();
 	}
@@ -82,22 +80,12 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		throw new IllegalArgumentException( "Not yet implemented" );
 	}
 
-	//TypeDescriptor methods
-
-	public boolean isTypeConstrained() {
-		return isBeanConstrained() || !constrainedMethods.isEmpty();
-	}
-
 	public Set<MethodDescriptor> getConstrainedMethods() {
 		return constrainedMethods;
 	}
 
-	//TODO GM: to be compatible with getConstraintsForProperty() this method should only return
-	//a descriptor if the given method is constrained.
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
-
 		Contracts.assertNotNull( methodName, MESSAGES.methodNameMustNotBeNull() );
-
 		return methods.get( methodName + Arrays.toString( parameterTypes ) );
 	}
 

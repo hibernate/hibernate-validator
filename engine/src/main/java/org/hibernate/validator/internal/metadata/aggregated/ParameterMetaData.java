@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.util.List;
 import java.util.Set;
+import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -25,17 +26,15 @@ import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorI
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * <p>
  * An aggregated view of the constraint related meta data for a single method
  * parameter.
- * </p>
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class ParameterMetaData extends AbstractConstraintMetaData {
 
@@ -78,21 +77,14 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 	}
 
 	public static class Builder extends MetaDataBuilder {
-
 		private final Class<?> rootClass;
-
 		private final Class<?> parameterType;
-
 		private final int parameterIndex;
-
 		private final Set<MetaConstraint<?>> constraints = newHashSet();
-
 		private String name;
-
 		private boolean isCascading = false;
 
 		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
-
 			super( constraintHelper );
 
 			this.rootClass = rootClass;
@@ -104,7 +96,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public boolean accepts(ConstrainedElement constrainedElement) {
-
 			if ( constrainedElement.getKind() != ConstrainedElementKind.PARAMETER ) {
 				return false;
 			}
@@ -114,7 +105,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
-
 			ConstrainedParameter constrainedParameter = (ConstrainedParameter) constrainedElement;
 
 			constraints.addAll( constrainedParameter.getConstraints() );
@@ -137,7 +127,5 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 					isCascading
 			);
 		}
-
 	}
-
 }

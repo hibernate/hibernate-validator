@@ -52,7 +52,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -229,10 +228,6 @@ public class ValidatorImpl implements Validator {
 
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return beanMetaDataManager.getBeanMetaData( clazz ).getBeanDescriptor();
-	}
-
-	public final TypeDescriptor getConstraintsForType(Class<?> clazz) {
-		return beanMetaDataManager.getBeanMetaData( clazz ).getTypeDescriptor();
 	}
 
 	public final <T> T unwrap(Class<T> type) {
