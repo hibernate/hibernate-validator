@@ -48,34 +48,35 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 
 	private final Class<?> type;
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
-	private final boolean cascaded;
 	private final boolean defaultGroupSequenceRedefined;
 	private final List<Class<?>> defaultGroupSequence;
 
-	public ElementDescriptorImpl(Class<?> type, Set<ConstraintDescriptorImpl<?>> constraintDescriptors, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public ElementDescriptorImpl(Class<?> type,
+								 Set<ConstraintDescriptorImpl<?>> constraintDescriptors,
+								 boolean defaultGroupSequenceRedefined,
+								 List<Class<?>> defaultGroupSequence) {
 		this.type = type;
 		this.constraintDescriptors = Collections.unmodifiableSet( constraintDescriptors );
-		this.cascaded = cascaded;
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
 		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupSequence );
 	}
 
-	public boolean isCascaded() {
-		return cascaded;
-	}
-
+	@Override
 	public final boolean hasConstraints() {
 		return constraintDescriptors.size() != 0;
 	}
 
+	@Override
 	public final Class<?> getElementClass() {
 		return type;
 	}
 
+	@Override
 	public final Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
 		return findConstraints().getConstraintDescriptors();
 	}
 
+	@Override
 	public final ConstraintFinder findConstraints() {
 		return new ConstraintFinderImpl();
 	}
@@ -122,6 +123,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 			groups = Collections.emptyList();
 		}
 
+		@Override
 		public ConstraintFinder unorderedAndMatchingGroups(Class<?>... classes) {
 			this.groups = new ArrayList<Class<?>>();
 			for ( Class<?> clazz : classes ) {
@@ -135,6 +137,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 			return this;
 		}
 
+		@Override
 		public ConstraintFinder lookingAt(Scope visibility) {
 			if ( visibility.equals( Scope.LOCAL_ELEMENT ) ) {
 				definedInSet.remove( ConstraintOrigin.DEFINED_IN_HIERARCHY );
@@ -142,17 +145,33 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 			return this;
 		}
 
+		@Override
 		public ConstraintFinder declaredOn(ElementType... elementTypes) {
 			this.elementTypes.clear();
 			this.elementTypes.addAll( Arrays.asList( elementTypes ) );
 			return this;
 		}
 
+		@Override
 		public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
 
 			Set<ConstraintDescriptor<?>> matchingDescriptors = new HashSet<ConstraintDescriptor<?>>();
 			findMatchingDescriptors( matchingDescriptors );
 			return Collections.unmodifiableSet( matchingDescriptors );
+		}
+
+		@Override
+		public boolean hasConstraints() {
+			return getConstraintDescriptors().size() != 0;
+		}
+
+		private void addMatchingDescriptorsForGroup(Class<?> group, Set<ConstraintDescriptor<?>> matchingDescriptors) {
+			for ( ConstraintDescriptorImpl<?> descriptor : constraintDescriptors ) {
+				if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getElementType() )
+						&& descriptor.getGroups().contains( group ) ) {
+					matchingDescriptors.add( descriptor );
+				}
+			}
 		}
 
 		private void findMatchingDescriptors(Set<ConstraintDescriptor<?>> matchingDescriptors) {
@@ -169,19 +188,6 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 					if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getElementType() ) ) {
 						matchingDescriptors.add( descriptor );
 					}
-				}
-			}
-		}
-
-		public boolean hasConstraints() {
-			return getConstraintDescriptors().size() != 0;
-		}
-
-		private void addMatchingDescriptorsForGroup(Class<?> group, Set<ConstraintDescriptor<?>> matchingDescriptors) {
-			for ( ConstraintDescriptorImpl<?> descriptor : constraintDescriptors ) {
-				if ( definedInSet.contains( descriptor.getDefinedOn() ) && elementTypes.contains( descriptor.getElementType() )
-						&& descriptor.getGroups().contains( group ) ) {
-					matchingDescriptors.add( descriptor );
 				}
 			}
 		}

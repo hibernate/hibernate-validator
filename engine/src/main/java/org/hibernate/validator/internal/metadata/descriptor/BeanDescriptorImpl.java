@@ -53,7 +53,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 							  Map<String, MethodDescriptor> methods,
 							  boolean defaultGroupSequenceRedefined,
 							  List<Class<?>> defaultGroupSequence) {
-		super( beanClass, classLevelConstraints, false, defaultGroupSequenceRedefined, defaultGroupSequence );
+		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.constrainedProperties = Collections.unmodifiableMap( properties );
 		this.methods = Collections.unmodifiableMap( methods );

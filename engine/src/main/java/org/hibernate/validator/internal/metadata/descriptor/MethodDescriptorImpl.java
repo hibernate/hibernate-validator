@@ -32,8 +32,14 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
 
-	public MethodDescriptorImpl(Class<?> returnType, String name, Set<ConstraintDescriptorImpl<?>> returnValueConstraints, boolean isCascaded, List<ParameterDescriptor> parameters, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		super( returnType, returnValueConstraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
+	public MethodDescriptorImpl(Class<?> returnType,
+								String name,
+								Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
+								boolean isCascaded,
+								List<ParameterDescriptor> parameters,
+								boolean defaultGroupSequenceRedefined,
+								List<Class<?>> defaultGroupSequence) {
+		super( returnType, returnValueConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.name = name;
 		this.parameters = Collections.unmodifiableList( parameters );
@@ -52,5 +58,14 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	@Override
 	public ReturnValueDescriptor getReturnValueDescriptor() {
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "MethodDescriptorImpl" );
+		sb.append( "{name='" ).append( name ).append( '\'' );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }

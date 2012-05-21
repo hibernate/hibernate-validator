@@ -28,12 +28,18 @@ import javax.validation.metadata.ParameterDescriptor;
  * @author Hardy Ferentschik
  */
 public class ParameterDescriptorImpl extends ElementDescriptorImpl implements ParameterDescriptor {
-
+	private final boolean cascaded;
 	private final int index;
 
 	public ParameterDescriptorImpl(Class<?> type, int index, Set<ConstraintDescriptorImpl<?>> constraints, boolean isCascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		super( type, constraints, isCascaded, defaultGroupSequenceRedefined, defaultGroupSequence );
+		super( type, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 		this.index = index;
+		this.cascaded = isCascaded;
+	}
+
+	@Override
+	public boolean isCascaded() {
+		return cascaded;
 	}
 
 	@Override
@@ -44,5 +50,15 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	@Override
 	public String getName() {
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ParameterDescriptorImpl" );
+		sb.append( "{cascaded=" ).append( cascaded );
+		sb.append( ", index=" ).append( index );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
