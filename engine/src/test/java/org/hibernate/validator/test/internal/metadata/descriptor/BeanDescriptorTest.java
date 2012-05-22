@@ -43,8 +43,9 @@ import static org.testng.Assert.assertTrue;
  * Unit test for {@link BeanDescriptor} and its creation.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
-@Test(groups = "BV-1.1-Migration-Test-Failure")
+@Test
 public class BeanDescriptorTest {
 
 	@Test
@@ -68,31 +69,31 @@ public class BeanDescriptorTest {
 	@Test
 	public void testIsTypeConstrainedForParameterConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ParameterConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained() );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForReturnValueConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ReturnValueConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained() );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForCascadingParameterType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingParameterType.class );
-		assertTrue( descriptor.isBeanConstrained() );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	public void testIsTypeConstrainedForCascadingReturnValueType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingReturnValueType.class );
-		assertTrue( descriptor.isBeanConstrained() );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForDerivedConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( DerivedConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained() );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
 	@Test
@@ -153,7 +154,7 @@ public class BeanDescriptorTest {
 		descriptor.getConstraintsForMethod( null );
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	public void testGetConstrainedMethods() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
@@ -165,7 +166,7 @@ public class BeanDescriptorTest {
 		);
 	}
 
-	@Test
+	@Test(groups = "BV-1.1-Migration-Test-Failure")
 	public void testGetConstrainedMethodsForDerivedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
@@ -196,7 +197,6 @@ public class BeanDescriptorTest {
 	private static class ParameterConstrainedType {
 		@SuppressWarnings("unused")
 		public void foo(@NotNull String foo) {
-
 		}
 	}
 

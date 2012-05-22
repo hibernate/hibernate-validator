@@ -61,7 +61,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	public final boolean isBeanConstrained() {
-		return hasConstraints() || !constrainedProperties.isEmpty();
+		return hasConstraints() || !constrainedProperties.isEmpty() || !constrainedMethods.isEmpty();
 	}
 
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
@@ -115,5 +115,15 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		}
 
 		return theValue;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "BeanDescriptorImpl" );
+		sb.append( "{" );
+		sb.append( getElementClass().getSimpleName() );
+		sb.append( "}" );
+		return sb.toString();
 	}
 }
