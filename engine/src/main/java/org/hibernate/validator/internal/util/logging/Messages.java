@@ -29,7 +29,7 @@ public interface Messages {
 	 */
 	Messages MESSAGES = org.jboss.logging.Messages.getBundle( Messages.class );
 
-	@Message(value = "must not be null.")
+	@Message(value = "must not be null.", format = Message.Format.NO_FORMAT)
 	String mustNotBeNull();
 
 	@Message(value = "%s must not be null.")
@@ -41,34 +41,35 @@ public interface Messages {
 	@Message(value = "The parameter \"%s\" must not be empty.")
 	String parameterMustNotBeEmpty(String parameterName);
 
-	@Message(value = "The bean type cannot be null.")
+	@Message(value = "The bean type cannot be null.", format = Message.Format.NO_FORMAT)
 	String beanTypeCannotBeNull();
 
-	@Message(value = "null is not allowed as property path.")
+	@Message(value = "null is not allowed as property path.", format = Message.Format.NO_FORMAT)
 	String propertyPathCannotBeNull();
 
-	@Message(value = "The property name must not be empty.")
+	@Message(value = "The property name must not be empty.", format = Message.Format.NO_FORMAT)
 	String propertyNameMustNotBeEmpty();
 
-	@Message(value = "null passed as group name.")
+	@Message(value = "null passed as group name.", format = Message.Format.NO_FORMAT)
 	String groupMustNotBeNull();
 
-	@Message(value = "The bean type must not be null when creating a constraint mapping.")
+	@Message(value = "The bean type must not be null when creating a constraint mapping.",
+			format = Message.Format.NO_FORMAT)
 	String beanTypeMustNotBeNull();
 
-	@Message(value = "The method name must not be null.")
+	@Message(value = "The method name must not be null.", format = Message.Format.NO_FORMAT)
 	String methodNameMustNotBeNull();
 
-	@Message(value = "The object to be validated must not be null.")
+	@Message(value = "The object to be validated must not be null.", format = Message.Format.NO_FORMAT)
 	String validatedObjectMustNotBeNull();
 
-	@Message(value = "The method to be validated must not be null.")
+	@Message(value = "The method to be validated must not be null.", format = Message.Format.NO_FORMAT)
 	String validatedMethodMustNotBeNull();
 
-	@Message(value = "The class cannot be null.")
+	@Message(value = "The class cannot be null.", format = Message.Format.NO_FORMAT)
 	String classCannotBeNull();
 
-	@Message(value = "Class is null.")
+	@Message(value = "Class is null.", format = Message.Format.NO_FORMAT)
 	String classIsNull();
 
 	@Message(value = "No JSR 223 script engine found for language \"%s\".")

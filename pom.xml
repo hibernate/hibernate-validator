@@ -157,7 +157,7 @@
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
-                <version>3.1.0.CR2</version>
+                <version>3.1.1.GA</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -404,7 +404,7 @@
                         <dependency>
                             <groupId>org.jboss.logging</groupId>
                             <artifactId>jboss-logging-processor</artifactId>
-                            <version>1.0.1.Final</version>
+                            <version>1.0.3.Final</version>
                         </dependency>
                     </dependencies>
                 </plugin>
