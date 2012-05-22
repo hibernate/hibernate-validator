@@ -100,30 +100,34 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	}
 
 	private Set<MethodDescriptor> getConstrainedMethods(Collection<MethodDescriptor> methods) {
-		Set<MethodDescriptor> theValue = newHashSet();
+		Set<MethodDescriptor> constrainedMethodDescriptors = newHashSet();
 
 		for ( MethodDescriptor oneMethod : methods ) {
 			if ( oneMethod.hasConstraints() ) {
-				theValue.add( oneMethod );
+				constrainedMethodDescriptors.add( oneMethod );
+			}
+
+			if ( oneMethod.getReturnValueDescriptor().isCascaded() ) {
+				constrainedMethodDescriptors.add( oneMethod );
 			}
 
 			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
 				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
-					theValue.add( oneMethod );
+					constrainedMethodDescriptors.add( oneMethod );
 				}
 			}
 		}
 
-		return theValue;
+		return constrainedMethodDescriptors;
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "BeanDescriptorImpl" );
-		sb.append( "{" );
+		sb.append( "{class='" );
 		sb.append( getElementClass().getSimpleName() );
-		sb.append( "}" );
+		sb.append( "'}" );
 		return sb.toString();
 	}
 }

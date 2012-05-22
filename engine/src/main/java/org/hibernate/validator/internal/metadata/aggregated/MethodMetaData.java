@@ -24,10 +24,12 @@ import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
+import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.MethodDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -348,7 +350,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 				getType(),
 				getName(),
 				asDescriptors( getConstraints() ),
-				isCascading(),
+				returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
@@ -363,6 +365,18 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		}
 
 		return theValue;
+	}
+
+	private ReturnValueDescriptor returnValueAsDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		ReturnValueDescriptor returnValueDescriptor = new ReturnValueDescriptorImpl(
+				getType(),
+				asDescriptors( getConstraints() ),
+				isCascading(),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
+		);
+
+		return returnValueDescriptor;
 	}
 
 	@Override

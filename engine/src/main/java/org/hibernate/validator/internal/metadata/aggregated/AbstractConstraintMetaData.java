@@ -34,15 +34,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	private final String name;
-
 	private final Class<?> type;
-
 	private final ConstraintMetaDataKind constrainedMetaDataKind;
-
 	private final Set<MetaConstraint<?>> constraints;
-
 	private final boolean isCascading;
-
 	private final boolean isConstrained;
 
 	/**
@@ -145,5 +140,4 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		}
 		return true;
 	}
-
 }

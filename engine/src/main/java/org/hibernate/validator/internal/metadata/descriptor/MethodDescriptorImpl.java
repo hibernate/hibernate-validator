@@ -31,11 +31,12 @@ import javax.validation.metadata.ReturnValueDescriptor;
 public class MethodDescriptorImpl extends ElementDescriptorImpl implements MethodDescriptor {
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
+	private final ReturnValueDescriptor returnValueDescriptor;
 
 	public MethodDescriptorImpl(Class<?> returnType,
 								String name,
 								Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
-								boolean isCascaded,
+								ReturnValueDescriptor returnValueDescriptor,
 								List<ParameterDescriptor> parameters,
 								boolean defaultGroupSequenceRedefined,
 								List<Class<?>> defaultGroupSequence) {
@@ -43,6 +44,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 
 		this.name = name;
 		this.parameters = Collections.unmodifiableList( parameters );
+		this.returnValueDescriptor = returnValueDescriptor;
 	}
 
 	@Override
@@ -57,7 +59,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 
 	@Override
 	public ReturnValueDescriptor getReturnValueDescriptor() {
-		return null;
+		return returnValueDescriptor;
 	}
 
 	@Override

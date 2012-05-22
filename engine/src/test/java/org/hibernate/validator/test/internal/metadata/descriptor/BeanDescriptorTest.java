@@ -84,7 +84,7 @@ public class BeanDescriptorTest {
 		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testIsTypeConstrainedForCascadingReturnValueType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingReturnValueType.class );
 		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
@@ -154,7 +154,7 @@ public class BeanDescriptorTest {
 		descriptor.getConstraintsForMethod( null );
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testGetConstrainedMethods() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
@@ -166,7 +166,7 @@ public class BeanDescriptorTest {
 		);
 	}
 
-	@Test(groups = "BV-1.1-Migration-Test-Failure")
+	@Test
 	public void testGetConstrainedMethodsForDerivedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
