@@ -231,13 +231,11 @@ public class LazyValidatorFactory implements ValidatorFactory {
 
 	@Override
 	public ParameterNameProvider getParameterNameProvider() {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		return delegate.getParameterNameProvider();
 	}
 
 	@Override
 	public void close() {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		delegate.close();
 	}
 }
