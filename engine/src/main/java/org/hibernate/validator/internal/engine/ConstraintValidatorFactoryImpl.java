@@ -22,13 +22,14 @@ import javax.validation.ConstraintValidatorFactory;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
- * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.
+ * Default {@code ConstraintValidatorFactory} using a no-arg constructor.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 
+	@Override
 	public final <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 		return ReflectionHelper.newInstance( key, "ConstraintValidator" );
 	}

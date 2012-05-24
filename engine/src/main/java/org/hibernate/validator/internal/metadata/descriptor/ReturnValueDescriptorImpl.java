@@ -39,6 +39,11 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl implements 
 	public boolean isCascaded() {
 		return cascaded;
 	}
+
+	@Override
+	public Kind getKind() {
+		return Kind.RETURN_VALUE;
+	}
 }
 
 

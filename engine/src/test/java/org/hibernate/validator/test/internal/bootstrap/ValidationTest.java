@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.internal.engine.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -45,7 +46,6 @@ import static org.testng.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 public class ValidationTest {
-
 	@Test
 	public void testBootstrapAsServiceWithBuilder() {
 		HibernateValidatorConfiguration configuration = Validation
@@ -102,10 +102,8 @@ public class ValidationTest {
 		assertEquals( constraintViolations.size(), 0, "Wrong number of constraints" );
 	}
 
-	/**
-	 * HV-328
-	 */
 	@Test(expectedExceptions = IllegalArgumentException.class)
+	@TestForIssue( jiraKey = "HV-328")
 	public void testNullInputStream() {
 		Configuration<?> configuration = Validation.byDefaultProvider().configure();
 		configuration.addMapping( null );

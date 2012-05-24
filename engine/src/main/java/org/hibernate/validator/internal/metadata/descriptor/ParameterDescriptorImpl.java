@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.ParameterDescriptor;
 
-
 /**
  * Describes a validated method parameter.
  *
@@ -50,6 +49,11 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	@Override
 	public String getName() {
 		return null;
+	}
+
+	@Override
+	public Kind getKind() {
+		return Kind.PARAMETER;
 	}
 
 	@Override

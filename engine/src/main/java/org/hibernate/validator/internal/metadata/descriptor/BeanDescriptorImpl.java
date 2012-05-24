@@ -60,16 +60,19 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		this.constrainedMethods = Collections.unmodifiableSet( getConstrainedMethods( methods.values() ) );
 	}
 
+	@Override
 	public final boolean isBeanConstrained() {
 		return hasConstraints() || !constrainedProperties.isEmpty() || !constrainedMethods.isEmpty();
 	}
 
+	@Override
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
 		assertNotNull( propertyName, "The property name cannot be null" );
 
 		return constrainedProperties.get( propertyName );
 	}
 
+	@Override
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
 		return new HashSet<PropertyDescriptor>( constrainedProperties.values() );
 	}
@@ -86,13 +89,20 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		throw new IllegalArgumentException( "Not yet implemented" );
 	}
 
+	@Override
 	public Set<MethodDescriptor> getConstrainedMethods() {
 		return constrainedMethods;
 	}
 
+	@Override
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( methodName, MESSAGES.methodNameMustNotBeNull() );
 		return methods.get( methodName + Arrays.toString( parameterTypes ) );
+	}
+
+	@Override
+	public Kind getKind() {
+		return Kind.BEAN;
 	}
 
 	public BeanDescriptor getBeanDescriptor() {

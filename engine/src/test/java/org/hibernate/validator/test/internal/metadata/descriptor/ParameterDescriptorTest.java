@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.Scope;
 
@@ -39,13 +40,11 @@ import static org.testng.Assert.assertTrue;
  */
 @Test
 public class ParameterDescriptorTest {
-
 	private ParameterDescriptor createCustomerParameter1;
 	private ParameterDescriptor createCustomerParameter2;
 
 	@BeforeMethod
 	public void setUpDescriptors() {
-
 		createCustomerParameter1 = getParameterDescriptor(
 				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { CharSequence.class, String.class }, 0
 		);
@@ -56,21 +55,24 @@ public class ParameterDescriptorTest {
 
 	@Test
 	public void testGetElementClass() {
-
 		assertEquals( createCustomerParameter1.getElementClass(), CharSequence.class );
 		assertEquals( createCustomerParameter2.getElementClass(), String.class );
 	}
 
 	@Test
-	public void testHasConstraints() {
+	public void testElementDescriptorType() {
+		assertEquals( createCustomerParameter1.getKind(), ElementDescriptor.Kind.PARAMETER );
+		assertEquals( createCustomerParameter2.getKind(), ElementDescriptor.Kind.PARAMETER );
+	}
 
+	@Test
+	public void testHasConstraints() {
 		assertFalse( createCustomerParameter1.hasConstraints() );
 		assertTrue( createCustomerParameter2.hasConstraints() );
 	}
 
 	@Test
 	public void testGetConstraintDescriptors() {
-
 		assertTrue( createCustomerParameter1.getConstraintDescriptors().isEmpty() );
 
 		assertEquals( createCustomerParameter2.getConstraintDescriptors().size(), 1 );
@@ -82,7 +84,6 @@ public class ParameterDescriptorTest {
 
 	@Test(enabled = false, description = "Temporarily disabled due to HV-443")
 	public void testFindConstraintLookingAtLocalElement() {
-
 		Set<ConstraintDescriptor<?>> constraintDescriptors =
 				createCustomerParameter2.findConstraints().lookingAt( Scope.LOCAL_ELEMENT ).getConstraintDescriptors();
 
@@ -110,7 +111,6 @@ public class ParameterDescriptorTest {
 
 	@Test
 	public void testFindConstraintLookingAtHierarchy() {
-
 		Set<ConstraintDescriptor<?>> constraintDescriptors =
 				createCustomerParameter2.findConstraints().lookingAt( Scope.HIERARCHY ).getConstraintDescriptors();
 
@@ -123,14 +123,12 @@ public class ParameterDescriptorTest {
 
 	@Test
 	public void testGetIndex() {
-
 		assertEquals( createCustomerParameter1.getIndex(), 0 );
 		assertEquals( createCustomerParameter2.getIndex(), 1 );
 	}
 
 	@Test
 	public void testIsCascaded() {
-
 		assertFalse( createCustomerParameter1.isCascaded() );
 
 		ParameterDescriptor saveCustomerParameter = getParameterDescriptor(

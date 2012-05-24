@@ -21,17 +21,21 @@ import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.metadata.Scope;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.test.internal.metadata.ChildWithoutAtValid2;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
@@ -51,15 +55,20 @@ public class MethodDescriptorTest {
 		assertEquals( methodDescriptor.getName(), "foo" );
 	}
 
-// TODO - HV-571
-//	@Test
-//	public void testIsCascaded() {
-//		MethodDescriptor cascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
-//		assertTrue( cascadingMethodDescriptor.isCascaded() );
-//
-//		MethodDescriptor nonCascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
-//		assertFalse( nonCascadingMethodDescriptor.isCascaded() );
-//	}
+	@Test
+	public void testPropertyDescriptorType() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
+		assertEquals( methodDescriptor.getKind(), ElementDescriptor.Kind.METHOD );
+	}
+
+	@Test
+	public void testIsCascaded() {
+		MethodDescriptor cascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
+		assertTrue( cascadingMethodDescriptor.getReturnValueDescriptor().isCascaded() );
+
+		MethodDescriptor nonCascadingMethodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
+		assertFalse( nonCascadingMethodDescriptor.getReturnValueDescriptor().isCascaded() );
+	}
 
 	@Test
 	public void testHasConstraints() {

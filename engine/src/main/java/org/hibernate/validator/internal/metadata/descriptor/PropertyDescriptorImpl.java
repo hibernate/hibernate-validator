@@ -45,4 +45,9 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	public String getPropertyName() {
 		return property;
 	}
+
+	@Override
+	public Kind getKind() {
+		return Kind.PROPERTY;
+	}
 }

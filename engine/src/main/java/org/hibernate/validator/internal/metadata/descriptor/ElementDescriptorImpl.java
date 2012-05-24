@@ -44,7 +44,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class ElementDescriptorImpl implements ElementDescriptor {
+public abstract class ElementDescriptorImpl implements ElementDescriptor {
 
 	private final Class<?> type;
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
@@ -82,10 +82,7 @@ public class ElementDescriptorImpl implements ElementDescriptor {
 	}
 
 	@Override
-	public Kind getKind() {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not yet implemented" );
-	}
+	public abstract Kind getKind();
 
 	@Override
 	public <T extends ElementDescriptor> T as(Class<T> descriptorType) {

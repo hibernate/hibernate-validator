@@ -62,6 +62,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		return returnValueDescriptor;
 	}
 
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -69,5 +70,10 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 		sb.append( "{name='" ).append( name ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	@Override
+	public Kind getKind() {
+		return Kind.METHOD;
 	}
 }

@@ -64,7 +64,6 @@ public class ElementDescriptorTest {
 
 	@Test
 	public void testThatMethodLevelConstraintsAreNotReflectedByBeanDescriptor() {
-
 		BeanDescriptor beanDescriptor = getValidator().getConstraintsForClass( CustomerRepository.class );
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors = beanDescriptor.getConstraintDescriptors();
@@ -109,7 +108,6 @@ public class ElementDescriptorTest {
 
 	@Test
 	public void testAtValidDefinedInHierarchyForPropertyDescriptor() {
-
 		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
 				ChildWithoutAtValid.class,
 				"order"
@@ -122,7 +120,6 @@ public class ElementDescriptorTest {
 
 	@Test
 	public void testAtValidDefinedLocallyForPropertyDescriptor() {
-
 		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor( ChildWithAtValid.class, "order" );
 		assertTrue(
 				propertyDescriptor.isCascaded(),
@@ -132,7 +129,6 @@ public class ElementDescriptorTest {
 
 	@Test
 	public void testAtValidNotDefinedForPropertyDescriptor() {
-
 		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
 				ChildWithoutAtValid2.class,
 				"order"
@@ -145,11 +141,19 @@ public class ElementDescriptorTest {
 
 	@Test
 	public void testGetNameFromPropertyDescriptor() {
-
 		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
 				ChildWithoutAtValid2.class,
 				"order"
 		);
 		assertEquals( propertyDescriptor.getPropertyName(), "order" );
+	}
+
+	@Test
+	public void testPropertyDescriptorType() {
+		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
+				ChildWithoutAtValid2.class,
+				"order"
+		);
+		assertEquals( propertyDescriptor.getKind(), ElementDescriptor.Kind.PROPERTY );
 	}
 }

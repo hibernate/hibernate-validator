@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 
 import org.testng.annotations.Test;
@@ -52,6 +53,12 @@ public class BeanDescriptorTest {
 	public void testGetElementClass() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		assertEquals( descriptor.getElementClass(), CustomerRepository.class );
+	}
+
+	@Test
+	public void testElementDescriptorType() {
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.BEAN );
 	}
 
 	@Test
