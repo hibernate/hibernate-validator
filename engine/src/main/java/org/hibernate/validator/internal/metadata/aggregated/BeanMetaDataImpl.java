@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -196,10 +195,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return methodMetaData.get( method.getName() + Arrays.toString( method.getParameterTypes() ) );
 	}
 
-	public Set<MethodMetaData> getAllMethodMetaData() {
-		return new HashSet<MethodMetaData>( methodMetaData.values() );
-	}
-
 	public PropertyMetaData getMetaDataFor(String propertyName) {
 		return propertyMetaData.get( propertyName );
 	}
@@ -219,10 +214,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	public boolean defaultGroupSequenceIsRedefined() {
 		return defaultGroupSequence.size() > 1 || hasDefaultGroupSequenceProvider();
-	}
-
-	public Set<PropertyMetaData> getAllPropertyMetaData() {
-		return Collections.unmodifiableSet( new HashSet<PropertyMetaData>( propertyMetaData.values() ) );
 	}
 
 	public List<Class<?>> getClassHierarchy() {
@@ -280,7 +271,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<String, MethodDescriptor> methodDescriptors = newHashMap();
 
 		for ( Entry<String, MethodMetaData> entry : methodMetaData.entrySet() ) {
-			MethodDescriptor descriptor = entry.getValue().asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) );
+			MethodDescriptor descriptor = entry.getValue()
+					.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) );
 			methodDescriptors.put( entry.getKey(), descriptor );
 		}
 

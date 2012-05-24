@@ -340,6 +340,7 @@ public class ValidatorImpl implements Validator {
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
+			@SuppressWarnings("unchecked")
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
@@ -366,9 +367,7 @@ public class ValidatorImpl implements Validator {
 						validatedInterfaces.put( declaringClass, clazz );
 					}
 
-					boolean tmp = validateConstraint(
-							validationContext, valueContext, metaConstraint
-					);
+					boolean tmp = validateConstraint( validationContext, valueContext, metaConstraint );
 					if ( shouldFailFast( validationContext ) ) {
 						return;
 					}

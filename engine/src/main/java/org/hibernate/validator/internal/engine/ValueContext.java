@@ -162,7 +162,6 @@ public class ValueContext<T, V> {
 	 * @param node the name of the new node. Cannot be {@code null}.
 	 */
 	public final void appendNode(String node) {
-
 		Contracts.assertValueNotNull( node, "node" );
 
 		propertyPath = PathImpl.createCopy( propertyPath );
@@ -211,13 +210,18 @@ public class ValueContext<T, V> {
 
 	@Override
 	public String toString() {
-		return "ValueContext [currentBean=" + currentBean
-				+ ", currentBeanType=" + currentBeanType + ", parameterIndex="
-				+ parameterIndex + ", parameterName=" + parameterName
-				+ ", propertyPath=" + propertyPath + ", currentGroup="
-				+ currentGroup + ", currentValue=" + currentValue
-				+ ", elementType=" + elementType + ", typeOfAnnotatedElement="
-				+ typeOfAnnotatedElement + "]";
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ValueContext" );
+		sb.append( "{currentBean=" ).append( currentBean );
+		sb.append( ", currentBeanType=" ).append( currentBeanType );
+		sb.append( ", parameterIndex=" ).append( parameterIndex );
+		sb.append( ", parameterName='" ).append( parameterName ).append( '\'' );
+		sb.append( ", propertyPath=" ).append( propertyPath );
+		sb.append( ", currentGroup=" ).append( currentGroup );
+		sb.append( ", currentValue=" ).append( currentValue );
+		sb.append( ", elementType=" ).append( elementType );
+		sb.append( ", typeOfAnnotatedElement=" ).append( typeOfAnnotatedElement );
+		sb.append( '}' );
+		return sb.toString();
 	}
-
 }

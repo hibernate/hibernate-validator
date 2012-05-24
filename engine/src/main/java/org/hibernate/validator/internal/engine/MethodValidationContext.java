@@ -103,7 +103,6 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
 
-        // TODO - HV-571
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
@@ -115,19 +114,5 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 				descriptor,
 				localContext.getElementType()
 		);
-//		return new MethodConstraintViolationImpl<T>(
-//				messageTemplate,
-//				interpolatedMessage,
-//				method,
-//				localContext.getParameterIndex(),
-//				localContext.getParameterName(),
-//				getRootBeanClass(),
-//				getRootBean(),
-//				localContext.getCurrentBean(),
-//				localContext.getCurrentValidatedValue(),
-//				messageAndPath.getPath(),
-//				descriptor,
-//				localContext.getElementType()
-//		);
 	}
 }

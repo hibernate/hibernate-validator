@@ -68,7 +68,6 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	@Override
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
 		assertNotNull( propertyName, "The property name cannot be null" );
-
 		return constrainedProperties.get( propertyName );
 	}
 
@@ -103,10 +102,6 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	@Override
 	public Kind getKind() {
 		return Kind.BEAN;
-	}
-
-	public BeanDescriptor getBeanDescriptor() {
-		return this;
 	}
 
 	private Set<MethodDescriptor> getConstrainedMethods(Collection<MethodDescriptor> methods) {

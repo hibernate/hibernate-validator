@@ -92,15 +92,6 @@ public interface BeanMetaData<T> {
 	MethodMetaData getMetaDataFor(Method method);
 
 	/**
-	 * Returns the constraint-related meta data for all the methods of the type
-	 * represented by this bean meta data.
-	 *
-	 * @return A set with constraint-related method meta data. May be empty, but
-	 *         will never be null.
-	 */
-	Set<MethodMetaData> getAllMethodMetaData();
-
-	/**
 	 * Return {@code PropertyDescriptor} for the given property.
 	 *
 	 * @param propertyName the name of the property for which to retrieve the descriptor.
@@ -119,15 +110,8 @@ public interface BeanMetaData<T> {
 	boolean isPropertyPresent(String name);
 
 	/**
-	 * @return the property descriptors having at least one constraint defined or which are marked
-	 *         as cascaded (@Valid).
-	 */
-	Set<PropertyMetaData> getAllPropertyMetaData();
-
-	/**
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the
 	 *         element itself and goes up the hierarchy chain. Interfaces are not included.
 	 */
 	List<Class<?>> getClassHierarchy();
-
 }

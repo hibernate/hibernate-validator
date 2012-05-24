@@ -36,7 +36,6 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
-
 	public ConstraintValidatorContextImpl(PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
 		this.basePath = PathImpl.createCopy( propertyPath );
 		this.constraintDescriptor = constraintDescriptor;
