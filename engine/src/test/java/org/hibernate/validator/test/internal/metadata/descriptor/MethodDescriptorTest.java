@@ -20,22 +20,21 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.metadata.Scope;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.internal.metadata.ChildWithoutAtValid2;
+import org.hibernate.validator.internal.metadata.descriptor.MethodDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
@@ -59,6 +58,22 @@ public class MethodDescriptorTest {
 	public void testPropertyDescriptorType() {
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
 		assertEquals( methodDescriptor.getKind(), ElementDescriptor.Kind.METHOD );
+	}
+
+	@Test
+	public void testNarrowDescriptor() {
+		ElementDescriptor descriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
+		MethodDescriptor methodDescriptor = descriptor.as( MethodDescriptor.class );
+		assertTrue( methodDescriptor != null );
+
+		methodDescriptor = descriptor.as( MethodDescriptorImpl.class );
+		assertTrue( methodDescriptor != null );
+	}
+
+	@Test(expectedExceptions = ClassCastException.class, expectedExceptionsMessageRegExp = "HV000118.*")
+	public void testUnableToNarrowDescriptor() {
+		ElementDescriptor descriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
+		descriptor.as( BeanDescriptor.class );
 	}
 
 	@Test

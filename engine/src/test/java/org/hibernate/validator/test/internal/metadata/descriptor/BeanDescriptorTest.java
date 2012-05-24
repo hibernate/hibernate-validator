@@ -28,6 +28,8 @@ import javax.validation.metadata.MethodDescriptor;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
@@ -59,6 +61,23 @@ public class BeanDescriptorTest {
 	public void testElementDescriptorType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.BEAN );
+	}
+
+	@Test
+	public void testNarrowDescriptor() {
+		ElementDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
+
+		BeanDescriptor beanDescriptor = descriptor.as( BeanDescriptor.class );
+		assertTrue( beanDescriptor != null );
+
+		beanDescriptor = descriptor.as( BeanDescriptorImpl.class );
+		assertTrue( beanDescriptor != null );
+	}
+
+	@Test(expectedExceptions = ClassCastException.class, expectedExceptionsMessageRegExp = "HV000118.*")
+	public void testUnableToNarrowDescriptor() {
+		ElementDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
+		descriptor.as( MethodDescriptor.class );
 	}
 
 	@Test

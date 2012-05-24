@@ -34,6 +34,8 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -45,7 +47,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public abstract class ElementDescriptorImpl implements ElementDescriptor {
-
+	private static final Log log = LoggerFactory.make();
 	private final Class<?> type;
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
 	private final boolean defaultGroupSequenceRedefined;
@@ -86,8 +88,10 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor {
 
 	@Override
 	public <T extends ElementDescriptor> T as(Class<T> descriptorType) {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		if ( descriptorType.isAssignableFrom( this.getClass() ) ) {
+			return descriptorType.cast( this );
+		}
+		throw log.unableToNarrowDescriptorType( this.getClass().getName(), descriptorType.getName() );
 	}
 
 	protected static Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {

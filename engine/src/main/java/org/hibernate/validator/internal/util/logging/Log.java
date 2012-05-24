@@ -422,4 +422,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 117, value = "Invalid value for property %s: %s")
 	ValidationException getInvalidPropertyValue(String propertyName, String propertyValue, @Cause Exception e);
+
+	@Message(id = 118, value = "Unable to cast %s to %s")
+	ClassCastException unableToNarrowDescriptorType(String actualDescriptorType, String expectedDescriptorType);
 }
