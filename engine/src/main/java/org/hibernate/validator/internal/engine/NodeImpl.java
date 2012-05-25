@@ -37,6 +37,7 @@ public class NodeImpl implements Path.Node, Serializable {
 	private final Integer index;
 	private final Object key;
 	private final int hashCode;
+	private ElementDescriptor elementDescriptor;
 
 	private String asString;
 
@@ -83,10 +84,14 @@ public class NodeImpl implements Path.Node, Serializable {
 		return parent;
 	}
 
+	// TODO - for now just a setter. maybe add a copy constructor later (HF)
+	void setElementDescriptor(ElementDescriptor elementDescriptor) {
+		this.elementDescriptor = elementDescriptor;
+	}
+
 	@Override
 	public ElementDescriptor getElementDescriptor() {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		return elementDescriptor;
 	}
 
 	@Override

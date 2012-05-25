@@ -23,6 +23,8 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+
 /**
  * A {@link ValidationContext} implementation which creates and manages
  * method validation violations.
@@ -43,14 +45,18 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 	 */
 	private final Integer parameterIndex;
 
-	protected MethodValidationContext(Class<T> rootBeanClass, T rootBean,
-									  Method method,
-									  MessageInterpolator messageInterpolator,
-									  ConstraintValidatorFactory constraintValidatorFactory,
-									  TraversableResolver traversableResolver,
-									  boolean failFast) {
+	protected MethodValidationContext(
+			BeanMetaDataManager beanMetaDataManager,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Method method,
+			MessageInterpolator messageInterpolator,
+			ConstraintValidatorFactory constraintValidatorFactory,
+			TraversableResolver traversableResolver,
+			boolean failFast) {
 
 		this(
+				beanMetaDataManager,
 				rootBeanClass,
 				rootBean,
 				method,
@@ -63,15 +69,19 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 
 	}
 
-	protected MethodValidationContext(Class<T> rootBeanClass, T rootBean,
-									  Method method,
-									  Integer parameterIndex,
-									  MessageInterpolator messageInterpolator,
-									  ConstraintValidatorFactory constraintValidatorFactory,
-									  TraversableResolver traversableResolver,
-									  boolean failFast) {
+	protected MethodValidationContext(
+			BeanMetaDataManager beanMetaDataManager,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Method method,
+			Integer parameterIndex,
+			MessageInterpolator messageInterpolator,
+			ConstraintValidatorFactory constraintValidatorFactory,
+			TraversableResolver traversableResolver,
+			boolean failFast) {
 
 		super(
+				beanMetaDataManager,
 				rootBeanClass,
 				rootBean,
 				messageInterpolator,

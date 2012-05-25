@@ -117,13 +117,17 @@ public class ValidatorImpl implements Validator {
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
-
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		ValidationContext<T, ConstraintViolation<T>> validationContext = ValidationContext.getContextForValidate(
-				object, messageInterpolator, constraintValidatorFactory, getCachingTraversableResolver(), failFast
+				beanMetaDataManager,
+				object,
+				messageInterpolator,
+				constraintValidatorFactory,
+				getCachingTraversableResolver(),
+				failFast
 		);
 
 		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext( object, PathImpl.createRootPath() );
@@ -132,13 +136,13 @@ public class ValidatorImpl implements Validator {
 	}
 
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
-
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
 		sanityCheckPropertyPath( propertyName );
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		ValidationContext<T, ConstraintViolation<T>> context = ValidationContext.getContextForValidateProperty(
+				beanMetaDataManager,
 				object,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -157,6 +161,7 @@ public class ValidatorImpl implements Validator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		ValidationContext<T, ConstraintViolation<T>> context = ValidationContext.getContextForValidateValue(
+				beanMetaDataManager,
 				beanType,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -181,6 +186,7 @@ public class ValidatorImpl implements Validator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
+				beanMetaDataManager,
 				method,
 				object,
 				messageInterpolator,
@@ -213,6 +219,7 @@ public class ValidatorImpl implements Validator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
+				beanMetaDataManager,
 				method,
 				object,
 				messageInterpolator,
@@ -409,7 +416,9 @@ public class ValidatorImpl implements Validator {
 		);
 	}
 
-	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext, MetaConstraint<?> metaConstraint) {
+	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext,
+												 ValueContext<U, V> valueContext,
+												 MetaConstraint<?> metaConstraint) {
 		boolean validationSuccessful = true;
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
@@ -434,8 +443,8 @@ public class ValidatorImpl implements Validator {
 	 * @param valueContext Collected information for single validation
 	 */
 	private <T, U, V> void validateCascadedConstraints(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
-		Set<Member> cascadedMembers = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
-				.getCascadedMembers();
+		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
+		Set<Member> cascadedMembers = beanMetaData.getCascadedMembers();
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( Member member : cascadedMembers ) {
 			String newNode = ReflectionHelper.getPropertyName( member );
@@ -1137,7 +1146,7 @@ public class ValidatorImpl implements Validator {
 			Set<Member> cascadedMembers = metaData.getCascadedMembers();
 			for ( Member m : cascadedMembers ) {
 				if ( ReflectionHelper.getPropertyName( m ).equals( elem.getName() ) ) {
-					Type type = ReflectionHelper.typeOf( m );
+					Type type = ReflectionHelper.getType( m );
 					newValue = newValue == null ? null : ReflectionHelper.getValue( m, newValue );
 					if ( elem.isInIterable() ) {
 						if ( newValue != null && elem.getIndex() != null ) {
@@ -1152,14 +1161,10 @@ public class ValidatorImpl implements Validator {
 						type = ReflectionHelper.getIndexedType( type );
 					}
 
-					// todo check the use of generics in this method. it really does not make sense - HF
-					@SuppressWarnings("unchecked")
-					Class<T> castedValueClass = (Class<T>) ( newValue == null ? type : newValue.getClass() );
-					@SuppressWarnings("unchecked")
-					T castedValue = (T) newValue;
+					Class<?> castedValueClass = newValue == null ? (Class<?>) type : newValue.getClass();
 					return collectMetaConstraintsForPath(
 							castedValueClass,
-							castedValue,
+							newValue,
 							propertyIter,
 							propertyPath,
 							metaConstraintsList

@@ -20,9 +20,9 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
-import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
@@ -40,7 +40,7 @@ public interface BeanMetaData<T> {
 	/**
 	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.
 	 */
-	BeanDescriptor getBeanDescriptor();
+	BeanDescriptorImpl<T> getBeanDescriptor();
 
 	/**
 	 * @return A list of all cascaded methods and fields (methods/fields annotated with &#064;Valid).
@@ -90,16 +90,6 @@ public interface BeanMetaData<T> {
 	 *         or implements.
 	 */
 	MethodMetaData getMetaDataFor(Method method);
-
-	/**
-	 * Return {@code PropertyDescriptor} for the given property.
-	 *
-	 * @param propertyName the name of the property for which to retrieve the descriptor.
-	 *
-	 * @return Returns the {@code PropertyDescriptor} for the given property or {@code null} in case the
-	 *         property does not have a descriptor.
-	 */
-	PropertyMetaData getMetaDataFor(String propertyName);
 
 	/**
 	 * @param name The name of the property

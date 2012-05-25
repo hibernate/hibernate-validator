@@ -206,5 +206,4 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			return ( s1 != null && s1.equals( s2 ) ) || ( s1 == null && s2 == null );
 		}
 	}
-
 }

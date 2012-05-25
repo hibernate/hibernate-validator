@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,11 +34,8 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Describes a validated element (class, field or property).
@@ -46,7 +44,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public abstract class ElementDescriptorImpl implements ElementDescriptor {
+public abstract class ElementDescriptorImpl implements ElementDescriptor, Serializable {
 	private static final Log log = LoggerFactory.make();
 	private final Class<?> type;
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
@@ -92,16 +90,6 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor {
 			return descriptorType.cast( this );
 		}
 		throw log.unableToNarrowDescriptorType( this.getClass().getName(), descriptorType.getName() );
-	}
-
-	protected static Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
-		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
-
-		for ( MetaConstraint<?> oneConstraint : constraints ) {
-			theValue.add( oneConstraint.getDescriptor() );
-		}
-
-		return theValue;
 	}
 
 	private class ConstraintFinderImpl implements ConstraintFinder {

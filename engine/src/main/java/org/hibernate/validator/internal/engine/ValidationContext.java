@@ -32,12 +32,17 @@ import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.util.IdentitySet;
 
 /**
- * Context object keeping track of all important data for a top level {@link javax.validation.Validator#validate(Object, Class[])} },
- * {@link javax.validation.Validator#validateValue(Class, String, Object, Class[])}  }
- * or {@link javax.validation.Validator#validateProperty(Object, String, Class[])}  call.
+ * Context object keeping track of all required data for a
+ * <ul>
+ * <li>{@link javax.validation.Validator#validate(Object, Class[])}</li>
+ * <li>{@link javax.validation.Validator#validateValue(Class, String, Object, Class[])}</li>
+ * <li>or {@link javax.validation.Validator#validateProperty(Object, String, Class[])}</li>
+ * </ul>
+ * call
  * <p>
  * We use this object to collect all failing constraints, but also to cache the caching traversable resolver for a full stack call.
  * </p>
@@ -47,6 +52,11 @@ import org.hibernate.validator.internal.util.IdentitySet;
  * @author Gunnar Morling
  */
 public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
+
+	/**
+	 * Access to the cached bean meta data
+	 */
+	private final BeanMetaDataManager beanMetaDataManager;
 
 	/**
 	 * The root bean of the validation.
@@ -99,24 +109,54 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	 */
 	private final boolean failFast;
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(
+			BeanMetaDataManager beanMetaDataManager,
+			T object,
+			MessageInterpolator messageInterpolator,
+			ConstraintValidatorFactory constraintValidatorFactory,
+			TraversableResolver traversableResolver,
+			boolean failFast) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new StandardValidationContext<T>(
-				rootBeanClass, object, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast
+				beanMetaDataManager,
+				rootBeanClass,
+				object,
+				messageInterpolator,
+				constraintValidatorFactory,
+				traversableResolver, failFast
 		);
 	}
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(
+			BeanMetaDataManager beanMetaDataManager,
+			T rootBean,
+			MessageInterpolator messageInterpolator,
+			ConstraintValidatorFactory constraintValidatorFactory,
+			TraversableResolver traversableResolver,
+			boolean failFast) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		return new StandardValidationContext<T>(
-				rootBeanClass, rootBean, messageInterpolator, constraintValidatorFactory, traversableResolver, failFast
+				beanMetaDataManager,
+				rootBeanClass,
+				rootBean,
+				messageInterpolator,
+				constraintValidatorFactory,
+				traversableResolver,
+				failFast
 		);
 	}
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateValue(Class<T> rootBeanClass, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
+	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateValue(
+			BeanMetaDataManager beanMetaDataManager,
+			Class<T> rootBeanClass,
+			MessageInterpolator messageInterpolator,
+			ConstraintValidatorFactory constraintValidatorFactory,
+			TraversableResolver traversableResolver,
+			boolean failFast) {
 		return new StandardValidationContext<T>(
+				beanMetaDataManager,
 				rootBeanClass,
 				null,
 				messageInterpolator,
@@ -126,26 +166,18 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		);
 	}
 
-	public static <T> MethodValidationContext<T> getContextForValidateParameter(Method method, int parameterIndex, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
+	public static <T> MethodValidationContext<T> getContextForValidateParameters(
+			BeanMetaDataManager beanMetaDataManager,
+			Method method,
+			T object,
+			MessageInterpolator messageInterpolator,
+			ConstraintValidatorFactory constraintValidatorFactory,
+			TraversableResolver traversableResolver,
+			boolean failFast) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
-				rootBeanClass,
-				object,
-				method,
-				parameterIndex,
-				messageInterpolator,
-				constraintValidatorFactory,
-				traversableResolver,
-				failFast
-
-		);
-	}
-
-	public static <T> MethodValidationContext<T> getContextForValidateParameters(Method method, T object, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
-		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = (Class<T>) object.getClass();
-		return new MethodValidationContext<T>(
+				beanMetaDataManager,
 				rootBeanClass,
 				object,
 				method,
@@ -156,8 +188,14 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		);
 	}
 
-	protected ValidationContext(Class<T> rootBeanClass, T rootBean, MessageInterpolator messageInterpolator, ConstraintValidatorFactory constraintValidatorFactory, TraversableResolver traversableResolver, boolean failFast) {
-
+	protected ValidationContext(BeanMetaDataManager beanMetaDataManager,
+								Class<T> rootBeanClass,
+								T rootBean,
+								MessageInterpolator messageInterpolator,
+								ConstraintValidatorFactory constraintValidatorFactory,
+								TraversableResolver traversableResolver,
+								boolean failFast) {
+		this.beanMetaDataManager = beanMetaDataManager;
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.messageInterpolator = messageInterpolator;
@@ -184,6 +222,10 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public final boolean isFailFastModeEnabled() {
 		return failFast;
+	}
+
+	public BeanMetaDataManager getBeanMetaDataManager() {
+		return beanMetaDataManager;
 	}
 
 	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor);

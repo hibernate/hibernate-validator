@@ -42,5 +42,4 @@ public class MethodReturnValueNodeImpl extends NodeImpl {
 				parent, false, null, null
 		);
 	}
-
 }

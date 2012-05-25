@@ -16,11 +16,17 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.util.Iterator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
+
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 
 /**
  * A {@link ValidationContext} implementation which creates and manages violations of type {@link ConstraintViolation}.
@@ -28,16 +34,20 @@ import javax.validation.metadata.ConstraintDescriptor;
  * @param <T> The type of the root bean for which this context is created.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class StandardValidationContext<T> extends ValidationContext<T, ConstraintViolation<T>> {
 
-	protected StandardValidationContext(Class<T> rootBeanClass, T rootBean,
+	protected StandardValidationContext(BeanMetaDataManager beanMetaDataManager,
+										Class<T> rootBeanClass,
+										T rootBean,
 										MessageInterpolator messageInterpolator,
 										ConstraintValidatorFactory constraintValidatorFactory,
 										TraversableResolver traversableResolver,
 										boolean failFast) {
 
 		super(
+				beanMetaDataManager,
 				rootBeanClass,
 				rootBean,
 				messageInterpolator,
@@ -57,6 +67,25 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				messageTemplate,
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
+
+		Class<?> currentClass = getRootBeanClass();
+
+		Iterator<Path.Node> nodeIterator = messageAndPath.getPath().iterator();
+		while ( nodeIterator.hasNext() ) {
+			BeanMetaData beanMetaData = getBeanMetaDataManager().getBeanMetaData( currentClass );
+			NodeImpl node = (NodeImpl) nodeIterator.next();
+			String name = node.getName();
+			// TODO - why can this be null (HF)
+			if(name == null) {
+				continue;
+			}
+			PropertyDescriptor propertyDescriptor = beanMetaData.getBeanDescriptor().getConstraintsForProperty( name );
+			// TODO -  propertyDescriptor.getElementClass() returns eg just Collection instead of the element type (HF)
+			if ( propertyDescriptor != null ) {
+				node.setElementDescriptor( propertyDescriptor );
+				currentClass = propertyDescriptor.getElementClass();
+			}
+		}
 
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,

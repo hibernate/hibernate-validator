@@ -23,24 +23,24 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.testng.Assert.assertEquals;
 
 /**
- * See HV-257
- *
  * @author Hardy Ferentschik
  */
+@TestForIssue(jiraKey = "HV-257")
 public class ProxyTest {
 	@Test
 	public void testValidateA() {
 		InvocationHandler handler = new CustomInvocationHandler( "some object" );
 
-		A a = ( A ) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { A.class }, handler );
+		A a = (A) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { A.class }, handler );
 		assertEquals( Integer.valueOf( 0 ), a.getInteger() );
 
 		Validator validator = ValidatorUtil.getValidator();
@@ -52,7 +52,7 @@ public class ProxyTest {
 	public void testValidateB() {
 		InvocationHandler handler = new CustomInvocationHandler( "some object" );
 
-		B b = ( B ) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { B.class }, handler );
+		B b = (B) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { B.class }, handler );
 		assertEquals( Integer.valueOf( 0 ), b.getInteger() );
 
 		Validator validator = ValidatorUtil.getValidator();
