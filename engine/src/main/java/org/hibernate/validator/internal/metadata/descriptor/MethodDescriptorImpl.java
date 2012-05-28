@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class MethodDescriptorImpl extends ElementDescriptorImpl implements Metho
 	private final List<ParameterDescriptor> parameters;
 	private final ReturnValueDescriptor returnValueDescriptor;
 
-	public MethodDescriptorImpl(Class<?> returnType,
+	public MethodDescriptorImpl(Type returnType,
 								String name,
 								Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
 								ReturnValueDescriptor returnValueDescriptor,

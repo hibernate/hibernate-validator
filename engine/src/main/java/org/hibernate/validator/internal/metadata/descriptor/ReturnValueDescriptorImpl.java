@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.ReturnValueDescriptor;
@@ -26,7 +27,7 @@ import javax.validation.metadata.ReturnValueDescriptor;
 public class ReturnValueDescriptorImpl extends ElementDescriptorImpl implements ReturnValueDescriptor {
 	private final boolean cascaded;
 
-	public ReturnValueDescriptorImpl(Class<?> returnType,
+	public ReturnValueDescriptorImpl(Type returnType,
 									 Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
 									 boolean cascaded,
 									 boolean defaultGroupSequenceRedefined,

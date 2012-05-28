@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.ParameterDescriptor;
@@ -30,7 +31,12 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	private final boolean cascaded;
 	private final int index;
 
-	public ParameterDescriptorImpl(Class<?> type, int index, Set<ConstraintDescriptorImpl<?>> constraints, boolean isCascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public ParameterDescriptorImpl(Type type,
+								   int index,
+								   Set<ConstraintDescriptorImpl<?>> constraints,
+								   boolean isCascaded,
+								   boolean defaultGroupSequenceRedefined,
+								   List<Class<?>> defaultGroupSequence) {
 		super( type, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 		this.index = index;
 		this.cascaded = isCascaded;

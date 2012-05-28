@@ -81,6 +81,11 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		}
 
 		public NodeBuilderDefinedContext addNode(String name) {
+			// in case we are in a class level constraint and we want to add a node we drop the node representing the
+			// class level (HF)
+			if ( !propertyPath.isRootPath() && propertyPath.getLeafNode().getName() == null ) {
+				propertyPath = propertyPath.getPathWithoutLeafNode();
+			}
 			propertyPath.addNode( name );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}

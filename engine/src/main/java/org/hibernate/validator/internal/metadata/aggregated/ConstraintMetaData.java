@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import javax.validation.metadata.ElementDescriptor;
 
@@ -53,7 +54,7 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	 *
 	 * @return This meta data object's type.
 	 */
-	Class<?> getType();
+	Type getType();
 
 	/**
 	 * Returns the {@link ConstraintMetaDataKind kind} of this meta data object.

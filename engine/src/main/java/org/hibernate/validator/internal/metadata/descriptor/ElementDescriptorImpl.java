@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +35,8 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -46,20 +49,37 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public abstract class ElementDescriptorImpl implements ElementDescriptor, Serializable {
 	private static final Log log = LoggerFactory.make();
+	/**
+	 * The type of the element
+	 */
 	private final Class<?> type;
+
+	/**
+	 * The type indexed type in case the element type is a array, collection ot map
+	 */
+	private final Class<?> iterableType;
+
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
 	private final boolean defaultGroupSequenceRedefined;
 	private final List<Class<?>> defaultGroupSequence;
 
-	public ElementDescriptorImpl(Class<?> type,
+	public ElementDescriptorImpl(Type type,
 								 Set<ConstraintDescriptorImpl<?>> constraintDescriptors,
 								 boolean defaultGroupSequenceRedefined,
 								 List<Class<?>> defaultGroupSequence) {
-		this.type = type;
+		this.type = (Class<?>) TypeHelper.getErasedType( type );
+		// TODO HV-571 handle wildcard types etc
+		if ( ReflectionHelper.isIterable( type ) && ReflectionHelper.getIndexedType( type ) instanceof Class ) {
+			this.iterableType = (Class<?>) ReflectionHelper.getIndexedType( type );
+		}
+		else {
+			this.iterableType = null;
+		}
 		this.constraintDescriptors = Collections.unmodifiableSet( constraintDescriptors );
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
 		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupSequence );
 	}
+
 
 	@Override
 	public final boolean hasConstraints() {
@@ -69,6 +89,10 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 	@Override
 	public final Class<?> getElementClass() {
 		return type;
+	}
+
+	public final Class<?> getIndexedClass() {
+		return iterableType;
 	}
 
 	@Override

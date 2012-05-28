@@ -423,6 +423,8 @@ public class ValidatorImpl implements Validator {
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
 			valueContext.appendNode( ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() ) );
+		} else {
+			valueContext.appendNode( null );
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {

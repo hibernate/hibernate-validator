@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.PropertyDescriptor;
@@ -30,7 +31,12 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	private final boolean cascaded;
 	private final String property;
 
-	public PropertyDescriptorImpl(Class<?> returnType, String propertyName, Set<ConstraintDescriptorImpl<?>> constraints, boolean cascaded, boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+	public PropertyDescriptorImpl(Type returnType,
+								  String propertyName,
+								  Set<ConstraintDescriptorImpl<?>> constraints,
+								  boolean cascaded,
+								  boolean defaultGroupSequenceRedefined,
+								  List<Class<?>> defaultGroupSequence) {
 		super( returnType, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 		this.property = propertyName;
 		this.cascaded = cascaded;

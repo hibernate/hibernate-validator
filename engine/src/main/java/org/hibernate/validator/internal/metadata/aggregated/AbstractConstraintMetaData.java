@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
@@ -34,7 +35,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	private final String name;
-	private final Class<?> type;
+	private final Type type;
 	private final ConstraintMetaDataKind constrainedMetaDataKind;
 	private final Set<MetaConstraint<?>> constraints;
 	private final boolean isCascading;
@@ -51,7 +52,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	 * marked for cascaded validation, {@code false} otherwise.
 	 */
 	public AbstractConstraintMetaData(String name,
-									  Class<?> type,
+									  Type type,
 									  Set<MetaConstraint<?>> constraints,
 									  ConstraintMetaDataKind constrainedMetaDataKind,
 									  boolean isCascading,
@@ -68,7 +69,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		return name;
 	}
 
-	public Class<?> getType() {
+	public Type getType() {
 		return type;
 	}
 

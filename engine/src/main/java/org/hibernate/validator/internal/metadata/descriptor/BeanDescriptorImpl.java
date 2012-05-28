@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 	private final Map<String, MethodDescriptor> methods;
 	private final Set<MethodDescriptor> constrainedMethods;
 
-	public BeanDescriptorImpl(Class<T> beanClass,
+	public BeanDescriptorImpl(Type beanClass,
 							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
 							  Map<String, PropertyDescriptor> properties,
 							  Map<String, MethodDescriptor> methods,

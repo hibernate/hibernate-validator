@@ -29,6 +29,7 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -49,10 +50,8 @@ public class ConstraintValidatorContextTest {
 		validator = ValidatorUtil.getValidator();
 	}
 
-	/**
-	 * HV-198
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-198")
 	public void testCorrectSubNodePath() {
 		Item item = new Item();
 		item.interval = new Interval();
@@ -64,10 +63,8 @@ public class ConstraintValidatorContextTest {
 		assertCorrectPropertyPaths( constraintViolations, "interval.start" );
 	}
 
-	/**
-	 * HV-208
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-208")
 	public void testCorrectPath() {
 		Item item = new Item();
 		Interval interval = new Interval();
@@ -88,6 +85,7 @@ public class ConstraintValidatorContextTest {
 		assertCorrectPropertyPaths( constraintViolations, "field1", "field2", "myNode1", "myNode2[key].myNode3" );
 	}
 
+	@SuppressWarnings("unused")
 	@MyClassLevelValidation
 	public static class MyObject {
 		@NotNull

@@ -162,7 +162,7 @@ public class ValueContext<T, V> {
 	 * @param node the name of the new node. Cannot be {@code null}.
 	 */
 	public final void appendNode(String node) {
-		Contracts.assertValueNotNull( node, "node" );
+//		Contracts.assertValueNotNull( node, "node" );
 
 		propertyPath = PathImpl.createCopy( propertyPath );
 		propertyPath.addNode( node );
