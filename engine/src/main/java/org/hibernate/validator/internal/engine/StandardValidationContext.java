@@ -23,6 +23,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -68,24 +69,7 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
 
-		Class<?> currentClass = getRootBeanClass();
-
-		Iterator<Path.Node> nodeIterator = messageAndPath.getPath().iterator();
-		while ( nodeIterator.hasNext() ) {
-			BeanMetaData beanMetaData = getBeanMetaDataManager().getBeanMetaData( currentClass );
-			NodeImpl node = (NodeImpl) nodeIterator.next();
-			String name = node.getName();
-			// TODO - why can this be null (HF)
-			if(name == null) {
-				continue;
-			}
-			PropertyDescriptor propertyDescriptor = beanMetaData.getBeanDescriptor().getConstraintsForProperty( name );
-			// TODO -  propertyDescriptor.getElementClass() returns eg just Collection instead of the element type (HF)
-			if ( propertyDescriptor != null ) {
-				node.setElementDescriptor( propertyDescriptor );
-				currentClass = propertyDescriptor.getElementClass();
-			}
-		}
+		attachElementDescriptorToPathNodes( messageAndPath );
 
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
@@ -98,5 +82,34 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				descriptor,
 				localContext.getElementType()
 		);
+	}
+
+	private void attachElementDescriptorToPathNodes(MessageAndPath messageAndPath) {
+		Class<?> currentClass = getRootBeanClass();
+
+		Iterator<Path.Node> nodeIterator = messageAndPath.getPath().iterator();
+		while ( nodeIterator.hasNext() ) {
+			BeanMetaData beanMetaData = getBeanMetaDataManager().getBeanMetaData( currentClass );
+			NodeImpl node = (NodeImpl) nodeIterator.next();
+			String name = node.getName();
+			ElementDescriptor elementDescriptor;
+			if ( name == null ) {
+				// this is a class level constraint
+				elementDescriptor = beanMetaData.getBeanDescriptor();
+			}
+			else {
+				elementDescriptor = beanMetaData.getBeanDescriptor().getConstraintsForProperty( name );
+				if ( elementDescriptor instanceof PropertyDescriptor && ( (PropertyDescriptor) elementDescriptor ).isCascaded() ) {
+					beanMetaData = getBeanMetaDataManager().getBeanMetaData( elementDescriptor.getElementClass() );
+					elementDescriptor = beanMetaData.getBeanDescriptor();
+				}
+			}
+
+			// TODO -  propertyDescriptor.getElementClass() returns eg just Collection instead of the element type (HF)
+			if ( elementDescriptor != null ) {
+				node.setElementDescriptor( elementDescriptor );
+				currentClass = elementDescriptor.getElementClass();
+			}
+		}
 	}
 }

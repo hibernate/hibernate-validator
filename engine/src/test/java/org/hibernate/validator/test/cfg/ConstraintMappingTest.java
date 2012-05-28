@@ -17,7 +17,6 @@
 package org.hibernate.validator.test.cfg;
 
 import java.lang.annotation.ElementType;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -32,6 +31,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
@@ -45,13 +45,14 @@ import org.hibernate.validator.cfg.defs.NotEmptyDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.util.Arrays.asList;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -65,6 +66,14 @@ import static org.testng.Assert.assertTrue;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ConstraintMappingTest {
+	ConstraintMapping mapping;
+
+	@BeforeMethod
+	public void setUp() {
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		mapping = config.createConstraintMapping();
+	}
+
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
@@ -77,7 +86,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testConstraintMappingWithConstraintDefs() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef() )
@@ -93,7 +101,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testConstraintMappingWithGenericConstraints() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new GenericConstraintDef<NotNull>( NotNull.class ) )
@@ -109,7 +116,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testDefConstraintFollowedByGenericConstraint() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) )
@@ -133,7 +139,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testSingleConstraint() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef() );
@@ -146,7 +151,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testThatSpecificParameterCanBeSetAfterInvokingMethodFromBaseType() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint(
@@ -163,7 +167,6 @@ public class ConstraintMappingTest {
 
 	@Test(description = "HV-404: Introducing ConstraintsForType#genericConstraint(Class) allows to set specific parameters on following specific constraints.")
 	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.constraint(
 						new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ).param( "minRunner", 1 )
@@ -182,7 +185,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testInheritedConstraint() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef() )
@@ -204,7 +206,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testValid() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "runners", METHOD )
 				.valid()
@@ -230,7 +231,6 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: The class class org.hibernate.validator.test.cfg.Marathon does not have a property 'numberOfHelpers' with access METHOD."
 	)
 	public void testSingleConstraintWrongAccessType() throws Throwable {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "numberOfHelpers", METHOD )
 				.constraint( new NotNullDef() );
@@ -238,7 +238,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testDefaultGroupSequence() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
 				.property( "name", METHOD )
@@ -261,9 +260,8 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testDefaultGroupSequenceProvider() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
-				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class )
+				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef().groups( Foo.class ) )
 				.property( "runners", METHOD )
@@ -287,10 +285,9 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class )
-				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class )
+				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef().groups( Foo.class ) )
 				.property( "runners", METHOD )
@@ -304,7 +301,6 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( B.class )
 				.defaultGroupSequence( Foo.class, B.class )
 				.property( "b", FIELD )
@@ -318,9 +314,8 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
 	)
 	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( A.class )
-				.defaultGroupSequenceProvider( ADefaultGroupSequenceProvider.class )
+				.defaultGroupSequenceProviderClass( ADefaultGroupSequenceProvider.class )
 				.property( "a", FIELD )
 				.constraint( new NotNullDef() );
 		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
@@ -329,7 +324,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testMultipleConstraintOfTheSameType() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new SizeDef().min( 5 ) )
@@ -356,7 +350,6 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = ".*No value provided for minRunner.*"
 	)
 	public void testCustomConstraintTypeMissingParameter() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.constraint( new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ) );
 
@@ -367,7 +360,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testCustomConstraintType() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.constraint(
 						new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class )
@@ -395,7 +387,6 @@ public class ConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: The bean type must not be null when creating a constraint mapping."
 	)
 	public void testNullBean() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( null )
 				.constraint( new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ) );
 
@@ -405,7 +396,6 @@ public class ConstraintMappingTest {
 
 	@Test(description = "HV-355 (parameter names of RangeDef wrong)")
 	public void testRangeDef() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Runner.class )
 				.property( "age", METHOD )
 				.constraint( new RangeDef().min( 12 ).max( 99 ) );
@@ -417,7 +407,6 @@ public class ConstraintMappingTest {
 
 	@Test(description = "HV-444")
 	public void testDefaultGroupSequenceDefinedOnClassWithNoConstraints() {
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef().groups( Foo.class ) )
@@ -441,8 +430,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testProgrammaticAndAnnotationFieldConstraintsAddUp() {
-
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( User.class )
 				.property( "firstName", ElementType.FIELD )
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
@@ -458,8 +445,6 @@ public class ConstraintMappingTest {
 
 	@Test
 	public void testProgrammaticAndAnnotationPropertyConstraintsAddUp() {
-
-		ConstraintMapping mapping = new ConstraintMapping();
 		mapping.type( User.class )
 				.property( "lastName", ElementType.METHOD )
 				.constraint( new SizeDef().min( 4 ).max( 10 ) );
@@ -508,24 +493,26 @@ public class ConstraintMappingTest {
 		public String getLastName() {
 			return lastName;
 		}
-
 	}
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
+		@SuppressWarnings("unchecked")
 		public List<Class<?>> getValidationGroups(Marathon object) {
-			return Arrays.<Class<?>>asList( Foo.class, Marathon.class );
+			return asList( Foo.class, Marathon.class );
 		}
 	}
 
 	public static class BDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
+		@SuppressWarnings("unchecked")
 		public List<Class<?>> getValidationGroups(B object) {
-			return Arrays.<Class<?>>asList( Foo.class, B.class );
+			return asList( Foo.class, B.class );
 		}
 	}
 
 	public static class ADefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
+		@SuppressWarnings("unchecked")
 		public List<Class<?>> getValidationGroups(A object) {
-			return Arrays.<Class<?>>asList( Foo.class, A.class );
+			return asList( Foo.class, A.class );
 		}
 	}
 }

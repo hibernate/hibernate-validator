@@ -16,19 +16,28 @@
 */
 package org.hibernate.validator.test.internal.engine.path;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.Iterator;
 import java.util.Set;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
+import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
+import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
@@ -37,7 +46,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author Hardy Ferentschik
  */
-public class GetElementDescriptorFromNodeTest {
+public class ElementDescriptorFromNodeTest {
 	private Validator validator;
 
 	@BeforeClass
@@ -89,6 +98,44 @@ public class GetElementDescriptorFromNodeTest {
 		assertConstraintViolationToOneValidation( constraintViolations );
 	}
 
+	@Test
+	public void testValidateCustomClassConstraint() {
+		C c = new C();
+
+		Set<ConstraintViolation<C>> constraintViolations = validator.validate( c );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "" );
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		ElementDescriptor descriptor = node.getElementDescriptor();
+
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.BEAN, "unexpected descriptor type" );
+		BeanDescriptor beanDescriptor = descriptor.as( BeanDescriptor.class );
+		assertEquals( beanDescriptor.getElementClass(), C.class, "unexpected bean class" );
+	}
+
+	@Test
+	public void testValidateCustomClassConstraintInCascadedValidation() {
+		D d = new D();
+
+		Set<ConstraintViolation<D>> constraintViolations = validator.validate( d );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "c" );
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		ElementDescriptor descriptor = node.getElementDescriptor();
+
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.BEAN, "unexpected descriptor type" );
+		BeanDescriptor beanDescriptor = descriptor.as( BeanDescriptor.class );
+		assertEquals( beanDescriptor.getElementClass(), C.class, "unexpected bean class" );
+	}
+
 	private void assertConstraintViolationToOneValidation(Set<ConstraintViolation<AWithB>> constraintViolations) {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "b.b" );
@@ -99,15 +146,15 @@ public class GetElementDescriptorFromNodeTest {
 		Path.Node node = nodeIterator.next();
 		ElementDescriptor descriptor = node.getElementDescriptor();
 
-		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
-		PropertyDescriptor propertyDescriptor = descriptor.as( PropertyDescriptor.class );
-		assertEquals( propertyDescriptor.getElementClass(), B.class, "unexpected bean class" );
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.BEAN, "unexpected descriptor type" );
+		BeanDescriptor beanDescriptor = descriptor.as( BeanDescriptor.class );
+		assertEquals( beanDescriptor.getElementClass(), B.class, "unexpected bean class" );
 
 		node = nodeIterator.next();
 		descriptor = node.getElementDescriptor();
 
 		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
-		propertyDescriptor = descriptor.as( PropertyDescriptor.class );
+		PropertyDescriptor propertyDescriptor = descriptor.as( PropertyDescriptor.class );
 		assertEquals( propertyDescriptor.getElementClass(), String.class, "unexpected bean class" );
 	}
 
@@ -145,5 +192,38 @@ public class GetElementDescriptorFromNodeTest {
 	class B {
 		@NotNull
 		String b;
+	}
+
+	@CustomConstraint
+	class C {
+	}
+
+	class D {
+		@Valid
+		C c;
+
+		public D() {
+			c = new C();
+		}
+	}
+
+	@Target({ TYPE })
+	@Retention(RUNTIME)
+	@Constraint(validatedBy = { CustomConstraintValidator.class })
+	public @interface CustomConstraint {
+		public String message() default "custom constraint";
+
+		public Class<?>[] groups() default { };
+
+		public Class<? extends Payload>[] payload() default { };
+	}
+
+	public static class CustomConstraintValidator implements ConstraintValidator<CustomConstraint, Object> {
+		public void initialize(CustomConstraint constraintAnnotation) {
+		}
+
+		public boolean isValid(Object o, ConstraintValidatorContext context) {
+			return false;
+		}
 	}
 }
