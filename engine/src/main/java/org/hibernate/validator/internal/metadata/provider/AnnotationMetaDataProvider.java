@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.GroupSequence;
+import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
@@ -62,7 +63,6 @@ import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-@SuppressWarnings("deprecation")
 public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private static final Log log = LoggerFactory.make();
 	/**
@@ -73,9 +73,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final ConstraintHelper constraintHelper;
 	private final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
+	private final ParameterNameProvider parameterNameProvider;
 
-	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, AnnotationProcessingOptions annotationProcessingOptions) {
+	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
+		this.parameterNameProvider = parameterNameProvider;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		configuredBeans = new ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>>(
 				DEFAULT_INITIAL_CAPACITY,
@@ -306,12 +308,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private List<ConstrainedParameter> getParameterMetaData(Method method) {
 		List<ConstrainedParameter> metaData = newArrayList();
 
+		String[] parameterNames = parameterNameProvider.getParameterNames( method );
+
 		int i = 0;
 
 		for ( Annotation[] annotationsOfOneParameter : method.getParameterAnnotations() ) {
 
 			boolean parameterIsCascading = false;
-			String parameterName = DEFAULT_PARAMETER_NAME_PREFIX + i;
+			String parameterName = parameterNames[i];
 			Set<MetaConstraint<?>> constraintsOfOneParameter = newHashSet();
 
 			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {

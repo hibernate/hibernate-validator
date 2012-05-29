@@ -320,6 +320,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			if ( validationBootstrapParameters.getConstraintValidatorFactory() == null ) {
 				validationBootstrapParameters.setConstraintValidatorFactory( defaultConstraintValidatorFactory );
 			}
+			if ( validationBootstrapParameters.getParameterNameProvider() == null ) {
+				validationBootstrapParameters.setParameterNameProvider( defaultParameterNameProvider );
+			}
 		}
 		else {
 			ValidationBootstrapParameters xmlParameters = new ValidationXmlParser().parseValidationXml();
@@ -354,6 +357,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 			else {
 				validationBootstrapParameters.setConstraintValidatorFactory( defaultConstraintValidatorFactory );
+			}
+		}
+
+		if ( validationBootstrapParameters.getParameterNameProvider() == null ) {
+			if ( xmlParameters.getParameterNameProvider() != null ) {
+				validationBootstrapParameters.setParameterNameProvider( xmlParameters.getParameterNameProvider() );
+			}
+			else {
+				validationBootstrapParameters.setParameterNameProvider( defaultParameterNameProvider );
 			}
 		}
 

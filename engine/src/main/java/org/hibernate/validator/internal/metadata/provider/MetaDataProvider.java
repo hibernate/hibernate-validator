@@ -35,10 +35,6 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
  * @author Hardy Ferentschik
  */
 public interface MetaDataProvider {
-	/**
-	 * Used as prefix for parameter names, if no explicit names are given.
-	 */
-	static final String DEFAULT_PARAMETER_NAME_PREFIX = "arg";
 
 	/**
 	 * Returns the annotation processing options as configured by this provider.

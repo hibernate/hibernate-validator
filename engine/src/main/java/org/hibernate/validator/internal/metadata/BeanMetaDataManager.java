@@ -16,10 +16,12 @@
 */
 package org.hibernate.validator.internal.metadata;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -85,15 +87,25 @@ public class BeanMetaDataManager {
 	 */
 	private final ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>> beanMetaDataCache;
 
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, MetaDataProvider... metaDataProviders) {
-		this( constraintHelper, Arrays.asList( metaDataProviders ) );
+	/**
+	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
+	 * provider, no meta data providers besides the annotation-based providers are used.
+	 *
+	 * @param constraintHelper The constraint helper
+	 */
+	public BeanMetaDataManager(ConstraintHelper constraintHelper) {
+		this( constraintHelper, new DefaultParameterNameProvider(), Collections.<MetaDataProvider>emptyList() );
 	}
 
 	/**
+	 * Creates a new {@code BeanMetaDataManager}.
+	 *
 	 * @param constraintHelper the constraint helper
+	 * @param parameterNameProvider the parameter name provider
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
+							   ParameterNameProvider parameterNameProvider,
 							   List<MetaDataProvider> optionalMetaDataProviders) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
@@ -112,6 +124,7 @@ public class BeanMetaDataManager {
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 				constraintHelper,
+				parameterNameProvider,
 				annotationProcessingOptions
 		);
 		this.metaDataProviders.add( defaultProvider );

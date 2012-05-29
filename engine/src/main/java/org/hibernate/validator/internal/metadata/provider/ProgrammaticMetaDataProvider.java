@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
@@ -64,10 +65,12 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private static final Log log = LoggerFactory.make();
 	private final AnnotationProcessingOptions annotationProcessingOptions;
+	private final ParameterNameProvider parameterNameProvider;
 
-	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper, Set<ConstraintMapping> programmaticMappings) {
+	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
 		Contracts.assertNotNull( programmaticMappings );
+		this.parameterNameProvider = parameterNameProvider;
 		ConstraintMappingContext mergedContext = createMergedMappingContext( programmaticMappings );
 		initProgrammaticConfiguration( mergedContext );
 		annotationProcessingOptions = mergedContext.getAnnotationProcessingOptions();
@@ -204,6 +207,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 		for ( Method oneMethod : allConfiguredMethods ) {
 
+			String[] parameterNames = parameterNameProvider.getParameterNames( oneMethod );
+
 			Map<Integer, Set<MethodConstraintLocation>> cascadesByParameter = partition(
 					cascadesByMethod.get(
 							oneMethod
@@ -219,7 +224,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 						new ConstrainedParameter(
 								ConfigurationSource.API,
 								new MethodConstraintLocation( oneMethod, i ),
-								DEFAULT_PARAMETER_NAME_PREFIX + i,
+								parameterNames[i],
 								asMetaConstraints( constraintsByParameter.get( i ) ),
 								cascadesByParameter.containsKey( i )
 						)

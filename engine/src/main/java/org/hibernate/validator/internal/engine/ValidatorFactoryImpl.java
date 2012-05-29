@@ -86,6 +86,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				metaDataProviders.add(
 						new ProgrammaticMetaDataProvider(
 								constraintHelper,
+								parameterNameProvider,
 								hibernateSpecificConfig.getProgrammaticMappings()
 						)
 				);
@@ -97,7 +98,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				properties, tmpFailFast
 		);
 		this.failFast = tmpFailFast;
-		metaDataManager = new BeanMetaDataManager( constraintHelper, metaDataProviders );
+		metaDataManager = new BeanMetaDataManager( constraintHelper, parameterNameProvider, metaDataProviders );
 	}
 
 	public Validator getValidator() {
