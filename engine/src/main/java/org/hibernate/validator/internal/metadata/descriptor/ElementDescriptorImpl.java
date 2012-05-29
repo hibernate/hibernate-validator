@@ -68,18 +68,11 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 								 boolean defaultGroupSequenceRedefined,
 								 List<Class<?>> defaultGroupSequence) {
 		this.type = (Class<?>) TypeHelper.getErasedType( type );
-		// TODO HV-571 handle wildcard types etc
-		if ( ReflectionHelper.isIterable( type ) && ReflectionHelper.getIndexedType( type ) instanceof Class ) {
-			this.iterableType = (Class<?>) ReflectionHelper.getIndexedType( type );
-		}
-		else {
-			this.iterableType = null;
-		}
+		this.iterableType = extractIterableType( type );
 		this.constraintDescriptors = Collections.unmodifiableSet( constraintDescriptors );
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
 		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupSequence );
 	}
-
 
 	@Override
 	public final boolean hasConstraints() {
@@ -89,10 +82,6 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 	@Override
 	public final Class<?> getElementClass() {
 		return type;
-	}
-
-	public final Class<?> getIndexedClass() {
-		return iterableType;
 	}
 
 	@Override
@@ -106,14 +95,28 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 	}
 
 	@Override
-	public abstract Kind getKind();
-
-	@Override
 	public <T extends ElementDescriptor> T as(Class<T> descriptorType) {
 		if ( descriptorType.isAssignableFrom( this.getClass() ) ) {
 			return descriptorType.cast( this );
 		}
 		throw log.unableToNarrowDescriptorType( this.getClass().getName(), descriptorType.getName() );
+	}
+
+	@Override
+	public abstract Kind getKind();
+
+	public final Class<?> getIterableClass() {
+		return iterableType;
+	}
+
+	private Class<?> extractIterableType(Type type) {
+		Class<?> iterableType = null;
+
+		if ( ReflectionHelper.isIterable( type ) && ReflectionHelper.getIndexedType( type ) instanceof Class ) {
+			iterableType = (Class<?>) ReflectionHelper.getIndexedType( type );
+		}
+
+		return iterableType;
 	}
 
 	private class ConstraintFinderImpl implements ConstraintFinder {

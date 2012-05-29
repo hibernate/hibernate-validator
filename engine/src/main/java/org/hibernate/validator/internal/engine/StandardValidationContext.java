@@ -106,7 +106,7 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				if ( elementDescriptor instanceof PropertyDescriptor && ( (PropertyDescriptor) elementDescriptor ).isCascaded() ) {
 					Class<?> elementClass = elementDescriptor.getElementClass();
 					if ( ReflectionHelper.isIterable( elementClass ) ) {
-						elementClass = ( (ElementDescriptorImpl) elementDescriptor ).getIndexedClass();
+						elementClass = ( (ElementDescriptorImpl) elementDescriptor ).getIterableClass();
 						if ( elementClass != null ) {
 							beanMetaData = getBeanMetaDataManager().getBeanMetaData( elementClass );
 							currentClass = beanMetaData.getBeanDescriptor().getElementClass();
