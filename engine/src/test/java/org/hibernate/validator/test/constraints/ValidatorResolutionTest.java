@@ -24,6 +24,7 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
@@ -114,10 +115,8 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
-	/**
-	 * HV-233
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-233")
 	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfObject() {
 		Validator validator = ValidatorUtil.getValidator();
 
@@ -126,10 +125,8 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
-	/**
-	 * HV-233
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-233")
 	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfClonable() {
 		Validator validator = ValidatorUtil.getValidator();
 
@@ -138,10 +135,8 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
-	/**
-	 * HV-233
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-233")
 	public void testObjectArraysAndPrimitiveArraysAreSubtypesOfSerializable() {
 		Validator validator = ValidatorUtil.getValidator();
 
@@ -150,10 +145,8 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
-	/**
-	 * HV-233
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-233")
 	public void testSubTypeArrayIsSubtypeOfSuperTypeArray() {
 		Validator validator = ValidatorUtil.getValidator();
 
@@ -162,6 +155,7 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
+	@SuppressWarnings("unused")
 	public class Foo {
 		@org.hibernate.validator.test.constraints.Object
 		private org.hibernate.validator.test.constraints.Object[] objectArray;
@@ -175,6 +169,7 @@ public class ValidatorResolutionTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public class Bar {
 		@org.hibernate.validator.test.constraints.Cloneable
 		private org.hibernate.validator.test.constraints.Object[] objectArray;
@@ -188,6 +183,7 @@ public class ValidatorResolutionTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public class Fubar {
 		@Serializable
 		private org.hibernate.validator.test.constraints.Object[] objectArray;
@@ -201,6 +197,7 @@ public class ValidatorResolutionTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public class SubTypeEntity {
 		@SuperTypeArray
 		private SubType[] subTypeArray;

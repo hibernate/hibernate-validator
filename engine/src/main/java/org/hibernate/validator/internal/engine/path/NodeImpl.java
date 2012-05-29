@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.engine;
+package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
 import javax.validation.Path;
@@ -85,7 +85,7 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	// TODO - for now just a setter. maybe add a copy constructor later (HF)
-	void setElementDescriptor(ElementDescriptor elementDescriptor) {
+	public void setElementDescriptor(ElementDescriptor elementDescriptor) {
 		this.elementDescriptor = elementDescriptor;
 	}
 

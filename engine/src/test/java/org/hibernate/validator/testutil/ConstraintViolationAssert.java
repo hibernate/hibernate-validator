@@ -25,7 +25,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 
-import static org.hibernate.validator.internal.engine.PathImpl.createPathFromString;
+import static org.hibernate.validator.internal.engine.path.PathImpl.createPathFromString;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

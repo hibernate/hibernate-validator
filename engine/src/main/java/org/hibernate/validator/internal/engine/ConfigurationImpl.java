@@ -67,16 +67,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private static final Log log = LoggerFactory.make();
 
-	private final ResourceBundleLocator defaultResourceBundleLocator = new PlatformResourceBundleLocator(
-			ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
-	);
-	private final MessageInterpolator defaultMessageInterpolator = new ResourceBundleMessageInterpolator(
-			defaultResourceBundleLocator
-	);
-	private final TraversableResolver defaultTraversableResolver = new DefaultTraversableResolver();
-	private final ConstraintValidatorFactory defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
-	private final ValidationProviderResolver providerResolver;
+	private final ResourceBundleLocator defaultResourceBundleLocator;
+	private final MessageInterpolator defaultMessageInterpolator;
+	private final TraversableResolver defaultTraversableResolver;
+	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
+	private final ParameterNameProvider defaultParameterNameProvider;
 
+	private ValidationProviderResolver providerResolver;
 	private ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
 	private Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
@@ -84,22 +81,31 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean failFast;
 
 	public ConfigurationImpl(BootstrapState state) {
+		this();
 		if ( state.getValidationProviderResolver() == null ) {
 			this.providerResolver = state.getDefaultValidationProviderResolver();
 		}
 		else {
 			this.providerResolver = state.getValidationProviderResolver();
 		}
-		validationBootstrapParameters = new ValidationBootstrapParameters();
 	}
 
 	public ConfigurationImpl(ValidationProvider<?> provider) {
+		this();
 		if ( provider == null ) {
 			throw log.getInconsistentConfigurationException();
 		}
 		this.providerResolver = null;
-		validationBootstrapParameters = new ValidationBootstrapParameters();
 		validationBootstrapParameters.setProvider( provider );
+	}
+
+	private ConfigurationImpl() {
+		this.validationBootstrapParameters = new ValidationBootstrapParameters();
+		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES );
+		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
+		this.defaultTraversableResolver = new DefaultTraversableResolver();
+		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
+		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 	}
 
 	public final HibernateValidatorConfiguration ignoreXmlConfiguration() {
@@ -142,8 +148,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public HibernateValidatorConfiguration parameterNameProvider(ParameterNameProvider parameterNameProvider) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+		if ( log.isDebugEnabled() ) {
+			if ( parameterNameProvider != null ) {
+				log.debug(
+						"Setting custom ParameterNameProvider of type " + parameterNameProvider.getClass()
+								.getName()
+				);
+			}
+		}
+		this.validationBootstrapParameters.setParameterNameProvider( parameterNameProvider );
+		return this;
 	}
 
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
@@ -252,8 +266,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public ParameterNameProvider getParameterNameProvider() {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+		return validationBootstrapParameters.getParameterNameProvider();
 	}
 
 	public final Map<String, String> getProperties() {
@@ -279,8 +292,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public ParameterNameProvider getDefaultParameterNameProvider() {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+		return defaultParameterNameProvider;
 	}
 
 	public final Set<ConstraintMapping> getProgrammaticMappings() {

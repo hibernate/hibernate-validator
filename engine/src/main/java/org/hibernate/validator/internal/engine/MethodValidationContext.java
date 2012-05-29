@@ -23,6 +23,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 
 /**

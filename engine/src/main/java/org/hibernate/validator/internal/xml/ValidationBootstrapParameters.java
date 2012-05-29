@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.spi.ValidationProvider;
 
@@ -34,6 +35,7 @@ public class ValidationBootstrapParameters {
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
+	private ParameterNameProvider parameterNameProvider;
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = new HashMap<String, String>();
@@ -97,5 +99,13 @@ public class ValidationBootstrapParameters {
 
 	public final Map<String, String> getConfigProperties() {
 		return Collections.unmodifiableMap( configProperties );
+	}
+
+	public ParameterNameProvider getParameterNameProvider() {
+		return parameterNameProvider;
+	}
+
+	public void setParameterNameProvider(ParameterNameProvider parameterNameProvider) {
+		this.parameterNameProvider = parameterNameProvider;
 	}
 }

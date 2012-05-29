@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.engine.PathImpl;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;

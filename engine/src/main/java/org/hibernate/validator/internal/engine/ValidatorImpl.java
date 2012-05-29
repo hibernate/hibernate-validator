@@ -41,6 +41,7 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -106,7 +107,11 @@ public class ValidatorImpl implements Validator {
 	 */
 	private final boolean failFast;
 
-	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory, MessageInterpolator messageInterpolator, TraversableResolver traversableResolver, BeanMetaDataManager beanMetaDataManager, boolean failFast) {
+	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
+						 MessageInterpolator messageInterpolator,
+						 TraversableResolver traversableResolver,
+						 BeanMetaDataManager beanMetaDataManager,
+						 boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;

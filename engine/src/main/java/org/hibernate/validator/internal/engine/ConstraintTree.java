@@ -28,6 +28,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.CompositionType;
+import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;

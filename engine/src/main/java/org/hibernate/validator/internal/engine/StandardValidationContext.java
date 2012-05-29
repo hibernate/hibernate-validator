@@ -25,6 +25,8 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.internal.engine.path.MessageAndPath;
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.descriptor.ElementDescriptorImpl;

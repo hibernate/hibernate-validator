@@ -21,7 +21,6 @@ import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
-import javax.validation.ValidatorContext;
 
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -34,24 +33,30 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
-	private MessageInterpolator messageInterpolator;
-	private TraversableResolver traversableResolver;
-	private ConstraintValidatorFactory constraintValidatorFactory;
 	private final MessageInterpolator factoryMessageInterpolator;
 	private final TraversableResolver factoryTraversableResolver;
 	private final ConstraintValidatorFactory factoryConstraintValidatorFactory;
+	private final ParameterNameProvider factoryParameterNameProvider;
 	private final BeanMetaDataManager beanMetaDataManager;
+
+	private MessageInterpolator messageInterpolator;
+	private TraversableResolver traversableResolver;
+	private ConstraintValidatorFactory constraintValidatorFactory;
+	private ParameterNameProvider parameterNameProvider;
+
 	private boolean failFast;
 
 	public ValidatorContextImpl(ConstraintValidatorFactory constraintValidatorFactory,
 								MessageInterpolator factoryMessageInterpolator,
 								TraversableResolver factoryTraversableResolver,
+								ParameterNameProvider factoryParameterNameProvider,
 								BeanMetaDataManager beanMetaDataManager,
 								boolean failFast) {
 
 		this.factoryConstraintValidatorFactory = constraintValidatorFactory;
 		this.factoryMessageInterpolator = factoryMessageInterpolator;
 		this.factoryTraversableResolver = factoryTraversableResolver;
+		this.factoryParameterNameProvider = factoryParameterNameProvider;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.failFast = failFast;
 
@@ -60,6 +65,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		constraintValidatorFactory( factoryConstraintValidatorFactory );
 	}
 
+	@Override
 	public HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
 		if ( messageInterpolator == null ) {
 			this.messageInterpolator = factoryMessageInterpolator;
@@ -70,6 +76,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		return this;
 	}
 
+	@Override
 	public HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver) {
 		if ( traversableResolver == null ) {
 			this.traversableResolver = factoryTraversableResolver;
@@ -80,8 +87,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		return this;
 	}
 
+	@Override
 	public HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory) {
-		if ( constraintValidatorFactory == null ) {
+		if ( factory == null ) {
 			this.constraintValidatorFactory = factoryConstraintValidatorFactory;
 		}
 		else {
@@ -91,16 +99,23 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
-	public ValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+	public HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
+		if ( parameterNameProvider == null ) {
+			this.parameterNameProvider = factoryParameterNameProvider;
+		}
+		else {
+			this.parameterNameProvider = parameterNameProvider;
+		}
+		return this;
 	}
 
+	@Override
 	public HibernateValidatorContext failFast(boolean failFast) {
 		this.failFast = failFast;
 		return this;
 	}
 
+	@Override
 	public Validator getValidator() {
 		return new ValidatorImpl(
 				constraintValidatorFactory,

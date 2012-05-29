@@ -21,6 +21,8 @@ import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.engine.path.MessageAndPath;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 

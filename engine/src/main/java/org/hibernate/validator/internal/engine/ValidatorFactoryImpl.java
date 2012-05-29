@@ -54,6 +54,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
 	private final ConstraintValidatorFactory constraintValidatorFactory;
+	private final ParameterNameProvider parameterNameProvider;
 	private final BeanMetaDataManager metaDataManager;
 	private final boolean failFast;
 
@@ -61,6 +62,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
+		this.parameterNameProvider = configurationState.getParameterNameProvider();
 		ConstraintHelper constraintHelper = new ConstraintHelper();
 
 		List<MetaDataProvider> metaDataProviders = newArrayList();
@@ -126,6 +128,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
+				parameterNameProvider,
 				metaDataManager,
 				failFast
 		);
@@ -133,8 +136,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public ParameterNameProvider getParameterNameProvider() {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		return parameterNameProvider;
 	}
 
 	@Override

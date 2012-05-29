@@ -105,8 +105,7 @@ public class BootstrapTest {
 		}
 
 		public void releaseInstance(ConstraintValidator<?, ?> instance) {
-			// TODO HV-571
-			throw new UnsupportedOperationException( "Not yet implemented" );
+			// noop
 		}
 	}
 }

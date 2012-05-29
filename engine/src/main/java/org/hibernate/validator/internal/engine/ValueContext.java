@@ -20,7 +20,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
-import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or

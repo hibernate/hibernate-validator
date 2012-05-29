@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.engine;
+package org.hibernate.validator.internal.engine.path;
 
 import java.lang.reflect.Method;
 
@@ -23,25 +23,22 @@ import java.lang.reflect.Method;
  *
  * @author Gunnar Morling
  */
-public class MethodParameterNodeImpl extends NodeImpl {
+public class MethodReturnValueNodeImpl extends NodeImpl {
 
 	private static final long serialVersionUID = -1964614171714243780L;
 
-	private final static String NAME_TEMPLATE = "%s#%s(%s)";
+	private final static String NAME_TEMPLATE = "%s#%s()";
 
 	/**
-	 * Creates a new {@link MethodParameterNodeImpl}.
+	 * Creates a new {@link MethodReturnValueNodeImpl}.
 	 *
 	 * @param method The method hosting the parameter to represent.
-	 * @param parameterName The name of the parameter to represent.
 	 * @param parent The parent node, representing the bean hosting the given
 	 * method.
 	 */
-	MethodParameterNodeImpl(Method method, String parameterName, NodeImpl parent) {
+	MethodReturnValueNodeImpl(Method method, NodeImpl parent) {
 		super(
-				String.format(
-						NAME_TEMPLATE, method.getDeclaringClass().getSimpleName(), method.getName(), parameterName
-				),
+				String.format( NAME_TEMPLATE, method.getDeclaringClass().getSimpleName(), method.getName() ),
 				parent, false, null, null
 		);
 	}
