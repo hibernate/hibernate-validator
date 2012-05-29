@@ -222,7 +222,6 @@
                             org.hibernate.validator.constraints.*;version="${project.version}",
                             org.hibernate.validator.group;version="${project.version}",
                             org.hibernate.validator.messageinterpolation;version="${project.version}",
-                            org.hibernate.validator.method.*;version="${project.version}",
                             org.hibernate.validator.resourceloading;version="${project.version}",
                             org.hibernate.validator.spi.*;version="${project.version}"
                         </Export-Package>
