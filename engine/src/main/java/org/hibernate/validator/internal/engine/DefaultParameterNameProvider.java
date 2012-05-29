@@ -21,19 +21,34 @@ import java.lang.reflect.Method;
 import javax.validation.ParameterNameProvider;
 
 /**
+ * A default {@link ParameterNameProvider} implementation which returns
+ * parameter names in the form {@code arg0}, {@code arg1} etc. as defined by the
+ * BV specification.
+ *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
-// TODO - HV-571 implement
 public class DefaultParameterNameProvider implements ParameterNameProvider {
+
+	private final static String PREFIX = "arg";
+
 	@Override
 	public String[] getParameterNames(Constructor<?> constructor) {
-		return new String[0];
+		return getParameterNames( constructor.getParameterTypes().length );
 	}
 
 	@Override
 	public String[] getParameterNames(Method method) {
-		return new String[0];
+		return getParameterNames( method.getParameterTypes().length );
+	}
+
+	private String[] getParameterNames(int parameterCount) {
+		String[] parameterNames = new String[parameterCount];
+
+		for ( int i = 0; i < parameterCount; i++ ) {
+			parameterNames[i] = PREFIX + i;
+		}
+
+		return parameterNames;
 	}
 }
-
-
