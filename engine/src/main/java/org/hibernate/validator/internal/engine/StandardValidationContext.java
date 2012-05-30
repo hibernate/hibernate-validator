@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.engine;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -28,13 +29,11 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.internal.engine.path.BeanMetaDataLocator;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
-import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.descriptor.ElementDescriptorImpl;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * A {@link ValidationContext} implementation which creates and manages violations of type {@link ConstraintViolation}.
@@ -92,35 +91,25 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 	}
 
 	private Path createPathWithElementDescriptors(MessageAndPath messageAndPath) {
-		Class<?> currentClass = getRootBeanClass();
-		List<ElementDescriptor> elementDescriptors = new ArrayList<ElementDescriptor>();
-		for ( Path.Node n : messageAndPath.getPath() ) {
-			// todo - we need to determine the current class by traversing the actual object.
-			// need to implement a object traverser (HF)
-			if ( currentClass == null ) {
-				elementDescriptors.add( null );
-				continue;
-			}
+		BeanMetaDataLocator traverser = BeanMetaDataLocator.createBeanMetaDataLocator(
+				getRootBean(),
+				getRootBeanClass(),
+				getBeanMetaDataManager()
+		);
+		Iterator<BeanMetaData<?>> beanMetaDataIterator = traverser.beanMetaDataIterator( messageAndPath.getPath() );
 
-			BeanMetaData beanMetaData = getBeanMetaDataManager().getBeanMetaData( currentClass );
-			NodeImpl node = (NodeImpl) n;
-			String name = node.getName();
-			if ( isClassLevelConstraintNode( name ) ) {
+		List<ElementDescriptor> elementDescriptors = new ArrayList<ElementDescriptor>();
+		for ( Path.Node node : messageAndPath.getPath() ) {
+			BeanMetaData beanMetaData = beanMetaDataIterator.next();
+			if ( isClassLevelConstraintNode( node.getName() ) ) {
 				BeanDescriptor beanDescriptor = beanMetaData.getBeanDescriptor();
 				elementDescriptors.add( beanDescriptor );
-				currentClass = beanDescriptor.getElementClass();
 			}
 			else {
 				PropertyDescriptor propertyDescriptor = beanMetaData.getBeanDescriptor()
-						.getConstraintsForProperty( name );
+						.getConstraintsForProperty( node.getName() );
 
 				elementDescriptors.add( propertyDescriptor );
-
-				// property descriptor can be null if for example the ConstraintValidatorContext#ConstraintViolationBuilder
-				// API is used. See BVAL-288 (HF)
-				if ( propertyDescriptor != null && propertyDescriptor.isCascaded() ) {
-					currentClass = determineCascadedBeanType( propertyDescriptor );
-				}
 			}
 		}
 
@@ -128,23 +117,6 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				(PathImpl) messageAndPath.getPath(),
 				elementDescriptors
 		);
-	}
-
-	private Class<?> determineCascadedBeanType(PropertyDescriptor propertyDescriptor) {
-		Class<?> cascadedBeanType = null;
-		BeanMetaData beanMetaData;
-		Class<?> elementClass = propertyDescriptor.getElementClass();
-		if ( ReflectionHelper.isIterable( elementClass ) || ReflectionHelper.isMap( elementClass ) ) {
-			elementClass = ( (ElementDescriptorImpl) propertyDescriptor ).getIterableClass();
-			if ( elementClass != null ) {
-				beanMetaData = getBeanMetaDataManager().getBeanMetaData( elementClass );
-				cascadedBeanType = beanMetaData.getBeanDescriptor().getElementClass();
-			}
-		}
-		else {
-			cascadedBeanType = propertyDescriptor.getElementClass();
-		}
-		return cascadedBeanType;
 	}
 
 	private boolean isClassLevelConstraintNode(String name) {

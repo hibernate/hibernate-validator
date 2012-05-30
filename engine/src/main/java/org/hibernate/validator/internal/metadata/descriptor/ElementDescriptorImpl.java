@@ -18,7 +18,6 @@ package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +35,6 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -55,11 +53,6 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 	 */
 	private final Class<?> type;
 
-	/**
-	 * The type indexed type in case the element type is a array, collection ot map
-	 */
-	private final Class<?> iterableType;
-
 	private final Set<ConstraintDescriptorImpl<?>> constraintDescriptors;
 	private final boolean defaultGroupSequenceRedefined;
 	private final List<Class<?>> defaultGroupSequence;
@@ -69,7 +62,6 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 								 boolean defaultGroupSequenceRedefined,
 								 List<Class<?>> defaultGroupSequence) {
 		this.type = (Class<?>) TypeHelper.getErasedType( type );
-		this.iterableType = extractIterableType( type );
 		this.constraintDescriptors = Collections.unmodifiableSet( constraintDescriptors );
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
 		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupSequence );
@@ -105,26 +97,6 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 	@Override
 	public abstract Kind getKind();
-
-	public final Class<?> getIterableClass() {
-		return iterableType;
-	}
-
-	private Class<?> extractIterableType(Type type) {
-		Class<?> iterableType = null;
-
-		if ( ReflectionHelper.isIterable( type ) || ReflectionHelper.isMap( type ) ) {
-			Type indexedType = ReflectionHelper.getIndexedType( type );
-			if ( indexedType instanceof Class ) {
-				iterableType = (Class<?>) indexedType;
-			}
-			else if ( indexedType instanceof ParameterizedType ) {
-				iterableType = (Class) ( (ParameterizedType) indexedType ).getRawType();
-			}
-		}
-
-		return iterableType;
-	}
 
 	private class ConstraintFinderImpl implements ConstraintFinder {
 		private List<Class<?>> groups;

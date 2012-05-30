@@ -55,6 +55,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -783,5 +784,36 @@ public final class ReflectionHelper {
 			classes.add( currentInterface );
 			computeAllImplementedInterfaces( currentInterface, classes );
 		}
+	}
+
+	/**
+	 * This methods inspects the type of the cascaded constraints and in case
+	 * of a list or array creates an iterator in order to validate each element. For maps an iterator over the values
+	 * is returned.
+	 *
+	 * @param type the type of the cascaded field or property.
+	 * @param value the actual value.
+	 *
+	 * @return An iterator over the value of a cascaded property.
+	 */
+	public static Iterator<?> createIteratorForCascadedValue(Type type, Object value) {
+		Iterator<?> iter;
+		if ( ReflectionHelper.isIterable( type ) ) {
+			iter = ( (Iterable<?>) value ).iterator();
+		}
+		else if ( ReflectionHelper.isMap( type ) ) {
+			Map<?, ?> map = (Map<?, ?>) value;
+			iter = map.entrySet().iterator();
+		}
+		else if ( TypeHelper.isArray( type ) ) {
+			List<?> arrayList = Arrays.asList( (Object[]) value );
+			iter = arrayList.iterator();
+		}
+		else {
+			List<Object> list = newArrayList();
+			list.add( value );
+			iter = list.iterator();
+		}
+		return iter;
 	}
 }
