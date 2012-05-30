@@ -37,17 +37,26 @@ public class NodeImpl implements Path.Node, Serializable {
 	private final Integer index;
 	private final Object key;
 	private final int hashCode;
-	private ElementDescriptor elementDescriptor;
+	private final ElementDescriptor elementDescriptor;
 
 	private String asString;
 
+	public NodeImpl(NodeImpl oldNode, NodeImpl parent, ElementDescriptor elementDescriptor) {
+		this( oldNode.name, parent, oldNode.isIterable, oldNode.index, oldNode.key, elementDescriptor );
+	}
+
 	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key) {
+		this( name, parent, indexable, index, key, null );
+	}
+
+	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementDescriptor descriptor) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
 		this.key = key;
 		this.isIterable = indexable;
 		this.hashCode = buildHashCode();
+		this.elementDescriptor = descriptor;
 	}
 
 	public final String getName() {
@@ -82,11 +91,6 @@ public class NodeImpl implements Path.Node, Serializable {
 
 	public final NodeImpl getParent() {
 		return parent;
-	}
-
-	// TODO - for now just a setter. maybe add a copy constructor later (HF)
-	public void setElementDescriptor(ElementDescriptor elementDescriptor) {
-		this.elementDescriptor = elementDescriptor;
 	}
 
 	@Override

@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,8 +113,14 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 	private Class<?> extractIterableType(Type type) {
 		Class<?> iterableType = null;
 
-		if ( ReflectionHelper.isIterable( type ) && ReflectionHelper.getIndexedType( type ) instanceof Class ) {
-			iterableType = (Class<?>) ReflectionHelper.getIndexedType( type );
+		if ( ReflectionHelper.isIterable( type ) || ReflectionHelper.isMap( type ) ) {
+			Type indexedType = ReflectionHelper.getIndexedType( type );
+			if ( indexedType instanceof Class ) {
+				iterableType = (Class<?>) indexedType;
+			}
+			else if ( indexedType instanceof ParameterizedType ) {
+				iterableType = (Class) ( (ParameterizedType) indexedType ).getRawType();
+			}
 		}
 
 		return iterableType;

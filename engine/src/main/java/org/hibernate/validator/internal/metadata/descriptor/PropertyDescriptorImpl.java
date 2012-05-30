@@ -56,4 +56,14 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	public Kind getKind() {
 		return Kind.PROPERTY;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "PropertyDescriptorImpl" );
+		sb.append( "{property=" ).append( property );
+		sb.append( ", cascaded='" ).append( cascaded ).append( '\'' );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }

@@ -82,6 +82,7 @@ public class ClassValidatorWithTypeVariableTest {
 		assertCorrectConstraintTypes( violations, NotNull.class );
 	}
 
+	@SuppressWarnings("unused")
 	private class Batch {
 		@NotNull
 		@Valid
@@ -92,6 +93,7 @@ public class ClassValidatorWithTypeVariableTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private abstract class Item {
 		@NotNull
 		private Date date;
@@ -101,6 +103,7 @@ public class ClassValidatorWithTypeVariableTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private abstract class ItemOffer<T extends Item> {
 		@NotNull
 		@Valid

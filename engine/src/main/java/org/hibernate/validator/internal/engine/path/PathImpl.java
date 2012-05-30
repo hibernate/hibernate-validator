@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.Path;
+import javax.validation.metadata.ElementDescriptor;
 
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -117,6 +118,10 @@ public final class PathImpl implements Path, Serializable {
 
 	public static PathImpl createCopy(PathImpl path) {
 		return new PathImpl( path );
+	}
+
+	public static PathImpl createCopyWithElementDescriptorsAttached(PathImpl path, List<ElementDescriptor> elementDescriptors) {
+		return new PathImpl( path, elementDescriptors );
 	}
 
 	public final boolean isRootPath() {
@@ -266,6 +271,19 @@ public final class PathImpl implements Path, Serializable {
 	private PathImpl(PathImpl path) {
 		this( path.nodeList );
 		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
+	}
+
+	private PathImpl(PathImpl path, List<ElementDescriptor> elementDescriptors) {
+		this();
+		NodeImpl parent = addNode( null );
+		int i = 0;
+		for ( Path.Node node : path ) {
+			NodeImpl oldNode = (NodeImpl) node;
+			NodeImpl newNode = new NodeImpl( oldNode, parent, elementDescriptors.get( i ));
+			nodeList.add( newNode );
+			parent = newNode;
+			i++;
+		}
 	}
 
 	private PathImpl() {
