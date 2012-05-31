@@ -79,6 +79,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
 	private Set<ConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
+	private ConfigurationSource configurationSource;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -260,8 +261,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public ConfigurationSource getConfigurationSource() {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+		if(configurationSource == null) {
+			  configurationSource = new ValidationXmlParser().parseValidationXml();
+		}
+		return configurationSource;
 	}
 
 	@Override
@@ -304,7 +307,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	/**
-	 * Tries to check whether a validation.xml file exists and parses it using JAXB
+	 * Tries to check whether a validation.xml file exists and parses it
 	 */
 	private void parseValidationXml() {
 		if ( ignoreXmlConfiguration ) {
@@ -325,7 +328,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 		else {
-			ValidationBootstrapParameters xmlParameters = new ValidationXmlParser().parseValidationXml();
+			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(getConfigurationSource());
 			applyXmlSettings( xmlParameters );
 		}
 	}

@@ -22,16 +22,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.ConfigurationSource;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
+
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ResourceLoaderHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
 public class ValidationBootstrapParameters {
+	private static final Log log = LoggerFactory.make();
+
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
@@ -40,6 +49,18 @@ public class ValidationBootstrapParameters {
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = new HashMap<String, String>();
 	private final Set<InputStream> mappings = new HashSet<InputStream>();
+
+	public ValidationBootstrapParameters() {
+	}
+
+	public ValidationBootstrapParameters(ConfigurationSource configurationSource) {
+		setProviderClass( configurationSource.getDefaultProviderClassName() );
+		setMessageInterpolator( configurationSource.getMessageInterpolatorClassName() );
+		setTraversableResolver( configurationSource.getTraversableResolverClassName() );
+		setConstraintFactory( configurationSource.getConstraintValidatorFactoryClassName() );
+		setMappingStreams( configurationSource.getConstraintMappingResourcePath() );
+		setConfigProperties( configurationSource.getProperties() );
+	}
 
 	public final ConstraintValidatorFactory getConstraintValidatorFactory() {
 		return constraintValidatorFactory;
@@ -107,5 +128,99 @@ public class ValidationBootstrapParameters {
 
 	public void setParameterNameProvider(ParameterNameProvider parameterNameProvider) {
 		this.parameterNameProvider = parameterNameProvider;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void setProviderClass(String providerFqcn) {
+		if ( providerFqcn != null ) {
+			try {
+				providerClass = (Class<? extends ValidationProvider<?>>) ReflectionHelper.loadClass(
+						providerFqcn,
+						this.getClass()
+				);
+				log.usingValidationProvider( providerFqcn );
+			}
+			catch ( Exception e ) {
+				throw log.getUnableToInstantiateValidationProviderClassException( providerFqcn, e );
+			}
+		}
+	}
+
+	private void setMessageInterpolator(String messageInterpolatorFqcn) {
+		if ( messageInterpolatorFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
+						messageInterpolatorFqcn, this.getClass()
+				);
+				messageInterpolator = messageInterpolatorClass.newInstance();
+				log.usingMessageInterpolator( messageInterpolatorFqcn );
+			}
+			catch ( ValidationException e ) {
+				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
+			}
+			catch ( InstantiationException e ) {
+				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
+			}
+			catch ( IllegalAccessException e ) {
+				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
+			}
+		}
+	}
+
+	private void setTraversableResolver(String traversableResolverFqcn) {
+		if ( traversableResolverFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<TraversableResolver> clazz = (Class<TraversableResolver>) ReflectionHelper.loadClass(
+						traversableResolverFqcn, this.getClass()
+				);
+				traversableResolver = clazz.newInstance();
+				log.usingTraversableResolver( traversableResolverFqcn );
+			}
+			catch ( ValidationException e ) {
+				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
+			}
+			catch ( InstantiationException e ) {
+				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
+			}
+			catch ( IllegalAccessException e ) {
+				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
+			}
+		}
+	}
+
+	private void setConstraintFactory(String constraintFactoryFqcn) {
+		if ( constraintFactoryFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) ReflectionHelper.loadClass(
+						constraintFactoryFqcn, this.getClass()
+				);
+				constraintValidatorFactory = ReflectionHelper.newInstance( clazz, "constraint factory class" );
+				log.usingConstraintFactory( constraintFactoryFqcn );
+			}
+			catch ( ValidationException e ) {
+				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryFqcn, e );
+			}
+		}
+	}
+
+	private void setMappingStreams(Set<String> mappingFileNames) {
+		for ( String mappingFileName : mappingFileNames ) {
+			log.debugf( "Trying to open input stream for %s.", mappingFileName );
+
+			InputStream in = ResourceLoaderHelper.getInputStreamForPath( mappingFileName );
+			if ( in == null ) {
+				throw log.getUnableToOpenInputStreamForMappingFileException( mappingFileName );
+			}
+			mappings.add( in );
+		}
+	}
+
+	private void setConfigProperties(Map<String, String> properties) {
+		for ( Map.Entry<String, String> entry : properties.entrySet() ) {
+			configProperties.put( entry.getKey(), entry.getValue() );
+		}
 	}
 }

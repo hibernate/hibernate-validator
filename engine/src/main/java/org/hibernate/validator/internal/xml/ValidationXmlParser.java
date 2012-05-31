@@ -19,11 +19,10 @@ package org.hibernate.validator.internal.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
-import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
-import javax.validation.spi.ValidationProvider;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import javax.validation.ConfigurationSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -35,6 +34,7 @@ import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.ResourceLoaderHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -49,140 +49,45 @@ public class ValidationXmlParser {
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
 	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.0.xsd";
 
-
 	/**
-	 * Tries to check whether a validation.xml file exists and parses it using JAXB.
+	 * Tries to check whether a <i>validation.xml</i> file exists and parses it.
 	 *
-	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of <code>ConfigurationImpl.ValidationBootstrapParameters</code>.
+	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
-	public final ValidationBootstrapParameters parseValidationXml() {
+	public final ConfigurationSource parseValidationXml() {
 		ValidationConfigType config = getValidationConfig();
-		ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters();
 		if ( config != null ) {
-			// collect the parameters from the xml file
-			setProviderClassFromXml( config, xmlParameters );
-			setMessageInterpolatorFromXml( config, xmlParameters );
-			setTraversableResolverFromXml( config, xmlParameters );
-			setConstraintFactoryFromXml( config, xmlParameters );
-			setMappingStreamsFromXml( config, xmlParameters );
-			setPropertiesFromXml( config, xmlParameters );
+			Map<String, String> properties = new HashMap<String, String>();
+			for ( PropertyType property : config.getProperty() ) {
+				if ( log.isDebugEnabled() ) {
+					log.debugf(
+							"Found property '%s' with value '%s' in validation.xml.",
+							property.getName(),
+							property.getValue()
+					);
+				}
+				properties.put( property.getName(), property.getValue() );
+			}
+
+			return new ValidationXmlConfigurationSource(
+					config.getDefaultProvider(),
+					config.getConstraintValidatorFactory(),
+					config.getMessageInterpolator(),
+					config.getTraversableResolver(),
+					// TODO - HV-571 need to get an updated validation.xml dtd and handle different xml
+					null,
+					new HashSet<String>( config.getConstraintMapping() ),
+					properties
+			);
 		}
-		return xmlParameters;
-	}
-
-	private void setConstraintFactoryFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
-		String constraintFactoryClass = config.getConstraintValidatorFactory();
-		if ( constraintFactoryClass != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) ReflectionHelper.loadClass(
-						constraintFactoryClass, this.getClass()
-				);
-				xmlParameters.setConstraintValidatorFactory(
-						ReflectionHelper.newInstance(
-								clazz, "constraint factory class"
-						)
-				);
-				log.usingConstraintFactory( constraintFactoryClass );
-			}
-			catch ( ValidationException e ) {
-				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryClass, e );
-			}
-		}
-	}
-
-	private void setPropertiesFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
-		for ( PropertyType property : config.getProperty() ) {
-			if ( log.isDebugEnabled() ) {
-				log.debugf(
-						"Found property '%s' with value '%s' in validation.xml.",
-						property.getName(),
-						property.getValue()
-				);
-			}
-			xmlParameters.addConfigProperty( property.getName(), property.getValue() );
-		}
-	}
-
-	private void setMappingStreamsFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
-		for ( String mappingFileName : config.getConstraintMapping() ) {
-			log.debugf( "Trying to open input stream for %s.", mappingFileName);
-
-			InputStream in = getInputStreamForPath( mappingFileName );
-			if ( in == null ) {
-				throw log.getUnableToOpenInputStreamForMappingFileException( mappingFileName );
-			}
-			xmlParameters.addMapping( in );
-		}
-	}
-
-	private void setMessageInterpolatorFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
-		String messageInterpolatorClass = config.getMessageInterpolator();
-		if ( messageInterpolatorClass != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<MessageInterpolator> clazz = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
-						messageInterpolatorClass, this.getClass()
-				);
-				xmlParameters.setMessageInterpolator( clazz.newInstance() );
-				log.usingMessageInterpolator( messageInterpolatorClass );
-			}
-			catch ( ValidationException e ) {
-				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorClass, e );
-			}
-			catch ( InstantiationException e ) {
-				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorClass, e );
-			}
-			catch ( IllegalAccessException e ) {
-				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorClass, e );
-			}
-		}
-	}
-
-	private void setTraversableResolverFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParameters) {
-		String traversableResolverClass = config.getTraversableResolver();
-		if ( traversableResolverClass != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<TraversableResolver> clazz = (Class<TraversableResolver>) ReflectionHelper.loadClass(
-						traversableResolverClass, this.getClass()
-				);
-				xmlParameters.setTraversableResolver( clazz.newInstance() );
-				log.usingTraversableResolver( traversableResolverClass );
-			}
-			catch ( ValidationException e ) {
-				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverClass, e );
-			}
-			catch ( InstantiationException e ) {
-				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverClass, e );
-			}
-			catch ( IllegalAccessException e ) {
-				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverClass, e );
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void setProviderClassFromXml(ValidationConfigType config, ValidationBootstrapParameters xmlParamters) {
-		String providerClassName = config.getDefaultProvider();
-		if ( providerClassName != null ) {
-			try {
-				xmlParamters.setProviderClass(
-						(Class<? extends ValidationProvider<?>>) ReflectionHelper.loadClass(
-								providerClassName, this.getClass()
-						)
-				);
-				log.usingValidationProvider( providerClassName );
-			}
-			catch ( Exception e ) {
-				throw log.getUnableToInstantiateValidationProviderClassException( providerClassName, e );
-			}
+		else {
+			return new ValidationXmlConfigurationSource();
 		}
 	}
 
 	private ValidationConfigType getValidationConfig() {
 		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
-		InputStream inputStream = getInputStreamForPath( VALIDATION_XML_FILE );
+		InputStream inputStream = ResourceLoaderHelper.getInputStreamForPath( VALIDATION_XML_FILE );
 		if ( inputStream == null ) {
 			log.debugf( "No %s found. Using annotation based configuration only.", VALIDATION_XML_FILE );
 			return null;
@@ -212,32 +117,6 @@ public class ValidationXmlParser {
 			}
 		}
 		return validationConfig;
-	}
-
-	private InputStream getInputStreamForPath(String path) {
-		//TODO not sure if it's the right thing to removing '/'
-		String inputPath = path;
-		if ( inputPath.startsWith( "/" ) ) {
-			inputPath = inputPath.substring( 1 );
-		}
-
-		boolean isContextCL = true;
-		// try the context class loader first
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromContext();
-
-		if ( loader == null ) {
-			log.debug( "No default context class loader, fall back to Bean Validation's loader" );
-			loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
-			isContextCL = false;
-		}
-		InputStream inputStream = loader.getResourceAsStream( inputPath );
-
-		// try the current class loader
-		if ( isContextCL && inputStream == null ) {
-			loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
-			inputStream = loader.getResourceAsStream( inputPath );
-		}
-		return inputStream;
 	}
 
 	private Schema getValidationConfigurationSchema() {
