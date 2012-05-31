@@ -19,8 +19,8 @@ package org.hibernate.validator.test.internal.engine.path;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -162,7 +162,7 @@ public class ElementDescriptorFromNodeTest {
 
 		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
 		PropertyDescriptor propertyDescriptor = descriptor.as( PropertyDescriptor.class );
-		assertEquals( propertyDescriptor.getElementClass(), List.class, "unexpected bean class" );
+		assertEquals( propertyDescriptor.getElementClass(), Collection.class, "unexpected bean class" );
 
 		node = nodeIterator.next();
 		descriptor = node.getElementDescriptor();
@@ -226,7 +226,7 @@ public class ElementDescriptorFromNodeTest {
 
 	class AWithListOfB {
 		@Valid
-		List<B> bs;
+		Collection<B> bs;
 
 		public AWithListOfB() {
 			bs = new ArrayList<B>();
