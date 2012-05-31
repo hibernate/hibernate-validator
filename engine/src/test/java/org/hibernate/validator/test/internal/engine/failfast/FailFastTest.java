@@ -81,7 +81,7 @@ public class FailFastTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastMethodValidationDefaultBehaviour() {
-		TestService service = getValidatingProxy( new TestServiceImpl() );
+		TestService service = getValidatingProxy( new TestServiceImpl(), ValidatorUtil.getValidator() );
 
 		try {
 			service.testMethod( " ", null );

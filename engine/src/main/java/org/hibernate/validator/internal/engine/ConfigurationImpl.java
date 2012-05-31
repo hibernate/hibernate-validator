@@ -37,6 +37,7 @@ import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
@@ -173,10 +174,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	@SuppressWarnings("deprecation")
 	public final ConstraintMapping createConstraintMapping() {
-		//TODO: create internal implementation and return this
-		return new ConstraintMapping();
+		return new DefaultConstraintMapping();
 	}
 
 	public final HibernateValidatorConfiguration addMapping(ConstraintMapping mapping) {

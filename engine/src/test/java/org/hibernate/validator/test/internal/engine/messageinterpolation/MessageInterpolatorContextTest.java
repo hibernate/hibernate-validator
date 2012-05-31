@@ -52,7 +52,8 @@ public class MessageInterpolatorContextTest {
 	@org.testng.annotations.Test
 	public void testInterpolatorContext() throws Exception {
 		// use programmatic mapping api to configure constraint
-		ConstraintMapping mapping = new ConstraintMapping();
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Test.class )
 				.property( "test", FIELD )
 				.constraint( new MinDef().value( 10 ).message( "{foo}" ) );
@@ -60,7 +61,6 @@ public class MessageInterpolatorContextTest {
 		// use a easy mock message interpolator to verify the right for verifying that the right MessageInterpolatorContext
 		// will be passed
 		MessageInterpolator mock = createMock( MessageInterpolator.class );
-		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		config.messageInterpolator( mock );
 		config.addMapping( mapping );
 
@@ -89,6 +89,7 @@ public class MessageInterpolatorContextTest {
 		verify( mock );
 	}
 
+	@SuppressWarnings("unused")
 	public static class Test {
 		private String test;
 

@@ -24,16 +24,19 @@ import javax.validation.GroupDefinitionException;
 import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -43,20 +46,29 @@ import static org.testng.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 public class MultipleConstraintMappingsTest {
+	HibernateValidatorConfiguration config;
+
+	@BeforeMethod
+	public void setUp() {
+		config = getConfiguration( HibernateValidator.class );
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HV-500")
 	public void testMultipleConstraintMappings() {
-		ConstraintMapping marathonMapping = new ConstraintMapping();
+		ConstraintMapping marathonMapping = config.createConstraintMapping();
 		marathonMapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef() );
 
-		ConstraintMapping runnerMapping = new ConstraintMapping();
+		ConstraintMapping runnerMapping = config.createConstraintMapping();
 		runnerMapping.type( Runner.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef() );
 
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( marathonMapping, runnerMapping );
+		config.addMapping( marathonMapping );
+		config.addMapping( runnerMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Marathon.class );
 		assertTrue( beanDescriptor.isBeanConstrained(), "There should be constraints defined on the Marathon class" );
@@ -78,18 +90,20 @@ public class MultipleConstraintMappingsTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-500")
 	public void testMultipleConstraintMappingsWithSameConfig() {
-		ConstraintMapping marathonMapping1 = new ConstraintMapping();
+		ConstraintMapping marathonMapping1 = config.createConstraintMapping();
 		marathonMapping1.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef().message( "foo" ) );
 
-		ConstraintMapping marathonMapping2 = new ConstraintMapping();
+		ConstraintMapping marathonMapping2 = config.createConstraintMapping();
 		marathonMapping2.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef().message( "bar" ) );
 
+		config.addMapping( marathonMapping1 );
+		config.addMapping( marathonMapping2 );
 
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( marathonMapping1, marathonMapping2 );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Marathon.class );
 		assertTrue( beanDescriptor.isBeanConstrained(), "There should be constraints defined on the Marathon class" );
@@ -108,45 +122,51 @@ public class MultipleConstraintMappingsTest {
 	@Test(expectedExceptions = GroupDefinitionException.class,
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Multiple definitions of default group sequence.")
 	public void testMultipleConstraintMappingsWithGroupSequenceForSameClass() {
-		ConstraintMapping marathonMapping1 = new ConstraintMapping();
+		ConstraintMapping marathonMapping1 = config.createConstraintMapping();
 		marathonMapping1.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class );
 
-		ConstraintMapping marathonMapping2 = new ConstraintMapping();
+		ConstraintMapping marathonMapping2 = config.createConstraintMapping();
 		marathonMapping2.type( Marathon.class )
 				.defaultGroupSequence( Bar.class, Marathon.class );
 
-
-		ValidatorUtil.getValidatorForProgrammaticMapping( marathonMapping1, marathonMapping2 );
+		config.addMapping( marathonMapping1 );
+		config.addMapping( marathonMapping2 );
+		config.buildValidatorFactory().getValidator();
 	}
 
 	@TestForIssue(jiraKey = "HV-500")
 	@Test(expectedExceptions = GroupDefinitionException.class,
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Multiple definitions of default group sequence provider.")
 	public void testMultipleConstraintMappingsWithGroupSequenceProviderForSameClass() {
-		ConstraintMapping marathonMapping1 = new ConstraintMapping();
+		ConstraintMapping marathonMapping1 = config.createConstraintMapping();
 		marathonMapping1.type( Marathon.class )
 				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class );
 
-		ConstraintMapping marathonMapping2 = new ConstraintMapping();
+		ConstraintMapping marathonMapping2 = config.createConstraintMapping();
 		marathonMapping2.type( Marathon.class )
 				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class );
 
-		ValidatorUtil.getValidatorForProgrammaticMapping( marathonMapping1, marathonMapping2 );
+		config.addMapping( marathonMapping1 );
+		config.addMapping( marathonMapping2 );
+
+		config.buildValidatorFactory().getValidator();
 	}
 
 	@Test(expectedExceptions = GroupDefinitionException.class)
 	@TestForIssue(jiraKey = "HV-500")
 	public void testMultipleConstraintMappingsWithGroupSequenceProviderAndGroupSequence() {
-		ConstraintMapping marathonMapping1 = new ConstraintMapping();
+		ConstraintMapping marathonMapping1 = config.createConstraintMapping();
 		marathonMapping1.type( Marathon.class )
 				.defaultGroupSequence( Foo.class, Marathon.class );
 
-		ConstraintMapping marathonMapping2 = new ConstraintMapping();
+		ConstraintMapping marathonMapping2 = config.createConstraintMapping();
 		marathonMapping2.type( Marathon.class )
 				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class );
 
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( marathonMapping1, marathonMapping2 );
+		config.addMapping( marathonMapping1 );
+		config.addMapping( marathonMapping2 );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new Marathon() );
 	}
 

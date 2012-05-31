@@ -46,6 +46,7 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.ValidatorUtil;
@@ -66,12 +67,13 @@ import static org.testng.Assert.assertTrue;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ConstraintMappingTest {
-	ConstraintMapping mapping;
+	private HibernateValidatorConfiguration config;
+	private DefaultConstraintMapping mapping;
 
 	@BeforeMethod
 	public void setUp() {
-		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
-		mapping = config.createConstraintMapping();
+		config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		mapping = (DefaultConstraintMapping) config.createConstraintMapping();
 	}
 
 
@@ -92,7 +94,7 @@ public class ConstraintMappingTest {
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) );
 
-		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
+		ConstraintMappingContext context = mapping.getContext();
 
 		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
@@ -107,7 +109,7 @@ public class ConstraintMappingTest {
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1 ) );
 
-		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
+		ConstraintMappingContext context = mapping.getContext();
 
 		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
@@ -121,7 +123,7 @@ public class ConstraintMappingTest {
 				.constraint( new MinDef().value( 1 ) )
 				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1 ) );
 
-		ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
+		ConstraintMappingContext context = mapping.getContext();
 
 		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
 		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 2 );
@@ -142,7 +144,8 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
 				.constraint( new NotNullDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<Marathon>> violations = validator.validate( new Marathon() );
 		assertNumberOfViolations( violations, 1 );
@@ -156,7 +159,8 @@ public class ConstraintMappingTest {
 				.constraint(
 						new SizeDef().message( "too short" ).min( 3 )
 				);
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -173,7 +177,8 @@ public class ConstraintMappingTest {
 				)
 				.property( "name", METHOD )
 				.constraint( new SizeDef().message( "name too short" ).min( 3 ) );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "NY" );
@@ -191,7 +196,8 @@ public class ConstraintMappingTest {
 				.type( Tournament.class )
 				.property( "tournamentDate", METHOD )
 				.constraint( new FutureDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -212,7 +218,8 @@ public class ConstraintMappingTest {
 				.type( Runner.class )
 				.property( "paidEntryFee", FIELD )
 				.constraint( new AssertTrueDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "New York Marathon" );
@@ -244,7 +251,8 @@ public class ConstraintMappingTest {
 				.constraint( new NotNullDef().groups( Foo.class ) )
 				.property( "runners", METHOD )
 				.constraint( new NotEmptyDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 
@@ -266,7 +274,8 @@ public class ConstraintMappingTest {
 				.constraint( new NotNullDef().groups( Foo.class ) )
 				.property( "runners", METHOD )
 				.constraint( new NotEmptyDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 
@@ -292,7 +301,8 @@ public class ConstraintMappingTest {
 				.constraint( new NotNullDef().groups( Foo.class ) )
 				.property( "runners", METHOD )
 				.constraint( new NotEmptyDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new Marathon() );
 	}
 
@@ -305,7 +315,8 @@ public class ConstraintMappingTest {
 				.defaultGroupSequence( Foo.class, B.class )
 				.property( "b", FIELD )
 				.constraint( new NotNullDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new B() );
 	}
 
@@ -318,7 +329,8 @@ public class ConstraintMappingTest {
 				.defaultGroupSequenceProviderClass( ADefaultGroupSequenceProvider.class )
 				.property( "a", FIELD )
 				.constraint( new NotNullDef() );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new A() );
 	}
 
@@ -328,7 +340,8 @@ public class ConstraintMappingTest {
 				.property( "name", METHOD )
 				.constraint( new SizeDef().min( 5 ) )
 				.constraint( new SizeDef().min( 10 ) );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Foo" );
@@ -352,8 +365,6 @@ public class ConstraintMappingTest {
 	public void testCustomConstraintTypeMissingParameter() {
 		mapping.type( Marathon.class )
 				.constraint( new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ) );
-
-		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		config.addMapping( mapping );
 		config.buildValidatorFactory();
 	}
@@ -366,7 +377,8 @@ public class ConstraintMappingTest {
 								.param( "minRunner", 100 )
 								.message( "Needs more runners" )
 				);
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Marathon marathon = new Marathon();
 		marathon.setName( "Stockholm Marathon" );
@@ -389,8 +401,6 @@ public class ConstraintMappingTest {
 	public void testNullBean() {
 		mapping.type( null )
 				.constraint( new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ) );
-
-		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		config.addMapping( mapping ).buildValidatorFactory();
 	}
 
@@ -399,7 +409,8 @@ public class ConstraintMappingTest {
 		mapping.type( Runner.class )
 				.property( "age", METHOD )
 				.constraint( new RangeDef().min( 12 ).max( 99 ) );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<Runner>> violations = validator.validate( new Runner() );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "must be between 12 and 99" );
@@ -414,7 +425,8 @@ public class ConstraintMappingTest {
 				.constraint( new NotEmptyDef() )
 				.type( ExtendedMarathon.class )
 				.defaultGroupSequence( Foo.class, ExtendedMarathon.class );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		ExtendedMarathon extendedMarathon = new ExtendedMarathon();
 
@@ -433,8 +445,8 @@ public class ConstraintMappingTest {
 		mapping.type( User.class )
 				.property( "firstName", ElementType.FIELD )
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
-
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( new User( "", "" ), "firstName" );
 
 		assertCorrectConstraintViolationMessages(
@@ -448,8 +460,8 @@ public class ConstraintMappingTest {
 		mapping.type( User.class )
 				.property( "lastName", ElementType.METHOD )
 				.constraint( new SizeDef().min( 4 ).max( 10 ) );
-
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<User>> violations = validator.validateProperty( new User( "", "" ), "lastName" );
 
 		assertCorrectConstraintViolationMessages(

@@ -27,6 +27,7 @@ import org.hibernate.validator.test.internal.engine.methodlevel.service.Customer
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationSequence;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
@@ -51,7 +52,7 @@ public class MethodLevelValidationGroupSequenceTest {
 
 	private void setUpValidatorForGroups(Class<?>... groups) {
 		customerRepository = getValidatingProxy(
-				new CustomerRepositoryWithRedefinedDefaultGroupImpl(), groups
+				new CustomerRepositoryWithRedefinedDefaultGroupImpl(), ValidatorUtil.getValidator(), groups
 		);
 	}
 

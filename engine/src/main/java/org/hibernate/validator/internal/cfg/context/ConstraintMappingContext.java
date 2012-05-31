@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
@@ -37,7 +36,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-@SuppressWarnings("deprecation")
 public class ConstraintMappingContext {
 	private final Map<Class<?>, Set<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintConfig;
 	private final Map<Class<?>, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintConfig;
@@ -59,17 +57,6 @@ public class ConstraintMappingContext {
 		this.deprecatedDefaultGroupSequenceProviders = newHashMap();
 		this.defaultGroupSequenceProviders = newHashMap();
 		this.annotationProcessingOptions = new AnnotationProcessingOptions();
-	}
-
-	/**
-	 * Returns the constraint mapping context from the given constraint mapping.
-	 *
-	 * @param mapping the programmatic constraint mapping
-	 *
-	 * @return returns the constraint mapping context from the given constraint mapping
-	 */
-	public static ConstraintMappingContext getFromMapping(ConstraintMapping mapping) {
-		return new ConstraintMappingContextAccessor( mapping ).getContext();
 	}
 
 	/**
@@ -214,20 +201,6 @@ public class ConstraintMappingContext {
 			Set<ConfiguredConstraint<?, MethodConstraintLocation>> definitionList = newHashSet();
 			definitionList.add( constraint );
 			methodConstraintConfig.put( beanClass, definitionList );
-		}
-	}
-
-	/**
-	 * Provides access to the members of a {@link ConstraintMapping}.
-	 */
-	private static class ConstraintMappingContextAccessor extends ConstraintMapping {
-
-		private ConstraintMappingContextAccessor(ConstraintMapping original) {
-			super( original );
-		}
-
-		private ConstraintMappingContext getContext() {
-			return context;
 		}
 	}
 }

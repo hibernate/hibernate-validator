@@ -26,18 +26,20 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidatorForProgrammaticMapping;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
@@ -48,7 +50,7 @@ import static org.testng.Assert.fail;
  */
 @Test
 public class MethodConstraintMappingTest {
-
+	private HibernateValidatorConfiguration config;
 	private GreetingService wrappedObject;
 
 	@BeforeClass
@@ -56,15 +58,21 @@ public class MethodConstraintMappingTest {
 		wrappedObject = new GreetingServiceImpl();
 	}
 
+	@BeforeMethod
+	public void setUpTest() {
+		config = getConfiguration( HibernateValidator.class );
+	}
+
 	@Test
 	public void testCascadingMethodReturnDefinition() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.returnValue()
 				.valid();
+		config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
 		try {
 			service.greet( new User( "foo" ) );
@@ -78,13 +86,14 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testCascadingMethodParameterDefinition() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.parameter( 0 )
 				.valid();
+		config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
 		try {
 			service.greet( new User( null ) );
@@ -101,13 +110,13 @@ public class MethodConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Type .*GreetingService doesn't have a method greet().*"
 	)
 	public void testCascadingDefinitionOnMissingMethod() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet" )
 				.returnValue()
 				.valid();
 
-		getValidatorForProgrammaticMapping( mapping );
+		config.buildValidatorFactory().getValidator();
 	}
 
 	@Test(
@@ -115,13 +124,13 @@ public class MethodConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: A valid parameter index has to be specified for method 'greet'"
 	)
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.parameter( 1 )
 				.valid();
 
-		getValidatorForProgrammaticMapping( mapping );
+		config.buildValidatorFactory().getValidator();
 	}
 
 	@Test(
@@ -129,7 +138,7 @@ public class MethodConstraintMappingTest {
 			expectedExceptionsMessageRegExp = ".* there are parameter constraints defined at all of the following overridden methods: .*"
 	)
 	public void testCascadingMethodParameterRedefinedInHierarchy() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.parameter( 0 )
@@ -138,8 +147,9 @@ public class MethodConstraintMappingTest {
 				.method( "greet", User.class )
 				.parameter( 0 )
 				.valid();
+		config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
 		service.greet( new User( null ) );
 	}
@@ -149,27 +159,32 @@ public class MethodConstraintMappingTest {
 			expectedExceptionsMessageRegExp = ".* The following method itself has no parameter constraints but it is not defined on a sub-type of .*"
 	)
 	public void testCascadingMethodParameterDefinedOnlyOnSubType() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
 				.method( "greet", User.class )
 				.parameter( 0 )
 				.valid();
+		config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
 		service.greet( new User( null ) );
 	}
 
 	@Test
 	public void testParameterConstraint() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.parameter( 0 )
 				.constraint( new NotNullDef() );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( (User) null );
 
 			fail( "Expected exception wasn't thrown." );
@@ -183,14 +198,18 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testGenericParameterConstraint() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.parameter( 0 )
 				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( "" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -207,15 +226,19 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testMultipleParameterConstraintsAtSameParameter() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.parameter( 0 )
 				.constraint( new SizeDef().min( 1 ).max( 10 ) )
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( "" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -232,16 +255,20 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testMultipleParameterConstraintsAtDifferentParameters() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class, String.class )
 				.parameter( 0 )
 				.constraint( new SizeDef().min( 1 ).max( 10 ) )
 				.parameter( 1 )
 				.constraint( new SizeDef().min( 1 ).max( 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( "", "" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -258,14 +285,18 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testProgrammaticAndAnnotationParameterConstraintsAddUp() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "sayHello", String.class )
 				.parameter( 0 )
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.sayHello( "" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -282,14 +313,15 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testConstraintAtCascadedParameter() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
 				.parameter( 0 )
 				.constraint( new NotNullDef() )
 				.valid();
+		config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
 		try {
 			service.greet( (User) null );
@@ -317,14 +349,18 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testReturnValueConstraint() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
 				.constraint( new SizeDef().min( 1 ).max( 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( "Hello" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -339,15 +375,19 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testMultipleReturnValueConstraints() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
 				.constraint( new SizeDef().min( 1 ).max( 10 ) )
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( "Hello" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -364,14 +404,18 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testGenericReturnValueConstraint() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
 				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( "" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -388,14 +432,18 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void testProgrammaticAndAnnotationReturnValueConstraintsAddUp() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class, String.class )
 				.returnValue()
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.greet( "Hello", "World" );
 
 			fail( "Expected exception wasn't thrown." );
@@ -412,13 +460,17 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void constraintConfiguredOnPropertyIsEvaluatedByMethodValidation() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.property( "hello", ElementType.METHOD )
 				.constraint( new NotNullDef() );
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.getHello();
 
 			fail( "Expected exception wasn't thrown." );
@@ -435,13 +487,17 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void cascadeConfiguredOnPropertyIsEvaluatedByMethodValidation() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.property( "user", ElementType.METHOD )
 				.valid();
+		config.addMapping( mapping );
 
 		try {
-			GreetingService service = getValidatingProxy( wrappedObject, mapping );
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
 			service.getUser();
 
 			fail( "Expected exception wasn't thrown." );
@@ -458,37 +514,40 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void constraintConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
 				.property( "hello", ElementType.FIELD )
 				.constraint( new NotNullDef() );
+		config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 		assertNull( service.getHello() );
 	}
 
 	@Test
 	public void cascadeConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
 				.property( "user", ElementType.FIELD )
 				.valid();
+		config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, mapping );
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 		assertNull( service.getUser().getName() );
 	}
 
 	@Test
 	public void constraintConfiguredOnMethodIsEvaluatedByPropertyValidation() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "getHello" )
 				.returnValue()
 				.constraint( new NotNullDef() );
+		config.addMapping( mapping );
 
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<GreetingServiceImpl>> violations = validator.validateProperty(
 				new GreetingServiceImpl(), "hello"
 		);
@@ -500,13 +559,14 @@ public class MethodConstraintMappingTest {
 	@Test
 	public void cascadeConfiguredOnMethodIsEvaluatedByPropertyValidation() {
 
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "getUser" )
 				.returnValue()
 				.valid();
+		config.addMapping( mapping );
 
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		Set<ConstraintViolation<GreetingServiceImpl>> violations = validator.validate( new GreetingServiceImpl() );
 
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );

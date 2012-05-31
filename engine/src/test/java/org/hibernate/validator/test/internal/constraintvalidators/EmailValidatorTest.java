@@ -36,7 +36,6 @@ import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidatorForProgrammaticMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -139,7 +138,8 @@ public class EmailValidatorTest {
 						new EmailDef().regexp( noOrgEmailAddressRegexp )
 								.message( "ORG addresses are not valid" )
 				);
-		validator = getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		validator = config.buildValidatorFactory().getValidator();
 
 		container = new EmailContainerNoAnnotations();
 		container.setEmail( email );

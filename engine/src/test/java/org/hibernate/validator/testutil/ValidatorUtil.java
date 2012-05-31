@@ -30,7 +30,6 @@ import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.ConstraintMapping;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
@@ -60,24 +59,6 @@ public final class ValidatorUtil {
 		configuration.traversableResolver( new DummyTraversableResolver() );
 
 		return configuration.buildValidatorFactory().getValidator();
-	}
-
-	/**
-	 * Returns a configured instance of {@code Validator} initialized with the given constraint mappings. This validator
-	 * is configured to use a {@link DummyTraversableResolver}. This method also sets the default locale to english.
-	 *
-	 * @param mappings The constraint mappings.
-	 *
-	 * @return an instance of {@code Validator}.
-	 */
-	public static Validator getValidatorForProgrammaticMapping(ConstraintMapping... mappings) {
-		assertNotNull( mappings );
-		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
-		config.traversableResolver( new DummyTraversableResolver() );
-		for ( ConstraintMapping mapping : mappings ) {
-			config.addMapping( mapping );
-		}
-		return config.buildValidatorFactory().getValidator();
 	}
 
 	/**
@@ -184,18 +165,6 @@ public final class ValidatorUtil {
 				"No method with the given signature is declared in " + clazz + " or its super class"
 		);
 		return methodDescriptor.getParameterDescriptors().get( parameterIndex );
-	}
-
-	public static <T, I extends T> T getValidatingProxy(I implementor) {
-		return getValidatingProxy( implementor, getValidatorForProgrammaticMapping() );
-	}
-
-	public static <T, I extends T> T getValidatingProxy(I implementor, Class<?>... validationGroups) {
-		return getValidatingProxy( implementor, getValidatorForProgrammaticMapping(), validationGroups );
-	}
-
-	public static <T, I extends T> T getValidatingProxy(I implementor, ConstraintMapping... mappings) {
-		return getValidatingProxy( implementor, getValidatorForProgrammaticMapping( mappings ) );
 	}
 
 	/**

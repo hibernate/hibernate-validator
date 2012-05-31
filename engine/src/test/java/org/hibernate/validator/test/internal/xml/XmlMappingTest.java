@@ -127,16 +127,15 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-480")
 	public void testConstraintsFromXmlAndProgrammaticApiAddUp() {
+		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
 		//given
-		final ConstraintMapping programmaticMapping = new ConstraintMapping();
+		final ConstraintMapping programmaticMapping = configuration.createConstraintMapping();
 		programmaticMapping.type( Customer.class )
 				.property( "firstName", ElementType.FIELD )
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 
 		final InputStream xmlMapping = XmlMappingTest.class.getResourceAsStream( "hv-480-mapping.xml" );
-
-		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
 		configuration.addMapping( programmaticMapping );
 		configuration.addMapping( xmlMapping );

@@ -24,10 +24,11 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.DecimalMinDef;
@@ -35,11 +36,11 @@ import org.hibernate.validator.cfg.defs.FutureDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.NullDef;
 import org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpolator;
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 
 /**
  * Test for {@link org.hibernate.validator.messageinterpolation.ValueFormatterMessageInterpolator}.
@@ -47,14 +48,24 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  * @author Hardy Ferentschik
  */
 public class ValueFormatterMessageInterpolatorTest {
+	private HibernateValidatorConfiguration config;
+
+	@BeforeMethod
+	public void setUp() {
+		config = getConfiguration( HibernateValidator.class );
+		config.messageInterpolator( new ValueFormatterMessageInterpolator() );
+	}
+
+
 	@Test
 	public void testSimpleValidatedValueInterpolation() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
 				.constraint( new FutureDef().message( "${validatedValue}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Date past = new Date( System.currentTimeMillis() - 60000 ); // current date minus one minute
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
@@ -65,12 +76,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testMultipleValidatedValuesInMessageTemplate() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
 				.constraint( new FutureDef().message( "${validatedValue} ${validatedValue}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Date past = new Date( System.currentTimeMillis() - 60000 ); // current date minus one minute
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
@@ -81,12 +93,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testEscapedCurlyBraces() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
 				.constraint( new FutureDef().message( "\\{${validatedValue}\\}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Date past = new Date( System.currentTimeMillis() - 60000 ); // current date minus one minute
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
@@ -97,12 +110,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testFormattedDate() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
 				.constraint( new FutureDef().message( "${validatedValue:%1$ty}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Date past = new Date( System.currentTimeMillis() - 60000 ); // current date minus one minute
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( past ) );
@@ -113,12 +127,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testNullValueValidation() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "date", FIELD )
 				.constraint( new NotNullDef().message( "${validatedValue}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( (Date) null ) );
 
@@ -128,12 +143,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testFormattedDouble() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
 				.constraint( new DecimalMinDef().value( "1.0" ).message( "${validatedValue: '%1$5f' }" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
 
@@ -143,12 +159,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testCurlyBraceInFormat() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
 				.constraint( new DecimalMinDef().value( "1.0" ).message( "${validatedValue: {%1$5f} }" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
 
@@ -158,12 +175,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testColonInFormat() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
 				.constraint( new DecimalMinDef().value( "1.0" ).message( "${validatedValue::%1$5f:}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
 
@@ -173,14 +191,15 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testValidatedValueAndAdditionalUnknownParameter() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
 				.constraint(
 						new DecimalMinDef().value( "1.0" ).message( "${validatedValue: '%1$5f' } ${foo}" )
 				);
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
 
@@ -190,12 +209,13 @@ public class ValueFormatterMessageInterpolatorTest {
 
 	@Test
 	public void testNoClosingBrace() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
 				.constraint( new DecimalMinDef().value( "1.0" ).message( "${validatedValue{" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( 0.1 ) );
 
@@ -208,23 +228,25 @@ public class ValueFormatterMessageInterpolatorTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Missing format string in template:.*"
 	)
 	public void testMissingFormatString() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
 				.constraint( new DecimalMinDef().value( "1.0" ).message( "${validatedValue:}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new TestClass( 0.1 ) );
 	}
 
 	@Test
 	public void testFormattable() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "greeter", FIELD )
 				.constraint( new NullDef().message( "${validatedValue: '%1$s' }" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		Set<ConstraintViolation<TestClass>> violations = validator.validate( new TestClass( new Greeter() ) );
 
@@ -237,25 +259,15 @@ public class ValueFormatterMessageInterpolatorTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: Invalid format:.*"
 	)
 	public void testIllegalFormat() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( TestClass.class )
 				.property( "doubleValue", FIELD )
 						// z is an unknown format
 				.constraint( new DecimalMinDef().value( "1.0" ).message( "${validatedValue:%1$z}" ) );
 
-		Validator validator = getValidatorUsingConstraintMapping( mapping );
-		validator.validate( new TestClass( 0.1 ) );
-	}
-
-	private Validator getValidatorUsingConstraintMapping(ConstraintMapping mapping) {
-		HibernateValidatorConfiguration config = (HibernateValidatorConfiguration) ValidatorUtil.getConfiguration();
-		config.messageInterpolator( new ValueFormatterMessageInterpolator() );
-
-		// use programmatic mapping
 		config.addMapping( mapping );
-
-		ValidatorFactory factory = config.buildValidatorFactory();
-		return factory.getValidator();
+		Validator validator = config.buildValidatorFactory().getValidator();
+		validator.validate( new TestClass( 0.1 ) );
 	}
 
 	@SuppressWarnings("unused")

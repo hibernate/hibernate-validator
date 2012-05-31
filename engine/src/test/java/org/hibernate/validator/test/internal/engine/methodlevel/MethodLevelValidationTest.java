@@ -34,6 +34,7 @@ import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.RepositoryBase;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static javax.validation.metadata.ElementDescriptor.Kind.PARAMETER;
 import static javax.validation.metadata.ElementDescriptor.Kind.RETURN_VALUE;
@@ -62,7 +63,7 @@ public class MethodLevelValidationTest {
 
 	private void setUpValidator(Class<?>... groups) {
 		repositoryBase = customerRepository = getValidatingProxy(
-				new CustomerRepositoryImpl(), groups
+				new CustomerRepositoryImpl(), ValidatorUtil.getValidator(), groups
 		);
 	}
 

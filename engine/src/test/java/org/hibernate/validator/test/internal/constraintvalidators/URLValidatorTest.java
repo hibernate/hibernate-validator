@@ -23,19 +23,20 @@ import javax.validation.constraints.Pattern.Flag;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
 import org.hibernate.validator.internal.constraintvalidators.URLValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidatorForProgrammaticMapping;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -144,19 +145,21 @@ public class URLValidatorTest {
 	}
 
 	@Test
-		 @TestForIssue(jiraKey = "HV-406")
-		 public void testRegExp() {
+	@TestForIssue(jiraKey = "HV-406")
+	public void testRegExp() {
 		// first run the test with @URL configured via annotations
 		Validator validator = ValidatorUtil.getValidator();
 		URLContainer container = new URLContainerAnnotated();
 		runUrlContainerValidation( validator, container, true );
 
 		// now the same test with programmatic configuration
-		ConstraintMapping mapping = new ConstraintMapping();
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( URLContainerNoAnnotations.class )
 				.property( "url", METHOD )
 				.constraint( new URLDef().regexp( "^http://\\S+[\\.htm|\\.html]{1}$" ) );
-		validator = getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		validator = config.buildValidatorFactory().getValidator();
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, true );
@@ -172,13 +175,15 @@ public class URLValidatorTest {
 		runUrlContainerValidation( validator, container, false );
 
 		// now the same test with programmatic configuration
-		ConstraintMapping mapping = new ConstraintMapping();
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( URLContainerNoAnnotations.class )
 				.property( "url", METHOD )
 				.constraint(
 						new URLDef().regexp( "^http://\\S+[\\.htm|\\.html]{1}$" ).flags( Flag.CASE_INSENSITIVE )
 				);
-		validator = getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		validator = config.buildValidatorFactory().getValidator();
 
 		container = new URLContainerNoAnnotations();
 		runUrlContainerValidation( validator, container, false );

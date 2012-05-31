@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.internal.engine.groups.DefaultGroupSequenceProviderAdapter;
@@ -129,11 +130,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 		//retrieve provider from new annotation
 		if ( providerClass != null ) {
-			DefaultGroupSequenceProvider<? super T> provider = ReflectionHelper.newInstance(
-					providerClass,
-					"default group sequence provider"
-			);
-			return provider;
+			return ReflectionHelper.newInstance( providerClass, "default group sequence provider" );
 		}
 
 		Class<? extends org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T>> deprecatedProviderClass = context
@@ -299,7 +296,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 			public Integer getPartition(
 					ConfiguredConstraint<?, MethodConstraintLocation> v) {
-
 				return v.getLocation().getParameterIndex();
 			}
 		};
@@ -315,12 +311,12 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private ConstraintMappingContext createMergedMappingContext(Set<ConstraintMapping> programmaticMappings) {
 		// if we only have one mapping we can return the context of just this mapping
 		if ( programmaticMappings.size() == 1 ) {
-			return ConstraintMappingContext.getFromMapping( programmaticMappings.iterator().next() );
+			return ( (DefaultConstraintMapping) programmaticMappings.iterator().next() ).getContext();
 		}
 
 		ConstraintMappingContext mergedContext = new ConstraintMappingContext();
 		for ( ConstraintMapping mapping : programmaticMappings ) {
-			ConstraintMappingContext context = ConstraintMappingContext.getFromMapping( mapping );
+			ConstraintMappingContext context = ( (DefaultConstraintMapping) mapping ).getContext();
 
 			mergedContext.getAnnotationProcessingOptions().merge( context.getAnnotationProcessingOptions() );
 

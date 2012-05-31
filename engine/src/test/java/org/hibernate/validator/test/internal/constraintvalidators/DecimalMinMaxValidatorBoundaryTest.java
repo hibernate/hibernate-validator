@@ -21,31 +21,41 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.DecimalMin;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.DecimalMaxDef;
 import org.hibernate.validator.cfg.defs.DecimalMinDef;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 
 /**
  * @author Hardy Ferentschik
  */
 public class DecimalMinMaxValidatorBoundaryTest {
 	private Double d;
+	private HibernateValidatorConfiguration config;
+
+	@BeforeMethod
+	public void setUp() {
+		config = getConfiguration( HibernateValidator.class );
+	}
 
 	@Test
 	public void testDecimalMinValue() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
 				.property( "d", FIELD )
 				.constraint( new DecimalMinDef().value( "0.100000000000000005" ) );
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		this.d = 0.1;
 
@@ -56,12 +66,12 @@ public class DecimalMinMaxValidatorBoundaryTest {
 
 	@Test
 	public void testDecimalMaxValue() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
 				.property( "d", FIELD )
 				.constraint( new DecimalMaxDef().value( "0.1" ) );
-
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		this.d = 0.1;
 
@@ -73,12 +83,13 @@ public class DecimalMinMaxValidatorBoundaryTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-508")
 	public void testDoubleTrouble() {
-		ConstraintMapping mapping = new ConstraintMapping();
+		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( DecimalMinMaxValidatorBoundaryTest.class )
 				.property( "d", FIELD )
 				.constraint( new DecimalMaxDef().value( "1.2" ) );
+		config.addMapping( mapping );
 
-		Validator validator = ValidatorUtil.getValidatorForProgrammaticMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
 
 		this.d = 1.0;
 		Set<ConstraintViolation<DecimalMinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
