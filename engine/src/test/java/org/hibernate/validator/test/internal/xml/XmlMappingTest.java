@@ -163,46 +163,81 @@ public class XmlMappingTest {
 	@Test
 	public void testParameterNameProviderConfiguration() {
 
+		runWithCustomValidationXml(
+				"parameter-name-provider-validation.xml", new Runnable() {
+
+			@Override
+			public void run() {
+				//given
+				Validator validator = ValidatorUtil.getValidator();
+				ConfigurationSource configurationSource = ValidatorUtil.getConfiguration().getConfigurationSource();
+
+				//when
+				MethodDescriptor methodDescriptor = validator.getConstraintsForClass( Customer.class )
+						.getConstraintsForMethod( "setFirstName", String.class );
+
+				//then
+				assertEquals(
+						configurationSource.getParameterNameProviderClassName(),
+						CustomParameterNameProvider.class.getName()
+				);
+
+				assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
+			}
+		}
+		);
+	}
+
+	@Test
+	public void testLoadingOfBv10ValidationXml() {
+
+		runWithCustomValidationXml(
+				"hv-1.0-validation.xml", new Runnable() {
+
+			@Override
+			public void run() {
+				//given
+				ConfigurationSource configurationSource = ValidatorUtil.getConfiguration().getConfigurationSource();
+
+				//when
+				//then
+				assertEquals(
+						configurationSource.getProperties().get( "com.acme.validation.safetyChecking" ),
+						"failOnError"
+				);
+			}
+		}
+		);
+	}
+
+	/**
+	 * Executes the given runnable, using the specified file as replacement for
+	 * {@code META-INF/validation.xml}.
+	 *
+	 * @param validationXmlName The file to be used as validation.xml file.
+	 * @param runnable The runnable to execute.
+	 */
+	private void runWithCustomValidationXml(final String validationXmlName, Runnable runnable) {
+
 		ClassLoader previousContextCl = Thread.currentThread().getContextClassLoader();
 
 		try {
-
-			//given
 			Thread.currentThread().setContextClassLoader(
 					new ClassLoader( previousContextCl ) {
-
 						@Override
 						public InputStream getResourceAsStream(String name) {
-							if ( "META-INF/validation.xml".equals( name ) ) {
-								return XmlMappingTest.class.getResourceAsStream(
-										"parameter-name-provider-validation.xml"
-								);
+							if ( name.equals( "META-INF/validation.xml" ) ) {
+								return XmlMappingTest.class.getResourceAsStream( validationXmlName );
 							}
+
 							return super.getResourceAsStream( name );
 						}
-
 					}
 			);
-
-			//when
-			Validator validator = ValidatorUtil.getValidator();
-			MethodDescriptor methodDescriptor = validator.getConstraintsForClass( Customer.class )
-					.getConstraintsForMethod( "setFirstName", String.class );
-			ConfigurationSource configurationSource = ValidatorUtil.getConfiguration().getConfigurationSource();
-
-			//then
-			assertEquals(
-					configurationSource.getParameterNameProviderClassName(),
-					CustomParameterNameProvider.class.getName()
-			);
-
-			assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
-
+			runnable.run();
 		}
 		finally {
 			Thread.currentThread().setContextClassLoader( previousContextCl );
 		}
-
 	}
-
 }

@@ -18,7 +18,7 @@
 <validation-config
     xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.1.xsd">
+    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd">
 
-    <parameter-name-provider>org.hibernate.validator.test.internal.xml.CustomParameterNameProvider</parameter-name-provider>
+    <property name="com.acme.validation.safetyChecking">failOnError</property>
 </validation-config>
