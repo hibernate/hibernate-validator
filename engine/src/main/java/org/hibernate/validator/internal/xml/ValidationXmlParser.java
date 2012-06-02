@@ -47,7 +47,7 @@ public class ValidationXmlParser {
 
 	private static final Log log = LoggerFactory.make();
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
-	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.0.xsd";
+	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.1.xsd";
 
 	/**
 	 * Tries to check whether a <i>validation.xml</i> file exists and parses it.
@@ -74,8 +74,7 @@ public class ValidationXmlParser {
 					config.getConstraintValidatorFactory(),
 					config.getMessageInterpolator(),
 					config.getTraversableResolver(),
-					// TODO - HV-571 need to get an updated validation.xml dtd and handle different xml
-					null,
+					config.getParameterNameProvider(),
 					new HashSet<String>( config.getConstraintMapping() ),
 					properties
 			);

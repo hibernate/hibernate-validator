@@ -22,10 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.validation.Configuration;
+import javax.validation.ConfigurationSource;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
+import javax.validation.metadata.MethodDescriptor;
 
 import org.testng.annotations.Test;
 
@@ -157,4 +159,50 @@ public class XmlMappingTest {
 				"size must be between 2 and 10"
 		);
 	}
+
+	@Test
+	public void testParameterNameProviderConfiguration() {
+
+		ClassLoader previousContextCl = Thread.currentThread().getContextClassLoader();
+
+		try {
+
+			//given
+			Thread.currentThread().setContextClassLoader(
+					new ClassLoader( previousContextCl ) {
+
+						@Override
+						public InputStream getResourceAsStream(String name) {
+							if ( "META-INF/validation.xml".equals( name ) ) {
+								return XmlMappingTest.class.getResourceAsStream(
+										"parameter-name-provider-validation.xml"
+								);
+							}
+							return super.getResourceAsStream( name );
+						}
+
+					}
+			);
+
+			//when
+			Validator validator = ValidatorUtil.getValidator();
+			MethodDescriptor methodDescriptor = validator.getConstraintsForClass( Customer.class )
+					.getConstraintsForMethod( "setFirstName", String.class );
+			ConfigurationSource configurationSource = ValidatorUtil.getConfiguration().getConfigurationSource();
+
+			//then
+			assertEquals(
+					configurationSource.getParameterNameProviderClassName(),
+					CustomParameterNameProvider.class.getName()
+			);
+
+			assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
+
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader( previousContextCl );
+		}
+
+	}
+
 }

@@ -58,6 +58,7 @@ public class ValidationBootstrapParameters {
 		setMessageInterpolator( configurationSource.getMessageInterpolatorClassName() );
 		setTraversableResolver( configurationSource.getTraversableResolverClassName() );
 		setConstraintFactory( configurationSource.getConstraintValidatorFactoryClassName() );
+		setParameterNameProvider( configurationSource.getParameterNameProviderClassName() );
 		setMappingStreams( configurationSource.getConstraintMappingResourcePath() );
 		setConfigProperties( configurationSource.getProperties() );
 	}
@@ -202,6 +203,22 @@ public class ValidationBootstrapParameters {
 			}
 			catch ( ValidationException e ) {
 				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryFqcn, e );
+			}
+		}
+	}
+
+	private void setParameterNameProvider(String parameterNameProviderFqcn) {
+		if ( parameterNameProviderFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<ParameterNameProvider> clazz = (Class<ParameterNameProvider>) ReflectionHelper.loadClass(
+						parameterNameProviderFqcn, this.getClass()
+				);
+				parameterNameProvider = ReflectionHelper.newInstance( clazz, "parameter name provider class" );
+				log.usingParameterNameProvider( parameterNameProviderFqcn );
+			}
+			catch ( ValidationException e ) {
+				throw log.getUnableToInstantiateParameterNameProviderClassException( parameterNameProviderFqcn, e );
 			}
 		}
 	}

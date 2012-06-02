@@ -425,4 +425,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 118, value = "Unable to cast %s to %s")
 	ClassCastException unableToNarrowDescriptorType(String actualDescriptorType, String expectedDescriptorType);
+
+	//TODO HV-571: Does this really need an id? I think this should better go into the Messages bundle.
+	@LogMessage(level = INFO)
+	@Message(id = 119, value = "Using %s as parameter name provider.")
+	void usingParameterNameProvider(String parameterNameProviderClassName);
+
+	@Message(id = 120, value = "Unable to instantiate parameter name provider class %s.")
+	ValidationException getUnableToInstantiateParameterNameProviderClassException(String parameterNameProviderClassName, @Cause ValidationException e);
+
 }
