@@ -154,16 +154,10 @@ public class ValidationBootstrapParameters {
 				Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
 						messageInterpolatorFqcn, this.getClass()
 				);
-				messageInterpolator = messageInterpolatorClass.newInstance();
+				messageInterpolator = ReflectionHelper.newInstance( messageInterpolatorClass, "message interpolator" );
 				log.usingMessageInterpolator( messageInterpolatorFqcn );
 			}
 			catch ( ValidationException e ) {
-				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
-			}
-			catch ( InstantiationException e ) {
-				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
-			}
-			catch ( IllegalAccessException e ) {
 				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
 			}
 		}
@@ -176,16 +170,10 @@ public class ValidationBootstrapParameters {
 				Class<TraversableResolver> clazz = (Class<TraversableResolver>) ReflectionHelper.loadClass(
 						traversableResolverFqcn, this.getClass()
 				);
-				traversableResolver = clazz.newInstance();
+				traversableResolver = ReflectionHelper.newInstance( clazz, "traversable resolver" );
 				log.usingTraversableResolver( traversableResolverFqcn );
 			}
 			catch ( ValidationException e ) {
-				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
-			}
-			catch ( InstantiationException e ) {
-				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
-			}
-			catch ( IllegalAccessException e ) {
 				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
 			}
 		}
