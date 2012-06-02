@@ -69,6 +69,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		return new ParameterDescriptorImpl(
 				getType(),
 				index,
+				getName(),
 				asDescriptors( getConstraints() ),
 				isCascading(),
 				defaultGroupSequenceRedefined,

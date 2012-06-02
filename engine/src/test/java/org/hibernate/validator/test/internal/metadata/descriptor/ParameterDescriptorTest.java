@@ -144,6 +144,12 @@ public class ParameterDescriptorTest {
 	}
 
 	@Test
+	public void testGetName() {
+		assertEquals( createCustomerParameter1.getName(), "arg0" );
+		assertEquals( createCustomerParameter2.getName(), "arg1" );
+	}
+
+	@Test
 	public void testIsCascaded() {
 		assertFalse( createCustomerParameter1.isCascaded() );
 
