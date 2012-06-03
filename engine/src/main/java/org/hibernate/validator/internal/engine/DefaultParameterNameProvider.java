@@ -30,8 +30,6 @@ import javax.validation.ParameterNameProvider;
  */
 public class DefaultParameterNameProvider implements ParameterNameProvider {
 
-	private final static String PREFIX = "arg";
-
 	@Override
 	public String[] getParameterNames(Constructor<?> constructor) {
 		return getParameterNames( constructor.getParameterTypes().length );
@@ -46,9 +44,19 @@ public class DefaultParameterNameProvider implements ParameterNameProvider {
 		String[] parameterNames = new String[parameterCount];
 
 		for ( int i = 0; i < parameterCount; i++ ) {
-			parameterNames[i] = PREFIX + i;
+			parameterNames[i] = getPrefix() + i;
 		}
 
 		return parameterNames;
+	}
+
+	/**
+	 * Returns the prefix to be used for parameter names. Defaults to {@code arg} as per
+	 * the spec. Can be overridden to create customized name providers.
+	 *
+	 * @return The prefix to be used for parameter names.
+	 */
+	protected String getPrefix() {
+		return "arg";
 	}
 }

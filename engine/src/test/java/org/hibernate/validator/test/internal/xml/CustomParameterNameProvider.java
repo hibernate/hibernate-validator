@@ -16,29 +16,16 @@
 */
 package org.hibernate.validator.test.internal.xml;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import javax.validation.ParameterNameProvider;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 
 /**
  * @author Gunnar Morling
  */
-public class CustomParameterNameProvider implements ParameterNameProvider {
+public class CustomParameterNameProvider extends DefaultParameterNameProvider {
 
 	@Override
-	public String[] getParameterNames(Constructor<?> constructor) {
-		throw new UnsupportedOperationException( "Not implemented" );
+	protected String getPrefix() {
+		return "param";
 	}
 
-	@Override
-	public String[] getParameterNames(Method method) {
-
-		int parameterCount = method.getParameterTypes().length;
-
-		String[] parameterNames = new String[parameterCount];
-		for ( int i = 0; i < parameterCount; i++ ) {
-			parameterNames[i] = "param" + i;
-		}
-		return parameterNames;
-	}
 }
