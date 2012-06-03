@@ -59,6 +59,9 @@ public class CustomerRepository {
 	public void qux() {
 	}
 
+	public void qax(@Max(1) Integer i) {
+	}
+
 	public void zap(@Max(1) int i) {
 	}
 }

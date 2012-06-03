@@ -173,8 +173,8 @@ public class XmlMappingTest {
 				ConfigurationSource configurationSource = ValidatorUtil.getConfiguration().getConfigurationSource();
 
 				//when
-				MethodDescriptor methodDescriptor = validator.getConstraintsForClass( Customer.class )
-						.getConstraintsForMethod( "setFirstName", String.class );
+				MethodDescriptor methodDescriptor = validator.getConstraintsForClass( CustomerService.class )
+						.getConstraintsForMethod( "createCustomer", Customer.class );
 
 				//then
 				assertEquals(

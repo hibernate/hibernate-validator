@@ -29,16 +29,15 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
-import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.testutil.ValidatorUtil.getBeanDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
@@ -158,12 +157,12 @@ public class BeanDescriptorTest {
 	}
 
 	// A method descriptor can be retrieved by specifying a method from a base
-	// type (qux() is not defined on CustomerRepositoryExt, but only on
+	// type (qax() is not defined on CustomerRepositoryExt, but only on
 	// CustomerRepository).
 	@Test
 	public void testGetConstraintsForMethodFromBaseType() throws Exception {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
-		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "qux" );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "qax", Integer.class );
 
 		assertNotNull( methodDescriptor );
 	}
@@ -185,10 +184,8 @@ public class BeanDescriptorTest {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
-		assertEquals( constrainedMethods.size(), 6 );
-		assertEquals(
-				getMethodNames( constrainedMethods ),
-				asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz", "zap" )
+		assertThat( getMethodNames( constrainedMethods ) ).containsOnly(
+				"createCustomer", "saveCustomer", "foo", "bar", "baz", "zap", "qax"
 		);
 	}
 
@@ -197,10 +194,8 @@ public class BeanDescriptorTest {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
-		assertEquals( constrainedMethods.size(), 7 );
-		assertEquals(
-				getMethodNames( constrainedMethods ),
-				asSet( "createCustomer", "saveCustomer", "foo", "bar", "baz", "zip", "zap" )
+		assertThat( getMethodNames( constrainedMethods ) ).containsOnly(
+				"createCustomer", "saveCustomer", "foo", "bar", "baz", "zip", "zap", "qax"
 		);
 	}
 

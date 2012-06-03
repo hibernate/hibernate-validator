@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.groups.Default;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -64,7 +62,6 @@ import static org.hibernate.validator.internal.util.ReflectionHelper.computeAllI
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-@SuppressWarnings("deprecation")
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static final Log log = LoggerFactory.make();
@@ -182,7 +179,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
 				getConstrainedPropertiesAsDescriptors(),
-				getMethodsAsDescriptors(),
+				getConstrainedMethodsAsDescriptors(),
 				defaultGroupSequenceIsRedefined(),
 				getDefaultGroupSequence( null )
 		);
@@ -272,16 +269,33 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
-	private Map<String, MethodDescriptor> getMethodsAsDescriptors() {
-		Map<String, MethodDescriptor> methodDescriptors = newHashMap();
+	private Map<String, MethodDescriptor> getConstrainedMethodsAsDescriptors() {
+		Map<String, MethodDescriptor> constrainedMethodDescriptors = newHashMap();
 
-		for ( Entry<String, MethodMetaData> entry : methodMetaData.entrySet() ) {
-			MethodDescriptor descriptor = entry.getValue()
-					.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) );
-			methodDescriptors.put( entry.getKey(), descriptor );
+		for ( Entry<String, MethodMetaData> oneMethod : methodMetaData.entrySet() ) {
+			if ( oneMethod.getValue().isConstrained() ) {
+
+				constrainedMethodDescriptors.put(
+						oneMethod.getKey(),
+						oneMethod.getValue()
+								.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
+				);
+
+			}
+
+			for ( ParameterMetaData oneParameter : oneMethod.getValue().getAllParameterMetaData() ) {
+				if ( oneParameter.isConstrained() ) {
+					constrainedMethodDescriptors.put(
+							oneMethod.getKey(),
+							oneMethod.getValue()
+									.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
+					);
+
+				}
+			}
 		}
 
-		return methodDescriptors;
+		return constrainedMethodDescriptors;
 	}
 
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {

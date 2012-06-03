@@ -18,7 +18,6 @@ package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -27,12 +26,10 @@ import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.util.Contracts;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -45,8 +42,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  */
 public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
 	private final Map<String, PropertyDescriptor> constrainedProperties;
-	private final Map<String, MethodDescriptor> methods;
-	private final Set<MethodDescriptor> constrainedMethods;
+	private final Map<String, MethodDescriptor> constrainedMethods;
 
 	public BeanDescriptorImpl(Type beanClass,
 							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
@@ -57,8 +53,7 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.constrainedProperties = Collections.unmodifiableMap( properties );
-		this.methods = Collections.unmodifiableMap( methods );
-		this.constrainedMethods = Collections.unmodifiableSet( getConstrainedMethods( methods.values() ) );
+		this.constrainedMethods = Collections.unmodifiableMap( methods );
 	}
 
 	@Override
@@ -91,40 +86,18 @@ public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements Bean
 
 	@Override
 	public Set<MethodDescriptor> getConstrainedMethods() {
-		return constrainedMethods;
+		return new HashSet<MethodDescriptor>( constrainedMethods.values() );
 	}
 
 	@Override
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( methodName, MESSAGES.methodNameMustNotBeNull() );
-		return methods.get( methodName + Arrays.toString( parameterTypes ) );
+		return constrainedMethods.get( methodName + Arrays.toString( parameterTypes ) );
 	}
 
 	@Override
 	public Kind getKind() {
 		return Kind.BEAN;
-	}
-
-	private Set<MethodDescriptor> getConstrainedMethods(Collection<MethodDescriptor> methods) {
-		Set<MethodDescriptor> constrainedMethodDescriptors = newHashSet();
-
-		for ( MethodDescriptor oneMethod : methods ) {
-			if ( oneMethod.hasConstraints() ) {
-				constrainedMethodDescriptors.add( oneMethod );
-			}
-
-			if ( oneMethod.getReturnValueDescriptor().isCascaded() ) {
-				constrainedMethodDescriptors.add( oneMethod );
-			}
-
-			for ( ParameterDescriptor oneParameter : oneMethod.getParameterDescriptors() ) {
-				if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
-					constrainedMethodDescriptors.add( oneMethod );
-				}
-			}
-		}
-
-		return constrainedMethodDescriptors;
 	}
 
 	@Override
