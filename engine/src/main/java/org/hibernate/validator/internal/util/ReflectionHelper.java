@@ -29,6 +29,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -98,85 +99,31 @@ public final class ReflectionHelper {
 	}
 
 	public static ClassLoader getClassLoaderFromContext() {
-		ClassLoader loader;
-		GetClassLoader action = GetClassLoader.fromContext();
-		if ( System.getSecurityManager() != null ) {
-			loader = AccessController.doPrivileged( action );
-		}
-		else {
-			loader = action.run();
-		}
-		return loader;
+		return run( GetClassLoader.fromContext() );
 	}
 
 	public static ClassLoader getClassLoaderFromClass(Class<?> clazz) {
-		ClassLoader loader;
-		GetClassLoader action = GetClassLoader.fromClass( clazz );
-		if ( System.getSecurityManager() != null ) {
-			loader = AccessController.doPrivileged( action );
-		}
-		else {
-			loader = action.run();
-		}
-		return loader;
+		return run( GetClassLoader.fromClass( clazz ) );
 	}
 
 	public static Class<?> loadClass(String className, Class<?> caller) {
-		LoadClass action = LoadClass.action( className, caller );
-		if ( System.getSecurityManager() != null ) {
-			return AccessController.doPrivileged( action );
-		}
-		else {
-			return action.run();
-		}
+		return run( LoadClass.action( className, caller ) );
 	}
 
 	public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... params) {
-		Constructor<T> constructor;
-		GetConstructor<T> action = GetConstructor.action( clazz, params );
-		if ( System.getSecurityManager() != null ) {
-			constructor = AccessController.doPrivileged( action );
-		}
-		else {
-			constructor = action.run();
-		}
-		return constructor;
+		return run( GetConstructor.action( clazz, params ) );
 	}
 
 	public static <T> T newInstance(Class<T> clazz, String message) {
-		T instance;
-		NewInstance<T> newInstance = NewInstance.action( clazz, message );
-		if ( System.getSecurityManager() != null ) {
-			instance = AccessController.doPrivileged( newInstance );
-		}
-		else {
-			instance = newInstance.run();
-		}
-		return instance;
+		return run( NewInstance.action( clazz, message ) );
 	}
 
 	public static <T> T newConstructorInstance(Constructor<T> constructor, Object... initArgs) {
-		T instance;
-		ConstructorInstance<T> newInstance = ConstructorInstance.action( constructor, initArgs );
-		if ( System.getSecurityManager() != null ) {
-			instance = AccessController.doPrivileged( newInstance );
-		}
-		else {
-			instance = newInstance.run();
-		}
-		return instance;
+		return run( ConstructorInstance.action( constructor, initArgs ) );
 	}
 
 	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
-		T result;
-		GetAnnotationParameter<T> action = GetAnnotationParameter.action( annotation, parameterName, type );
-		if ( System.getSecurityManager() != null ) {
-			result = AccessController.doPrivileged( action );
-		}
-		else {
-			result = action.run();
-		}
-		return result;
+		return run( GetAnnotationParameter.action( annotation, parameterName, type ) );
 	}
 
 	/**
@@ -254,24 +201,12 @@ public final class ReflectionHelper {
 
 		Member member = null;
 		if ( ElementType.FIELD.equals( elementType ) ) {
-			GetDeclaredField action = GetDeclaredField.action( clazz, property );
-			if ( System.getSecurityManager() != null ) {
-				member = AccessController.doPrivileged( action );
-			}
-			else {
-				member = action.run();
-			}
+			member = run( GetDeclaredField.action( clazz, property ) );
 		}
 		else {
 			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
 			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
-				GetMethod action = GetMethod.action( clazz, prefix + methodName );
-				if ( System.getSecurityManager() != null ) {
-					member = AccessController.doPrivileged( action );
-				}
-				else {
-					member = action.run();
-				}
+				member = run( GetMethod.action( clazz, prefix + methodName ) );
 				if ( member != null ) {
 					break;
 				}
@@ -370,13 +305,7 @@ public final class ReflectionHelper {
 	}
 
 	public static void setAccessibility(Member member) {
-		SetAccessibility action = SetAccessibility.action( member );
-		if ( System.getSecurityManager() != null ) {
-			AccessController.doPrivileged( action );
-		}
-		else {
-			action.run();
-		}
+		run( SetAccessibility.action( member ) );
 	}
 
 	/**
@@ -529,15 +458,7 @@ public final class ReflectionHelper {
 	 * @return Returns the declared field with the specified name or {@code null} if it does not exist.
 	 */
 	public static Field getDeclaredField(Class<?> clazz, String fieldName) {
-		GetDeclaredField action = GetDeclaredField.action( clazz, fieldName );
-		final Field field;
-		if ( System.getSecurityManager() != null ) {
-			field = AccessController.doPrivileged( action );
-		}
-		else {
-			field = action.run();
-		}
-		return field;
+		return run( GetDeclaredField.action( clazz, fieldName ) );
 	}
 
 	/**
@@ -560,15 +481,7 @@ public final class ReflectionHelper {
 	 * @return Returns the fields for this class.
 	 */
 	public static Field[] getDeclaredFields(Class<?> clazz) {
-		GetDeclaredFields action = GetDeclaredFields.action( clazz );
-		final Field[] fields;
-		if ( System.getSecurityManager() != null ) {
-			fields = AccessController.doPrivileged( action );
-		}
-		else {
-			fields = action.run();
-		}
-		return fields;
+		return run( GetDeclaredFields.action( clazz ) );
 	}
 
 	/**
@@ -581,15 +494,7 @@ public final class ReflectionHelper {
 	 * @return Returns the method with the specified property or {@code null} if it does not exist.
 	 */
 	public static Method getMethodFromPropertyName(Class<?> clazz, String methodName) {
-		Method method;
-		GetMethodFromPropertyName action = GetMethodFromPropertyName.action( clazz, methodName );
-		if ( System.getSecurityManager() != null ) {
-			method = AccessController.doPrivileged( action );
-		}
-		else {
-			method = action.run();
-		}
-		return method;
+		return run( GetMethodFromPropertyName.action( clazz, methodName ) );
 	}
 
 	/**
@@ -613,15 +518,7 @@ public final class ReflectionHelper {
 	 * @return Returns the method with the specified property or {@code null} if it does not exist.
 	 */
 	public static Method getMethod(Class<?> clazz, String methodName) {
-		Method method;
-		GetMethod action = GetMethod.action( clazz, methodName );
-		if ( System.getSecurityManager() != null ) {
-			method = AccessController.doPrivileged( action );
-		}
-		else {
-			method = action.run();
-		}
-		return method;
+		return run( GetMethod.action( clazz, methodName ) );
 	}
 
 	/**
@@ -635,15 +532,7 @@ public final class ReflectionHelper {
 	 * @return Returns the declared method with the specified name or {@code null} if it does not exist.
 	 */
 	public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-		Method method;
-		GetDeclaredMethod action = GetDeclaredMethod.action( clazz, methodName, parameterTypes );
-		if ( System.getSecurityManager() != null ) {
-			method = AccessController.doPrivileged( action );
-		}
-		else {
-			method = action.run();
-		}
-		return method;
+		return run( GetDeclaredMethod.action( clazz, methodName, parameterTypes ) );
 	}
 
 	/**
@@ -654,15 +543,7 @@ public final class ReflectionHelper {
 	 * @return Returns the declared methods for this class.
 	 */
 	public static Method[] getDeclaredMethods(Class<?> clazz) {
-		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
-		final Method[] methods;
-		if ( System.getSecurityManager() != null ) {
-			methods = AccessController.doPrivileged( action );
-		}
-		else {
-			methods = action.run();
-		}
-		return methods;
+		return run( GetDeclaredMethods.action( clazz ) );
 	}
 
 	/**
@@ -673,15 +554,20 @@ public final class ReflectionHelper {
 	 * @return Returns the methods for this class.
 	 */
 	public static Method[] getMethods(Class<?> clazz) {
-		GetMethods action = GetMethods.action( clazz );
-		final Method[] methods;
-		if ( System.getSecurityManager() != null ) {
-			methods = AccessController.doPrivileged( action );
-		}
-		else {
-			methods = action.run();
-		}
-		return methods;
+		return run( GetMethods.action( clazz ) );
+	}
+
+	/**
+	 * Executes the given privileged action either directly or with privileges
+	 * enabled, depending on whether a security manager is around or not.
+	 *
+	 * @param <T> The return type of the privileged action to run.
+	 * @param action The action to run.
+	 *
+	 * @return The result of the privileged action's execution.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**
