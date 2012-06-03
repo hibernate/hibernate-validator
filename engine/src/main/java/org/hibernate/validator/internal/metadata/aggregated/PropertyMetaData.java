@@ -161,7 +161,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			this.beanClass = constrainedMethod.getLocation().getBeanClass();
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
-			this.propertyType = constrainedMethod.getLocation().getMember().getGenericReturnType();
+			this.propertyType = constrainedMethod.getLocation().typeOfAnnotatedElement();
 			add( constrainedMethod );
 		}
 

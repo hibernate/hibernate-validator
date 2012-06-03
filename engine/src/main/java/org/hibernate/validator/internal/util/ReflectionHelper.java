@@ -39,12 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetConstructor;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
@@ -261,21 +263,20 @@ public final class ReflectionHelper {
 	/**
 	 * Returns the type of the parameter of the given method with the given parameter index.
 	 *
-	 * @param method The method of interest.
+	 * @param executable The executable of interest.
 	 * @param parameterIndex The index of the parameter for which the type should be returned.
 	 *
 	 * @return The erased type.
 	 */
-	public static Type typeOf(Method method, int parameterIndex) {
+	public static Type typeOf(ExecutableElement executable, int parameterIndex) {
 
-		Type type = method.getGenericParameterTypes()[parameterIndex];
+		Type type = executable.getGenericParameterTypes()[parameterIndex];
 
 		if ( type instanceof TypeVariable ) {
 			type = TypeHelper.getErasedType( type );
 		}
 		return type;
 	}
-
 
 	public static Object getValue(Member member, Object object) {
 		Object value = null;
@@ -558,6 +559,17 @@ public final class ReflectionHelper {
 	}
 
 	/**
+	 * Returns the declared constructors of the specified class.
+	 *
+	 * @param clazz The class for which to retrieve the constructors.
+	 *
+	 * @return Returns the declared constructors for this class.
+	 */
+	public static Constructor<?>[] getDeclaredConstructors(Class<?> clazz) {
+		return run( GetDeclaredConstructors.action( clazz ) );
+	}
+
+	/**
 	 * Executes the given privileged action either directly or with privileges
 	 * enabled, depending on whether a security manager is around or not.
 	 *
@@ -579,13 +591,13 @@ public final class ReflectionHelper {
 	 *
 	 * @return True, if the methods have the same signature, false otherwise.
 	 */
-	public static boolean haveSameSignature(Method method1, Method method2) {
+	public static boolean haveSameSignature(ExecutableElement method1, ExecutableElement method2) {
 
 		Contracts.assertValueNotNull( method1, "method1" );
 		Contracts.assertValueNotNull( method2, "method2" );
 
 		return
-				method1.getName().equals( method2.getName() ) &&
+				method1.getMember().getName().equals( method2.getMember().getName() ) &&
 						Arrays.equals( method1.getGenericParameterTypes(), method2.getGenericParameterTypes() );
 	}
 

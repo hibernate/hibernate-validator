@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -99,7 +98,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 				isCascading
 		);
 
-		Method method = location.getMember();
+		ExecutableElement method = location.getExecutableElement();
 
 		if ( parameterMetaData.size() != method.getParameterTypes().length ) {
 			throw log.getInvalidLengthOfParameterMetaDataListException(
@@ -113,7 +112,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
 
 		if ( isConstrained() ) {
-			ReflectionHelper.setAccessibility( method );
+			ReflectionHelper.setAccessibility( method.getMember() );
 		}
 	}
 
@@ -197,7 +196,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return ReflectionHelper.isGetterMethod( getLocation().getMember() );
+		return getLocation().getExecutableElement().isGetterMethod();
 	}
 
 	@Override

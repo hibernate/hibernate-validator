@@ -17,54 +17,57 @@
 package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
- * A {@link ConstraintLocation} implementation that represents a method
+ * A {@link ConstraintLocation} implementation that represents a method or constructor.
  * parameter or return value.
  *
  * @author Gunnar Morling
  */
 public class MethodConstraintLocation implements ConstraintLocation {
-	private final Method method;
+	private final ExecutableElement executableElement;
 	private final Integer parameterIndex;
 
 	public MethodConstraintLocation(Method method) {
-		Contracts.assertValueNotNull( method, "method" );
-
-		this.method = method;
-		this.parameterIndex = null;
+		this( ExecutableElement.forMethod( method ), null );
 	}
 
 	/**
 	 * Creates a new {@link MethodConstraintLocation}.
 	 *
-	 * @param method The method of the location to be created.
+	 * @param executableElement The executableElement of the location to be created.
 	 * @param parameterIndex The parameter index of the location to be created.
 	 */
-	public MethodConstraintLocation(Method method, int parameterIndex) {
-		Contracts.assertValueNotNull( method, "method" );
+	public MethodConstraintLocation(Method method, Integer parameterIndex) {
+		this( ExecutableElement.forMethod( method ), parameterIndex );
+	}
 
-		this.method = method;
+	public MethodConstraintLocation(ExecutableElement executableElement, Integer parameterIndex) {
+		Contracts.assertValueNotNull( executableElement, "executableElement" );
+
+		this.executableElement = executableElement;
 		this.parameterIndex = parameterIndex;
 	}
 
 	public Class<?> getBeanClass() {
-		return method.getDeclaringClass();
+		return executableElement.getMember().getDeclaringClass();
 	}
 
 	public Type typeOfAnnotatedElement() {
 		Type t;
 
 		if ( parameterIndex == null ) {
-			t = ReflectionHelper.typeOf( method );
+			t = ReflectionHelper.typeOf( executableElement.getMember() );
 		}
 		else {
-			t = ReflectionHelper.typeOf( method, parameterIndex );
+			t = ReflectionHelper.typeOf( executableElement, parameterIndex );
 		}
 
 		if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
@@ -74,8 +77,12 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		return t;
 	}
 
-	public Method getMember() {
-		return method;
+	public Member getMember() {
+		return executableElement.getMember();
+	}
+
+	public ExecutableElement getExecutableElement() {
+		return executableElement;
 	}
 
 	public ElementType getElementType() {
@@ -84,22 +91,22 @@ public class MethodConstraintLocation implements ConstraintLocation {
 
 	/**
 	 * @return returns the parameter index of this constraint location or <code>null</code> if
-	 *         this location represents a method return value.
+	 *         this location represents a executableElement return value.
 	 */
 	public Integer getParameterIndex() {
 		return parameterIndex;
 	}
 
 	public Class<?> getParameterType() {
-		return parameterIndex != null ? method.getParameterTypes()[parameterIndex] : null;
+		return parameterIndex != null ? executableElement.getParameterTypes()[parameterIndex] : null;
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
 				"%s#%s(%s)",
-				method.getDeclaringClass().getSimpleName(),
-				method.getName(),
+				executableElement.getMember().getDeclaringClass().getSimpleName(),
+				executableElement.getMember().getName(),
 				parameterIndex != null ? parameterIndex : ""
 		);
 	}
@@ -108,7 +115,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( method == null ) ? 0 : method.hashCode() );
+		result = prime * result + ( ( executableElement == null ) ? 0 : executableElement.hashCode() );
 		result = prime * result
 				+ ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 		return result;
@@ -126,12 +133,12 @@ public class MethodConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 		MethodConstraintLocation other = (MethodConstraintLocation) obj;
-		if ( method == null ) {
-			if ( other.method != null ) {
+		if ( executableElement == null ) {
+			if ( other.executableElement != null ) {
 				return false;
 			}
 		}
-		else if ( !method.equals( other.method ) ) {
+		else if ( !executableElement.equals( other.executableElement ) ) {
 			return false;
 		}
 		if ( parameterIndex == null ) {

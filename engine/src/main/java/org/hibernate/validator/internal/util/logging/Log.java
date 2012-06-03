@@ -33,6 +33,7 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBException;
 
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -249,7 +250,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 62,
 			value = "Method %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
-	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(Method method, int nbParameters, int listSize);
+	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(ExecutableElement executableElement, int nbParameters, int listSize);
 
 	@Message(id = 63, value = "Unable to instantiate %s.")
 	ValidationException getUnableToInstantiateException(String className, @Cause Exception e);

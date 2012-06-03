@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -133,8 +133,8 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		public boolean accepts(ConstrainedElement constrainedElement) {
 			return constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
 					ReflectionHelper.haveSameSignature(
-							location.getMember(),
-							( (ConstrainedMethod) constrainedElement ).getLocation().getMember()
+							location.getExecutableElement(),
+							( (ConstrainedMethod) constrainedElement ).getLocation().getExecutableElement()
 					);
 		}
 
@@ -154,12 +154,12 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		 * {@inheritDoc}
 		 */
 		public MethodMetaData build() {
-			Method method = location.getMember();
+			ExecutableElement executableElement = location.getExecutableElement();
 
 			return new MethodMetaData(
-					method.getName(),
-					method.getReturnType(),
-					method.getParameterTypes(),
+					executableElement.getMember().getName(),
+					executableElement.getReturnType(),
+					executableElement.getParameterTypes(),
 					adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
 					findParameterMetaData(),
 					checkParameterConstraints(),

@@ -18,7 +18,8 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -47,6 +48,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -125,8 +127,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return Retrieves constraint related meta data from the annotations of the given type.
 	 */
 	private <T> BeanConfiguration<T> retrieveBeanConfiguration(Class<T> beanClass) {
-		Set<ConstrainedElement> propertyMetaData = getPropertyMetaData( beanClass );
-		propertyMetaData.addAll( getMethodMetaData( beanClass ) );
+		Set<ConstrainedElement> constrainedElements = getPropertyMetaData( beanClass );
+		constrainedElements.addAll( getMethodMetaData( beanClass ) );
+		constrainedElements.addAll( getConstructorMetaData( beanClass ) );
 
 		//TODO GM: currently class level constraints are represented by a PropertyMetaData. This
 		//works but seems somewhat unnatural
@@ -138,13 +141,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							new BeanConstraintLocation( beanClass ),
 							classLevelConstraints
 					);
-			propertyMetaData.add( classLevelMetaData );
+			constrainedElements.add( classLevelMetaData );
 		}
 
 		return new BeanConfiguration<T>(
 				ConfigurationSource.ANNOTATION,
 				beanClass,
-				propertyMetaData,
+				constrainedElements,
 				getDefaultGroupSequence( beanClass ),
 				getDefaultGroupSequenceProvider( beanClass )
 		);
@@ -242,19 +245,34 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraints;
 	}
 
+	private Set<ConstrainedMethod> getConstructorMetaData(Class<?> clazz) {
+
+		List<ExecutableElement> declaredConstructors = asExecutableElements(
+				ReflectionHelper.getDeclaredConstructors( clazz )
+		);
+
+		return getMetaData( declaredConstructors );
+	}
+
 	private Set<ConstrainedMethod> getMethodMetaData(Class<?> clazz) {
+
+		List<ExecutableElement> declaredMethods = asExecutableElements( ReflectionHelper.getDeclaredMethods( clazz ) );
+
+		return getMetaData( declaredMethods );
+	}
+
+	private Set<ConstrainedMethod> getMetaData(List<ExecutableElement> executableElements) {
 		Set<ConstrainedMethod> methodMetaData = newHashSet();
 
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( clazz );
-
-		for ( Method method : declaredMethods ) {
+		for ( ExecutableElement method : executableElements ) {
 
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
-			if ( Modifier.isStatic( method.getModifiers() ) || annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored(
-					method
-			) || method
-					.isSynthetic() ) {
+			Member member = method.getMember();
+			if ( Modifier.isStatic( member.getModifiers() ) ||
+					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( member ) ||
+					member.isSynthetic() ) {
+
 				continue;
 			}
 
@@ -264,30 +282,56 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return methodMetaData;
 	}
 
+	private List<ExecutableElement> asExecutableElements(Constructor<?>[] constructors) {
+
+		List<ExecutableElement> executableElements = newArrayList( constructors.length );
+
+		for ( Constructor<?> constructor : constructors ) {
+			executableElements.add( ExecutableElement.forConstructor( constructor ) );
+		}
+
+		return executableElements;
+	}
+
+	private List<ExecutableElement> asExecutableElements(Method[] methods) {
+
+		List<ExecutableElement> executableElements = newArrayList( methods.length );
+
+		for ( Method method : methods ) {
+			executableElements.add( ExecutableElement.forMethod( method ) );
+		}
+
+		return executableElements;
+	}
+
 	/**
 	 * Finds all constraint annotations defined for the given method.
 	 *
-	 * @param method The method to check for constraints annotations.
+	 * @param executable The executable element to check for constraints annotations.
 	 *
 	 * @return A meta data object describing the constraints specified for the
-	 *         given method.
+	 *         given element.
 	 */
-	private ConstrainedMethod findMethodMetaData(Method method) {
-		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( method );
-		boolean isCascading = method.isAnnotationPresent( Valid.class );
+	private ConstrainedMethod findMethodMetaData(ExecutableElement executable) {
+
+		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
+		boolean isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
 		Set<MetaConstraint<?>> constraints =
-				convertToMetaConstraints( findConstraints( method, ElementType.METHOD ), method );
+				convertToMetaConstraints(
+						findConstraints( executable.getAccessibleObject(), ElementType.METHOD ),
+						executable
+				);
 
 		return new ConstrainedMethod(
 				ConfigurationSource.ANNOTATION,
-				new MethodConstraintLocation( method ),
+				new MethodConstraintLocation( executable, null ),
 				parameterConstraints,
 				constraints,
 				isCascading
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Method method) {
+	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement method) {
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
 		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
@@ -305,10 +349,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list with parameter meta data for the given method.
 	 */
-	private List<ConstrainedParameter> getParameterMetaData(Method method) {
+	private List<ConstrainedParameter> getParameterMetaData(ExecutableElement method) {
 		List<ConstrainedParameter> metaData = newArrayList();
 
-		String[] parameterNames = parameterNameProvider.getParameterNames( method );
+		String[] parameterNames = method.getParameterNames( parameterNameProvider );
 
 		int i = 0;
 
@@ -362,11 +406,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
-		assert member instanceof Field || member instanceof Method;
+	private List<ConstraintDescriptorImpl<?>> findConstraints(AccessibleObject member, ElementType type) {
 
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-		for ( Annotation annotation : ( (AnnotatedElement) member ).getAnnotations() ) {
+		for ( Annotation annotation : member.getAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( annotation, type ) );
 		}
 
@@ -428,12 +471,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( member ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(Method method, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new MethodConstraintLocation( method, parameterIndex ) );
+	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>( descriptor, new MethodConstraintLocation( member, parameterIndex ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(Method method, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new MethodConstraintLocation( method ) );
+	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>( descriptor, new MethodConstraintLocation( member, null ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(A annotation, ElementType type) {

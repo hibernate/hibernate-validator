@@ -270,7 +270,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private Partitioner<Method, MethodConstraintLocation> cascadesByMethod() {
 		return new Partitioner<Method, MethodConstraintLocation>() {
 			public Method getPartition(MethodConstraintLocation location) {
-				return location.getMember();
+				//TODO HV-571
+				return (Method) location.getMember();
 			}
 		};
 	}
@@ -286,7 +287,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>> constraintsByMethod() {
 		return new Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>>() {
 			public Method getPartition(ConfiguredConstraint<?, MethodConstraintLocation> constraint) {
-				return constraint.getLocation().getMember();
+				//TODO HV-571
+				return (Method) constraint.getLocation().getMember();
 			}
 		};
 	}
