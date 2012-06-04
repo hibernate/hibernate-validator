@@ -23,6 +23,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 
@@ -48,6 +49,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 
 	protected MethodValidationContext(
 			BeanMetaDataManager beanMetaDataManager,
+			ConstraintValidatorManager constraintValidatorManager,
 			Class<T> rootBeanClass,
 			T rootBean,
 			Method method,
@@ -58,6 +60,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 
 		this(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				rootBeanClass,
 				rootBean,
 				method,
@@ -72,6 +75,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 
 	protected MethodValidationContext(
 			BeanMetaDataManager beanMetaDataManager,
+			ConstraintValidatorManager constraintValidatorManager,
 			Class<T> rootBeanClass,
 			T rootBean,
 			Method method,
@@ -83,6 +87,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 
 		super(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				rootBeanClass,
 				rootBean,
 				messageInterpolator,

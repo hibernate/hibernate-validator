@@ -29,6 +29,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.path.BeanMetaDataLocator;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -46,6 +47,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 public class StandardValidationContext<T> extends ValidationContext<T, ConstraintViolation<T>> {
 
 	protected StandardValidationContext(BeanMetaDataManager beanMetaDataManager,
+										ConstraintValidatorManager constraintValidatorManager,
 										Class<T> rootBeanClass,
 										T rootBean,
 										MessageInterpolator messageInterpolator,
@@ -55,6 +57,7 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 
 		super(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				rootBeanClass,
 				rootBean,
 				messageInterpolator,

@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.engine.ConstraintValidatorContextImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 

@@ -152,6 +152,9 @@ public class BeanMetaDataManager {
 		return beanMetaData;
 	}
 
+	public void clear() {
+		beanMetaDataCache.clear();
+	}
 
 	public int numberOfCachedBeanMetaDataInstances() {
 		return beanMetaDataCache.size();

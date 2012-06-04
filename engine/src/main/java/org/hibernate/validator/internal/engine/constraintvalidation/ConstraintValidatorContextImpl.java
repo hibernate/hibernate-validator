@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.engine;
+package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -37,6 +37,7 @@ import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
@@ -103,6 +104,11 @@ public class ValidatorImpl implements Validator {
 	private final BeanMetaDataManager beanMetaDataManager;
 
 	/**
+	 * Manages the life cycle of constraint validator instances
+	 */
+	private final ConstraintValidatorManager constraintValidatorManager;
+
+	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
 	private final boolean failFast;
@@ -111,11 +117,13 @@ public class ValidatorImpl implements Validator {
 						 MessageInterpolator messageInterpolator,
 						 TraversableResolver traversableResolver,
 						 BeanMetaDataManager beanMetaDataManager,
+						 ConstraintValidatorManager constraintValidatorManager,
 						 boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
+		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
 		validationOrderGenerator = new ValidationOrderGenerator();
@@ -128,6 +136,7 @@ public class ValidatorImpl implements Validator {
 
 		ValidationContext<T, ConstraintViolation<T>> validationContext = ValidationContext.getContextForValidate(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				object,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -148,6 +157,7 @@ public class ValidatorImpl implements Validator {
 
 		ValidationContext<T, ConstraintViolation<T>> context = ValidationContext.getContextForValidateProperty(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				object,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -167,6 +177,7 @@ public class ValidatorImpl implements Validator {
 
 		ValidationContext<T, ConstraintViolation<T>> context = ValidationContext.getContextForValidateValue(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				beanType,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -192,6 +203,7 @@ public class ValidatorImpl implements Validator {
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				method,
 				object,
 				messageInterpolator,
@@ -225,6 +237,7 @@ public class ValidatorImpl implements Validator {
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				method,
 				object,
 				messageInterpolator,

@@ -28,6 +28,7 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -56,6 +57,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final ParameterNameProvider parameterNameProvider;
 	private final BeanMetaDataManager metaDataManager;
+	private final ConstraintValidatorManager constraintValidatorManager;
 	private final boolean failFast;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
@@ -99,24 +101,30 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 		this.failFast = tmpFailFast;
 		metaDataManager = new BeanMetaDataManager( constraintHelper, parameterNameProvider, metaDataProviders );
+		constraintValidatorManager = new ConstraintValidatorManager();
 	}
 
+	@Override
 	public Validator getValidator() {
 		return usingContext().getValidator();
 	}
 
+	@Override
 	public MessageInterpolator getMessageInterpolator() {
 		return messageInterpolator;
 	}
 
+	@Override
 	public TraversableResolver getTraversableResolver() {
 		return traversableResolver;
 	}
 
+	@Override
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
 		return constraintValidatorFactory;
 	}
 
+	@Override
 	public <T> T unwrap(Class<T> type) {
 		if ( HibernateValidatorFactory.class.equals( type ) ) {
 			return type.cast( this );
@@ -124,6 +132,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		throw log.getTypeNotSupportedException( type );
 	}
 
+	@Override
 	public HibernateValidatorContext usingContext() {
 		return new ValidatorContextImpl(
 				constraintValidatorFactory,
@@ -131,6 +140,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				metaDataManager,
+				constraintValidatorManager,
 				failFast
 		);
 	}
@@ -142,8 +152,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public void close() {
-		// TODO HV-571
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		constraintValidatorManager.clear();
+		metaDataManager.clear();
 	}
 
 	private boolean checkPropertiesForFailFast(Map<String, String> properties, boolean programmaticConfiguredFailFast) {

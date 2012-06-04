@@ -40,7 +40,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.constraintvalidators.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCollection;
-import org.hibernate.validator.internal.engine.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -97,6 +97,9 @@ public class ConstraintValidatorCachingTest {
 		violations = validator.validate( john );
 		assertNumberOfViolations( violations, 0 );
 		constraintValidatorFactory.assertSize( 3 );
+
+		factory.close();
+		constraintValidatorFactory.assertAllConstraintValidatorInstancesReleased();
 	}
 
 	@Test
@@ -126,6 +129,10 @@ public class ConstraintValidatorCachingTest {
 		assertNumberOfViolations( violations, 0 );
 		constraintValidatorFactory2.assertSize( 3 );
 		constraintValidatorFactory1.assertConstraintValidatorInstancesAreNotShared( constraintValidatorFactory2 );
+
+		factory.close();
+		constraintValidatorFactory1.assertAllConstraintValidatorInstancesReleased();
+		constraintValidatorFactory2.assertAllConstraintValidatorInstancesReleased();
 	}
 
 	@Test
@@ -181,13 +188,26 @@ public class ConstraintValidatorCachingTest {
 			}
 		}
 
+		public void assertAllConstraintValidatorInstancesReleased() {
+			assertTrue(
+					instantiatedConstraintValidatorClasses.isEmpty(),
+					"All validator instances should have been released"
+			);
+		}
+
 		@Override
 		public void releaseInstance(ConstraintValidator<?, ?> instance) {
-			// TODO HV-571
-			throw new IllegalArgumentException( "Not yet implemented" );
+			Class<?> key = null;
+			for ( Map.Entry<Class<?>, ConstraintValidator<?, ?>> entry : instantiatedConstraintValidatorClasses.entrySet() ) {
+				if ( entry.getValue() == instance ) {
+					key = entry.getKey();
+				}
+			}
+			instantiatedConstraintValidatorClasses.remove( key );
 		}
 	}
 
+	@SuppressWarnings("unused")
 	class Person {
 		@NotNull
 		String name;
@@ -271,6 +291,7 @@ public class ConstraintValidatorCachingTest {
 		public abstract Class<? extends Payload>[] payload() default { };
 	}
 
+	@SuppressWarnings("unused")
 	class Foo {
 		@C
 		String value = "The quick brown fox jumps over the lazy dog";

@@ -33,7 +33,7 @@
     <properties>
         <jsr303.tck.version>1.0.6.GA</jsr303.tck.version>
         <arquillian.version>1.0.0.CR7</arquillian.version>
-        <jbossas.version>7.1.0.Beta1b</jbossas.version>
+        <jbossas.version>7.1.0.Final</jbossas.version>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug/>
     </properties>

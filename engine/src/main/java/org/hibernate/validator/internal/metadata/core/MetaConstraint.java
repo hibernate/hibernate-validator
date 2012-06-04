@@ -21,7 +21,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.ConstraintTree;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -57,7 +57,6 @@ public class MetaConstraint<A extends Annotation> {
 	 * @param location meta data about constraint placement
 	 */
 	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
-
 		this.constraintTree = new ConstraintTree<A>( constraintDescriptor );
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;

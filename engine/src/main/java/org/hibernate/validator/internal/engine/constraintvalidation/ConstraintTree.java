@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.internal.engine;
+package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -28,10 +28,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.CompositionType;
+import org.hibernate.validator.internal.engine.ValidationContext;
+import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -41,7 +42,6 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
@@ -55,11 +55,6 @@ import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.R
 public class ConstraintTree<A extends Annotation> {
 	private static final Log log = LoggerFactory.make();
 
-	/**
-	 * The default initial capacity for this cache.
-	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 16;
-
 	private final ConstraintTree<?> parent;
 	private final List<ConstraintTree<?>> children;
 
@@ -68,19 +63,6 @@ public class ConstraintTree<A extends Annotation> {
 	 */
 	private final ConstraintDescriptorImpl<A> descriptor;
 
-	/**
-	 * Cache for initialized {@code ConstraintValidator} instance per {@code ConstraintValidatorFactory} and validated type.
-	 * This is necessary, because via {@code aValidatorFactory.usingContext().constraintValidatorFactory(otherCVF)} it
-	 * is possible to create a {@code Validator} instance which is using a different constraint validator factory.
-	 * <p>
-	 * Also note, that {@code ConstraintTree} is part of the {@code BeanMetaData}
-	 * which is cached on {@code ValidatorFactory} level. In most cases there is only one {@code ConstraintValidator}
-	 * instance per {@code ConstraintTree}, unless {@code aValidatorFactory.usingContext().constraintValidatorFactory(otherCVF)} is
-	 * used or the user classes are getting reloaded.
-	 * </p>
-	 */
-	private final ConcurrentReferenceHashMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>> constraintValidatorCache;
-
 	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
 		this( descriptor, null );
 	}
@@ -88,12 +70,6 @@ public class ConstraintTree<A extends Annotation> {
 	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
-		this.constraintValidatorCache =
-				new ConcurrentReferenceHashMap<ConstraintValidatorCacheKey, ConstraintValidator<A, ?>>(
-						DEFAULT_INITIAL_CAPACITY,
-						SOFT,
-						SOFT
-				);
 
 		final Set<ConstraintDescriptorImpl<?>> composingConstraints = newHashSet();
 		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
@@ -139,8 +115,8 @@ public class ConstraintTree<A extends Annotation> {
 
 		Set<E> localViolationList = CollectionHelper.newHashSet();
 
-		// After all children are validated the actual ConstraintValidator of the constraint itself is executed (provided
-		// there is one)
+		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
+		// (provided there is one)
 		// If fail fast mode is enabled and there are already failing constraints we don't need to validate the constraint (HV-550)
 		if ( !descriptor.getConstraintValidatorClasses().isEmpty()
 				&& ( !executionContext.isFailFastModeEnabled() || constraintViolations.isEmpty() ) ) {
@@ -152,15 +128,19 @@ public class ConstraintTree<A extends Annotation> {
 						descriptor
 				);
 			}
-			ConstraintValidator<A, V> validator = getInitializedValidator(
-					valueContext.getTypeOfAnnotatedElement(),
-					executionContext.getConstraintValidatorFactory()
-			);
 
+			// create a constraint validator context
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
 					valueContext.getPropertyPath(), descriptor
 			);
 
+			// get the initialized validator
+			ConstraintValidator<A, V> validator = getInitializedValidator(
+					valueContext.getTypeOfAnnotatedElement(),
+					executionContext
+			);
+
+			// validate
 			validateSingleConstraint(
 					executionContext,
 					valueContext,
@@ -317,22 +297,28 @@ public class ConstraintTree<A extends Annotation> {
 
 	/**
 	 * @param validatedValueType The type of the value to be validated (the type of the member/class the constraint was placed on).
-	 * @param constraintFactory constraint factory used to instantiate the constraint validator.
+	 * @param validationContext the execution context for this validation
 	 *
 	 * @return A initialized constraint validator matching the type of the value to be validated.
 	 */
 	@SuppressWarnings("unchecked")
-	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ConstraintValidatorFactory constraintFactory) {
-
-		final ConstraintValidatorCacheKey key = new ConstraintValidatorCacheKey(
-				constraintFactory,
-				validatedValueType
+	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ValidationContext<?, ?> validationContext) {
+		ConstraintValidatorManager constraintValidatorManager = validationContext.getConstraintValidatorManager();
+		ConstraintValidatorFactory factory = validationContext.getConstraintValidatorFactory();
+		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorManager.getInitializedValidator(
+				validatedValueType,
+				getDescriptor().getAnnotation(),
+				factory
 		);
-		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
 		if ( constraintValidator == null ) {
 			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
-			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass );
-			constraintValidatorCache.put( key, constraintValidator );
+			constraintValidator = createAndInitializeValidator( factory, validatorClass );
+			constraintValidatorManager.putInitializedValidator(
+					validatedValueType,
+					getDescriptor().getAnnotation(),
+					factory,
+					constraintValidator
+			);
 		}
 		else {
 			log.tracef( "Constraint validator %s found in cache.", constraintValidator );
@@ -459,44 +445,6 @@ public class ConstraintTree<A extends Annotation> {
 		sb.append( ", isRoot=" ).append( parent == null );
 		sb.append( '}' );
 		return sb.toString();
-	}
-
-	private static final class ConstraintValidatorCacheKey {
-		private ConstraintValidatorFactory constraintValidatorFactory;
-		private Type validatedType;
-
-		private ConstraintValidatorCacheKey(ConstraintValidatorFactory constraintValidatorFactory, Type validatorType) {
-			this.constraintValidatorFactory = constraintValidatorFactory;
-			this.validatedType = validatorType;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || getClass() != o.getClass() ) {
-				return false;
-			}
-
-			ConstraintValidatorCacheKey that = (ConstraintValidatorCacheKey) o;
-
-			if ( constraintValidatorFactory != null ? !constraintValidatorFactory.equals( that.constraintValidatorFactory ) : that.constraintValidatorFactory != null ) {
-				return false;
-			}
-			if ( validatedType != null ? !validatedType.equals( that.validatedType ) : that.validatedType != null ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		public int hashCode() {
-			int result = constraintValidatorFactory != null ? constraintValidatorFactory.hashCode() : 0;
-			result = 31 * result + ( validatedType != null ? validatedType.hashCode() : 0 );
-			return result;
-		}
 	}
 
 	private static final class CompositionResult {

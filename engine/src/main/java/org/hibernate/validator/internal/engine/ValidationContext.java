@@ -32,6 +32,8 @@ import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -59,6 +61,11 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	 * Access to the cached bean meta data
 	 */
 	private final BeanMetaDataManager beanMetaDataManager;
+
+	/**
+	 * Caches and manages life cycle of constraint validator instances.
+	 */
+	private final ConstraintValidatorManager constraintValidatorManager;
 
 	/**
 	 * The root bean of the validation.
@@ -113,6 +120,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(
 			BeanMetaDataManager beanMetaDataManager,
+			ConstraintValidatorManager constraintValidatorManager,
 			T object,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -122,6 +130,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new StandardValidationContext<T>(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				rootBeanClass,
 				object,
 				messageInterpolator,
@@ -132,6 +141,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(
 			BeanMetaDataManager beanMetaDataManager,
+			ConstraintValidatorManager constraintValidatorManager,
 			T rootBean,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -141,6 +151,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 		return new StandardValidationContext<T>(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				rootBeanClass,
 				rootBean,
 				messageInterpolator,
@@ -152,6 +163,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateValue(
 			BeanMetaDataManager beanMetaDataManager,
+			ConstraintValidatorManager constraintValidatorManager,
 			Class<T> rootBeanClass,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -159,6 +171,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 			boolean failFast) {
 		return new StandardValidationContext<T>(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				rootBeanClass,
 				null,
 				messageInterpolator,
@@ -170,6 +183,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public static <T> MethodValidationContext<T> getContextForValidateParameters(
 			BeanMetaDataManager beanMetaDataManager,
+			ConstraintValidatorManager constraintValidatorManager,
 			Method method,
 			T object,
 			MessageInterpolator messageInterpolator,
@@ -180,6 +194,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		return new MethodValidationContext<T>(
 				beanMetaDataManager,
+				constraintValidatorManager,
 				rootBeanClass,
 				object,
 				method,
@@ -191,6 +206,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	}
 
 	protected ValidationContext(BeanMetaDataManager beanMetaDataManager,
+								ConstraintValidatorManager constraintValidatorManager,
 								Class<T> rootBeanClass,
 								T rootBean,
 								MessageInterpolator messageInterpolator,
@@ -198,6 +214,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 								TraversableResolver traversableResolver,
 								boolean failFast) {
 		this.beanMetaDataManager = beanMetaDataManager;
+		this.constraintValidatorManager = constraintValidatorManager;
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.messageInterpolator = messageInterpolator;
@@ -228,6 +245,10 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 
 	public BeanMetaDataManager getBeanMetaDataManager() {
 		return beanMetaDataManager;
+	}
+
+	public ConstraintValidatorManager getConstraintValidatorManager() {
+		return constraintValidatorManager;
 	}
 
 	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor);

@@ -23,6 +23,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 
 /**
@@ -38,6 +39,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private final ConstraintValidatorFactory factoryConstraintValidatorFactory;
 	private final ParameterNameProvider factoryParameterNameProvider;
 	private final BeanMetaDataManager beanMetaDataManager;
+	private final ConstraintValidatorManager constraintValidatorManager;
 
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
@@ -51,6 +53,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 								TraversableResolver factoryTraversableResolver,
 								ParameterNameProvider factoryParameterNameProvider,
 								BeanMetaDataManager beanMetaDataManager,
+								ConstraintValidatorManager constraintValidatorManager,
 								boolean failFast) {
 
 		this.factoryConstraintValidatorFactory = constraintValidatorFactory;
@@ -58,6 +61,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.factoryTraversableResolver = factoryTraversableResolver;
 		this.factoryParameterNameProvider = factoryParameterNameProvider;
 		this.beanMetaDataManager = beanMetaDataManager;
+		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
 		messageInterpolator( factoryMessageInterpolator );
@@ -122,6 +126,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				messageInterpolator,
 				traversableResolver,
 				beanMetaDataManager,
+				constraintValidatorManager,
 				failFast
 		);
 	}

@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.engine;
+package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
@@ -36,7 +36,6 @@ public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactor
 
 	@Override
 	public void releaseInstance(ConstraintValidator<?, ?> instance) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+		// noop
 	}
 }
