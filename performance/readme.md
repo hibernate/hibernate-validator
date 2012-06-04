@@ -27,7 +27,7 @@ downloaded and extracted into the performance module.
 
 To run or configure a test via the GUI you run:
 
-    > mvn chronos-jmeter:jmetergui -P hv-4.3 &
+    > mvn chronos-jmeter:jmetergui -P hv-5.0 &
 
 Then open a JMeter test file from _src/jmx_ and run the test.
 
@@ -35,7 +35,7 @@ Then open a JMeter test file from _src/jmx_ and run the test.
 
 The following command line will run all performance tests found under _src/jmx/_  (_*.jmx_ files):
 
-    > mvn clean package chronos-jmeter:jmeter -P hv-4.3
+    > mvn clean package chronos-jmeter:jmeter -P hv-5.0
 
 To generate a report from the test execution run:
 
