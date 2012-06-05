@@ -17,13 +17,10 @@
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -33,14 +30,12 @@ import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
@@ -135,10 +130,12 @@ public class ConstraintTree<A extends Annotation> {
 			);
 
 			// get the initialized validator
-			ConstraintValidator<A, V> validator = getInitializedValidator(
-					valueContext.getTypeOfAnnotatedElement(),
-					executionContext
-			);
+			ConstraintValidator<A, V> validator = executionContext.getConstraintValidatorManager()
+					.getInitializedValidator(
+							valueContext.getTypeOfAnnotatedElement(),
+							descriptor,
+							executionContext.getConstraintValidatorFactory()
+					);
 
 			// validate
 			validateSingleConstraint(
@@ -293,148 +290,6 @@ public class ConstraintTree<A extends Annotation> {
 	private boolean reportAsSingleViolation() {
 		return getDescriptor().isReportAsSingleViolation()
 				|| getDescriptor().getCompositionType() == ALL_FALSE;
-	}
-
-	/**
-	 * @param validatedValueType The type of the value to be validated (the type of the member/class the constraint was placed on).
-	 * @param validationContext the execution context for this validation
-	 *
-	 * @return A initialized constraint validator matching the type of the value to be validated.
-	 */
-	@SuppressWarnings("unchecked")
-	private <V> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType, ValidationContext<?, ?> validationContext) {
-		ConstraintValidatorManager constraintValidatorManager = validationContext.getConstraintValidatorManager();
-		ConstraintValidatorFactory factory = validationContext.getConstraintValidatorFactory();
-		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorManager.getInitializedValidator(
-				validatedValueType,
-				getDescriptor().getAnnotation(),
-				factory
-		);
-		if ( constraintValidator == null ) {
-			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass( validatedValueType );
-			constraintValidator = createAndInitializeValidator( factory, validatorClass );
-			constraintValidatorManager.putInitializedValidator(
-					validatedValueType,
-					getDescriptor().getAnnotation(),
-					factory,
-					constraintValidator
-			);
-		}
-		else {
-			log.tracef( "Constraint validator %s found in cache.", constraintValidator );
-		}
-		return constraintValidator;
-	}
-
-	@SuppressWarnings("unchecked")
-	private <V> ConstraintValidator<A, V> createAndInitializeValidator(ConstraintValidatorFactory constraintFactory, Class<? extends ConstraintValidator<?, ?>> validatorClass) {
-		ConstraintValidator<A, V> constraintValidator;
-		constraintValidator = (ConstraintValidator<A, V>) constraintFactory.getInstance(
-				validatorClass
-		);
-		if ( constraintValidator == null ) {
-			throw log.getConstraintFactoryMustNotReturnNullException( validatorClass.getName() );
-		}
-		initializeConstraint( descriptor, constraintValidator );
-		return constraintValidator;
-	}
-
-	/**
-	 * Runs the validator resolution algorithm.
-	 *
-	 * @param validatedValueType The type of the value to be validated (the type of the member/class the constraint was placed on).
-	 *
-	 * @return The class of a matching validator.
-	 */
-	private Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(Type validatedValueType) {
-		Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
-				descriptor.getConstraintValidatorClasses()
-		);
-		Map<Type, Type> suitableTypeMap = newHashMap();
-
-		if ( suitableTypeMap.containsKey( validatedValueType ) ) {
-			return availableValidatorTypes.get( suitableTypeMap.get( validatedValueType ) );
-		}
-
-		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes );
-		resolveAssignableTypes( discoveredSuitableTypes );
-		verifyResolveWasUnique( validatedValueType, discoveredSuitableTypes );
-
-		Type suitableType = discoveredSuitableTypes.get( 0 );
-		suitableTypeMap.put( validatedValueType, suitableType );
-		return availableValidatorTypes.get( suitableType );
-	}
-
-	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
-		if ( assignableClasses.size() == 0 ) {
-			String className = valueClass.toString();
-			if ( valueClass instanceof Class ) {
-				Class<?> clazz = (Class<?>) valueClass;
-				if ( clazz.isArray() ) {
-					className = clazz.getComponentType().toString() + "[]";
-				}
-				else {
-					className = clazz.getName();
-				}
-			}
-			throw log.getNoValidatorFoundForTypeException( className );
-		}
-		else if ( assignableClasses.size() > 1 ) {
-			StringBuilder builder = new StringBuilder();
-			for ( Type clazz : assignableClasses ) {
-				builder.append( clazz );
-				builder.append( ", " );
-			}
-			builder.delete( builder.length() - 2, builder.length() );
-			throw log.getMoreThanOneValidatorFoundForTypeException( valueClass, builder.toString() );
-		}
-	}
-
-	private List<Type> findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes) {
-		List<Type> determinedSuitableTypes = new ArrayList<Type>();
-		for ( Type validatorType : availableValidatorTypes.keySet() ) {
-			if ( TypeHelper.isAssignable( validatorType, type )
-					&& !determinedSuitableTypes.contains( validatorType ) ) {
-				determinedSuitableTypes.add( validatorType );
-			}
-		}
-		return determinedSuitableTypes;
-	}
-
-	/**
-	 * Tries to reduce all assignable classes down to a single class.
-	 *
-	 * @param assignableTypes The set of all classes which are assignable to the class of the value to be validated and
-	 * which are handled by at least one of the  validators for the specified constraint.
-	 */
-	private void resolveAssignableTypes(List<Type> assignableTypes) {
-		if ( assignableTypes.size() == 0 || assignableTypes.size() == 1 ) {
-			return;
-		}
-
-		List<Type> typesToRemove = new ArrayList<Type>();
-		do {
-			typesToRemove.clear();
-			Type type = assignableTypes.get( 0 );
-			for ( int i = 1; i < assignableTypes.size(); i++ ) {
-				if ( TypeHelper.isAssignable( type, assignableTypes.get( i ) ) ) {
-					typesToRemove.add( type );
-				}
-				else if ( TypeHelper.isAssignable( assignableTypes.get( i ), type ) ) {
-					typesToRemove.add( assignableTypes.get( i ) );
-				}
-			}
-			assignableTypes.removeAll( typesToRemove );
-		} while ( typesToRemove.size() > 0 );
-	}
-
-	private <V> void initializeConstraint(ConstraintDescriptor<A> descriptor, ConstraintValidator<A, V> constraintValidator) {
-		try {
-			constraintValidator.initialize( descriptor.getAnnotation() );
-		}
-		catch ( RuntimeException e ) {
-			throw log.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass().getName(), e );
-		}
 	}
 
 	@Override

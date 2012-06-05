@@ -81,7 +81,7 @@ public class ValidationTest {
 		configuration = Validation.byDefaultProvider().configure();
 		configuration.constraintValidatorFactory(
 				new ConstraintValidatorFactory() {
-
+					@Override
 					public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 						if ( key == NotNullValidator.class ) {
 							return (T) new BadlyBehavedNotNullConstraintValidator();
@@ -91,8 +91,6 @@ public class ValidationTest {
 
 					@Override
 					public void releaseInstance(ConstraintValidator<?, ?> instance) {
-						// TODO HV-571
-						throw new IllegalArgumentException( "Not yet implemented" );
 					}
 				}
 		);

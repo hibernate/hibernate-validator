@@ -18,10 +18,19 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.metadata.ConstraintDescriptor;
+
+import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Manager in charge of providing and caching initialized {@code ConstraintValidator} instances.
@@ -29,39 +38,84 @@ import javax.validation.ConstraintValidatorFactory;
  * @author Hardy Ferentschik
  */
 public class ConstraintValidatorManager {
+	private static final Log log = LoggerFactory.make();
+
+	/**
+	 * The explicit or implicit default constraint validator factory. We always cache {@code ConstraintValidator} instances
+	 * if they are created via the default instance. Constraint validator instances created via other factory
+	 * instances (specified eg via {@code ValidatorFactory#usingContext()} are only cached for the least recently used
+	 * factory
+	 */
+	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
+
+	/**
+	 * The least recently used non default constraint validator factory.
+	 */
+	private ConstraintValidatorFactory leastRecentlyUsedNonDefaultConstraintValidatorFactory;
+
+	/**
+	 * Cache of initalized {@code ConstraintValidator} instances keyed against validates type, annotation and
+	 * constraint validator factory ({@code CacheKey}).
+	 */
 	private final ConcurrentHashMap<CacheKey, ConstraintValidator<?, ?>> constraintValidatorCache;
 
 	/**
 	 * Creates a new {@code ConstraintValidatorManager}.
 	 */
-	public ConstraintValidatorManager() {
+	public ConstraintValidatorManager(ConstraintValidatorFactory constraintValidatorFactory) {
+		this.defaultConstraintValidatorFactory = constraintValidatorFactory;
 		this.constraintValidatorCache = new ConcurrentHashMap<CacheKey, ConstraintValidator<?, ?>>();
 	}
 
 	/**
 	 * @param validatedValueType the type of the value to be validated
-	 * @param annotation the constraint annotation
+	 * @param descriptor the constraint descriptor for which to get an initalized constraint validator
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator
 	 *
 	 * @return A initialized constraint validator for the given type and annotation of the value to be validated.
 	 */
-	public ConstraintValidator<?, ?> getInitializedValidator(Type validatedValueType,
-															 Annotation annotation,
-															 ConstraintValidatorFactory constraintFactory) {
-
+	public <V, A extends Annotation> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType,
+																					   ConstraintDescriptor<A> descriptor,
+																					   ConstraintValidatorFactory constraintFactory) {
 		final CacheKey key = new CacheKey(
-				annotation,
+				descriptor.getAnnotation(),
 				validatedValueType,
 				constraintFactory
 		);
 
-		return constraintValidatorCache.get( key );
+		@SuppressWarnings("unchecked")
+		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get( key );
+
+		if ( constraintValidator == null ) {
+			Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass(
+					descriptor,
+					validatedValueType
+			);
+			constraintValidator = createAndInitializeValidator( constraintFactory, validatorClass, descriptor );
+			putInitializedValidator(
+					validatedValueType,
+					descriptor.getAnnotation(),
+					constraintFactory,
+					constraintValidator
+			);
+		}
+		else {
+			log.tracef( "Constraint validator %s found in cache.", constraintValidator );
+		}
+
+		return constraintValidator;
 	}
 
-	public void putInitializedValidator(Type validatedValueType,
-										Annotation annotation,
-										ConstraintValidatorFactory constraintFactory,
-										ConstraintValidator<?, ?> constraintValidator) {
+
+	private void putInitializedValidator(Type validatedValueType,
+										 Annotation annotation,
+										 ConstraintValidatorFactory constraintFactory,
+										 ConstraintValidator<?, ?> constraintValidator) {
+		// we only cache constraint validator instance for the default and least recently used factory
+		if ( constraintFactory != defaultConstraintValidatorFactory && constraintFactory != leastRecentlyUsedNonDefaultConstraintValidatorFactory ) {
+			clearEntriesForFactory( constraintFactory );
+			leastRecentlyUsedNonDefaultConstraintValidatorFactory = constraintFactory;
+		}
 
 		final CacheKey key = new CacheKey(
 				annotation,
@@ -72,6 +126,33 @@ public class ConstraintValidatorManager {
 		constraintValidatorCache.putIfAbsent( key, constraintValidator );
 	}
 
+	private <V, A extends Annotation> ConstraintValidator<A, V> createAndInitializeValidator(
+			ConstraintValidatorFactory constraintFactory,
+			Class<? extends ConstraintValidator<?, ?>> validatorClass,
+			ConstraintDescriptor<A> descriptor) {
+		@SuppressWarnings("unchecked")
+		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintFactory.getInstance(
+				validatorClass
+		);
+		if ( constraintValidator == null ) {
+			throw log.getConstraintFactoryMustNotReturnNullException( validatorClass.getName() );
+		}
+		initializeConstraint( descriptor, constraintValidator );
+		return constraintValidator;
+	}
+
+	private void clearEntriesForFactory(ConstraintValidatorFactory constraintFactory) {
+		List<CacheKey> entriesToRemove = new ArrayList<CacheKey>();
+		for ( Map.Entry<CacheKey, ConstraintValidator<?, ?>> entry : constraintValidatorCache.entrySet() ) {
+			if ( entry.getKey().getConstraintFactory() == constraintFactory ) {
+				entriesToRemove.add( entry.getKey() );
+			}
+		}
+		for ( CacheKey key : entriesToRemove ) {
+			constraintValidatorCache.remove( key );
+		}
+	}
+
 	public void clear() {
 		for ( Map.Entry<CacheKey, ConstraintValidator<?, ?>> entry : constraintValidatorCache.entrySet() ) {
 			entry.getKey().getConstraintFactory().releaseInstance( entry.getValue() );
@@ -79,8 +160,110 @@ public class ConstraintValidatorManager {
 		constraintValidatorCache.clear();
 	}
 
+	public ConstraintValidatorFactory getDefaultConstraintValidatorFactory() {
+		return defaultConstraintValidatorFactory;
+	}
+
 	public int numberOfCachedConstraintValidatorInstances() {
 		return constraintValidatorCache.size();
+	}
+
+	/**
+	 * Runs the validator resolution algorithm.
+	 *
+	 * @param validatedValueType The type of the value to be validated (the type of the member/class the constraint was placed on).
+	 *
+	 * @return The class of a matching validator.
+	 */
+	private <A extends Annotation> Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(ConstraintDescriptor<A> descriptor, Type validatedValueType) {
+		Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
+				descriptor.getConstraintValidatorClasses()
+		);
+		Map<Type, Type> suitableTypeMap = newHashMap();
+
+		if ( suitableTypeMap.containsKey( validatedValueType ) ) {
+			return availableValidatorTypes.get( suitableTypeMap.get( validatedValueType ) );
+		}
+
+		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes );
+		resolveAssignableTypes( discoveredSuitableTypes );
+		verifyResolveWasUnique( validatedValueType, discoveredSuitableTypes );
+
+		Type suitableType = discoveredSuitableTypes.get( 0 );
+		suitableTypeMap.put( validatedValueType, suitableType );
+		return availableValidatorTypes.get( suitableType );
+	}
+
+	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
+		if ( assignableClasses.size() == 0 ) {
+			String className = valueClass.toString();
+			if ( valueClass instanceof Class ) {
+				Class<?> clazz = (Class<?>) valueClass;
+				if ( clazz.isArray() ) {
+					className = clazz.getComponentType().toString() + "[]";
+				}
+				else {
+					className = clazz.getName();
+				}
+			}
+			throw log.getNoValidatorFoundForTypeException( className );
+		}
+		else if ( assignableClasses.size() > 1 ) {
+			StringBuilder builder = new StringBuilder();
+			for ( Type clazz : assignableClasses ) {
+				builder.append( clazz );
+				builder.append( ", " );
+			}
+			builder.delete( builder.length() - 2, builder.length() );
+			throw log.getMoreThanOneValidatorFoundForTypeException( valueClass, builder.toString() );
+		}
+	}
+
+	private List<Type> findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes) {
+		List<Type> determinedSuitableTypes = new ArrayList<Type>();
+		for ( Type validatorType : availableValidatorTypes.keySet() ) {
+			if ( TypeHelper.isAssignable( validatorType, type )
+					&& !determinedSuitableTypes.contains( validatorType ) ) {
+				determinedSuitableTypes.add( validatorType );
+			}
+		}
+		return determinedSuitableTypes;
+	}
+
+	private <A extends Annotation> void initializeConstraint(ConstraintDescriptor<A> descriptor, ConstraintValidator<A, ?> constraintValidator) {
+		try {
+			constraintValidator.initialize( descriptor.getAnnotation() );
+		}
+		catch ( RuntimeException e ) {
+			throw log.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass().getName(), e );
+		}
+	}
+
+	/**
+	 * Tries to reduce all assignable classes down to a single class.
+	 *
+	 * @param assignableTypes The set of all classes which are assignable to the class of the value to be validated and
+	 * which are handled by at least one of the  validators for the specified constraint.
+	 */
+	private void resolveAssignableTypes(List<Type> assignableTypes) {
+		if ( assignableTypes.size() == 0 || assignableTypes.size() == 1 ) {
+			return;
+		}
+
+		List<Type> typesToRemove = new ArrayList<Type>();
+		do {
+			typesToRemove.clear();
+			Type type = assignableTypes.get( 0 );
+			for ( int i = 1; i < assignableTypes.size(); i++ ) {
+				if ( TypeHelper.isAssignable( type, assignableTypes.get( i ) ) ) {
+					typesToRemove.add( type );
+				}
+				else if ( TypeHelper.isAssignable( assignableTypes.get( i ), type ) ) {
+					typesToRemove.add( assignableTypes.get( i ) );
+				}
+			}
+			assignableTypes.removeAll( typesToRemove );
+		} while ( typesToRemove.size() > 0 );
 	}
 
 	private static final class CacheKey {

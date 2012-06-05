@@ -54,7 +54,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private final MessageInterpolator messageInterpolator;
 	private final TraversableResolver traversableResolver;
-	private final ConstraintValidatorFactory constraintValidatorFactory;
 	private final ParameterNameProvider parameterNameProvider;
 	private final BeanMetaDataManager metaDataManager;
 	private final ConstraintValidatorManager constraintValidatorManager;
@@ -62,7 +61,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
-		this.constraintValidatorFactory = configurationState.getConstraintValidatorFactory();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = configurationState.getParameterNameProvider();
 		ConstraintHelper constraintHelper = new ConstraintHelper();
@@ -101,7 +99,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 		this.failFast = tmpFailFast;
 		metaDataManager = new BeanMetaDataManager( constraintHelper, parameterNameProvider, metaDataProviders );
-		constraintValidatorManager = new ConstraintValidatorManager();
+		constraintValidatorManager = new ConstraintValidatorManager(configurationState.getConstraintValidatorFactory());
 	}
 
 	@Override
@@ -121,7 +119,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
-		return constraintValidatorFactory;
+		return constraintValidatorManager.getDefaultConstraintValidatorFactory();
 	}
 
 	@Override
@@ -135,7 +133,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public HibernateValidatorContext usingContext() {
 		return new ValidatorContextImpl(
-				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
 				parameterNameProvider,

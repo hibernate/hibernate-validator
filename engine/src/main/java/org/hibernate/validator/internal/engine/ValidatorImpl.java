@@ -129,6 +129,7 @@ public class ValidatorImpl implements Validator {
 		validationOrderGenerator = new ValidationOrderGenerator();
 	}
 
+	@Override
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
@@ -149,6 +150,7 @@ public class ValidatorImpl implements Validator {
 		return validateInContext( valueContext, validationContext, validationOrder );
 	}
 
+	@Override
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
@@ -168,6 +170,7 @@ public class ValidatorImpl implements Validator {
 		return validatePropertyInContext( context, PathImpl.createPathFromString( propertyName ), validationOrder );
 	}
 
+	@Override
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
 
 		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
@@ -229,6 +232,7 @@ public class ValidatorImpl implements Validator {
 		throw new IllegalArgumentException( "Not yet implemented" );
 	}
 
+	@Override
 	public <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
 
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
@@ -251,10 +255,12 @@ public class ValidatorImpl implements Validator {
 		return context.getFailingConstraints();
 	}
 
+	@Override
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return beanMetaDataManager.getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
+	@Override
 	public final <T> T unwrap(Class<T> type) {
 		if ( type.isAssignableFrom( getClass() ) ) {
 			return type.cast( this );
