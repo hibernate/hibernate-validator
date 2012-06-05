@@ -26,6 +26,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -68,15 +69,19 @@ public class ConstraintValidatorManager {
 	}
 
 	/**
-	 * @param validatedValueType the type of the value to be validated
-	 * @param descriptor the constraint descriptor for which to get an initalized constraint validator
-	 * @param constraintFactory constraint factory used to instantiate the constraint validator
+	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}
+	 * @param descriptor the constraint descriptor for which to get an initalized constraint validator. Cannot be {@code null}
+	 * @param constraintFactory constraint factory used to instantiate the constraint validator. Cannot be {@code null}.
 	 *
 	 * @return A initialized constraint validator for the given type and annotation of the value to be validated.
 	 */
 	public <V, A extends Annotation> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType,
 																					   ConstraintDescriptor<A> descriptor,
 																					   ConstraintValidatorFactory constraintFactory) {
+		Contracts.assertNotNull( validatedValueType );
+		Contracts.assertNotNull( descriptor );
+		Contracts.assertNotNull( constraintFactory );
+
 		final CacheKey key = new CacheKey(
 				descriptor.getAnnotation(),
 				validatedValueType,
@@ -113,7 +118,7 @@ public class ConstraintValidatorManager {
 										 ConstraintValidator<?, ?> constraintValidator) {
 		// we only cache constraint validator instance for the default and least recently used factory
 		if ( constraintFactory != defaultConstraintValidatorFactory && constraintFactory != leastRecentlyUsedNonDefaultConstraintValidatorFactory ) {
-			clearEntriesForFactory( constraintFactory );
+			clearEntriesForFactory( leastRecentlyUsedNonDefaultConstraintValidatorFactory );
 			leastRecentlyUsedNonDefaultConstraintValidatorFactory = constraintFactory;
 		}
 
