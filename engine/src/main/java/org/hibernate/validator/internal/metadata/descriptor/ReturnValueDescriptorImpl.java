@@ -45,6 +45,15 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl implements 
 	public Kind getKind() {
 		return Kind.RETURN_VALUE;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ReturnValueDescriptorImpl" );
+		sb.append( "{cascaded=" ).append( cascaded );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
 
 
