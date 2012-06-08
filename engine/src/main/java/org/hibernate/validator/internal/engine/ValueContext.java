@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -107,9 +108,6 @@ public class ValueContext<T, V> {
 		this.parameterName = parameterName;
 	}
 
-	/**
-	 * @return returns the current path.
-	 */
 	public final PathImpl getPropertyPath() {
 		return propertyPath;
 	}
@@ -146,24 +144,11 @@ public class ValueContext<T, V> {
 		return currentValue;
 	}
 
-	/**
-	 * Sets the property path to the match the currently validated value. To avoid side effects a copy of the
-	 * provided path is stored.
-	 *
-	 * @param propertyPath Sets the new property path.
-	 */
 	public final void setPropertyPath(PathImpl propertyPath) {
 		this.propertyPath = propertyPath;
 	}
 
-	/**
-	 * Adds a new node with the specified name to the current property path.
-	 *
-	 * @param node the name of the new node. Cannot be {@code null}.
-	 */
 	public final void appendNode(String node) {
-//		Contracts.assertValueNotNull( node, "node" );
-
 		propertyPath = PathImpl.createCopy( propertyPath );
 		propertyPath.addNode( node );
 	}
