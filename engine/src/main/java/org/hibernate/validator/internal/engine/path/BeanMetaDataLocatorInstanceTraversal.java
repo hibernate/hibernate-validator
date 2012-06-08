@@ -25,29 +25,33 @@ import javax.validation.Path;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * @author Hardy Ferentschik
  */
-public class BeanMetaDataInstanceTraversal extends BeanMetaDataLocator {
+public class BeanMetaDataLocatorInstanceTraversal extends BeanMetaDataLocator {
 	private final Object rootBean;
 	private final BeanMetaDataManager beanMetaDataManager;
 
-	BeanMetaDataInstanceTraversal(Object rootBean, BeanMetaDataManager beanMetaDataManager) {
+	BeanMetaDataLocatorInstanceTraversal(Object rootBean, BeanMetaDataManager beanMetaDataManager) {
 		this.rootBean = rootBean;
 		this.beanMetaDataManager = beanMetaDataManager;
 	}
 
 	@Override
-	public Iterator<BeanMetaData<?>> beanMetaDataIterator(Path path) {
+	public Iterator<BeanMetaData<?>> beanMetaDataIterator(Iterator<Path.Node> nodeIterator) {
+		Contracts.assertNotNull( nodeIterator );
+
 		List<BeanMetaData<?>> metaDataList = new ArrayList<BeanMetaData<?>>();
 
 		// the path was created as part of the validation, hence we have to be able to access the different
 		// involved bean metadata instances
 		Object currentValue = rootBean;
 		Class<?> currentClass = rootBean.getClass();
-		for ( Path.Node node : path ) {
+		while ( nodeIterator.hasNext() ){
+			Path.Node node = nodeIterator.next();
 			BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( currentClass );
 			metaDataList.add( beanMetaData );
 

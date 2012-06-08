@@ -77,5 +77,4 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	public interface ValidationGroup {
 	}
-
 }

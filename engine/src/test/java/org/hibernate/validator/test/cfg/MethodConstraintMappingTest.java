@@ -80,7 +80,7 @@ public class MethodConstraintMappingTest {
 		}
 		catch ( ConstraintViolationException e ) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "GreetingService#greet().message" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.$retval.message" );
 		}
 	}
 
@@ -101,7 +101,7 @@ public class MethodConstraintMappingTest {
 		}
 		catch ( ConstraintViolationException e ) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0).name" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.arg0.name" );
 		}
 	}
 
@@ -192,7 +192,7 @@ public class MethodConstraintMappingTest {
 		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.arg0" );
 		}
 	}
 
@@ -219,7 +219,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.arg0" );
 		}
 	}
 
@@ -248,7 +248,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)", "GreetingService#greet(arg0)" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.arg0", "GreetingService#greet.arg0" );
 		}
 	}
 
@@ -278,7 +278,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 1 and 10"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)", "GreetingService#greet(arg1)" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.arg0", "GreetingService#greet.arg1" );
 		}
 	}
 
@@ -306,7 +306,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#sayHello(arg0)", "GreetingService#sayHello(arg0)" );
+			assertCorrectPropertyPaths( e, "GreetingService#sayHello.arg0", "GreetingService#sayHello.arg0" );
 		}
 	}
 
@@ -331,7 +331,7 @@ public class MethodConstraintMappingTest {
 		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0)" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.arg0" );
 		}
 
 		try {
@@ -342,7 +342,7 @@ public class MethodConstraintMappingTest {
 		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "GreetingService#greet(arg0).name" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.arg0.name" );
 		}
 	}
 
@@ -368,7 +368,7 @@ public class MethodConstraintMappingTest {
 		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "size must be between 1 and 10" );
-			assertCorrectPropertyPaths( e, "GreetingService#greet()" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.$retval" );
 		}
 	}
 
@@ -397,7 +397,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#greet()", "GreetingService#greet()" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.$retval", "GreetingService#greet.$retval" );
 		}
 	}
 
@@ -425,7 +425,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#greet()" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.$retval" );
 		}
 	}
 
@@ -453,7 +453,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#greet()", "GreetingService#greet()" );
+			assertCorrectPropertyPaths( e, "GreetingService#greet.$retval", "GreetingService#greet.$retval" );
 		}
 	}
 
@@ -480,7 +480,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "may not be null"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#getHello()" );
+			assertCorrectPropertyPaths( e, "GreetingService#getHello.$retval" );
 		}
 	}
 
@@ -507,7 +507,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "may not be null"
 			);
-			assertCorrectPropertyPaths( e, "GreetingService#getUser().name" );
+			assertCorrectPropertyPaths( e, "GreetingService#getUser.$retval.name" );
 		}
 	}
 

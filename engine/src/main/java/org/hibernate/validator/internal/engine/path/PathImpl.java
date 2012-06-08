@@ -43,6 +43,7 @@ public final class PathImpl implements Path, Serializable {
 	private static final Log log = LoggerFactory.make();
 
 	public static final String PROPERTY_PATH_SEPARATOR = ".";
+	public static final String RETURN_VALUE_NODE_NAME = "$retval";
 
 	/**
 	 * Regular expression used to split a string path into its elements.
@@ -142,16 +143,30 @@ public final class PathImpl implements Path, Serializable {
 
 	private NodeImpl addMethodParameterNode(Method method, String parameterName) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = new MethodParameterNodeImpl( method, parameterName, parent );
+
+		// create a node for the method
+		String methodNodeName = method.getDeclaringClass().getSimpleName() + "#" + method.getName();
+		nodeList.add( new NodeImpl( methodNodeName, parent, false, null, null ) );
+
+		// now a node for the parameter
+		currentLeafNode = new NodeImpl( parameterName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
+
 		hashCode = -1;
 		return currentLeafNode;
 	}
 
 	private NodeImpl addMethodReturnValueNode(Method method) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = new MethodReturnValueNodeImpl( method, parent );
+
+		// create a node for the method
+		String methodNodeName = method.getDeclaringClass().getSimpleName() + "#" + method.getName();
+		nodeList.add( new NodeImpl( methodNodeName, parent, false, null, null ) );
+
+		// now a node for the return value
+		currentLeafNode = new NodeImpl( RETURN_VALUE_NODE_NAME, parent, false, null, null );
 		nodeList.add( currentLeafNode );
+
 		hashCode = -1;
 		return currentLeafNode;
 	}
@@ -184,6 +199,7 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
+	@Override
 	public final Iterator<Path.Node> iterator() {
 		if ( nodeList.size() == 0 ) {
 			return Collections.<Path.Node>emptyList().iterator();
@@ -279,7 +295,7 @@ public final class PathImpl implements Path, Serializable {
 		int i = 0;
 		for ( Path.Node node : path ) {
 			NodeImpl oldNode = (NodeImpl) node;
-			NodeImpl newNode = new NodeImpl( oldNode, parent, elementDescriptors.get( i ));
+			NodeImpl newNode = new NodeImpl( oldNode, parent, elementDescriptors.get( i ) );
 			nodeList.add( newNode );
 			parent = newNode;
 			i++;

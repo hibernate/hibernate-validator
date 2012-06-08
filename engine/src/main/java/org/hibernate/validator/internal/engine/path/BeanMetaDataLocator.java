@@ -17,27 +17,30 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.util.Iterator;
-
 import javax.validation.Path;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 
 /**
- * Given a {@code Path} the {@code BeanMetaDataLocator} creates an iterator over
+ * Given a {@code Iterator<Path.Node>} the {@code BeanMetaDataLocator} creates an iterator over
  * all bean meta instances required by this path.
  *
  * @author Hardy Ferentschik
  */
 public abstract class BeanMetaDataLocator {
-	public static BeanMetaDataLocator createBeanMetaDataLocator(Object rootBean, Class<?> rootBeanClass, BeanMetaDataManager beanMetaDataManager) {
+	public static BeanMetaDataLocator createBeanMetaDataLocatorForBeanValidation(
+			Object rootBean,
+			Class<?> rootBeanClass,
+			BeanMetaDataManager beanMetaDataManager
+	) {
 		if ( rootBean == null ) {
-			return new BeanMetaDataLocatorClassTraversal( rootBeanClass, beanMetaDataManager  );
+			return new BeanMetaDataLocatorClassTraversal( rootBeanClass, beanMetaDataManager );
 		}
 		else {
-			return new BeanMetaDataInstanceTraversal( rootBean,  beanMetaDataManager );
+			return new BeanMetaDataLocatorInstanceTraversal( rootBean, beanMetaDataManager );
 		}
 	}
 
-	public abstract Iterator<BeanMetaData<?>> beanMetaDataIterator(Path path);
+	public abstract Iterator<BeanMetaData<?>> beanMetaDataIterator(Iterator<Path.Node> nodeIterator);
 }

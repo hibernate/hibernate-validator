@@ -25,6 +25,7 @@ import javax.validation.Path;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -40,10 +41,13 @@ public class BeanMetaDataLocatorClassTraversal extends BeanMetaDataLocator {
 	}
 
 	@Override
-	public Iterator<BeanMetaData<?>> beanMetaDataIterator(Path path) {
+	public Iterator<BeanMetaData<?>> beanMetaDataIterator(Iterator<Path.Node> nodeIterator) {
+		Contracts.assertNotNull( nodeIterator );
+
 		List<BeanMetaData<?>> metaDataList = new ArrayList<BeanMetaData<?>>();
 		Class<?> currentClass = rootBeanClass;
-		for ( Path.Node node : path ) {
+		while(nodeIterator.hasNext()){
+			Path.Node node = nodeIterator.next();
 			BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( currentClass );
 			metaDataList.add( beanMetaData );
 

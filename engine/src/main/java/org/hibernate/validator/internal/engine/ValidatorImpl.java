@@ -208,6 +208,7 @@ public class ValidatorImpl implements Validator {
 				beanMetaDataManager,
 				constraintValidatorManager,
 				method,
+				parameterValues,
 				object,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -243,6 +244,7 @@ public class ValidatorImpl implements Validator {
 				beanMetaDataManager,
 				constraintValidatorManager,
 				method,
+				null,
 				object,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -447,7 +449,8 @@ public class ValidatorImpl implements Validator {
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
 			valueContext.appendNode( ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() ) );
-		} else {
+		}
+		else {
 			valueContext.appendNode( null );
 		}
 
@@ -794,7 +797,9 @@ public class ValidatorImpl implements Validator {
 	 *
 	 * @return The number of constraint violations raised when validating the default group.
 	 */
-	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext, List<MetaConstraint<?>> constraintList) {
+	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext,
+														  ValidationContext<T, ConstraintViolation<T>> validationContext,
+														  List<MetaConstraint<?>> constraintList) {
 		final int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
@@ -853,7 +858,10 @@ public class ValidatorImpl implements Validator {
 		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
-	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, ValidationOrder validationOrder) {
+	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext,
+												 T object,
+												 Object[] parameterValues,
+												 ValidationOrder validationOrder) {
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 
@@ -921,13 +929,6 @@ public class ValidatorImpl implements Validator {
 			int numberOfViolationsOfCurrentGroup = 0;
 
 			for ( int i = 0; i < parameterValues.length; i++ ) {
-
-				//ignore this parameter if this validation is for a single parameter and this is not the right one
-				if ( validationContext.getParameterIndex() != null && !validationContext.getParameterIndex()
-						.equals( i ) ) {
-					continue;
-				}
-
 				Object value = parameterValues[i];
 				String parameterName = methodMetaData.getParameterMetaData( i ).getName();
 
@@ -955,24 +956,19 @@ public class ValidatorImpl implements Validator {
 		// validate parameter beans annotated with @Valid if required
 		for ( int i = 0; i < parameterValues.length; i++ ) {
 
-			//ignore this parameter if this validation is for a single parameter and this is not the right one
-			if ( validationContext.getParameterIndex() != null && !validationContext.getParameterIndex().equals( i ) ) {
-				continue;
-			}
-
 			Object value = parameterValues[i];
 			ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( i );
 			String parameterName = parameterMetaData.getName();
 
 			if ( parameterMetaData.isCascading() && value != null ) {
 
-				ValueContext<Object, ?> cascadingvalueContext = ValueContext.getLocalExecutionContext(
+				ValueContext<Object, ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
 						value, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
 				);
-				cascadingvalueContext.setCurrentGroup( group.getDefiningClass() );
+				cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
 
 				//TODO GM: consider violations from cascaded validation
-				validateCascadedMethodConstraints( validationContext, cascadingvalueContext );
+				validateCascadedMethodConstraints( validationContext, cascadingValueContext );
 				if ( shouldFailFast( validationContext ) ) {
 					break;
 				}

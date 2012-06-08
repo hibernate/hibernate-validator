@@ -40,16 +40,10 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.util.IdentitySet;
 
 /**
- * Context object keeping track of all required data for a
- * <ul>
- * <li>{@link javax.validation.Validator#validate(Object, Class[])}</li>
- * <li>{@link javax.validation.Validator#validateValue(Class, String, Object, Class[])}</li>
- * <li>or {@link javax.validation.Validator#validateProperty(Object, String, Class[])}</li>
- * </ul>
- * call
- * <p>
- * We use this object to collect all failing constraints, but also to cache the caching traversable resolver for a full stack call.
- * </p>
+ * Context object keeping track of all required data for a validation call.
+ *
+ * We use this object to collect all failing constraints, but also to have access to resources like
+ * constraint validator factory, message interpolator, traversable resolver, etc.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
@@ -185,6 +179,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			Method method,
+			Object[] parameterValues,
 			T object,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -198,6 +193,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 				rootBeanClass,
 				object,
 				method,
+				parameterValues,
 				messageInterpolator,
 				constraintValidatorFactory,
 				traversableResolver,
@@ -251,9 +247,8 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		return constraintValidatorManager;
 	}
 
-	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor);
-
-	public final <U, V> List<C> createConstraintViolations(ValueContext<U, V> localContext, ConstraintValidatorContextImpl constraintValidatorContext) {
+	public final <U, V> List<C> createConstraintViolations(ValueContext<U, V> localContext,
+														   ConstraintValidatorContextImpl constraintValidatorContext) {
 		List<C> constraintViolations = new ArrayList<C>();
 		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
 			C violation = createConstraintViolation(
@@ -292,6 +287,19 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	public Set<C> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ValidationContext" );
+		sb.append( "{rootBean=" ).append( rootBean );
+		sb.append( '}' );
+		return sb.toString();
+	}
+
+	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext,
+													   MessageAndPath messageAndPath,
+													   ConstraintDescriptor<?> descriptor);
 
 	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
 		Set<PathImpl> pathSet = processedPaths.get( value );

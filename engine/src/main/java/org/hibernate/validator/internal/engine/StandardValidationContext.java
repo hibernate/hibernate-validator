@@ -68,9 +68,9 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 	}
 
 	@Override
-	public <U, V> ConstraintViolation<T> createConstraintViolation(
-			ValueContext<U, V> localContext, MessageAndPath messageAndPath,
-			ConstraintDescriptor<?> descriptor) {
+	public <U, V> ConstraintViolation<T> createConstraintViolation(ValueContext<U, V> localContext,
+																   MessageAndPath messageAndPath,
+																   ConstraintDescriptor<?> descriptor) {
 
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
@@ -78,7 +78,7 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
 
-		Path path = createPathWithElementDescriptors( messageAndPath );
+		Path path = createPathWithElementDescriptors( messageAndPath.getPath() );
 
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
@@ -93,16 +93,16 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 		);
 	}
 
-	private Path createPathWithElementDescriptors(MessageAndPath messageAndPath) {
-		BeanMetaDataLocator traverser = BeanMetaDataLocator.createBeanMetaDataLocator(
+	private Path createPathWithElementDescriptors(Path path) {
+		BeanMetaDataLocator traverser = BeanMetaDataLocator.createBeanMetaDataLocatorForBeanValidation(
 				getRootBean(),
 				getRootBeanClass(),
 				getBeanMetaDataManager()
 		);
-		Iterator<BeanMetaData<?>> beanMetaDataIterator = traverser.beanMetaDataIterator( messageAndPath.getPath() );
+		Iterator<BeanMetaData<?>> beanMetaDataIterator = traverser.beanMetaDataIterator( path.iterator() );
 
 		List<ElementDescriptor> elementDescriptors = new ArrayList<ElementDescriptor>();
-		for ( Path.Node node : messageAndPath.getPath() ) {
+		for ( Path.Node node : path ) {
 			BeanMetaData beanMetaData = beanMetaDataIterator.next();
 			if ( isClassLevelConstraintNode( node.getName() ) ) {
 				BeanDescriptor beanDescriptor = beanMetaData.getBeanDescriptor();
@@ -117,7 +117,7 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 		}
 
 		return PathImpl.createCopyWithElementDescriptorsAttached(
-				(PathImpl) messageAndPath.getPath(),
+				(PathImpl) path,
 				elementDescriptors
 		);
 	}

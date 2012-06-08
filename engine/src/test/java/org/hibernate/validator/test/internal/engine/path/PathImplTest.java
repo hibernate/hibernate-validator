@@ -182,7 +182,7 @@ public class PathImplTest {
 				Container.class.getMethod( "addItem", Key.class, Item.class ), "arg0"
 		);
 
-		assertEquals( methodParameterPath.toString(), "Container#addItem(arg0)" );
+		assertEquals( methodParameterPath.toString(), "Container#addItem.arg0" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -200,7 +200,7 @@ public class PathImplTest {
 				Container.class.getMethod( "addItem", Key.class, Item.class )
 		);
 
-		assertEquals( methodParameterPath.toString(), "Container#addItem()" );
+		assertEquals( methodParameterPath.toString(), "Container#addItem.$retval" );
 	}
 
 	@Test(

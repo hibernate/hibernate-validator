@@ -65,9 +65,7 @@ public class CascadingWithConstraintMappingTest {
 
 		Set<ConstraintViolation<B>> violations = validator.validate( b );
 
-		assertNumberOfViolations( violations, 1 )
-		;
-
+		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 	}
 

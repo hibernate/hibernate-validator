@@ -138,9 +138,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 					);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public void add(ConstrainedElement constrainedElement) {
 			ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 
@@ -150,9 +148,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			returnValueConstraints.addAll( constrainedMethod.getConstraints() );
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public MethodMetaData build() {
 			ExecutableElement executableElement = location.getExecutableElement();
 
@@ -345,6 +341,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		return parameterTypes;
 	}
 
+	@Override
 	public MethodDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new MethodDescriptorImpl(
 				getType(),
