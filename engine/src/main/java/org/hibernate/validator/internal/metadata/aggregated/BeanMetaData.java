@@ -17,12 +17,12 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
@@ -89,7 +89,7 @@ public interface BeanMetaData<T> {
 	 *         given method all the methods from super-types which it overrides
 	 *         or implements.
 	 */
-	MethodMetaData getMetaDataFor(Method method);
+	MethodMetaData getMetaDataFor(ExecutableElement method);
 
 	/**
 	 * @param name The name of the property

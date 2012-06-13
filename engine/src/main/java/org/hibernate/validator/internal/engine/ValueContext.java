@@ -21,7 +21,6 @@ import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.util.Contracts;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -87,6 +86,10 @@ public class ValueContext<T, V> {
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath, int parameterIndex, String parameterName) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) value.getClass();
+		return new ValueContext<T, V>( value, rootBeanClass, propertyPath, parameterIndex, parameterName );
+	}
+
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Class<T> rootBeanClass, PathImpl propertyPath, int parameterIndex, String parameterName) {
 		return new ValueContext<T, V>( value, rootBeanClass, propertyPath, parameterIndex, parameterName );
 	}
 

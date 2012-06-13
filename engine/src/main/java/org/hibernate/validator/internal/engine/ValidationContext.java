@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.engine;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +36,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.IdentitySet;
 
 /**
@@ -178,7 +178,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	public static <T> MethodValidationContext<T> getContextForValidateParameters(
 			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
-			Method method,
+			ExecutableElement executable,
 			Object[] parameterValues,
 			T object,
 			MessageInterpolator messageInterpolator,
@@ -186,13 +186,14 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 			TraversableResolver traversableResolver,
 			boolean failFast) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = (Class<T>) object.getClass();
+		Class<T> rootBeanClass = object != null ? (Class<T>) object.getClass() : (Class<T>) executable.getMember()
+				.getDeclaringClass();
 		return new MethodValidationContext<T>(
 				beanMetaDataManager,
 				constraintValidatorManager,
 				rootBeanClass,
 				object,
-				method,
+				executable,
 				parameterValues,
 				messageInterpolator,
 				constraintValidatorFactory,

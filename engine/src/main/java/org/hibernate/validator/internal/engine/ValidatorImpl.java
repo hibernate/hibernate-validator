@@ -49,6 +49,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
@@ -197,6 +198,18 @@ public class ValidatorImpl implements Validator {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
+		return validateParameters( object, ExecutableElement.forMethod( method ), parameterValues, groups );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<T> constructor, Object[] parameterValues, Class<?>... groups) {
+
+		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
+
+		return validateParameters( null, ExecutableElement.forConstructor( constructor ), parameterValues, groups );
+	}
+
+	private <T> Set<ConstraintViolation<T>> validateParameters(T object, ExecutableElement executable, Object[] parameterValues, Class<?>... groups) {
 		//this might be the case for parameterless methods
 		if ( parameterValues == null ) {
 			return Collections.emptySet();
@@ -207,7 +220,7 @@ public class ValidatorImpl implements Validator {
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				beanMetaDataManager,
 				constraintValidatorManager,
-				method,
+				executable,
 				parameterValues,
 				object,
 				messageInterpolator,
@@ -219,12 +232,6 @@ public class ValidatorImpl implements Validator {
 		validateParametersInContext( context, object, parameterValues, validationOrder );
 
 		return context.getFailingConstraints();
-	}
-
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<T> constructor, Object[] parameterValues, Class<?>... groups) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
 	}
 
 	@Override
@@ -243,7 +250,7 @@ public class ValidatorImpl implements Validator {
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				beanMetaDataManager,
 				constraintValidatorManager,
-				method,
+				ExecutableElement.forMethod( method ),
 				null,
 				object,
 				messageInterpolator,
@@ -866,7 +873,7 @@ public class ValidatorImpl implements Validator {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 
 		//assert that there are no illegal method parameter constraints
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getMethod() );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
 		methodMetaData.assertCorrectnessOfMethodParameterConstraints();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
@@ -904,10 +911,10 @@ public class ValidatorImpl implements Validator {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		Method method = validationContext.getMethod();
+		ExecutableElement executable = validationContext.getExecutable();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( executable );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -933,9 +940,22 @@ public class ValidatorImpl implements Validator {
 				String parameterName = methodMetaData.getParameterMetaData( i ).getName();
 
 				// validate constraints at parameter itself
-				ValueContext<T, Object> valueContext = ValueContext.getLocalExecutionContext(
-						object, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
-				);
+				ValueContext<T, Object> valueContext;
+
+				if ( object != null ) {
+					valueContext = ValueContext.getLocalExecutionContext(
+							object, PathImpl.createPathForParameter( executable, parameterName ), i, parameterName
+					);
+				}
+				else {
+					valueContext = ValueContext.getLocalExecutionContext(
+							object,
+							(Class<T>) executable.getMember().getDeclaringClass(),
+							PathImpl.createPathForParameter( executable, parameterName ),
+							i,
+							parameterName
+					);
+				}
 				valueContext.setCurrentValidatedValue( value );
 				valueContext.setCurrentGroup( oneGroup );
 
@@ -963,7 +983,7 @@ public class ValidatorImpl implements Validator {
 			if ( parameterMetaData.isCascading() && value != null ) {
 
 				ValueContext<Object, ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
-						value, PathImpl.createPathForMethodParameter( method, parameterName ), i, parameterName
+						value, PathImpl.createPathForParameter( executable, parameterName ), i, parameterName
 				);
 				cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
 
@@ -1051,10 +1071,10 @@ public class ValidatorImpl implements Validator {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		Method method = validationContext.getMethod();
+		ExecutableElement executable = validationContext.getExecutable();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( executable );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1077,7 +1097,7 @@ public class ValidatorImpl implements Validator {
 
 			// validate constraints at return value itself
 			ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
-					bean, PathImpl.createPathForMethodReturnValue( method )
+					bean, PathImpl.createPathForMethodReturnValue( executable )
 			);
 			valueContext.setCurrentValidatedValue( value );
 			valueContext.setCurrentGroup( oneGroup );
@@ -1100,7 +1120,7 @@ public class ValidatorImpl implements Validator {
 		if ( methodMetaData.isCascading() && value != null ) {
 
 			ValueContext<V, Object> cascadingvalueContext = ValueContext.getLocalExecutionContext(
-					value, PathImpl.createPathForMethodReturnValue( method )
+					value, PathImpl.createPathForMethodReturnValue( executable )
 			);
 			cascadingvalueContext.setCurrentGroup( group.getDefiningClass() );
 

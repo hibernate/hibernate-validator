@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.engine.methodlevel.service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 
@@ -28,6 +29,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  * @author Gunnar Morling
  */
 public class CustomerRepositoryImpl implements CustomerRepository {
+
+	public CustomerRepositoryImpl() {
+	}
+
+	public CustomerRepositoryImpl(@NotNull String id) {
+	}
 
 	public Customer findCustomerByName(String name) {
 		return null;

@@ -29,6 +29,7 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -178,8 +179,8 @@ public class PathImplTest {
 	@Test
 	public void testCreationOfMethodParameterPath() throws Exception {
 
-		PathImpl methodParameterPath = PathImpl.createPathForMethodParameter(
-				Container.class.getMethod( "addItem", Key.class, Item.class ), "arg0"
+		PathImpl methodParameterPath = PathImpl.createPathForParameter(
+				ExecutableElement.forMethod( Container.class.getMethod( "addItem", Key.class, Item.class ) ), "arg0"
 		);
 
 		assertEquals( methodParameterPath.toString(), "Container#addItem.arg0" );
@@ -188,8 +189,8 @@ public class PathImplTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testCreationOfMethodParameterPathFailsDueToMissingParameterIndex() throws Exception {
 
-		PathImpl.createPathForMethodParameter(
-				Container.class.getMethod( "addItem", Key.class, Item.class ), null
+		PathImpl.createPathForParameter(
+				ExecutableElement.forMethod( Container.class.getMethod( "addItem", Key.class, Item.class ) ), null
 		);
 	}
 
@@ -197,7 +198,7 @@ public class PathImplTest {
 	public void testCreationOfReturnValuePath() throws Exception {
 
 		PathImpl methodParameterPath = PathImpl.createPathForMethodReturnValue(
-				Container.class.getMethod( "addItem", Key.class, Item.class )
+				ExecutableElement.forMethod( Container.class.getMethod( "addItem", Key.class, Item.class ) )
 		);
 
 		assertEquals( methodParameterPath.toString(), "Container#addItem.$retval" );

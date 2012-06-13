@@ -22,12 +22,13 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 
@@ -55,7 +56,7 @@ public class ParameterMetaDataTest {
 	public void constrainedParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 1 );
 
@@ -73,7 +74,7 @@ public class ParameterMetaDataTest {
 	public void cascadingParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -88,7 +89,7 @@ public class ParameterMetaDataTest {
 	public void unconstrainedParameterMetaData() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -101,7 +102,7 @@ public class ParameterMetaDataTest {
 	public void illegalParameterIndexCausesException() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "foo" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
+		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		methodMetaData.getParameterMetaData( 0 );
 	}

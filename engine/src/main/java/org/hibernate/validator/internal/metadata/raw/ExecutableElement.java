@@ -22,6 +22,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -60,6 +61,10 @@ public abstract class ExecutableElement {
 	public abstract Member getMember();
 
 	public abstract boolean isGetterMethod();
+
+	public String getIdentifier() {
+		return getMember().getName() + Arrays.toString( getParameterTypes() );
+	}
 
 	private static class ConstructorElement extends ExecutableElement {
 

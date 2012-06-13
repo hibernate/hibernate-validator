@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.engine;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +38,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -54,7 +54,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 	/**
 	 * The method of the current validation call.
 	 */
-	private final Method method;
+	private final ExecutableElement method;
 
 	/**
 	 * The index of the parameter to validate if this context is used for validation of a single parameter, {@code null} otherwise.
@@ -66,7 +66,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 			ConstraintValidatorManager constraintValidatorManager,
 			Class<T> rootBeanClass,
 			T rootBean,
-			Method method,
+			ExecutableElement method,
 			Object[] parameterValues,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -88,7 +88,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		this.parameterValues = parameterValues;
 	}
 
-	public Method getMethod() {
+	public ExecutableElement getExecutable() {
 		return method;
 	}
 
@@ -176,7 +176,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		Iterator<Path.Node> nodeIterator = advanceIteratorToCascadedNode( path );
 		while ( nodeIterator.hasNext() ) {
 			Path.Node node = nodeIterator.next();
-			BeanMetaData beanMetaData = beanMetaDataIterator.next();
+			BeanMetaData<?> beanMetaData = beanMetaDataIterator.next();
 			if ( isClassLevelConstraintNode( node.getName() ) ) {
 				BeanDescriptor beanDescriptor = beanMetaData.getBeanDescriptor();
 				elementDescriptors.add( beanDescriptor );
@@ -211,11 +211,11 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 	}
 
 	private MethodDescriptor getMethodDescriptor() {
-		BeanMetaData<?> rootMetaData = getBeanMetaDataManager().getBeanMetaData( getRootBean().getClass() );
+		BeanMetaData<?> rootMetaData = getBeanMetaDataManager().getBeanMetaData( getRootBeanClass() );
 		MethodMetaData methodMetaData = rootMetaData.getMetaDataFor( method );
 		BeanDescriptor beanDescriptor = rootMetaData.getBeanDescriptor();
 		return beanDescriptor.getConstraintsForMethod(
-				method.getName(),
+				method.getMember().getName(),
 				methodMetaData.getParameterTypes()
 		);
 	}

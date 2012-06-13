@@ -17,7 +17,6 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,6 +26,7 @@ import java.util.regex.Pattern;
 import javax.validation.Path;
 import javax.validation.metadata.ElementDescriptor;
 
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -89,26 +89,26 @@ public final class PathImpl implements Path, Serializable {
 	/**
 	 * Creates a path representing the specified method parameter.
 	 *
-	 * @param method The method hosting the parameter to represent.
+	 * @param executable The executable hosting the parameter to represent.
 	 * @param parameterName The parameter's name, e.g. "arg0" or "param1".
 	 *
 	 * @return A path representing the specified method parameter.
 	 */
-	public static PathImpl createPathForMethodParameter(Method method, String parameterName) {
-		Contracts.assertNotNull( method, "A method is required to create a method parameter path." );
+	public static PathImpl createPathForParameter(ExecutableElement executable, String parameterName) {
+		Contracts.assertNotNull( executable, "A method is required to create a method parameter path." );
 		Contracts.assertNotNull( parameterName, "A parameter name is required to create a method parameter path." );
 
 		PathImpl path = createRootPath();
-		path.addMethodParameterNode( method, parameterName );
+		path.addMethodParameterNode( executable, parameterName );
 
 		return path;
 	}
 
-	public static PathImpl createPathForMethodReturnValue(Method method) {
-		Contracts.assertNotNull( method, "A method is required to create a method return value path." );
+	public static PathImpl createPathForMethodReturnValue(ExecutableElement executable) {
+		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
 		PathImpl path = createRootPath();
-		path.addMethodReturnValueNode( method );
+		path.addMethodReturnValueNode( executable );
 
 		return path;
 	}
@@ -141,11 +141,13 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	private NodeImpl addMethodParameterNode(Method method, String parameterName) {
+	private NodeImpl addMethodParameterNode(ExecutableElement executable, String parameterName) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 
 		// create a node for the method
-		String methodNodeName = method.getDeclaringClass().getSimpleName() + "#" + method.getName();
+		String methodNodeName = executable.getMember()
+				.getDeclaringClass()
+				.getSimpleName() + "#" + executable.getMember().getName();
 		nodeList.add( new NodeImpl( methodNodeName, parent, false, null, null ) );
 
 		// now a node for the parameter
@@ -156,11 +158,13 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	private NodeImpl addMethodReturnValueNode(Method method) {
+	private NodeImpl addMethodReturnValueNode(ExecutableElement executable) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 
 		// create a node for the method
-		String methodNodeName = method.getDeclaringClass().getSimpleName() + "#" + method.getName();
+		String methodNodeName = executable.getMember()
+				.getDeclaringClass()
+				.getSimpleName() + "#" + executable.getMember().getName();
 		nodeList.add( new NodeImpl( methodNodeName, parent, false, null, null ) );
 
 		// now a node for the return value
