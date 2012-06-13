@@ -127,9 +127,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 			add( constrainedMethod );
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public boolean accepts(ConstrainedElement constrainedElement) {
 			return constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
 					ReflectionHelper.haveSameSignature(

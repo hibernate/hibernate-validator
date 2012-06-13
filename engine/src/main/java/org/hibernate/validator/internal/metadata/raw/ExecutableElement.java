@@ -27,7 +27,7 @@ import javax.validation.ParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
- * Provides a unified on {@link Constructor}s and {@link Method}s.
+ * Provides a unified view on {@link Constructor}s and {@link Method}s.
  *
  * @author Gunnar Morling
  */

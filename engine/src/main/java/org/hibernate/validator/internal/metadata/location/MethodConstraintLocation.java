@@ -42,7 +42,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	/**
 	 * Creates a new {@link MethodConstraintLocation}.
 	 *
-	 * @param executableElement The executableElement of the location to be created.
+	 * @param method The method of the location to be created.
 	 * @param parameterIndex The parameter index of the location to be created.
 	 */
 	public MethodConstraintLocation(Method method, Integer parameterIndex) {
