@@ -50,7 +50,7 @@ public class BeanMetaDataLocatorInstanceTraversal extends BeanMetaDataLocator {
 		// involved bean metadata instances
 		Object currentValue = rootBean;
 		Class<?> currentClass = rootBean.getClass();
-		while ( nodeIterator.hasNext() ){
+		while ( nodeIterator.hasNext() ) {
 			Path.Node node = nodeIterator.next();
 			BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( currentClass );
 			metaDataList.add( beanMetaData );
@@ -63,14 +63,12 @@ public class BeanMetaDataLocatorInstanceTraversal extends BeanMetaDataLocator {
 					currentValue = ReflectionHelper.getValue( member, currentValue );
 					if ( currentValue != null ) {
 						currentClass = currentValue.getClass();
-						if ( ReflectionHelper.isIterable( currentClass ) ) {
-							Iterator<?> iter = ReflectionHelper.createIteratorForCascadedValue(
-									currentClass,
-									currentValue
-							);
-							currentValue = iter.next();
-							currentClass = currentValue.getClass();
-						}
+						Iterator<?> iter = ReflectionHelper.createIteratorForCascadedValue(
+								currentClass,
+								currentValue
+						);
+						currentValue = iter.next();
+						currentClass = currentValue.getClass();
 					}
 					break;
 				}

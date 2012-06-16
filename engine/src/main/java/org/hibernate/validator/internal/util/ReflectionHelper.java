@@ -698,14 +698,15 @@ public final class ReflectionHelper {
 	 *
 	 * @return An iterator over the value of a cascaded property.
 	 */
+	//TODO HV-571: Check whether we can unify this with ValidatorImpl#createIteratorForCascadedValue()
 	public static Iterator<?> createIteratorForCascadedValue(Type type, Object value) {
 		Iterator<?> iter;
-		if ( ReflectionHelper.isIterable( type ) ) {
+		if ( isIterable( type ) ) {
 			iter = ( (Iterable<?>) value ).iterator();
 		}
-		else if ( ReflectionHelper.isMap( type ) ) {
+		else if ( isMap( type ) ) {
 			Map<?, ?> map = (Map<?, ?>) value;
-			iter = map.entrySet().iterator();
+			iter = map.values().iterator();
 		}
 		else if ( TypeHelper.isArray( type ) ) {
 			List<?> arrayList = Arrays.asList( (Object[]) value );

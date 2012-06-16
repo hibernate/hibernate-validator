@@ -20,7 +20,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -146,6 +148,7 @@ public class ElementDescriptorFromNodeTest {
 	}
 
 	@Test
+	//TODO HV-571: Add tests where runtime type differs between elements in cascaded list
 	public void testToManyCascadeValidate() {
 		AWithListOfB a = new AWithListOfB();
 
@@ -163,6 +166,60 @@ public class ElementDescriptorFromNodeTest {
 		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
 		PropertyDescriptor propertyDescriptor = descriptor.as( PropertyDescriptor.class );
 		assertEquals( propertyDescriptor.getElementClass(), Collection.class, "unexpected bean class" );
+
+		node = nodeIterator.next();
+		descriptor = node.getElementDescriptor();
+
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
+		propertyDescriptor = descriptor.as( PropertyDescriptor.class );
+		assertEquals( propertyDescriptor.getElementClass(), String.class, "unexpected bean class" );
+	}
+
+	@Test
+	public void testToArrayCascadeValidate() {
+		AWithArrayOfB a = new AWithArrayOfB();
+
+		Set<ConstraintViolation<AWithArrayOfB>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "bs[0].b" );
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		ElementDescriptor descriptor = node.getElementDescriptor();
+
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
+		PropertyDescriptor propertyDescriptor = descriptor.as( PropertyDescriptor.class );
+		assertEquals( propertyDescriptor.getElementClass(), B[].class, "unexpected bean class" );
+
+		node = nodeIterator.next();
+		descriptor = node.getElementDescriptor();
+
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
+		propertyDescriptor = descriptor.as( PropertyDescriptor.class );
+		assertEquals( propertyDescriptor.getElementClass(), String.class, "unexpected bean class" );
+	}
+
+	@Test
+	public void testToMapCascadeValidate() {
+		AWithMapOfB a = new AWithMapOfB();
+
+		Set<ConstraintViolation<AWithMapOfB>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "bs[b].b" );
+
+		Path path = constraintViolations.iterator().next().getPropertyPath();
+		Iterator<Path.Node> nodeIterator = path.iterator();
+
+		Path.Node node = nodeIterator.next();
+		ElementDescriptor descriptor = node.getElementDescriptor();
+
+		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.PROPERTY, "unexpected descriptor type" );
+		PropertyDescriptor propertyDescriptor = descriptor.as( PropertyDescriptor.class );
+		assertEquals( propertyDescriptor.getElementClass(), Map.class, "unexpected bean class" );
 
 		node = nodeIterator.next();
 		descriptor = node.getElementDescriptor();
@@ -209,13 +266,12 @@ public class ElementDescriptorFromNodeTest {
 		assertEquals( propertyDescriptor.getElementClass(), String.class, "unexpected bean class" );
 	}
 
-	@SuppressWarnings("unused")
-	class A {
+	static class A {
 		@NotNull
 		String a;
 	}
 
-	class AWithB {
+	static class AWithB {
 		@Valid
 		B b;
 
@@ -224,7 +280,7 @@ public class ElementDescriptorFromNodeTest {
 		}
 	}
 
-	class AWithListOfB {
+	static class AWithListOfB {
 		@Valid
 		Collection<B> bs;
 
@@ -234,17 +290,36 @@ public class ElementDescriptorFromNodeTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	class B {
+	static class AWithArrayOfB {
+		@Valid
+		B[] bs;
+
+		public AWithArrayOfB() {
+			bs = new B[1];
+			bs[0] = new B();
+		}
+	}
+
+	static class AWithMapOfB {
+		@Valid
+		Map<String, B> bs;
+
+		public AWithMapOfB() {
+			bs = new HashMap<String, B>();
+			bs.put( "b", new B() );
+		}
+	}
+
+	static class B {
 		@NotNull
 		String b;
 	}
 
 	@CustomConstraint
-	class C {
+	static class C {
 	}
 
-	class D {
+	static class D {
 		@Valid
 		C c;
 
