@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.groups.Default;
+import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -102,7 +103,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * The bean descriptor for this bean.
 	 */
-	private final BeanDescriptorImpl<T> beanDescriptor;
+	private final BeanDescriptor beanDescriptor;
 
 	/**
 	 * The default groups sequence for this bean class.
@@ -175,7 +176,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.directMetaConstraints = buildDirectConstraintSets();
 
 		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDataSet ) );
-		this.beanDescriptor = new BeanDescriptorImpl<T>(
+		this.beanDescriptor = new BeanDescriptorImpl(
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
 				getConstrainedPropertiesAsDescriptors(),
@@ -191,7 +192,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public BeanDescriptorImpl<T> getBeanDescriptor() {
+	public BeanDescriptor getBeanDescriptor() {
 		return beanDescriptor;
 	}
 

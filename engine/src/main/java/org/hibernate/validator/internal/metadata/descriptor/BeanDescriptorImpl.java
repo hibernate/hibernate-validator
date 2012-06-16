@@ -40,7 +40,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class BeanDescriptorImpl<T> extends ElementDescriptorImpl implements BeanDescriptor {
+public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDescriptor {
 	private final Map<String, PropertyDescriptor> constrainedProperties;
 	private final Map<String, MethodDescriptor> constrainedMethods;
 

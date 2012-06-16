@@ -20,8 +20,9 @@ import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.metadata.BeanDescriptor;
+
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
@@ -40,7 +41,7 @@ public interface BeanMetaData<T> {
 	/**
 	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.
 	 */
-	BeanDescriptorImpl<T> getBeanDescriptor();
+	BeanDescriptor getBeanDescriptor();
 
 	/**
 	 * @return A list of all cascaded methods and fields (methods/fields annotated with &#064;Valid).
