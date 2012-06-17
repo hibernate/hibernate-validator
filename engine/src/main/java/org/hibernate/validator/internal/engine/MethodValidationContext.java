@@ -37,7 +37,7 @@ import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -212,7 +212,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 
 	private MethodDescriptor getMethodDescriptor() {
 		BeanMetaData<?> rootMetaData = getBeanMetaDataManager().getBeanMetaData( getRootBeanClass() );
-		MethodMetaData methodMetaData = rootMetaData.getMetaDataFor( method );
+		ExecutableMetaData methodMetaData = rootMetaData.getMetaDataFor( method );
 		BeanDescriptor beanDescriptor = rootMetaData.getBeanDescriptor();
 		return beanDescriptor.getConstraintsForMethod(
 				method.getMember().getName(),

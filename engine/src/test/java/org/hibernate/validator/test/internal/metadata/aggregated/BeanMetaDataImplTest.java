@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -40,7 +40,7 @@ import static org.testng.Assert.assertTrue;
  * Unit test for {@link BeanMetaData}.
  *
  * TODO GM: Check, whether these tests are still needed. They seem redundant to
- * {@link MethodMetaDataTest} and {@link org.hibernate.validator.test.internal.metadata.aggregated.AggregatedMethodMetaDataTest}.
+ * {@link MethodMetaDataTest} and {@link org.hibernate.validator.test.internal.metadata.aggregated.ExecutableMetaDataTest}.
  *
  * @author Gunnar Morling
  */
@@ -52,7 +52,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "baz" );
-		MethodMetaData methodMetaData = metaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = metaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
@@ -69,7 +69,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepositoryImpl> metaData = setupBeanMetaData( CustomerRepositoryImpl.class );
 
 		Method method = CustomerRepositoryImpl.class.getMethod( "baz" );
-		MethodMetaData methodMetaData = metaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = metaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertIterableSize( methodMetaData, 1 );
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
@@ -88,7 +88,7 @@ public class BeanMetaDataImplTest {
 		BeanMetaData<CustomerRepository> metaData = setupBeanMetaData( CustomerRepository.class );
 
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
-		MethodMetaData methodMetaData = metaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = metaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertTrue( methodMetaData.isCascading() );

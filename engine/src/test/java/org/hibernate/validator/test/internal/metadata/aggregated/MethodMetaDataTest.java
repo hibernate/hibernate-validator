@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -55,7 +55,7 @@ public class MethodMetaDataTest {
 	public void methodWithConstrainedParameter() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getName(), method.getName() );
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
@@ -69,7 +69,7 @@ public class MethodMetaDataTest {
 	public void methodWithCascadedParameter() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getName(), method.getName() );
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
@@ -83,7 +83,7 @@ public class MethodMetaDataTest {
 	public void methodWithConstrainedReturnValue() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "bar" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getName(), method.getName() );
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
@@ -100,7 +100,7 @@ public class MethodMetaDataTest {
 	public void methodWithCascadedReturnValue() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "foo" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getName(), method.getName() );
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
@@ -114,7 +114,7 @@ public class MethodMetaDataTest {
 	public void unconstrainedMethod() throws Exception {
 
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getName(), method.getName() );
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );

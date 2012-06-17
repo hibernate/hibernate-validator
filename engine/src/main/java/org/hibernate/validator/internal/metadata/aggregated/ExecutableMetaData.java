@@ -59,7 +59,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class MethodMetaData extends AbstractConstraintMetaData {
+public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -81,7 +81,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 */
 	private final String identifier;
 
-	private MethodMetaData(
+	private ExecutableMetaData(
 			String name,
 			Class<?> returnType,
 			Class<?>[] parameterTypes,
@@ -108,7 +108,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	}
 
 	/**
-	 * Creates new {@link MethodMetaData} instances.
+	 * Creates new {@link ExecutableMetaData} instances.
 	 *
 	 * @author Gunnar Morling
 	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
@@ -161,10 +161,10 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		}
 
 		@Override
-		public MethodMetaData build() {
+		public ExecutableMetaData build() {
 			ExecutableElement executableElement = location.getExecutableElement();
 
-			return new MethodMetaData(
+			return new ExecutableMetaData(
 					executableElement.getMember().getName(),
 					executableElement.getReturnType(),
 					executableElement.getParameterTypes(),
@@ -413,7 +413,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
 						parameterBuilder.toString();
 
-		return "MethodMetaData [method=" + getType() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
+		return "ExecutableMetaData [method=" + getType() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
 
@@ -436,7 +436,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		MethodMetaData other = (MethodMetaData) obj;
+		ExecutableMetaData other = (ExecutableMetaData) obj;
 		if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
 			return false;
 		}

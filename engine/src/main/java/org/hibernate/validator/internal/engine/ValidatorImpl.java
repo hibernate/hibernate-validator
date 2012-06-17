@@ -46,7 +46,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -873,7 +873,7 @@ public class ValidatorImpl implements Validator {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 
 		//assert that there are no illegal method parameter constraints
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
 		methodMetaData.assertCorrectnessOfMethodParameterConstraints();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
@@ -914,7 +914,7 @@ public class ValidatorImpl implements Validator {
 		ExecutableElement executable = validationContext.getExecutable();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( executable );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( executable );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1074,7 +1074,7 @@ public class ValidatorImpl implements Validator {
 		ExecutableElement executable = validationContext.getExecutable();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( executable );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( executable );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1131,7 +1131,7 @@ public class ValidatorImpl implements Validator {
 	}
 
 	private <T, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext,
-												   ValueContext<T, V> valueContext, MethodMetaData methodMetaData) {
+												   ValueContext<T, V> valueContext, ExecutableMetaData methodMetaData) {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 

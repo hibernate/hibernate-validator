@@ -90,7 +90,7 @@ public interface BeanMetaData<T> {
 	 *         given method all the methods from super-types which it overrides
 	 *         or implements.
 	 */
-	MethodMetaData getMetaDataFor(ExecutableElement method);
+	ExecutableMetaData getMetaDataFor(ExecutableElement method);
 
 	/**
 	 * @param name The name of the property

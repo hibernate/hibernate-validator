@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.MethodMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -38,11 +38,11 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests creation of {@link MethodMetaData} in {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl}.
+ * Tests creation of {@link ExecutableMetaData} in {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl}.
  *
  * @author Gunnar Morling
  */
-public class AggregatedMethodMetaDataTest {
+public class ExecutableMetaDataTest {
 
 	private BeanMetaData<CustomerRepositoryExt> beanMetaData;
 
@@ -56,7 +56,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithConstrainedParameter() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
@@ -85,7 +85,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithCascadedParameter() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "saveCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
@@ -106,7 +106,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithConstrainedReturnValue() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
@@ -124,7 +124,7 @@ public class AggregatedMethodMetaDataTest {
 	public void returnValueConstraintsAddUpInHierarchy() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
@@ -136,7 +136,7 @@ public class AggregatedMethodMetaDataTest {
 	public void methodWithCascadedReturnValue() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertTrue( methodMetaData.isCascading() );
@@ -148,7 +148,7 @@ public class AggregatedMethodMetaDataTest {
 	public void unconstrainedMethod() throws Exception {
 
 		Method method = CustomerRepositoryExt.class.getMethod( "updateCustomer", Customer.class );
-		MethodMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
