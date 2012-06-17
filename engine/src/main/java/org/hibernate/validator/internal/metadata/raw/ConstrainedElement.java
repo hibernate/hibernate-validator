@@ -54,7 +54,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * @author Gunnar Morling
 	 */
 	public enum ConstrainedElementKind {
-		TYPE, FIELD, METHOD, PARAMETER
+		TYPE, FIELD, CONSTRUCTOR, METHOD, PARAMETER
 	}
 
 	/**

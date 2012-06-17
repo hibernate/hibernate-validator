@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.lang.annotation.ElementType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -92,7 +93,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 
 		super(
 				source,
-				ConstrainedElementKind.METHOD,
+				location.getElementType() == ElementType.CONSTRUCTOR ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				location,
 				returnValueConstraints,
 				isCascading

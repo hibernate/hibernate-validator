@@ -38,7 +38,7 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	 * @author Gunnar Morling
 	 */
 	public static enum ConstraintMetaDataKind {
-		METHOD, PROPERTY, PARAMETER
+		CONSTRUCTOR, METHOD, PROPERTY, PARAMETER
 	}
 
 	/**

@@ -17,7 +17,7 @@
 package org.hibernate.validator.test.internal.metadata;
 
 import javax.validation.constraints.Min;
-
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Gunnar Morling
@@ -25,6 +25,9 @@ import javax.validation.constraints.Min;
 public class CustomerRepositoryExt extends CustomerRepository {
 
 	public static class CustomerExtension extends Customer {
+	}
+
+	public CustomerRepositoryExt(@NotNull String foo) {
 	}
 
 	public Customer createCustomer(CharSequence firstName, String lastName) {

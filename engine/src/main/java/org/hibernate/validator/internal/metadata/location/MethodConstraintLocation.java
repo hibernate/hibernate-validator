@@ -86,7 +86,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 	}
 
 	public ElementType getElementType() {
-		return parameterIndex != null ? ElementType.PARAMETER : ElementType.METHOD;
+		return parameterIndex != null ? ElementType.PARAMETER : executableElement.getElementType();
 	}
 
 	/**

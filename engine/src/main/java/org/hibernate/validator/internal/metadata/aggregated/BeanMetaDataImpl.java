@@ -83,12 +83,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<MetaConstraint<?>> directMetaConstraints;
 
 	/**
-	 * Contains constrained related meta data for all methods of the type
-	 * represented by this bean meta data. Keyed by method, values are an
-	 * aggregated view on each method together with all the methods from the
-	 * inheritance hierarchy with the same signature.
+	 * Contains constrained related meta data for all methods and constructors
+	 * of the type represented by this bean meta data. Keyed by executable,
+	 * values are an aggregated view on each executable together with all the
+	 * executables from the inheritance hierarchy with the same signature.
 	 */
-	private final Map<String, MethodMetaData> methodMetaData;
+	private final Map<String, MethodMetaData> executableMetaData;
 
 	/**
 	 * Property meta data keyed against the property name
@@ -141,14 +141,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.propertyMetaData = newHashMap();
 
 		Set<PropertyMetaData> propertyMetaDataSet = newHashSet();
-		Set<MethodMetaData> methodMetaDataSet = newHashSet();
+		Set<MethodMetaData> executableMetaDataSet = newHashSet();
 
 		for ( ConstraintMetaData oneElement : constraintMetaData ) {
 			if ( oneElement.getKind() == ConstraintMetaDataKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) oneElement );
 			}
 			else {
-				methodMetaDataSet.add( (MethodMetaData) oneElement );
+				executableMetaDataSet.add( (MethodMetaData) oneElement );
 			}
 		}
 
@@ -175,7 +175,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.directMetaConstraints = buildDirectConstraintSets();
 
-		this.methodMetaData = Collections.unmodifiableMap( buildMethodMetaData( methodMetaDataSet ) );
+		this.executableMetaData = Collections.unmodifiableMap( byIdentifier( executableMetaDataSet ) );
 		this.beanDescriptor = new BeanDescriptorImpl(
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
@@ -213,7 +213,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public MethodMetaData getMetaDataFor(ExecutableElement executable) {
-		return methodMetaData.get( executable.getIdentifier() );
+		return executableMetaData.get( executable.getIdentifier() );
 	}
 
 	@Override
@@ -273,26 +273,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, MethodDescriptor> getConstrainedMethodsAsDescriptors() {
 		Map<String, MethodDescriptor> constrainedMethodDescriptors = newHashMap();
 
-		for ( Entry<String, MethodMetaData> oneMethod : methodMetaData.entrySet() ) {
-			if ( oneMethod.getValue().isConstrained() ) {
-
+		for ( MethodMetaData oneExecutable : executableMetaData.values() ) {
+			if ( oneExecutable.getKind() == ConstraintMetaDataKind.METHOD && oneExecutable.isConstrained() ) {
 				constrainedMethodDescriptors.put(
-						oneMethod.getKey(),
-						oneMethod.getValue()
-								.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
+						oneExecutable.getIdentifier(),
+						oneExecutable.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
 				);
-
-			}
-
-			for ( ParameterMetaData oneParameter : oneMethod.getValue().getAllParameterMetaData() ) {
-				if ( oneParameter.isConstrained() ) {
-					constrainedMethodDescriptors.put(
-							oneMethod.getKey(),
-							oneMethod.getValue()
-									.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
-					);
-
-				}
 			}
 		}
 
@@ -347,15 +333,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Builds up the method meta data for this type
 	 */
-	private Map<String, MethodMetaData> buildMethodMetaData(Set<MethodMetaData> allMethodMetaData) {
+	private Map<String, MethodMetaData> byIdentifier(Set<MethodMetaData> executables) {
 
 		Map<String, MethodMetaData> theValue = newHashMap();
 
-		for ( MethodMetaData oneAggregatedMethodMetaData : allMethodMetaData ) {
-			theValue.put(
-					oneAggregatedMethodMetaData.getName() + Arrays.toString( oneAggregatedMethodMetaData.getParameterTypes() ),
-					oneAggregatedMethodMetaData
-			);
+		for ( MethodMetaData oneMethod : executables ) {
+			theValue.put( oneMethod.getIdentifier(), oneMethod );
 		}
 
 		return theValue;
@@ -527,6 +510,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							constraintHelper
 					);
 					break;
+				case CONSTRUCTOR:
 				case METHOD:
 					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
 					methodBuilder = new MethodMetaData.Builder(

@@ -76,10 +76,16 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 */
 	private final ConstraintDeclarationException parameterConstraintDeclarationException;
 
+	/**
+	 * An identifier for storing this object in maps etc.
+	 */
+	private final String identifier;
+
 	private MethodMetaData(
 			String name,
 			Class<?> returnType,
 			Class<?>[] parameterTypes,
+			ConstraintMetaDataKind kind,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			ConstraintDeclarationException parameterConstraintDeclarationException,
@@ -90,7 +96,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 				name,
 				returnType,
 				returnValueConstraints,
-				ConstraintMetaDataKind.METHOD,
+				kind,
 				isCascading,
 				isConstrained
 		);
@@ -98,6 +104,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
+		this.identifier = name + Arrays.toString( parameterTypes );
 	}
 
 	/**
@@ -107,8 +114,13 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
-		private Set<ConstrainedMethod> constrainedMethods = newHashSet();
-		private MethodConstraintLocation location;
+
+		/**
+		 * Either CONSTRUCTOR or METHOD.
+		 */
+		private final ConstrainedElementKind kind;
+		private final Set<ConstrainedMethod> constrainedMethods = newHashSet();
+		private final MethodConstraintLocation location;
 		private final Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
 		private boolean isCascading = false;
 		private boolean isConstrained = false;
@@ -123,17 +135,19 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
 
+			kind = constrainedMethod.getKind();
 			location = constrainedMethod.getLocation();
 			add( constrainedMethod );
 		}
 
 		@Override
 		public boolean accepts(ConstrainedElement constrainedElement) {
-			return constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					ReflectionHelper.haveSameSignature(
-							location.getExecutableElement(),
-							( (ConstrainedMethod) constrainedElement ).getLocation().getExecutableElement()
-					);
+			return
+					kind == constrainedElement.getKind() &&
+							ReflectionHelper.haveSameSignature(
+									location.getExecutableElement(),
+									( (ConstrainedMethod) constrainedElement ).getLocation().getExecutableElement()
+							);
 		}
 
 		@Override
@@ -154,6 +168,7 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 					executableElement.getMember().getName(),
 					executableElement.getReturnType(),
 					executableElement.getParameterTypes(),
+					kind == ConstrainedElementKind.CONSTRUCTOR ? ConstraintMetaDataKind.CONSTRUCTOR : ConstraintMetaDataKind.METHOD,
 					adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
 					findParameterMetaData(),
 					checkParameterConstraints(),
@@ -337,6 +352,16 @@ public class MethodMetaData extends AbstractConstraintMetaData {
 
 	public Class<?>[] getParameterTypes() {
 		return parameterTypes;
+	}
+
+	/**
+	 * Returns an identifier for this meta data object, based on the represented
+	 * method's names and its parameter types.
+	 *
+	 * @return An identifier for this meta data object.
+	 */
+	public String getIdentifier() {
+		return identifier;
 	}
 
 	@Override

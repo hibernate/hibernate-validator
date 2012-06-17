@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
@@ -59,6 +60,8 @@ public abstract class ExecutableElement {
 	public abstract AccessibleObject getAccessibleObject();
 
 	public abstract Member getMember();
+
+	public abstract ElementType getElementType();
 
 	public abstract boolean isGetterMethod();
 
@@ -110,6 +113,11 @@ public abstract class ExecutableElement {
 		}
 
 		@Override
+		public ElementType getElementType() {
+			return ElementType.CONSTRUCTOR;
+		}
+
+		@Override
 		public boolean isGetterMethod() {
 			return false;
 		}
@@ -156,6 +164,11 @@ public abstract class ExecutableElement {
 		@Override
 		public Member getMember() {
 			return method;
+		}
+
+		@Override
+		public ElementType getElementType() {
+			return ElementType.METHOD;
 		}
 
 		@Override
