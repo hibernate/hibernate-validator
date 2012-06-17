@@ -27,7 +27,6 @@ import javax.validation.TraversableResolver;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -37,7 +36,9 @@ import org.hibernate.validator.internal.engine.path.MessageAndPath;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
+import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -122,13 +123,13 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		List<ElementDescriptor> elementDescriptors = new ArrayList<ElementDescriptor>();
 
 		// first node in method level validation is the method and its descriptor
-		MethodDescriptor methodDescriptor = getMethodDescriptor();
+		ExecutableDescriptorImpl executableDescriptor = getMethodDescriptor();
 		elementDescriptors.add( getMethodDescriptor() );
 
 		Object value;
 		if ( isReturnValueValidation( localContext ) ) {
 			// add the return value descriptor
-			elementDescriptors.add( methodDescriptor.getReturnValueDescriptor() );
+			elementDescriptors.add( executableDescriptor.getReturnValueDescriptor() );
 			value = localContext.getCurrentBean();
 
 			if ( value != null && ReflectionHelper.isIterable( value.getClass() ) ) {
@@ -138,7 +139,8 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		else {
 			// add the parameter descriptor
 			Integer parameterIndex = localContext.getParameterIndex();
-			ParameterDescriptor parameterDescriptor = methodDescriptor.getParameterDescriptors().get( parameterIndex );
+			ParameterDescriptor parameterDescriptor = executableDescriptor.getParameterDescriptors()
+					.get( parameterIndex );
 			elementDescriptors.add( parameterDescriptor );
 
 			value = parameterValues[localContext.getParameterIndex()];
@@ -210,14 +212,23 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		return localContext.getParameterIndex() == null;
 	}
 
-	private MethodDescriptor getMethodDescriptor() {
+	private ExecutableDescriptorImpl getMethodDescriptor() {
 		BeanMetaData<?> rootMetaData = getBeanMetaDataManager().getBeanMetaData( getRootBeanClass() );
 		ExecutableMetaData methodMetaData = rootMetaData.getMetaDataFor( method );
 		BeanDescriptor beanDescriptor = rootMetaData.getBeanDescriptor();
-		return beanDescriptor.getConstraintsForMethod(
-				method.getMember().getName(),
-				methodMetaData.getParameterTypes()
-		);
+
+		//HV-571: Avoid these casts
+		if ( methodMetaData.getKind() == ConstraintMetaDataKind.METHOD ) {
+			return (ExecutableDescriptorImpl) beanDescriptor.getConstraintsForMethod(
+					method.getMember().getName(),
+					methodMetaData.getParameterTypes()
+			);
+		}
+		else {
+			return (ExecutableDescriptorImpl) beanDescriptor.getConstraintsForConstructor(
+					methodMetaData.getParameterTypes()
+			);
+		}
 	}
 
 	private boolean isClassLevelConstraintNode(String name) {
