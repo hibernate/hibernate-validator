@@ -236,8 +236,10 @@ public class ValidatorImpl implements Validator {
 
 	@Override
 	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<T> constructor, T createdObject, Class<?>... groups) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+
+		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
+
+		return validateReturnValue( null, ExecutableElement.forConstructor( constructor ), createdObject, groups );
 	}
 
 	@Override
@@ -245,12 +247,17 @@ public class ValidatorImpl implements Validator {
 
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
+		return validateReturnValue( object, ExecutableElement.forMethod( method ), returnValue, groups );
+	}
+
+	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, ExecutableElement executable, Object returnValue, Class<?>... groups) {
+
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				beanMetaDataManager,
 				constraintValidatorManager,
-				ExecutableElement.forMethod( method ),
+				executable,
 				null,
 				object,
 				messageInterpolator,
@@ -1096,9 +1103,20 @@ public class ValidatorImpl implements Validator {
 			int numberOfViolationsOfCurrentGroup = 0;
 
 			// validate constraints at return value itself
-			ValueContext<T, V> valueContext = ValueContext.getLocalExecutionContext(
-					bean, PathImpl.createPathForMethodReturnValue( executable )
-			);
+			ValueContext<T, V> valueContext;
+			if ( bean != null ) {
+				valueContext = ValueContext.getLocalExecutionContext(
+						bean, PathImpl.createPathForMethodReturnValue( executable )
+				);
+			}
+			else {
+				//constructor validation
+				valueContext = ValueContext.getLocalExecutionContext(
+						(Class<T>) executable.getMember().getDeclaringClass(),
+						PathImpl.createPathForMethodReturnValue( executable )
+				);
+			}
+
 			valueContext.setCurrentValidatedValue( value );
 			valueContext.setCurrentGroup( oneGroup );
 

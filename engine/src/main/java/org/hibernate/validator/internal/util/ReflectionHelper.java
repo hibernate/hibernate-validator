@@ -251,6 +251,10 @@ public final class ReflectionHelper {
 		else if ( member instanceof Method ) {
 			type = ( (Method) member ).getGenericReturnType();
 		}
+		else if ( member instanceof Constructor<?> ) {
+			type = ( (Constructor<?>) member ).getDeclaringClass();
+		}
+		//HV-571 change log method name
 		else {
 			throw log.getMemberIsNeitherAFieldNorAMethodException( member );
 		}

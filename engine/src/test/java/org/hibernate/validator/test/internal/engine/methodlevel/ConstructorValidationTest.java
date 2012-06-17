@@ -26,6 +26,7 @@ import javax.validation.metadata.ElementDescriptor.Kind;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
+import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl.ValidB2BRepository;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
@@ -36,7 +37,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 public class ConstructorValidationTest {
 
 	@Test
-	public void constructorValidationYieldsConstraintViolation() throws Exception {
+	public void constructorParameterValidationYieldsConstraintViolation() throws Exception {
 
 		Validator validator = getValidator();
 
@@ -57,11 +58,48 @@ public class ConstructorValidationTest {
 		Node constructorNode = pathIterator.next();
 		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
 		//TODO HV-571: The name looks strange
-		//assertThat(constructorNode.getName()).isEqualTo("arg0");
+		//assertThat(constructorNode.getName()).isEqualTo("");
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
 		assertThat( parameterNode.getName() ).isEqualTo( "arg0" );
+
+		assertThat( pathIterator.hasNext() ).isFalse();
+
+		//TODO HV-571: Add more assertions
+	}
+
+	@Test
+	public void constructorReturnValueValidationYieldsConstraintViolation() throws Exception {
+
+		Validator validator = getValidator();
+
+		CustomerRepositoryImpl customerRepository = new CustomerRepositoryImpl();
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = validator.validateConstructorReturnValue(
+				CustomerRepositoryImpl.class.getConstructor(),
+				customerRepository
+		);
+
+		assertThat( violations ).hasSize( 1 );
+
+		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
+		assertThat( constraintViolation.getMessage() ).isEqualTo( "{ValidB2BRepository.message}" );
+		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
+		assertThat( constraintViolation.getInvalidValue() ).isSameAs( customerRepository );
+		assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() ).isSameAs(
+				ValidB2BRepository.class
+		);
+
+		Iterator<Node> pathIterator = constraintViolation.getPropertyPath().iterator();
+
+		Node constructorNode = pathIterator.next();
+		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
+		//TODO HV-571: The name looks strange
+		//assertThat(constructorNode.getName()).isEqualTo("");
+
+		Node parameterNode = pathIterator.next();
+		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
+		assertThat( parameterNode.getName() ).isEqualTo( "$retval" );
 
 		assertThat( pathIterator.hasNext() ).isFalse();
 
