@@ -16,14 +16,17 @@
 */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
 
 import org.testng.annotations.Test;
 
@@ -33,6 +36,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutil.ValidatorUtil.getBeanDescriptor;
 import static org.testng.Assert.assertEquals;
@@ -199,6 +203,18 @@ public class BeanDescriptorTest {
 		);
 	}
 
+	@Test
+	public void testGetConstrainedConstructors() {
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
+		Set<ConstructorDescriptor> constrainedConstructors = descriptor.getConstrainedConstructors();
+
+		assertThat( constrainedConstructors ).isNotNull();
+		assertThat( getSignatures( constrainedConstructors ) ).containsOnly(
+				Arrays.<Class<?>>asList( String.class ),
+				Arrays.<Class<?>>asList( String.class, int.class )
+		);
+	}
+
 	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {
 		Set<String> methodNames = newHashSet();
 
@@ -207,6 +223,21 @@ public class BeanDescriptorTest {
 		}
 
 		return methodNames;
+	}
+
+	private Set<List<Class<?>>> getSignatures(Set<ConstructorDescriptor> descriptors) {
+		Set<List<Class<?>>> signatures = newHashSet();
+
+		for ( ConstructorDescriptor methodDescriptor : descriptors ) {
+			List<Class<?>> parameterTypes = newArrayList();
+
+			for ( ParameterDescriptor oneParameter : methodDescriptor.getParameterDescriptors() ) {
+				parameterTypes.add( oneParameter.getElementClass() );
+			}
+			signatures.add( parameterTypes );
+		}
+
+		return signatures;
 	}
 
 	private static class UnconstrainedType {

@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -176,11 +177,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.directMetaConstraints = buildDirectConstraintSets();
 
 		this.executableMetaData = Collections.unmodifiableMap( byIdentifier( executableMetaDataSet ) );
+
 		this.beanDescriptor = new BeanDescriptorImpl(
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
 				getConstrainedPropertiesAsDescriptors(),
 				getConstrainedMethodsAsDescriptors(),
+				getConstrainedConstructorsAsDescriptors(),
 				defaultGroupSequenceIsRedefined(),
 				getDefaultGroupSequence( null )
 		);
@@ -277,7 +280,28 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( oneExecutable.getKind() == ConstraintMetaDataKind.METHOD && oneExecutable.isConstrained() ) {
 				constrainedMethodDescriptors.put(
 						oneExecutable.getIdentifier(),
-						oneExecutable.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
+						(MethodDescriptor) oneExecutable.asDescriptor(
+								defaultGroupSequenceIsRedefined(),
+								getDefaultGroupSequence( null )
+						)
+				);
+			}
+		}
+
+		return constrainedMethodDescriptors;
+	}
+
+	private Map<String, ConstructorDescriptor> getConstrainedConstructorsAsDescriptors() {
+		Map<String, ConstructorDescriptor> constrainedMethodDescriptors = newHashMap();
+
+		for ( ExecutableMetaData oneExecutable : executableMetaData.values() ) {
+			if ( oneExecutable.getKind() == ConstraintMetaDataKind.CONSTRUCTOR && oneExecutable.isConstrained() ) {
+				constrainedMethodDescriptors.put(
+						oneExecutable.getIdentifier(),
+						(ConstructorDescriptor) oneExecutable.asDescriptor(
+								defaultGroupSequenceIsRedefined(),
+								getDefaultGroupSequence( null )
+						)
 				);
 			}
 		}

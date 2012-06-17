@@ -43,17 +43,20 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDescriptor {
 	private final Map<String, PropertyDescriptor> constrainedProperties;
 	private final Map<String, MethodDescriptor> constrainedMethods;
+	private final Map<String, ConstructorDescriptor> constrainedConstructors;
 
 	public BeanDescriptorImpl(Type beanClass,
 							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
-							  Map<String, PropertyDescriptor> properties,
-							  Map<String, MethodDescriptor> methods,
+							  Map<String, PropertyDescriptor> constrainedProperties,
+							  Map<String, MethodDescriptor> constrainedMethods,
+							  Map<String, ConstructorDescriptor> constrainedConstructors,
 							  boolean defaultGroupSequenceRedefined,
 							  List<Class<?>> defaultGroupSequence) {
 		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
-		this.constrainedProperties = Collections.unmodifiableMap( properties );
-		this.constrainedMethods = Collections.unmodifiableMap( methods );
+		this.constrainedProperties = Collections.unmodifiableMap( constrainedProperties );
+		this.constrainedMethods = Collections.unmodifiableMap( constrainedMethods );
+		this.constrainedConstructors = Collections.unmodifiableMap( constrainedConstructors );
 	}
 
 	@Override
@@ -80,8 +83,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public Set<ConstructorDescriptor> getConstrainedConstructors() {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+		return new HashSet<ConstructorDescriptor>( constrainedConstructors.values() );
 	}
 
 	@Override

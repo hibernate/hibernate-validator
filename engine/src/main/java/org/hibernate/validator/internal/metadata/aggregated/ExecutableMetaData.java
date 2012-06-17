@@ -21,12 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.ConstructorDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.MethodDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
@@ -365,16 +366,29 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	@Override
-	public MethodDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		return new MethodDescriptorImpl(
-				getType(),
-				getName(),
-				asDescriptors( getConstraints() ),
-				returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
-				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
-				defaultGroupSequenceRedefined,
-				defaultGroupSequence
-		);
+	public ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+
+		if ( super.getKind() == ConstraintMetaDataKind.METHOD ) {
+			return new MethodDescriptorImpl(
+					getType(),
+					getName(),
+					asDescriptors( getConstraints() ),
+					returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
+					parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
+					defaultGroupSequenceRedefined,
+					defaultGroupSequence
+			);
+		}
+		else {
+			return new ConstructorDescriptorImpl(
+					getType(),
+					asDescriptors( getConstraints() ),
+					returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
+					parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
+					defaultGroupSequenceRedefined,
+					defaultGroupSequence
+			);
+		}
 	}
 
 	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
