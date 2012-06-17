@@ -27,8 +27,7 @@ import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstructorDescriptorImpl;
-import org.hibernate.validator.internal.metadata.descriptor.MethodDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -369,7 +368,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	public ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
 		if ( super.getKind() == ConstraintMetaDataKind.METHOD ) {
-			return new MethodDescriptorImpl(
+			return new ExecutableDescriptorImpl(
 					getType(),
 					getName(),
 					asDescriptors( getConstraints() ),
@@ -380,7 +379,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			);
 		}
 		else {
-			return new ConstructorDescriptorImpl(
+			return new ExecutableDescriptorImpl(
 					getType(),
 					asDescriptors( getConstraints() ),
 					returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),

@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -21,28 +21,55 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 /**
- * Describes a validated constructor.
+ * Describes a validated method.
  *
  * @author Gunnar Morling
  */
-public class ConstructorDescriptorImpl extends ElementDescriptorImpl implements ConstructorDescriptor {
+public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements ConstructorDescriptor, MethodDescriptor {
+	private final Kind kind;
+	private final String name;
 	private final List<ParameterDescriptor> parameters;
 	private final ReturnValueDescriptor returnValueDescriptor;
 
-	public ConstructorDescriptorImpl(Type returnType,
-									 Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
-									 ReturnValueDescriptor returnValueDescriptor,
-									 List<ParameterDescriptor> parameters,
-									 boolean defaultGroupSequenceRedefined,
-									 List<Class<?>> defaultGroupSequence) {
+	public ExecutableDescriptorImpl(
+			Type returnType,
+			Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
+			ReturnValueDescriptor returnValueDescriptor,
+			List<ParameterDescriptor> parameters,
+			boolean defaultGroupSequenceRedefined,
+			List<Class<?>> defaultGroupSequence) {
 		super( returnType, returnValueConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
+		this.kind = Kind.CONSTRUCTOR;
+		this.name = null;
 		this.parameters = Collections.unmodifiableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;
+	}
+
+	public ExecutableDescriptorImpl(
+			Type returnType,
+			String name,
+			Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
+			ReturnValueDescriptor returnValueDescriptor,
+			List<ParameterDescriptor> parameters,
+			boolean defaultGroupSequenceRedefined,
+			List<Class<?>> defaultGroupSequence) {
+		super( returnType, returnValueConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
+
+		this.kind = Kind.METHOD;
+		this.name = name;
+		this.parameters = Collections.unmodifiableList( parameters );
+		this.returnValueDescriptor = returnValueDescriptor;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -55,14 +82,18 @@ public class ConstructorDescriptorImpl extends ElementDescriptorImpl implements 
 		return returnValueDescriptor;
 	}
 
+
 	@Override
 	public String toString() {
-		return "ConstructorDescriptorImpl [parameters=" + parameters
-				+ ", returnValueDescriptor=" + returnValueDescriptor + "]";
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ExecutableDescriptorImpl" );
+		sb.append( "{name='" ).append( name ).append( '\'' );
+		sb.append( '}' );
+		return sb.toString();
 	}
 
 	@Override
 	public Kind getKind() {
-		return Kind.CONSTRUCTOR;
+		return kind;
 	}
 }

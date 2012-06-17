@@ -29,7 +29,7 @@ import javax.validation.metadata.Scope;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.metadata.descriptor.MethodDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
@@ -67,7 +67,7 @@ public class MethodDescriptorTest {
 		MethodDescriptor methodDescriptor = descriptor.as( MethodDescriptor.class );
 		assertTrue( methodDescriptor != null );
 
-		methodDescriptor = descriptor.as( MethodDescriptorImpl.class );
+		methodDescriptor = descriptor.as( ExecutableDescriptorImpl.class );
 		assertTrue( methodDescriptor != null );
 	}
 
