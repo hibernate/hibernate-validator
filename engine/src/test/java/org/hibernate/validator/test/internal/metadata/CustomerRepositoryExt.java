@@ -33,6 +33,9 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public CustomerRepositoryExt(@NotNull String foo, @Min(0) int bar) {
 	}
 
+	public CustomerRepositoryExt(int bar) {
+	}
+
 	public Customer createCustomer(CharSequence firstName, String lastName) {
 		return null;
 	}

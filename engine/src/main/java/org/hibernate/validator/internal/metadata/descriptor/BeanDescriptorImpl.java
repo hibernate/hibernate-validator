@@ -77,8 +77,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public ConstructorDescriptor getConstraintsForConstructor(Class<?>... parameterTypes) {
-		// TODO HV-571
-		throw new IllegalArgumentException( "Not yet implemented" );
+		return constrainedConstructors.get( getElementClass().getName() + Arrays.toString( parameterTypes ) );
 	}
 
 	@Override

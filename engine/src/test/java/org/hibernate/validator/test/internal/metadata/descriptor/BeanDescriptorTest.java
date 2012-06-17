@@ -215,6 +215,25 @@ public class BeanDescriptorTest {
 		);
 	}
 
+	@Test
+	public void testGetConstraintsForConstructor() {
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
+		ConstructorDescriptor constructorDescriptor = descriptor.getConstraintsForConstructor(
+				String.class,
+				int.class
+		);
+
+		assertThat( constructorDescriptor ).isNotNull();
+	}
+
+	@Test
+	public void testGetConstraintsForUnconstrainedConstructor() {
+		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
+		ConstructorDescriptor constructorDescriptor = descriptor.getConstraintsForConstructor( int.class );
+
+		assertThat( constructorDescriptor ).isNull();
+	}
+
 	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {
 		Set<String> methodNames = newHashSet();
 
