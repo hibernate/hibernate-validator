@@ -16,8 +16,19 @@
 */
 package org.hibernate.validator.test.internal.metadata;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * @author Gunnar Morling
@@ -27,10 +38,12 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public static class CustomerExtension extends Customer {
 	}
 
+	@ValidB2BRepository
+	@Valid
 	public CustomerRepositoryExt(@NotNull String foo) {
 	}
 
-	public CustomerRepositoryExt(@NotNull String foo, @Min(0) int bar) {
+	public CustomerRepositoryExt(@NotNull String foo, @Valid Customer customer) {
 	}
 
 	public CustomerRepositoryExt(int bar) {
@@ -69,4 +82,27 @@ public class CustomerRepositoryExt extends CustomerRepository {
 
 	public void zap(@Min(0) int i) {
 	}
+
+	@Constraint(validatedBy = { ValidB2BRepositoryValidator.class })
+	@Target({ TYPE, CONSTRUCTOR })
+	@Retention(RUNTIME)
+	public @interface ValidB2BRepository {
+		String message() default "{ValidB2BRepository.message}";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+	}
+
+	public static class ValidB2BRepositoryValidator
+			implements ConstraintValidator<ValidB2BRepository, CustomerRepositoryExt> {
+
+		public void initialize(ValidB2BRepository annotation) {
+		}
+
+		public boolean isValid(CustomerRepositoryExt repository, ConstraintValidatorContext context) {
+			return false;
+		}
+	}
+
 }

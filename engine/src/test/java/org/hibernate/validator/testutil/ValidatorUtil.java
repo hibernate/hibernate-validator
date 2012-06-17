@@ -23,6 +23,7 @@ import javax.validation.Configuration;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -141,10 +142,22 @@ public final class ValidatorUtil {
 	 * @param methodName The method name.
 	 * @param parameterTypes The method parameter types.
 	 *
-	 * @return an instance of {@code MethodDescriptor} for the given method signature or {@code null} if does not exists.
+	 * @return an instance of {@code MethodDescriptor} for the given method signature or {@code null} if no such method exists.
 	 */
 	public static MethodDescriptor getMethodDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
 		return getBeanDescriptor( clazz ).getConstraintsForMethod( methodName, parameterTypes );
+	}
+
+	/**
+	 * Returns the {@code ConstructorDescriptor} for the given constructor signature in the given class.
+	 *
+	 * @param clazz The class.
+	 * @param parameterTypes The constructor parameter types.
+	 *
+	 * @return an instance of {@code ConstructorDescriptor} for the given constructor signature or {@code null} if no such constructor exists.
+	 */
+	public static ConstructorDescriptor getConstructorDescriptor(Class<?> clazz, Class<?>... parameterTypes) {
+		return getBeanDescriptor( clazz ).getConstraintsForConstructor( parameterTypes );
 	}
 
 	/**

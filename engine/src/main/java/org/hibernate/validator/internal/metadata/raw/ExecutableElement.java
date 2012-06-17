@@ -52,7 +52,6 @@ public abstract class ExecutableElement {
 
 	public abstract Class<?>[] getParameterTypes();
 
-	//TODO HV-571: Does that really make sense?
 	public abstract Class<?> getReturnType();
 
 	public abstract Type[] getGenericParameterTypes();
@@ -94,7 +93,7 @@ public abstract class ExecutableElement {
 
 		@Override
 		public Class<?> getReturnType() {
-			return null;
+			return constructor.getDeclaringClass();
 		}
 
 		@Override

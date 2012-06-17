@@ -32,6 +32,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
+import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
@@ -211,7 +212,7 @@ public class BeanDescriptorTest {
 		assertThat( constrainedConstructors ).isNotNull();
 		assertThat( getSignatures( constrainedConstructors ) ).containsOnly(
 				Arrays.<Class<?>>asList( String.class ),
-				Arrays.<Class<?>>asList( String.class, int.class )
+				Arrays.<Class<?>>asList( String.class, Customer.class )
 		);
 	}
 
@@ -220,7 +221,7 @@ public class BeanDescriptorTest {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
 		ConstructorDescriptor constructorDescriptor = descriptor.getConstraintsForConstructor(
 				String.class,
-				int.class
+				Customer.class
 		);
 
 		assertThat( constructorDescriptor ).isNotNull();
