@@ -26,10 +26,13 @@ import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 /**
- * Describes a validated method.
+ * Describes a validated constructor or method.
  *
  * @author Gunnar Morling
  */
+// TODO HV-571: Discuss whether ConstructorDescriptor and MethodDescriptor should really extend ElementDescriptor.
+// Methods as getConstraintDescriptors() or findConstraints() seem really useful only on ReturnValueDescriptor
+// and ParameterDescriptor.
 public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements ConstructorDescriptor, MethodDescriptor {
 	private final Kind kind;
 	private final String name;

@@ -62,6 +62,8 @@ public abstract class ExecutableElement {
 
 	public abstract ElementType getElementType();
 
+	public abstract String getSimpleName();
+
 	public abstract boolean isGetterMethod();
 
 	public String getIdentifier() {
@@ -117,6 +119,11 @@ public abstract class ExecutableElement {
 		}
 
 		@Override
+		public String getSimpleName() {
+			return constructor.getDeclaringClass().getSimpleName();
+		}
+
+		@Override
 		public boolean isGetterMethod() {
 			return false;
 		}
@@ -168,6 +175,11 @@ public abstract class ExecutableElement {
 		@Override
 		public ElementType getElementType() {
 			return ElementType.METHOD;
+		}
+
+		@Override
+		public String getSimpleName() {
+			return method.getName();
 		}
 
 		@Override

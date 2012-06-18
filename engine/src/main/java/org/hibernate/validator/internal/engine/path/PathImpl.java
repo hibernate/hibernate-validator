@@ -43,6 +43,9 @@ public final class PathImpl implements Path, Serializable {
 	private static final Log log = LoggerFactory.make();
 
 	public static final String PROPERTY_PATH_SEPARATOR = ".";
+
+	//TODO HV-571: The spec currently says "In the return value case, the name of the node is null".
+	//But maybe a reserved name like this is actually better. Need to discuss with EG.
 	public static final String RETURN_VALUE_NODE_NAME = "$retval";
 
 	/**
@@ -99,7 +102,7 @@ public final class PathImpl implements Path, Serializable {
 		Contracts.assertNotNull( parameterName, "A parameter name is required to create a method parameter path." );
 
 		PathImpl path = createRootPath();
-		path.addMethodParameterNode( executable, parameterName );
+		path.addParameterNode( executable, parameterName );
 
 		return path;
 	}
@@ -108,7 +111,7 @@ public final class PathImpl implements Path, Serializable {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
 		PathImpl path = createRootPath();
-		path.addMethodReturnValueNode( executable );
+		path.addReturnValueNode( executable );
 
 		return path;
 	}
@@ -141,14 +144,20 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	private NodeImpl addMethodParameterNode(ExecutableElement executable, String parameterName) {
+	private NodeImpl addParameterNode(ExecutableElement executable, String parameterName) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 
+		// TODO HV-571: The spec currently says "the name of the node equals the validated
+		// method or constructor", so we probably shouldn't add the '<DECLARING_TYPE>#'
+		// part. OTOH we currently don't add a node for the declaring type itself (see
+		// BVAL-276), so it's maybe a good thing to add the name here. Needs discussion
+		// with the EG.
+
 		// create a node for the method
-		String methodNodeName = executable.getMember()
+		String executableName = executable.getMember()
 				.getDeclaringClass()
-				.getSimpleName() + "#" + executable.getMember().getName();
-		nodeList.add( new NodeImpl( methodNodeName, parent, false, null, null ) );
+				.getSimpleName() + "#" + executable.getSimpleName();
+		nodeList.add( new NodeImpl( executableName, parent, false, null, null ) );
 
 		// now a node for the parameter
 		currentLeafNode = new NodeImpl( parameterName, parent, false, null, null );
@@ -158,14 +167,14 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	private NodeImpl addMethodReturnValueNode(ExecutableElement executable) {
+	private NodeImpl addReturnValueNode(ExecutableElement executable) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 
 		// create a node for the method
-		String methodNodeName = executable.getMember()
+		String executableName = executable.getMember()
 				.getDeclaringClass()
-				.getSimpleName() + "#" + executable.getMember().getName();
-		nodeList.add( new NodeImpl( methodNodeName, parent, false, null, null ) );
+				.getSimpleName() + "#" + executable.getSimpleName();
+		nodeList.add( new NodeImpl( executableName, parent, false, null, null ) );
 
 		// now a node for the return value
 		currentLeafNode = new NodeImpl( RETURN_VALUE_NODE_NAME, parent, false, null, null );

@@ -58,8 +58,7 @@ public class ConstructorValidationTest {
 
 		Node constructorNode = pathIterator.next();
 		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		//TODO HV-571: The name looks strange
-		//assertThat(constructorNode.getName()).isEqualTo("");
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
@@ -91,13 +90,10 @@ public class ConstructorValidationTest {
 
 		Node constructorNode = pathIterator.next();
 		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat(
-				constructorNode.getElementDescriptor()
-						.getElementClass()
-		).isEqualTo( CustomerRepositoryImpl.class );
-
-		//TODO HV-571: The name looks strange
-		//assertThat(constructorNode.getName()).isEqualTo("");
+		assertThat( constructorNode.getElementDescriptor().getElementClass() ).isEqualTo(
+				CustomerRepositoryImpl.class
+		);
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
@@ -139,8 +135,7 @@ public class ConstructorValidationTest {
 
 		Node constructorNode = pathIterator.next();
 		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		//TODO HV-571: The name looks strange
-		//assertThat(constructorNode.getName()).isEqualTo("");
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
@@ -173,13 +168,10 @@ public class ConstructorValidationTest {
 
 		Node constructorNode = pathIterator.next();
 		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat(
-				constructorNode.getElementDescriptor()
-						.getElementClass()
-		).isEqualTo( CustomerRepositoryImpl.class );
-
-		//TODO HV-571: The name looks strange
-		//assertThat(constructorNode.getName()).isEqualTo("");
+		assertThat( constructorNode.getElementDescriptor().getElementClass() ).isEqualTo(
+				CustomerRepositoryImpl.class
+		);
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
