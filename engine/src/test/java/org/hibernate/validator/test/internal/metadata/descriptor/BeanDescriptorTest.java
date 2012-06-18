@@ -103,8 +103,8 @@ public class BeanDescriptorTest {
 	}
 
 	@Test
-	public void testIsTypeConstrainedForReturnValueConstrainedType() {
-		BeanDescriptor descriptor = getBeanDescriptor( ReturnValueConstrainedType.class );
+	public void testIsTypeConstrainedForConstructorParameterConstrainedType() {
+		BeanDescriptor descriptor = getBeanDescriptor( ConstructorParameterConstrainedType.class );
 		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
@@ -115,8 +115,32 @@ public class BeanDescriptorTest {
 	}
 
 	@Test
+	public void testIsTypeConstrainedForConstructorCascadingParameterType() {
+		BeanDescriptor descriptor = getBeanDescriptor( ConstructorCascadingParameterType.class );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForReturnValueConstrainedType() {
+		BeanDescriptor descriptor = getBeanDescriptor( ReturnValueConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForConstructorReturnValueConstrainedType() {
+		BeanDescriptor descriptor = getBeanDescriptor( ConstructorReturnValueConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+	}
+
+	@Test
 	public void testIsTypeConstrainedForCascadingReturnValueType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingReturnValueType.class );
+		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+	}
+
+	@Test
+	public void testIsTypeConstrainedForConstructorCascadingReturnValueType() {
+		BeanDescriptor descriptor = getBeanDescriptor( ConstructorCascadingReturnValueType.class );
 		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
 	}
 
@@ -272,9 +296,22 @@ public class BeanDescriptorTest {
 		}
 	}
 
+	private static class ConstructorParameterConstrainedType {
+		@SuppressWarnings("unused")
+		public ConstructorParameterConstrainedType(@NotNull String foo) {
+		}
+	}
+
 	private static class CascadingParameterType {
 		@SuppressWarnings("unused")
 		public void foo(@Valid List<String> foo) {
+
+		}
+	}
+
+	private static class ConstructorCascadingParameterType {
+		@SuppressWarnings("unused")
+		public ConstructorCascadingParameterType(@Valid List<String> foo) {
 
 		}
 	}
@@ -287,11 +324,25 @@ public class BeanDescriptorTest {
 		}
 	}
 
+	private static class ConstructorReturnValueConstrainedType {
+		@NotNull
+		@SuppressWarnings("unused")
+		public ConstructorReturnValueConstrainedType(String foo) {
+		}
+	}
+
 	private static class CascadingReturnValueType {
 		@Valid
 		@SuppressWarnings("unused")
 		public List<String> foo(String foo) {
 			return null;
+		}
+	}
+
+	private static class ConstructorCascadingReturnValueType {
+		@Valid
+		@SuppressWarnings("unused")
+		public ConstructorCascadingReturnValueType(String foo) {
 		}
 	}
 
