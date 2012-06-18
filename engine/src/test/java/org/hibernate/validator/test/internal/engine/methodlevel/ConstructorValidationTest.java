@@ -25,6 +25,7 @@ import javax.validation.metadata.ElementDescriptor.Kind;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl.ValidB2BRepository;
 
@@ -70,6 +71,50 @@ public class ConstructorValidationTest {
 	}
 
 	@Test
+	public void cascadedConstructorParameterValidationYieldsConstraintViolation() throws Exception {
+
+		Validator validator = getValidator();
+
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = validator.validateConstructorParameters(
+				CustomerRepositoryImpl.class.getConstructor( Customer.class ),
+				new Customer[] { new Customer( null ) }
+		);
+
+		assertThat( violations ).hasSize( 1 );
+
+		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
+		assertThat( constraintViolation.getMessage() ).isEqualTo( "may not be null" );
+		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
+		assertThat( constraintViolation.getInvalidValue() ).isNull();
+
+		Iterator<Node> pathIterator = constraintViolation.getPropertyPath().iterator();
+
+		Node constructorNode = pathIterator.next();
+		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
+		assertThat(
+				constructorNode.getElementDescriptor()
+						.getElementClass()
+		).isEqualTo( CustomerRepositoryImpl.class );
+
+		//TODO HV-571: The name looks strange
+		//assertThat(constructorNode.getName()).isEqualTo("");
+
+		Node parameterNode = pathIterator.next();
+		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
+		assertThat( parameterNode.getElementDescriptor().getElementClass() ).isEqualTo( Customer.class );
+		assertThat( parameterNode.getName() ).isEqualTo( "arg0" );
+
+		Node nameNode = pathIterator.next();
+		assertThat( nameNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PROPERTY );
+		assertThat( nameNode.getElementDescriptor().getElementClass() ).isEqualTo( String.class );
+		assertThat( nameNode.getName() ).isEqualTo( "name" );
+
+		assertThat( pathIterator.hasNext() ).isFalse();
+
+		//TODO HV-571: Add more assertions
+	}
+
+	@Test
 	public void constructorReturnValueValidationYieldsConstraintViolation() throws Exception {
 
 		Validator validator = getValidator();
@@ -100,6 +145,51 @@ public class ConstructorValidationTest {
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
 		assertThat( parameterNode.getName() ).isEqualTo( "$retval" );
+
+		assertThat( pathIterator.hasNext() ).isFalse();
+
+		//TODO HV-571: Add more assertions
+	}
+
+	@Test
+	public void cascadedConstructorReturnValueValidationYieldsConstraintViolation() throws Exception {
+
+		Validator validator = getValidator();
+
+		CustomerRepositoryImpl customerRepository = new CustomerRepositoryImpl();
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = validator.validateConstructorReturnValue(
+				CustomerRepositoryImpl.class.getConstructor( String.class ),
+				customerRepository
+		);
+
+		assertThat( violations ).hasSize( 1 );
+
+		ConstraintViolation<CustomerRepositoryImpl> constraintViolation = violations.iterator().next();
+		assertThat( constraintViolation.getMessage() ).isEqualTo( "may not be null" );
+		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
+		assertThat( constraintViolation.getInvalidValue() ).isNull();
+
+		Iterator<Node> pathIterator = constraintViolation.getPropertyPath().iterator();
+
+		Node constructorNode = pathIterator.next();
+		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
+		assertThat(
+				constructorNode.getElementDescriptor()
+						.getElementClass()
+		).isEqualTo( CustomerRepositoryImpl.class );
+
+		//TODO HV-571: The name looks strange
+		//assertThat(constructorNode.getName()).isEqualTo("");
+
+		Node parameterNode = pathIterator.next();
+		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
+		assertThat( parameterNode.getElementDescriptor().getElementClass() ).isEqualTo( CustomerRepositoryImpl.class );
+		assertThat( parameterNode.getName() ).isEqualTo( "$retval" );
+
+		Node nameNode = pathIterator.next();
+		assertThat( nameNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PROPERTY );
+		assertThat( nameNode.getElementDescriptor().getElementClass() ).isEqualTo( Customer.class );
+		assertThat( nameNode.getName() ).isEqualTo( "customer" );
 
 		assertThat( pathIterator.hasNext() ).isFalse();
 

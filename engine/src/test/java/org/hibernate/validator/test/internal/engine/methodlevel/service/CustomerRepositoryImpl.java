@@ -25,6 +25,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
@@ -39,11 +40,19 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  */
 public class CustomerRepositoryImpl implements CustomerRepository {
 
+	@SuppressWarnings("unused")
+	@NotNull
+	private final Customer customer = null;
+
 	@ValidB2BRepository
 	public CustomerRepositoryImpl() {
 	}
 
+	@Valid
 	public CustomerRepositoryImpl(@NotNull String id) {
+	}
+
+	public CustomerRepositoryImpl(@Valid Customer customer) {
 	}
 
 	public Customer findCustomerByName(String name) {
