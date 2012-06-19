@@ -254,7 +254,7 @@ public final class ReflectionHelper {
 		else if ( member instanceof Constructor<?> ) {
 			type = ( (Constructor<?>) member ).getDeclaringClass();
 		}
-		//HV-571 change log method name
+		//TODO HV-571 change log method name
 		else {
 			throw log.getMemberIsNeitherAFieldNorAMethodException( member );
 		}

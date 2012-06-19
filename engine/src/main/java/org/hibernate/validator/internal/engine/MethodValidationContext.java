@@ -217,7 +217,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		ExecutableMetaData methodMetaData = rootMetaData.getMetaDataFor( method );
 		BeanDescriptor beanDescriptor = rootMetaData.getBeanDescriptor();
 
-		//HV-571: Avoid these casts
+		//TODO HV-571: Avoid these casts
 		if ( methodMetaData.getKind() == ConstraintMetaDataKind.METHOD ) {
 			return (ExecutableDescriptorImpl) beanDescriptor.getConstraintsForMethod(
 					method.getMember().getName(),
