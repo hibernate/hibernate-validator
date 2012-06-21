@@ -1,6 +1,22 @@
 Hibernate Validator Changelog
 =============================
 
+
+5.0.0.Alpha1 (21.06.2012)
+-------------------------
+
+** Bug
+    * [HV-590] - Update copyright year in reference guide
+    * [HV-591] - EmailValidator throws an IllegalArgumentException for long email addresses
+
+** Improvement
+    * [HV-583] - Upgrade JBoss Logging dependency
+
+** Task
+    * [HV-541] - The hibernate-validator-tck-runner project should not be deployed to the maven repository
+    * [HV-571] - Align method level validation w/ Bean Validation 1.1
+
+
 4.3.0.Final (09.05.2012)
 ------------------------
 

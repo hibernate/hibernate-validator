@@ -1,19 +1,14 @@
 # Hibernate Validator
 
-*Version: 4.3.0.Final, 09.05.2012*
+*Version: 5.0.0.Alpha1, 21.06.2012*
 
 
 ## What is it?
 
-This is the reference implementation of JSR 303 - Bean Validation. 
+This is the reference implementation of JSR-349 - Bean Validation 1.1.
 Bean Validation defines a metadata model and API for JavaBean validation. 
 The default metadata source is annotations, with the ability to override and extend 
 the meta-data through the use of XML validation descriptors.
-
-## A bit of history
-
-Prior to version 4.x Hibernate Validators was based on a different source base which 
-is not based on JSR 303. This code can be accessed via [this](https://github.com/hibernate/hibernate-validator/tree/pre-validator3-removal/hibernate-validator-legacy) GitHub tag.
 
 ## Documentation
 
@@ -40,7 +35,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.3.0.Final</version>
+            <version>5.0.0.Alpha1</version>
         </dependency>
 
 
@@ -70,6 +65,7 @@ There are more build options available as well. For more information refer to [C
 ## Hibernate Validator URLs
 
 * [Home Page](http://validator.hibernate.org)
+* [Bean Validation Home](http://beanvalidation.org)
 * [Downloads](http://www.hibernate.org/subprojects/validator/download.html)
 * [Mailing Lists](http://www.hibernate.org/community/mailinglists.html)
 * [Source Code](git://github.com/hibernate/hibernate-validator.git)
