@@ -25,16 +25,14 @@ import org.hibernate.validator.internal.util.Contracts;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
- * Top level class for constraints configured via the programmatic API. This
- * class is not intended to be inherited by clients. It will be converted into
- * an interface in a future release.
+ * Default implementation of {@link ConstraintMapping}.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class DefaultConstraintMapping implements ConstraintMapping {
-	protected ConstraintMappingContext context;
+	private ConstraintMappingContext context;
 
 	public DefaultConstraintMapping() {
 		context = new ConstraintMappingContext();
