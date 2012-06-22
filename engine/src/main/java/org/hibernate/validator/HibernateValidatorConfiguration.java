@@ -19,7 +19,7 @@ package org.hibernate.validator;
 import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -64,15 +64,9 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 *    new ResourceBundleMessageInterpolator(myResourceBundleLocator));
 	 * }
 	 * </pre>
-	 * <p>
-	 * <b>Deprecation note:</b> The return type of this method will change to
-	 * {@link org.hibernate.validator.spi.resourceloading.ResourceBundleLocator} in a future release.
-	 * The return value of this method should be assigned to a variable of this type.
-	 * </p>
 	 *
 	 * @return The default {@link ResourceBundleLocator}. Never null.
 	 */
-	@SuppressWarnings("deprecation")
 	ResourceBundleLocator getDefaultResourceBundleLocator();
 
 	/**

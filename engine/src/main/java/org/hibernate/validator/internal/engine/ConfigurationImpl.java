@@ -20,9 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import javax.validation.ConfigurationSource;
 import javax.validation.ConstraintValidatorFactory;
@@ -261,8 +259,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public ConfigurationSource getConfigurationSource() {
-		if(configurationSource == null) {
-			  configurationSource = new ValidationXmlParser().parseValidationXml();
+		if ( configurationSource == null ) {
+			configurationSource = new ValidationXmlParser().parseValidationXml();
 		}
 		return configurationSource;
 	}
@@ -288,9 +286,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return defaultConstraintValidatorFactory;
 	}
 
-	@SuppressWarnings("deprecation")
-	public final org.hibernate.validator.resourceloading.ResourceBundleLocator getDefaultResourceBundleLocator() {
-		return new Adapter( defaultResourceBundleLocator );
+	public final ResourceBundleLocator getDefaultResourceBundleLocator() {
+		return defaultResourceBundleLocator;
 	}
 
 	@Override
@@ -328,7 +325,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 		else {
-			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(getConfigurationSource());
+			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters( getConfigurationSource() );
 			applyXmlSettings( xmlParameters );
 		}
 	}
@@ -379,20 +376,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			if ( validationBootstrapParameters.getConfigProperties().get( entry.getKey() ) == null ) {
 				validationBootstrapParameters.addConfigProperty( entry.getKey(), entry.getValue() );
 			}
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	private static class Adapter implements org.hibernate.validator.resourceloading.ResourceBundleLocator {
-
-		private final org.hibernate.validator.spi.resourceloading.ResourceBundleLocator adaptee;
-
-		public Adapter(org.hibernate.validator.spi.resourceloading.ResourceBundleLocator adaptee) {
-			this.adaptee = adaptee;
-		}
-
-		public ResourceBundle getResourceBundle(Locale locale) {
-			return adaptee.getResourceBundle( locale );
 		}
 	}
 }

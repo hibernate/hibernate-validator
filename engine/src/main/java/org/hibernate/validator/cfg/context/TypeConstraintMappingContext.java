@@ -16,7 +16,7 @@
  */
 package org.hibernate.validator.cfg.context;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
  * Constraint mapping creational context representing a type. Allows place
@@ -56,20 +56,7 @@ public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConst
 	 * @param defaultGroupSequenceProviderClass The default group sequence provider class.
 	 *
 	 * @return The current creational context following the method chaining pattern.
-	 *
-	 * @deprecated Will be removed in a future release. Use {@link #defaultGroupSequenceProviderClass(Class)} instead.
-	 */
-	@Deprecated
-	<T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingContext<C> defaultGroupSequenceProvider(
-			Class<T> defaultGroupSequenceProviderClass);
-
-	/**
-	 * Defines the default group sequence provider for the current type.
-	 *
-	 * @param defaultGroupSequenceProviderClass The default group sequence provider class.
-	 *
-	 * @return The current creational context following the method chaining pattern.
 	 */
 	TypeConstraintMappingContext<C> defaultGroupSequenceProviderClass(
-			Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass);
+			Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass);
 }

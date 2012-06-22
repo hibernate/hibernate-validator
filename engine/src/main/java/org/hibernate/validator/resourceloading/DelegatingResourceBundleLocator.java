@@ -27,25 +27,9 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  *
  * @author Gunnar Morling
  */
-@SuppressWarnings("deprecation")
-public abstract class DelegatingResourceBundleLocator
-		implements org.hibernate.validator.resourceloading.ResourceBundleLocator, org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
+public abstract class DelegatingResourceBundleLocator implements ResourceBundleLocator {
 
 	private final ResourceBundleLocator delegate;
-
-	/**
-	 * Creates a new {@link DelegatingResourceBundleLocator}.
-	 *
-	 * @param delegate The delegate.
-	 *
-	 * @deprecated Will be removed in a future release. Use
-	 *             {@link #DelegatingResourceBundleLocator(org.hibernate.validator.spi.resourceloading.ResourceBundleLocator)}
-	 *             instead.
-	 */
-	@Deprecated
-	public DelegatingResourceBundleLocator(org.hibernate.validator.resourceloading.ResourceBundleLocator delegate) {
-		this.delegate = new Adapter( delegate );
-	}
 
 	/**
 	 * Creates a new {@link DelegatingResourceBundleLocator}.
@@ -58,18 +42,5 @@ public abstract class DelegatingResourceBundleLocator
 
 	public ResourceBundle getResourceBundle(Locale locale) {
 		return delegate == null ? null : delegate.getResourceBundle( locale );
-	}
-
-	private static class Adapter implements org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
-
-		private final org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee;
-
-		public Adapter(org.hibernate.validator.resourceloading.ResourceBundleLocator adaptee) {
-			this.adaptee = adaptee;
-		}
-
-		public ResourceBundle getResourceBundle(Locale locale) {
-			return adaptee.getResourceBundle( locale );
-		}
 	}
 }

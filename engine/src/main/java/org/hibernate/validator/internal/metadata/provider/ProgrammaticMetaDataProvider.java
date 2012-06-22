@@ -30,7 +30,6 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.ConfiguredConstraint;
 import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
-import org.hibernate.validator.internal.engine.groups.DefaultGroupSequenceProviderAdapter;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
@@ -61,7 +60,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  *
  * @author Gunnar Morling
  */
-@SuppressWarnings("deprecation")
 public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	private static final Log log = LoggerFactory.make();
@@ -131,18 +129,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		//retrieve provider from new annotation
 		if ( providerClass != null ) {
 			return ReflectionHelper.newInstance( providerClass, "default group sequence provider" );
-		}
-
-		Class<? extends org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T>> deprecatedProviderClass = context
-				.getDeprecatedDefaultGroupSequenceProvider( beanType );
-
-		//retrieve provider from deprecated annotation and wrap into adapter
-		if ( deprecatedProviderClass != null ) {
-			org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T> provider = ReflectionHelper.newInstance(
-					deprecatedProviderClass,
-					"default group sequence provider"
-			);
-			return DefaultGroupSequenceProviderAdapter.getInstance( provider );
 		}
 
 		return null;
@@ -368,15 +354,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 			mergedContext.addDefaultGroupSequenceProvider(
 					clazz,
 					context.getDefaultGroupSequenceProvider( clazz )
-			);
-		}
-		if ( context.getDeprecatedDefaultGroupSequenceProvider( clazz ) != null ) {
-			if ( mergedContext.getDeprecatedDefaultGroupSequenceProvider( clazz ) != null ) {
-				throw log.getMultipleDefinitionOfDefaultGroupSequenceProviderException();
-			}
-			mergedContext.addDeprecatedDefaultGroupSequenceProvider(
-					clazz,
-					context.getDeprecatedDefaultGroupSequenceProvider( clazz )
 			);
 		}
 		if ( context.getDefaultSequence( clazz ) != null ) {

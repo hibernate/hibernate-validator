@@ -18,9 +18,8 @@ package org.hibernate.validator.ap.testmodel.groupsequenceprovider;
 
 import java.util.List;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
-
-import static org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition.FooBar;
+import org.hibernate.validator.ap.testmodel.groupsequenceprovider.GroupSequenceProviderDefinition.FooBar;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI

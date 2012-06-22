@@ -31,7 +31,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static java.lang.annotation.ElementType.METHOD;
@@ -141,11 +141,11 @@ public class MultipleConstraintMappingsTest {
 	public void testMultipleConstraintMappingsWithGroupSequenceProviderForSameClass() {
 		ConstraintMapping marathonMapping1 = config.createConstraintMapping();
 		marathonMapping1.type( Marathon.class )
-				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class );
+				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
 
 		ConstraintMapping marathonMapping2 = config.createConstraintMapping();
 		marathonMapping2.type( Marathon.class )
-				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class );
+				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
 
 		config.addMapping( marathonMapping1 );
 		config.addMapping( marathonMapping2 );
@@ -162,7 +162,7 @@ public class MultipleConstraintMappingsTest {
 
 		ConstraintMapping marathonMapping2 = config.createConstraintMapping();
 		marathonMapping2.type( Marathon.class )
-				.defaultGroupSequenceProvider( MarathonDefaultGroupSequenceProvider.class );
+				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
 
 		config.addMapping( marathonMapping1 );
 		config.addMapping( marathonMapping2 );

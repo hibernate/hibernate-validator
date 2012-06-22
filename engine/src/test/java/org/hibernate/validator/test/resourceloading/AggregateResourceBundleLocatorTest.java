@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;

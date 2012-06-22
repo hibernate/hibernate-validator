@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
  * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
@@ -31,7 +31,6 @@ import org.hibernate.validator.group.DefaultGroupSequenceProvider;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-@SuppressWarnings("deprecation")
 public final class TypeConstraintMappingContextImpl<C> extends ConstraintMappingContextImplBase
 		implements TypeConstraintMappingContext<C> {
 
@@ -60,14 +59,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		return this;
 	}
 
-	public <T extends DefaultGroupSequenceProvider<? super C>> TypeConstraintMappingContext<C> defaultGroupSequenceProvider(Class<T> defaultGroupSequenceProviderClass) {
-		@SuppressWarnings("unchecked")
-		Class<C> clazz = (Class<C>) beanClass;
-		mapping.addDeprecatedDefaultGroupSequenceProvider( clazz, defaultGroupSequenceProviderClass );
-		return this;
-	}
-
-	public TypeConstraintMappingContext<C> defaultGroupSequenceProviderClass(Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass) {
+	public TypeConstraintMappingContext<C> defaultGroupSequenceProviderClass(Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass) {
 		@SuppressWarnings("unchecked")
 		Class<C> clazz = (Class<C>) beanClass;
 		mapping.addDefaultGroupSequenceProvider( clazz, defaultGroupSequenceProviderClass );

@@ -24,6 +24,8 @@ import java.util.ResourceBundle;
 
 import org.jboss.logging.Logger;
 
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
 /**
  * A resource bundle locator, that loads resource bundles by simply
  * invoking <code>ResourceBundle.loadBundle(...)</code>.
@@ -31,9 +33,7 @@ import org.jboss.logging.Logger;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@SuppressWarnings("deprecation")
-public class PlatformResourceBundleLocator
-		implements ResourceBundleLocator, org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
+public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
 	private String bundleName;
 
