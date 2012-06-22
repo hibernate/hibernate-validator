@@ -120,11 +120,6 @@
                 <version>1.0.1.Final</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-entitymanager</artifactId>
-                <version>3.6.0.Final</version>
-            </dependency>
-            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.8.2</version>
@@ -143,11 +138,6 @@
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
                 <version>3.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>1.2.124</version>
             </dependency>
             <dependency>
                 <groupId>org.jsoup</groupId>
