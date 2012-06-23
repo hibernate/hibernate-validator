@@ -421,6 +421,11 @@
                     <artifactId>chronos-jmeter-maven-plugin</artifactId>
                     <version>${org.codehaus.mojo.chronos.version}</version>
                 </plugin>
+               <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>clirr-maven-plugin</artifactId>
+                    <version>2.4</version>
+               </plugin>
             </plugins>
         </pluginManagement>
     </build>

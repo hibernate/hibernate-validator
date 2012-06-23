@@ -120,6 +120,23 @@
                 </includes>
             </testResource>
         </testResources>
+        <pluginManagement>
+            <plugins>
+                <!-- Creates a report by running "mvn clirr:clirr" -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>clirr-maven-plugin</artifactId>
+                    <configuration>
+                        <comparisonVersion>4.3.0.Final</comparisonVersion>
+                        <excludes>
+                            <exclude>org/hibernate/validator/internal/**</exclude>
+                        </excludes>
+                        <logResults>true</logResults>
+                        <minSeverity>info</minSeverity>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
