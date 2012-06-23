@@ -207,7 +207,6 @@ public class ConstraintValidatorCachingTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	class Person {
 		@NotNull
 		String name;
@@ -291,7 +290,6 @@ public class ConstraintValidatorCachingTest {
 		public abstract Class<? extends Payload>[] payload() default { };
 	}
 
-	@SuppressWarnings("unused")
 	class Foo {
 		@C
 		String value = "The quick brown fox jumps over the lazy dog";

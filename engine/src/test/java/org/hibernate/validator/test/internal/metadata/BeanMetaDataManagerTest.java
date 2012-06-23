@@ -69,7 +69,6 @@ public class BeanMetaDataManagerTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	public static class Fubar {
 		@NotNull
 		Object o;
@@ -83,7 +82,7 @@ public class BeanMetaDataManagerTest {
 			this.className = className;
 		}
 
-		public Class loadClass(String className) throws ClassNotFoundException {
+		public Class<?> loadClass(String className) throws ClassNotFoundException {
 			if ( this.className.equals( className ) ) {
 				return myLoadClass( className, true );
 			}
@@ -94,7 +93,7 @@ public class BeanMetaDataManagerTest {
 
 		protected Class<?> myLoadClass(String name, boolean resolve) throws ClassNotFoundException {
 			// make sure there is no parent delegation, instead call custom findClass
-			Class c = myFindClass( name );
+			Class<?> c = myFindClass( name );
 
 			if ( resolve ) {
 				resolveClass( c );
@@ -102,9 +101,9 @@ public class BeanMetaDataManagerTest {
 			return c;
 		}
 
-		public Class myFindClass(String className) {
+		public Class<?> myFindClass(String className) {
 			byte classByte[];
-			Class result;
+			Class<?> result;
 
 			try {
 				String classPath = ClassLoader.getSystemResource(

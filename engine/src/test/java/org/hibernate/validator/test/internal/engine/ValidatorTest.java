@@ -186,7 +186,6 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
-	@SuppressWarnings("unused")
 	class A {
 		@NotNull
 		String b;
@@ -198,7 +197,6 @@ public class ValidatorTest {
 		D d;
 	}
 
-	@SuppressWarnings("unused")
 	class B {
 		private boolean b;
 
@@ -252,7 +250,6 @@ public class ValidatorTest {
 	interface TestGroup {
 	}
 
-	@SuppressWarnings("unused")
 	interface F {
 		@CountValidationCalls
 		String getFoo();
@@ -284,13 +281,11 @@ public class ValidatorTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	class Bar {
 		@NotNull
 		String alwaysNull;
 	}
 
-	@SuppressWarnings("unused")
 	class NotFollowingJavaBeanNotation {
 		@NotNull
 		String m_foo;

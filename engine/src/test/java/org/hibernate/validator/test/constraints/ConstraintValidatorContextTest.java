@@ -85,7 +85,6 @@ public class ConstraintValidatorContextTest {
 		assertCorrectPropertyPaths( constraintViolations, "field1", "field2", "myNode1", "myNode2[key].myNode3" );
 	}
 
-	@SuppressWarnings("unused")
 	@MyClassLevelValidation
 	public static class MyObject {
 		@NotNull
