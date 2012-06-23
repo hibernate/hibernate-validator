@@ -89,7 +89,6 @@ public class MessageInterpolatorContextTest {
 		verify( mock );
 	}
 
-	@SuppressWarnings("unused")
 	public static class Test {
 		private String test;
 

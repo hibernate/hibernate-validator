@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -43,8 +43,7 @@ public class ConstraintMappingContext {
 	private final Map<Class<?>, Set<MethodConstraintLocation>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
-	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> deprecatedDefaultGroupSequenceProviders;
-	private final Map<Class<?>, Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
+	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public ConstraintMappingContext() {
@@ -54,7 +53,6 @@ public class ConstraintMappingContext {
 		this.methodCascadeConfig = newHashMap();
 		this.configuredClasses = newHashSet();
 		this.defaultGroupSequences = newHashMap();
-		this.deprecatedDefaultGroupSequenceProviders = newHashMap();
 		this.defaultGroupSequenceProviders = newHashMap();
 		this.annotationProcessingOptions = new AnnotationProcessingOptions();
 	}
@@ -102,24 +100,9 @@ public class ConstraintMappingContext {
 	 *
 	 * @return The default group sequence provider defined class or {@code null} if none.
 	 */
-	public final <T> Class<? extends DefaultGroupSequenceProvider<? super T>> getDeprecatedDefaultGroupSequenceProvider(Class<T> beanType) {
+	public final <T> Class<? extends DefaultGroupSequenceProvider<? super T>> getDefaultGroupSequenceProvider(Class<T> beanType) {
 		@SuppressWarnings("unchecked")
-		Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends DefaultGroupSequenceProvider<? super T>>) deprecatedDefaultGroupSequenceProviders
-				.get( beanType );
-		return providerClass;
-	}
-
-	/**
-	 * Returns the class of the default group sequence provider defined
-	 * for the given bean type.
-	 *
-	 * @param beanType The bean type.
-	 *
-	 * @return The default group sequence provider defined class or {@code null} if none.
-	 */
-	public final <T> Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>> getDefaultGroupSequenceProvider(Class<T> beanType) {
-		@SuppressWarnings("unchecked")
-		Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>>) defaultGroupSequenceProviders
+		Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends DefaultGroupSequenceProvider<? super T>>) defaultGroupSequenceProviders
 				.get( beanType );
 		return providerClass;
 	}
@@ -168,12 +151,7 @@ public class ConstraintMappingContext {
 		defaultGroupSequences.put( beanClass, defaultGroupSequence );
 	}
 
-	public final <T> void addDeprecatedDefaultGroupSequenceProvider(Class<T> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> defaultGroupSequenceProviderClass) {
-		configuredClasses.add( beanClass );
-		deprecatedDefaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
-	}
-
-	public final <T> void addDefaultGroupSequenceProvider(Class<T> beanClass, Class<? extends org.hibernate.validator.spi.group.DefaultGroupSequenceProvider<? super T>> defaultGroupSequenceProviderClass) {
+	public final <T> void addDefaultGroupSequenceProvider(Class<T> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> defaultGroupSequenceProviderClass) {
 		configuredClasses.add( beanClass );
 		defaultGroupSequenceProviders.put( beanClass, defaultGroupSequenceProviderClass );
 	}

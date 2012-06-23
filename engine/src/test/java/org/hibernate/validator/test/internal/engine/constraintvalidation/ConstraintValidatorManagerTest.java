@@ -180,7 +180,6 @@ public class ConstraintValidatorManagerTest {
 		return constraintDescriptorSet.iterator().next();
 	}
 
-	@SuppressWarnings("unused")
 	public class Foo {
 		@NotNull
 		String s1;

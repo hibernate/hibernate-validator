@@ -55,9 +55,10 @@ public class TypeNames {
 	public static class HibernateValidatorTypes {
 
 		private static final String ORG_HIBERNATE_VALIDATOR_GROUP = "org.hibernate.validator.group";
-
 		public final static String GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".GroupSequenceProvider";
-		public final static String DEFAULT_GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".DefaultGroupSequenceProvider";
+
+		private static final String ORG_HIBERNATE_VALIDATOR_SPI_GROUP = "org.hibernate.validator.spi.group";
+		public final static String DEFAULT_GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_SPI_GROUP + ".DefaultGroupSequenceProvider";
 
 		private static final String ORG_HIBERNATE_VALIDATOR_CONSTRAINTS = "org.hibernate.validator.constraints";
 

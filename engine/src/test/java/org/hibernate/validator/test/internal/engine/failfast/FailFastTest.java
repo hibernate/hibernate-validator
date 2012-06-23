@@ -244,7 +244,6 @@ public class FailFastTest {
 		assertCorrectConstraintViolationMessages( constraintViolations, "Bar constraint failed!" );
 	}
 
-	@SuppressWarnings("unused")
 	public void testFailSafePerformance() {
 		final Validator regularValidator = ValidatorUtil.getConfiguration().buildValidatorFactory().getValidator();
 		final Validator failFastValidator = ValidatorUtil.getConfiguration()
@@ -305,7 +304,6 @@ public class FailFastTest {
 		@NotNull
 		String b;
 
-		@SuppressWarnings("unused")
 		@NotNull
 		@Email
 		String c;

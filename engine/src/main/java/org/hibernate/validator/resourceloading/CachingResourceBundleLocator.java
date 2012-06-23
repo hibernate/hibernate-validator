@@ -38,20 +38,6 @@ public class CachingResourceBundleLocator extends DelegatingResourceBundleLocato
 	 * Creates a new CachingResourceBundleLocator.
 	 *
 	 * @param delegate The locator from which the values actually will be retrieved.
-	 *
-	 * @deprecated Will be removed in a future release. Use
-	 *             {@link #CachingResourceBundleLocator(ResourceBundleLocator)}
-	 *             instead.
-	 */
-	@Deprecated
-	public CachingResourceBundleLocator(org.hibernate.validator.resourceloading.ResourceBundleLocator delegate) {
-		super( delegate );
-	}
-
-	/**
-	 * Creates a new CachingResourceBundleLocator.
-	 *
-	 * @param delegate The locator from which the values actually will be retrieved.
 	 */
 	public CachingResourceBundleLocator(ResourceBundleLocator delegate) {
 		super( delegate );

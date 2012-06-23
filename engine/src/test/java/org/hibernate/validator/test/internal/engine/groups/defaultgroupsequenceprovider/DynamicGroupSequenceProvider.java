@@ -19,7 +19,7 @@ package org.hibernate.validator.test.internal.engine.groups.defaultgroupsequence
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.validator.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI

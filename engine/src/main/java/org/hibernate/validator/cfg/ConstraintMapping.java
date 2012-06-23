@@ -19,7 +19,7 @@ package org.hibernate.validator.cfg;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 
 /**
- * Top level class for constraints configured via the programmatic API.
+ * Represents a constraint mapping configured via the programmatic API.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling

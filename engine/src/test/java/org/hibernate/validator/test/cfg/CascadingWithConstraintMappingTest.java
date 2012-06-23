@@ -129,7 +129,6 @@ public class CascadingWithConstraintMappingTest {
 	private static class B extends A {
 	}
 
-	@SuppressWarnings("unused")
 	public static class C {
 		private String string;
 
