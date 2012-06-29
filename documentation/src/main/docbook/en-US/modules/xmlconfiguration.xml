@@ -30,7 +30,7 @@
     file <filename>validation.xml</filename>. If this file exists in the
     classpath its configuration will be applied when the
     <classname>ValidationFactory</classname> gets created. <xref
-    linkend="image-validation-configuration" /> shows a model view of the xsd
+    linkend="image-validation-configuration"/> shows a model view of the xsd
     <filename>valiation.xml</filename> has to adhere to.<example
         id="image-validation-configuration">
         <title>validation-configuration-1.0.xsd</title>
@@ -38,17 +38,17 @@
         <mediaobject>
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="validation-configuration-1.0.png" scalefit="1" />
+                       fileref="validation-configuration-1.0.png" scalefit="1"/>
           </imageobject>
 
           <imageobject role="html">
             <imagedata depth="" fileref="validation-configuration-1.0.png"
-                       scalefit="1" />
+                       scalefit="1"/>
           </imageobject>
         </mediaobject>
       </example></para>
 
-    <para><xref linkend="example-validation-xml" /> shows the several
+    <para><xref linkend="example-validation-xml"/> shows the several
     configuration options of <filename>validation.xml</filename>.</para>
 
     <example id="example-validation-xml">
@@ -73,7 +73,7 @@
     </warning>
 
     <para>All settings shown in the <filename>validation.xml</filename> are
-    optional and in the case of <xref linkend="example-validation-xml" /> show
+    optional and in the case of <xref linkend="example-validation-xml"/> show
     the defaults used within Hibernate Validator. The node
     <property>default-provider</property> allows to choose the Bean Validation
     provider. This is useful if there is more than one provider in the
@@ -88,11 +88,11 @@
     configuration will be overridden by values explicitly specified via the
     API. It is even possible to ignore the XML configuration completely via
     <methodname> Configuration.ignoreXmlConfiguration()</methodname>. See also
-    <xref linkend="validator-bootstrapping" />.</para>
+    <xref linkend="validator-bootstrapping"/>.</para>
 
     <para>Via the <property>constraint-mapping</property> you can list an
     arbitrary number of additional XML files containing the actual constraint
-    configuration. See <xref linkend="section-mapping-constraints" />.</para>
+    configuration. See <xref linkend="section-mapping-constraints"/>.</para>
 
     <para>Last but not least, you can specify provider specific properties via
     the <property>property</property> nodes.</para>
@@ -102,8 +102,8 @@
     <title id="section-mapping-constraints">Mapping constraints</title>
 
     <para>Expressing constraints in XML is possible via files adhering to the
-    xsd seen in <xref linkend="image-mapping-configuration" />. Note that
-    these mapping files are only processed if listed via
+    xsd seen in <xref linkend="image-mapping-configuration"/>. Note that these
+    mapping files are only processed if listed via
     <property>constraint-mapping</property> in your
     <filename>validation.xml</filename>.</para>
 
@@ -113,19 +113,19 @@
       <mediaobject>
         <imageobject role="fo">
           <imagedata align="center" contentdepth="240mm"
-                     fileref="validation-mapping-1.0.png" scalefit="" />
+                     fileref="validation-mapping-1.0.png" scalefit=""/>
         </imageobject>
 
         <imageobject role="html">
           <imagedata depth="" fileref="validation-mapping-1.0.png"
-                     scalefit="1" />
+                     scalefit="1"/>
         </imageobject>
       </mediaobject>
     </example>
 
-    <para><xref linkend="example-constraints-car" /> shows how our classes Car
-    and RentalCar from <xref linkend="example-car" /> resp. <xref
-    linkend="example-rental-car" /> could be mapped in XML.</para>
+    <para><xref linkend="example-constraints-car"/> shows how our classes Car
+    and RentalCar from <xref linkend="example-car"/> resp. <xref
+    linkend="example-rental-car"/> could be mapped in XML.</para>
 
     <example id="example-constraints-car">
       <title>constraints-car.xml</title>
@@ -194,7 +194,7 @@
     <property>bean</property> value applies. Otherwise do the nodes
     <property>class</property>, <property>fields</property> and
     <property>getter</property> determine on which level the constraints are
-    placed (see <xref linkend="validator-usingvalidator-annotate" />). The
+    placed (see <xref linkend="validator-usingvalidator-annotate"/>). The
     <property>constraint</property> node is then used to add a constraint on
     the corresponding level. Each constraint definition must define the class
     via the annotation attribute. The constraint attributes required by the
@@ -204,7 +204,7 @@
     using the the <property>element</property> node.</para>
 
     <para>The class node also allows to reconfigure the default group sequence
-    (see <xref linkend="section-default-group-class" />) via the
+    (see <xref linkend="section-default-group-class"/>) via the
     <property>group-sequence</property> node.</para>
 
     <para>Last but not least, the list of
