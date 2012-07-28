@@ -25,7 +25,7 @@ import java.lang.reflect.Proxy;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
- * Creates live annotations (actually <code>AnnotationProxies</code>) from <code>AnnotationDescriptors</code>.
+ * Creates live annotations (actually {@link AnnotationProxy} instances) from {@code AnnotationDescriptor}s.
  *
  * @author Paolo Perrotta
  * @author Davide Marchignoli
@@ -34,10 +34,12 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public class AnnotationFactory {
 
-	@SuppressWarnings("unchecked")
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
-		ClassLoader classLoader = ReflectionHelper.getClassLoaderFromContext();
-		Class<T> proxyClass = ( Class<T> ) Proxy.getProxyClass( classLoader, descriptor.type() );
+		@SuppressWarnings("unchecked")
+		Class<T> proxyClass = (Class<T>) Proxy.getProxyClass(
+				ReflectionHelper.getClassLoaderFromClass( descriptor.type() ),
+				descriptor.type()
+		);
 		InvocationHandler handler = new AnnotationProxy( descriptor );
 		try {
 			return getProxyInstance( proxyClass, handler );
