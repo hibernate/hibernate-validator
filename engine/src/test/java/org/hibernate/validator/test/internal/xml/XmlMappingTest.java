@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.validation.Configuration;
 import javax.validation.ConfigurationSource;
 import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
@@ -192,7 +193,7 @@ public class XmlMappingTest {
 	public void testLoadingOfBv10ValidationXml() {
 
 		runWithCustomValidationXml(
-				"hv-1.0-validation.xml", new Runnable() {
+				"bv-1.0-validation.xml", new Runnable() {
 
 			@Override
 			public void run() {
@@ -205,6 +206,40 @@ public class XmlMappingTest {
 						configurationSource.getProperties().get( "com.acme.validation.safetyChecking" ),
 						"failOnError"
 				);
+			}
+		}
+		);
+	}
+
+	@Test(
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for file META-INF/validation.xml: 2\\.0\\."
+	)
+	public void shouldFailToLoadValidationXmlWithUnsupportedVersion() {
+
+		runWithCustomValidationXml(
+				"unsupported-validation.xml", new Runnable() {
+
+			@Override
+			public void run() {
+				ValidatorUtil.getConfiguration().getConfigurationSource();
+			}
+		}
+		);
+	}
+
+	@Test(
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = "HV000100: Unable to parse META-INF/validation.xml."
+	)
+	public void shouldFailToLoad10ValidationXmlWithParameterNameProvider() {
+
+		runWithCustomValidationXml(
+				"invalid-bv-1.0-validation.xml", new Runnable() {
+
+			@Override
+			public void run() {
+				ValidatorUtil.getConfiguration().getConfigurationSource();
 			}
 		}
 		);
