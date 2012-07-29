@@ -38,17 +38,18 @@ public class XmlParserHelper {
 
 	private static final Log log = LoggerFactory.make();
 	private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+	private static final String DEFAULT_VERSION = "1.0";
 
 	/**
 	 * Retrieves the value of the "version" attribute of the root element of the
 	 * given XML input stream.
 	 *
-	 * @param resourceName
-	 *            The name of the represented XML resource.
-	 * @param xmlInputStream
-	 *            An input stream representing an XML resource.
+	 * @param resourceName The name of the represented XML resource.
+	 * @param xmlInputStream An input stream representing an XML resource.
 	 *
-	 * @return The value of the "version" attribute. May be null.
+	 * @return The value of the "version" attribute. For compatibility with BV
+	 *         1.0, "1.0" will be returned if the given stream doesn't have a
+	 *         "version" attribute.
 	 */
 	public String getVersion(String resourceName, InputStream xmlInputStream) {
 
@@ -70,7 +71,7 @@ public class XmlParserHelper {
 		}
 
 		Attribute versionAttribute = startElement.getAttributeByName( new QName( "version" ) );
-		return versionAttribute != null ? versionAttribute.getValue() : null;
+		return versionAttribute != null ? versionAttribute.getValue() : DEFAULT_VERSION;
 	}
 
 	private StartElement getRootElement(XMLEventReader xmlEventReader) throws XMLStreamException {

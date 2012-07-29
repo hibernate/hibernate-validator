@@ -49,13 +49,13 @@ public class XmlParserHelperTest {
 	}
 
 	@Test
-	public void shouldRetrieveNullFor10ValidationXml() {
+	public void shouldRetrieveVersionFor10ValidationXml() {
 
 		String version = xmlParserHelper.getVersion(
 				"META-INF/validation.xml",
 				XmlParserHelperTest.class.getResourceAsStream( "hv-1.0-validation.xml" )
 		);
 
-		assertThat( version ).isNull();
+		assertThat( version ).isEqualTo( "1.0" );
 	}
 }

@@ -151,6 +151,7 @@
                 <configuration>
                     <packageName>org.hibernate.validator.internal.xml</packageName>
                     <extension>true</extension>
+                    <schemaFiles>validation-configuration-1.1.xsd,validation-mapping-1.0.xsd</schemaFiles>
                 </configuration>
                 <dependencies>
                     <dependency>
