@@ -66,52 +66,36 @@ public class ValidationXmlParser {
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
 	public final ConfigurationSource parseValidationXml() {
-		ValidationConfigType config = getValidationConfig();
-		if ( config != null ) {
-			Map<String, String> properties = new HashMap<String, String>();
-			for ( PropertyType property : config.getProperty() ) {
-				if ( log.isDebugEnabled() ) {
-					log.debugf(
-							"Found property '%s' with value '%s' in validation.xml.",
-							property.getName(),
-							property.getValue()
-					);
-				}
-				properties.put( property.getName(), property.getValue() );
-			}
 
-			return new ValidationXmlConfigurationSource(
-					config.getDefaultProvider(),
-					config.getConstraintValidatorFactory(),
-					config.getMessageInterpolator(),
-					config.getTraversableResolver(),
-					config.getParameterNameProvider(),
-					new HashSet<String>( config.getConstraintMapping() ),
-					properties
-			);
-		}
-		else {
+		BufferedInputStream inputStream = getInputStream();
+		if ( inputStream == null ) {
 			return new ValidationXmlConfigurationSource();
+		}
+
+		try {
+			String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, inputStream );
+			String schemaResourceName = getSchemaResourceName( schemaVersion );
+			Schema schema = xmlParserHelper.getSchema( schemaResourceName );
+			ValidationConfigType validationConfig = unmarshal( inputStream, schema );
+
+			return createConfigurationSource( validationConfig );
+		}
+		finally {
+			closeStream( inputStream );
 		}
 	}
 
-	private ValidationConfigType getValidationConfig() {
-		BufferedInputStream inputStream = getInputStream();
+	private BufferedInputStream getInputStream() {
+		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
+		InputStream inputStream = ResourceLoaderHelper.getInputStreamForPath( VALIDATION_XML_FILE );
 
-		if ( inputStream == null ) {
+		if ( inputStream != null ) {
+			return new BufferedInputStream( inputStream );
+		}
+		else {
 			log.debugf( "No %s found. Using annotation based configuration only.", VALIDATION_XML_FILE );
 			return null;
 		}
-
-		String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, inputStream );
-		String schemaResourceName = getSchemaResourceName( schemaVersion );
-		Schema schema = xmlParserHelper.getSchema( schemaResourceName );
-
-		ValidationConfigType validationConfig = unmarshal( inputStream, schema );
-
-		closeStream( inputStream );
-
-		return validationConfig;
 	}
 
 	private String getSchemaResourceName(String schemaVersion) {
@@ -122,12 +106,6 @@ public class ValidationXmlParser {
 		}
 
 		return schemaResource;
-	}
-
-	private BufferedInputStream getInputStream() {
-		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
-		InputStream inputStream = ResourceLoaderHelper.getInputStreamForPath( VALIDATION_XML_FILE );
-		return inputStream != null ? new BufferedInputStream( inputStream ) : null;
 	}
 
 	private ValidationConfigType unmarshal(InputStream inputStream, Schema schema) {
@@ -153,5 +131,29 @@ public class ValidationXmlParser {
 		catch ( IOException io ) {
 			log.unableToCloseXMLFileInputStream( VALIDATION_XML_FILE );
 		}
+	}
+
+	private ConfigurationSource createConfigurationSource(ValidationConfigType config) {
+		Map<String, String> properties = new HashMap<String, String>();
+		for ( PropertyType property : config.getProperty() ) {
+			if ( log.isDebugEnabled() ) {
+				log.debugf(
+						"Found property '%s' with value '%s' in validation.xml.",
+						property.getName(),
+						property.getValue()
+				);
+			}
+			properties.put( property.getName(), property.getValue() );
+		}
+
+		return new ValidationXmlConfigurationSource(
+				config.getDefaultProvider(),
+				config.getConstraintValidatorFactory(),
+				config.getMessageInterpolator(),
+				config.getTraversableResolver(),
+				config.getParameterNameProvider(),
+				new HashSet<String>( config.getConstraintMapping() ),
+				properties
+		);
 	}
 }
