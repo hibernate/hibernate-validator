@@ -19,6 +19,8 @@ package org.hibernate.validator.internal.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -57,6 +59,8 @@ public class XmlParserHelper {
 	 * should never happen.
 	 */
 	private static final int READ_LIMIT = 1024 * 1024;
+
+	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>( 4 );
 
 	/**
 	 * Retrieves the schema version applying for the given XML input stream as
@@ -123,6 +127,20 @@ public class XmlParserHelper {
 	}
 
 	public Schema getSchema(String schemaResource) {
+
+		Schema schema = schemaCache.get( schemaResource );
+
+		if ( schema != null ) {
+			return schema;
+		}
+
+		schema = loadSchema( schemaResource );
+		Schema previous = schemaCache.putIfAbsent( schemaResource, schema );
+
+		return previous != null ? previous : schema;
+	}
+
+	private Schema loadSchema(String schemaResource) {
 
 		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlParserHelper.class );
 
