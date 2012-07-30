@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.xml;
 
+import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,12 +26,13 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.Payload;
@@ -40,9 +42,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
-import org.xml.sax.SAXException;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -66,7 +65,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class XmlMappingParser {
 
 	private static final Log log = LoggerFactory.make();
-	private static final String VALIDATION_MAPPING_XSD = "META-INF/validation-mapping-1.0.xsd";
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
 	private static final String PAYLOAD_PARAM = "payload";
@@ -79,6 +77,19 @@ public class XmlMappingParser {
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
+	private final XmlParserHelper xmlParserHelper = new XmlParserHelper();
+
+	private static final ConcurrentMap<String, String> SCHEMAS_BY_VERSION = new ConcurrentHashMap<String, String>(
+			2,
+			0.75f,
+			1
+	);
+
+	static {
+		SCHEMAS_BY_VERSION.put( "1.0", "META-INF/validation-mapping-1.0.xsd" );
+		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
+	}
+
 	public XmlMappingParser(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptions();
@@ -89,15 +100,21 @@ public class XmlMappingParser {
 
 	public final void parse(Set<InputStream> mappingStreams) {
 
-		Schema schema = getMappingSchema();
-
 		try {
 			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
-			unmarshaller.setSchema( schema );
 
 			for ( InputStream in : mappingStreams ) {
-				ConstraintMappingsType mapping = getValidationConfig( in, unmarshaller );
+
+				InputStream resettableStream = in.markSupported() ? in : new BufferedInputStream( in );
+
+				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", resettableStream );
+				String schemaResourceName = getSchemaResourceName( schemaVersion );
+				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
+
+				Unmarshaller unmarshaller = jc.createUnmarshaller();
+				unmarshaller.setSchema( schema );
+
+				ConstraintMappingsType mapping = getValidationConfig( resettableStream, unmarshaller );
 				String defaultPackage = mapping.getDefaultPackage();
 
 				parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
@@ -593,20 +610,6 @@ public class XmlMappingParser {
 		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
-	private Schema getMappingSchema() {
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlMappingParser.class );
-		URL schemaUrl = loader.getResource( VALIDATION_MAPPING_XSD );
-		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
-		Schema schema = null;
-		try {
-			schema = sf.newSchema( schemaUrl );
-		}
-		catch ( SAXException e ) {
-			log.unableToCreateSchema( VALIDATION_MAPPING_XSD, e.getMessage() );
-		}
-		return schema;
-	}
-
 	private ConstraintMappingsType getValidationConfig(InputStream in, Unmarshaller unmarshaller) {
 		ConstraintMappingsType constraintMappings;
 		try {
@@ -635,9 +638,18 @@ public class XmlMappingParser {
 		return constraintMappings;
 	}
 
+	private String getSchemaResourceName(String schemaVersion) {
+		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
+
+		if ( schemaResource == null ) {
+			throw log.getUnsupportedSchemaVersionException( "constraint mapping file", schemaVersion );
+		}
+
+		return schemaResource;
+	}
 
 	// JAXB closes the underlying input stream
-	public class CloseIgnoringInputStream extends FilterInputStream {
+	private static class CloseIgnoringInputStream extends FilterInputStream {
 		public CloseIgnoringInputStream(InputStream in) {
 			super( in );
 		}

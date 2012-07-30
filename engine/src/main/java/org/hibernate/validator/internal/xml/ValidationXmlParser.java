@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.xml;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,11 +31,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
-import org.xml.sax.SAXException;
-
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.ResourceLoaderHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -45,18 +40,12 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * Parser for <i>validation.xml</i> using JAXB.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ValidationXmlParser {
 
 	private static final Log log = LoggerFactory.make();
 
-	/**
-	 * Read limit for the buffered input stream. Resetting the stream after
-	 * reading the version attribute will fail, if this has required reading
-	 * more bytes than this limit (1MB) from the stream. Practically, this
-	 * should never happen.
-	 */
-	private static final int READ_LIMIT = 1024 * 1024;
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
 	private static final ConcurrentMap<String, String> SCHEMAS_BY_VERSION = new ConcurrentHashMap<String, String>(
 			2,
@@ -114,8 +103,9 @@ public class ValidationXmlParser {
 			return null;
 		}
 
-		String schemaVersion = getSchemaVersion( inputStream );
-		Schema schema = getSchema( schemaVersion );
+		String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, inputStream );
+		String schemaResourceName = getSchemaResourceName( schemaVersion );
+		Schema schema = xmlParserHelper.getSchema( schemaResourceName );
 
 		ValidationConfigType validationConfig = unmarshal( inputStream, schema );
 
@@ -124,43 +114,20 @@ public class ValidationXmlParser {
 		return validationConfig;
 	}
 
+	private String getSchemaResourceName(String schemaVersion) {
+		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
+
+		if ( schemaResource == null ) {
+			throw log.getUnsupportedSchemaVersionException( VALIDATION_XML_FILE, schemaVersion );
+		}
+
+		return schemaResource;
+	}
+
 	private BufferedInputStream getInputStream() {
 		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
 		InputStream inputStream = ResourceLoaderHelper.getInputStreamForPath( VALIDATION_XML_FILE );
 		return inputStream != null ? new BufferedInputStream( inputStream ) : null;
-	}
-
-	private String getSchemaVersion(BufferedInputStream inputStream) {
-		inputStream.mark( READ_LIMIT );
-		String version = xmlParserHelper.getVersion( VALIDATION_XML_FILE, inputStream );
-		try {
-			inputStream.reset();
-		}
-		catch ( IOException e ) {
-			throw log.getUnableToResetXmlInputStreamException( VALIDATION_XML_FILE, e );
-		}
-		return version;
-	}
-
-	private Schema getSchema(String version) {
-		String schemaResource = SCHEMAS_BY_VERSION.get( version );
-
-		if ( schemaResource == null ) {
-			throw log.getUnsupportedSchemaVersionException( VALIDATION_XML_FILE, version );
-		}
-
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
-
-		URL schemaUrl = loader.getResource( schemaResource );
-		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
-		Schema schema = null;
-		try {
-			schema = sf.newSchema( schemaUrl );
-		}
-		catch ( SAXException e ) {
-			log.unableToCreateSchema( schemaResource, e.getMessage() );
-		}
-		return schema;
 	}
 
 	private ValidationConfigType unmarshal(InputStream inputStream, Schema schema) {

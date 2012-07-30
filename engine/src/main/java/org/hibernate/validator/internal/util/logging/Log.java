@@ -439,7 +439,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 121, value = "Unable to parse %s.")
 	ValidationException getUnableToDetermineSchemaVersionException(String file, @Cause XMLStreamException e);
 
-	@Message(id = 122, value = "Unsupported schema version for file %s: %s.")
+	@Message(id = 122, value = "Unsupported schema version for %s: %s.")
 	ValidationException getUnsupportedSchemaVersionException(String file, String version);
 
 	@Message(id = 123, value = "Unable to parse %s.")

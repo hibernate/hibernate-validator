@@ -40,7 +40,7 @@ public class XmlParserHelperTest {
 	@Test
 	public void shouldRetrieveVersionFor11ValidationXml() {
 
-		String version = xmlParserHelper.getVersion(
+		String version = xmlParserHelper.getSchemaVersion(
 				"META-INF/validation.xml",
 				XmlParserHelperTest.class.getResourceAsStream( "parameter-name-provider-validation.xml" )
 		);
@@ -51,9 +51,9 @@ public class XmlParserHelperTest {
 	@Test
 	public void shouldRetrieveVersionFor10ValidationXml() {
 
-		String version = xmlParserHelper.getVersion(
+		String version = xmlParserHelper.getSchemaVersion(
 				"META-INF/validation.xml",
-				XmlParserHelperTest.class.getResourceAsStream( "hv-1.0-validation.xml" )
+				XmlParserHelperTest.class.getResourceAsStream( "bv-1.0-validation.xml" )
 		);
 
 		assertThat( version ).isEqualTo( "1.0" );

@@ -16,7 +16,9 @@
 */
 package org.hibernate.validator.internal.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -24,9 +26,17 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
+import org.xml.sax.SAXException;
+
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Provides common functionality used within the different XML descriptor
@@ -41,17 +51,31 @@ public class XmlParserHelper {
 	private static final String DEFAULT_VERSION = "1.0";
 
 	/**
-	 * Retrieves the value of the "version" attribute of the root element of the
-	 * given XML input stream.
+	 * Read limit for the buffered input stream. Resetting the stream after
+	 * reading the version attribute will fail, if this has required reading
+	 * more bytes than this limit (1MB) from the stream. Practically, this
+	 * should never happen.
+	 */
+	private static final int READ_LIMIT = 1024 * 1024;
+
+	/**
+	 * Retrieves the schema version applying for the given XML input stream as
+	 * represented by the "version" attribute of the root element of the stream.
 	 *
 	 * @param resourceName The name of the represented XML resource.
-	 * @param xmlInputStream An input stream representing an XML resource.
+	 * @param xmlInputStream An input stream representing an XML resource. Must support the
+	 * {@link InputStream#mark(int)} and {@link InputStream#reset()}
+	 * methods.
 	 *
 	 * @return The value of the "version" attribute. For compatibility with BV
 	 *         1.0, "1.0" will be returned if the given stream doesn't have a
 	 *         "version" attribute.
 	 */
-	public String getVersion(String resourceName, InputStream xmlInputStream) {
+	public String getSchemaVersion(String resourceName, InputStream xmlInputStream) {
+
+		Contracts.assertNotNull( xmlInputStream, MESSAGES.parameterMustNotBeNull( "xmlInputStream" ) );
+
+		xmlInputStream.mark( READ_LIMIT );
 
 		try {
 			XMLEventReader xmlEventReader = createXmlEventReader( xmlInputStream );
@@ -61,6 +85,14 @@ public class XmlParserHelper {
 		}
 		catch ( XMLStreamException e ) {
 			throw log.getUnableToDetermineSchemaVersionException( resourceName, e );
+		}
+		finally {
+			try {
+				xmlInputStream.reset();
+			}
+			catch ( IOException e ) {
+				throw log.getUnableToResetXmlInputStreamException( resourceName, e );
+			}
 		}
 	}
 
@@ -88,5 +120,21 @@ public class XmlParserHelper {
 
 	private synchronized XMLEventReader createXmlEventReader(InputStream xmlStream) throws XMLStreamException {
 		return xmlInputFactory.createXMLEventReader( xmlStream );
+	}
+
+	public Schema getSchema(String schemaResource) {
+
+		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlParserHelper.class );
+
+		URL schemaUrl = loader.getResource( schemaResource );
+		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
+		Schema schema = null;
+		try {
+			schema = sf.newSchema( schemaUrl );
+		}
+		catch ( SAXException e ) {
+			log.unableToCreateSchema( schemaResource, e.getMessage() );
+		}
+		return schema;
 	}
 }

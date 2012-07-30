@@ -162,6 +162,39 @@ public class XmlMappingTest {
 	}
 
 	@Test
+	public void shouldLoadBv11ConstraintMapping() {
+
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-impl-mapping-bv-1.1.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
+
+		assertEquals( violations.size(), 1 );
+	}
+
+	@Test(
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for constraint mapping file: 2\\.0\\."
+	)
+	public void shouldFailToLoadConstraintMappingWithUnsupportedVersion() {
+
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+		configuration.addMapping(
+				XmlMappingTest.class.getResourceAsStream(
+						"my-interface-impl-mapping-unsupported-version.xml"
+				)
+		);
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
+
+		assertEquals( violations.size(), 1 );
+	}
+
+	@Test
 	public void testParameterNameProviderConfiguration() {
 
 		runWithCustomValidationXml(
@@ -213,7 +246,7 @@ public class XmlMappingTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for file META-INF/validation.xml: 2\\.0\\."
+			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for META-INF/validation.xml: 2\\.0\\."
 	)
 	public void shouldFailToLoadValidationXmlWithUnsupportedVersion() {
 
