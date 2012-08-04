@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.xml;
 
-import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,6 +97,12 @@ public class XmlMappingParser {
 		this.defaultSequences = newHashMap();
 	}
 
+	/**
+	 * Parses the given set of input stream representing XML constraint
+	 * mappings.
+	 *
+	 * @param mappingStreams The streams to parse. Must support the mark/reset contract.
+	 */
 	public final void parse(Set<InputStream> mappingStreams) {
 
 		try {
@@ -105,16 +110,14 @@ public class XmlMappingParser {
 
 			for ( InputStream in : mappingStreams ) {
 
-				InputStream resettableStream = in.markSupported() ? in : new BufferedInputStream( in );
-
-				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", resettableStream );
+				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", in );
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
 				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
 
 				Unmarshaller unmarshaller = jc.createUnmarshaller();
 				unmarshaller.setSchema( schema );
 
-				ConstraintMappingsType mapping = getValidationConfig( resettableStream, unmarshaller );
+				ConstraintMappingsType mapping = getValidationConfig( in, unmarshaller );
 				String defaultPackage = mapping.getDefaultPackage();
 
 				parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
@@ -547,15 +550,19 @@ public class XmlMappingParser {
 		}
 		else {
 			try {
-				@SuppressWarnings("unchecked")
-				Class<Enum> enumClass = (Class<Enum>) returnType;
-				returnValue = Enum.valueOf( enumClass, value );
+				returnValue = getEnumInstance( returnType, value );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getInvalidReturnTypeException( returnType, e );
 			}
 		}
 		return returnValue;
+	}
+
+	private <E extends Enum<E>> E getEnumInstance(Class<?> enumClazz, String value) {
+		@SuppressWarnings("unchecked")
+		Class<E> enumClass = (Class<E>) enumClazz;
+		return Enum.valueOf( enumClass, value );
 	}
 
 	private void checkNameIsValid(String name) {

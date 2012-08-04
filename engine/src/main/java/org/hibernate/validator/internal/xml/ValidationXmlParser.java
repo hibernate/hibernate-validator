@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -67,15 +66,14 @@ public class ValidationXmlParser {
 	 */
 	public final ConfigurationSource parseValidationXml() {
 
-		BufferedInputStream inputStream = getInputStream();
+		InputStream inputStream = getInputStream();
 		if ( inputStream == null ) {
 			return new ValidationXmlConfigurationSource();
 		}
 
 		try {
 			String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, inputStream );
-			String schemaResourceName = getSchemaResourceName( schemaVersion );
-			Schema schema = xmlParserHelper.getSchema( schemaResourceName );
+			Schema schema = getSchema( schemaVersion );
 			ValidationConfigType validationConfig = unmarshal( inputStream, schema );
 
 			return createConfigurationSource( validationConfig );
@@ -85,12 +83,12 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private BufferedInputStream getInputStream() {
+	private InputStream getInputStream() {
 		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
-		InputStream inputStream = ResourceLoaderHelper.getInputStreamForPath( VALIDATION_XML_FILE );
+		InputStream inputStream = ResourceLoaderHelper.getResettableInputStreamForPath( VALIDATION_XML_FILE );
 
 		if ( inputStream != null ) {
-			return new BufferedInputStream( inputStream );
+			return inputStream;
 		}
 		else {
 			log.debugf( "No %s found. Using annotation based configuration only.", VALIDATION_XML_FILE );
@@ -98,14 +96,14 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private String getSchemaResourceName(String schemaVersion) {
+	private Schema getSchema(String schemaVersion) {
 		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
 
 		if ( schemaResource == null ) {
 			throw log.getUnsupportedSchemaVersionException( VALIDATION_XML_FILE, schemaVersion );
 		}
 
-		return schemaResource;
+		return xmlParserHelper.getSchema( schemaResource );
 	}
 
 	private ValidationConfigType unmarshal(InputStream inputStream, Schema schema) {
@@ -124,7 +122,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private void closeStream(BufferedInputStream inputStream) {
+	private void closeStream(InputStream inputStream) {
 		try {
 			inputStream.close();
 		}
