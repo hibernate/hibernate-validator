@@ -49,8 +49,15 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 public class XmlParserHelper {
 
 	private static final Log log = LoggerFactory.make();
-	private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+
+	/**
+	 * The expected number of XML schemas managed by this class. Used to set the
+	 * initial cache size.
+	 */
+	private static final int NUMBER_OF_SCHEMAS = 4;
 	private static final String DEFAULT_VERSION = "1.0";
+
+	private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
 
 	/**
 	 * Read limit for the buffered input stream. Resetting the stream after
@@ -60,7 +67,7 @@ public class XmlParserHelper {
 	 */
 	private static final int READ_LIMIT = 1024 * 1024;
 
-	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>( 4 );
+	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>( NUMBER_OF_SCHEMAS );
 
 	/**
 	 * Retrieves the schema version applying for the given XML input stream as
