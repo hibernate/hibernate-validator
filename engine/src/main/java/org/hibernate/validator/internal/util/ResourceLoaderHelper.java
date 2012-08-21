@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.util;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -29,7 +30,18 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public final class ResourceLoaderHelper {
 	private static final Log log = LoggerFactory.make();
 
-	public static InputStream getInputStreamForPath(String path) {
+	/**
+	 * Returns an input stream for the given path, which supports the mark/reset
+	 * contract.
+	 *
+	 * @param path The path of the requested input stream.
+	 *
+	 * @return An input stream for the given path or {@code null} if no such
+	 *         resource exists.
+	 *
+	 * @see InputStream#markSupported()
+	 */
+	public static InputStream getResettableInputStreamForPath(String path) {
 		//TODO not sure if it's the right thing to removing '/'
 		String inputPath = path;
 		if ( inputPath.startsWith( "/" ) ) {
@@ -52,6 +64,15 @@ public final class ResourceLoaderHelper {
 			loader = ReflectionHelper.getClassLoaderFromClass( ResourceLoaderHelper.class );
 			inputStream = loader.getResourceAsStream( inputPath );
 		}
-		return inputStream;
+
+		if ( inputStream == null ) {
+			return null;
+		}
+		else if ( inputStream.markSupported() ) {
+			return inputStream;
+		}
+		else {
+			return new BufferedInputStream( inputStream );
+		}
 	}
 }

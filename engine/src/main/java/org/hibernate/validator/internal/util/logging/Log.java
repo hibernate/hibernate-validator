@@ -16,10 +16,10 @@
  */
 package org.hibernate.validator.internal.util.logging;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.IllegalFormatException;
@@ -32,13 +32,15 @@ import javax.validation.GroupDefinitionException;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
 
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
+
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
@@ -434,4 +436,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 120, value = "Unable to instantiate parameter name provider class %s.")
 	ValidationException getUnableToInstantiateParameterNameProviderClassException(String parameterNameProviderClassName, @Cause ValidationException e);
 
+	@Message(id = 121, value = "Unable to parse %s.")
+	ValidationException getUnableToDetermineSchemaVersionException(String file, @Cause XMLStreamException e);
+
+	@Message(id = 122, value = "Unsupported schema version for %s: %s.")
+	ValidationException getUnsupportedSchemaVersionException(String file, String version);
+
+	@Message(id = 123, value = "Unable to parse %s.")
+	ValidationException getUnableToResetXmlInputStreamException(String file, @Cause IOException e);
 }

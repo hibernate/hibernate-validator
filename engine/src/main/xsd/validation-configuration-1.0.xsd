@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://jboss.org/xml/ns/javax/validation/configuration"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           version="1.0">
+    <xs:element name="validation-config" type="config:validation-configType" xmlns:config="http://jboss.org/xml/ns/javax/validation/configuration"/>
+    <xs:complexType name="validation-configType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="default-provider" minOccurs="0"/>
+            <xs:element type="xs:string" name="message-interpolator" minOccurs="0"/>
+            <xs:element type="xs:string" name="traversable-resolver" minOccurs="0"/>
+            <xs:element type="xs:string" name="constraint-validator-factory" minOccurs="0"/>
+            <xs:element type="xs:string" name="constraint-mapping" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="config:propertyType" name="property" maxOccurs="unbounded" minOccurs="0" xmlns:config="http://jboss.org/xml/ns/javax/validation/configuration"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="propertyType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" use="required" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

@@ -215,7 +215,7 @@ public class ValidationBootstrapParameters {
 		for ( String mappingFileName : mappingFileNames ) {
 			log.debugf( "Trying to open input stream for %s.", mappingFileName );
 
-			InputStream in = ResourceLoaderHelper.getInputStreamForPath( mappingFileName );
+			InputStream in = ResourceLoaderHelper.getResettableInputStreamForPath( mappingFileName );
 			if ( in == null ) {
 				throw log.getUnableToOpenInputStreamForMappingFileException( mappingFileName );
 			}

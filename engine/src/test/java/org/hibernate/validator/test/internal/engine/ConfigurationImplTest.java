@@ -114,7 +114,7 @@ public class ConfigurationImplTest {
 		}
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000115.*")
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000123.*")
 	@TestForIssue(jiraKey = "HV-563")
 	public void testReusableConfigurationWithClosedInputStream() throws Exception {
 		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();

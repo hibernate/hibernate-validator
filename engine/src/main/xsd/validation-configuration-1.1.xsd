@@ -3,8 +3,36 @@
            elementFormDefault="qualified"
            targetNamespace="http://jboss.org/xml/ns/javax/validation/configuration"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:config="http://jboss.org/xml/ns/javax/validation/configuration"
            version="1.1">
-    <xs:element name="validation-config" type="config:validation-configType" xmlns:config="http://jboss.org/xml/ns/javax/validation/configuration"/>
+
+    <xs:annotation>
+        <xs:documentation><![CDATA[
+            This is the XML Schema for the Bean Validation configuration file.
+            The configuration file must be named "META-INF/validation.xml".
+
+            Bean Validation configuration files must indicate the Bean Validation
+            XML schema by using the validation namespace:
+
+            http://jboss.org/xml/ns/javax/validation/configuration
+
+            and indicate the version of the schema by using the version attribute
+            as shown below:
+
+            <validation-config
+                xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="
+                    http://jboss.org/xml/ns/javax/validation/configuration
+                    validation-configuration-1.1.xsd"
+                version="1.1">
+                ...
+            </validation-config>
+        ]]>
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="validation-config" type="config:validation-configType"/>
     <xs:complexType name="validation-configType">
         <xs:sequence>
             <xs:element type="xs:string" name="default-provider" minOccurs="0"/>
@@ -15,6 +43,7 @@
             <xs:element type="xs:string" name="constraint-mapping" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="config:propertyType" name="property" maxOccurs="unbounded" minOccurs="0" xmlns:config="http://jboss.org/xml/ns/javax/validation/configuration"/>
         </xs:sequence>
+        <xs:attribute name="version" type="config:versionType" fixed="1.1" use="required"/>
     </xs:complexType>
     <xs:complexType name="propertyType">
         <xs:simpleContent>
@@ -23,4 +52,9 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:simpleType name="versionType">
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[0-9]+(\.[0-9]+)*" />
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>
