@@ -550,19 +550,15 @@ public class XmlMappingParser {
 		}
 		else {
 			try {
-				returnValue = getEnumInstance( returnType, value );
+				@SuppressWarnings("unchecked")
+				Class<Enum> enumClass = (Class<Enum>) returnType;
+				returnValue = Enum.valueOf( enumClass, value );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getInvalidReturnTypeException( returnType, e );
 			}
 		}
 		return returnValue;
-	}
-
-	private <E extends Enum<E>> E getEnumInstance(Class<?> enumClazz, String value) {
-		@SuppressWarnings("unchecked")
-		Class<E> enumClass = (Class<E>) enumClazz;
-		return Enum.valueOf( enumClass, value );
 	}
 
 	private void checkNameIsValid(String name) {
