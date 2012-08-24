@@ -86,6 +86,7 @@
                         <!--     could also locate the docbook dependency and inspect its version... -->
                         <docbookVersion>1.72.0</docbookVersion>
                         <localeSeparator>-</localeSeparator>
+                        <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
                     </options>
                     <profiling>
                         <enabled>true</enabled>
@@ -121,7 +122,7 @@
                                 println "[INFO] ------------------------------------------------------------------------";
                                 println "[INFO] The documentation build requires the external tool po2xml for processing";
                                 println "[INFO] translations. You can skip the whole documentation build via specifying ";
-                                println "[INFO] the property 'disableDocumentationBuil':                                ";
+                                println "[INFO] the property 'disableDocumentationBuild':                                ";
                                 println "[INFO]                                                                         ";
                                 println "[INFO] mvn install -DdisableDocumentationBuild=true                            ";
                                 println "[INFO]                                                                         ";
