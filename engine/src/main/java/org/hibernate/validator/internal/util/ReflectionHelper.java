@@ -155,16 +155,17 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the given method's name is a valid JavaBeans getter name,
-	 * meaning it starts with "is" or "has".
+	 * Checks whether the given method is a valid JavaBeans getter method,
+	 * meaning its name starts with "is" or "has" and it has no parameters.
 	 *
-	 * @param member The method of interest.
+	 * @param member
+	 *            The method of interest.
 	 *
-	 * @return True, if the given method is a JavaBeans getter method, false
-	 *         otherwise.
+	 * @return {@code true}, if the given method is a JavaBeans getter method,
+	 *         {@code false} otherwise.
 	 */
 	public static boolean isGetterMethod(Method member) {
-		return getPropertyName( member ) != null;
+		return getPropertyName( member ) != null && member.getParameterTypes().length == 0;
 	}
 
 	/**
