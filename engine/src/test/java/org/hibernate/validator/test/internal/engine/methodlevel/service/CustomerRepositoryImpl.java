@@ -110,4 +110,12 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	public void voidMethodWithIllegalReturnValueConstraint() {
 	}
+
+	public int getFoo(int i) {
+		return 0;
+	}
+
+	public int getFoo(String s) {
+		return 0;
+	}
 }

@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 
 /**
@@ -74,6 +75,10 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	@Min(10)
 	void voidMethodWithIllegalReturnValueConstraint();
+
+	int getFoo(int i);
+
+	int getFoo(@NotEmpty String s);
 
 	public interface ValidationGroup {
 	}

@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.engine.methodlevel;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.UnexpectedTypeException;
 import javax.validation.constraints.NotNull;
 
@@ -34,6 +35,7 @@ import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.RepositoryBase;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
@@ -629,6 +631,12 @@ public class MethodLevelValidationTest {
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
 	public void voidMethodWithReturnValueConstraintCausesUnexpectedTypeException() {
 		customerRepository.voidMethodWithIllegalReturnValueConstraint();
+	}
+
+	@TestForIssue(jiraKey = "HV-601")
+	@Test(expectedExceptions = MethodConstraintViolationException.class)
+	public void shouldValidateGetterLikeNamedMethodWithParameter() {
+		customerRepository.getFoo( "" );
 	}
 
 	@Test
