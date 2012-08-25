@@ -40,7 +40,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  */
 public class CustomerRepositoryImpl implements CustomerRepository {
 
-	@SuppressWarnings("unused")
 	@NotNull
 	private final Customer customer = null;
 
@@ -135,6 +134,14 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	public void voidMethodWithIllegalReturnValueConstraint() {
+	}
+
+	public int getFoo(int i) {
+		return 0;
+	}
+
+	public int getFoo(String s) {
+		return 0;
 	}
 
 	@Constraint(validatedBy = { ValidB2BRepositoryValidator.class })
