@@ -38,6 +38,7 @@ import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.RepositoryBase;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static javax.validation.metadata.ElementDescriptor.Kind.PARAMETER;
@@ -540,6 +541,12 @@ public class MethodLevelValidationTest {
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
 	public void voidMethodWithReturnValueConstraintCausesUnexpectedTypeException() {
 		customerRepository.voidMethodWithIllegalReturnValueConstraint();
+	}
+
+	@TestForIssue(jiraKey = "HV-601")
+	@Test(expectedExceptions = ConstraintViolationException.class)
+	public void shouldValidateGetterLikeNamedMethodWithParameter() {
+		customerRepository.getFoo( "" );
 	}
 
 	@Test
