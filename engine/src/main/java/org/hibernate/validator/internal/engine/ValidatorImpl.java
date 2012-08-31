@@ -388,7 +388,7 @@ public class ValidatorImpl implements Validator {
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			@SuppressWarnings("unchecked")
-			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
+			BeanMetaData<U> hostingBeanMetaData = ( BeanMetaData<U> ) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
 			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
@@ -425,11 +425,7 @@ public class ValidatorImpl implements Validator {
 					break;
 				}
 			}
-			validationContext.markProcessed(
-					valueContext.getCurrentBean(),
-					valueContext.getCurrentGroup(),
-					valueContext.getPropertyPath()
-			);
+			validationContext.markProcessed( valueContext );
 
 			// all constraints in the hierarchy has been validated, stop validation.
 			if ( defaultGroupSequenceIsRedefined ) {
@@ -449,11 +445,7 @@ public class ValidatorImpl implements Validator {
 			// reset the path to the state before this call
 			valueContext.setPropertyPath( currentPath );
 		}
-		validationContext.markProcessed(
-				valueContext.getCurrentBean(),
-				valueContext.getCurrentGroup(),
-				valueContext.getPropertyPath()
-		);
+		validationContext.markProcessed( valueContext );
 	}
 
 	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext,
@@ -470,7 +462,7 @@ public class ValidatorImpl implements Validator {
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 			@SuppressWarnings("unchecked")
-			V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+			V valueToValidate = ( V ) metaConstraint.getValue( valueContext.getCurrentBean() );
 			valueContext.setCurrentValidatedValue( valueToValidate );
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
@@ -553,16 +545,16 @@ public class ValidatorImpl implements Validator {
 	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
-			iter = ( (Iterable<?>) value ).iterator();
+			iter = ( ( Iterable<?> ) value ).iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( ReflectionHelper.isMap( type ) ) {
-			Map<?, ?> map = (Map<?, ?>) value;
+			Map<?, ?> map = ( Map<?, ?> ) value;
 			iter = map.entrySet().iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( TypeHelper.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( (Object[]) value );
+			List<?> arrayList = Arrays.asList( ( Object[] ) value );
 			iter = arrayList.iterator();
 			valueContext.markCurrentPropertyAsIterable();
 		}
@@ -603,9 +595,9 @@ public class ValidatorImpl implements Validator {
 		while ( iter.hasNext() ) {
 			value = iter.next();
 			if ( value instanceof Map.Entry ) {
-				mapKey = ( (Map.Entry<?, ?>) value ).getKey();
+				mapKey = ( ( Map.Entry<?, ?> ) value ).getKey();
 				valueContext.setKey( mapKey );
-				value = ( (Map.Entry<?, ?>) value ).getValue();
+				value = ( ( Map.Entry<?, ?> ) value ).getValue();
 			}
 			else if ( isIndexable ) {
 				valueContext.setIndex( i );
@@ -785,7 +777,7 @@ public class ValidatorImpl implements Validator {
 			if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 				if ( valueContext.getCurrentBean() != null ) {
 					@SuppressWarnings("unchecked")
-					V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+					V valueToValidate = ( V ) metaConstraint.getValue( valueContext.getCurrentBean() );
 					valueContext.setCurrentValidatedValue( valueToValidate );
 				}
 				metaConstraint.validateConstraint( validationContext, valueContext );
@@ -820,7 +812,7 @@ public class ValidatorImpl implements Validator {
 
 		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
-			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
+			BeanMetaData<U> hostingBeanMetaData = ( BeanMetaData<U> ) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
@@ -849,7 +841,7 @@ public class ValidatorImpl implements Validator {
 
 						if ( valueContext.getCurrentBean() != null ) {
 							@SuppressWarnings("unchecked")
-							V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+							V valueToValidate = ( V ) metaConstraint.getValue( valueContext.getCurrentBean() );
 							valueContext.setCurrentValidatedValue( valueToValidate );
 						}
 						boolean tmp = metaConstraint.validateConstraint( validationContext, valueContext );
@@ -957,7 +949,7 @@ public class ValidatorImpl implements Validator {
 				else {
 					valueContext = ValueContext.getLocalExecutionContext(
 							object,
-							(Class<T>) executable.getMember().getDeclaringClass(),
+							( Class<T> ) executable.getMember().getDeclaringClass(),
 							PathImpl.createPathForParameter( executable, parameterName ),
 							i,
 							parameterName
@@ -1112,7 +1104,7 @@ public class ValidatorImpl implements Validator {
 			else {
 				//constructor validation
 				valueContext = ValueContext.getLocalExecutionContext(
-						(Class<T>) executable.getMember().getDeclaringClass(),
+						( Class<T> ) executable.getMember().getDeclaringClass(),
 						PathImpl.createPathForMethodReturnValue( executable )
 				);
 			}
@@ -1221,7 +1213,7 @@ public class ValidatorImpl implements Validator {
 						type = ReflectionHelper.getIndexedType( type );
 					}
 
-					Class<?> castedValueClass = newValue == null ? (Class<?>) type : newValue.getClass();
+					Class<?> castedValueClass = newValue == null ? ( Class<?> ) type : newValue.getClass();
 					return collectMetaConstraintsForPath(
 							castedValueClass,
 							newValue,
@@ -1234,9 +1226,9 @@ public class ValidatorImpl implements Validator {
 		}
 
 		if ( newValue == null ) {
-			return ValueContext.getLocalExecutionContext( (Class<U>) clazz, propertyPath );
+			return ValueContext.getLocalExecutionContext( ( Class<U> ) clazz, propertyPath );
 		}
-		return ValueContext.getLocalExecutionContext( (U) value, propertyPath );
+		return ValueContext.getLocalExecutionContext( ( U ) value, propertyPath );
 	}
 
 	/**

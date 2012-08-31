@@ -274,10 +274,10 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		return alreadyValidated;
 	}
 
-	public void markProcessed(Object value, Class<?> group, PathImpl path) {
-		markProcessForCurrentGroup( value, group );
+	public void markProcessed(ValueContext<?,?> valueContext) {
+		markProcessForCurrentGroup( valueContext.getCurrentBean(), valueContext.getCurrentGroup() );
 		if ( allowOneValidationPerPath ) {
-			markProcessedForCurrentPath( value, path );
+			markProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
 		}
 	}
 
