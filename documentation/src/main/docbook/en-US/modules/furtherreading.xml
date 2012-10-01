@@ -29,7 +29,7 @@
   available for anonymous access on <ulink
   url="https://github.com/beanvalidation/beanvalidation-tck">GitHub</ulink>.
   In particular the TCK's <ulink
-  url="https://github.com/beanvalidation/beanvalidation-tck/tree/master/src/main/java/org/hibernate/jsr303/tck/tests">tests</ulink>
+  url="https://github.com/beanvalidation/beanvalidation-tck/tree/master/src/main/java/org/hibernate/beanvalidation/tck/tests">tests</ulink>
   might be of interest. <ulink url="http://jcp.org/en/jsr/detail?id=303">The
   JSR 303</ulink> specification itself is also a great way to deepen your
   understanding of Bean Validation resp. Hibernate Validator.</para>

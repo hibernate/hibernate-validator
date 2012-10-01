@@ -12,7 +12,7 @@ used when running
 
 ## In container
 
-You can also run the TCK test against JBoss AS7 (>=[7.1.0.Beta1b](http://www.jboss.org/jbossas/downloads/)). In this case the tests are bundled as war files and executed
+You can also run the TCK test against JBoss AS7. In this case the tests are bundled as war files and executed
 in a remote JBoss AS7 instance:
 
     $ mvn clean test -Dincontainer

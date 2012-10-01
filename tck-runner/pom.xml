@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -31,11 +33,13 @@
     <description>Aggregates dependencies and runs the JSR-303 TCK</description>
 
     <properties>
-        <jsr303.tck.version>1.0.6.GA</jsr303.tck.version>
-        <arquillian.version>1.0.0.CR7</arquillian.version>
-        <jbossas.version>7.1.0.Final</jbossas.version>
+        <tck.version>1.1.0-SNAPSHOT</tck.version>
+        <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-suite.xml</tck.suite.file>
+        <arquillian.version>1.0.0.Final</arquillian.version>
+        <jbossas.version>7.1.1.Final</jbossas.version>
+        <jbossTargetDir>${project.build.directory}/jboss-as-${jbossas.version}</jbossTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug />
+        <remote.debug/>
     </properties>
 
     <dependencies>
@@ -57,58 +61,31 @@
             <artifactId>testng</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.jbossas.as7-cdi-tck</groupId>
-            <artifactId>jbossas-container</artifactId>
-            <version>1.0.0.CR1</version>
+            <groupId>org.hibernate.beanvalidation.tck</groupId>
+            <artifactId>beanvalidation-tck</artifactId>
+            <version>${tck.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.jsr303.tck</groupId>
-            <artifactId>jsr303-tck</artifactId>
-            <version>${jsr303.tck.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.core</groupId>
-            <artifactId>arquillian-core-spi</artifactId>
+            <groupId>org.jboss.arquillian.testng</groupId>
+            <artifactId>arquillian-testng-container</artifactId>
             <version>${arquillian.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.arquillian.core</groupId>
-            <artifactId>arquillian-core-impl-base</artifactId>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
             <version>${arquillian.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-container-impl-base</artifactId>
-            <version>${arquillian.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-container-spi</artifactId>
-            <version>${arquillian.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-arquillian-container-managed</artifactId>
-            <version>${jbossas.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-arquillian-common</artifactId>
-            <version>${jbossas.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-arquillian-container-remote</artifactId>
-            <version>${jbossas.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-controller-client</artifactId>
-            <version>${jbossas.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -122,7 +99,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy</id>
+                        <id>copy-tck-test-suite-file</id>
                         <phase>generate-test-sources</phase>
                         <goals>
                             <goal>copy</goal>
@@ -131,8 +108,8 @@
                             <stripVersion>true</stripVersion>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.hibernate.jsr303.tck</groupId>
-                                    <artifactId>jsr303-tck</artifactId>
+                                    <groupId>org.hibernate.beanvalidation.tck</groupId>
+                                    <artifactId>beanvalidation-tck</artifactId>
                                     <type>xml</type>
                                     <classifier>suite</classifier>
                                     <overWrite>false</overWrite>
@@ -147,7 +124,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-suite.xml</suiteXmlFile>
+                        <suiteXmlFile>${tck.suite.file}</suiteXmlFile>
                     </suiteXmlFiles>
                     <argLine>-Xmx128m</argLine>
                     <forkMode>once</forkMode>
@@ -155,10 +132,6 @@
                         <property>
                             <name>validation.provider</name>
                             <value>${validation.provider}</value>
-                        </property>
-                        <property>
-                            <name>org.jboss.testharness.spi.StandaloneContainers</name>
-                            <value>org.hibernate.jsr303.tck.util.StandaloneContainersImpl</value>
                         </property>
                     </systemProperties>
                 </configuration>
@@ -185,6 +158,25 @@
 
     <profiles>
         <profile>
+            <id>local</id>
+            <activation>
+                <property>
+                    <name>incontainer</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.protocol>Local</arquillian.protocol>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.beanvalidation.tck</groupId>
+                    <artifactId>standalone-container-adapter</artifactId>
+                    <version>${tck.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>incontainer-debug</id>
             <activation>
                 <property>
@@ -204,6 +196,17 @@
                     <name>incontainer</name>
                 </property>
             </activation>
+            <properties>
+                <arquillian.protocol>Servlet 3.0</arquillian.protocol>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
+                    <version>${jbossas.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -228,6 +231,66 @@
                                     </artifactItems>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>copy-beanvalidation-api</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>
+                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/javax/validation/api/main
+                                    </outputDirectory>
+                                    <stripVersion>true</stripVersion>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>javax.validation</groupId>
+                                            <artifactId>validation-api</artifactId>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-hv</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>
+                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/org/hibernate/validator/main
+                                    </outputDirectory>
+                                    <stripVersion>true</stripVersion>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-validator</artifactId>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.6</version>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/jboss-as-${jbossas.version}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/test/modules</directory>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -237,144 +300,13 @@
                             <argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager</argLine>
                             <forkMode>once</forkMode>
                             <suiteXmlFiles>
-                                <suiteXmlFile>${project.build.directory}/dependency/jsr303-tck-suite.xml</suiteXmlFile>
+                                <suiteXmlFile>${tck.suite.file}</suiteXmlFile>
                             </suiteXmlFiles>
                             <systemPropertyVariables>
-                                <!-- TCK test harness related properties -->
-                                <java.io.tmpdir>${project.build.outputDirectory}</java.io.tmpdir>
-                                <org.jboss.testharness.standalone>false</org.jboss.testharness.standalone>
-                                <org.jboss.testharness.container.forceRestart>true</org.jboss.testharness.container.forceRestart>
-                                <org.jboss.testharness.runIntegrationTests>true</org.jboss.testharness.runIntegrationTests>
-                                <org.jboss.testharness.libraryDirectory>${project.build.directory}/dependency/lib</org.jboss.testharness.libraryDirectory>
-                                <org.jboss.testharness.outputDirectory>${project.build.directory}</org.jboss.testharness.outputDirectory>
-                                <org.jboss.testharness.spi.Containers>org.jboss.jbossas.cdiTck.container.ArquillianContainerAdaptor</org.jboss.testharness.spi.Containers>
-                                <org.jboss.har2arq.container>org.jboss.as.arquillian.container.managed.ManagedDeployableContainer</org.jboss.har2arq.container>
-
-                                <!-- JBOSS container related properties -->
-                                <jboss.options>-Xmx1024m -XX:MaxPermSize=512m -enableassertions -Dvalidation.provider=${validation.provider} ${remote.debug}</jboss.options>
-
-                                <!-- The validation provider to use -->
+                                <arquillian.launch>incontainer</arquillian.launch>
                                 <validation.provider>${validation.provider}</validation.provider>
+                                <includeIntegrationTests>true</includeIntegrationTests>
                             </systemPropertyVariables>
-                            <environmentVariables>
-                                <JBOSS_HOME>${project.build.directory}/jboss-as-${jbossas.version}</JBOSS_HOME>
-                            </environmentVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!--
-                 Enabling this profile will bundle the BV API and Hibernate Validator w/ the deployed war files instead of
-                 testing against the AS provided dependencies
-            -->
-            <id>bundled-dependencies</id>
-            <activation>
-                <property>
-                    <name>bundled-dependencies</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>generate-test-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <stripVersion>true</stripVersion>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.hibernate.jsr303.tck</groupId>
-                                            <artifactId>jsr303-tck</artifactId>
-                                            <type>xml</type>
-                                            <classifier>suite</classifier>
-                                            <overWrite>false</overWrite>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>javax.validation</groupId>
-                                            <artifactId>validation-api</artifactId>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-validator</artifactId>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.jboss.logging</groupId>
-                                            <artifactId>jboss-logging</artifactId>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>log4j</groupId>
-                                            <artifactId>log4j</artifactId>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}/dependency/lib</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>write-artifacts-to-disk</id>
-            <activation>
-                <property>
-                    <name>dumpArtifacts</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>generate-jsr-303-artifacts</id>
-                                <phase>test-compile</phase>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <classpathScope>test</classpathScope>
-                            <mainClass>org.jboss.testharness.api.TCK</mainClass>
-                            <systemProperties>
-                                <systemProperty>
-                                    <key>dumpArtifacts</key>
-                                    <value>true</value>
-                                </systemProperty>
-                                <systemProperty>
-                                    <key>org.jboss.testharness.outputDirectory</key>
-                                    <value>target/jsr303-artifacts</value>
-                                </systemProperty>
-                                <systemProperty>
-                                    <key>org.jboss.testharness.libraryDirectory</key>
-                                    <value>target/jsr303-artifacts/dependencies</value>
-                                </systemProperty>
-                                <systemProperty>
-                                    <key>org.jboss.testharness.libraryDirectory</key>
-                                    <value>${project.build.directory}/dependency/lib</value>
-                                </systemProperty>
-                                <systemProperty>
-                                    <key>org.jboss.testharness.spi.StandaloneContainers</key>
-                                    <value>org.hibernate.jsr303.tck.util.StandaloneContainersImpl</value>
-                                </systemProperty>
-                            </systemProperties>
                         </configuration>
                     </plugin>
                 </plugins>
