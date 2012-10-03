@@ -180,6 +180,19 @@ public final class ValidatorUtil {
 		return methodDescriptor.getParameterDescriptors().get( parameterIndex );
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T, I extends T> T getValidatingProxy(I implementor, Class<?>[] interfaces, Validator methodValidator, Class<?>... validationGroups) {
+		InvocationHandler handler = new ValidationInvocationHandler(
+				implementor, methodValidator, validationGroups
+		);
+
+		return (T) Proxy.newProxyInstance(
+				implementor.getClass().getClassLoader(),
+				interfaces,
+				handler
+		);
+	}
+
 	/**
 	 * Creates a proxy for the given object which performs a validation of the given object's method constraints upon method invocation.
 	 *
@@ -193,14 +206,6 @@ public final class ValidatorUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T, I extends T> T getValidatingProxy(I implementor, Validator methodValidator, Class<?>... validationGroups) {
-		InvocationHandler handler = new ValidationInvocationHandler(
-				implementor, methodValidator, validationGroups
-		);
-
-		return (T) Proxy.newProxyInstance(
-				implementor.getClass().getClassLoader(),
-				implementor.getClass().getInterfaces(),
-				handler
-		);
+		return getValidatingProxy( implementor, implementor.getClass().getInterfaces(), methodValidator, validationGroups );
 	}
 }
