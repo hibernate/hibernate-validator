@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.internal.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import javax.validation.groups.Default;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -190,6 +192,16 @@ public class ReflectionHelperTest {
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-622")
+	public void testIsGetterMethod() throws Exception {
+		Method method = Bar.class.getMethod( "getBar" );
+		assertTrue( ReflectionHelper.isGetterMethod( method ) );
+
+		method = Bar.class.getMethod( "getBar", String.class);
+		assertFalse( ReflectionHelper.isGetterMethod( method ) );
+	}
+
 	public class TestTypes {
 		public List<String> stringList;
 		public Map<String, Object> objectMap;
@@ -201,6 +213,16 @@ public class ReflectionHelperTest {
 
 		public String getBar() {
 			return "bar";
+		}
+	}
+
+	public class Bar {
+		public String getBar() {
+			return null;
+		}
+
+		public String getBar(String param) {
+			return null;
 		}
 	}
 }
