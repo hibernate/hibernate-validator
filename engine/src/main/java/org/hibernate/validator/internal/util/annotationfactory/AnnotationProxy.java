@@ -80,7 +80,10 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 				result.put( m.getName(), m.getDefaultValue() );
 			}
 			else {
-				throw log.getNoValueProvidedForAnnotationParameterException( m.getName() );
+				throw log.getNoValueProvidedForAnnotationParameterException(
+						m.getName(),
+						annotationType.getSimpleName()
+				);
 			}
 		}
 		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {

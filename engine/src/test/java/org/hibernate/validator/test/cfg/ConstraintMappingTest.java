@@ -360,7 +360,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = ".*No value provided for minRunner.*"
+			expectedExceptionsMessageRegExp = "HV000012.*"
 	)
 	public void testCustomConstraintTypeMissingParameter() {
 		mapping.type( Marathon.class )
