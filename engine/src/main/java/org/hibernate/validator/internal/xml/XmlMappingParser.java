@@ -382,7 +382,7 @@ public class XmlMappingParser {
 			annotation = AnnotationFactory.create( annotationDescriptor );
 		}
 		catch ( RuntimeException e ) {
-			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e.getMessage(), e );
+			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
 		}
 
 		java.lang.annotation.ElementType type = java.lang.annotation.ElementType.TYPE;

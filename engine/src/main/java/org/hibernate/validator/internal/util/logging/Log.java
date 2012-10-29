@@ -97,8 +97,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 11, value = "Unable to create schema for %1$s: %2$s")
 	void unableToCreateSchema(String fileName, String message);
 
-	@Message(id = 12, value = "Unable to create annotation for configured constraint: %s.")
-	ValidationException getUnableToCreateAnnotationForConfiguredConstraintException(String message, @Cause RuntimeException e);
+	@Message(id = 12, value = "Unable to create annotation for configured constraint")
+	ValidationException getUnableToCreateAnnotationForConfiguredConstraintException(@Cause RuntimeException e);
 
 	@Message(id = 13, value = "The class %1$s does not have a property '%2$s' with access %3$s.")
 	ValidationException getUnableToFindPropertyWithAccessException(Class<?> beanClass, String property, ElementType elementType);
@@ -328,8 +328,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 84, value = "Unable to get '%1$s' from %2$s.")
 	ValidationException getUnableToGetAnnotationParameterException(String parameterName, String annotationName, @Cause Exception e);
 
-	@Message(id = 85, value = "No value provided for %s.")
-	IllegalArgumentException getNoValueProvidedForAnnotationParameterException(String parameterName);
+	@Message(id = 85, value = "No value provided for parameter '%1$s' of annotation @%2$s.")
+	IllegalArgumentException getNoValueProvidedForAnnotationParameterException(String parameterName, String annotation);
 
 	@Message(id = 86, value = "Trying to instantiate %1$s with unknown parameter(s): %2$s.")
 	RuntimeException getTryingToInstantiateAnnotationWithUnknownParametersException(Class<?> annotationType, Set<String> unknownParameters);
