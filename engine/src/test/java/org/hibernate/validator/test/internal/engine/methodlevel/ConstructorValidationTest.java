@@ -19,8 +19,8 @@ package org.hibernate.validator.test.internal.engine.methodlevel;
 import java.util.Iterator;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.MethodValidator;
 import javax.validation.Path.Node;
-import javax.validation.Validator;
 import javax.validation.metadata.ElementDescriptor.Kind;
 
 import org.testng.annotations.Test;
@@ -40,9 +40,9 @@ public class ConstructorValidationTest {
 	@Test
 	public void constructorParameterValidationYieldsConstraintViolation() throws Exception {
 
-		Validator validator = getValidator();
+		MethodValidator methodValidator = getValidator().forMethods();
 
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = validator.validateConstructorParameters(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorParameters(
 				CustomerRepositoryImpl.class.getConstructor( String.class ),
 				new String[] { null }
 		);
@@ -72,9 +72,9 @@ public class ConstructorValidationTest {
 	@Test
 	public void cascadedConstructorParameterValidationYieldsConstraintViolation() throws Exception {
 
-		Validator validator = getValidator();
+		MethodValidator methodValidator = getValidator().forMethods();
 
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = validator.validateConstructorParameters(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorParameters(
 				CustomerRepositoryImpl.class.getConstructor( Customer.class ),
 				new Customer[] { new Customer( null ) }
 		);
@@ -113,10 +113,10 @@ public class ConstructorValidationTest {
 	@Test
 	public void constructorReturnValueValidationYieldsConstraintViolation() throws Exception {
 
-		Validator validator = getValidator();
+		MethodValidator methodValidator = getValidator().forMethods();
 
 		CustomerRepositoryImpl customerRepository = new CustomerRepositoryImpl();
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = validator.validateConstructorReturnValue(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorReturnValue(
 				CustomerRepositoryImpl.class.getConstructor(),
 				customerRepository
 		);
@@ -149,10 +149,10 @@ public class ConstructorValidationTest {
 	@Test
 	public void cascadedConstructorReturnValueValidationYieldsConstraintViolation() throws Exception {
 
-		Validator validator = getValidator();
+		MethodValidator methodValidator = getValidator().forMethods();
 
 		CustomerRepositoryImpl customerRepository = new CustomerRepositoryImpl();
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = validator.validateConstructorReturnValue(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorReturnValue(
 				CustomerRepositoryImpl.class.getConstructor( String.class ),
 				customerRepository
 		);

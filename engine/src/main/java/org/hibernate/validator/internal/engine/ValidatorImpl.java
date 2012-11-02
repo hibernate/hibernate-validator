@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.MethodValidator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
@@ -68,7 +69,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public class ValidatorImpl implements Validator {
+public class ValidatorImpl implements Validator, MethodValidator {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -282,6 +283,11 @@ public class ValidatorImpl implements Validator {
 			return type.cast( this );
 		}
 		throw log.getTypeNotSupportedException( type );
+	}
+
+	@Override
+	public MethodValidator forMethods() {
+		return this;
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {
