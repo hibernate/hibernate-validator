@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 
 /**
  * A {@link ConstraintLocation} implementation that represents either a bean (in case of class-level
@@ -47,6 +48,11 @@ public class BeanConstraintLocation implements ConstraintLocation {
 	 */
 	private final ElementType elementType;
 
+	/**
+	 * The type of the annotated element
+	 */
+	private final Type typeOfAnnotatedElement;
+
 	public BeanConstraintLocation(Class<?> beanClass) {
 		this( beanClass, null );
 	}
@@ -60,7 +66,6 @@ public class BeanConstraintLocation implements ConstraintLocation {
 	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
 	 */
 	public BeanConstraintLocation(Class<?> beanClass, Member member) {
-
 		this.member = member;
 
 		if ( this.member != null ) {
@@ -70,6 +75,7 @@ public class BeanConstraintLocation implements ConstraintLocation {
 			this.elementType = ElementType.TYPE;
 		}
 		this.beanClass = beanClass;
+		this.typeOfAnnotatedElement = determineTypeOfAnnotatedElement();
 	}
 
 	public Class<?> getBeanClass() {
@@ -81,19 +87,7 @@ public class BeanConstraintLocation implements ConstraintLocation {
 	}
 
 	public Type typeOfAnnotatedElement() {
-		Type t;
-
-		if ( member == null ) {
-			t = beanClass;
-		}
-		else {
-			t = ReflectionHelper.typeOf( member );
-			if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
-				t = ReflectionHelper.boxedType( (Class<?>) t );
-			}
-		}
-
-		return t;
+		return typeOfAnnotatedElement;
 	}
 
 	public ElementType getElementType() {
@@ -133,4 +127,25 @@ public class BeanConstraintLocation implements ConstraintLocation {
 		return "BeanConstraintLocation [" + beanClass.getSimpleName() + "#" + ReflectionHelper.getPropertyName( member ) + " (" + elementType + ")]";
 	}
 
+	private Type determineTypeOfAnnotatedElement() {
+		Type t;
+
+		if ( member == null ) {
+			// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator resolution (HF)
+			if ( beanClass.getTypeParameters().length != 0 ) {
+				t = TypeHelper.parameterizedType( beanClass, beanClass.getTypeParameters() );
+			}
+			else {
+				t = beanClass;
+			}
+		}
+		else {
+			t = ReflectionHelper.typeOf( member );
+			if ( t instanceof Class && ( (Class<?>) t ).isPrimitive() ) {
+				t = ReflectionHelper.boxedType( (Class<?>) t );
+			}
+		}
+
+		return t;
+	}
 }

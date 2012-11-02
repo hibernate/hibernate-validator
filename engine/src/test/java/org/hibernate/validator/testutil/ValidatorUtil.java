@@ -68,7 +68,7 @@ public final class ValidatorUtil {
 	 *
 	 * @return an instance of {@code Configuration} for Hibernate Validator.
 	 */
-	public static Configuration<HibernateValidatorConfiguration> getConfiguration() {
+	public static HibernateValidatorConfiguration getConfiguration() {
 		return getConfiguration( HibernateValidator.class, Locale.ENGLISH );
 	}
 
@@ -80,7 +80,7 @@ public final class ValidatorUtil {
 	 *
 	 * @return an instance of {@code Configuration} for Hibernate Validator.
 	 */
-	public static Configuration<HibernateValidatorConfiguration> getConfiguration(Locale locale) {
+	public static HibernateValidatorConfiguration getConfiguration(Locale locale) {
 		return getConfiguration( HibernateValidator.class, locale );
 	}
 

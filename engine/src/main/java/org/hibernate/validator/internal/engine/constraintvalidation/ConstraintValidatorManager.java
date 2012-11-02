@@ -31,8 +31,6 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-
 /**
  * Manager in charge of providing and caching initialized {@code ConstraintValidator} instances.
  *
@@ -184,18 +182,12 @@ public class ConstraintValidatorManager {
 		Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
 				descriptor.getConstraintValidatorClasses()
 		);
-		Map<Type, Type> suitableTypeMap = newHashMap();
-
-		if ( suitableTypeMap.containsKey( validatedValueType ) ) {
-			return availableValidatorTypes.get( suitableTypeMap.get( validatedValueType ) );
-		}
 
 		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes );
 		resolveAssignableTypes( discoveredSuitableTypes );
 		verifyResolveWasUnique( validatedValueType, discoveredSuitableTypes );
 
 		Type suitableType = discoveredSuitableTypes.get( 0 );
-		suitableTypeMap.put( validatedValueType, suitableType );
 		return availableValidatorTypes.get( suitableType );
 	}
 
