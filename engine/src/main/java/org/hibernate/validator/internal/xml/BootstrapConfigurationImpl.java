@@ -20,45 +20,45 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConfigurationSource;
+import javax.validation.BootstrapConfiguration;
 
 /**
  * Wrapper class for the bootstrap parameters defined in <i>validation.xml</i>
  *
  * @author Hardy Ferentschik
  */
-public class ValidationXmlConfigurationSource implements ConfigurationSource {
+public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final String defaultProviderClassName;
 	private final String constraintValidatorFactoryClassName;
 	private final String messageInterpolatorClassName;
 	private final String traversableResolverClassName;
 	private final String parameterNameProviderClassName;
-	private final Set<String> constraintMappingResourcePath;
+	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
 
-	public ValidationXmlConfigurationSource() {
+	public BootstrapConfigurationImpl() {
 		this.defaultProviderClassName = null;
 		this.constraintValidatorFactoryClassName = null;
 		this.messageInterpolatorClassName = null;
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
-		this.constraintMappingResourcePath = new HashSet<String>();
+		this.constraintMappingResourcePaths = new HashSet<String>();
 		this.properties = new HashMap<String, String>();
 	}
 
-	public ValidationXmlConfigurationSource(String defaultProviderClassName,
+	public BootstrapConfigurationImpl(String defaultProviderClassName,
 											String constraintValidatorFactoryClassName,
 											String messageInterpolatorClassName,
 											String traversableResolverClassName,
 											String parameterNameProviderClassName,
-											Set<String> constraintMappingResourcePath,
+											Set<String> constraintMappingResourcePaths,
 											Map<String, String> properties) {
 		this.defaultProviderClassName = defaultProviderClassName;
 		this.constraintValidatorFactoryClassName = constraintValidatorFactoryClassName;
 		this.messageInterpolatorClassName = messageInterpolatorClassName;
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
-		this.constraintMappingResourcePath = constraintMappingResourcePath;
+		this.constraintMappingResourcePaths = constraintMappingResourcePaths;
 		this.properties = properties;
 	}
 
@@ -88,8 +88,8 @@ public class ValidationXmlConfigurationSource implements ConfigurationSource {
 	}
 
 	@Override
-	public Set<String> getConstraintMappingResourcePath() {
-		return constraintMappingResourcePath;
+	public Set<String> getConstraintMappingResourcePaths() {
+		return constraintMappingResourcePaths;
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class ValidationXmlConfigurationSource implements ConfigurationSource {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "ValidationXmlConfigurationSource" );
+		sb.append( "BootstrapConfigurationImpl" );
 		sb.append( "{defaultProviderClassName='" ).append( defaultProviderClassName ).append( '\'' );
 		sb.append( ", constraintValidatorFactoryClassName='" )
 				.append( constraintValidatorFactoryClassName )
@@ -108,7 +108,7 @@ public class ValidationXmlConfigurationSource implements ConfigurationSource {
 		sb.append( ", messageInterpolatorClassName='" ).append( messageInterpolatorClassName ).append( '\'' );
 		sb.append( ", traversableResolverClassName='" ).append( traversableResolverClassName ).append( '\'' );
 		sb.append( ", parameterNameProviderClassName='" ).append( parameterNameProviderClassName ).append( '\'' );
-		sb.append( ", constraintMappingResourcePath=" ).append( constraintMappingResourcePath );
+		sb.append( ", constraintMappingResourcePaths=" ).append( constraintMappingResourcePaths );
 		sb.append( ", properties=" ).append( properties );
 		sb.append( '}' );
 		return sb.toString();

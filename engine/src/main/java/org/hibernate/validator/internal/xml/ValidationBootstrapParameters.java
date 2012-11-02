@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConfigurationSource;
+import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -53,14 +53,14 @@ public class ValidationBootstrapParameters {
 	public ValidationBootstrapParameters() {
 	}
 
-	public ValidationBootstrapParameters(ConfigurationSource configurationSource) {
-		setProviderClass( configurationSource.getDefaultProviderClassName() );
-		setMessageInterpolator( configurationSource.getMessageInterpolatorClassName() );
-		setTraversableResolver( configurationSource.getTraversableResolverClassName() );
-		setConstraintFactory( configurationSource.getConstraintValidatorFactoryClassName() );
-		setParameterNameProvider( configurationSource.getParameterNameProviderClassName() );
-		setMappingStreams( configurationSource.getConstraintMappingResourcePath() );
-		setConfigProperties( configurationSource.getProperties() );
+	public ValidationBootstrapParameters(BootstrapConfiguration bootstrapConfiguration) {
+		setProviderClass( bootstrapConfiguration.getDefaultProviderClassName() );
+		setMessageInterpolator( bootstrapConfiguration.getMessageInterpolatorClassName() );
+		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName() );
+		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName() );
+		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName() );
+		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths() );
+		setConfigProperties( bootstrapConfiguration.getProperties() );
 	}
 
 	public final ConstraintValidatorFactory getConstraintValidatorFactory() {
