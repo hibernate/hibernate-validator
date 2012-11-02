@@ -17,7 +17,6 @@
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -77,7 +76,7 @@ public class ConstraintValidatorResolutionTest {
 		Validator validator = configuration.buildValidatorFactory().getValidator();
 
 		//when
-		Set<ConstraintViolation<IntegerValue>> constraintViolations = validator.validate( new IntegerValue() );
+		Set<ConstraintViolation<Value<Integer>>> constraintViolations = validator.validate( new Value<Integer>() );
 
 		//then
 		assertNumberOfViolations( constraintViolations, 1 );
@@ -94,14 +93,25 @@ public class ConstraintValidatorResolutionTest {
 		Validator validator = configuration.buildValidatorFactory().getValidator();
 
 		//when
-		Set<ConstraintViolation<IntegerValue>> constraintViolations = validator.validate( new IntegerValue() );
+		Set<ConstraintViolation<Value<Integer>>> constraintViolations = validator.validate( new Value<Integer>() );
 
 		//then
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
+	/**
+	 * As per the JLS, {@code Value<T>} is a sub-type of of the raw type
+	 * {@code Value}. Therefore
+	 * {@link ParametrizedValidatorForConstraintWithRawAndParametrizedValidator}
+	 * is more specific than
+	 * {@link RawValidatorForConstraintWithRawAndParametrizedValidator}.
+	 *
+	 * @see <a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.10.2">JLS</a> (subtyping)
+	 * @see <a href="http://beanvalidation.org/1.1/spec/#typevalidatorresolution">BV spec</a> (constraint validator resolution)
+	 */
 	@Test
 	@TestForIssue(jiraKey = "HV-623")
+
 	public void parametrizedValidatorHasPrecedenceOverRawValidator() {
 
 		//given
@@ -115,7 +125,7 @@ public class ConstraintValidatorResolutionTest {
 		Validator validator = configuration.buildValidatorFactory().getValidator();
 
 		//when
-		Set<ConstraintViolation<IntegerValue>> constraintViolations = validator.validate( new IntegerValue() );
+		Set<ConstraintViolation<Value<Integer>>> constraintViolations = validator.validate( new Value<Integer>() );
 
 		//then
 		assertNumberOfViolations( constraintViolations, 1 );
@@ -125,17 +135,13 @@ public class ConstraintValidatorResolutionTest {
 		);
 	}
 
-	public abstract class Value<T> {
-	}
-
-	public class IntegerValue extends Value<Integer> {
+	public class Value<T> {
 	}
 
 	@Target({ TYPE, ANNOTATION_TYPE })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = ParametrizedValidator.class)
 	@Documented
-	@Inherited
 	public @interface ConstraintWithParametrizedValidator {
 		String message() default "foo";
 
