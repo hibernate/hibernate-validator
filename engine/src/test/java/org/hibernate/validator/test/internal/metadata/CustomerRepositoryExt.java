@@ -80,6 +80,11 @@ public class CustomerRepositoryExt extends CustomerRepository {
 		return 0;
 	}
 
+	@Min(0)
+	public int zip(int i) {
+		return 0;
+	}
+
 	public void zap(@Min(0) int i) {
 	}
 

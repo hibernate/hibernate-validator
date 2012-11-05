@@ -99,4 +99,20 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements C
 	public Kind getKind() {
 		return kind;
 	}
+
+	@Override
+	public boolean areParametersConstrained() {
+		for ( ParameterDescriptor oneParameter : parameters ) {
+			if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isReturnValueConstrained() {
+		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints() || returnValueDescriptor.isCascaded() );
+	}
 }
