@@ -9,7 +9,8 @@ and the [chronos-jmeter-maven-plugin](http://mojo.codehaus.org/chronos/chronos-j
 To allow performance testing of different Hibernate Validator versions there are multiple profiles configured.
 Choosing a profile executes the tests against the specified Hibernate Validator version. The defined profiles are:
 
-* hv-4.3 (Hibernate Validator 4.3.0-SNAPSHOT)
+* hv-5.0 (Hibernate Validator 5.0.0-SNAPSHOT)
+* hv-4.3 (Hibernate Validator 4.3.0.Final)
 * hv-4.2 (Hibernate Validator 4.2.0.Final)
 * hv-4.1 (Hibernate Validator 4.1.0.Final)
 
@@ -52,7 +53,7 @@ adjust the property _profilingOptions_ and make sure it is used in the _chronos-
 
 #### Creating reports for all major Validator versions
 
-    > for i in "hv-4.3" "hv-4.2" "hv-4.1"
+    > for i in "hv-4.3" "hv-4.2" "hv-4.1" "hv-5.0"
     > do
     > mvn -P $i clean package chronos-jmeter:jmeter ; mvn chronos-jmeter:jmeteroutput chronos-report:report; open target/site/performancetest.html;
     > done
