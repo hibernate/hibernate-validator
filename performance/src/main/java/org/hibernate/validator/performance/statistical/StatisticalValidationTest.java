@@ -24,6 +24,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -58,6 +59,10 @@ public class StatisticalValidationTest {
 		for ( int i = 0; i < NUMBER_OF_TEST_ENTITIES; i++ ) {
 			entitiesUnderTest[i] = new TestEntity( i % 10 );
 		}
+	}
+
+	@Before
+	public void dummy() {
 	}
 
 	@Test
