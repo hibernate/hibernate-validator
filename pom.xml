@@ -380,7 +380,7 @@
                         <processors>
                             <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                         </processors>
-                        <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.6 -target 1.6 -sourcepath ${project.build.directory}/generated-sources/jaxb -encoding UTF-8</compilerArguments>
+                        <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.6 -target 1.6 -sourcepath ${project.build.directory}/generated-sources/jaxb -encoding UTF-8</compilerArguments>
                     </configuration>
                     <executions>
                         <execution>
