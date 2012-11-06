@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.validation.GroupSequence;
+import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -38,6 +39,13 @@ public class ValidationOrderGenerator {
 
 	private final ConcurrentMap<Class<?>, Sequence> resolvedSequences = new ConcurrentHashMap<Class<?>, Sequence>();
 
+	private final DefaultValidationOrder validationOrderForDefaultGroup;
+
+	public ValidationOrderGenerator() {
+		validationOrderForDefaultGroup = new DefaultValidationOrder();
+		validationOrderForDefaultGroup.insertGroup( new Group( Default.class ) );
+	}
+
 	/**
 	 * Generates a order of groups and sequences for the specified validation groups.
 	 *
@@ -50,25 +58,35 @@ public class ValidationOrderGenerator {
 			throw log.getAtLeastOneGroupHasToBeSpecifiedException();
 		}
 
+		// HV-621 - if we deal with the Default group we return the default ValidationOrder. No need to
+		// process Default as other groups which saves several reflection calls (HF)
+		if ( groups.size() == 1 && groups.contains( Default.class ) ) {
+			return validationOrderForDefaultGroup;
+		}
+
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
 				throw log.getGroupHasToBeAnInterfaceException( clazz.getName() );
 			}
 		}
 
-		DefaultValidationOrder order = new DefaultValidationOrder();
+		DefaultValidationOrder validationOrder = new DefaultValidationOrder();
 		for ( Class<?> clazz : groups ) {
-			if ( isGroupSequence( clazz ) ) {
-				insertSequence( clazz, order );
+			if ( Default.class.equals( clazz ) ) { // HV-621
+				Group group = new Group( clazz );
+				validationOrder.insertGroup( group );
+			}
+			else if ( isGroupSequence( clazz ) ) {
+				insertSequence( clazz, validationOrder );
 			}
 			else {
 				Group group = new Group( clazz );
-				order.insertGroup( group );
-				insertInheritedGroups( clazz, order );
+				validationOrder.insertGroup( group );
+				insertInheritedGroups( clazz, validationOrder );
 			}
 		}
 
-		return order;
+		return validationOrder;
 	}
 
 	private boolean isGroupSequence(Class<?> clazz) {
