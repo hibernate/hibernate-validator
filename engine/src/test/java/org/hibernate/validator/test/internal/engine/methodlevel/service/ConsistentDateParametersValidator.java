@@ -14,10 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.metadata.provider;
+package org.hibernate.validator.test.internal.engine.methodlevel.service;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -31,6 +33,18 @@ public class ConsistentDateParametersValidator implements ConstraintValidator<Co
 
 	@Override
 	public boolean isValid(Object[] value, ConstraintValidatorContext context) {
-		return false;
+		if ( value.length != 2 ) {
+			throw new IllegalArgumentException( "Unexpected method signature" );
+		}
+
+		if ( value[0] == null || value[1] == null ) {
+			return true;
+		}
+
+		if ( !( value[0] instanceof DateMidnight ) || !( value[1] instanceof DateMidnight ) ) {
+			throw new IllegalArgumentException( "Unexpected method signature" );
+		}
+
+		return ( ( DateMidnight ) value[0] ).isBefore( ( DateMidnight ) value[1] );
 	}
 }

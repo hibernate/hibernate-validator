@@ -940,31 +940,29 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 			int numberOfViolationsOfCurrentGroup = 0;
 
+			// 1. validate cross-parameter constraints
+			ValueContext<T, Object> crossParameterValueContext = getCrossParameterValueContext(
+					object, parameterValues, executable, oneGroup
+			);
+
+			numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
+					validationContext, crossParameterValueContext, methodMetaData.getCrossParameterConstraints()
+			);
+			if ( shouldFailFast( validationContext ) ) {
+				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
+			}
+
+			// 2. validate parameter constraints
 			for ( int i = 0; i < parameterValues.length; i++ ) {
 				Object value = parameterValues[i];
 				String parameterName = methodMetaData.getParameterMetaData( i ).getName();
 
-				// validate constraints at parameter itself
-				ValueContext<T, Object> valueContext;
+				ValueContext<T, Object> valueContext = getParameterValueContext(
+						object,
+						executable, oneGroup, i, value, parameterName
+				);
 
-				if ( object != null ) {
-					valueContext = ValueContext.getLocalExecutionContext(
-							object, PathImpl.createPathForParameter( executable, parameterName ), i, parameterName
-					);
-				}
-				else {
-					valueContext = ValueContext.getLocalExecutionContext(
-							object,
-							( Class<T> ) executable.getMember().getDeclaringClass(),
-							PathImpl.createPathForParameter( executable, parameterName ),
-							i,
-							parameterName
-					);
-				}
-				valueContext.setCurrentValidatedValue( value );
-				valueContext.setCurrentGroup( oneGroup );
-
-				numberOfViolationsOfCurrentGroup += validateParameterForGroup(
+				numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
 						validationContext, valueContext, methodMetaData.getParameterMetaData( i )
 				);
 				if ( shouldFailFast( validationContext ) ) {
@@ -978,7 +976,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 		}
 
-		// validate parameter beans annotated with @Valid if required
+		// 3. validate cascaded parameter if required
 		for ( int i = 0; i < parameterValues.length; i++ ) {
 
 			Object value = parameterValues[i];
@@ -1003,36 +1001,51 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	/**
-	 * Validates the constraints at the specified parameter which are part of
-	 * the given value context's current group. Any occurred constraint
-	 * violations are stored in the given validation context.
-	 *
-	 * @param validationContext The validation context for storing constraint violations.
-	 * @param valueContext The value context specifying the group and value to validate.
-	 * @param parameterMetaData Meta data on the constraints to evaluate.
-	 *
-	 * @return The number of constraint violations occurred during validation of
-	 *         the specified constraints.
-	 */
-	private <T, U, V> int validateParameterForGroup(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext, ParameterMetaData parameterMetaData) {
+	private <T> ValueContext<T, Object> getParameterValueContext(T object,
+																 ExecutableElement executable, Class<?> oneGroup, int i,
+																 Object value, String parameterName) {
+		// validate constraints at parameter itself
+		ValueContext<T, Object> valueContext;
 
-		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
+		if ( object != null ) {
+			valueContext = ValueContext.getLocalExecutionContext(
+					object, PathImpl.createPathForParameter( executable, parameterName ), i, parameterName
+			);
+		}
+		else {
+			valueContext = ValueContext.getLocalExecutionContext(
+					object,
+					( Class<T> ) executable.getMember().getDeclaringClass(),
+					PathImpl.createPathForParameter( executable, parameterName ),
+					i,
+					parameterName
+			);
+		}
+		valueContext.setCurrentValidatedValue( value );
+		valueContext.setCurrentGroup( oneGroup );
+		return valueContext;
+	}
 
-		for ( MetaConstraint<?> metaConstraint : parameterMetaData ) {
+	private <T> ValueContext<T, Object> getCrossParameterValueContext(T object, Object[] parameterValues, ExecutableElement executable, Class<?> oneGroup) {
+		ValueContext<T, Object> valueContext;
 
-			//ignore constraints not part of the evaluated group
-			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
-				continue;
-			}
-
-			metaConstraint.validateConstraint( validationContext, valueContext );
-			if ( shouldFailFast( validationContext ) ) {
-				break;
-			}
+		//TODO HV-632: What path to take here?
+		if ( object != null ) {
+			valueContext = ValueContext.getLocalExecutionContext(
+					object, PathImpl.createPathForMethodReturnValue( executable )
+			);
+		}
+		else {
+			valueContext = ValueContext.getLocalExecutionContext(
+					( Class<T> ) executable.getMember().getDeclaringClass(),
+					PathImpl.createPathForMethodReturnValue( executable )
+			);
 		}
 
-		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
+		valueContext.setCurrentValidatedValue( parameterValues );
+		valueContext.setCurrentGroup( oneGroup );
+
+		return valueContext;
 	}
 
 	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, V value, ValidationOrder validationOrder) {
@@ -1119,7 +1132,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			valueContext.setCurrentGroup( oneGroup );
 
 			numberOfViolationsOfCurrentGroup +=
-					validateReturnValueForGroup(
+					validateConstraintsForGroup(
 							validationContext, valueContext, methodMetaData
 					);
 			if ( shouldFailFast( validationContext ) ) {
@@ -1146,12 +1159,12 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <T, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext,
-												   ValueContext<T, V> valueContext, ExecutableMetaData methodMetaData) {
+	private <T> int validateConstraintsForGroup(MethodValidationContext<T> validationContext,
+												ValueContext<T, ?> valueContext, Iterable<MetaConstraint<?>> constraints) {
 
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
-		for ( MetaConstraint<?> metaConstraint : methodMetaData ) {
+		for ( MetaConstraint<?> metaConstraint : constraints ) {
 
 			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 				continue;

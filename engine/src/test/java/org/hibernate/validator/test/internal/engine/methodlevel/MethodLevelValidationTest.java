@@ -29,12 +29,14 @@ import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Address;
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
+import org.hibernate.validator.test.internal.engine.methodlevel.service.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.RepositoryBase;
@@ -43,6 +45,7 @@ import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static javax.validation.metadata.ElementDescriptor.Kind.PARAMETER;
 import static javax.validation.metadata.ElementDescriptor.Kind.RETURN_VALUE;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
@@ -550,6 +553,40 @@ public class MethodLevelValidationTest {
 	}
 
 	@Test
+	public void validationOfCrossParameterConstraint() {
+		//given
+		DateMidnight startDate = new DateMidnight( 2012, 11, 5 );
+		DateMidnight endDate = new DateMidnight( 2012, 11, 4 );
+
+		try {
+			//when
+			customerRepository.methodWithCrossParameterConstraint( startDate, endDate );
+
+			fail( "Expected ConstraintViolationException wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+			//then
+			assertThat( e.getConstraintViolations() ).hasSize( 1 );
+			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertCorrectConstraintViolationMessages(
+					e.getConstraintViolations(),
+					"{ConsistentDateParameters.message}"
+			);
+			assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo(
+					ConsistentDateParameters.class
+			);
+			assertThat( constraintViolation.getInvalidValue() ).isEqualTo( new Object[] { startDate, endDate } );
+
+			//TODO BVAL-337: Does that make sense?
+			assertEquals( constraintViolation.getLeafBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
+
+			assertMethodName( constraintViolation, "methodWithCrossParameterConstraint" );
+		}
+	}
+
+	@Test
 	public void methodValidationSucceeds() {
 		customerRepository.findCustomerByName( "Bob" );
 	}
@@ -559,6 +596,7 @@ public class MethodLevelValidationTest {
 
 		Path.Node node = nodeIterator.next();
 		assertNotNull( node );
+		assertEquals( node.getName(), methodName );
 		ElementDescriptor descriptor = node.getElementDescriptor();
 		assertNotNull( descriptor );
 
