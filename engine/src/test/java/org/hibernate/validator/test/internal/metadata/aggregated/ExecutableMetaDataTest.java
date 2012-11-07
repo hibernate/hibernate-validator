@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -61,7 +61,7 @@ public class ExecutableMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
 
 		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 2 );
@@ -71,7 +71,7 @@ public class ExecutableMetaDataTest {
 
 		assertTrue( parameterMetaData.get( 1 ).isConstrained() );
 		assertFalse( parameterMetaData.get( 1 ).isCascading() );
-		assertIterableSize( parameterMetaData.get( 1 ), 1 );
+		assertThat( parameterMetaData.get( 1 ) ).hasSize( 1 );
 		assertEquals(
 				parameterMetaData.get( 1 ).iterator().next().getDescriptor().getAnnotation().annotationType(),
 				NotNull.class
@@ -79,6 +79,9 @@ public class ExecutableMetaDataTest {
 
 		assertEquals( parameterMetaData.get( 0 ), methodMetaData.getParameterMetaData( 0 ) );
 		assertEquals( parameterMetaData.get( 1 ), methodMetaData.getParameterMetaData( 1 ) );
+
+		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
 
 	@Test
@@ -90,16 +93,24 @@ public class ExecutableMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
 
 		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
 		assertEquals( parameterMetaData.size(), 1 );
 
 		assertTrue( parameterMetaData.get( 0 ).isConstrained() );
 		assertTrue( parameterMetaData.get( 0 ).isCascading() );
-		assertIterableSize( parameterMetaData.get( 0 ), 0 );
+		assertThat( parameterMetaData.get( 0 ) ).isEmpty();
 
 		assertEquals( parameterMetaData.get( 0 ), methodMetaData.getParameterMetaData( 0 ) );
+
+		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
+	}
+
+	@Test
+	public void methodWithCrossParameterConstraint() {
+
 	}
 
 	@Test
@@ -111,13 +122,13 @@ public class ExecutableMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 1 );
+		assertThat( methodMetaData ).hasSize( 1 );
 		assertEquals(
 				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
 
-		List<ParameterMetaData> parameterMetaData = methodMetaData.getAllParameterMetaData();
-		assertEquals( parameterMetaData.size(), 0 );
+		assertThat( methodMetaData.getAllParameterMetaData() ).isEmpty();
+		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
 
 	@Test
@@ -129,7 +140,7 @@ public class ExecutableMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 2 );
+		assertThat( methodMetaData ).hasSize( 2 );
 	}
 
 	@Test
@@ -141,7 +152,8 @@ public class ExecutableMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
 
 	@Test
@@ -153,7 +165,7 @@ public class ExecutableMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertFalse( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
+		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
-
 }

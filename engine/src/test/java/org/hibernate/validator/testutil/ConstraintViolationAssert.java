@@ -241,21 +241,4 @@ public final class ConstraintViolationAssert {
 
 		return !p2Iterator.hasNext();
 	}
-
-	/**
-	 * Asserts that the given iterable has the expected size.
-	 *
-	 * @param iterable The iterable which size have to be verified.
-	 * @param size The expected size.
-	 */
-	public static void assertIterableSize(Iterable<?> iterable, int size) {
-		int i = 0;
-
-		//noinspection UnusedDeclaration
-		for ( @SuppressWarnings("unused") Object o : iterable ) {
-			i++;
-		}
-
-		assertEquals( i, size, "Actual size of iterable [" + iterable + "] differed from expected size" );
-	}
 }

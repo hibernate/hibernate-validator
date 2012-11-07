@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -64,7 +64,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 1 );
 		assertEquals( parameterMetaData.getName(), "arg1" );
-		assertIterableSize( parameterMetaData, 1 );
+		assertThat( parameterMetaData ).hasSize( 1 );
 		assertEquals(
 				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
@@ -82,7 +82,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 0 );
 		assertEquals( parameterMetaData.getName(), "arg0" );
-		assertIterableSize( parameterMetaData, 0 );
+		assertThat( parameterMetaData ).isEmpty();
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class ParameterMetaDataTest {
 
 		assertFalse( parameterMetaData.isCascading() );
 		assertFalse( parameterMetaData.isConstrained() );
-		assertIterableSize( parameterMetaData, 0 );
+		assertThat( parameterMetaData ).isEmpty();
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
