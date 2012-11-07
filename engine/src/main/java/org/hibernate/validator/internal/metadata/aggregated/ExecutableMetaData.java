@@ -77,6 +77,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 */
 	private final ConstraintDeclarationException parameterConstraintDeclarationException;
 
+	private final Set<MetaConstraint<?>> crossParameterConstraints;
+
 	/**
 	 * An identifier for storing this object in maps etc.
 	 */
@@ -89,6 +91,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			ConstraintMetaDataKind kind,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
+			Set<MetaConstraint<?>> crossParameterConstraints,
 			ConstraintDeclarationException parameterConstraintDeclarationException,
 			boolean isCascading,
 			boolean isConstrained) {
@@ -105,6 +108,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
+		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
 		this.identifier = name + Arrays.toString( parameterTypes );
 	}
 
@@ -123,6 +127,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<ConstrainedMethod> constrainedMethods = newHashSet();
 		private final MethodConstraintLocation location;
 		private final Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
+		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private boolean isCascading = false;
 		private boolean isConstrained = false;
 
@@ -158,6 +163,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedMethods.add( constrainedMethod );
 			isCascading = isCascading || constrainedMethod.isCascading();
 			isConstrained = isConstrained || constrainedMethod.isConstrained();
+			crossParameterConstraints.addAll( constrainedMethod.getCrossParameterConstraints() );
 			returnValueConstraints.addAll( constrainedMethod.getConstraints() );
 		}
 
@@ -172,6 +178,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					kind == ConstrainedElementKind.CONSTRUCTOR ? ConstraintMetaDataKind.CONSTRUCTOR : ConstraintMetaDataKind.METHOD,
 					adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
 					findParameterMetaData(),
+					crossParameterConstraints,
 					checkParameterConstraints(),
 					isCascading,
 					isConstrained
@@ -365,6 +372,18 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return identifier;
 	}
 
+	/**
+	 * Returns the cross-parameter constraints declared for the represented
+	 * method or constructor.
+	 *
+	 * @return the cross-parameter constraints declared for the represented
+	 *         method or constructor. May be empty but will never be
+	 *         {@code null}.
+	 */
+	public Iterable<MetaConstraint<?>> getCrossParameterConstraints() {
+		return crossParameterConstraints;
+	}
+
 	@Override
 	public ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
@@ -456,5 +475,4 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 		return true;
 	}
-
 }

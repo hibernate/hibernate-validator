@@ -224,7 +224,15 @@ public class BeanDescriptorTest {
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
 		assertThat( getMethodNames( constrainedMethods ) ).containsOnly(
-				"createCustomer", "saveCustomer", "foo", "bar", "baz", "zip", "zap", "qax"
+				"createCustomer",
+				"saveCustomer",
+				"foo",
+				"bar",
+				"baz",
+				"zip",
+				"zap",
+				"qax",
+				"methodWithCrossParameterConstraint"
 		);
 	}
 
@@ -347,6 +355,7 @@ public class BeanDescriptorTest {
 	}
 
 	private static class DerivedConstrainedType extends ParameterConstrainedType {
+		@Override
 		public void foo(String foo) {
 		}
 	}

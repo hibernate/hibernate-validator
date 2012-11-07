@@ -29,8 +29,10 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.joda.time.DateMidnight;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -109,8 +111,18 @@ public class ExecutableMetaDataTest {
 	}
 
 	@Test
-	public void methodWithCrossParameterConstraint() {
+	public void methodWithCrossParameterConstraint() throws Exception {
 
+		Method method = CustomerRepositoryExt.class.getMethod( "methodWithCrossParameterConstraint", DateMidnight.class, DateMidnight.class );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
+		assertFalse( methodMetaData.isCascading() );
+		assertTrue( methodMetaData.isConstrained() );
+		assertThat( methodMetaData ).isEmpty();
+
+		assertThat( methodMetaData.getCrossParameterConstraints() ).hasSize( 1 );
+		assertThat( methodMetaData.getCrossParameterConstraints().iterator().next().getDescriptor().getAnnotation().annotationType() ).isEqualTo( ConsistentDateParameters.class );
 	}
 
 	@Test

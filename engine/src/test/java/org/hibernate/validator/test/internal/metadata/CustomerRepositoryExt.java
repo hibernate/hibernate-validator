@@ -26,6 +26,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.joda.time.DateMidnight;
+
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -49,24 +51,30 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public CustomerRepositoryExt(int bar) {
 	}
 
+	@Override
 	public Customer createCustomer(CharSequence firstName, String lastName) {
 		return null;
 	}
 
+	@Override
 	public void saveCustomer(Customer customer) {
 	}
 
+	@Override
 	public void updateCustomer(Customer customer) {
 	}
 
+	@Override
 	public Customer foo() {
 		return null;
 	}
 
+	@Override
 	public CustomerExtension bar() {
 		return null;
 	}
 
+	@Override
 	@Min(0)
 	public int baz() {
 		return 0;
@@ -85,7 +93,12 @@ public class CustomerRepositoryExt extends CustomerRepository {
 		return 0;
 	}
 
+	@Override
 	public void zap(@Min(0) int i) {
+	}
+
+	@ConsistentDateParameters
+	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
 	}
 
 	@Constraint(validatedBy = { ValidB2BRepositoryValidator.class })
@@ -102,9 +115,11 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public static class ValidB2BRepositoryValidator
 			implements ConstraintValidator<ValidB2BRepository, CustomerRepositoryExt> {
 
+		@Override
 		public void initialize(ValidB2BRepository annotation) {
 		}
 
+		@Override
 		public boolean isValid(CustomerRepositoryExt repository, ConstraintValidatorContext context) {
 			return false;
 		}
