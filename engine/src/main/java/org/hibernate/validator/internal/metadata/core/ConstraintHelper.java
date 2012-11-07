@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
+import javax.validation.CrossParameterConstraint;
 import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
@@ -303,10 +304,10 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks whether the specified annotation is a valid constraint annotation. A constraint annotations has to
+	 * Checks whether the specified annotation is a valid constraint annotation. A constraint annotation has to
 	 * fulfill the following conditions:
 	 * <ul>
-	 * <li>Has to contain a <code>ConstraintValidator</code> implementation.</li>
+	 * <li>Must be annotated either with {@link Constraint} or {@link CrossParameterConstraint}.
 	 * <li>Defines a message parameter.</li>
 	 * <li>Defines a group parameter.</li>
 	 * <li>Defines a payload parameter.</li>
@@ -314,11 +315,11 @@ public class ConstraintHelper {
 	 *
 	 * @param annotationType The annotation type to test.
 	 *
-	 * @return <code>true</code> if the annotation fulfills the above conditions, <code>false</code> otherwise.
+	 * @return {@code true} if the annotation fulfills the above conditions, {@code false} otherwise.
 	 */
 	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
-		Constraint constraint = annotationType.getAnnotation( Constraint.class );
-		if ( constraint == null ) {
+		if ( annotationType.getAnnotation( Constraint.class ) == null &&
+				annotationType.getAnnotation( CrossParameterConstraint.class ) == null ) {
 			return false;
 		}
 

@@ -218,6 +218,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 					ConfigurationSource.API,
 					new MethodConstraintLocation( oneMethod ),
 					parameterMetaDataList,
+					Collections.<MetaConstraint<?>>emptySet(),
 					asMetaConstraints( constraintsByParameter.get( null ) ),
 					cascadesByParameter.containsKey( null )
 			);

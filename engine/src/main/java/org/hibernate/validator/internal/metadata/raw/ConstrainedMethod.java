@@ -45,6 +45,8 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 
 	private final boolean hasParameterConstraints;
 
+	private final Set<MetaConstraint<?>> crossParameterConstraints;
+
 	/**
 	 * Creates a new method meta data object for a parameter-less method.
 	 *
@@ -65,6 +67,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 				source,
 				location,
 				Collections.<ConstrainedParameter>emptyList(),
+				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
 				isCascading
 		);
@@ -78,7 +81,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 * @param parameterMetaData A list with parameter meta data. The length must correspond
 	 * with the number of parameters of the represented method. So
 	 * this list may be empty (in case of a parameterless method),
-	 * but never <code>null</code>.
+	 * but never {@code null}.
 	 * @param returnValueConstraints The return value constraints of the represented method, if
 	 * any.
 	 * @param isCascading Whether a cascaded validation of the represented method's
@@ -88,6 +91,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 			ConfigurationSource source,
 			MethodConstraintLocation location,
 			List<ConstrainedParameter> parameterMetaData,
+			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
@@ -109,8 +113,9 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 			);
 		}
 
+		this.crossParameterConstraints = crossParameterConstraints;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
-		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
+		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
 
 		if ( isConstrained() ) {
 			ReflectionHelper.setAccessibility( method.getMember() );
@@ -128,6 +133,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		return false;
 	}
 
+	@Override
 	public MethodConstraintLocation getLocation() {
 		return (MethodConstraintLocation) super.getLocation();
 	}
@@ -138,8 +144,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 * @param parameterIndex The index in this method's parameter array of the parameter of
 	 * interest.
 	 *
-	 * @return Meta data for the specified parameter. Will never be
-	 *         <code>null</code>.
+	 * @return Meta data for the specified parameter. Will never be {@code null}.
 	 *
 	 * @throws IllegalArgumentException In case this method doesn't have a parameter with the
 	 * specified index.
@@ -159,32 +164,37 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 * @return A list with parameter meta data. The length corresponds to the
 	 *         number of parameters of the method represented by this meta data
 	 *         object, so an empty list may be returned (in case of a
-	 *         parameterless method), but never <code>null</code>.
+	 *         parameterless method), but never {@code null}.
 	 */
 	public List<ConstrainedParameter> getAllParameterMetaData() {
 		return parameterMetaData;
 	}
 
+	public Set<MetaConstraint<?>> getCrossParameterConstraints() {
+		return crossParameterConstraints;
+	}
+
 	/**
 	 * Whether the represented method is constrained or not. This is the case if
 	 * it has at least one constrained parameter, at least one parameter marked
-	 * for cascaded validation, at least one return value constraint or if the
-	 * return value is marked for cascaded validation.
+	 * for cascaded validation, at least one cross-parameter constraint, at
+	 * least one return value constraint or if the return value is marked for
+	 * cascaded validation.
 	 *
-	 * @return <code>True</code>, if this method is constrained by any means,
-	 *         <code>false</code> otherwise.
+	 * @return {@code True} if this method is constrained by any means,
+	 *         {@code false} otherwise.
 	 */
+	@Override
 	public boolean isConstrained() {
-
 		return super.isConstrained() || hasParameterConstraints;
 	}
 
 	/**
 	 * Whether this method has at least one cascaded parameter or at least one
-	 * parameter with constraints.
+	 * parameter with constraints or at least one cross-parameter constraint.
 	 *
-	 * @return <code>True</code>, if this method has at least one cascading or
-	 *         constrained parameter, <code>false</code> otherwise.
+	 * @return {@code True}, if this method is parameter-constrained by any
+	 *         means, {@code false} otherwise.
 	 */
 	public boolean hasParameterConstraints() {
 		return hasParameterConstraints;
@@ -193,8 +203,8 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	/**
 	 * Whether the represented method is a JavaBeans getter method or not.
 	 *
-	 * @return <code>True</code>, if this method is a getter method,
-	 *         <code>false</code> otherwise.
+	 * @return {@code True}, if this method is a getter method, {@code false}
+	 *         otherwise.
 	 */
 	public boolean isGetterMethod() {
 		return getLocation().getExecutableElement().isGetterMethod();
