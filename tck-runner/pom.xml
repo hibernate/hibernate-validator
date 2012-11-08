@@ -126,14 +126,14 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>${tck.suite.file}</suiteXmlFile>
                     </suiteXmlFiles>
-                    <argLine>-Xmx128m</argLine>
-                    <forkMode>once</forkMode>
                     <systemProperties>
                         <property>
                             <name>validation.provider</name>
                             <value>${validation.provider}</value>
                         </property>
                     </systemProperties>
+                    <parallel>methods</parallel>
+                    <threadCount>4</threadCount>
                 </configuration>
             </plugin>
             <plugin>
