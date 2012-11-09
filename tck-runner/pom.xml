@@ -33,8 +33,8 @@
     <description>Aggregates dependencies and runs the JSR-303 TCK</description>
 
     <properties>
-        <tck.version>1.1.0-SNAPSHOT</tck.version>
-        <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-suite.xml</tck.suite.file>
+        <tck.version>1.1.0.Beta1</tck.version>
+        <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
         <jbossas.version>7.1.1.Final</jbossas.version>
         <jbossTargetDir>${project.build.directory}/jboss-as-${jbossas.version}</jbossTargetDir>
@@ -62,7 +62,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.beanvalidation.tck</groupId>
-            <artifactId>beanvalidation-tck</artifactId>
+            <artifactId>beanvalidation-tck-tests</artifactId>
             <version>${tck.version}</version>
         </dependency>
         <dependency>
@@ -109,7 +109,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.hibernate.beanvalidation.tck</groupId>
-                                    <artifactId>beanvalidation-tck</artifactId>
+                                    <artifactId>beanvalidation-tck-tests</artifactId>
                                     <type>xml</type>
                                     <classifier>suite</classifier>
                                     <overWrite>false</overWrite>
@@ -171,7 +171,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate.beanvalidation.tck</groupId>
-                    <artifactId>standalone-container-adapter</artifactId>
+                    <artifactId>beanvalidation-standalone-container-adapter</artifactId>
                     <version>${tck.version}</version>
                 </dependency>
             </dependencies>
