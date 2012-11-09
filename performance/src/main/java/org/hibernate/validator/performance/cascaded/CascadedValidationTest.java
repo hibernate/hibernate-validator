@@ -19,8 +19,8 @@ package org.hibernate.validator.performance.cascaded;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
@@ -66,7 +66,7 @@ public class CascadedValidationTest {
 	@Test
 	public void testCascadedValidationMultiThreaded() throws Exception {
 		CountDownLatch startLatch = new CountDownLatch( 1 );
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( SIZE_OF_THREAD_POOL );
+		ExecutorService executor = Executors.newFixedThreadPool( SIZE_OF_THREAD_POOL );
 		for ( int i = 0; i <= NUMBER_OF_RUNNABLES; i++ ) {
 			Runnable run = new TestRunner( startLatch );
 			executor.execute( run );
