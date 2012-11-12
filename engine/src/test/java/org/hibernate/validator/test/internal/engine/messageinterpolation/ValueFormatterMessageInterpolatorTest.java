@@ -56,7 +56,6 @@ public class ValueFormatterMessageInterpolatorTest {
 		config.messageInterpolator( new ValueFormatterMessageInterpolator() );
 	}
 
-
 	@Test
 	public void testSimpleValidatedValueInterpolation() {
 		ConstraintMapping mapping = config.createConstraintMapping();
