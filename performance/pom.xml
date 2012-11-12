@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -31,7 +33,9 @@
     <description>Hibernate Validator performance tests.</description>
 
     <properties>
-        <profilingOptions>-agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait</profilingOptions>
+        <profilingOptions>
+            -agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait
+        </profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
     </properties>
 
@@ -60,7 +64,7 @@
                 <artifactId>chronos-jmeter-maven-plugin</artifactId>
                 <configuration>
                     <input>${basedir}/src/jmx</input>
-                    <jMeterRemoteLocation>http://www.apache.org/dist/jmeter/binaries/apache-jmeter-2.6.zip</jMeterRemoteLocation>
+                    <jMeterRemoteLocation>http://www.apache.org/dist/jmeter/binaries/apache-jmeter-2.8.zip</jMeterRemoteLocation>
                     <jmeterhome>${project.basedir}/jmeter</jmeterhome>
                     <jmeterOutput>${project.basedir}/target/chronos/performancetest</jmeterOutput>
                     <historydir>${history.directory}</historydir>
@@ -88,6 +92,8 @@
                 <!-- Can't retrieve reporting plug-in version from pluginManagement
                      (see http://jira.codehaus.org/browse/MSITE-443) -->
                 <version>${org.codehaus.mojo.chronos.version}</version>
+                <configuration>
+                </configuration>
             </plugin>
         </plugins>
     </reporting>
@@ -135,7 +141,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <validator.version>HV 4.3.0-SNAPSHOT</validator.version>
+                <validator.version>HV 4.3.0.Final</validator.version>
             </properties>
         </profile>
         <profile>
