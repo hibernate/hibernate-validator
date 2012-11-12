@@ -63,6 +63,9 @@ public class CascadedValidationTest {
 		assertEquals( 0, violations.size() );
 	}
 
+	/**
+	 * To be executed manually. Not part of the JMeter tests for now.
+	 */
 	@Test
 	public void testCascadedValidationMultiThreaded() throws Exception {
 		CountDownLatch startLatch = new CountDownLatch( 1 );
@@ -116,6 +119,3 @@ public class CascadedValidationTest {
 		}
 	}
 }
-
-
-
