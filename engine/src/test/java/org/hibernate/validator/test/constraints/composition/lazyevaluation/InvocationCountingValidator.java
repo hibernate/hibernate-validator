@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,40 +14,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.constraints.composition;
+package org.hibernate.validator.test.constraints.composition.lazyevaluation;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
- * Test mode for HV-182.
- *
- * @author Gerhard Petracek
  * @author Hardy Ferentschik
  */
+public class InvocationCountingValidator extends InvocationCounter
+		implements ConstraintValidator<InvocationCounting, Object> {
 
-public class Person {
-	@ValidNameSingleViolation
-	private String nickName;
-
-	@ValidName
-	private String name;
-
-	public Person(String nickName, String name) {
-		this.nickName = nickName;
-		this.name = name;
+	public void initialize(InvocationCounting parameters) {
 	}
 
-	public String getNickName() {
-		return nickName;
-	}
-
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
+		incrementCount( o );
+		return false;
 	}
 }
+

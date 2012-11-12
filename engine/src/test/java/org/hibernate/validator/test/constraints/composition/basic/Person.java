@@ -14,33 +14,40 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.constraints.composition;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+package org.hibernate.validator.test.constraints.composition.basic;
 
 /**
- * Test constraint for HV-182.
+ * Test mode for HV-182.
  *
  * @author Gerhard Petracek
  * @author Hardy Ferentschik
  */
-@NotNull
-@Size(min = 2, max = 10)
-@Target({ METHOD, FIELD })
-@Retention(RUNTIME)
-@Constraint(validatedBy = { })
-public @interface ValidName {
-	public abstract String message() default "invalid name";
 
-	public abstract Class<?>[] groups() default { };
+public class Person {
+	@ValidNameSingleViolation
+	private String nickName;
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	@ValidName
+	private String name;
+
+	public Person(String nickName, String name) {
+		this.nickName = nickName;
+		this.name = name;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

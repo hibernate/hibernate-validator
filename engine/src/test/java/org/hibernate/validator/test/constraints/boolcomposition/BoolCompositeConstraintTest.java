@@ -23,6 +23,7 @@ import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
@@ -35,10 +36,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  */
 public class BoolCompositeConstraintTest {
 
-	/**
-	 * HV-390
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-390")
 	public void testCorrectAnnotationTypeWithBoolOr() {
 		Validator currentValidator = ValidatorUtil.getValidator();
 
@@ -60,10 +59,8 @@ public class BoolCompositeConstraintTest {
 		assertCorrectPropertyPaths( constraintViolations, "nickName", "ssn", "ssn" );
 	}
 
-	/**
-	 * HV-390
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-390")
 	public void testCorrectAnnotationTypeWithBoolAnd() {
 		Validator currentValidator = ValidatorUtil.getValidator();
 
@@ -92,10 +89,8 @@ public class BoolCompositeConstraintTest {
 		assertCorrectPropertyPaths( constraintViolations, "name", "name", "nickName", "ssn", "ssn" );
 	}
 
-	/**
-	 * HV-390
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-390")
 	public void testCorrectAnnotationTypeWithBoolAllFalse() {
 		Validator currentValidator = ValidatorUtil.getValidator();
 		// Uses ALL_FALSE, OR, and AND. Checks that SSN works

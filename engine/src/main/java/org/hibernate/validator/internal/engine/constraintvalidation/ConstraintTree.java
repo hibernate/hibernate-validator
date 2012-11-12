@@ -111,10 +111,7 @@ public class ConstraintTree<A extends Annotation> {
 		Set<E> localViolationList = CollectionHelper.newHashSet();
 
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
-		// (provided there is one)
-		// If fail fast mode is enabled and there are already failing constraints we don't need to validate the constraint (HV-550)
-		if ( !descriptor.getConstraintValidatorClasses().isEmpty()
-				&& ( !executionContext.isFailFastModeEnabled() || constraintViolations.isEmpty() ) ) {
+		if ( mainConstraintNeedsEvaluation( executionContext, constraintViolations ) ) {
 
 			if ( log.isTraceEnabled() ) {
 				log.tracef(
@@ -161,6 +158,25 @@ public class ConstraintTree<A extends Annotation> {
 					executionContext, valueContext, constraintViolations, localViolationList
 			);
 		}
+	}
+
+	private <T, E extends ConstraintViolation<T>> boolean mainConstraintNeedsEvaluation(ValidationContext<T, E> executionContext, Set<E> constraintViolations) {
+		// there is no validator for the main constraints
+		if ( descriptor.getConstraintValidatorClasses().isEmpty() ) {
+			return false;
+		}
+
+		// report as single violation and there is already a violation
+		if ( descriptor.isReportAsSingleViolation() && descriptor.getCompositionType() == AND && !constraintViolations.isEmpty() ) {
+			return false;
+		}
+
+		// explicit fail fast mode
+		if ( executionContext.isFailFastModeEnabled() && !constraintViolations.isEmpty() ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -229,7 +245,8 @@ public class ConstraintTree<A extends Annotation> {
 			}
 			else {
 				compositionResult.setAllTrue( false );
-				if ( executionContext.isFailFastModeEnabled() && descriptor.getCompositionType() == AND ) {
+				if ( descriptor.getCompositionType() == AND
+						&& ( executionContext.isFailFastModeEnabled() || descriptor.isReportAsSingleViolation() ) ) {
 					break;
 				}
 			}

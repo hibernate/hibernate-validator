@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.constraints.composition;
+package org.hibernate.validator.test.constraints.composition.basic;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
@@ -35,11 +36,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  * @author Hardy Ferentschik
  */
 public class CompositeConstraintTest {
-
-	/**
-	 * HV-182
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-182")
 	public void testCorrectAnnotationTypeForWithReportAsSingleViolation() {
 
 		Validator currentValidator = ValidatorUtil.getValidator();
@@ -66,10 +64,8 @@ public class CompositeConstraintTest {
 		}
 	}
 
-	/**
-	 * HV-182
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-182")
 	public void testCorrectAnnotationTypeReportMultipleViolations() {
 
 		Validator currentValidator = ValidatorUtil.getValidator();
