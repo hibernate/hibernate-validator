@@ -18,8 +18,6 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -49,6 +47,8 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData.ValueAccessStrategy;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
@@ -485,14 +485,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 */
 	private <T, U, V> void validateCascadedConstraints(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
 		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
-		Set<Member> cascadedMembers = beanMetaData.getCascadedMembers();
+		Set<PropertyMetaData> cascadedProperties = beanMetaData.getCascadedProperties();
 		PathImpl currentPath = valueContext.getPropertyPath();
-		for ( Member member : cascadedMembers ) {
-			String newNode = ReflectionHelper.getPropertyName( member );
-			valueContext.appendNode( newNode );
+		for ( PropertyMetaData cascadedProperty : cascadedProperties ) {
+			valueContext.appendNode( cascadedProperty.getName() );
 
-			if ( isCascadeRequired( validationContext, valueContext, member ) ) {
-				Object value = ReflectionHelper.getValue( member, valueContext.getCurrentBean() );
+			ElementType elementType = cascadedProperty.getCascadedValueAccessStrategy() == ValueAccessStrategy.FIELD ? ElementType.FIELD : ElementType.METHOD;
+			if ( isCascadeRequired( validationContext, valueContext, elementType ) ) {
+				Object value = cascadedProperty.getValue(
+						valueContext.getCurrentBean(),
+						cascadedProperty.getCascadedValueAccessStrategy()
+				);
 				if ( value != null ) {
 					Type type = value.getClass();
 					Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
@@ -1197,50 +1200,43 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Object newValue = value;
 
 		BeanMetaData<?> metaData = beanMetaDataManager.getBeanMetaData( clazz );
+		PropertyMetaData property = metaData.getMetaDataFor( elem.getName() );
+
 		//use precomputed method list as ReflectionHelper#containsMember is slow
-		if ( !metaData.isPropertyPresent( elem.getName() ) ) {
+		if ( property == null ) {
 			throw log.getInvalidPropertyPathException( elem.getName(), metaData.getBeanClass().getName() );
 		}
-
-		if ( !propertyIter.hasNext() ) {
-			for ( Class<?> hierarchyClass : metaData.getClassHierarchy() ) {
-				metaData = beanMetaDataManager.getBeanMetaData( hierarchyClass );
-				for ( MetaConstraint<?> constraint : metaData.getDirectMetaConstraints() ) {
-					if ( elem.getName() != null && elem.getName()
-							.equals( ReflectionHelper.getPropertyName( constraint.getLocation().getMember() ) ) ) {
-						metaConstraintsList.add( constraint );
-					}
-				}
-			}
+		else if ( !propertyIter.hasNext() ) {
+			metaConstraintsList.addAll( property.getConstraints() );
 		}
 		else {
-			Set<Member> cascadedMembers = metaData.getCascadedMembers();
-			for ( Member m : cascadedMembers ) {
-				if ( ReflectionHelper.getPropertyName( m ).equals( elem.getName() ) ) {
-					Type type = ReflectionHelper.getType( m );
-					newValue = newValue == null ? null : ReflectionHelper.getValue( m, newValue );
-					if ( elem.isInIterable() ) {
-						if ( newValue != null && elem.getIndex() != null ) {
-							newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
-						}
-						else if ( newValue != null && elem.getKey() != null ) {
-							newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
-						}
-						else if ( newValue != null ) {
-							throw log.getPropertyPathMustProvideIndexOrMapKeyException();
-						}
-						type = ReflectionHelper.getIndexedType( type );
+			if ( property.isCascading() ) {
+				Type type = property.getType();
+				newValue = newValue == null ? null : property.getValue(
+						newValue,
+						property.getCascadedValueAccessStrategy()
+				);
+				if ( elem.isInIterable() ) {
+					if ( newValue != null && elem.getIndex() != null ) {
+						newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
 					}
-
-					Class<?> castedValueClass = newValue == null ? ( Class<?> ) type : newValue.getClass();
-					return collectMetaConstraintsForPath(
-							castedValueClass,
-							newValue,
-							propertyIter,
-							propertyPath,
-							metaConstraintsList
-					);
+					else if ( newValue != null && elem.getKey() != null ) {
+						newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
+					}
+					else if ( newValue != null ) {
+						throw log.getPropertyPathMustProvideIndexOrMapKeyException();
+					}
+					type = ReflectionHelper.getIndexedType( type );
 				}
+
+				Class<?> castedValueClass = newValue == null ? ( Class<?> ) type : newValue.getClass();
+				return collectMetaConstraintsForPath(
+						castedValueClass,
+						newValue,
+						propertyIter,
+						propertyPath,
+						metaConstraintsList
+				);
 			}
 		}
 
@@ -1290,8 +1286,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return isReachable;
 	}
 
-	private boolean isCascadeRequired(ValidationContext<?, ?> validationContext, ValueContext<?, ?> valueContext, Member member) {
-		final ElementType type = member instanceof Field ? ElementType.FIELD : ElementType.METHOD;
+	private boolean isCascadeRequired(ValidationContext<?, ?> validationContext, ValueContext<?, ?> valueContext, ElementType type) {
 		boolean isReachable;
 		boolean isCascadable;
 

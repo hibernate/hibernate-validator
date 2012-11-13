@@ -283,30 +283,34 @@ public final class ReflectionHelper {
 	}
 
 	public static Object getValue(Member member, Object object) {
-		Object value = null;
-
 		if ( member instanceof Method ) {
-			Method method = (Method) member;
-			try {
-				value = method.invoke( object );
-			}
-			catch ( IllegalAccessException e ) {
-				throw log.getUnableToAccessMemberException( method.getName(), e );
-			}
-			catch ( InvocationTargetException e ) {
-				throw log.getUnableToAccessMemberException( method.getName(), e );
-			}
+			return getValue( (Method) member, object );
 		}
 		else if ( member instanceof Field ) {
-			Field field = (Field) member;
-			try {
-				value = field.get( object );
-			}
-			catch ( IllegalAccessException e ) {
-				throw log.getUnableToAccessMemberException( field.getName(), e );
-			}
+			return getValue( (Field) member, object );
 		}
-		return value;
+		return null;
+	}
+
+	public static Object getValue(Field field, Object object) {
+		try {
+			return field.get( object );
+		}
+		catch ( IllegalAccessException e ) {
+			throw log.getUnableToAccessMemberException( field.getName(), e );
+		}
+	}
+
+	public static Object getValue(Method method, Object object) {
+		try {
+			return method.invoke( object );
+		}
+		catch ( IllegalAccessException e ) {
+			throw log.getUnableToAccessMemberException( method.getName(), e );
+		}
+		catch ( InvocationTargetException e ) {
+			throw log.getUnableToAccessMemberException( method.getName(), e );
+		}
 	}
 
 	public static void setAccessibility(Member member) {
@@ -416,7 +420,7 @@ public final class ReflectionHelper {
 			iter = ( (Iterable<?>) value ).iterator();
 		}
 		else if ( TypeHelper.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( (Object) value );
+			List<?> arrayList = Arrays.asList( value );
 			iter = arrayList.iterator();
 		}
 		else {
