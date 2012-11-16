@@ -40,8 +40,8 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
@@ -217,7 +217,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 				);
 			}
 
-			ConstrainedMethod methodMetaData = new ConstrainedMethod(
+			ConstrainedExecutable methodMetaData = new ConstrainedExecutable(
 					ConfigurationSource.API,
 					new MethodConstraintLocation( oneMethod ),
 					parameterMetaDataList,

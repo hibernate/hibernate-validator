@@ -33,8 +33,8 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.xml.XmlMappingParser;
@@ -113,7 +113,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 			}
 			else if ( oneConfiguredLocation.getElementType() == ElementType.METHOD ) {
 				propertyMetaData.add(
-						new ConstrainedMethod(
+						new ConstrainedExecutable(
 								ConfigurationSource.XML,
 								new MethodConstraintLocation( (Method) oneConfiguredLocation.getMember() ),
 								constraintsByLocation.get( oneConfiguredLocation ),

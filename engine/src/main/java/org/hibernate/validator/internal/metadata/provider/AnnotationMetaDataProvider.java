@@ -47,8 +47,8 @@ import org.hibernate.validator.internal.metadata.location.MethodConstraintLocati
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -258,7 +258,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraints;
 	}
 
-	private Set<ConstrainedMethod> getConstructorMetaData(Class<?> clazz) {
+	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
 
 		List<ExecutableElement> declaredConstructors = ExecutableElement.forConstructors(
 				ReflectionHelper.getDeclaredConstructors( clazz )
@@ -267,7 +267,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return getMetaData( declaredConstructors );
 	}
 
-	private Set<ConstrainedMethod> getMethodMetaData(Class<?> clazz) {
+	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
 
 		List<ExecutableElement> declaredMethods = ExecutableElement.forMethods(
 				ReflectionHelper.getDeclaredMethods( clazz )
@@ -276,14 +276,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return getMetaData( declaredMethods );
 	}
 
-	private Set<ConstrainedMethod> getMetaData(List<ExecutableElement> executableElements) {
-		Set<ConstrainedMethod> methodMetaData = newHashSet();
+	private Set<ConstrainedExecutable> getMetaData(List<ExecutableElement> executableElements) {
+		Set<ConstrainedExecutable> executableMetaData = newHashSet();
 
-		for ( ExecutableElement method : executableElements ) {
+		for ( ExecutableElement executable : executableElements ) {
 
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
-			Member member = method.getMember();
+			Member member = executable.getMember();
 			if ( Modifier.isStatic( member.getModifiers() ) ||
 					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( member ) ||
 					member.isSynthetic() ) {
@@ -291,28 +291,29 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			methodMetaData.add( findMethodMetaData( method ) );
+			executableMetaData.add( findExecutableMetaData( executable ) );
 		}
 
-		return methodMetaData;
+		return executableMetaData;
 	}
 
 	/**
-	 * Finds all constraint annotations defined for the given method.
+	 * Finds all constraint annotations defined for the given method or constructor.
 	 *
 	 * @param executable The executable element to check for constraints annotations.
 	 *
 	 * @return A meta data object describing the constraints specified for the
 	 *         given element.
 	 */
-	private ConstrainedMethod findMethodMetaData(ExecutableElement executable) {
+	private ConstrainedExecutable findExecutableMetaData(ExecutableElement executable) {
 
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
 		boolean isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
 
 		Map<Class<?>, Class<?>> groupConversions = findGroupConversions( executable.getAccessibleObject() );
 
-		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> methodConstraints = partition(
+		//TODO GM: I think the wrong element type is used for constructor constraints
+		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = partition(
 				findConstraints(
 						executable.getAccessibleObject(),
 						ElementType.METHOD
@@ -320,15 +321,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 
 		Set<MetaConstraint<?>> returnValueConstraints = convertToMetaConstraints(
-				methodConstraints.get( ConstraintType.GENERIC ),
+				executableConstraints.get( ConstraintType.GENERIC ),
 				executable
 		);
 		Set<MetaConstraint<?>> crossParameterConstraints = convertToMetaConstraints(
-				methodConstraints.get( ConstraintType.CROSS_PARAMETER ),
+				executableConstraints.get( ConstraintType.CROSS_PARAMETER ),
 				executable
 		);
 
-		return new ConstrainedMethod(
+		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
 				new MethodConstraintLocation( executable, null ),
 				parameterConstraints,
@@ -339,7 +340,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement method) {
+	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement executable) {
 		if ( constraintsDescriptors == null ) {
 			return Collections.emptySet();
 		}
@@ -349,8 +350,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
 			constraints.add(
 					oneDescriptor.getConstraintType() == ConstraintType.GENERIC ?
-							createReturnValueMetaConstraint( method, oneDescriptor ) :
-							createCrossParameterMetaConstraint( method, oneDescriptor )
+							createReturnValueMetaConstraint( executable, oneDescriptor ) :
+							createCrossParameterMetaConstraint( executable, oneDescriptor )
 			);
 		}
 
@@ -359,20 +360,20 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	/**
 	 * Retrieves constraint related meta data for the parameters of the given
-	 * method.
+	 * executable.
 	 *
-	 * @param method The method of interest.
+	 * @param executable The executable of interest.
 	 *
-	 * @return A list with parameter meta data for the given method.
+	 * @return A list with parameter meta data for the given executable.
 	 */
-	private List<ConstrainedParameter> getParameterMetaData(ExecutableElement method) {
+	private List<ConstrainedParameter> getParameterMetaData(ExecutableElement executable) {
 		List<ConstrainedParameter> metaData = newArrayList();
 
-		String[] parameterNames = method.getParameterNames( parameterNameProvider );
+		String[] parameterNames = executable.getParameterNames( parameterNameProvider );
 
 		int i = 0;
 
-		for ( Annotation[] annotationsOfOneParameter : method.getParameterAnnotations() ) {
+		for ( Annotation[] annotationsOfOneParameter : executable.getParameterAnnotations() ) {
 
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames[i];
@@ -388,7 +389,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					constraintsOfOneParameter.add(
 							createParameterMetaConstraint(
-									method, i, constraintDescriptorImpl
+									executable, i, constraintDescriptorImpl
 							)
 					);
 				}
@@ -413,7 +414,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
-							new MethodConstraintLocation( method, i ),
+							new MethodConstraintLocation( executable, i ),
 							parameterName,
 							constraintsOfOneParameter,
 							groupConversions,
@@ -427,13 +428,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	/**
-	 * Finds all constraint annotations defined for the given field/method and returns them in a list of
+	 * Finds all constraint annotations defined for the given member and returns them in a list of
 	 * constraint descriptors.
 	 *
-	 * @param member The fields or method to check for constraints annotations.
+	 * @param member The member to check for constraints annotations.
 	 * @param type The element type the constraint/annotation is placed on.
 	 *
-	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
+	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
 	private List<ConstraintDescriptorImpl<?>> findConstraints(AccessibleObject member, ElementType type) {
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();

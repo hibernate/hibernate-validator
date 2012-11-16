@@ -20,20 +20,25 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import javax.validation.ConstraintDeclarationException;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
@@ -194,7 +199,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			add( constrainedType );
 		}
 
-		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
+		public Builder(ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
 
 			this.beanClass = constrainedMethod.getLocation().getBeanClass();
@@ -210,7 +215,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			}
 
 			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
-					!( (ConstrainedMethod) constrainedElement ).isGetterMethod() ) {
+					!( (ConstrainedExecutable) constrainedElement ).isGetterMethod() ) {
 				return false;
 			}
 

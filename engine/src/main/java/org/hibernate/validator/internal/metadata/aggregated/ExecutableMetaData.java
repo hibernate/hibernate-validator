@@ -33,7 +33,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescripto
 import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -44,12 +44,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * An aggregated view of the constraint related meta data for a given method and
- * all the methods in the inheritance hierarchy which it overrides or
- * implements.
+ * An aggregated view of the constraint related meta data for a given method or
+ * constructors and in (case of methods) all the methods in the inheritance
+ * hierarchy which it overrides or implements.
  * <p>
  * Instances are retrieved by creating a {@link Builder} and adding all required
- * {@link ConstrainedMethod} objects to it. Instances are read-only after
+ * {@link ConstrainedExecutable} objects to it. Instances are read-only after
  * creation.
  * </p>
  * <p>
@@ -124,7 +124,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * Either CONSTRUCTOR or METHOD.
 		 */
 		private final ConstrainedElementKind kind;
-		private final Set<ConstrainedMethod> constrainedMethods = newHashSet();
+		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		private final MethodConstraintLocation location;
 		private final Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
@@ -132,18 +132,18 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private boolean isConstrained = false;
 
 		/**
-		 * Creates a new builder based on the given method meta data.
+		 * Creates a new builder based on the given executable meta data.
 		 *
-		 * @param constrainedMethod The base method for this builder. This is the lowest
-		 * method with a given signature within a type hierarchy.
+		 * @param constrainedExecutable The base executable for this builder. This is the lowest
+		 * executable with a given signature within a type hierarchy.
 		 * @param constraintHelper the constraint helper
 		 */
-		public Builder(ConstrainedMethod constrainedMethod, ConstraintHelper constraintHelper) {
+		public Builder(ConstrainedExecutable constrainedExecutable, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
 
-			kind = constrainedMethod.getKind();
-			location = constrainedMethod.getLocation();
-			add( constrainedMethod );
+			kind = constrainedExecutable.getKind();
+			location = constrainedExecutable.getLocation();
+			add( constrainedExecutable );
 		}
 
 		@Override
@@ -152,19 +152,19 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					kind == constrainedElement.getKind() &&
 							ReflectionHelper.haveSameSignature(
 									location.getExecutableElement(),
-									( (ConstrainedMethod) constrainedElement ).getLocation().getExecutableElement()
+									( (ConstrainedExecutable) constrainedElement ).getLocation().getExecutableElement()
 							);
 		}
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
-			ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
+			ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 
-			constrainedMethods.add( constrainedMethod );
-			isCascading = isCascading || constrainedMethod.isCascading();
-			isConstrained = isConstrained || constrainedMethod.isConstrained();
-			crossParameterConstraints.addAll( constrainedMethod.getCrossParameterConstraints() );
-			returnValueConstraints.addAll( constrainedMethod.getConstraints() );
+			constrainedExecutables.add( constrainedExecutable );
+			isCascading = isCascading || constrainedExecutable.isCascading();
+			isConstrained = isConstrained || constrainedExecutable.isConstrained();
+			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
+			returnValueConstraints.addAll( constrainedExecutable.getConstraints() );
 		}
 
 		@Override
@@ -186,22 +186,22 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		/**
-		 * Finds the one method from the underlying hierarchy with parameter
-		 * constraints. If no method in the hierarchy is parameter constrained,
-		 * the parameter meta data from this builder's base method is returned.
+		 * Finds the one executable from the underlying hierarchy with parameter
+		 * constraints. If no executable in the hierarchy is parameter constrained,
+		 * the parameter meta data from this builder's base executable is returned.
 		 *
-		 * @return The parameter meta data for this builder's method.
+		 * @return The parameter meta data for this builder's executable.
 		 */
 		private List<ParameterMetaData> findParameterMetaData() {
 
 			List<ParameterMetaData.Builder> parameterBuilders = null;
 
-			for ( ConstrainedMethod oneMethod : constrainedMethods ) {
+			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
 
 				if ( parameterBuilders == null ) {
 					parameterBuilders = newArrayList();
 
-					for ( ConstrainedParameter oneParameter : oneMethod.getAllParameterMetaData() ) {
+					for ( ConstrainedParameter oneParameter : oneExecutable.getAllParameterMetaData() ) {
 						parameterBuilders.add(
 								new ParameterMetaData.Builder(
 										location.getBeanClass(),
@@ -213,7 +213,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				}
 				else {
 					int i = 0;
-					for ( ConstrainedParameter oneParameter : oneMethod.getAllParameterMetaData() ) {
+					for ( ConstrainedParameter oneParameter : oneExecutable.getAllParameterMetaData() ) {
 						parameterBuilders.get( i ).add( oneParameter );
 						i++;
 					}
@@ -239,37 +239,37 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 */
 		private ConstraintDeclarationException checkParameterConstraints() {
 
-			Set<ConstrainedMethod> methodsWithParameterConstraints = getMethodsWithParameterConstraints(
-					constrainedMethods
+			Set<ConstrainedExecutable> executablesWithParameterConstraints = executablesWithParameterConstraints(
+					constrainedExecutables
 			);
 
-			if ( methodsWithParameterConstraints.isEmpty() ) {
+			if ( executablesWithParameterConstraints.isEmpty() ) {
 				return null;
 			}
 			Set<Class<?>> definingTypes = newHashSet();
 
-			for ( ConstrainedMethod constrainedMethod : methodsWithParameterConstraints ) {
-				definingTypes.add( constrainedMethod.getLocation().getBeanClass() );
+			for ( ConstrainedExecutable constrainedExecutable : executablesWithParameterConstraints ) {
+				definingTypes.add( constrainedExecutable.getLocation().getBeanClass() );
 			}
 
 			if ( definingTypes.size() > 1 ) {
 				return new ConstraintDeclarationException(
 						"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, " +
 								"but there are parameter constraints defined at all of the following overridden methods: " +
-								methodsWithParameterConstraints
+								executablesWithParameterConstraints
 				);
 			}
 
-			ConstrainedMethod constrainedMethod = methodsWithParameterConstraints.iterator().next();
+			ConstrainedExecutable constrainedExecutable = executablesWithParameterConstraints.iterator().next();
 
-			for ( ConstrainedMethod oneMethod : constrainedMethods ) {
+			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
 
-				if ( !constrainedMethod.getLocation().getBeanClass()
-						.isAssignableFrom( oneMethod.getLocation().getBeanClass() ) ) {
+				if ( !constrainedExecutable.getLocation().getBeanClass()
+						.isAssignableFrom( oneExecutable.getLocation().getBeanClass() ) ) {
 					return new ConstraintDeclarationException(
 							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
 									"The following method itself has no parameter constraints but it is not defined on a sub-type of " +
-									constrainedMethod.getLocation().getBeanClass() + ": " + oneMethod
+									constrainedExecutable.getLocation().getBeanClass() + ": " + oneExecutable
 					);
 				}
 			}
@@ -278,20 +278,20 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		/**
-		 * Returns a set with those methods from the given pile of methods that have
+		 * Returns a set with those executables from the given pile of executables that have
 		 * at least one constrained parameter or at least one parameter annotated
 		 * with {@link javax.validation.Valid}.
 		 *
-		 * @param methods The methods to search in.
+		 * @param executables The executables to search in.
 		 *
-		 * @return A set with constrained methods. May be empty, but never null.
+		 * @return A set with constrained executables. May be empty, but never null.
 		 */
-		private Set<ConstrainedMethod> getMethodsWithParameterConstraints(Iterable<ConstrainedMethod> methods) {
-			Set<ConstrainedMethod> theValue = newHashSet();
+		private Set<ConstrainedExecutable> executablesWithParameterConstraints(Iterable<ConstrainedExecutable> executables) {
+			Set<ConstrainedExecutable> theValue = newHashSet();
 
-			for ( ConstrainedMethod oneMethod : methods ) {
-				if ( oneMethod.hasParameterConstraints() ) {
-					theValue.add( oneMethod );
+			for ( ConstrainedExecutable oneExecutable : executables ) {
+				if ( oneExecutable.hasParameterConstraints() ) {
+					theValue.add( oneExecutable );
 				}
 			}
 
@@ -331,7 +331,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	/**
-	 * Returns meta data for the specified parameter of the represented method.
+	 * Returns meta data for the specified parameter of the represented executable.
 	 *
 	 * @param parameterIndex the index of the parameter
 	 *
@@ -347,12 +347,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	/**
-	 * Returns meta data for all parameters of the represented method.
+	 * Returns meta data for all parameters of the represented executable.
 	 *
 	 * @return A list with parameter meta data. The length corresponds to the
-	 *         number of parameters of the method represented by this meta data
+	 *         number of parameters of the executable represented by this meta data
 	 *         object, so an empty list may be returned (in case of a
-	 *         parameterless method), but never <code>null</code>.
+	 *         parameterless executable), but never <code>null</code>.
 	 */
 	public List<ParameterMetaData> getAllParameterMetaData() {
 		return parameterMetaDataList;
@@ -364,7 +364,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	/**
 	 * Returns an identifier for this meta data object, based on the represented
-	 * method's names and its parameter types.
+	 * executable's name and its parameter types.
 	 *
 	 * @return An identifier for this meta data object.
 	 */
@@ -446,7 +446,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
 						parameterBuilder.toString();
 
-		return "ExecutableMetaData [method=" + getType() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
+		return "ExecutableMetaData [executable=" + getType() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
 				+ isConstrained() + "]";
 	}
 

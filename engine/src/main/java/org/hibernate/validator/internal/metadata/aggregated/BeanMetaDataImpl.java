@@ -39,8 +39,8 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
@@ -536,15 +536,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					break;
 				case CONSTRUCTOR:
 				case METHOD:
-					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
+					ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
-							constrainedMethod,
+							constrainedExecutable,
 							constraintHelper
 					);
 
-					if ( constrainedMethod.isGetterMethod() ) {
+					if ( constrainedExecutable.isGetterMethod() ) {
 						propertyBuilder = new PropertyMetaData.Builder(
-								constrainedMethod,
+								constrainedExecutable,
 								constraintHelper
 						);
 					}
@@ -571,7 +571,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				propertyBuilder.add( constrainedElement );
 
 				if ( added == false && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
-					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
+					ConstrainedExecutable constrainedMethod = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
 							constrainedMethod,
 							constraintHelper

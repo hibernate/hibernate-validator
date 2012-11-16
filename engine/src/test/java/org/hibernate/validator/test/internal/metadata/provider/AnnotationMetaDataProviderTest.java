@@ -42,8 +42,8 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.buildHashMap;
@@ -92,7 +92,10 @@ public class AnnotationMetaDataProviderTest {
 				Calendar.class
 		);
 
-		ConstrainedMethod createEvent = findConstrainedExecutable( beanConfigurations, Calendar.class.getMethod( "createEvent", DateMidnight.class, DateMidnight.class ) );
+		ConstrainedExecutable createEvent = findConstrainedExecutable(
+				beanConfigurations,
+				Calendar.class.getMethod( "createEvent", DateMidnight.class, DateMidnight.class )
+		);
 
 		//then
 		assertThat( createEvent.isConstrained() ).isTrue();
@@ -164,9 +167,9 @@ public class AnnotationMetaDataProviderTest {
 		//then
 		assertThat( field.getGroupConversions() ).isEqualTo(
 				buildHashMap()
-					.with( Default.class, BasicPostal.class )
-					.with( Complete.class, FullPostal.class )
-					.build()
+						.with( Default.class, BasicPostal.class )
+						.with( Complete.class, FullPostal.class )
+						.build()
 		);
 	}
 
@@ -175,7 +178,10 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "getMail1" ) );
+		ConstrainedExecutable method = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getMethod( "getMail1" )
+		);
 
 		//then
 		assertThat( method.getGroupConversions() ).isEmpty();
@@ -186,7 +192,10 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "getPhone1" ) );
+		ConstrainedExecutable method = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getMethod( "getPhone1" )
+		);
 
 		//then
 		assertThat( method.getGroupConversions() ).isEqualTo(
@@ -199,14 +208,17 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "getAddress1" ) );
+		ConstrainedExecutable method = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getMethod( "getAddress1" )
+		);
 
 		//then
 		assertThat( method.getGroupConversions() ).isEqualTo(
 				buildHashMap()
-					.with( Default.class, BasicPostal.class )
-					.with( Complete.class, FullPostal.class )
-					.build()
+						.with( Default.class, BasicPostal.class )
+						.with( Complete.class, FullPostal.class )
+						.build()
 		);
 	}
 
@@ -215,7 +227,10 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "setMail1", String.class ) );
+		ConstrainedExecutable method = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getMethod( "setMail1", String.class )
+		);
 
 		//then
 		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEmpty();
@@ -226,7 +241,10 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "setPhone1", PhoneNumber.class ) );
+		ConstrainedExecutable method = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getMethod( "setPhone1", PhoneNumber.class )
+		);
 
 		//then
 		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
@@ -239,14 +257,17 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "setAddress1", Address.class ) );
+		ConstrainedExecutable method = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getMethod( "setAddress1", Address.class )
+		);
 
 		//then
 		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
 				buildHashMap()
-					.with( Default.class, BasicPostal.class )
-					.with( Complete.class, FullPostal.class )
-					.build()
+						.with( Default.class, BasicPostal.class )
+						.with( Complete.class, FullPostal.class )
+						.build()
 		);
 	}
 
@@ -255,7 +276,10 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod constructor = findConstrainedExecutable( beanConfigurations, User.class.getConstructor() );
+		ConstrainedExecutable constructor = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getConstructor()
+		);
 
 		//then
 		assertThat( constructor.getGroupConversions() ).isEqualTo(
@@ -268,27 +292,30 @@ public class AnnotationMetaDataProviderTest {
 
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedMethod constructor = findConstrainedExecutable( beanConfigurations, User.class.getConstructor( Address.class ) );
+		ConstrainedExecutable constructor = findConstrainedExecutable(
+				beanConfigurations,
+				User.class.getConstructor( Address.class )
+		);
 
 		//then
 		assertThat( constructor.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
 				buildHashMap()
-					.with( Default.class, BasicPostal.class )
-					.with( Complete.class, FullPostal.class )
-					.build()
+						.with( Default.class, BasicPostal.class )
+						.with( Complete.class, FullPostal.class )
+						.build()
 		);
 	}
 
 	private ConstrainedField findConstrainedField(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Field field) {
-		return (ConstrainedField) findConstrainedElement(beanConfigurations, field);
+		return (ConstrainedField) findConstrainedElement( beanConfigurations, field );
 	}
 
-	private ConstrainedMethod findConstrainedExecutable(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Method method) {
-		return (ConstrainedMethod) findConstrainedElement(beanConfigurations, method);
+	private ConstrainedExecutable findConstrainedExecutable(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Method method) {
+		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, method );
 	}
 
-	private <T> ConstrainedMethod findConstrainedExecutable(Iterable<BeanConfiguration<? super T>> beanConfigurations, Constructor<T> constructor) {
-		return (ConstrainedMethod) findConstrainedElement(beanConfigurations, constructor);
+	private <T> ConstrainedExecutable findConstrainedExecutable(Iterable<BeanConfiguration<? super T>> beanConfigurations, Constructor<T> constructor) {
+		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, constructor );
 	}
 
 	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
