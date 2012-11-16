@@ -47,6 +47,24 @@ public final class CollectionHelper {
 		return new HashMap<K, V>( size );
 	}
 
+	public static <K, V> HashMapBuilder<K, V> buildHashMap() {
+		return new HashMapBuilder<K, V>();
+	}
+
+	public static class HashMapBuilder<K, V> {
+
+		HashMap<K, V> map = new HashMap<K, V>();
+
+		public HashMapBuilder<K, V> with(K key, V value) {
+			map.put( key, value );
+			return this;
+		}
+
+		public HashMap<K, V> build() {
+			return map;
+		}
+	}
+
 	public static <K, V> ConcurrentHashMap<K, V> newConcurrentHashMap() {
 		return new ConcurrentHashMap<K, V>();
 	}

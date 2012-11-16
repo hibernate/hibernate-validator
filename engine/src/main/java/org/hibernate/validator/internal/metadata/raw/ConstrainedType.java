@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -39,9 +40,17 @@ public class ConstrainedType extends AbstractConstrainedElement {
 	 */
 	public ConstrainedType(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints) {
 
-		super( source, ConstrainedElementKind.TYPE, location, constraints, false );
+		super(
+				source,
+				ConstrainedElementKind.TYPE,
+				location,
+				constraints,
+				Collections.<Class<?>, Class<?>>emptyMap(),
+				false
+		);
 	}
 
+	@Override
 	public BeanConstraintLocation getLocation() {
 		return (BeanConstraintLocation) super.getLocation();
 	}

@@ -75,6 +75,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		annotationProcessingOptions = mergedContext.getAnnotationProcessingOptions();
 	}
 
+	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return annotationProcessingOptions;
 	}
@@ -158,6 +159,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 								ConfigurationSource.API,
 								oneConfiguredProperty,
 								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
+								Collections.<Class<?>, Class<?>>emptyMap(),
 								cascades.contains( oneConfiguredProperty )
 						)
 				);
@@ -209,6 +211,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 								new MethodConstraintLocation( oneMethod, i ),
 								parameterNames[i],
 								asMetaConstraints( constraintsByParameter.get( i ) ),
+								Collections.<Class<?>, Class<?>>emptyMap(),
 								cascadesByParameter.containsKey( i )
 						)
 				);
@@ -220,6 +223,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 					parameterMetaDataList,
 					Collections.<MetaConstraint<?>>emptySet(),
 					asMetaConstraints( constraintsByParameter.get( null ) ),
+					Collections.<Class<?>, Class<?>>emptyMap(),
 					cascadesByParameter.containsKey( null )
 			);
 			allMethodMetaData.add( methodMetaData );
@@ -256,6 +260,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private Partitioner<Method, MethodConstraintLocation> cascadesByMethod() {
 		return new Partitioner<Method, MethodConstraintLocation>() {
+			@Override
 			public Method getPartition(MethodConstraintLocation location) {
 				//TODO HV-571
 				return (Method) location.getMember();
@@ -265,6 +270,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private Partitioner<Integer, MethodConstraintLocation> cascadesByParameterIndex() {
 		return new Partitioner<Integer, MethodConstraintLocation>() {
+			@Override
 			public Integer getPartition(MethodConstraintLocation location) {
 				return location.getParameterIndex();
 			}
@@ -273,6 +279,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>> constraintsByMethod() {
 		return new Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>>() {
+			@Override
 			public Method getPartition(ConfiguredConstraint<?, MethodConstraintLocation> constraint) {
 				//TODO HV-571
 				return (Method) constraint.getLocation().getMember();
@@ -283,6 +290,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>> constraintsByParameterIndex() {
 		return new Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>>() {
 
+			@Override
 			public Integer getPartition(
 					ConfiguredConstraint<?, MethodConstraintLocation> v) {
 				return v.getLocation().getParameterIndex();
@@ -370,6 +378,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>> constraintsByLocation() {
 		return new Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>>() {
+			@Override
 			public BeanConstraintLocation getPartition(ConfiguredConstraint<?, BeanConstraintLocation> constraint) {
 				return constraint.getLocation();
 			}

@@ -19,6 +19,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.lang.annotation.ElementType;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -69,6 +70,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
+				Collections.<Class<?>, Class<?>>emptyMap(),
 				isCascading
 		);
 	}
@@ -84,6 +86,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 	 * but never {@code null}.
 	 * @param returnValueConstraints The return value constraints of the represented method, if
 	 * any.
+	 * @param groupConversions The group conversions of the represented method, if any.
 	 * @param isCascading Whether a cascaded validation of the represented method's
 	 * return value shall be performed or not.
 	 */
@@ -93,6 +96,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
+			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading) {
 
 		super(
@@ -100,6 +104,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 				location.getElementType() == ElementType.CONSTRUCTOR ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				location,
 				returnValueConstraints,
+				groupConversions,
 				isCascading
 		);
 

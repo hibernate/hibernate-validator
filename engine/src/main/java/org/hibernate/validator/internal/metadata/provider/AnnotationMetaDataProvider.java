@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.ConvertGroup;
 import javax.validation.GroupSequence;
 import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
@@ -59,6 +60,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
@@ -234,12 +236,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				field
 		);
 
+		Map<Class<?>, Class<?>> groupConversions = findGroupConversions( field );
+
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
 				new BeanConstraintLocation( field ),
 				constraints,
+				groupConversions,
 				isCascading
 		);
 	}
@@ -305,6 +310,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
 		boolean isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
 
+		Map<Class<?>, Class<?>> groupConversions = findGroupConversions( executable.getAccessibleObject() );
+
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> methodConstraints = partition(
 				findConstraints(
 						executable.getAccessibleObject(),
@@ -327,6 +334,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
+				groupConversions,
 				isCascading
 		);
 	}
@@ -369,6 +377,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames[i];
 			Set<MetaConstraint<?>> constraintsOfOneParameter = newHashSet();
+			Map<Class<?>, Class<?>> groupConversions = newHashMap();
 
 			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
 
@@ -388,6 +397,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				if ( oneAnnotation.annotationType().equals( Valid.class ) ) {
 					parameterIsCascading = true;
 				}
+				//3. determine group conversions
+				else if ( oneAnnotation.annotationType().equals( ConvertGroup.class ) ) {
+					ConvertGroup groupConversion = (ConvertGroup) oneAnnotation;
+					groupConversions.put( groupConversion.from(), groupConversion.to() );
+				}
+				else if ( oneAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
+					ConvertGroup.List groupConversionList = (ConvertGroup.List) oneAnnotation;
+					for ( ConvertGroup oneConversion : groupConversionList.value() ) {
+						groupConversions.put( oneConversion.from(), oneConversion.to() );
+					}
+				}
 			}
 
 			metaData.add(
@@ -396,6 +416,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							new MethodConstraintLocation( method, i ),
 							parameterName,
 							constraintsOfOneParameter,
+							groupConversions,
 							parameterIsCascading
 					)
 			);
@@ -468,6 +489,25 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
+	}
+
+	private Map<Class<?>, Class<?>> findGroupConversions(AccessibleObject member) {
+
+		Map<Class<?>, Class<?>> groupConversions = newHashMap();
+
+		ConvertGroup groupConversion = member.getAnnotation( ConvertGroup.class );
+		if ( groupConversion != null ) {
+			groupConversions.put( groupConversion.from(), groupConversion.to() );
+		}
+
+		ConvertGroup.List groupConversionList = member.getAnnotation( ConvertGroup.List.class );
+		if ( groupConversionList != null ) {
+			for ( ConvertGroup oneConversion : groupConversionList.value() ) {
+				groupConversions.put( oneConversion.from(), oneConversion.to() );
+			}
+		}
+
+		return groupConversions;
 	}
 
 	private Partitioner<ConstraintType, ConstraintDescriptorImpl<?>> byType() {

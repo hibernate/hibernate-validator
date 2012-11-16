@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -79,6 +80,15 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 *         but never <code>null</code>.
 	 */
 	Set<MetaConstraint<?>> getConstraints();
+
+	/**
+	 * Returns a map with the group conversions for this constrained element, as
+	 * e.g. given using the {@link ConvertGroup} annotation.
+	 *
+	 * @return A map with this constrained element's group conversions. May be
+	 *         empty, but never {@code null}.
+	 */
+	Map<Class<?>, Class<?>> getGroupConversions();
 
 	/**
 	 * Whether cascading validation for the represented element shall be

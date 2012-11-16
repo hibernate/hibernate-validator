@@ -17,9 +17,16 @@
 package org.hibernate.validator.test.internal.metadata.provider;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
+import javax.validation.ConvertGroup;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
@@ -32,11 +39,14 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.CollectionHelper.buildHashMap;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
@@ -82,7 +92,7 @@ public class AnnotationMetaDataProviderTest {
 				Calendar.class
 		);
 
-		ConstrainedMethod createEvent = findConstrainedExecutable( beanConfigurations, Calendar.class, "createEvent" );
+		ConstrainedMethod createEvent = findConstrainedExecutable( beanConfigurations, Calendar.class.getMethod( "createEvent", DateMidnight.class, DateMidnight.class ) );
 
 		//then
 		assertThat( createEvent.isConstrained() ).isTrue();
@@ -112,29 +122,186 @@ public class AnnotationMetaDataProviderTest {
 		assertThat( constraint.getLocation().typeOfAnnotatedElement() ).isEqualTo( Object[].class );
 	}
 
-	private <T> ConstrainedMethod findConstrainedExecutable(Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<T> beanType, String executableName) {
+	@Test
+	public void configurationsHaveAnnotationSource() {
 
-		BeanConfiguration<? super T> beanConfiguration = null;
+		for ( BeanConfiguration<? super User> configuration : provider.getBeanConfigurationForHierarchy( User.class ) ) {
+			assertThat( configuration.getSource() ).isEqualTo( ConfigurationSource.ANNOTATION );
+		}
+	}
 
-		for ( BeanConfiguration<? super T> oneConfiguration : beanConfigurations ) {
-			if ( oneConfiguration.getBeanClass().equals( beanType ) ) {
-				beanConfiguration = oneConfiguration;
-				break;
+	@Test
+	public void noGroupConversionOnField() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "mail" ) );
+
+		//then
+		assertThat( field.getGroupConversions() ).isEmpty();
+	}
+
+	@Test
+	public void singleGroupConversionOnField() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "phone" ) );
+
+		//then
+		assertThat( field.getGroupConversions() ).isEqualTo(
+				buildHashMap().with( Default.class, BasicNumber.class ).build()
+		);
+	}
+
+	@Test
+	public void multipleGroupConversionsOnField() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "address" ) );
+
+		//then
+		assertThat( field.getGroupConversions() ).isEqualTo(
+				buildHashMap()
+					.with( Default.class, BasicPostal.class )
+					.with( Complete.class, FullPostal.class )
+					.build()
+		);
+	}
+
+	@Test
+	public void noGroupConversionOnMethod() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "getMail1" ) );
+
+		//then
+		assertThat( method.getGroupConversions() ).isEmpty();
+	}
+
+	@Test
+	public void singleGroupConversionOnMethod() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "getPhone1" ) );
+
+		//then
+		assertThat( method.getGroupConversions() ).isEqualTo(
+				buildHashMap().with( Default.class, BasicNumber.class ).build()
+		);
+	}
+
+	@Test
+	public void multipleGroupConversionsOnMethod() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "getAddress1" ) );
+
+		//then
+		assertThat( method.getGroupConversions() ).isEqualTo(
+				buildHashMap()
+					.with( Default.class, BasicPostal.class )
+					.with( Complete.class, FullPostal.class )
+					.build()
+		);
+	}
+
+	@Test
+	public void noGroupConversionOnParameter() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "setMail1", String.class ) );
+
+		//then
+		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEmpty();
+	}
+
+	@Test
+	public void singleGroupConversionOnParameter() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "setPhone1", PhoneNumber.class ) );
+
+		//then
+		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
+				buildHashMap().with( Default.class, BasicNumber.class ).build()
+		);
+	}
+
+	@Test
+	public void multipleGroupConversionsOnParameter() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod method = findConstrainedExecutable( beanConfigurations, User.class.getMethod( "setAddress1", Address.class ) );
+
+		//then
+		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
+				buildHashMap()
+					.with( Default.class, BasicPostal.class )
+					.with( Complete.class, FullPostal.class )
+					.build()
+		);
+	}
+
+	@Test
+	public void singleGroupConversionOnConstructor() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod constructor = findConstrainedExecutable( beanConfigurations, User.class.getConstructor() );
+
+		//then
+		assertThat( constructor.getGroupConversions() ).isEqualTo(
+				buildHashMap().with( Default.class, BasicNumber.class ).build()
+		);
+	}
+
+	@Test
+	public void multipleGroupConversionsOnConstructorParameter() throws Exception {
+
+		//when
+		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
+		ConstrainedMethod constructor = findConstrainedExecutable( beanConfigurations, User.class.getConstructor( Address.class ) );
+
+		//then
+		assertThat( constructor.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
+				buildHashMap()
+					.with( Default.class, BasicPostal.class )
+					.with( Complete.class, FullPostal.class )
+					.build()
+		);
+	}
+
+	private ConstrainedField findConstrainedField(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Field field) {
+		return (ConstrainedField) findConstrainedElement(beanConfigurations, field);
+	}
+
+	private ConstrainedMethod findConstrainedExecutable(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Method method) {
+		return (ConstrainedMethod) findConstrainedElement(beanConfigurations, method);
+	}
+
+	private <T> ConstrainedMethod findConstrainedExecutable(Iterable<BeanConfiguration<? super T>> beanConfigurations, Constructor<T> constructor) {
+		return (ConstrainedMethod) findConstrainedElement(beanConfigurations, constructor);
+	}
+
+	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
+
+		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
+			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
+				if ( constrainedElement.getLocation().getMember().equals( member ) ) {
+					return constrainedElement;
+				}
 			}
 		}
 
-		if ( beanConfiguration == null ) {
-			throw new RuntimeException( "Found no configuration for type " + beanType );
-		}
-
-
-		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
-			if ( constrainedElement.getLocation().getMember().getName().equals( executableName ) ) {
-				return (ConstrainedMethod) constrainedElement;
-			}
-		}
-
-		throw new RuntimeException( "Found no constrained element with name " + executableName + " on type " + beanType );
+		throw new RuntimeException( "Found no constrained element for " + member );
 	}
 
 	private static class Foo {
@@ -148,6 +315,90 @@ public class AnnotationMetaDataProviderTest {
 
 		@ConsistentDateParameters
 		public void createEvent(DateMidnight start, DateMidnight end) {
+		}
+	}
+
+	public interface Complete extends Default {
+	}
+
+	public interface BasicPostal {
+	}
+
+	public interface FullPostal extends BasicPostal {
+	}
+
+	private interface BasicNumber {
+	}
+
+	private static class Address {
+	}
+
+	private static class PhoneNumber {
+	}
+
+	@SuppressWarnings("unused")
+	private static class User {
+
+		private final String mail = null;
+
+		@Valid
+		@ConvertGroup(from = Default.class, to = BasicNumber.class)
+		private final PhoneNumber phone = null;
+
+		@Valid
+		@ConvertGroup.List({
+				@ConvertGroup(from = Default.class, to = BasicPostal.class),
+				@ConvertGroup(from = Complete.class, to = FullPostal.class)
+		})
+		private final Address address = null;
+
+		@Valid
+		@ConvertGroup(from = Default.class, to = BasicNumber.class)
+		public User() {
+		}
+
+		public User(
+				@Valid
+				@ConvertGroup.List({
+						@ConvertGroup(from = Default.class, to = BasicPostal.class),
+						@ConvertGroup(from = Complete.class, to = FullPostal.class)
+				})
+				Address address) {
+		}
+
+		public String getMail1() {
+			return null;
+		}
+
+		public void setMail1(String mail) {
+		}
+
+		@Valid
+		@ConvertGroup(from = Default.class, to = BasicNumber.class)
+		public PhoneNumber getPhone1() {
+			return null;
+		}
+
+		public void setPhone1(@Valid @ConvertGroup(from = Default.class, to = BasicNumber.class) PhoneNumber phone) {
+		}
+
+		@Valid
+		@ConvertGroup.List({
+				@ConvertGroup(from = Default.class, to = BasicPostal.class),
+				@ConvertGroup(from = Complete.class, to = FullPostal.class)
+		})
+
+		public Address getAddress1() {
+			return null;
+		}
+
+		public void setAddress1(
+				@Valid
+				@ConvertGroup.List({
+						@ConvertGroup(from = Default.class, to = BasicPostal.class),
+						@ConvertGroup(from = Complete.class, to = FullPostal.class)
+				})
+				Address address) {
 		}
 	}
 }

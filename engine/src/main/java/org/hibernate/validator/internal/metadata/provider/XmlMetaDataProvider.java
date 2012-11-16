@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -86,6 +87,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
+	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return annotationProcessingOptions;
 	}
@@ -104,6 +106,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 								ConfigurationSource.XML,
 								(BeanConstraintLocation) oneConfiguredLocation,
 								constraintsByLocation.get( oneConfiguredLocation ),
+								Collections.<Class<?>, Class<?>>emptyMap(),
 								cascades.contains( oneConfiguredLocation )
 						)
 				);
@@ -152,6 +155,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	protected Partitioner<ConstraintLocation, MetaConstraint<?>> byLocation() {
 		return new Partitioner<ConstraintLocation, MetaConstraint<?>>() {
+			@Override
 			public ConstraintLocation getPartition(MetaConstraint<?> constraint) {
 				return constraint.getLocation();
 			}

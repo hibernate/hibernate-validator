@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.raw;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -34,41 +35,50 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	private final ConfigurationSource source;
 	private final ConstraintLocation location;
 	private final Set<MetaConstraint<?>> constraints;
+	private final Map<Class<?>, Class<?>> groupConversions;
 	private final boolean isCascading;
 
-	public AbstractConstrainedElement(ConfigurationSource source, ConstrainedElementKind kind, ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	public AbstractConstrainedElement(ConfigurationSource source, ConstrainedElementKind kind, ConstraintLocation location, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions, boolean isCascading) {
 
 		this.kind = kind;
 		this.source = source;
 		this.location = location;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
+		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.isCascading = isCascading;
 	}
 
+	@Override
 	public ConstrainedElementKind getKind() {
 		return kind;
 	}
 
-	public ConfigurationSource getSource() {
-		return source;
-	}
-
+	@Override
 	public ConstraintLocation getLocation() {
 		return location;
 	}
 
+	@Override
 	public Iterator<MetaConstraint<?>> iterator() {
 		return constraints.iterator();
 	}
 
+	@Override
 	public Set<MetaConstraint<?>> getConstraints() {
 		return constraints;
 	}
 
+	@Override
+	public Map<Class<?>, Class<?>> getGroupConversions() {
+		return groupConversions;
+	}
+
+	@Override
 	public boolean isCascading() {
 		return isCascading;
 	}
 
+	@Override
 	public boolean isConstrained() {
 		return isCascading || !constraints.isEmpty();
 	}
