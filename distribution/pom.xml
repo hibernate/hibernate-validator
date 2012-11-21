@@ -83,6 +83,7 @@
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
                     <windowtitle>Hibernate Validator ${project.version}</windowtitle>
+                    <overview>${basedir}/../engine/src/main/java/org/hibernate/validator/overview.html</overview>
                     <groups>
                         <group>
                             <title>Validator Packages</title>
