@@ -40,6 +40,7 @@ import org.jboss.logging.LogMessage;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 import static org.jboss.logging.Logger.Level.INFO;
@@ -444,4 +445,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 123, value = "Unable to parse %s.")
 	ValidationException getUnableToResetXmlInputStreamException(String file, @Cause IOException e);
+
+	@Message(id = 124, value = "Found multiple group conversions for source group %s: %s.")
+	ConstraintDeclarationException getMultipleGroupConversionsForSameSourceException(Class<?> from, Set<Class<?>> tos);
+
+	@Message(id = 125, value = "Found group conversions for non-cascading element %s.")
+	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(ConstraintLocation location);
+
+	@Message(id = 126,
+			value = "No bean manager is available. In order to use InjectingConstraintValidatorFactory, the javax.validation.Validator must either be retrieved via dependency injection or a bean manager must be available via JNDI.")
+	IllegalStateException beanManagerIsNotAvailable();
 }
