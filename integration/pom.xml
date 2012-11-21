@@ -31,48 +31,19 @@
     <description>Hibernate Validator integration tests.</description>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jbossas.version>7.1.1.Final</jbossas.version>
-        <arquillian.version>1.0.0.CR7</arquillian.version>
+        <jbossTargetDir>${basedir}/target/jboss-as-${jbossas.version}</jbossTargetDir>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.arquillian</groupId>
-                <artifactId>arquillian-bom</artifactId>
-                <version>${arquillian.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.8.2</version>
-            </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.16</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.0-api</artifactId>
-                <version>1.0.1.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-arquillian-container-managed</artifactId>
-                <version>${jbossas.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -83,6 +54,16 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -97,7 +78,28 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-            <artifactId>shrinkwrap-descriptors-impl</artifactId>
+            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec</groupId>
+            <artifactId>jboss-javaee-6.0</artifactId>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-api-maven</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -154,6 +156,70 @@
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax.validation</groupId>
+                                    <artifactId>validation-api</artifactId>
+                                    <version>${bv.api.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <id>copy-modules</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                println "[INFO] ------------------------------------------------------------------------";
+                                println "[INFO] INTEGRATION BUILD INFO                                                  ";
+                                println "[INFO] ------------------------------------------------------------------------";
+                                println "[INFO] These tests will replace the default Bean Validation API module with a  ";
+                                println "[INFO] custom on based on Bean Validation 1.1.                                 ";
+                                println "[INFO] ------------------------------------------------------------------------";
+
+
+                                def toDir = new File(project.properties['jbossTargetDir'], 'modules/javax/validation')
+                                def fromDir = new File(project.basedir, 'src/as7config/modules/javax/validation')
+
+                                log.info('Deleting old Bean Validation 1.0 module from ' + fromDir )
+                                ant.delete(dir : toDir)
+
+                                log.info('Copying Bean Validation 1.1 module from ' + fromDir + ' to ' + toDir)
+                                ant.copy(todir: toDir, filtering: true) {
+                                    fileset(dir: fromDir)
+                                    filterset() {
+                                        filter(token:'BV-API-VERSION', value:project.properties['bv.api.version'])
+                                    }
+                                }
+
+                                def apiDependencyDir = new File(project.basedir, 'target/dependencies')
+                                def apiTargetDir = new File(project.properties['jbossTargetDir'], 'modules/javax/validation/api/main')
+                                log.info('Copying Bean Validation 1.1 jar from ' + apiDependencyDir + ' to ' + toDir)
+                                ant.copy( todir: apiTargetDir) {
+                                    fileset(dir: apiDependencyDir)
+                                }
+                            </source>
                         </configuration>
                     </execution>
                 </executions>

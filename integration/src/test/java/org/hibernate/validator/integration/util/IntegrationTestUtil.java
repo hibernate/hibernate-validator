@@ -90,6 +90,14 @@ public class IntegrationTestUtil {
 				.artifact( "log4j:log4j" )
 				.resolveAs( JavaArchive.class );
 	}
+
+	public static Collection<JavaArchive> bundleOptionalDependencies() {
+		return DependencyResolvers.use( MavenDependencyResolver.class )
+				.loadMetadataFromPom( "pom.xml" )
+				.artifact( "org.jsoup:jsoup" )
+				.artifact( "joda-time:joda-time" )
+				.resolveAs( JavaArchive.class );
+	}
 }
 
 
