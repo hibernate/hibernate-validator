@@ -46,7 +46,7 @@
             <id>gunnar.morling</id>
             <name>Gunnar Morling</name>
             <email>gunnar.morling@googlemail.com</email>
-            <organization>Individual</organization>
+            <organization>JBoss, a division of Red Hat</organization>
             <url>http://musingsofaprogrammingaddict.blogspot.com/</url>
         </developer>
         <developer>
@@ -103,7 +103,7 @@
             <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
-                <version>1.1.0.Alpha1</version>
+                <version>1.1.0.Beta1</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>
@@ -380,7 +380,7 @@
                         <processors>
                             <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                         </processors>
-                        <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.6 -target 1.6 -sourcepath ${project.build.directory}/generated-sources/jaxb -encoding UTF-8</compilerArguments>
+                        <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.6 -target 1.6 -sourcepath ${project.build.directory}/generated-sources/jaxb -encoding UTF-8</compilerArguments>
                     </configuration>
                     <executions>
                         <execution>

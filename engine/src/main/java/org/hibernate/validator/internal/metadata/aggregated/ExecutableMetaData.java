@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -401,15 +402,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	private ReturnValueDescriptor returnValueAsDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		ReturnValueDescriptor returnValueDescriptor = new ReturnValueDescriptorImpl(
-				getType(),
+		Type returnType = getType();
+
+		return returnType.equals( void.class ) ? null : new ReturnValueDescriptorImpl(
+				returnType,
 				asDescriptors( getConstraints() ),
 				isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);
-
-		return returnValueDescriptor;
 	}
 
 	@Override

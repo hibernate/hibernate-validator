@@ -36,6 +36,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository.Validat
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
 import static org.testng.Assert.assertEquals;
@@ -194,5 +195,80 @@ public class MethodDescriptorTest {
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterDescriptors();
 		assertNotNull( parameterConstraints );
 		assertEquals( parameterConstraints.size(), 0 );
+	}
+
+	@Test
+	public void testGetReturnValueDescriptorForVoidMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "zap", int.class );
+		assertThat( methodDescriptor.getReturnValueDescriptor() ).isNull();
+	}
+
+	@Test
+	public void testIsReturnValueConstrainedForConstrainedMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "baz" );
+		assertThat( methodDescriptor.isReturnValueConstrained() ).isTrue();
+	}
+
+	@Test
+	public void testIsReturnValueConstrainedForCascadedMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
+		assertThat( methodDescriptor.isReturnValueConstrained() ).isTrue();
+	}
+
+	@Test
+	public void testIsReturnValueConstrainedForParameterConstrainedMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class,
+				"createCustomer",
+				CharSequence.class,
+				String.class
+		);
+		assertThat( methodDescriptor.isReturnValueConstrained() ).isFalse();
+	}
+
+	@Test
+	public void testIsReturnValueConstrainedForVoidMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "zap", int.class );
+		assertThat( methodDescriptor.isReturnValueConstrained() ).isFalse();
+	}
+
+	@Test
+	public void testAreParametersConstrainedForParameterConstrainedMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class,
+				"createCustomer",
+				CharSequence.class,
+				String.class
+		);
+		assertThat( methodDescriptor.areParametersConstrained() ).isTrue();
+	}
+
+	@Test
+	public void testAreParametersConstrainedForParameterCascadedMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class,
+				"saveCustomer",
+				Customer.class
+		);
+		assertThat( methodDescriptor.areParametersConstrained() ).isTrue();
+	}
+
+	@Test
+	public void testAreParametersConstrainedForNonParameterConstrainedMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class,
+				"zip",
+				int.class
+		);
+		assertThat( methodDescriptor.areParametersConstrained() ).isFalse();
+	}
+
+	@Test
+	public void testAreParametersConstrainedForParameterlessMethod() {
+		MethodDescriptor methodDescriptor = getMethodDescriptor(
+				CustomerRepositoryExt.class,
+				"zip"
+		);
+		assertThat( methodDescriptor.areParametersConstrained() ).isFalse();
 	}
 }

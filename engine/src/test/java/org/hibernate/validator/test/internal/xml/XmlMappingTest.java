@@ -21,8 +21,8 @@ import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
-import javax.validation.ConfigurationSource;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
@@ -204,7 +204,8 @@ public class XmlMappingTest {
 			public void run() {
 				//given
 				Validator validator = ValidatorUtil.getValidator();
-				ConfigurationSource configurationSource = ValidatorUtil.getConfiguration().getConfigurationSource();
+				BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+						.getBootstrapConfiguration();
 
 				//when
 				MethodDescriptor methodDescriptor = validator.getConstraintsForClass( CustomerService.class )
@@ -212,7 +213,7 @@ public class XmlMappingTest {
 
 				//then
 				assertEquals(
-						configurationSource.getParameterNameProviderClassName(),
+						bootstrapConfiguration.getParameterNameProviderClassName(),
 						CustomParameterNameProvider.class.getName()
 				);
 
@@ -231,12 +232,13 @@ public class XmlMappingTest {
 			@Override
 			public void run() {
 				//given
-				ConfigurationSource configurationSource = ValidatorUtil.getConfiguration().getConfigurationSource();
+				BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+						.getBootstrapConfiguration();
 
 				//when
 				//then
 				assertEquals(
-						configurationSource.getProperties().get( "com.acme.validation.safetyChecking" ),
+						bootstrapConfiguration.getProperties().get( "com.acme.validation.safetyChecking" ),
 						"failOnError"
 				);
 			}
@@ -255,7 +257,7 @@ public class XmlMappingTest {
 
 			@Override
 			public void run() {
-				ValidatorUtil.getConfiguration().getConfigurationSource();
+				ValidatorUtil.getConfiguration().getBootstrapConfiguration();
 			}
 		}
 		);
@@ -272,7 +274,7 @@ public class XmlMappingTest {
 
 			@Override
 			public void run() {
-				ValidatorUtil.getConfiguration().getConfigurationSource();
+				ValidatorUtil.getConfiguration().getBootstrapConfiguration();
 			}
 		}
 		);

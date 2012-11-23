@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.validation.ConfigurationSource;
+import javax.validation.BootstrapConfiguration;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -64,11 +64,11 @@ public class ValidationXmlParser {
 	 *
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
-	public final ConfigurationSource parseValidationXml() {
+	public final BootstrapConfiguration parseValidationXml() {
 
 		InputStream inputStream = getInputStream();
 		if ( inputStream == null ) {
-			return new ValidationXmlConfigurationSource();
+			return new BootstrapConfigurationImpl();
 		}
 
 		try {
@@ -76,7 +76,7 @@ public class ValidationXmlParser {
 			Schema schema = getSchema( schemaVersion );
 			ValidationConfigType validationConfig = unmarshal( inputStream, schema );
 
-			return createConfigurationSource( validationConfig );
+			return createBoostrapConfiguration( validationConfig );
 		}
 		finally {
 			closeStream( inputStream );
@@ -131,7 +131,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private ConfigurationSource createConfigurationSource(ValidationConfigType config) {
+	private BootstrapConfiguration createBoostrapConfiguration(ValidationConfigType config) {
 		Map<String, String> properties = new HashMap<String, String>();
 		for ( PropertyType property : config.getProperty() ) {
 			if ( log.isDebugEnabled() ) {
@@ -144,7 +144,7 @@ public class ValidationXmlParser {
 			properties.put( property.getName(), property.getValue() );
 		}
 
-		return new ValidationXmlConfigurationSource(
+		return new BootstrapConfigurationImpl(
 				config.getDefaultProvider(),
 				config.getConstraintValidatorFactory(),
 				config.getMessageInterpolator(),

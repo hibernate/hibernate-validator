@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConfigurationSource;
+import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -79,7 +79,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
 	private Set<ConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
-	private ConfigurationSource configurationSource;
+	private BootstrapConfiguration bootstrapConfiguration;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -258,11 +258,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public ConfigurationSource getConfigurationSource() {
-		if ( configurationSource == null ) {
-			configurationSource = new ValidationXmlParser().parseValidationXml();
+	public BootstrapConfiguration getBootstrapConfiguration() {
+		if ( bootstrapConfiguration == null ) {
+			bootstrapConfiguration = new ValidationXmlParser().parseValidationXml();
 		}
-		return configurationSource;
+		return bootstrapConfiguration;
 	}
 
 	@Override
@@ -325,7 +325,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 		else {
-			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters( getConfigurationSource() );
+			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters( getBootstrapConfiguration() );
 			applyXmlSettings( xmlParameters );
 		}
 	}

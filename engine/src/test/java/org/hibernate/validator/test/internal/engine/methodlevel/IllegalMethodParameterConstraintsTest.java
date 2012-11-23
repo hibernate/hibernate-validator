@@ -45,7 +45,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
 
-		getValidator().validateParameters(
+		getValidator().forMethods().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -56,7 +56,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void atValidAddedInSubTypeCausesDeclarationException() {
 
-		getValidator().validateParameters(
+		getValidator().forMethods().validateParameters(
 				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -67,7 +67,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
 
-		getValidator().validateParameters(
+		getValidator().forMethods().validateParameters(
 				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -78,7 +78,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
 
-		getValidator().validateParameters(
+		getValidator().forMethods().validateParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -96,7 +96,7 @@ public class IllegalMethodParameterConstraintsTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 
 		//but method validation fails due to illegal parameter constraints being defined
-		getValidator().validateParameters(
+		getValidator().forMethods().validateParameters(
 				qux, QuxImpl.class.getDeclaredMethod( "qux", String.class ), new Object[] { }
 		);
 	}
