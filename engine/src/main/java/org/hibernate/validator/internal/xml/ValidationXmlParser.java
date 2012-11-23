@@ -76,7 +76,7 @@ public class ValidationXmlParser {
 			Schema schema = getSchema( schemaVersion );
 			ValidationConfigType validationConfig = unmarshal( inputStream, schema );
 
-			return createBoostrapConfiguration( validationConfig );
+			return createBootstrapConfiguration( validationConfig );
 		}
 		finally {
 			closeStream( inputStream );
@@ -131,7 +131,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private BootstrapConfiguration createBoostrapConfiguration(ValidationConfigType config) {
+	private BootstrapConfiguration createBootstrapConfiguration(ValidationConfigType config) {
 		Map<String, String> properties = new HashMap<String, String>();
 		for ( PropertyType property : config.getProperty() ) {
 			if ( log.isDebugEnabled() ) {
