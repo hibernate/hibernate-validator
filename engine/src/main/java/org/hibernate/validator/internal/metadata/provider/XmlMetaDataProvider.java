@@ -30,7 +30,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -115,7 +115,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 				propertyMetaData.add(
 						new ConstrainedExecutable(
 								ConfigurationSource.XML,
-								new MethodConstraintLocation( (Method) oneConfiguredLocation.getMember() ),
+								new ExecutableConstraintLocation( (Method) oneConfiguredLocation.getMember() ),
 								constraintsByLocation.get( oneConfiguredLocation ),
 								cascades.contains( oneConfiguredLocation )
 						)

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -43,7 +43,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
 	 */
-	public ConstrainedParameter(ConfigurationSource source, MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions, boolean isCascading) {
+	public ConstrainedParameter(ConfigurationSource source, ExecutableConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions, boolean isCascading) {
 
 		super(
 				source,
@@ -58,8 +58,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	}
 
 	@Override
-	public MethodConstraintLocation getLocation() {
-		return (MethodConstraintLocation) super.getLocation();
+	public ExecutableConstraintLocation getLocation() {
+		return (ExecutableConstraintLocation) super.getLocation();
 	}
 
 	public String getParameterName() {

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -60,7 +60,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			MethodConstraintLocation location,
+			ExecutableConstraintLocation location,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
 
@@ -92,7 +92,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			MethodConstraintLocation location,
+			ExecutableConstraintLocation location,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
@@ -139,8 +139,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	}
 
 	@Override
-	public MethodConstraintLocation getLocation() {
-		return (MethodConstraintLocation) super.getLocation();
+	public ExecutableConstraintLocation getLocation() {
+		return (ExecutableConstraintLocation) super.getLocation();
 	}
 
 	/**

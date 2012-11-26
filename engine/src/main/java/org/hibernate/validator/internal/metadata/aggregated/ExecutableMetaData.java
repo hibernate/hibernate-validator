@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -131,7 +131,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 */
 		private final ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
-		private final MethodConstraintLocation location;
+		private final ExecutableConstraintLocation location;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private boolean isConstrained = false;
 

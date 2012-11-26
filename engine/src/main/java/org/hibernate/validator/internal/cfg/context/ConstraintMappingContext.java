@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -38,9 +38,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ConstraintMappingContext {
 	private final Map<Class<?>, Set<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintConfig;
-	private final Map<Class<?>, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> methodConstraintConfig;
+	private final Map<Class<?>, Set<ConfiguredConstraint<?, ExecutableConstraintLocation>>> methodConstraintConfig;
 	private final Map<Class<?>, Set<BeanConstraintLocation>> cascadeConfig;
-	private final Map<Class<?>, Set<MethodConstraintLocation>> methodCascadeConfig;
+	private final Map<Class<?>, Set<ExecutableConstraintLocation>> methodCascadeConfig;
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
@@ -68,7 +68,7 @@ public class ConstraintMappingContext {
 		return constraintConfig;
 	}
 
-	public Map<Class<?>, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> getMethodConstraintConfig() {
+	public Map<Class<?>, Set<ConfiguredConstraint<?, ExecutableConstraintLocation>>> getMethodConstraintConfig() {
 		return methodConstraintConfig;
 	}
 
@@ -76,7 +76,7 @@ public class ConstraintMappingContext {
 		return cascadeConfig;
 	}
 
-	public final Map<Class<?>, Set<MethodConstraintLocation>> getMethodCascadeConfig() {
+	public final Map<Class<?>, Set<ExecutableConstraintLocation>> getMethodCascadeConfig() {
 		return methodCascadeConfig;
 	}
 
@@ -133,14 +133,14 @@ public class ConstraintMappingContext {
 		}
 	}
 
-	public final void addMethodCascadeConfig(MethodConstraintLocation cascade) {
+	public final void addMethodCascadeConfig(ExecutableConstraintLocation cascade) {
 		Class<?> beanClass = cascade.getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( methodCascadeConfig.containsKey( beanClass ) ) {
 			methodCascadeConfig.get( beanClass ).add( cascade );
 		}
 		else {
-			Set<MethodConstraintLocation> cascadeList = newHashSet();
+			Set<ExecutableConstraintLocation> cascadeList = newHashSet();
 			cascadeList.add( cascade );
 			methodCascadeConfig.put( beanClass, cascadeList );
 		}
@@ -169,14 +169,14 @@ public class ConstraintMappingContext {
 		}
 	}
 
-	public final void addMethodConstraintConfig(ConfiguredConstraint<?, MethodConstraintLocation> constraint) {
+	public final void addMethodConstraintConfig(ConfiguredConstraint<?, ExecutableConstraintLocation> constraint) {
 		Class<?> beanClass = constraint.getLocation().getBeanClass();
 		configuredClasses.add( beanClass );
 		if ( methodConstraintConfig.containsKey( beanClass ) ) {
 			methodConstraintConfig.get( beanClass ).add( constraint );
 		}
 		else {
-			Set<ConfiguredConstraint<?, MethodConstraintLocation>> definitionList = newHashSet();
+			Set<ConfiguredConstraint<?, ExecutableConstraintLocation>> definitionList = newHashSet();
 			definitionList.add( constraint );
 			methodConstraintConfig.put( beanClass, definitionList );
 		}

@@ -31,35 +31,37 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  *
  * @author Gunnar Morling
  */
-public class MethodConstraintLocation implements ConstraintLocation {
+public class ExecutableConstraintLocation implements ConstraintLocation {
 	private final ExecutableElement executableElement;
 	private final Integer parameterIndex;
 
-	public MethodConstraintLocation(Method method) {
+	public ExecutableConstraintLocation(Method method) {
 		this( ExecutableElement.forMethod( method ), null );
 	}
 
 	/**
-	 * Creates a new {@link MethodConstraintLocation}.
+	 * Creates a new {@link ExecutableConstraintLocation}.
 	 *
 	 * @param method The method of the location to be created.
 	 * @param parameterIndex The parameter index of the location to be created.
 	 */
-	public MethodConstraintLocation(Method method, Integer parameterIndex) {
+	public ExecutableConstraintLocation(Method method, Integer parameterIndex) {
 		this( ExecutableElement.forMethod( method ), parameterIndex );
 	}
 
-	public MethodConstraintLocation(ExecutableElement executableElement, Integer parameterIndex) {
+	public ExecutableConstraintLocation(ExecutableElement executableElement, Integer parameterIndex) {
 		Contracts.assertValueNotNull( executableElement, "executableElement" );
 
 		this.executableElement = executableElement;
 		this.parameterIndex = parameterIndex;
 	}
 
+	@Override
 	public Class<?> getBeanClass() {
 		return executableElement.getMember().getDeclaringClass();
 	}
 
+	@Override
 	public Type typeOfAnnotatedElement() {
 		Type t;
 
@@ -77,6 +79,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		return t;
 	}
 
+	@Override
 	public Member getMember() {
 		return executableElement.getMember();
 	}
@@ -85,6 +88,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		return executableElement;
 	}
 
+	@Override
 	public ElementType getElementType() {
 		return parameterIndex != null ? ElementType.PARAMETER : executableElement.getElementType();
 	}
@@ -132,7 +136,7 @@ public class MethodConstraintLocation implements ConstraintLocation {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		MethodConstraintLocation other = (MethodConstraintLocation) obj;
+		ExecutableConstraintLocation other = (ExecutableConstraintLocation) obj;
 		if ( executableElement == null ) {
 			if ( other.executableElement != null ) {
 				return false;
