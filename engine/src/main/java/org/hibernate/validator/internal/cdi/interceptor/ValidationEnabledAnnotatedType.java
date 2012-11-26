@@ -18,13 +18,14 @@ package org.hibernate.validator.internal.cdi.interceptor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.Set;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedField;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
+
+import org.hibernate.validator.internal.util.CollectionHelper;
 
 /**
  * @author Hardy Ferentschik
@@ -36,8 +37,8 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 
 	public ValidationEnabledAnnotatedType(AnnotatedType<T> type, Set<AnnotatedCallable<T>> constrainedCallables) {
 		this.wrappedType = type;
-		this.wrappedMethods = new HashSet<AnnotatedMethod<? super T>>();
-		this.wrappedConstructors = new HashSet<AnnotatedConstructor<T>>();
+		this.wrappedMethods = CollectionHelper.newHashSet();
+		this.wrappedConstructors = CollectionHelper.newHashSet();
 		buildWrappedCallable( constrainedCallables );
 	}
 

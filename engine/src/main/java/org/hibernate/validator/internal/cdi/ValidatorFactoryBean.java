@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.cdi;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
@@ -37,6 +36,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -45,10 +45,12 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 	private final BeanManager beanManager;
 	private final Set<Annotation> qualifiers;
+	private final Set<DestructibleBeanInstance<?>> destructibleResources;
 
 	public ValidatorFactoryBean(BeanManager beanManager, Set<Annotation> qualifiers) {
 		this.beanManager = beanManager;
-		this.qualifiers = new HashSet<Annotation>();
+		this.destructibleResources = CollectionHelper.newHashSet();
+		this.qualifiers = CollectionHelper.newHashSet();
 		this.qualifiers.addAll( qualifiers );
 		this.qualifiers.add(
 				new AnnotationLiteral<Any>() {
@@ -88,7 +90,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 
 	@Override
 	public Set<Type> getTypes() {
-		Set<Type> types = new HashSet<Type>();
+		Set<Type> types = CollectionHelper.newHashSet();
 
 		types.add( ValidatorFactory.class );
 		types.add( Object.class );
@@ -120,8 +122,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 	}
 
 	@Override
-	// TODO - verify that this is called (HF)
 	public void destroy(ValidatorFactory instance, CreationalContext<ValidatorFactory> ctx) {
+		for ( DestructibleBeanInstance<?> resource : destructibleResources ) {
+			resource.destroy();
+		}
 		instance.close();
 	}
 
@@ -182,7 +186,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 
 		if ( constraintValidatorFactoryFqcn == null ) {
 			// use default
-			return new InjectingConstraintValidatorFactory( beanManager );
+			return createInstance( InjectingConstraintValidatorFactory.class );
 		}
 
 		@SuppressWarnings("unchecked")
@@ -196,33 +200,9 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 	}
 
 	private <T> T createInstance(Class<T> type) {
-		T instance = null;
-		Set<Bean<?>> beans = beanManager.getBeans( type );
-
-		// if the specified type is managed create it
-		if ( !beans.isEmpty() ) {
-			@SuppressWarnings("unchecked")
-			Bean<T> bean = (Bean<T>) beanManager.resolve(
-					beans
-			);
-			if ( bean != null ) {
-				CreationalContext<T> creationalContext = beanManager.createCreationalContext(
-						bean
-				);
-				instance = bean.create( creationalContext );
-			}
-
-		}
-		// not managed create a new instance
-		else {
-			instance = (T) ReflectionHelper.newInstance(
-					type,
-					type.getName()
-
-			);
-		}
-
-		return instance;
+		DestructibleBeanInstance<T> destructibleInstance = new DestructibleBeanInstance<T>( beanManager, type );
+		destructibleResources.add( destructibleInstance );
+		return destructibleInstance.getInstance();
 	}
 }
 

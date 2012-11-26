@@ -32,6 +32,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.internal.util.CollectionHelper;
 
 /**
  * @author Hardy Ferentschik
@@ -42,7 +43,7 @@ public class ValidatorBean implements Bean<Validator> {
 
 	public ValidatorBean(BeanManager beanManager, Set<Annotation> qualifiers) {
 		this.beanManager = beanManager;
-		this.qualifiers = new HashSet<Annotation>();
+		this.qualifiers = CollectionHelper.newHashSet();
 		this.qualifiers.addAll( qualifiers );
 		this.qualifiers.add(
 				new AnnotationLiteral<Any>() {

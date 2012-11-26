@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -19,10 +19,8 @@ package org.hibernate.validator.internal.cdi;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.InjectionTarget;
+import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
@@ -42,14 +40,16 @@ public class InjectingConstraintValidatorFactory implements ConstraintValidatorF
 
 	private final BeanManager beanManager;
 
+	@Inject
 	public InjectingConstraintValidatorFactory(BeanManager beanManager) {
 		Contracts.assertNotNull( beanManager, "The BeanManager cannot be null" );
 		this.beanManager = beanManager;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		DestructibleBeanInstance<T> destructibleBeanInstance = new DestructibleBeanInstance<T>( key );
+		DestructibleBeanInstance<T> destructibleBeanInstance = new DestructibleBeanInstance<T>( beanManager, key );
 		constraintValidatorMap.put( destructibleBeanInstance.getInstance(), destructibleBeanInstance );
 		return destructibleBeanInstance.getInstance();
 	}
@@ -58,40 +58,6 @@ public class InjectingConstraintValidatorFactory implements ConstraintValidatorF
 	public void releaseInstance(ConstraintValidator<?, ?> instance) {
 		DestructibleBeanInstance<?> destructibleBeanInstance = constraintValidatorMap.remove( instance );
 		destructibleBeanInstance.destroy();
-	}
-
-	public class DestructibleBeanInstance<T> {
-		private final T instance;
-		private final InjectionTarget<T> injectionTarget;
-
-		public DestructibleBeanInstance(Class<T> key) {
-			this.injectionTarget = createInjectionTarget( key );
-			this.instance = createAndInjectBeans( injectionTarget );
-		}
-
-		public T getInstance() {
-			return instance;
-		}
-
-		public void destroy() {
-			injectionTarget.preDestroy( instance );
-			injectionTarget.dispose( instance );
-		}
-
-		private <T> InjectionTarget<T> createInjectionTarget(Class<T> type) {
-			AnnotatedType<T> annotatedType = beanManager.createAnnotatedType( type );
-			return beanManager.createInjectionTarget( annotatedType );
-		}
-
-		private <T> T createAndInjectBeans(InjectionTarget<T> injectionTarget) {
-			CreationalContext<T> creationalContext = beanManager.createCreationalContext( null );
-
-			T instance = injectionTarget.produce( creationalContext );
-			injectionTarget.inject( instance, creationalContext );
-			injectionTarget.postConstruct( instance );
-
-			return instance;
-		}
 	}
 }
 

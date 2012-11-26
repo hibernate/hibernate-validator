@@ -187,6 +187,13 @@
                 <artifactId>jboss-javaee-6.0</artifactId>
                 <version>1.0.0.Final</version>
                 <type>pom</type>
+                <exclusions>
+                    <!-- STAX is part of Java 1.6 -->
+                    <exclusion>
+                        <groupId>stax</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>

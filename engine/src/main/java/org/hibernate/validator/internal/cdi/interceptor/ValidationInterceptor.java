@@ -75,7 +75,7 @@ public class ValidationInterceptor implements Serializable {
 				ctx.getParameters()
 		);
 
-		// TODO - need to figure out why I cannot cast here. Works in the IDE, but on the command line the build fails (HF)
+		// need to create a new set of constraint violations (instead of casting). See also BVAL-198
 		Set<ConstraintViolation<?>> violationsNew = new HashSet<ConstraintViolation<?>>();
 		violationsNew.addAll( violations );
 
