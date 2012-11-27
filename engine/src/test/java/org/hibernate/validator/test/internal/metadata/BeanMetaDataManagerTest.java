@@ -49,8 +49,8 @@ public class BeanMetaDataManagerTest {
 		int totalCreatedMetaDataInstances = 0;
 		int cachedBeanMetaDataInstances = 0;
 		for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
-			Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
-			BeanMetaData meta = metaDataManager.getBeanMetaData( c );
+			Class<?> c = new CustomClassLoader().loadClass( Fubar.class.getName() );
+			BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
 			assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
 			lastIterationsBean = meta.getBeanClass();
 			totalCreatedMetaDataInstances++;
@@ -75,15 +75,20 @@ public class BeanMetaDataManagerTest {
 	}
 
 	public class CustomClassLoader extends ClassLoader {
-		private final String className;
 
-		public CustomClassLoader(String className) {
+		/**
+		 * Classes from this name space will be loaded by this class loader, all
+		 * others will be loaded by the default loader.
+		 */
+		private final static String PACKAGE_PREFIX = "org.hibernate.validator.test";
+
+		public CustomClassLoader() {
 			super( CustomClassLoader.class.getClassLoader() );
-			this.className = className;
 		}
 
+		@Override
 		public Class<?> loadClass(String className) throws ClassNotFoundException {
-			if ( this.className.equals( className ) ) {
+			if ( className.startsWith( PACKAGE_PREFIX ) ) {
 				return myLoadClass( className, true );
 			}
 			else {
@@ -132,5 +137,3 @@ public class BeanMetaDataManagerTest {
 		}
 	}
 }
-
-

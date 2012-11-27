@@ -27,9 +27,9 @@ import javax.validation.GroupDefinitionException;
  */
 public interface ValidationOrder {
 
-	public Iterator<Group> getGroupIterator();
+	Iterator<Group> getGroupIterator();
 
-	public Iterator<Sequence> getSequenceIterator();
+	Iterator<Sequence> getSequenceIterator();
 
 	/**
 	 * Asserts that the default group sequence of the validated bean can be expanded into the sequences which needs to
@@ -40,6 +40,6 @@ public interface ValidationOrder {
 	 * @throws GroupDefinitionException in case {@code defaultGroupSequence} cannot be expanded into one of the group sequences
 	 * which need to be validated
 	 */
-	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence)
+	void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence)
 			throws GroupDefinitionException;
 }

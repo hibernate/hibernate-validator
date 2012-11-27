@@ -455,4 +455,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 126,
 			value = "No bean manager is available. In order to use InjectingConstraintValidatorFactory, the javax.validation.Validator must either be retrieved via dependency injection or a bean manager must be available via JNDI.")
 	IllegalStateException beanManagerIsNotAvailable();
+
+	@Message(id = 127, value = "Found group conversion using a group sequence as source: %s.")
+	ConstraintDeclarationException getGroupConversionForSequenceException(Class<?> from);
+
+	@Message(id = 128,
+			value = "Annotation type %s is no constraint annotation. It needs to be annotated with @Constraint or @CrossParameterConstraint.")
+	ConstraintDefinitionException getAnnotationIsNoConstraintTypeException(Class<? extends Annotation> annotationType);
 }

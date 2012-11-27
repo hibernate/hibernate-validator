@@ -16,17 +16,14 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -37,9 +34,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents the constraint related meta data for a JavaBeans property.
@@ -56,14 +50,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class PropertyMetaData extends AbstractConstraintMetaData {
-
-	/**
-	 * Access strategy when retrieving the value of this property.
-	 */
-	public enum ValueAccessStrategy {
-		FIELD, GETTER;
-	}
+public class PropertyMetaData extends AbstractConstraintMetaData implements Cascadable {
 
 	/**
 	 * The member marked as cascaded (either field or getter). Used to retrieve
@@ -71,11 +58,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 	 */
 	private final Member cascadingMember;
 
-	private ValueAccessStrategy cascadingValueAccessStrategy;
+	private final ElementType elementType;
+
+	private final GroupConverter groupConverter;
 
 	private PropertyMetaData(String propertyName,
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
+							 Map<Class<?>, Class<?>> groupConversions,
 							 Member cascadingMember) {
 		super(
 				propertyName,
@@ -86,46 +76,43 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				cascadingMember != null || !constraints.isEmpty()
 		);
 
+		this.groupConverter = new GroupConverter( groupConversions );
+
 		if ( cascadingMember != null ) {
 			this.cascadingMember = cascadingMember;
-			this.cascadingValueAccessStrategy = cascadingMember instanceof Field ? ValueAccessStrategy.FIELD : ValueAccessStrategy.GETTER;
+			this.elementType = cascadingMember instanceof Field ? ElementType.FIELD : ElementType.METHOD;
 		}
 		else {
 			this.cascadingMember = null;
-			this.cascadingValueAccessStrategy = null;
+			this.elementType = ElementType.TYPE;
 		}
 	}
 
 	/**
-	 * Retrieves the value of this property from the given object in case this
-	 * property.
+	 * Retrieves the value of this property from the given object.
 	 *
-	 * @param o
-	 *            The object to retrieve the value from.
-	 * @param accessStrategy
-	 *            The strategy to use for retrieving the value.
+	 * @param o The object to retrieve the value from.
+	 * @param accessStrategy The strategy to use for retrieving the value.
 	 *
 	 * @return This property's value.
 	 */
-	public Object getValue(Object o, ValueAccessStrategy accessStrategy) {
-
-		if ( accessStrategy == ValueAccessStrategy.FIELD ) {
-			return ReflectionHelper.getValue( (Field) cascadingMember, o );
-		}
-		else if ( accessStrategy == ValueAccessStrategy.GETTER ) {
-			return ReflectionHelper.getValue( (Method) cascadingMember, o );
-		}
-		else {
-			return null;
-		}
+	@Override
+	public Object getValue(Object parent) {
+		return ReflectionHelper.getValue( cascadingMember, parent );
 	}
 
-	public ValueAccessStrategy getCascadedValueAccessStrategy() {
-		return cascadingValueAccessStrategy;
+	@Override
+	public ElementType getElementType() {
+		return elementType;
 	}
 
 	public Class<?> getRawType() {
 		return ReflectionHelper.getType( cascadingMember );
+	}
+
+	@Override
+	public Class<?> convertGroup(Class<?> from) {
+		return groupConverter.convertGroup( from );
 	}
 
 	@Override
@@ -177,9 +164,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Class<?> beanClass;
 		private final String propertyName;
 		private final Type propertyType;
-		private final Set<MetaConstraint<?>> constraints = newHashSet();
 		private Member cascadingMember;
-
 
 		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
@@ -227,7 +212,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
-			constraints.addAll( constrainedElement.getConstraints() );
+
+			super.add( constrainedElement );
 
 			if ( constrainedElement.isCascading() && cascadingMember == null ) {
 				cascadingMember = constrainedElement.getLocation().getMember();
@@ -239,7 +225,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			return new PropertyMetaData(
 					propertyName,
 					propertyType,
-					adaptOriginsAndImplicitGroups( beanClass, constraints ),
+					adaptOriginsAndImplicitGroups( beanClass, getConstraints() ),
+					getGroupConversions(),
 					cascadingMember
 			);
 		}

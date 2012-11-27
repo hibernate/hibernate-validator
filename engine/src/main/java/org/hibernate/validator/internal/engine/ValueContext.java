@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.aggregated.Validatable;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -67,6 +68,8 @@ public class ValueContext<T, V> {
 	 */
 	private V currentValue;
 
+	private final Validatable currentValidatable;
+
 	/**
 	 * The {@code ElementType} the constraint was defined on
 	 */
@@ -77,38 +80,21 @@ public class ValueContext<T, V> {
 	 */
 	private Type typeOfAnnotatedElement;
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath) {
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) value.getClass();
-		return new ValueContext<T, V>( value, rootBeanClass, propertyPath );
+		return new ValueContext<T, V>( value, rootBeanClass, validatable, propertyPath );
 	}
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, PathImpl propertyPath, int parameterIndex, String parameterName) {
-		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = (Class<T>) value.getClass();
-		return new ValueContext<T, V>( value, rootBeanClass, propertyPath, parameterIndex, parameterName );
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type, Validatable validatable, PathImpl propertyPath) {
+		return new ValueContext<T, V>( null, type, validatable, propertyPath );
 	}
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Class<T> rootBeanClass, PathImpl propertyPath, int parameterIndex, String parameterName) {
-		return new ValueContext<T, V>( value, rootBeanClass, propertyPath, parameterIndex, parameterName );
-	}
-
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type, PathImpl propertyPath) {
-		return new ValueContext<T, V>( null, type, propertyPath );
-	}
-
-	protected ValueContext(T currentBean, Class<T> currentBeanType, PathImpl propertyPath) {
+	protected ValueContext(T currentBean, Class<T> currentBeanType, Validatable validatable, PathImpl propertyPath) {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
+		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
-	}
-
-	private ValueContext(T currentBean, Class<T> currentBeanType, PathImpl propertyPath, int parameterIndex, String parameterName) {
-		this.currentBean = currentBean;
-		this.currentBeanType = currentBeanType;
-		this.propertyPath = propertyPath;
-		this.parameterIndex = parameterIndex;
-		this.parameterName = parameterName;
 	}
 
 	public final PathImpl getPropertyPath() {
@@ -127,11 +113,15 @@ public class ValueContext<T, V> {
 		return currentBeanType;
 	}
 
+	public Validatable getCurrentValidatable() {
+		return currentValidatable;
+	}
+
 	public Integer getParameterIndex() {
 		return parameterIndex;
 	}
 
-	public void setParameterIndex(int parameterIndex) {
+	public void setParameterIndex(Integer parameterIndex) {
 		this.parameterIndex = parameterIndex;
 	}
 

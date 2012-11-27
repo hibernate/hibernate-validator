@@ -45,10 +45,11 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.SingleThreadCachedTraversableResolver;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.Cascadable;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData.ValueAccessStrategy;
+import org.hibernate.validator.internal.metadata.aggregated.Validatable;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
@@ -147,7 +148,11 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				failFast
 		);
 
-		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext( object, PathImpl.createRootPath() );
+		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext(
+				object,
+				beanMetaDataManager.getBeanMetaData( object.getClass() ),
+				PathImpl.createRootPath()
+		);
 
 		return validateInContext( valueContext, validationContext, validationOrder );
 	}
@@ -457,6 +462,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	private <T, U, V> boolean validateConstraint(ValidationContext<T, ?> validationContext,
 												 ValueContext<U, V> valueContext,
 												 MetaConstraint<?> metaConstraint) {
+
 		boolean validationSuccessful = true;
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
@@ -484,17 +490,25 @@ public class ValidatorImpl implements Validator, MethodValidator {
 	 * @param valueContext Collected information for single validation
 	 */
 	private <T, U, V> void validateCascadedConstraints(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
-		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
-		Set<PropertyMetaData> cascadedProperties = beanMetaData.getCascadedProperties();
-		PathImpl currentPath = valueContext.getPropertyPath();
-		for ( PropertyMetaData cascadedProperty : cascadedProperties ) {
-			valueContext.appendNode( cascadedProperty.getName() );
+		Validatable validatable = valueContext.getCurrentValidatable();
+		PathImpl originalPath = valueContext.getPropertyPath();
+		Class<?> originalGroup = valueContext.getCurrentGroup();
+		Integer originalParameterIndex = valueContext.getParameterIndex();
 
-			ElementType elementType = cascadedProperty.getCascadedValueAccessStrategy() == ValueAccessStrategy.FIELD ? ElementType.FIELD : ElementType.METHOD;
+		for ( Cascadable oneCascadable : validatable.getCascadables() ) {
+
+			valueContext.appendNode( oneCascadable.getName() );
+			valueContext.setCurrentGroup( oneCascadable.convertGroup( originalGroup ) );
+
+			//That's not so elegant. Will be not required when we collect all cascadables on the path in the context.
+			if ( oneCascadable instanceof ParameterMetaData ) {
+				valueContext.setParameterIndex( ( (ParameterMetaData) oneCascadable ).getIndex() );
+			}
+
+			ElementType elementType = oneCascadable.getElementType();
 			if ( isCascadeRequired( validationContext, valueContext, elementType ) ) {
-				Object value = cascadedProperty.getValue(
-						valueContext.getCurrentBean(),
-						cascadedProperty.getCascadedValueAccessStrategy()
+				Object value = oneCascadable.getValue(
+						valueContext.getCurrentBean()
 				);
 				if ( value != null ) {
 					Type type = value.getClass();
@@ -512,33 +526,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				}
 			}
 			// reset the path
-			valueContext.setPropertyPath( currentPath );
+			valueContext.setPropertyPath( originalPath );
+			valueContext.setCurrentGroup( originalGroup );
+			valueContext.setParameterIndex( originalParameterIndex );
 		}
-	}
-
-	/**
-	 * Validates the cascading parameter or return value specified with the
-	 * given value context. Any further cascading references are followed if
-	 * applicable.
-	 *
-	 * @param validationContext The global context for the current validateParameter(s) or
-	 * validateReturnValue() call.
-	 * @param valueContext The local context for validating the given parameter/return
-	 * value.
-	 */
-	private <T, U, V> void validateCascadedMethodConstraints(MethodValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
-
-		Object value = valueContext.getCurrentBean();
-		Type type = valueContext.getCurrentBeanType();
-		Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
-		boolean isIndexable = isIndexable( type );
-
-		validateCascadedConstraint(
-				validationContext,
-				iter,
-				isIndexable,
-				valueContext
-		);
 	}
 
 	/**
@@ -621,11 +612,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 				ValueContext<?, T> newValueContext;
 				if ( value != null ) {
-					newValueContext = ValueContext.getLocalExecutionContext( value, valueContext.getPropertyPath() );
+					newValueContext = ValueContext.getLocalExecutionContext(
+							value,
+							beanMetaDataManager.getBeanMetaData( value.getClass() ),
+							valueContext.getPropertyPath()
+					);
 				}
 				else {
 					newValueContext = ValueContext.getLocalExecutionContext(
-							valueContext.getCurrentBeanType(), valueContext.getPropertyPath()
+							valueContext.getCurrentBeanType(),
+							beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ),
+							valueContext.getPropertyPath()
 					);
 				}
 
@@ -943,13 +940,15 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 			int numberOfViolationsOfCurrentGroup = 0;
 
-			// 1. validate cross-parameter constraints
-			ValueContext<T, Object> crossParameterValueContext = getCrossParameterValueContext(
-					object, parameterValues, executable, oneGroup
+			ValueContext<T, Object> valueContext = getExecutableValueContext(
+					object,
+					executable, oneGroup
 			);
+			valueContext.setCurrentValidatedValue( parameterValues );
 
+			// 1. validate cross-parameter constraints
 			numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
-					validationContext, crossParameterValueContext, methodMetaData.getCrossParameterConstraints()
+					validationContext, valueContext, methodMetaData.getCrossParameterConstraints()
 			);
 			if ( shouldFailFast( validationContext ) ) {
 				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
@@ -957,13 +956,13 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 			// 2. validate parameter constraints
 			for ( int i = 0; i < parameterValues.length; i++ ) {
+				PathImpl originalPath = valueContext.getPropertyPath();
 				Object value = parameterValues[i];
 				String parameterName = methodMetaData.getParameterMetaData( i ).getName();
 
-				ValueContext<T, Object> valueContext = getParameterValueContext(
-						object,
-						executable, oneGroup, i, value, parameterName
-				);
+				valueContext.appendNode( parameterName );
+				valueContext.setParameterIndex( i );
+				valueContext.setCurrentValidatedValue( value );
 
 				numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
 						validationContext, valueContext, methodMetaData.getParameterMetaData( i )
@@ -971,6 +970,22 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				if ( shouldFailFast( validationContext ) ) {
 					return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 				}
+
+				valueContext.setPropertyPath( originalPath );
+			}
+
+			// 3. validate cascaded parameter if required
+			ValueContext<Object[], ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
+					parameterValues,
+					methodMetaData.getValidatableParameters(),
+					PathImpl.createPathForExecutable( executable )
+			);
+			cascadingValueContext.setCurrentGroup( oneGroup );
+
+			//TODO GM: consider violations from cascaded validation
+			validateCascadedConstraints( validationContext, cascadingValueContext );
+			if ( shouldFailFast( validationContext ) ) {
+				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 			}
 
 			//stop processing after first group with errors occurred
@@ -979,73 +994,27 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			}
 		}
 
-		// 3. validate cascaded parameter if required
-		for ( int i = 0; i < parameterValues.length; i++ ) {
-
-			Object value = parameterValues[i];
-			ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( i );
-			String parameterName = parameterMetaData.getName();
-
-			if ( parameterMetaData.isCascading() && value != null ) {
-
-				ValueContext<Object, ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
-						value, PathImpl.createPathForParameter( executable, parameterName ), i, parameterName
-				);
-				cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
-
-				//TODO GM: consider violations from cascaded validation
-				validateCascadedMethodConstraints( validationContext, cascadingValueContext );
-				if ( shouldFailFast( validationContext ) ) {
-					break;
-				}
-			}
-		}
-
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <T> ValueContext<T, Object> getParameterValueContext(T object,
-																 ExecutableElement executable, Class<?> oneGroup, int i,
-																 Object value, String parameterName) {
-		// validate constraints at parameter itself
+	private <T> ValueContext<T, Object> getExecutableValueContext(T object, ExecutableElement executable, Class<?> oneGroup) {
 		ValueContext<T, Object> valueContext;
 
 		if ( object != null ) {
-			valueContext = ValueContext.getLocalExecutionContext(
-					object, PathImpl.createPathForParameter( executable, parameterName ), i, parameterName
-			);
-		}
-		else {
 			valueContext = ValueContext.getLocalExecutionContext(
 					object,
-					(Class<T>) executable.getMember().getDeclaringClass(),
-					PathImpl.createPathForParameter( executable, parameterName ),
-					i,
-					parameterName
-			);
-		}
-		valueContext.setCurrentValidatedValue( value );
-		valueContext.setCurrentGroup( oneGroup );
-		return valueContext;
-	}
-
-	private <T> ValueContext<T, Object> getCrossParameterValueContext(T object, Object[] parameterValues, ExecutableElement executable, Class<?> oneGroup) {
-		ValueContext<T, Object> valueContext;
-
-		//TODO HV-632: What path to take here?
-		if ( object != null ) {
-			valueContext = ValueContext.getLocalExecutionContext(
-					object, PathImpl.createPathForMethodReturnValue( executable )
+					null,
+					PathImpl.createPathForExecutable( executable )
 			);
 		}
 		else {
 			valueContext = ValueContext.getLocalExecutionContext(
 					(Class<T>) executable.getMember().getDeclaringClass(),
-					PathImpl.createPathForMethodReturnValue( executable )
+					null,
+					PathImpl.createPathForExecutable( executable )
 			);
 		}
 
-		valueContext.setCurrentValidatedValue( parameterValues );
 		valueContext.setCurrentGroup( oneGroup );
 
 		return valueContext;
@@ -1095,7 +1064,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		ExecutableElement executable = validationContext.getExecutable();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( executable );
+		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( executable );
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
@@ -1117,26 +1086,14 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			int numberOfViolationsOfCurrentGroup = 0;
 
 			// validate constraints at return value itself
-			ValueContext<T, V> valueContext;
-			if ( bean != null ) {
-				valueContext = ValueContext.getLocalExecutionContext(
-						bean, PathImpl.createPathForMethodReturnValue( executable )
-				);
-			}
-			else {
-				//constructor validation
-				valueContext = ValueContext.getLocalExecutionContext(
-						(Class<T>) executable.getMember().getDeclaringClass(),
-						PathImpl.createPathForMethodReturnValue( executable )
-				);
-			}
+			ValueContext<T, Object> valueContext = getExecutableValueContext( bean, executable, oneGroup );
 
 			valueContext.setCurrentValidatedValue( value );
-			valueContext.setCurrentGroup( oneGroup );
+			valueContext.appendNode( PathImpl.RETURN_VALUE_NODE_NAME );
 
 			numberOfViolationsOfCurrentGroup +=
 					validateConstraintsForGroup(
-							validationContext, valueContext, methodMetaData
+							validationContext, valueContext, executableMetaData
 					);
 			if ( shouldFailFast( validationContext ) ) {
 				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
@@ -1146,17 +1103,19 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			if ( numberOfViolationsOfCurrentGroup > 0 ) {
 				break;
 			}
-		}
 
-		// cascaded validation if required
-		if ( methodMetaData.isCascading() && value != null ) {
+			// cascaded validation if required
+			if ( executableMetaData.isCascading() && value != null ) {
 
-			ValueContext<V, Object> cascadingvalueContext = ValueContext.getLocalExecutionContext(
-					value, PathImpl.createPathForMethodReturnValue( executable )
-			);
-			cascadingvalueContext.setCurrentGroup( group.getDefiningClass() );
+				ValueContext<V, Object> cascadingvalueContext = ValueContext.getLocalExecutionContext(
+						value,
+						executableMetaData.getReturnValueValidatable(),
+						PathImpl.createPathForExecutable( executable )
+				);
+				cascadingvalueContext.setCurrentGroup( oneGroup );
 
-			validateCascadedMethodConstraints( validationContext, cascadingvalueContext );
+				validateCascadedConstraints( validationContext, cascadingvalueContext );
+			}
 		}
 
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
@@ -1213,8 +1172,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			if ( property.isCascading() ) {
 				Type type = property.getType();
 				newValue = newValue == null ? null : property.getValue(
-						newValue,
-						property.getCascadedValueAccessStrategy()
+						newValue
 				);
 				if ( elem.isInIterable() ) {
 					if ( newValue != null && elem.getIndex() != null ) {
@@ -1241,9 +1199,9 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		}
 
 		if ( newValue == null ) {
-			return ValueContext.getLocalExecutionContext( (Class<U>) clazz, propertyPath );
+			return ValueContext.getLocalExecutionContext( (Class<U>) clazz, null, propertyPath );
 		}
-		return ValueContext.getLocalExecutionContext( (U) value, propertyPath );
+		return ValueContext.getLocalExecutionContext( (U) value, null, propertyPath );
 	}
 
 	/**

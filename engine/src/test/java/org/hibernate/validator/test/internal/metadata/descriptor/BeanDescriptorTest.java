@@ -214,7 +214,15 @@ public class BeanDescriptorTest {
 		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
 
 		assertThat( getMethodNames( constrainedMethods ) ).containsOnly(
-				"createCustomer", "saveCustomer", "foo", "bar", "baz", "zap", "qax"
+				"createCustomer",
+				"saveCustomer",
+				"foo",
+				"bar",
+				"baz",
+				"zap",
+				"qax",
+				"methodWithParameterGroupConversion",
+				"methodWithReturnValueGroupConversion"
 		);
 	}
 
@@ -232,7 +240,9 @@ public class BeanDescriptorTest {
 				"zip",
 				"zap",
 				"qax",
-				"methodWithCrossParameterConstraint"
+				"methodWithCrossParameterConstraint",
+				"methodWithParameterGroupConversion",
+				"methodWithReturnValueGroupConversion"
 		);
 	}
 

@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
-import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintValidator;
 import javax.validation.CrossParameterConstraint;
 import javax.validation.OverridesAttribute;
@@ -277,36 +276,42 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		else if ( annotationType.isAnnotationPresent( CrossParameterConstraint.class ) ) {
 			return ConstraintType.CROSS_PARAMETER;
 		}
-		//TODO HV-632: Use JBoss Logging
 		else {
-			throw new ConstraintDefinitionException( "Not a constraint type: " + annotationType );
+			throw log.getAnnotationIsNoConstraintTypeException( annotationType );
 		}
 	}
 
+	@Override
 	public T getAnnotation() {
 		return annotation;
 	}
 
+	@Override
 	public Set<Class<?>> getGroups() {
 		return groups;
 	}
 
+	@Override
 	public Set<Class<? extends Payload>> getPayload() {
 		return payloads;
 	}
 
+	@Override
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
 		return constraintValidatorDefinitionClasses;
 	}
 
+	@Override
 	public Map<String, Object> getAttributes() {
 		return attributes;
 	}
 
+	@Override
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
 		return composingConstraints;
 	}
 
+	@Override
 	public boolean isReportAsSingleViolation() {
 		return isReportAsSingleInvalidConstraint;
 	}

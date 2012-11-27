@@ -29,7 +29,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public interface BeanMetaData<T> {
+public interface BeanMetaData<T> extends Validatable {
 
 	/**
 	 * @return the class of the bean.
@@ -40,11 +40,6 @@ public interface BeanMetaData<T> {
 	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.
 	 */
 	BeanDescriptor getBeanDescriptor();
-
-	/**
-	 * @return All properties which are marked for cascaded validation (e.g. annotated with {@code @Valid}).
-	 */
-	Set<PropertyMetaData> getCascadedProperties();
 
 	/**
 	 * Returns constraint-related meta data for the given property of this bean.

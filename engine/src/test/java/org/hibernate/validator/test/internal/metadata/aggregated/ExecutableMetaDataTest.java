@@ -19,7 +19,9 @@ package org.hibernate.validator.test.internal.metadata.aggregated;
 import java.lang.reflect.Method;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
+import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -31,8 +33,8 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.Customer;
+import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
-import org.joda.time.DateMidnight;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -113,7 +115,11 @@ public class ExecutableMetaDataTest {
 	@Test
 	public void methodWithCrossParameterConstraint() throws Exception {
 
-		Method method = CustomerRepositoryExt.class.getMethod( "methodWithCrossParameterConstraint", DateMidnight.class, DateMidnight.class );
+		Method method = CustomerRepositoryExt.class.getMethod(
+				"methodWithCrossParameterConstraint",
+				DateMidnight.class,
+				DateMidnight.class
+		);
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
@@ -122,7 +128,14 @@ public class ExecutableMetaDataTest {
 		assertThat( methodMetaData ).isEmpty();
 
 		assertThat( methodMetaData.getCrossParameterConstraints() ).hasSize( 1 );
-		assertThat( methodMetaData.getCrossParameterConstraints().iterator().next().getDescriptor().getAnnotation().annotationType() ).isEqualTo( ConsistentDateParameters.class );
+		assertThat(
+				methodMetaData.getCrossParameterConstraints()
+						.iterator()
+						.next()
+						.getDescriptor()
+						.getAnnotation()
+						.annotationType()
+		).isEqualTo( ConsistentDateParameters.class );
 	}
 
 	@Test
@@ -166,6 +179,21 @@ public class ExecutableMetaDataTest {
 		assertTrue( methodMetaData.isConstrained() );
 		assertThat( methodMetaData ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
+	}
+
+	@Test
+	public void locallyDefinedGroupConversion() throws Exception {
+
+		Method method = CustomerRepositoryExt.class.getMethod( "methodWithReturnValueGroupConversion" );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		assertThat(
+				methodMetaData.getReturnValueValidatable()
+						.getCascadables()
+						.iterator()
+						.next()
+						.convertGroup( Default.class )
+		).isEqualTo( ValidationGroup.class );
 	}
 
 	@Test

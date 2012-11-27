@@ -92,7 +92,7 @@ public abstract class ExecutableElement {
 	public abstract boolean isGetterMethod();
 
 	public String getIdentifier() {
-		return getMember().getName() + Arrays.toString( getParameterTypes() );
+		return getSimpleName() + Arrays.toString( getParameterTypes() );
 	}
 
 	private static class ConstructorElement extends ExecutableElement {

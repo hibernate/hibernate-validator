@@ -17,7 +17,9 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,6 +33,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
+import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -105,5 +108,17 @@ public class ParameterMetaDataTest {
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		methodMetaData.getParameterMetaData( 0 );
+	}
+
+	@Test
+	public void locallyDefinedGroupConversion() throws Exception {
+
+		Method method = CustomerRepository.class.getMethod( "methodWithParameterGroupConversion", Set.class );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		assertThat(
+				methodMetaData.getParameterMetaData( 0 )
+						.convertGroup( Default.class )
+		).isEqualTo( ValidationGroup.class );
 	}
 }

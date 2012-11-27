@@ -20,9 +20,11 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.ElementDescriptor.Kind;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
@@ -84,6 +86,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 */
 	private final String identifier;
 
+	private final Map<Class<?>, Class<?>> returnValueGroupConversions;
+
 	private ExecutableMetaData(
 			String name,
 			Class<?> returnType,
@@ -94,7 +98,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			ConstraintDeclarationException parameterConstraintDeclarationException,
 			boolean isCascading,
-			boolean isConstrained) {
+			boolean isConstrained,
+			Map<Class<?>, Class<?>> returnValueGroupConversions) {
 
 		super(
 				name,
@@ -109,6 +114,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
 		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
+		this.returnValueGroupConversions = returnValueGroupConversions;
 		this.identifier = name + Arrays.toString( parameterTypes );
 	}
 
@@ -126,9 +132,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		private final MethodConstraintLocation location;
-		private final Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
-		private boolean isCascading = false;
 		private boolean isConstrained = false;
 
 		/**
@@ -158,13 +162,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
+			super.add( constrainedElement );
 			ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 
 			constrainedExecutables.add( constrainedExecutable );
-			isCascading = isCascading || constrainedExecutable.isCascading();
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
-			returnValueConstraints.addAll( constrainedExecutable.getConstraints() );
 		}
 
 		@Override
@@ -172,16 +175,17 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			ExecutableElement executableElement = location.getExecutableElement();
 
 			return new ExecutableMetaData(
-					executableElement.getMember().getName(),
+					executableElement.getSimpleName(),
 					executableElement.getReturnType(),
 					executableElement.getParameterTypes(),
 					kind == ConstrainedElementKind.CONSTRUCTOR ? ConstraintMetaDataKind.CONSTRUCTOR : ConstraintMetaDataKind.METHOD,
-					adaptOriginsAndImplicitGroups( location.getBeanClass(), returnValueConstraints ),
+					adaptOriginsAndImplicitGroups( location.getBeanClass(), getConstraints() ),
 					findParameterMetaData(),
 					crossParameterConstraints,
 					checkParameterConstraints(),
-					isCascading,
-					isConstrained
+					isCascading(),
+					isConstrained,
+					getGroupConversions()
 			);
 		}
 
@@ -297,7 +301,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			return theValue;
 		}
-
 	}
 
 	/**
@@ -384,30 +387,36 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return crossParameterConstraints;
 	}
 
+	public Validatable getValidatableParameters() {
+
+		Set<ParameterMetaData> cascadedParameters = newHashSet();
+
+		for ( ParameterMetaData oneParameter : parameterMetaDataList ) {
+			if ( oneParameter.isCascading() ) {
+				cascadedParameters.add( oneParameter );
+			}
+		}
+
+		return new ValidatableParameters( cascadedParameters );
+	}
+
+	public ValidatableReturnValue getReturnValueValidatable() {
+		return new ValidatableReturnValue( returnValueGroupConversions );
+	}
+
 	@Override
 	public ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 
-		if ( super.getKind() == ConstraintMetaDataKind.METHOD ) {
-			return new ExecutableDescriptorImpl(
-					getType(),
-					getName(),
-					asDescriptors( getConstraints() ),
-					returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
-					parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
-					defaultGroupSequenceRedefined,
-					defaultGroupSequence
-			);
-		}
-		else {
-			return new ExecutableDescriptorImpl(
-					getType(),
-					asDescriptors( getConstraints() ),
-					returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
-					parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
-					defaultGroupSequenceRedefined,
-					defaultGroupSequence
-			);
-		}
+		return new ExecutableDescriptorImpl(
+				getKind() == ConstraintMetaDataKind.METHOD ? Kind.METHOD : Kind.CONSTRUCTOR,
+				getType(),
+				getName(),
+				asDescriptors( getConstraints() ),
+				returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
+				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
+		);
 	}
 
 	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {

@@ -57,7 +57,7 @@ public class BeanMetaDataLocatorInstanceTraversal extends BeanMetaDataLocator {
 			PropertyMetaData property = beanMetaData.getMetaDataFor( node.getName() );
 
 			if ( property != null && property.isCascading() ) {
-				currentValue = property.getValue( currentValue, property.getCascadedValueAccessStrategy() );
+				currentValue = property.getValue( currentValue );
 				if ( currentValue != null ) {
 					currentClass = currentValue.getClass();
 					Iterator<?> iter = ReflectionHelper.createIteratorForCascadedValue(

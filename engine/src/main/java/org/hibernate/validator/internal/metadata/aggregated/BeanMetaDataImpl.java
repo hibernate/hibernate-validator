@@ -98,7 +98,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * The cascaded properties of this bean.
 	 */
-	private final Set<PropertyMetaData> cascadedProperties;
+	private final Set<Cascadable> cascadedProperties;
 
 	/**
 	 * The bean descriptor for this bean.
@@ -152,7 +152,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		Set<PropertyMetaData> cascadedProperties = newHashSet();
+		Set<Cascadable> cascadedProperties = newHashSet();
 		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
 
 		for ( PropertyMetaData oneProperty : propertyMetaDataSet ) {
@@ -199,7 +199,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public Set<PropertyMetaData> getCascadedProperties() {
+	public Set<Cascadable> getCascadables() {
 		return cascadedProperties;
 	}
 
