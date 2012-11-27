@@ -18,7 +18,7 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -59,10 +59,11 @@ import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
 import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
 /**
+ * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
+ *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-@SuppressWarnings("deprecation")
 public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private static final Log log = LoggerFactory.make();
 	/**
@@ -84,17 +85,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
+	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return new AnnotationProcessingOptions();
 	}
 
+	@Override
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+		for ( Class<?> hierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 			@SuppressWarnings("unchecked")
 			BeanConfiguration<? super T> configuration = (BeanConfiguration<? super T>) getBeanConfiguration(
-					oneHierarchyClass
+					hierarchyClass
 			);
 			if ( configuration != null ) {
 				configurations.add( configuration );
@@ -358,11 +361,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
-		assert member instanceof Field || member instanceof Method;
-
+	private List<ConstraintDescriptorImpl<?>> findConstraints(AccessibleObject member, ElementType type) {
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-		for ( Annotation annotation : ( (AnnotatedElement) member ).getAnnotations() ) {
+		for ( Annotation annotation : member.getDeclaredAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( annotation, type ) );
 		}
 
@@ -379,7 +380,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-		for ( Annotation annotation : beanClass.getAnnotations() ) {
+		for ( Annotation annotation : beanClass.getDeclaredAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( annotation, ElementType.TYPE ) );
 		}
 		return metaData;
