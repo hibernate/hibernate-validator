@@ -17,7 +17,9 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,8 +33,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
+import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -64,7 +67,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 1 );
 		assertEquals( parameterMetaData.getName(), "arg1" );
-		assertIterableSize( parameterMetaData, 1 );
+		assertThat( parameterMetaData ).hasSize( 1 );
 		assertEquals(
 				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
@@ -82,7 +85,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 0 );
 		assertEquals( parameterMetaData.getName(), "arg0" );
-		assertIterableSize( parameterMetaData, 0 );
+		assertThat( parameterMetaData ).isEmpty();
 	}
 
 	@Test
@@ -95,7 +98,7 @@ public class ParameterMetaDataTest {
 
 		assertFalse( parameterMetaData.isCascading() );
 		assertFalse( parameterMetaData.isConstrained() );
-		assertIterableSize( parameterMetaData, 0 );
+		assertThat( parameterMetaData ).isEmpty();
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -105,5 +108,17 @@ public class ParameterMetaDataTest {
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		methodMetaData.getParameterMetaData( 0 );
+	}
+
+	@Test
+	public void locallyDefinedGroupConversion() throws Exception {
+
+		Method method = CustomerRepository.class.getMethod( "methodWithParameterGroupConversion", Set.class );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		assertThat(
+				methodMetaData.getParameterMetaData( 0 )
+						.convertGroup( Default.class )
+		).isEqualTo( ValidationGroup.class );
 	}
 }

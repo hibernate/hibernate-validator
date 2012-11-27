@@ -58,7 +58,7 @@ public class ConstructorValidationTest {
 
 		Node constructorNode = pathIterator.next();
 		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
@@ -93,7 +93,7 @@ public class ConstructorValidationTest {
 		assertThat( constructorNode.getElementDescriptor().getElementClass() ).isEqualTo(
 				CustomerRepositoryImpl.class
 		);
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
@@ -135,7 +135,7 @@ public class ConstructorValidationTest {
 
 		Node constructorNode = pathIterator.next();
 		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
@@ -171,7 +171,7 @@ public class ConstructorValidationTest {
 		assertThat( constructorNode.getElementDescriptor().getElementClass() ).isEqualTo(
 				CustomerRepositoryImpl.class
 		);
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl#CustomerRepositoryImpl" );
+		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
 
 		Node parameterNode = pathIterator.next();
 		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );

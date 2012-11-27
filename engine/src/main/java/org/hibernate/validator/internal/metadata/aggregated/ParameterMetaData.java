@@ -16,7 +16,9 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.annotation.ElementType;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.ParameterDescriptor;
 
@@ -27,8 +29,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 /**
  * An aggregated view of the constraint related meta data for a single method
  * parameter.
@@ -36,8 +36,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class ParameterMetaData extends AbstractConstraintMetaData {
+public class ParameterMetaData extends AbstractConstraintMetaData implements Cascadable {
 
+	private final GroupConverter groupConverter;
 	private final int index;
 
 	/**
@@ -48,7 +49,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 	 * @param isCascading should cascading constraints be evaluated. Returns {@code true} is the constrained element
 	 * is marked for cascaded validation ({@code @Valid}), {@code false} otherwise.
 	 */
-	private ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	private ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading, Map<Class<?>, Class<?>> groupConversions) {
 		super(
 				name,
 				type,
@@ -58,6 +59,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 				!constraints.isEmpty() || isCascading
 		);
 
+		this.groupConverter = new GroupConverter( groupConversions );
 		this.index = index;
 	}
 
@@ -65,6 +67,22 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		return index;
 	}
 
+	@Override
+	public Class<?> convertGroup(Class<?> originalGroup) {
+		return groupConverter.convertGroup( originalGroup );
+	}
+
+	@Override
+	public ElementType getElementType() {
+		return ElementType.PARAMETER;
+	}
+
+	@Override
+	public Object getValue(Object parent) {
+		return ( (Object[]) parent )[index];
+	}
+
+	@Override
 	public ParameterDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ParameterDescriptorImpl(
 				getType(),
@@ -81,9 +99,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 		private final Class<?> rootClass;
 		private final Class<?> parameterType;
 		private final int parameterIndex;
-		private final Set<MetaConstraint<?>> constraints = newHashSet();
 		private String name;
-		private boolean isCascading = false;
 
 		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
 			super( constraintHelper );
@@ -106,15 +122,12 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
+			super.add( constrainedElement );
 			ConstrainedParameter constrainedParameter = (ConstrainedParameter) constrainedElement;
-
-			constraints.addAll( constrainedParameter.getConstraints() );
 
 			if ( name == null ) {
 				name = constrainedParameter.getParameterName();
 			}
-
-			isCascading = isCascading || constrainedParameter.isCascading();
 		}
 
 		@Override
@@ -124,8 +137,9 @@ public class ParameterMetaData extends AbstractConstraintMetaData {
 					parameterIndex,
 					name,
 					parameterType,
-					adaptOriginsAndImplicitGroups( rootClass, constraints ),
-					isCascading
+					adaptOriginsAndImplicitGroups( rootClass, getConstraints() ),
+					isCascading(),
+					getGroupConversions()
 			);
 		}
 	}

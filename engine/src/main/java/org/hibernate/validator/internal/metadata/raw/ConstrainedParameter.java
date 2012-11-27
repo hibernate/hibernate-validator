@@ -16,10 +16,11 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -38,18 +39,27 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param name The name of the represented parameter.
 	 * @param constraints The constraints of the represented method parameter, if
 	 * any.
+	 * @param groupConversions The group conversions of the represented method parameter, if any.
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
 	 */
-	public ConstrainedParameter(ConfigurationSource source, MethodConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	public ConstrainedParameter(ConfigurationSource source, ExecutableConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions, boolean isCascading) {
 
-		super( source, ConstrainedElementKind.PARAMETER, location, constraints, isCascading );
+		super(
+				source,
+				ConstrainedElementKind.PARAMETER,
+				location,
+				constraints,
+				groupConversions,
+				isCascading
+		);
 
 		this.name = name;
 	}
 
-	public MethodConstraintLocation getLocation() {
-		return (MethodConstraintLocation) super.getLocation();
+	@Override
+	public ExecutableConstraintLocation getLocation() {
+		return (ExecutableConstraintLocation) super.getLocation();
 	}
 
 	public String getParameterName() {

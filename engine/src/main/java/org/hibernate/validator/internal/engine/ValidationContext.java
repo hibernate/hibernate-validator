@@ -88,11 +88,6 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	private final Set<C> failingConstraintViolations;
 
 	/**
-	 * Flag indicating whether an object can only be validated once per group or once per group AND validation path.
-	 */
-	private boolean allowOneValidationPerPath = true;
-
-	/**
 	 * The message resolver which should be used in this context.
 	 */
 	protected final MessageInterpolator messageInterpolator;
@@ -265,20 +260,19 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	}
 
 	public boolean isAlreadyValidated(Object value, Class<?> group, PathImpl path) {
+
 		boolean alreadyValidated;
 		alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
 
-		if ( alreadyValidated && allowOneValidationPerPath ) {
+		if ( alreadyValidated ) {
 			alreadyValidated = isAlreadyValidatedForPath( value, path );
 		}
 		return alreadyValidated;
 	}
 
-	public void markProcessed(ValueContext<?,?> valueContext) {
-		markProcessForCurrentGroup( valueContext.getCurrentBean(), valueContext.getCurrentGroup() );
-		if ( allowOneValidationPerPath ) {
-			markProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
-		}
+	public void markProcessed(ValueContext<?, ?> valueContext) {
+		markProcessedForCurrentGroup( valueContext.getCurrentBean(), valueContext.getCurrentGroup() );
+		markProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
 	}
 
 	public final void addConstraintFailures(Set<C> failingConstraintViolations) {
@@ -349,7 +343,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		}
 	}
 
-	private void markProcessForCurrentGroup(Object value, Class<?> group) {
+	private void markProcessedForCurrentGroup(Object value, Class<?> group) {
 		if ( processedObjects.containsKey( group ) ) {
 			processedObjects.get( group ).add( value );
 		}

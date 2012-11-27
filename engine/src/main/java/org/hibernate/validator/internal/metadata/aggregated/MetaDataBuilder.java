@@ -17,6 +17,8 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.Annotation;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -24,7 +26,11 @@ import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
@@ -36,7 +42,13 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public abstract class MetaDataBuilder {
 
+	private static final Log log = LoggerFactory.make();
+
 	protected final ConstraintHelper constraintHelper;
+
+	private final Set<MetaConstraint<?>> constraints = newHashSet();
+	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
+	private boolean isCascading = false;
 
 	protected MetaDataBuilder(ConstraintHelper constraintHelper) {
 		this.constraintHelper = constraintHelper;
@@ -61,7 +73,12 @@ public abstract class MetaDataBuilder {
 	 *
 	 * @param constrainedElement The element to add.
 	 */
-	public abstract void add(ConstrainedElement constrainedElement);
+	public void add(ConstrainedElement constrainedElement) {
+		constraints.addAll( constrainedElement.getConstraints() );
+		isCascading = isCascading || constrainedElement.isCascading();
+
+		addGroupConversions( constrainedElement.getGroupConversions() );
+	}
 
 	/**
 	 * Creates a new, read-only {@link ConstraintMetaData} object with all
@@ -71,6 +88,35 @@ public abstract class MetaDataBuilder {
 	 * @return A {@link ConstraintMetaData} object.
 	 */
 	public abstract ConstraintMetaData build();
+
+	private void addGroupConversions(Map<Class<?>, Class<?>> groupConversions) {
+		for ( Entry<Class<?>, Class<?>> oneConversion : groupConversions.entrySet() ) {
+			if ( this.groupConversions.containsKey( oneConversion.getKey() ) ) {
+				throw log.getMultipleGroupConversionsForSameSourceException(
+						oneConversion.getKey(),
+						CollectionHelper.<Class<?>>asSet(
+								groupConversions.get( oneConversion.getKey() ),
+								oneConversion.getValue()
+						)
+				);
+			}
+			else {
+				this.groupConversions.put( oneConversion.getKey(), oneConversion.getValue() );
+			}
+		}
+	}
+
+	protected Map<Class<?>, Class<?>> getGroupConversions() {
+		return groupConversions;
+	}
+
+	protected Set<MetaConstraint<?>> getConstraints() {
+		return constraints;
+	}
+
+	protected boolean isCascading() {
+		return isCascading;
+	}
 
 	/**
 	 * Adapts the given constraints to the given bean type. In case a constraint

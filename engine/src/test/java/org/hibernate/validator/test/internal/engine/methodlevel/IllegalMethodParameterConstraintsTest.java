@@ -23,9 +23,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
+import org.hibernate.validator.test.internal.engine.methodlevel.service.ConsistentDateParameters;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
@@ -85,6 +87,19 @@ public class IllegalMethodParameterConstraintsTest {
 
 	@Test(
 			expectedExceptions = ConstraintDeclarationException.class,
+			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
+	)
+	//TODO HV-632: Add more tests
+	public void crossParameterConstraintStrengtheningInSubTypeCausesDeclarationException() {
+
+		getValidator().forMethods().validateParameters(
+				new ZipImpl(), ZipImpl.class.getDeclaredMethods()[0], new Object[2]
+		);
+	}
+
+
+	@Test(
+			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints.*"
 	)
 	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() throws Exception {
@@ -111,6 +126,7 @@ public class IllegalMethodParameterConstraintsTest {
 		/**
 		 * Adds constraints to an un-constrained method from a super-type, which is not allowed.
 		 */
+		@Override
 		public void foo(@NotNull String s) {
 		}
 	}
@@ -125,6 +141,7 @@ public class IllegalMethodParameterConstraintsTest {
 		/**
 		 * Adds constraints to a constrained method from a super-type, which is not allowed.
 		 */
+		@Override
 		public void bar(@Size(min = 3) String s) {
 		}
 	}
@@ -144,6 +161,7 @@ public class IllegalMethodParameterConstraintsTest {
 		/**
 		 * Implements a method defined by two interfaces (one with parameter constraints), which is not allowed.
 		 */
+		@Override
 		public void baz(String s) {
 		}
 	}
@@ -158,10 +176,12 @@ public class IllegalMethodParameterConstraintsTest {
 
 	private static class QuxImpl implements Qux {
 
+		@Override
 		public String getQux() {
 			return null;
 		}
 
+		@Override
 		public void qux(@NotNull String s) {
 		}
 	}
@@ -176,7 +196,24 @@ public class IllegalMethodParameterConstraintsTest {
 		/**
 		 * Adds @Valid to an un-constrained method from a super-type, which is not allowed.
 		 */
+		@Override
 		public void zap(@Valid String s) {
+		}
+	}
+
+	private static interface Zip {
+
+		void zip(DateMidnight start, DateMidnight end);
+	}
+
+	private static class ZipImpl implements Zip {
+
+		/**
+		 * Adds cross-parameter constraint to an un-constrained method from a super-type, which is not allowed.
+		 */
+		@Override
+		@ConsistentDateParameters
+		public void zip(DateMidnight start, DateMidnight end) {
 		}
 	}
 

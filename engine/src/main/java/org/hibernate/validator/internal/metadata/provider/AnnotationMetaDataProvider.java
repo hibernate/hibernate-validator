@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.metadata.provider;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -28,7 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import javax.validation.ConvertGroup;
 import javax.validation.GroupSequence;
 import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
@@ -39,16 +40,20 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.CrossParameterConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -56,7 +61,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
 import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
@@ -90,10 +97,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
+	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return new AnnotationProcessingOptions();
 	}
 
+	@Override
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
@@ -228,12 +237,18 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				field
 		);
 
+		Map<Class<?>, Class<?>> groupConversions = getGroupConversions(
+				field.getAnnotation( ConvertGroup.class ),
+				field.getAnnotation( ConvertGroup.List.class )
+		);
+
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
 				new BeanConstraintLocation( field ),
 				constraints,
+				groupConversions,
 				isCascading
 		);
 	}
@@ -247,30 +262,32 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraints;
 	}
 
-	private Set<ConstrainedMethod> getConstructorMetaData(Class<?> clazz) {
+	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
 
-		List<ExecutableElement> declaredConstructors = asExecutableElements(
+		List<ExecutableElement> declaredConstructors = ExecutableElement.forConstructors(
 				ReflectionHelper.getDeclaredConstructors( clazz )
 		);
 
 		return getMetaData( declaredConstructors );
 	}
 
-	private Set<ConstrainedMethod> getMethodMetaData(Class<?> clazz) {
+	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
 
-		List<ExecutableElement> declaredMethods = asExecutableElements( ReflectionHelper.getDeclaredMethods( clazz ) );
+		List<ExecutableElement> declaredMethods = ExecutableElement.forMethods(
+				ReflectionHelper.getDeclaredMethods( clazz )
+		);
 
 		return getMetaData( declaredMethods );
 	}
 
-	private Set<ConstrainedMethod> getMetaData(List<ExecutableElement> executableElements) {
-		Set<ConstrainedMethod> methodMetaData = newHashSet();
+	private Set<ConstrainedExecutable> getMetaData(List<ExecutableElement> executableElements) {
+		Set<ConstrainedExecutable> executableMetaData = newHashSet();
 
-		for ( ExecutableElement method : executableElements ) {
+		for ( ExecutableElement executable : executableElements ) {
 
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
-			Member member = method.getMember();
+			Member member = executable.getMember();
 			if ( Modifier.isStatic( member.getModifiers() ) ||
 					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( member ) ||
 					member.isSynthetic() ) {
@@ -278,66 +295,71 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			methodMetaData.add( findMethodMetaData( method ) );
+			executableMetaData.add( findExecutableMetaData( executable ) );
 		}
 
-		return methodMetaData;
-	}
-
-	private List<ExecutableElement> asExecutableElements(Constructor<?>[] constructors) {
-
-		List<ExecutableElement> executableElements = newArrayList( constructors.length );
-
-		for ( Constructor<?> constructor : constructors ) {
-			executableElements.add( ExecutableElement.forConstructor( constructor ) );
-		}
-
-		return executableElements;
-	}
-
-	private List<ExecutableElement> asExecutableElements(Method[] methods) {
-
-		List<ExecutableElement> executableElements = newArrayList( methods.length );
-
-		for ( Method method : methods ) {
-			executableElements.add( ExecutableElement.forMethod( method ) );
-		}
-
-		return executableElements;
+		return executableMetaData;
 	}
 
 	/**
-	 * Finds all constraint annotations defined for the given method.
+	 * Finds all constraint annotations defined for the given method or constructor.
 	 *
 	 * @param executable The executable element to check for constraints annotations.
 	 *
 	 * @return A meta data object describing the constraints specified for the
 	 *         given element.
 	 */
-	private ConstrainedMethod findMethodMetaData(ExecutableElement executable) {
+	private ConstrainedExecutable findExecutableMetaData(ExecutableElement executable) {
 
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
 		boolean isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
-		Set<MetaConstraint<?>> constraints =
-				convertToMetaConstraints(
-						findConstraints( executable.getAccessibleObject(), ElementType.METHOD ),
-						executable
-				);
+		AccessibleObject member = executable.getAccessibleObject();
 
-		return new ConstrainedMethod(
+		Map<Class<?>, Class<?>> groupConversions = getGroupConversions(
+				member.getAnnotation( ConvertGroup.class ),
+				member.getAnnotation( ConvertGroup.List.class )
+		);
+
+		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = partition(
+				findConstraints(
+						executable.getAccessibleObject(),
+						executable.getElementType()
+				), byType()
+		);
+
+		Set<MetaConstraint<?>> returnValueConstraints = convertToMetaConstraints(
+				executableConstraints.get( ConstraintType.GENERIC ),
+				executable
+		);
+		Set<MetaConstraint<?>> crossParameterConstraints = convertToMetaConstraints(
+				executableConstraints.get( ConstraintType.CROSS_PARAMETER ),
+				executable
+		);
+
+		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
-				new MethodConstraintLocation( executable, null ),
+				new ExecutableConstraintLocation( executable, null ),
 				parameterConstraints,
-				constraints,
+				crossParameterConstraints,
+				returnValueConstraints,
+				groupConversions,
 				isCascading
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement method) {
+	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement executable) {
+		if ( constraintsDescriptors == null ) {
+			return Collections.emptySet();
+		}
+
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
-			constraints.add( createReturnValueMetaConstraint( method, oneDescriptor ) );
+		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintsDescriptors ) {
+			constraints.add(
+					constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ?
+							createReturnValueMetaConstraint( executable, constraintDescriptor ) :
+							createCrossParameterMetaConstraint( executable, constraintDescriptor )
+			);
 		}
 
 		return constraints;
@@ -345,51 +367,60 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	/**
 	 * Retrieves constraint related meta data for the parameters of the given
-	 * method.
+	 * executable.
 	 *
-	 * @param method The method of interest.
+	 * @param executable The executable of interest.
 	 *
-	 * @return A list with parameter meta data for the given method.
+	 * @return A list with parameter meta data for the given executable.
 	 */
-	private List<ConstrainedParameter> getParameterMetaData(ExecutableElement method) {
+	private List<ConstrainedParameter> getParameterMetaData(ExecutableElement executable) {
 		List<ConstrainedParameter> metaData = newArrayList();
 
-		String[] parameterNames = method.getParameterNames( parameterNameProvider );
+		String[] parameterNames = executable.getParameterNames( parameterNameProvider );
 
 		int i = 0;
 
-		for ( Annotation[] annotationsOfOneParameter : method.getParameterAnnotations() ) {
+		for ( Annotation[] annotationsOfOneParameter : executable.getParameterAnnotations() ) {
 
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames[i];
 			Set<MetaConstraint<?>> constraintsOfOneParameter = newHashSet();
-
-			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
+			ConvertGroup groupConversion = null;
+			ConvertGroup.List groupConversionList = null;
+			for ( Annotation parameterAnnotation : annotationsOfOneParameter ) {
 
 				//1. collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						oneAnnotation, ElementType.PARAMETER
+						parameterAnnotation, ElementType.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					constraintsOfOneParameter.add(
 							createParameterMetaConstraint(
-									method, i, constraintDescriptorImpl
+									executable, i, constraintDescriptorImpl
 							)
 					);
 				}
 
 				//2. mark parameter as cascading if this annotation is the @Valid annotation
-				if ( oneAnnotation.annotationType().equals( Valid.class ) ) {
+				if ( parameterAnnotation.annotationType().equals( Valid.class ) ) {
 					parameterIsCascading = true;
+				}
+				//3. determine group conversions
+				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.class ) ) {
+					groupConversion = (ConvertGroup) parameterAnnotation;
+				}
+				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
+					groupConversionList = (ConvertGroup.List) parameterAnnotation;
 				}
 			}
 
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
-							new MethodConstraintLocation( method, i ),
+							new ExecutableConstraintLocation( executable, i ),
 							parameterName,
 							constraintsOfOneParameter,
+							getGroupConversions( groupConversion, groupConversionList ),
 							parameterIsCascading
 					)
 			);
@@ -400,13 +431,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	/**
-	 * Finds all constraint annotations defined for the given field/method and returns them in a list of
+	 * Finds all constraint annotations defined for the given member and returns them in a list of
 	 * constraint descriptors.
 	 *
-	 * @param member The fields or method to check for constraints annotations.
+	 * @param member The member to check for constraints annotations.
 	 * @param type The element type the constraint/annotation is placed on.
 	 *
-	 * @return A list of constraint descriptors for all constraint specified for the given field or method.
+	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
 	private List<ConstraintDescriptorImpl<?>> findConstraints(AccessibleObject member, ElementType type) {
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
@@ -464,6 +495,43 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraintDescriptors;
 	}
 
+	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
+		Map<Class<?>, Class<?>> groupConversions = newHashMap();
+
+		if ( groupConversion != null ) {
+			groupConversions.put( groupConversion.from(), groupConversion.to() );
+		}
+
+		if ( groupConversionList != null ) {
+			for ( ConvertGroup conversion : groupConversionList.value() ) {
+
+				if ( groupConversions.containsKey( conversion.from() ) ) {
+					throw log.getMultipleGroupConversionsForSameSourceException(
+							conversion.from(),
+							CollectionHelper.<Class<?>>asSet(
+									groupConversions.get( conversion.from() ),
+									conversion.to()
+							)
+					);
+				}
+
+				groupConversions.put( conversion.from(), conversion.to() );
+			}
+		}
+
+		return groupConversions;
+	}
+
+	private Partitioner<ConstraintType, ConstraintDescriptorImpl<?>> byType() {
+		return new Partitioner<ConstraintType, ConstraintDescriptorImpl<?>>() {
+
+			@Override
+			public ConstraintType getPartition(ConstraintDescriptorImpl<?> v) {
+				return v.getConstraintType();
+			}
+		};
+	}
+
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass ) );
 	}
@@ -473,11 +541,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new MethodConstraintLocation( member, parameterIndex ) );
+		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member, parameterIndex ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new MethodConstraintLocation( member, null ) );
+		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member, null ) );
+	}
+
+	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>( descriptor, new CrossParameterConstraintLocation( member ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(A annotation, ElementType type) {

@@ -24,9 +24,12 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.List;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Provides a unified view on {@link Constructor}s and {@link Method}s.
@@ -39,8 +42,30 @@ public abstract class ExecutableElement {
 		return new ConstructorElement( constructor );
 	}
 
+	public static List<ExecutableElement> forConstructors(Constructor<?>[] constructors) {
+
+		List<ExecutableElement> executableElements = newArrayList( constructors.length );
+
+		for ( Constructor<?> constructor : constructors ) {
+			executableElements.add( forConstructor( constructor ) );
+		}
+
+		return executableElements;
+	}
+
 	public static ExecutableElement forMethod(Method method) {
 		return new MethodElement( method );
+	}
+
+	public static List<ExecutableElement> forMethods(Method[] methods) {
+
+		List<ExecutableElement> executableElements = newArrayList( methods.length );
+
+		for ( Method method : methods ) {
+			executableElements.add( forMethod( method ) );
+		}
+
+		return executableElements;
 	}
 
 	private ExecutableElement() {
@@ -67,7 +92,7 @@ public abstract class ExecutableElement {
 	public abstract boolean isGetterMethod();
 
 	public String getIdentifier() {
-		return getMember().getName() + Arrays.toString( getParameterTypes() );
+		return getSimpleName() + Arrays.toString( getParameterTypes() );
 	}
 
 	private static class ConstructorElement extends ExecutableElement {
@@ -127,6 +152,12 @@ public abstract class ExecutableElement {
 		public boolean isGetterMethod() {
 			return false;
 		}
+
+
+		@Override
+		public String toString() {
+			return constructor.toGenericString();
+		}
 	}
 
 	private static class MethodElement extends ExecutableElement {
@@ -185,6 +216,11 @@ public abstract class ExecutableElement {
 		@Override
 		public boolean isGetterMethod() {
 			return ReflectionHelper.isGetterMethod( method );
+		}
+
+		@Override
+		public String toString() {
+			return method.toGenericString();
 		}
 	}
 }

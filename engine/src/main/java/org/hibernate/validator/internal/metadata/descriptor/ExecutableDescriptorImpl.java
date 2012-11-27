@@ -30,9 +30,6 @@ import javax.validation.metadata.ReturnValueDescriptor;
  *
  * @author Gunnar Morling
  */
-// TODO HV-571: Discuss whether ConstructorDescriptor and MethodDescriptor should really extend ElementDescriptor.
-// Methods as getConstraintDescriptors() or findConstraints() seem really useful only on ReturnValueDescriptor
-// and ParameterDescriptor.
 public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements ConstructorDescriptor, MethodDescriptor {
 	private final Kind kind;
 	private final String name;
@@ -40,21 +37,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements C
 	private final ReturnValueDescriptor returnValueDescriptor;
 
 	public ExecutableDescriptorImpl(
-			Type returnType,
-			Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
-			ReturnValueDescriptor returnValueDescriptor,
-			List<ParameterDescriptor> parameters,
-			boolean defaultGroupSequenceRedefined,
-			List<Class<?>> defaultGroupSequence) {
-		super( returnType, returnValueConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
-
-		this.kind = Kind.CONSTRUCTOR;
-		this.name = null;
-		this.parameters = Collections.unmodifiableList( parameters );
-		this.returnValueDescriptor = returnValueDescriptor;
-	}
-
-	public ExecutableDescriptorImpl(
+			Kind kind,
 			Type returnType,
 			String name,
 			Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
@@ -64,7 +47,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements C
 			List<Class<?>> defaultGroupSequence) {
 		super( returnType, returnValueConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
-		this.kind = Kind.METHOD;
+		this.kind = kind;
 		this.name = name;
 		this.parameters = Collections.unmodifiableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;

@@ -89,29 +89,11 @@ public final class PathImpl implements Path, Serializable {
 		return parseProperty( propertyPath );
 	}
 
-	/**
-	 * Creates a path representing the specified method parameter.
-	 *
-	 * @param executable The executable hosting the parameter to represent.
-	 * @param parameterName The parameter's name, e.g. "arg0" or "param1".
-	 *
-	 * @return A path representing the specified method parameter.
-	 */
-	public static PathImpl createPathForParameter(ExecutableElement executable, String parameterName) {
-		Contracts.assertNotNull( executable, "A method is required to create a method parameter path." );
-		Contracts.assertNotNull( parameterName, "A parameter name is required to create a method parameter path." );
-
-		PathImpl path = createRootPath();
-		path.addParameterNode( executable, parameterName );
-
-		return path;
-	}
-
-	public static PathImpl createPathForMethodReturnValue(ExecutableElement executable) {
+	public static PathImpl createPathForExecutable(ExecutableElement executable) {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
 		PathImpl path = createRootPath();
-		path.addReturnValueNode( executable );
+		path.addNode( executable.getSimpleName() );
 
 		return path;
 	}
@@ -140,46 +122,6 @@ public final class PathImpl implements Path, Serializable {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
-		hashCode = -1;
-		return currentLeafNode;
-	}
-
-	private NodeImpl addParameterNode(ExecutableElement executable, String parameterName) {
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-
-		// TODO HV-571: The spec currently says "the name of the node equals the validated
-		// method or constructor", so we probably shouldn't add the '<DECLARING_TYPE>#'
-		// part. OTOH we currently don't add a node for the declaring type itself (see
-		// BVAL-276), so it's maybe a good thing to add the name here. Needs discussion
-		// with the EG.
-
-		// create a node for the method
-		String executableName = executable.getMember()
-				.getDeclaringClass()
-				.getSimpleName() + "#" + executable.getSimpleName();
-		nodeList.add( new NodeImpl( executableName, parent, false, null, null ) );
-
-		// now a node for the parameter
-		currentLeafNode = new NodeImpl( parameterName, parent, false, null, null );
-		nodeList.add( currentLeafNode );
-
-		hashCode = -1;
-		return currentLeafNode;
-	}
-
-	private NodeImpl addReturnValueNode(ExecutableElement executable) {
-		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-
-		// create a node for the method
-		String executableName = executable.getMember()
-				.getDeclaringClass()
-				.getSimpleName() + "#" + executable.getSimpleName();
-		nodeList.add( new NodeImpl( executableName, parent, false, null, null ) );
-
-		// now a node for the return value
-		currentLeafNode = new NodeImpl( RETURN_VALUE_NODE_NAME, parent, false, null, null );
-		nodeList.add( currentLeafNode );
-
 		hashCode = -1;
 		return currentLeafNode;
 	}

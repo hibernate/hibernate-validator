@@ -18,10 +18,14 @@ package org.hibernate.validator.internal.metadata.raw;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import javax.validation.GroupSequence;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Base implementation of with functionality common to all {@link ConstrainedElement} implementations.
@@ -30,45 +34,76 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  * @author Hardy Ferentschik
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
+	private static final Log log = LoggerFactory.make();
+
 	private final ConstrainedElementKind kind;
 	private final ConfigurationSource source;
 	private final ConstraintLocation location;
 	private final Set<MetaConstraint<?>> constraints;
+	private final Map<Class<?>, Class<?>> groupConversions;
 	private final boolean isCascading;
 
-	public AbstractConstrainedElement(ConfigurationSource source, ConstrainedElementKind kind, ConstraintLocation location, Set<MetaConstraint<?>> constraints, boolean isCascading) {
+	public AbstractConstrainedElement(ConfigurationSource source, ConstrainedElementKind kind, ConstraintLocation location, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions, boolean isCascading) {
 
 		this.kind = kind;
 		this.source = source;
 		this.location = location;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
+		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.isCascading = isCascading;
+
+		validateGroupConversions();
 	}
 
+	private void validateGroupConversions() {
+		//group conversions may only be configured for cascadable elements
+		if ( !isCascading && !groupConversions.isEmpty() ) {
+			throw log.getGroupConversionOnNonCascadingElementException( location );
+		}
+
+		//group conversions may not be configured using a sequence as source
+		for ( Class<?> oneGroup : groupConversions.keySet() ) {
+			if ( isGroupSequence( oneGroup ) ) {
+				throw log.getGroupConversionForSequenceException( oneGroup );
+			}
+		}
+	}
+
+	private boolean isGroupSequence(Class<?> oneGroup) {
+		return oneGroup.isAnnotationPresent( GroupSequence.class );
+	}
+
+	@Override
 	public ConstrainedElementKind getKind() {
 		return kind;
 	}
 
-	public ConfigurationSource getSource() {
-		return source;
-	}
-
+	@Override
 	public ConstraintLocation getLocation() {
 		return location;
 	}
 
+	@Override
 	public Iterator<MetaConstraint<?>> iterator() {
 		return constraints.iterator();
 	}
 
+	@Override
 	public Set<MetaConstraint<?>> getConstraints() {
 		return constraints;
 	}
 
+	@Override
+	public Map<Class<?>, Class<?>> getGroupConversions() {
+		return groupConversions;
+	}
+
+	@Override
 	public boolean isCascading() {
 		return isCascading;
 	}
 
+	@Override
 	public boolean isConstrained() {
 		return isCascading || !constraints.isEmpty();
 	}

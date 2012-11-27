@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
+import javax.validation.CrossParameterConstraint;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
@@ -62,6 +63,24 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
  * @author Dag Hovland
  */
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
+
+	/**
+	 * The type of a constraint.
+	 *
+	 * @author Gunnar Morling
+	 */
+	public enum ConstraintType {
+
+		/**
+		 * A non cross parameter constraint.
+		 */
+		GENERIC,
+
+		/**
+		 * A cross parameter constraint.
+		 */
+		CROSS_PARAMETER;
+	}
 
 	private static final long serialVersionUID = -2563102960314069246L;
 	private static final Log log = LoggerFactory.make();
@@ -140,6 +159,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private CompositionType compositionType = AND;
 
+	/**
+	 * The type of this constraint.
+	 */
+	private final ConstraintType constraintType;
 
 	/**
 	 * Handle to the built-in constraint implementations.
@@ -162,6 +185,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.attributes = buildAnnotationParameterMap( annotation );
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
+		this.constraintType = determineConstraintType( annotationType );
 		this.constraintValidatorDefinitionClasses = findConstraintValidatorClasses();
 		this.composingConstraints = parseComposingConstraints();
 	}
@@ -220,11 +244,17 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
 			constraintDefinitionClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
 		}
-		else {
+		else if ( constraintType == ConstraintType.GENERIC ) {
 			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
 					.getAnnotation( Constraint.class )
 					.validatedBy();
 			constraintDefinitionClasses.addAll( Arrays.asList( validatedBy ) );
+		}
+		else if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
+			Class<? extends ConstraintValidator<?, ?>> validatedBy = annotationType
+					.getAnnotation( CrossParameterConstraint.class )
+					.validatedBy();
+			constraintDefinitionClasses.add( validatedBy );
 		}
 
 		constraintHelper.addConstraintValidatorDefinition(
@@ -239,30 +269,49 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return Collections.unmodifiableList( constraintValidatorClasses );
 	}
 
+	private ConstraintType determineConstraintType(Class<T> annotationType) {
+		if ( annotationType.isAnnotationPresent( Constraint.class ) ) {
+			return ConstraintType.GENERIC;
+		}
+		else if ( annotationType.isAnnotationPresent( CrossParameterConstraint.class ) ) {
+			return ConstraintType.CROSS_PARAMETER;
+		}
+		else {
+			throw log.getAnnotationIsNoConstraintTypeException( annotationType );
+		}
+	}
+
+	@Override
 	public T getAnnotation() {
 		return annotation;
 	}
 
+	@Override
 	public Set<Class<?>> getGroups() {
 		return groups;
 	}
 
+	@Override
 	public Set<Class<? extends Payload>> getPayload() {
 		return payloads;
 	}
 
+	@Override
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
 		return constraintValidatorDefinitionClasses;
 	}
 
+	@Override
 	public Map<String, Object> getAttributes() {
 		return attributes;
 	}
 
+	@Override
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
 		return composingConstraints;
 	}
 
+	@Override
 	public boolean isReportAsSingleViolation() {
 		return isReportAsSingleInvalidConstraint;
 	}
@@ -273,6 +322,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	public ConstraintOrigin getDefinedOn() {
 		return definedOn;
+	}
+
+	public ConstraintType getConstraintType() {
+		return constraintType;
 	}
 
 	@Override
@@ -310,6 +363,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		sb.append( ", definedOn=" ).append( definedOn );
 		sb.append( ", groups=" ).append( groups );
 		sb.append( ", attributes=" ).append( attributes );
+		sb.append( ", constraintType=" ).append( constraintType );
 		sb.append( '}' );
 		return sb.toString();
 	}

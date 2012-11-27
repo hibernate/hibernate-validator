@@ -177,40 +177,18 @@ public class PathImplTest {
 	}
 
 	@Test
-	public void testCreationOfMethodParameterPath() throws Exception {
+	public void testCreationOfExecutablePath() throws Exception {
 
-		PathImpl methodParameterPath = PathImpl.createPathForParameter(
-				ExecutableElement.forMethod( Container.class.getMethod( "addItem", Key.class, Item.class ) ), "arg0"
-		);
-
-		assertEquals( methodParameterPath.toString(), "Container#addItem.arg0" );
-	}
-
-	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testCreationOfMethodParameterPathFailsDueToMissingParameterIndex() throws Exception {
-
-		PathImpl.createPathForParameter(
-				ExecutableElement.forMethod( Container.class.getMethod( "addItem", Key.class, Item.class ) ), null
-		);
-	}
-
-	@Test
-	public void testCreationOfReturnValuePath() throws Exception {
-
-		PathImpl methodParameterPath = PathImpl.createPathForMethodReturnValue(
+		PathImpl methodParameterPath = PathImpl.createPathForExecutable(
 				ExecutableElement.forMethod( Container.class.getMethod( "addItem", Key.class, Item.class ) )
 		);
 
-		assertEquals( methodParameterPath.toString(), "Container#addItem.$retval" );
+		assertEquals( methodParameterPath.toString(), "addItem" );
 	}
 
-	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: A method is required to create a method return value path."
-	)
-	public void creationOfReturnValuePathFailsDueToNullMethod() throws Exception {
-
-		PathImpl.createPathForMethodReturnValue( null );
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testCreationOfExecutablePathFailsDueToMissingExecutable() throws Exception {
+		PathImpl.createPathForExecutable( null );
 	}
 
 	class Container {

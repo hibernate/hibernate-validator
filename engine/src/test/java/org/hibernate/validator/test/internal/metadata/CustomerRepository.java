@@ -16,9 +16,12 @@
 */
 package org.hibernate.validator.test.internal.metadata;
 
+import java.util.Set;
+import javax.validation.ConvertGroup;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 
@@ -63,5 +66,17 @@ public class CustomerRepository {
 	}
 
 	public void zap(@Max(1) int i) {
+	}
+
+	public void methodWithParameterGroupConversion(
+			@Valid
+			@ConvertGroup(from = Default.class, to = ValidationGroup.class)
+			Set<String> addresses) {
+	}
+
+	@Valid
+	@ConvertGroup(from = Default.class, to = ValidationGroup.class)
+	public Set<String> methodWithReturnValueGroupConversion() {
+		return null;
 	}
 }

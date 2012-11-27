@@ -31,7 +31,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -71,7 +71,7 @@ public class BeanMetaDataImplTest {
 		Method method = CustomerRepositoryImpl.class.getMethod( "baz" );
 		ExecutableMetaData methodMetaData = metaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
-		assertIterableSize( methodMetaData, 1 );
+		assertThat( methodMetaData ).hasSize( 1 );
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 
@@ -92,7 +92,7 @@ public class BeanMetaDataImplTest {
 
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertTrue( methodMetaData.isCascading() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
 	}
 
 	private <T> BeanMetaData<T> setupBeanMetaData(Class<T> clazz) {

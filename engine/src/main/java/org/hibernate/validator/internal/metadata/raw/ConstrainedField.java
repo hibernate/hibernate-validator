@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Member;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -37,13 +38,14 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param source The source of meta data.
 	 * @param location The location of the represented field.
 	 * @param constraints The constraints of the represented field, if any.
+	 * @param groupConversions The group conversions of the represented field, if any.
 	 * @param isCascading Whether a cascaded validation of the represented field shall
 	 * be performed or not.
 	 */
-	public ConstrainedField(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints,
+	public ConstrainedField(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions,
 							boolean isCascading) {
 
-		super( source, ConstrainedElementKind.FIELD, location, constraints, isCascading );
+		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading );
 
 		Member member = location.getMember();
 		if ( member != null && isConstrained() ) {
@@ -51,8 +53,8 @@ public class ConstrainedField extends AbstractConstrainedElement {
 		}
 	}
 
+	@Override
 	public BeanConstraintLocation getLocation() {
 		return (BeanConstraintLocation) super.getLocation();
 	}
-
 }

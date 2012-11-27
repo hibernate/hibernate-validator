@@ -16,10 +16,8 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Set;
-
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -31,7 +29,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public interface BeanMetaData<T> {
+public interface BeanMetaData<T> extends Validatable {
 
 	/**
 	 * @return the class of the bean.
@@ -44,9 +42,13 @@ public interface BeanMetaData<T> {
 	BeanDescriptor getBeanDescriptor();
 
 	/**
-	 * @return A list of all cascaded methods and fields (methods/fields annotated with &#064;Valid).
+	 * Returns constraint-related meta data for the given property of this bean.
+	 *
+	 * @param propertyName The property name.
+	 *
+	 * @return Constraint-related meta data or {@code null} if no property with the given name exists.
 	 */
-	Set<Member> getCascadedMembers();
+	PropertyMetaData getMetaDataFor(String propertyName);
 
 	/**
 	 * Get the composition of the default group sequence.
@@ -91,14 +93,6 @@ public interface BeanMetaData<T> {
 	 *         or implements.
 	 */
 	ExecutableMetaData getMetaDataFor(ExecutableElement method);
-
-	/**
-	 * @param name The name of the property
-	 *
-	 * @return true if the property exists on the object
-	 *         even if the property does not host any constraint nor is cascaded
-	 */
-	boolean isPropertyPresent(String name);
 
 	/**
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the

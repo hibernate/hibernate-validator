@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,11 +30,11 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.xml.XmlMappingParser;
@@ -86,6 +87,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
+	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return annotationProcessingOptions;
 	}
@@ -104,15 +106,16 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 								ConfigurationSource.XML,
 								(BeanConstraintLocation) oneConfiguredLocation,
 								constraintsByLocation.get( oneConfiguredLocation ),
+								Collections.<Class<?>, Class<?>>emptyMap(),
 								cascades.contains( oneConfiguredLocation )
 						)
 				);
 			}
 			else if ( oneConfiguredLocation.getElementType() == ElementType.METHOD ) {
 				propertyMetaData.add(
-						new ConstrainedMethod(
+						new ConstrainedExecutable(
 								ConfigurationSource.XML,
-								new MethodConstraintLocation( (Method) oneConfiguredLocation.getMember() ),
+								new ExecutableConstraintLocation( (Method) oneConfiguredLocation.getMember() ),
 								constraintsByLocation.get( oneConfiguredLocation ),
 								cascades.contains( oneConfiguredLocation )
 						)
@@ -152,6 +155,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	protected Partitioner<ConstraintLocation, MetaConstraint<?>> byLocation() {
 		return new Partitioner<ConstraintLocation, MetaConstraint<?>>() {
+			@Override
 			public ConstraintLocation getPartition(MetaConstraint<?> constraint) {
 				return constraint.getLocation();
 			}

@@ -28,6 +28,8 @@ import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.joda.time.DateMidnight;
+
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -142,6 +144,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	public int getFoo(String s) {
 		return 0;
+	}
+
+	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
 	}
 
 	@Constraint(validatedBy = { ValidB2BRepositoryValidator.class })

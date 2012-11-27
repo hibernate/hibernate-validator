@@ -29,12 +29,14 @@ import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Address;
 import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
+import org.hibernate.validator.test.internal.engine.methodlevel.service.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodlevel.service.RepositoryBase;
@@ -43,6 +45,7 @@ import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static javax.validation.metadata.ElementDescriptor.Kind.PARAMETER;
 import static javax.validation.metadata.ElementDescriptor.Kind.RETURN_VALUE;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
@@ -104,7 +107,7 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#findCustomerByName.arg0"
+					"findCustomerByName.arg0"
 			);
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getInvalidValue(), null );
@@ -128,7 +131,7 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#findCustomerByAgeAndName.arg1"
+					"findCustomerByAgeAndName.arg1"
 			);
 		}
 	}
@@ -163,7 +166,7 @@ public class MethodLevelValidationTest {
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, PARAMETER );
 			assertEquals(
-					constraintViolation.getPropertyPath().toString(), "CustomerRepository#persistCustomer.arg0.name"
+					constraintViolation.getPropertyPath().toString(), "persistCustomer.arg0.name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -191,7 +194,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#persistCustomer.arg0.address.city"
+					"persistCustomer.arg0.address.city"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -220,7 +223,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#cascadingMapParameter.arg0[Bob].name"
+					"cascadingMapParameter.arg0[Bob].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -247,7 +250,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#cascadingIterableParameter.arg0[1].name"
+					"cascadingIterableParameter.arg0[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -274,7 +277,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#cascadingArrayParameter.arg0[1].name"
+					"cascadingArrayParameter.arg0[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -334,7 +337,7 @@ public class MethodLevelValidationTest {
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, PARAMETER );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getPropertyPath().toString(), "CustomerRepository#bar.arg0.name" );
+			assertEquals( constraintViolation.getPropertyPath().toString(), "bar.arg0.name" );
 		}
 	}
 
@@ -359,7 +362,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, RETURN_VALUE );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getPropertyPath().toString(), "CustomerRepository#baz.$retval" );
+			assertEquals( constraintViolation.getPropertyPath().toString(), "baz.$retval" );
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getInvalidValue(), 9 );
 		}
@@ -383,7 +386,7 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#cascadingReturnValue.$retval.name"
+					"cascadingReturnValue.$retval.name"
 			);
 			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
 			assertEquals( constraintViolation.getInvalidValue(), null );
@@ -408,7 +411,7 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#overriddenMethodWithCascadingReturnValue.$retval.name"
+					"overriddenMethodWithCascadingReturnValue.$retval.name"
 			);
 			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
 			assertEquals( constraintViolation.getInvalidValue(), null );
@@ -432,7 +435,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, RETURN_VALUE );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#cascadingIterableReturnValue.$retval[1].name"
+					"cascadingIterableReturnValue.$retval[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -458,7 +461,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, RETURN_VALUE );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#cascadingMapReturnValue.$retval[Bob].name"
+					"cascadingMapReturnValue.$retval[Bob].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -484,7 +487,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, RETURN_VALUE );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"CustomerRepository#cascadingArrayReturnValue.$retval[1].name"
+					"cascadingArrayReturnValue.$retval[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -550,6 +553,40 @@ public class MethodLevelValidationTest {
 	}
 
 	@Test
+	public void validationOfCrossParameterConstraint() {
+		//given
+		DateMidnight startDate = new DateMidnight( 2012, 11, 5 );
+		DateMidnight endDate = new DateMidnight( 2012, 11, 4 );
+
+		try {
+			//when
+			customerRepository.methodWithCrossParameterConstraint( startDate, endDate );
+
+			fail( "Expected ConstraintViolationException wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+			//then
+			assertThat( e.getConstraintViolations() ).hasSize( 1 );
+			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertCorrectConstraintViolationMessages(
+					e.getConstraintViolations(),
+					"{ConsistentDateParameters.message}"
+			);
+			assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo(
+					ConsistentDateParameters.class
+			);
+			assertThat( constraintViolation.getInvalidValue() ).isEqualTo( new Object[] { startDate, endDate } );
+
+			//TODO BVAL-337: Does that make sense?
+			assertEquals( constraintViolation.getLeafBean(), customerRepository );
+			assertEquals( constraintViolation.getRootBean(), customerRepository );
+			assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
+
+			assertMethodName( constraintViolation, "methodWithCrossParameterConstraint" );
+		}
+	}
+
+	@Test
 	public void methodValidationSucceeds() {
 		customerRepository.findCustomerByName( "Bob" );
 	}
@@ -559,6 +596,7 @@ public class MethodLevelValidationTest {
 
 		Path.Node node = nodeIterator.next();
 		assertNotNull( node );
+		assertEquals( node.getName(), methodName );
 		ElementDescriptor descriptor = node.getElementDescriptor();
 		assertNotNull( descriptor );
 

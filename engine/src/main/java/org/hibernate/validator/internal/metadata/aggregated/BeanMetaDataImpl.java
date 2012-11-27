@@ -17,7 +17,6 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,8 +39,8 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
@@ -97,9 +96,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Map<String, PropertyMetaData> propertyMetaData;
 
 	/**
-	 * List of cascaded members.
+	 * The cascaded properties of this bean.
 	 */
-	private final Set<Member> cascadedMembers;
+	private final Set<Cascadable> cascadedProperties;
 
 	/**
 	 * The bean descriptor for this bean.
@@ -123,7 +122,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * The class hierarchy for this class starting with the class itself going up the inheritance chain. Interfaces
 	 * are not included.
 	 */
-	private List<Class<?>> classHierarchyWithoutInterfaces;
+	private final List<Class<?>> classHierarchyWithoutInterfaces;
 
 	/**
 	 * Creates a new {@link BeanMetaDataImpl}
@@ -153,7 +152,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		Set<Member> cascadedMembers = newHashSet();
+		Set<Cascadable> cascadedProperties = newHashSet();
 		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
 
 		for ( PropertyMetaData oneProperty : propertyMetaDataSet ) {
@@ -161,13 +160,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			propertyMetaData.put( oneProperty.getName(), oneProperty );
 
 			if ( oneProperty.isCascading() ) {
-				cascadedMembers.addAll( oneProperty.getCascadingMembers() );
+				cascadedProperties.add( oneProperty );
 			}
 
 			allMetaConstraints.addAll( oneProperty.getConstraints() );
 		}
 
-		this.cascadedMembers = Collections.unmodifiableSet( cascadedMembers );
+		this.cascadedProperties = Collections.unmodifiableSet( cascadedProperties );
 		this.allMetaConstraints = Collections.unmodifiableSet( allMetaConstraints );
 
 		this.classHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy( beanClass, false );
@@ -200,8 +199,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public Set<Member> getCascadedMembers() {
-		return cascadedMembers;
+	public Set<Cascadable> getCascadables() {
+		return cascadedProperties;
+	}
+
+	@Override
+	public PropertyMetaData getMetaDataFor(String propertyName) {
+		return propertyMetaData.get( propertyName );
 	}
 
 	@Override
@@ -217,11 +221,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public ExecutableMetaData getMetaDataFor(ExecutableElement executable) {
 		return executableMetaData.get( executable.getIdentifier() );
-	}
-
-	@Override
-	public boolean isPropertyPresent(String name) {
-		return propertyMetaData.containsKey( name );
 	}
 
 	@Override
@@ -410,6 +409,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private Partitioner<ElementType, MetaConstraint<?>> byElementType() {
 		return new Partitioner<ElementType, MetaConstraint<?>>() {
+			@Override
 			public ElementType getPartition(MetaConstraint<?> constraint) {
 				return constraint.getElementType();
 			}
@@ -422,7 +422,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		sb.append( "BeanMetaDataImpl" );
 		sb.append( "{beanClass=" ).append( beanClass.getSimpleName() );
 		sb.append( ", constraintCount=" ).append( getMetaConstraints().size() );
-		sb.append( ", cascadedMemberCount=" ).append( cascadedMembers.size() );
+		sb.append( ", cascadedPropertiesCount=" ).append( cascadedProperties.size() );
 		sb.append( ", defaultGroupSequence=" ).append( getDefaultGroupSequence( null ) );
 		sb.append( '}' );
 		return sb.toString();
@@ -536,15 +536,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					break;
 				case CONSTRUCTOR:
 				case METHOD:
-					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
+					ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
-							constrainedMethod,
+							constrainedExecutable,
 							constraintHelper
 					);
 
-					if ( constrainedMethod.isGetterMethod() ) {
+					if ( constrainedExecutable.isGetterMethod() ) {
 						propertyBuilder = new PropertyMetaData.Builder(
-								constrainedMethod,
+								constrainedExecutable,
 								constraintHelper
 						);
 					}
@@ -571,7 +571,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				propertyBuilder.add( constrainedElement );
 
 				if ( added == false && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
-					ConstrainedMethod constrainedMethod = (ConstrainedMethod) constrainedElement;
+					ConstrainedExecutable constrainedMethod = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
 							constrainedMethod,
 							constraintHelper

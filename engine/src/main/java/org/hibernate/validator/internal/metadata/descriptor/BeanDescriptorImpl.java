@@ -78,7 +78,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public ConstructorDescriptor getConstraintsForConstructor(Class<?>... parameterTypes) {
-		return constrainedConstructors.get( getElementClass().getName() + Arrays.toString( parameterTypes ) );
+		return constrainedConstructors.get( getElementClass().getSimpleName() + Arrays.toString( parameterTypes ) );
 	}
 
 	@Override

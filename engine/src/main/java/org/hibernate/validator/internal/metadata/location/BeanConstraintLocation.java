@@ -78,18 +78,22 @@ public class BeanConstraintLocation implements ConstraintLocation {
 		this.typeOfAnnotatedElement = determineTypeOfAnnotatedElement();
 	}
 
+	@Override
 	public Class<?> getBeanClass() {
 		return beanClass;
 	}
 
+	@Override
 	public Member getMember() {
 		return member;
 	}
 
+	@Override
 	public Type typeOfAnnotatedElement() {
 		return typeOfAnnotatedElement;
 	}
 
+	@Override
 	public ElementType getElementType() {
 		return elementType;
 	}

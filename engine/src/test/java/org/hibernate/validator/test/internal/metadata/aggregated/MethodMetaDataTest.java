@@ -26,18 +26,18 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertIterableSize;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests creation of {@link ConstrainedMethod} in {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl}.
+ * Tests creation of {@link ConstrainedExecutable} in {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl}.
  *
  * @author Gunnar Morling
  */
@@ -61,7 +61,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
 		assertEquals( methodMetaData.getAllParameterMetaData().size(), 2 );
 	}
 
@@ -75,7 +75,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
 		assertEquals( methodMetaData.getAllParameterMetaData().size(), 1 );
 	}
 
@@ -89,7 +89,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 1 );
+		assertThat( methodMetaData ).hasSize( 1 );
 		assertEquals(
 				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
 		);
@@ -106,7 +106,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertTrue( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
 		assertEquals( methodMetaData.getAllParameterMetaData().size(), 0 );
 	}
 
@@ -120,7 +120,7 @@ public class MethodMetaDataTest {
 		assertEquals( methodMetaData.getParameterTypes(), method.getParameterTypes() );
 		assertFalse( methodMetaData.isCascading() );
 		assertFalse( methodMetaData.isConstrained() );
-		assertIterableSize( methodMetaData, 0 );
+		assertThat( methodMetaData ).isEmpty();
 		assertEquals( methodMetaData.getAllParameterMetaData().size(), 1 );
 	}
 

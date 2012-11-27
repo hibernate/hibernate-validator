@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -37,7 +37,7 @@ public final class ParameterConstraintMappingContextImpl
 		implements ParameterConstraintMappingContext {
 
 	private static final Log log = LoggerFactory.make();
-	
+
 	private final Method method;
 	private final int parameterIndex;
 
@@ -70,7 +70,7 @@ public final class ParameterConstraintMappingContextImpl
 	 */
 	public ParameterConstraintMappingContext valid() {
 		mapping.addMethodCascadeConfig(
-				new MethodConstraintLocation(
+				new ExecutableConstraintLocation(
 						method, parameterIndex
 				)
 		);

@@ -37,11 +37,11 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.MethodConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedMethod;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
@@ -75,6 +75,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		annotationProcessingOptions = mergedContext.getAnnotationProcessingOptions();
 	}
 
+	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return annotationProcessingOptions;
 	}
@@ -158,6 +159,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 								ConfigurationSource.API,
 								oneConfiguredProperty,
 								asMetaConstraints( constraintsByLocation.get( oneConfiguredProperty ) ),
+								Collections.<Class<?>, Class<?>>emptyMap(),
 								cascades.contains( oneConfiguredProperty )
 						)
 				);
@@ -175,12 +177,12 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		return allPropertyMetaData;
 	}
 
-	private Set<ConstrainedElement> retrieveMethodMetaData(Set<MethodConstraintLocation> methodCascades, Set<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints) {
+	private Set<ConstrainedElement> retrieveMethodMetaData(Set<ExecutableConstraintLocation> methodCascades, Set<ConfiguredConstraint<?, ExecutableConstraintLocation>> methodConstraints) {
 
-		Map<Method, Set<MethodConstraintLocation>> cascadesByMethod = partition(
+		Map<Method, Set<ExecutableConstraintLocation>> cascadesByMethod = partition(
 				methodCascades, cascadesByMethod()
 		);
-		Map<Method, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByMethod = partition(
+		Map<Method, Set<ConfiguredConstraint<?, ExecutableConstraintLocation>>> constraintsByMethod = partition(
 				methodConstraints, constraintsByMethod()
 		);
 
@@ -192,12 +194,12 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 			String[] parameterNames = parameterNameProvider.getParameterNames( oneMethod );
 
-			Map<Integer, Set<MethodConstraintLocation>> cascadesByParameter = partition(
+			Map<Integer, Set<ExecutableConstraintLocation>> cascadesByParameter = partition(
 					cascadesByMethod.get(
 							oneMethod
 					), cascadesByParameterIndex()
 			);
-			Map<Integer, Set<ConfiguredConstraint<?, MethodConstraintLocation>>> constraintsByParameter = partition(
+			Map<Integer, Set<ConfiguredConstraint<?, ExecutableConstraintLocation>>> constraintsByParameter = partition(
 					constraintsByMethod.get( oneMethod ), constraintsByParameterIndex()
 			);
 			List<ConstrainedParameter> parameterMetaDataList = newArrayList();
@@ -206,19 +208,22 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 				parameterMetaDataList.add(
 						new ConstrainedParameter(
 								ConfigurationSource.API,
-								new MethodConstraintLocation( oneMethod, i ),
+								new ExecutableConstraintLocation( oneMethod, i ),
 								parameterNames[i],
 								asMetaConstraints( constraintsByParameter.get( i ) ),
+								Collections.<Class<?>, Class<?>>emptyMap(),
 								cascadesByParameter.containsKey( i )
 						)
 				);
 			}
 
-			ConstrainedMethod methodMetaData = new ConstrainedMethod(
+			ConstrainedExecutable methodMetaData = new ConstrainedExecutable(
 					ConfigurationSource.API,
-					new MethodConstraintLocation( oneMethod ),
+					new ExecutableConstraintLocation( oneMethod ),
 					parameterMetaDataList,
+					Collections.<MetaConstraint<?>>emptySet(),
 					asMetaConstraints( constraintsByParameter.get( null ) ),
+					Collections.<Class<?>, Class<?>>emptyMap(),
 					cascadesByParameter.containsKey( null )
 			);
 			allMethodMetaData.add( methodMetaData );
@@ -253,37 +258,41 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		return new MetaConstraint<A>( constraintDescriptor, config.getLocation() );
 	}
 
-	private Partitioner<Method, MethodConstraintLocation> cascadesByMethod() {
-		return new Partitioner<Method, MethodConstraintLocation>() {
-			public Method getPartition(MethodConstraintLocation location) {
+	private Partitioner<Method, ExecutableConstraintLocation> cascadesByMethod() {
+		return new Partitioner<Method, ExecutableConstraintLocation>() {
+			@Override
+			public Method getPartition(ExecutableConstraintLocation location) {
 				//TODO HV-571
 				return (Method) location.getMember();
 			}
 		};
 	}
 
-	private Partitioner<Integer, MethodConstraintLocation> cascadesByParameterIndex() {
-		return new Partitioner<Integer, MethodConstraintLocation>() {
-			public Integer getPartition(MethodConstraintLocation location) {
+	private Partitioner<Integer, ExecutableConstraintLocation> cascadesByParameterIndex() {
+		return new Partitioner<Integer, ExecutableConstraintLocation>() {
+			@Override
+			public Integer getPartition(ExecutableConstraintLocation location) {
 				return location.getParameterIndex();
 			}
 		};
 	}
 
-	private Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>> constraintsByMethod() {
-		return new Partitioner<Method, ConfiguredConstraint<?, MethodConstraintLocation>>() {
-			public Method getPartition(ConfiguredConstraint<?, MethodConstraintLocation> constraint) {
+	private Partitioner<Method, ConfiguredConstraint<?, ExecutableConstraintLocation>> constraintsByMethod() {
+		return new Partitioner<Method, ConfiguredConstraint<?, ExecutableConstraintLocation>>() {
+			@Override
+			public Method getPartition(ConfiguredConstraint<?, ExecutableConstraintLocation> constraint) {
 				//TODO HV-571
 				return (Method) constraint.getLocation().getMember();
 			}
 		};
 	}
 
-	private Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>> constraintsByParameterIndex() {
-		return new Partitioner<Integer, ConfiguredConstraint<?, MethodConstraintLocation>>() {
+	private Partitioner<Integer, ConfiguredConstraint<?, ExecutableConstraintLocation>> constraintsByParameterIndex() {
+		return new Partitioner<Integer, ConfiguredConstraint<?, ExecutableConstraintLocation>>() {
 
+			@Override
 			public Integer getPartition(
-					ConfiguredConstraint<?, MethodConstraintLocation> v) {
+					ConfiguredConstraint<?, ExecutableConstraintLocation> v) {
 				return v.getLocation().getParameterIndex();
 			}
 		};
@@ -321,16 +330,16 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 				}
 			}
 
-			for ( Set<ConfiguredConstraint<?, MethodConstraintLocation>> methodConstraints : context.getMethodConstraintConfig()
+			for ( Set<ConfiguredConstraint<?, ExecutableConstraintLocation>> methodConstraints : context.getMethodConstraintConfig()
 					.values() ) {
-				for ( ConfiguredConstraint<?, MethodConstraintLocation> methodConstraint : methodConstraints ) {
+				for ( ConfiguredConstraint<?, ExecutableConstraintLocation> methodConstraint : methodConstraints ) {
 					mergedContext.addMethodConstraintConfig( methodConstraint );
 				}
 			}
 
-			for ( Set<MethodConstraintLocation> cascadedMethodConstraints : context.getMethodCascadeConfig()
+			for ( Set<ExecutableConstraintLocation> cascadedMethodConstraints : context.getMethodCascadeConfig()
 					.values() ) {
-				for ( MethodConstraintLocation methodCascade : cascadedMethodConstraints ) {
+				for ( ExecutableConstraintLocation methodCascade : cascadedMethodConstraints ) {
 					mergedContext.addMethodCascadeConfig( methodCascade );
 				}
 			}
@@ -369,6 +378,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>> constraintsByLocation() {
 		return new Partitioner<BeanConstraintLocation, ConfiguredConstraint<?, BeanConstraintLocation>>() {
+			@Override
 			public BeanConstraintLocation getPartition(ConfiguredConstraint<?, BeanConstraintLocation> constraint) {
 				return constraint.getLocation();
 			}
