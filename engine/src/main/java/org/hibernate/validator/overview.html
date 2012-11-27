@@ -1,0 +1,42 @@
+<!--
+  ~
+  ~ JBoss, Home of Professional Open Source
+  ~ Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+  ~ by the @authors tag. See the copyright.txt in the distribution for a
+  ~ full listing of individual contributors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+</head>
+<body>
+<p>This is the Hibernate Validator API documentation. Hibernate Validator is the reference implementation of
+ Bean Validation 1.1 - <a href="http://jcp.org/en/jsr/detail?id=349">JSR-349</a>
+</p>
+<p>
+All classes fall into three categories:
+<ul>
+    <li><i>spi</i>: Classes with <i>spi</i> in the package name are service provider interfaces intended to be implemented
+        or extended by users of Hibernate Validator.
+    </li>
+    <li><i>internal</i>: Classes with <i>internal</i> in the package name are Hibernate Validator specific classes which are
+        not intended for use. Internal classes can change at any time and no guarantee is given regarding backwards
+        compatibility.
+    </li>
+    <li><i>public</i>: Classes with neither <i>spi</i> or <i>internal</i> in the package name are considered public and can be used or
+        extended by users. If changes to this classes are necessary there will be a deprecation first.
+    </li>
+</ul>
+</p>
+</body>
+</html>

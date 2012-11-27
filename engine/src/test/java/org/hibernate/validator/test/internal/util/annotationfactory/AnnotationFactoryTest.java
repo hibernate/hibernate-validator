@@ -19,11 +19,12 @@ package org.hibernate.validator.test.internal.util.annotationfactory;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+
+import static org.testng.Assert.assertEquals;
 
 
 /**
@@ -44,13 +45,13 @@ public class AnnotationFactoryTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void createAnnotationProxyMissingRequiredParamter() {
+	public void createAnnotationProxyMissingRequiredParameter() {
 		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		AnnotationFactory.create( descriptor );
 	}
 
 	@Test
-	public void createAnnotationProxyWithRequiredParamter() {
+	public void createAnnotationProxyWithRequiredParameter() {
 		AnnotationDescriptor<Pattern> descriptor = new AnnotationDescriptor<Pattern>( Pattern.class );
 		descriptor.setValue( "regexp", ".*" );
 

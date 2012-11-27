@@ -314,7 +314,7 @@ public class ConstraintHelper {
 	 *
 	 * @param annotationType The annotation type to test.
 	 *
-	 * @return <code>true</code> if the annotation fulfills the above condtions, <code>false</code> otherwise.
+	 * @return <code>true</code> if the annotation fulfills the above conditions, <code>false</code> otherwise.
 	 */
 	public boolean isConstraintAnnotation(Class<? extends Annotation> annotationType) {
 		Constraint constraint = annotationType.getAnnotation( Constraint.class );

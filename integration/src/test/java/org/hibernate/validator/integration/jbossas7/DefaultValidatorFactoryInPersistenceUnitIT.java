@@ -31,7 +31,7 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
-import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceDescriptor;
+import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -66,9 +66,13 @@ public class DefaultValidatorFactoryInPersistenceUnitIT {
 	private static Asset persistenceXml() {
 		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
 				.version( "2.0" )
-				.persistenceUnit( "default" )
+				.createPersistenceUnit()
+				.name( "default" )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-				.property( "hibernate.hbm2ddl.auto", "create-drop" )
+				.getOrCreateProperties()
+				.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+				.up()
+				.up()
 				.exportAsString();
 		return new StringAsset( persistenceXml );
 	}
@@ -84,7 +88,7 @@ public class DefaultValidatorFactoryInPersistenceUnitIT {
 		// under javax.persistence.validation.factory. This works for the JBoss AS purposes, but not generically
 		Object obj = properties.get( "javax.persistence.validation.factory" );
 		assertTrue( "There should be an object under this property", obj != null );
-		ValidatorFactory factory = (ValidatorFactory) obj;
+		ValidatorFactory factory = ( ValidatorFactory ) obj;
 		assertEquals(
 				"The Hibernate Validator implementation should be used",
 				"ValidatorImpl",

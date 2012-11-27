@@ -70,6 +70,11 @@
             <artifactId>jsoup</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
@@ -97,6 +102,12 @@
         <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec</groupId>
+            <artifactId>jboss-javaee-6.0</artifactId>
+            <type>pom</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
