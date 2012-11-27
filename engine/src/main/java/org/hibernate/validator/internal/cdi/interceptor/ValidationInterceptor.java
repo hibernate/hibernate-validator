@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.cdi.interceptor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import javax.inject.Inject;
@@ -75,14 +74,10 @@ public class ValidationInterceptor implements Serializable {
 				ctx.getParameters()
 		);
 
-		// need to create a new set of constraint violations (instead of casting). See also BVAL-198
-		Set<ConstraintViolation<?>> violationsNew = new HashSet<ConstraintViolation<?>>();
-		violationsNew.addAll( violations );
-
 		if ( !violations.isEmpty() ) {
 			throw new ConstraintViolationException(
 					getMessage( ctx.getMethod(), ctx.getParameters(), violations ),
-					violationsNew
+					violations
 			);
 		}
 
@@ -94,13 +89,10 @@ public class ValidationInterceptor implements Serializable {
 				result
 		);
 
-		violationsNew = new HashSet<ConstraintViolation<?>>();
-		violationsNew.addAll( violations );
-
 		if ( !violations.isEmpty() ) {
 			throw new ConstraintViolationException(
 					getMessage( ctx.getMethod(), ctx.getParameters(), violations ),
-					violationsNew
+					violations
 			);
 		}
 
@@ -124,11 +116,14 @@ public class ValidationInterceptor implements Serializable {
 
 			message.append( "\n (" );
 			message.append( i );
-			message.append( ") Kind: " );
-			message.append( elementDescriptor.getKind() );
-			if ( elementDescriptor instanceof ParameterDescriptor ) {
-				message.append( "\n parameter index: " );
-				message.append( ( (ParameterDescriptor) elementDescriptor ).getIndex() );
+			message.append( ")" );
+			if ( elementDescriptor != null ) {
+				message.append( " Kind: " );
+				message.append( elementDescriptor.getKind() );
+				if ( elementDescriptor instanceof ParameterDescriptor ) {
+					message.append( "\n parameter index: " );
+					message.append( ( (ParameterDescriptor) elementDescriptor ).getIndex() );
+				}
 			}
 			message.append( "\n message: " );
 			message.append( constraintViolation.getMessage() );
@@ -151,7 +146,7 @@ public class ValidationInterceptor implements Serializable {
 		while ( nodes.hasNext() ) {
 			leafNode = nodes.next();
 		}
-		return leafNode.getElementDescriptor();
+		return leafNode == null ? null : leafNode.getElementDescriptor();
 	}
 }
 
