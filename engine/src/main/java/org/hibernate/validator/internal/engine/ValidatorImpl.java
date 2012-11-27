@@ -977,7 +977,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			// 3. validate cascaded parameter if required
 			ValueContext<Object[], ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
 					parameterValues,
-					methodMetaData.getValidatableParameters(),
+					methodMetaData.getParameterListMetaData(),
 					PathImpl.createPathForExecutable( executable )
 			);
 			cascadingValueContext.setCurrentGroup( oneGroup );
@@ -1108,7 +1108,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 
 				ValueContext<V, Object> cascadingvalueContext = ValueContext.getLocalExecutionContext(
 						value,
-						executableMetaData.getReturnValueValidatable(),
+						executableMetaData.getReturnValueMetaData(),
 						PathImpl.createPathForExecutable( executable )
 				);
 				cascadingvalueContext.setCurrentGroup( oneGroup );

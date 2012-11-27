@@ -387,7 +387,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return crossParameterConstraints;
 	}
 
-	public Validatable getValidatableParameters() {
+	public ParameterListMetaData getParameterListMetaData() {
 
 		Set<ParameterMetaData> cascadedParameters = newHashSet();
 
@@ -397,11 +397,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			}
 		}
 
-		return new ValidatableParameters( cascadedParameters );
+		return new ParameterListMetaData( cascadedParameters );
 	}
 
-	public ValidatableReturnValue getReturnValueValidatable() {
-		return new ValidatableReturnValue( returnValueGroupConversions );
+	public ReturnValueMetaData getReturnValueMetaData() {
+		return new ReturnValueMetaData( returnValueGroupConversions );
 	}
 
 	@Override

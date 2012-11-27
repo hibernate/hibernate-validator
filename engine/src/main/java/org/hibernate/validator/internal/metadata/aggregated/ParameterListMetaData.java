@@ -19,15 +19,16 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * A {@link Validatable} representing the arguments of a method or constructor.
+ * Represents the constraint related meta data of the arguments of a method or
+ * constructor.
  *
  * @author Gunnar Morling
  */
-public class ValidatableParameters implements Validatable {
+public class ParameterListMetaData implements Validatable {
 
 	private final Iterable<Cascadable> cascadables;
 
-	public ValidatableParameters(Iterable<? extends Cascadable> cascadables) {
+	public ParameterListMetaData(Iterable<? extends Cascadable> cascadables) {
 		this.cascadables = newHashSet( cascadables );
 	}
 

@@ -188,7 +188,7 @@ public class ExecutableMetaDataTest {
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
 		assertThat(
-				methodMetaData.getReturnValueValidatable()
+				methodMetaData.getReturnValueMetaData()
 						.getCascadables()
 						.iterator()
 						.next()
