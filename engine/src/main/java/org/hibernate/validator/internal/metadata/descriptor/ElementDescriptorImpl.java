@@ -100,13 +100,14 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 	private class ConstraintFinderImpl implements ConstraintFinder {
 		private List<Class<?>> groups;
-		private Set<ConstraintOrigin> definedInSet;
-		private Set<ElementType> elementTypes;
+		private final Set<ConstraintOrigin> definedInSet;
+		private final Set<ElementType> elementTypes;
 
 		ConstraintFinderImpl() {
 			elementTypes = new HashSet<ElementType>();
 			elementTypes.add( ElementType.TYPE );
 			elementTypes.add( ElementType.METHOD );
+			elementTypes.add( ElementType.CONSTRUCTOR );
 			elementTypes.add( ElementType.FIELD );
 
 			//for a bean descriptor there will be no parameter constraints, so we can safely add this element type here

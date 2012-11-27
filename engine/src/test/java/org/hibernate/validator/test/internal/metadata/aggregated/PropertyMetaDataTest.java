@@ -68,8 +68,7 @@ public class PropertyMetaDataTest {
 		assertThat( property.convertGroup( Complete.class ) ).isEqualTo( FullPostal.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Duplicate mapping")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionInHierarchyWithSameFrom() {
 
 		beanMetaDataManager.getBeanMetaData( User4.class ).getMetaDataFor( "addresses" );
@@ -107,6 +106,7 @@ public class PropertyMetaDataTest {
 	private static class User3 extends User1 {
 
 		@Override
+		@Valid
 		@ConvertGroup(from = Complete.class, to = FullPostal.class)
 		public Set<Address> getAddresses() {
 			return super.getAddresses();
@@ -116,6 +116,7 @@ public class PropertyMetaDataTest {
 	private static class User4 extends User1 {
 
 		@Override
+		@Valid
 		@ConvertGroup(from = Default.class, to = BasicPostal.class)
 		public Set<Address> getAddresses() {
 			return super.getAddresses();

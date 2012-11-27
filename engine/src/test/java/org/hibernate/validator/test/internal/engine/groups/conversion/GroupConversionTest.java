@@ -3,8 +3,10 @@ package org.hibernate.validator.test.internal.engine.groups.conversion;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConvertGroup;
+import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
@@ -99,6 +101,11 @@ public class GroupConversionTest {
 		assertCorrectPropertyPaths( violations, "addresses[].street1", "addresses[].zipCode", "phoneNumber.number" );
 	}
 
+	@Test(expectedExceptions = ConstraintDeclarationException.class,
+			expectedExceptionsMessageRegExp = "HV000127.*PostalSequence.*")
+	public void conversionFromSequenceCausesException() {
+		validator.validate( new User8() );
+	}
 
 	public interface Complete extends Default {
 	}
@@ -110,6 +117,10 @@ public class GroupConversionTest {
 	}
 
 	private interface BasicNumber {
+	}
+
+	@GroupSequence({ BasicPostal.class, FullPostal.class })
+	private interface PostalSequence {
 	}
 
 	private static class Address {
@@ -197,7 +208,6 @@ public class GroupConversionTest {
 		}
 	}
 
-	//TODO HV-638: Fails when using j.u.Set as parameter type
 	private static class User6 {
 
 		public void setAddresses(
@@ -216,5 +226,12 @@ public class GroupConversionTest {
 		public List<Address> findAddresses() {
 			return addresses;
 		}
+	}
+
+	private static class User8 {
+
+		@Valid
+		@ConvertGroup(from = PostalSequence.class, to = BasicPostal.class)
+		private final List<Address> addresses = Arrays.asList( new Address() );
 	}
 }

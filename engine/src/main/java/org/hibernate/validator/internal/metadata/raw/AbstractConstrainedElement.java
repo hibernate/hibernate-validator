@@ -20,9 +20,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.GroupSequence;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Base implementation of with functionality common to all {@link ConstrainedElement} implementations.
@@ -31,6 +34,8 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  * @author Hardy Ferentschik
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
+	private static final Log log = LoggerFactory.make();
+
 	private final ConstrainedElementKind kind;
 	private final ConfigurationSource source;
 	private final ConstraintLocation location;
@@ -46,6 +51,26 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.isCascading = isCascading;
+
+		validateGroupConversions();
+	}
+
+	private void validateGroupConversions() {
+		//group conversions may only be configured for cascadable elements
+		if ( !isCascading && !groupConversions.isEmpty() ) {
+			throw log.getGroupConversionOnNonCascadingElementException( location );
+		}
+
+		//group conversions may not be configured using a sequence as source
+		for ( Class<?> oneGroup : groupConversions.keySet() ) {
+			if ( isGroupSequence( oneGroup ) ) {
+				throw log.getGroupConversionForSequenceException( oneGroup );
+			}
+		}
+	}
+
+	private boolean isGroupSequence(Class<?> oneGroup) {
+		return oneGroup.isAnnotationPresent( GroupSequence.class );
 	}
 
 	@Override

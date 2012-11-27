@@ -22,7 +22,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConvertGroup;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -46,7 +47,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.CollectionHelper.buildHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
@@ -73,15 +74,19 @@ public class AnnotationMetaDataProviderTest {
 
 		assertThat( beanConfigurations ).hasSize( 2 );
 
-		Set<ConstrainedElement> constrainedElements = beanConfigurations.get( 0 ).getConstrainedElements();
+		ConstrainedExecutable constructor = findConstrainedExecutable(
+				beanConfigurations,
+				Foo.class.getConstructor( String.class )
+		);
 
-		assertThat( constrainedElements ).hasSize( 1 );
-		assertThat(
-				constrainedElements.iterator()
-						.next()
-						.getLocation()
-						.getMember()
-		).isEqualTo( Foo.class.getConstructor( String.class ) );
+		assertThat( constructor.getKind() ).isEqualTo( ConstrainedElementKind.CONSTRUCTOR );
+		assertThat( constructor.isConstrained() ).isTrue();
+		assertThat( constructor.isCascading() ).isFalse();
+		assertThat( constructor.getConstraints() ).hasSize( 1 );
+
+		MetaConstraint<?> constraint = constructor.getConstraints().iterator().next();
+		assertThat( constraint.getDescriptor().getAnnotation().annotationType() ).isEqualTo( NotNull.class );
+		assertThat( constraint.getElementType() ).isEqualTo( ElementType.CONSTRUCTOR );
 	}
 
 	@Test
@@ -152,9 +157,10 @@ public class AnnotationMetaDataProviderTest {
 		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "phone" ) );
 
 		//then
-		assertThat( field.getGroupConversions() ).isEqualTo(
-				buildHashMap().with( Default.class, BasicNumber.class ).build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicNumber.class );
+
+		assertThat( field.getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -165,12 +171,22 @@ public class AnnotationMetaDataProviderTest {
 		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "address" ) );
 
 		//then
-		assertThat( field.getGroupConversions() ).isEqualTo(
-				buildHashMap()
-						.with( Default.class, BasicPostal.class )
-						.with( Complete.class, FullPostal.class )
-						.build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicPostal.class );
+		expected.put( Complete.class, FullPostal.class );
+
+		assertThat( field.getGroupConversions() ).isEqualTo( expected );
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	public void multipleGroupConversionsOnFieldWithSameFromCauseException() {
+		provider.getBeanConfigurationForHierarchy( User2.class );
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class,
+			expectedExceptionsMessageRegExp = "HV000125.*.*User5#address.*")
+	public void groupConversionOnNonCascadingFieldCausesException() {
+		provider.getBeanConfigurationForHierarchy( User5.class );
 	}
 
 	@Test
@@ -198,9 +214,10 @@ public class AnnotationMetaDataProviderTest {
 		);
 
 		//then
-		assertThat( method.getGroupConversions() ).isEqualTo(
-				buildHashMap().with( Default.class, BasicNumber.class ).build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicNumber.class );
+
+		assertThat( method.getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -214,12 +231,17 @@ public class AnnotationMetaDataProviderTest {
 		);
 
 		//then
-		assertThat( method.getGroupConversions() ).isEqualTo(
-				buildHashMap()
-						.with( Default.class, BasicPostal.class )
-						.with( Complete.class, FullPostal.class )
-						.build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicPostal.class );
+		expected.put( Complete.class, FullPostal.class );
+
+		assertThat( method.getGroupConversions() ).isEqualTo( expected );
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class,
+			expectedExceptionsMessageRegExp = "HV000125.*User7#getAddress\\(\\).*")
+	public void groupConversionOnNonCascadingMethodCausesException() {
+		provider.getBeanConfigurationForHierarchy( User7.class );
 	}
 
 	@Test
@@ -247,9 +269,10 @@ public class AnnotationMetaDataProviderTest {
 		);
 
 		//then
-		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
-				buildHashMap().with( Default.class, BasicNumber.class ).build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicNumber.class );
+
+		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -263,13 +286,24 @@ public class AnnotationMetaDataProviderTest {
 		);
 
 		//then
-		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
-				buildHashMap()
-						.with( Default.class, BasicPostal.class )
-						.with( Complete.class, FullPostal.class )
-						.build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicPostal.class );
+		expected.put( Complete.class, FullPostal.class );
+
+		assertThat( method.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo( expected );
 	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	public void multipleGroupConversionsOnParameterdWithSameFromCauseException() {
+		provider.getBeanConfigurationForHierarchy( User4.class );
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class,
+			expectedExceptionsMessageRegExp = "HV000125.*.*User6#setAddress\\(0\\).*")
+	public void groupConversionOnNonCascadingParameterCausesException() {
+		provider.getBeanConfigurationForHierarchy( User6.class );
+	}
+
 
 	@Test
 	public void singleGroupConversionOnConstructor() throws Exception {
@@ -282,9 +316,10 @@ public class AnnotationMetaDataProviderTest {
 		);
 
 		//then
-		assertThat( constructor.getGroupConversions() ).isEqualTo(
-				buildHashMap().with( Default.class, BasicNumber.class ).build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicNumber.class );
+
+		assertThat( constructor.getGroupConversions() ).isEqualTo( expected );
 	}
 
 	@Test
@@ -298,12 +333,16 @@ public class AnnotationMetaDataProviderTest {
 		);
 
 		//then
-		assertThat( constructor.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo(
-				buildHashMap()
-						.with( Default.class, BasicPostal.class )
-						.with( Complete.class, FullPostal.class )
-						.build()
-		);
+		Map<Class<?>, Class<?>> expected = newHashMap();
+		expected.put( Default.class, BasicPostal.class );
+		expected.put( Complete.class, FullPostal.class );
+
+		assertThat( constructor.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo( expected );
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	public void groupConversionWithSameFromInSingleAndListAnnotationCauseException() {
+		provider.getBeanConfigurationForHierarchy( User3.class );
 	}
 
 	private ConstrainedField findConstrainedField(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Field field) {
@@ -333,7 +372,7 @@ public class AnnotationMetaDataProviderTest {
 
 	private static class Foo {
 
-		@SuppressWarnings("unused")
+		@NotNull
 		public Foo(@NotNull String foo) {
 		}
 	}
@@ -426,6 +465,60 @@ public class AnnotationMetaDataProviderTest {
 						@ConvertGroup(from = Complete.class, to = FullPostal.class)
 				})
 				Address address) {
+		}
+	}
+
+	private static class User2 {
+
+		@Valid
+		@ConvertGroup.List({
+				@ConvertGroup(from = Default.class, to = BasicPostal.class),
+				@ConvertGroup(from = Default.class, to = FullPostal.class)
+		})
+		private final Address address = null;
+	}
+
+	private static class User3 {
+
+		@Valid
+		@ConvertGroup(from = Default.class, to = BasicPostal.class)
+		@ConvertGroup.List(@ConvertGroup(from = Default.class, to = FullPostal.class))
+		private final Address address = null;
+	}
+
+	private static class User4 {
+
+		@SuppressWarnings("unused")
+		public void setAddress(
+				@Valid
+				@ConvertGroup.List({
+						@ConvertGroup(from = Default.class, to = BasicPostal.class),
+						@ConvertGroup(from = Default.class, to = FullPostal.class)
+				})
+				Address address) {
+		}
+	}
+
+	private static class User5 {
+
+		@ConvertGroup(from = Default.class, to = BasicPostal.class)
+		private final Address address = null;
+	}
+
+	private static class User6 {
+
+		@SuppressWarnings("unused")
+		public void setAddress(
+				@ConvertGroup(from = Default.class, to = BasicPostal.class)
+				Address address) {
+		}
+	}
+
+	private static class User7 {
+
+		@ConvertGroup(from = Default.class, to = BasicPostal.class)
+		public Address getAddress() {
+			return null;
 		}
 	}
 }

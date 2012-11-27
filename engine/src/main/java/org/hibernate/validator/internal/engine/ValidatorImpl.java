@@ -982,7 +982,6 @@ public class ValidatorImpl implements Validator, MethodValidator {
 			);
 			cascadingValueContext.setCurrentGroup( oneGroup );
 
-			//TODO GM: consider violations from cascaded validation
 			validateCascadedConstraints( validationContext, cascadingValueContext );
 			if ( shouldFailFast( validationContext ) ) {
 				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;

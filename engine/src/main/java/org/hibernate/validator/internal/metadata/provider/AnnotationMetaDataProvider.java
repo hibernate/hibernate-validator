@@ -52,6 +52,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -236,7 +237,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				field
 		);
 
-		Map<Class<?>, Class<?>> groupConversions = findGroupConversions( field );
+		Map<Class<?>, Class<?>> groupConversions = getGroupConversions(
+				field.getAnnotation( ConvertGroup.class ),
+				field.getAnnotation( ConvertGroup.List.class )
+		);
 
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
 
@@ -309,14 +313,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
 		boolean isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
+		AccessibleObject member = executable.getAccessibleObject();
 
-		Map<Class<?>, Class<?>> groupConversions = findGroupConversions( executable.getAccessibleObject() );
+		Map<Class<?>, Class<?>> groupConversions = getGroupConversions(
+				member.getAnnotation( ConvertGroup.class ),
+				member.getAnnotation( ConvertGroup.List.class )
+		);
 
-		//TODO GM: I think the wrong element type is used for constructor constraints
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = partition(
 				findConstraints(
 						executable.getAccessibleObject(),
-						ElementType.METHOD
+						executable.getElementType()
 				), byType()
 		);
 
@@ -347,11 +354,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		for ( ConstraintDescriptorImpl<?> oneDescriptor : constraintsDescriptors ) {
+		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintsDescriptors ) {
 			constraints.add(
-					oneDescriptor.getConstraintType() == ConstraintType.GENERIC ?
-							createReturnValueMetaConstraint( executable, oneDescriptor ) :
-							createCrossParameterMetaConstraint( executable, oneDescriptor )
+					constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ?
+							createReturnValueMetaConstraint( executable, constraintDescriptor ) :
+							createCrossParameterMetaConstraint( executable, constraintDescriptor )
 			);
 		}
 
@@ -378,13 +385,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames[i];
 			Set<MetaConstraint<?>> constraintsOfOneParameter = newHashSet();
-			Map<Class<?>, Class<?>> groupConversions = newHashMap();
-
-			for ( Annotation oneAnnotation : annotationsOfOneParameter ) {
+			ConvertGroup groupConversion = null;
+			ConvertGroup.List groupConversionList = null;
+			for ( Annotation parameterAnnotation : annotationsOfOneParameter ) {
 
 				//1. collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						oneAnnotation, ElementType.PARAMETER
+						parameterAnnotation, ElementType.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					constraintsOfOneParameter.add(
@@ -395,19 +402,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 
 				//2. mark parameter as cascading if this annotation is the @Valid annotation
-				if ( oneAnnotation.annotationType().equals( Valid.class ) ) {
+				if ( parameterAnnotation.annotationType().equals( Valid.class ) ) {
 					parameterIsCascading = true;
 				}
 				//3. determine group conversions
-				else if ( oneAnnotation.annotationType().equals( ConvertGroup.class ) ) {
-					ConvertGroup groupConversion = (ConvertGroup) oneAnnotation;
-					groupConversions.put( groupConversion.from(), groupConversion.to() );
+				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.class ) ) {
+					groupConversion = (ConvertGroup) parameterAnnotation;
 				}
-				else if ( oneAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
-					ConvertGroup.List groupConversionList = (ConvertGroup.List) oneAnnotation;
-					for ( ConvertGroup oneConversion : groupConversionList.value() ) {
-						groupConversions.put( oneConversion.from(), oneConversion.to() );
-					}
+				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
+					groupConversionList = (ConvertGroup.List) parameterAnnotation;
 				}
 			}
 
@@ -417,7 +420,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							new MethodConstraintLocation( executable, i ),
 							parameterName,
 							constraintsOfOneParameter,
-							groupConversions,
+							getGroupConversions( groupConversion, groupConversionList ),
 							parameterIsCascading
 					)
 			);
@@ -492,19 +495,27 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraintDescriptors;
 	}
 
-	private Map<Class<?>, Class<?>> findGroupConversions(AccessibleObject member) {
-
+	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
 		Map<Class<?>, Class<?>> groupConversions = newHashMap();
 
-		ConvertGroup groupConversion = member.getAnnotation( ConvertGroup.class );
 		if ( groupConversion != null ) {
 			groupConversions.put( groupConversion.from(), groupConversion.to() );
 		}
 
-		ConvertGroup.List groupConversionList = member.getAnnotation( ConvertGroup.List.class );
 		if ( groupConversionList != null ) {
-			for ( ConvertGroup oneConversion : groupConversionList.value() ) {
-				groupConversions.put( oneConversion.from(), oneConversion.to() );
+			for ( ConvertGroup conversion : groupConversionList.value() ) {
+
+				if ( groupConversions.containsKey( conversion.from() ) ) {
+					throw log.getMultipleGroupConversionsForSameSourceException(
+							conversion.from(),
+							CollectionHelper.<Class<?>>asSet(
+									groupConversions.get( conversion.from() ),
+									conversion.to()
+							)
+					);
+				}
+
+				groupConversions.put( conversion.from(), conversion.to() );
 			}
 		}
 

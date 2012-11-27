@@ -20,13 +20,15 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -39,6 +41,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public abstract class MetaDataBuilder {
+
+	private static final Log log = LoggerFactory.make();
 
 	protected final ConstraintHelper constraintHelper;
 
@@ -88,8 +92,13 @@ public abstract class MetaDataBuilder {
 	private void addGroupConversions(Map<Class<?>, Class<?>> groupConversions) {
 		for ( Entry<Class<?>, Class<?>> oneConversion : groupConversions.entrySet() ) {
 			if ( this.groupConversions.containsKey( oneConversion.getKey() ) ) {
-				//TODO HV-638: Use JBoss logging
-				throw new ConstraintDeclarationException( "Duplicate mapping" );
+				throw log.getMultipleGroupConversionsForSameSourceException(
+						oneConversion.getKey(),
+						CollectionHelper.<Class<?>>asSet(
+								groupConversions.get( oneConversion.getKey() ),
+								oneConversion.getValue()
+						)
+				);
 			}
 			else {
 				this.groupConversions.put( oneConversion.getKey(), oneConversion.getValue() );
