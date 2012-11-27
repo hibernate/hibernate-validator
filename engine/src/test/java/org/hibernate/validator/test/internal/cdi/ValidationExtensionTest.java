@@ -20,7 +20,6 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -56,21 +55,24 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ValidationExtensionTest {
+@Test(singleThreaded = true) // needs to run single threaded, because the mocks are shared across test methods
+public class ValidationExtensionTest<T> {
 	private ValidationExtension extension;
 	private AfterBeanDiscovery afterBeanDiscoveryMock;
 	private BeforeBeanDiscovery beforeBeanDiscoveryMock;
-	private ProcessAnnotatedType<?> processAnnotatedTypeMock;
-	private AnnotatedType<?> annotatedTypeMock;
-	private AnnotatedMethod<?> annotatedMethodMock;
-	private AnnotatedConstructor<?> annotatedConstructorMock;
+	private ProcessAnnotatedType<T> processAnnotatedTypeMock;
+	private AnnotatedType<T> annotatedTypeMock;
+	private AnnotatedMethod<T> annotatedMethodMock;
+	private AnnotatedConstructor<T> annotatedConstructorMock;
 	private BeanManager beanManagerMock;
 
+	@SuppressWarnings("unchecked")
 	@BeforeMethod
 	public void setUp() {
 		extension = new ValidationExtension();
@@ -197,13 +199,12 @@ public class ValidationExtensionTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testConstrainedMethodGetsInterceptorBidingAdded() {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		Annotation notNull = AnnotationFactory.create( descriptor );
 		setupMocks( annotatedMethodMock, notNull );
 
-		Capture<AnnotatedType> capturedType = new Capture<AnnotatedType>();
+		Capture<AnnotatedType<T>> capturedType = new Capture<AnnotatedType<T>>();
 		processAnnotatedTypeMock.setAnnotatedType( capture( capturedType ) );
 
 		// get the mocks ready
@@ -216,7 +217,7 @@ public class ValidationExtensionTest {
 		verify( processAnnotatedTypeMock, annotatedTypeMock, annotatedMethodMock, annotatedConstructorMock );
 
 		// check the captured type has @MethodValidated added
-		Set<AnnotatedMethod<?>> methods = capturedType.getValue().getMethods();
+		Set<AnnotatedMethod<? super T>> methods = capturedType.getValue().getMethods();
 		assertTrue( methods.size() == 1, "We still should only have a single method" );
 		AnnotatedMethod<?> method = methods.iterator().next();
 		assertTrue(
@@ -226,13 +227,12 @@ public class ValidationExtensionTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testConstrainedConstructorGetsInterceptorBidingAdded() {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		Annotation notNull = AnnotationFactory.create( descriptor );
 		setupMocks( annotatedConstructorMock, notNull );
 
-		Capture<AnnotatedType> capturedType = new Capture<AnnotatedType>();
+		Capture<AnnotatedType<T>> capturedType = new Capture<AnnotatedType<T>>();
 		processAnnotatedTypeMock.setAnnotatedType( capture( capturedType ) );
 
 		// get the mocks ready
@@ -245,7 +245,7 @@ public class ValidationExtensionTest {
 		verify( processAnnotatedTypeMock, annotatedTypeMock, annotatedMethodMock, annotatedConstructorMock );
 
 		// check the captured type has @MethodValidated added
-		Set<AnnotatedConstructor<?>> constructors = capturedType.getValue().getConstructors();
+		Set<AnnotatedConstructor<T>> constructors = capturedType.getValue().getConstructors();
 		assertTrue( constructors.size() == 1, "We still should only have a single constructor" );
 		AnnotatedConstructor<?> constructor = constructors.iterator().next();
 		assertTrue(
@@ -268,25 +268,24 @@ public class ValidationExtensionTest {
 		verify( processAnnotatedTypeMock, annotatedTypeMock, annotatedMethodMock );
 	}
 
-	@SuppressWarnings("unchecked")
-	private void setupMocks(AnnotatedCallable<?> callable, Annotation... constraintAnnotations) {
-		expect( (AnnotatedType) processAnnotatedTypeMock.getAnnotatedType() ).andReturn( annotatedTypeMock );
+	private void setupMocks(AnnotatedCallable<T> callable, Annotation... constraintAnnotations) {
+		expect( processAnnotatedTypeMock.getAnnotatedType() ).andReturn( annotatedTypeMock );
 
-		Set<AnnotatedConstructor<?>> constructors = new HashSet<AnnotatedConstructor<?>>();
-		Set<Annotation> constructorAnnotations = new HashSet<Annotation>();
+		Set<AnnotatedConstructor<T>> constructors = newHashSet();
+		Set<Annotation> constructorAnnotations = newHashSet();
 		if ( callable instanceof AnnotatedConstructor ) {
-			constructors.add( (AnnotatedConstructor) callable );
+			constructors.add( (AnnotatedConstructor<T>) callable );
 			Collections.addAll( constructorAnnotations, constraintAnnotations );
 		}
-		expect( (Set<AnnotatedConstructor<?>>) annotatedTypeMock.getConstructors() ).andReturn( constructors );
+		expect( annotatedTypeMock.getConstructors() ).andReturn( constructors );
 
-		Set<AnnotatedMethod<?>> methods = new HashSet<AnnotatedMethod<?>>();
-		Set<Annotation> methodAnnotations = new HashSet<Annotation>();
+		Set<AnnotatedMethod<? super T>> methods = newHashSet();
+		Set<Annotation> methodAnnotations = newHashSet();
 		if ( callable instanceof AnnotatedMethod ) {
-			methods.add( (AnnotatedMethod) callable );
+			methods.add( (AnnotatedMethod<T>) callable );
 			Collections.addAll( methodAnnotations, constraintAnnotations );
 		}
-		expect( (Set<AnnotatedMethod<?>>) annotatedTypeMock.getMethods() ).andReturn( methods );
+		expect( annotatedTypeMock.getMethods() ).andReturn( methods );
 
 		if ( callable instanceof AnnotatedConstructor ) {
 			expect( annotatedConstructorMock.getAnnotations() ).andReturn( constructorAnnotations );
@@ -297,12 +296,12 @@ public class ValidationExtensionTest {
 
 		if ( constraintAnnotations.length == 0 ) {
 			// if there is no constraint annotation on the method the parameters get checked
-			expect( (List<AnnotatedParameter<?>>) annotatedMethodMock.getParameters() ).andReturn( new ArrayList<AnnotatedParameter<?>>() );
+			expect( annotatedMethodMock.getParameters() ).andReturn( new ArrayList<AnnotatedParameter<T>>() );
 		}
 		else {
 			// if we have found a constraint annotation we expect another call to getConstructors and getMethods when the wrapped type gets build
-			expect( (Set<AnnotatedConstructor<?>>) annotatedTypeMock.getConstructors() ).andReturn( constructors );
-			expect( (Set<AnnotatedMethod<?>>) annotatedTypeMock.getMethods() ).andReturn( methods );
+			expect( annotatedTypeMock.getConstructors() ).andReturn( constructors );
+			expect( annotatedTypeMock.getMethods() ).andReturn( methods );
 		}
 	}
 }
