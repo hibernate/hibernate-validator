@@ -16,23 +16,31 @@
 */
 package org.hibernate.validator.test.internal.metadata.provider;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Constraint;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConvertGroup;
+import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -45,9 +53,15 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.testutil.TestForIssue;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
+;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
@@ -340,6 +354,30 @@ public class AnnotationMetaDataProviderTest {
 		assertThat( constructor.getParameterMetaData( 0 ).getGroupConversions() ).isEqualTo( expected );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-626")
+	public void onlyLocallyDefinedConstraintsAreConsidered() {
+
+		List<BeanConfiguration<? super Person>> beanConfigurations = provider.getBeanConfigurationForHierarchy( Person.class );
+
+		ConstrainedType personType = findConstrainedType( beanConfigurations, Person.class );
+		assertThat( personType.getConstraints() ).hasSize( 1 );
+		ConstraintDescriptor<?> constraintInSubType = personType.getConstraints()
+				.iterator()
+				.next()
+				.getDescriptor();
+		assertThat( constraintInSubType.getAnnotation().annotationType() ).isEqualTo( ScriptAssert.class );
+
+		ConstrainedType personBaseType = findConstrainedType( beanConfigurations, PersonBase.class );
+		assertThat( personBaseType.getConstraints() ).hasSize( 1 );
+
+		ConstraintDescriptor<?> constraintInSuperType = personBaseType.getConstraints()
+				.iterator()
+				.next()
+				.getDescriptor();
+		assertThat( constraintInSuperType.getAnnotation().annotationType() ).isEqualTo( ClassLevelConstraint.class );
+	}
+
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionWithSameFromInSingleAndListAnnotationCauseException() {
 		provider.getBeanConfigurationForHierarchy( User3.class );
@@ -355,6 +393,21 @@ public class AnnotationMetaDataProviderTest {
 
 	private <T> ConstrainedExecutable findConstrainedExecutable(Iterable<BeanConfiguration<? super T>> beanConfigurations, Constructor<T> constructor) {
 		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, constructor );
+	}
+
+	private <T> ConstrainedType findConstrainedType(Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<? super T> type) {
+		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
+			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
+				if ( constrainedElement.getLocation().getElementType() == ElementType.TYPE ) {
+					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
+					if ( constrainedType.getLocation().getBeanClass().equals( type ) ) {
+						return constrainedType;
+					}
+				}
+			}
+		}
+
+		throw new RuntimeException( "Found no constrained element for type " + type );
 	}
 
 	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
@@ -520,5 +573,29 @@ public class AnnotationMetaDataProviderTest {
 		public Address getAddress() {
 			return null;
 		}
+	}
+
+	@ClassLevelConstraint("some script")
+	private static class PersonBase {
+	}
+
+	@ScriptAssert(lang = "javascript", script = "some script")
+	private static class Person extends PersonBase {
+	}
+
+	@Target({ TYPE })
+	@Retention(RUNTIME)
+	@Constraint(validatedBy = { })
+	@Documented
+	@Inherited
+	public @interface ClassLevelConstraint {
+
+		String message() default "{ClassLevelConstraint.message}";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
+		String value();
 	}
 }
