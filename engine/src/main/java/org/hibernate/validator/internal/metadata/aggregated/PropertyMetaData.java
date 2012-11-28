@@ -88,14 +88,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		}
 	}
 
-	/**
-	 * Retrieves the value of this property from the given object.
-	 *
-	 * @param o The object to retrieve the value from.
-	 * @param accessStrategy The strategy to use for retrieving the value.
-	 *
-	 * @return This property's value.
-	 */
 	@Override
 	public Object getValue(Object parent) {
 		return ReflectionHelper.getValue( cascadingMember, parent );

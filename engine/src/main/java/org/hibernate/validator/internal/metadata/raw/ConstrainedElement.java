@@ -83,7 +83,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 
 	/**
 	 * Returns a map with the group conversions for this constrained element, as
-	 * e.g. given using the {@link ConvertGroup} annotation.
+	 * e.g. given using the {@code @ConvertGroup} annotation.
 	 *
 	 * @return A map with this constrained element's group conversions. May be
 	 *         empty, but never {@code null}.
