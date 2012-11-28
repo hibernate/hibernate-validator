@@ -1,6 +1,24 @@
 Hibernate Validator Changelog
 =============================
 
+4.3.1.Final (28.11.2012)
+------------------------
+
+** Bug
+    * [HV-591] - EmailValidator throws an IllegalArgumentException for long email addresses
+    * [HV-601] - NPE w/ overloaded methods on class validated with MethodValidationInterceptor
+    * [HV-607] - Email Validator producing error for large email addresses
+    * [HV-609] - EmailValidator fails where email address is large
+    * [HV-613] - email handles complete address as idn label and fails for valid longer addresses
+    * [HV-622] - Assumes all getX/setX methods are bean properties and errors with "wrong number of arguments"
+    * [HV-623] - Wrong constraint validator type resolution in case of constraint placed on parameterized type in class hierachy
+    * [HV-625] - EmailValidator.isValid sometimes throws an exception instead of returning false
+    * [HV-626] - AnnotationMetaDataProvider should use #getDeclaredAnnotations instead of #getAnnotations when reading metadata from class and members
+
+** Task
+    * [HV-639] - Evaluation of composed constraints should stops on first validation error when @ReportAsSingleViolation is used
+
+
 4.3.0.Final (09.05.2012)
 ------------------------
 
