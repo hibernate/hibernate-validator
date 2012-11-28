@@ -147,7 +147,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 	public static class Builder extends MetaDataBuilder {
 
-		private final static EnumSet<ConstrainedElementKind> SUPPORTED_ELEMENT_KINDS = EnumSet.of(
+		private static final EnumSet<ConstrainedElementKind> SUPPORTED_ELEMENT_KINDS = EnumSet.of(
 				ConstrainedElementKind.TYPE,
 				ConstrainedElementKind.FIELD,
 				ConstrainedElementKind.METHOD

@@ -56,7 +56,7 @@ public class ConstraintCheckFactory {
 
 	private ConstraintHelper constraintHelper;
 
-	private final static SingleValuedChecks NULL_CHECKS = new SingleValuedChecks();
+	private static final SingleValuedChecks NULL_CHECKS = new SingleValuedChecks();
 
 	public ConstraintCheckFactory(Types typeUtils, ConstraintHelper constraintHelper, AnnotationApiHelper annotationApiHelper, boolean methodConstraintsSupported) {
 

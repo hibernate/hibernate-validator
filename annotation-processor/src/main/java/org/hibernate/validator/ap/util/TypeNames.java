@@ -37,45 +37,45 @@ public class TypeNames {
 
 		public static final String JAVAX_VALIDATION_CONSTRAINTS = "javax.validation.constraints";
 
-		public final static String ASSERT_FALSE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertFalse";
-		public final static String ASSERT_TRUE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertTrue";
-		public final static String DECIMAL_MAX = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMax";
-		public final static String DECIMAL_MIN = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMin";
-		public final static String DIGITS = JAVAX_VALIDATION_CONSTRAINTS + ".Digits";
-		public final static String FUTURE = JAVAX_VALIDATION_CONSTRAINTS + ".Future";
-		public final static String MAX = JAVAX_VALIDATION_CONSTRAINTS + ".Max";
-		public final static String MIN = JAVAX_VALIDATION_CONSTRAINTS + ".Min";
-		public final static String NOT_NULL = JAVAX_VALIDATION_CONSTRAINTS + ".NotNull";
-		public final static String NULL = JAVAX_VALIDATION_CONSTRAINTS + ".Null";
-		public final static String PAST = JAVAX_VALIDATION_CONSTRAINTS + ".Past";
-		public final static String PATTERN = JAVAX_VALIDATION_CONSTRAINTS + ".Pattern";
-		public final static String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";
+		public static final String ASSERT_FALSE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertFalse";
+		public static final String ASSERT_TRUE = JAVAX_VALIDATION_CONSTRAINTS + ".AssertTrue";
+		public static final String DECIMAL_MAX = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMax";
+		public static final String DECIMAL_MIN = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMin";
+		public static final String DIGITS = JAVAX_VALIDATION_CONSTRAINTS + ".Digits";
+		public static final String FUTURE = JAVAX_VALIDATION_CONSTRAINTS + ".Future";
+		public static final String MAX = JAVAX_VALIDATION_CONSTRAINTS + ".Max";
+		public static final String MIN = JAVAX_VALIDATION_CONSTRAINTS + ".Min";
+		public static final String NOT_NULL = JAVAX_VALIDATION_CONSTRAINTS + ".NotNull";
+		public static final String NULL = JAVAX_VALIDATION_CONSTRAINTS + ".Null";
+		public static final String PAST = JAVAX_VALIDATION_CONSTRAINTS + ".Past";
+		public static final String PATTERN = JAVAX_VALIDATION_CONSTRAINTS + ".Pattern";
+		public static final String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";
 	}
 
 	public static class HibernateValidatorTypes {
 
 		private static final String ORG_HIBERNATE_VALIDATOR_GROUP = "org.hibernate.validator.group";
-		public final static String GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".GroupSequenceProvider";
+		public static final String GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_GROUP + ".GroupSequenceProvider";
 
 		private static final String ORG_HIBERNATE_VALIDATOR_SPI_GROUP = "org.hibernate.validator.spi.group";
-		public final static String DEFAULT_GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_SPI_GROUP + ".DefaultGroupSequenceProvider";
+		public static final String DEFAULT_GROUP_SEQUENCE_PROVIDER = ORG_HIBERNATE_VALIDATOR_SPI_GROUP + ".DefaultGroupSequenceProvider";
 
 		private static final String ORG_HIBERNATE_VALIDATOR_CONSTRAINTS = "org.hibernate.validator.constraints";
 
-		public final static String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
-		public final static String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
-		public final static String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
-		public final static String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";
-		public final static String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
-		public final static String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
-		public final static String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";
+		public static final String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
+		public static final String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
+		public static final String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
+		public static final String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";
+		public static final String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
+		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
+		public static final String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";
 	}
 
 	public static class JodaTypes {
 
 		private static final String ORG_JODA_TIME = "org.joda.time";
 
-		public final static String READABLE_PARTIAL = ORG_JODA_TIME + ".ReadablePartial";
-		public final static String READABLE_INSTANT = ORG_JODA_TIME + ".ReadableInstant";
+		public static final String READABLE_PARTIAL = ORG_JODA_TIME + ".ReadablePartial";
+		public static final String READABLE_INSTANT = ORG_JODA_TIME + ".ReadableInstant";
 	}
 }

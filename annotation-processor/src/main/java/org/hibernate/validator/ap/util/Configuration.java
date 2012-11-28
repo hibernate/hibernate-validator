@@ -33,23 +33,23 @@ public class Configuration {
 	 * The name of the processor option for setting the diagnostic kind to be
 	 * used when reporting errors during annotation processing.
 	 */
-	public final static String DIAGNOSTIC_KIND_PROCESSOR_OPTION = "diagnosticKind";
+	public static final String DIAGNOSTIC_KIND_PROCESSOR_OPTION = "diagnosticKind";
 
 	/**
 	 * The name of the processor option for activating verbose message reporting.
 	 */
-	public final static String VERBOSE_PROCESSOR_OPTION = "verbose";
+	public static final String VERBOSE_PROCESSOR_OPTION = "verbose";
 
 	/**
 	 * The name of the processor option for allowing constraints at methods
 	 * other than getter methods.
 	 */
-	public final static String METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION = "methodConstraintsSupported";
+	public static final String METHOD_CONSTRAINTS_SUPPORTED_PROCESSOR_OPTION = "methodConstraintsSupported";
 
 	/**
 	 * The diagnostic kind to be used if no or an invalid kind is given as processor option.
 	 */
-	public final static Kind DEFAULT_DIAGNOSTIC_KIND = Kind.ERROR;
+	public static final Kind DEFAULT_DIAGNOSTIC_KIND = Kind.ERROR;
 
 	private final Kind diagnosticKind;
 

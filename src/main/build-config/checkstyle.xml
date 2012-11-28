@@ -15,6 +15,10 @@
         <module name="AvoidStarImport"/>
         <module name="RedundantImport"/>
 
+        <!-- Modifier Checks  -->
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+
         <!-- Checks for blocks. You know, those {}'s -->
         <module name="LeftCurly"/>
         <module name="RightCurly">
@@ -22,12 +26,20 @@
         </module>
 
         <!-- Checks for common coding problems -->
+        <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
         <module name="IllegalInstantiation"/>
+        <module name="RedundantThrows">
+            <property name="allowUnchecked" value="true"/>
+        </module>
 
-        <!-- Miscellaneous other checks. -->
+        <!-- Miscellaneous other checks.  -->
+        <module name="BooleanExpressionComplexity"/>
+        <module name="UpperEll"/>
         <module name="PackageAnnotation"/>
         <module name="CovariantEquals"/>
+        <module name="ArrayTypeStyle"/>
+        <module name="DefaultComesLast"/>
     </module>
 
 </module>
