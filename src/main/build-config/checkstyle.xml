@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+
+    <module name="RegexpHeader">
+        <property name="headerFile" value="${checkstyle.header.file}"/>
+    </module>
+
+    <module name="TreeWalker">
+        <property name="cacheFile" value="${checkstyle.cache.file}"/>
+
+        <!-- Checks for imports -->
+        <module name="AvoidStarImport"/>
+        <module name="RedundantImport"/>
+
+        <!-- Checks for blocks. You know, those {}'s -->
+        <module name="LeftCurly"/>
+        <module name="RightCurly">
+            <property name="option" value="alone"/>
+        </module>
+
+        <!-- Checks for common coding problems -->
+        <module name="EqualsHashCode"/>
+        <module name="IllegalInstantiation"/>
+
+        <!-- Miscellaneous other checks. -->
+        <module name="PackageAnnotation"/>
+        <module name="CovariantEquals"/>
+    </module>
+
+</module>

@@ -37,7 +37,7 @@
         <jbossas.version>7.1.1.Final</jbossas.version>
         <jbossTargetDir>${project.build.directory}/jboss-as-${jbossas.version}</jbossTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug />
+        <remote.debug/>
     </properties>
 
     <dependencies>
@@ -85,6 +85,10 @@
             </testResource>
         </testResources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
