@@ -38,15 +38,20 @@ import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
 
 /**
- * Checks that the {@link org.hibernate.validator.group.GroupSequenceProvider} annotation definition is valid.
+ * Checks that the {@link org.hibernate.validator.group.GroupSequenceProvider}
+ * annotation definition is valid.
  * <p>
  * This check ensure that :
  * <ul>
  * <li>The annotation is not defined on an interface.</li>
- * <li>The annotation defines an implementation class of {@link org.hibernate.validator.group.DefaultGroupSequenceProvider}, not an interface or an abstract class.</li>
+ * <li>The annotation defines an implementation class of
+ * {@link org.hibernate.validator.spi.group.DefaultGroupSequenceProvider}, not
+ * an interface or an abstract class.</li>
  * <li>The annotation defines a class with a public default constructor.</li>
- * <li>The annotation defines a default group sequence provider class for a (super-)type of the annotated class.</li>
- * <li>The class hosting the annotation is not already annotated with {@link javax.validation.GroupSequence}.</li>
+ * <li>The annotation defines a default group sequence provider class for a
+ * (super-)type of the annotated class.</li>
+ * <li>The class hosting the annotation is not already annotated with
+ * {@link javax.validation.GroupSequence}.</li>
  * </ul>
  * </p>
  *
