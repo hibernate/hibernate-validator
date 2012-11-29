@@ -1,6 +1,60 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.0.Alpha2 (28.11.2012)
+-------------------------
+
+** Sub-task
+    * [HV-629] - Move methods related to method validation to delegate interface
+    * [HV-631] - Extend the meta-data API with required convenience methods for method validation
+    * [HV-632] - Support cross-parameter constraints
+
+** Bug
+    * [HV-601] - NPE w/ overloaded methods on class validated with MethodValidationInterceptor
+    * [HV-602] - Docs are wrong about location of /validation.xml or the code is
+    * [HV-603] - XML based configuration fails when context class loader is not set
+    * [HV-612] - Documentation fails to build on locales with accented months
+    * [HV-615] - Create a CDI extension to activate Bean Validation
+    * [HV-622] - Assumes all getX/setX methods are bean properties and errors with "wrong number of arguments"
+    * [HV-623] - Wrong constraint validator type resolution in case of constraint placed on parameterized type in class hierachy
+    * [HV-626] - AnnotationMetaDataProvider should use #getDeclaredAnnotations instead of #getAnnotations when reading metadata from class and members
+    * [HV-638] - Support groups translation during cascaded validations
+    * [HV-647] - Don't add JMeter API doc to distribution
+
+** Improvement
+    * [HV-557] - Refactor package organisation to clearly separate spi, public and private APIs - part 2 (public packages)
+    * [HV-620] - Improve error message for HV000085
+    * [HV-621] - Avoid GroupChainGenerator to use reflection at runtime
+    * [HV-628] - Method validation changes from BV 1.1 PR
+    * [HV-630] - Refinements around ConfigurationSource
+    * [HV-636] - Investigate possiblity to run tests in parallel
+
+** Task
+    * [HV-584] - Remove deprecated types
+    * [HV-595] - Determine how to handle different versions of validation-configuration and validation-mapping xsd
+    * [HV-597] - Update tck-runner module
+    * [HV-635] - Align TCK runner with beta release of BVTCK
+    * [HV-639] - Evaluation of composed constraints should stops on first validation error when @ReportAsSingleViolation is used
+    * [HV-649] - Upgrade the tck runner module to BV TCK release 1.1.0.Beta2
+
+
+4.3.1.Final (28.11.2012)
+------------------------
+
+** Bug
+    * [HV-591] - EmailValidator throws an IllegalArgumentException for long email addresses
+    * [HV-601] - NPE w/ overloaded methods on class validated with MethodValidationInterceptor
+    * [HV-607] - Email Validator producing error for large email addresses
+    * [HV-609] - EmailValidator fails where email address is large
+    * [HV-613] - email handles complete address as idn label and fails for valid longer addresses
+    * [HV-622] - Assumes all getX/setX methods are bean properties and errors with "wrong number of arguments"
+    * [HV-623] - Wrong constraint validator type resolution in case of constraint placed on parameterized type in class hierachy
+    * [HV-625] - EmailValidator.isValid sometimes throws an exception instead of returning false
+    * [HV-626] - AnnotationMetaDataProvider should use #getDeclaredAnnotations instead of #getAnnotations when reading metadata from class and members
+
+** Task
+    * [HV-639] - Evaluation of composed constraints should stops on first validation error when @ReportAsSingleViolation is used
+
 
 5.0.0.Alpha1 (21.06.2012)
 -------------------------
