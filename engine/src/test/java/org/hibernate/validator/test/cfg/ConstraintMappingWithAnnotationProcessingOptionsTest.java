@@ -149,17 +149,19 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	@Retention(RUNTIME)
 	@Documented
 	public @interface Fighters {
-		public abstract String message() default "fu fighters";
+		String message() default "fu fighters";
 
-		public abstract Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public abstract Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public class FightersValidator implements ConstraintValidator<Fighters, Object> {
+		@Override
 		public void initialize(Fighters annotation) {
 		}
 
+		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
 			return true;
 		}

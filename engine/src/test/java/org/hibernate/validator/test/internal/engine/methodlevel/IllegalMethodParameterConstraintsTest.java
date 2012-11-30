@@ -116,7 +116,7 @@ public class IllegalMethodParameterConstraintsTest {
 		);
 	}
 
-	private static interface Foo {
+	private interface Foo {
 
 		void foo(String s);
 	}
@@ -131,7 +131,7 @@ public class IllegalMethodParameterConstraintsTest {
 		}
 	}
 
-	private static interface Bar {
+	private interface Bar {
 
 		void bar(@NotNull String s);
 	}
@@ -146,12 +146,12 @@ public class IllegalMethodParameterConstraintsTest {
 		}
 	}
 
-	private static interface Baz1 {
+	private interface Baz1 {
 
 		void baz(String s);
 	}
 
-	private static interface Baz2 {
+	private interface Baz2 {
 
 		void baz(@Size(min = 3) String s);
 	}
@@ -166,12 +166,12 @@ public class IllegalMethodParameterConstraintsTest {
 		}
 	}
 
-	private static interface Qux {
+	private interface Qux {
 
 		@NotNull
-		public String getQux();
+		String getQux();
 
-		public void qux(String s);
+		void qux(String s);
 	}
 
 	private static class QuxImpl implements Qux {
@@ -186,7 +186,7 @@ public class IllegalMethodParameterConstraintsTest {
 		}
 	}
 
-	private static interface Zap {
+	private interface Zap {
 
 		void zap(String s);
 	}
@@ -201,7 +201,7 @@ public class IllegalMethodParameterConstraintsTest {
 		}
 	}
 
-	private static interface Zip {
+	private interface Zip {
 
 		void zip(DateMidnight start, DateMidnight end);
 	}

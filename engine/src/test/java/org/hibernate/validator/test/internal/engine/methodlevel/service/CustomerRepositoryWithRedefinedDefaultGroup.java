@@ -70,17 +70,17 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 	int constraintsInAllPartsOfGroupSequence();
 
 
-	public static interface ValidationGroup1 {
+	public interface ValidationGroup1 {
 	}
 
-	public static interface ValidationGroup2 {
+	public interface ValidationGroup2 {
 	}
 
-	public static interface ValidationGroup3 {
+	public interface ValidationGroup3 {
 	}
 
 	@GroupSequence( { ValidationGroup2.class, ValidationGroup3.class })
-	public static interface ValidationSequence {
+	public interface ValidationSequence {
 	}
 
 }

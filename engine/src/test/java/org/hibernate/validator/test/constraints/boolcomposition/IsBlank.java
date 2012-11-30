@@ -44,9 +44,9 @@ import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 @Retention(RUNTIME)
 @NotBlank
 public @interface IsBlank {
-	public abstract String message() default "Is Not Blank";
+	String message() default "Is Not Blank";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }

@@ -37,10 +37,10 @@ import static org.testng.Assert.assertTrue;
  */
 public class AggregateBundleTest {
 
-	private final static String BUNDLE_NAME_1 = AggregateResourceBundleLocatorTest.class.getPackage()
+	private static final String BUNDLE_NAME_1 = AggregateResourceBundleLocatorTest.class.getPackage()
 			.getName() + ".AggregateResourceBundleLocatorTestBundle1";
 
-	private final static String BUNDLE_NAME_2 = AggregateResourceBundleLocatorTest.class.getPackage()
+	private static final String BUNDLE_NAME_2 = AggregateResourceBundleLocatorTest.class.getPackage()
 			.getName() + ".AggregateResourceBundleLocatorTestBundle2";
 
 	@Test

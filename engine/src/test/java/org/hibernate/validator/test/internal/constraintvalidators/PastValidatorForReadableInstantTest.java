@@ -40,8 +40,8 @@ public class PastValidatorForReadableInstantTest {
 
 	@Test
 	public void testIsValidForInstant() {
-		Instant future = new Instant().plus( 31557600000l );
-		Instant past = new Instant().minus( 31557600000l );
+		Instant future = new Instant().plus( 31557600000L );
+		Instant past = new Instant().minus( 31557600000L );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
 		Assert.assertTrue( validator.isValid( past, null ) );

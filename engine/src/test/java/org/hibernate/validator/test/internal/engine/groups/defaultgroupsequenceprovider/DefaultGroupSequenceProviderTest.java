@@ -142,16 +142,17 @@ public class DefaultGroupSequenceProviderTest {
 	private static class B {
 	}
 
-	private static interface C {
+	private interface C {
 
 		@NotNull(message = "may not be null")
 		@Length(min = 10, max = 20, groups = TestGroup.class, message = "length must be between {min} and {max}")
-		public String foo(String param);
+		String foo(String param);
 	}
 
 	@GroupSequenceProvider(MethodGroupSequenceProvider.class)
 	private static class CImpl implements C {
 
+		@Override
 		public String foo(String param) {
 			return param;
 		}
@@ -166,6 +167,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	public static class MethodGroupSequenceProvider implements DefaultGroupSequenceProvider<CImpl> {
 
+		@Override
 		public List<Class<?>> getValidationGroups(CImpl object) {
 			return Arrays.asList( TestGroup.class, CImpl.class );
 		}
@@ -173,6 +175,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	public static class NullGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
 
+		@Override
 		public List<Class<?>> getValidationGroups(A object) {
 			return null;
 		}
@@ -180,6 +183,7 @@ public class DefaultGroupSequenceProviderTest {
 
 	public static class InvalidGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
 
+		@Override
 		public List<Class<?>> getValidationGroups(B object) {
 			List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 			defaultGroupSequence.add( TestGroup.class );

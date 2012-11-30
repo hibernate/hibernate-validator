@@ -37,11 +37,11 @@ import static org.testng.Assert.assertNull;
  */
 public class AggregateResourceBundleLocatorTest {
 
-	private final static String BUNDLE_NAME_1 =
+	private static final String BUNDLE_NAME_1 =
 			AggregateResourceBundleLocatorTest.class.getPackage()
 					.getName() + ".AggregateResourceBundleLocatorTestBundle1";
 
-	private final static String BUNDLE_NAME_2 =
+	private static final String BUNDLE_NAME_2 =
 			AggregateResourceBundleLocatorTest.class.getPackage()
 					.getName() + ".AggregateResourceBundleLocatorTestBundle2";
 
@@ -71,7 +71,7 @@ public class AggregateResourceBundleLocatorTest {
 		ResourceBundleLocator locator =
 				new AggregateResourceBundleLocator(
 						Arrays.asList( BUNDLE_NAME_1 ),
-						(ResourceBundleLocator) new PlatformResourceBundleLocator( BUNDLE_NAME_2 )
+						new PlatformResourceBundleLocator( BUNDLE_NAME_2 )
 				);
 
 		ResourceBundle resourceBundle = locator.getResourceBundle( Locale.ENGLISH );

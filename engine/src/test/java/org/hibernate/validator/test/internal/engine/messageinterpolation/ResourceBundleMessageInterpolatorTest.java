@@ -214,7 +214,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	public void testRecursiveMessageInterpolation() {
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
 		descriptor.setValue( "message", "{replace.in.user.bundle1}" );
-		descriptor.setValue( "value", 10l );
+		descriptor.setValue( "value", 10L );
 		Max max = AnnotationFactory.create( descriptor );
 
 
@@ -242,7 +242,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
 		String message = "Message should stay unchanged since {fubar} is not replaceable";
 		descriptor.setValue( "message", message );
-		descriptor.setValue( "value", 10l );
+		descriptor.setValue( "value", 10L );
 		Max max = AnnotationFactory.create( descriptor );
 
 
@@ -324,6 +324,7 @@ public class ResourceBundleMessageInterpolatorTest {
 			resourceBundle = bundle;
 		}
 
+		@Override
 		public ResourceBundle getResourceBundle(Locale locale) {
 			return resourceBundle;
 		}
@@ -334,7 +335,7 @@ public class ResourceBundleMessageInterpolatorTest {
 	 * the user specified resource bundle.
 	 */
 	private static class TestResourceBundle extends ResourceBundle implements Enumeration<String> {
-		private Map<String, String> testResources;
+		private final Map<String, String> testResources;
 		Iterator<String> iter;
 
 		public TestResourceBundle() {
@@ -349,18 +350,22 @@ public class ResourceBundleMessageInterpolatorTest {
 			iter = testResources.keySet().iterator();
 		}
 
+		@Override
 		public Object handleGetObject(String key) {
 			return testResources.get( key );
 		}
 
+		@Override
 		public Enumeration<String> getKeys() {
 			return this;
 		}
 
+		@Override
 		public boolean hasMoreElements() {
 			return iter.hasNext();
 		}
 
+		@Override
 		public String nextElement() {
 			if ( hasMoreElements() ) {
 				return iter.next();

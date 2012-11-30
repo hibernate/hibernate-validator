@@ -327,6 +327,7 @@ public class FailFastTest {
 	}
 
 	class TestServiceImpl implements TestService {
+		@Override
 		public void testMethod(String param1, String param2) {
 		}
 	}
@@ -340,29 +341,31 @@ public class FailFastTest {
 	@Retention(RUNTIME)
 	@Constraint(validatedBy = { FooConstraintValidator.class })
 	public @interface FooConstraint {
-		public abstract String message() default "invalid name";
+		String message() default "invalid name";
 
-		public abstract Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public abstract Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	@Target({ ANNOTATION_TYPE })
 	@Retention(RUNTIME)
 	@Constraint(validatedBy = { BarConstraintValidator.class })
 	public @interface BarConstraint {
-		public abstract String message() default "invalid name";
+		String message() default "invalid name";
 
-		public abstract Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public abstract Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class BarConstraintValidator implements ConstraintValidator<BarConstraint, FooBar> {
 
+		@Override
 		public void initialize(BarConstraint constraintAnnotation) {
 		}
 
+		@Override
 		public boolean isValid(FooBar value, ConstraintValidatorContext context) {
 			return false;
 		}
@@ -370,9 +373,11 @@ public class FailFastTest {
 
 	public static class FooConstraintValidator implements ConstraintValidator<FooConstraint, FooBar> {
 
+		@Override
 		public void initialize(FooConstraint constraintAnnotation) {
 		}
 
+		@Override
 		public boolean isValid(FooBar value, ConstraintValidatorContext context) {
 			throw new RuntimeException( "Should not be executed due to fail fast mode" );
 		}

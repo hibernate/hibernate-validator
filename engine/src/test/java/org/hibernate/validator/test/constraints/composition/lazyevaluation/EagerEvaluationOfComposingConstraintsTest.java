@@ -63,11 +63,11 @@ public class EagerEvaluationOfComposingConstraintsTest {
 	@Retention(RUNTIME)
 	@InvocationCounting.List(value = { @InvocationCounting, @InvocationCounting })
 	public @interface MyComposedConstraint {
-		public abstract String message() default "my composed constraint failed";
+		String message() default "my composed constraint failed";
 
-		public abstract Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public abstract Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class MyComposedConstraintValidator extends InvocationCounter

@@ -38,9 +38,9 @@ import javax.validation.constraints.Size;
 @Retention(RUNTIME)
 @Constraint(validatedBy = { })
 public @interface ValidName {
-	public abstract String message() default "invalid name";
+	String message() default "invalid name";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }

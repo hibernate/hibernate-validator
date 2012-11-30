@@ -20,7 +20,7 @@ package org.hibernate.validator.integration.cdi.service;
  * @author Hardy Ferentschik
  */
 public interface PingService {
-	public String ping();
+	String ping();
 }
 
 

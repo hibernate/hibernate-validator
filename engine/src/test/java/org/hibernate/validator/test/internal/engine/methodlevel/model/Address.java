@@ -1,4 +1,3 @@
-// $Id: Address.java 19033 Oct 3, 2010 2:12:45 PM gunnar.morling $
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2009, Red Hat Middleware LLC, and individual contributors

@@ -46,14 +46,14 @@ public class PastValidatorForDateTest {
 	private Date getFutureDate() {
 		Date date = new Date();
 		long timeStamp = date.getTime();
-		date.setTime( timeStamp + 31557600000l );
+		date.setTime( timeStamp + 31557600000L );
 		return date;
 	}
 
 	private Date getPastDate() {
 		Date date = new Date();
 		long timeStamp = date.getTime();
-		date.setTime( timeStamp - 31557600000l );
+		date.setTime( timeStamp - 31557600000L );
 		return date;
 	}
 

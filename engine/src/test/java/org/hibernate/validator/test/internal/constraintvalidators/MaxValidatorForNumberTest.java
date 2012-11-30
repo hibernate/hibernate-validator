@@ -42,7 +42,7 @@ public class MaxValidatorForNumberTest {
 	public void testIsValidMax() {
 
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
-		descriptor.setValue( "value", 15l );
+		descriptor.setValue( "value", 15L );
 		descriptor.setValue( "message", "{validator.max}" );
 		Max m = AnnotationFactory.create( descriptor );
 
@@ -87,17 +87,17 @@ public class MaxValidatorForNumberTest {
 		Byte bWrapper = 127;
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( b, null ) );
-		assertTrue( constraint.isValid( 15l, null ) );
+		assertTrue( constraint.isValid( 15L, null ) );
 		assertTrue( constraint.isValid( 15, null ) );
 		assertTrue( constraint.isValid( 15.0, null ) );
 		assertTrue( constraint.isValid( BigDecimal.valueOf( -156000000000.0 ), null ) );
-		assertTrue( constraint.isValid( BigInteger.valueOf( -10000000l ), null ) );
+		assertTrue( constraint.isValid( BigInteger.valueOf( -10000000L ), null ) );
 		assertTrue( constraint.isValid( 10, null ) );
 		assertTrue( constraint.isValid( 14.99, null ) );
 		assertTrue( constraint.isValid( -14.99, null ) );
 		assertFalse( constraint.isValid( 20, null ) );
 		assertFalse( constraint.isValid( bWrapper, null ) );
 		assertFalse( constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ) );
-		assertFalse( constraint.isValid( BigInteger.valueOf( 10000000l ), null ) );
+		assertFalse( constraint.isValid( BigInteger.valueOf( 10000000L ), null ) );
 	}
 }

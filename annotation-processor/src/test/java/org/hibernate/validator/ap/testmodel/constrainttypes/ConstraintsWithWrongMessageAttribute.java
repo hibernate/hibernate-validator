@@ -25,13 +25,12 @@ import javax.validation.Payload;
  * @author Gunnar Morling
  */
 public interface ConstraintsWithWrongMessageAttribute {
-
 	/**
 	 * Compilation error expected as no message() attribute is specified.
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = { DummyValidator.class })
-	public @interface ConstraintWithoutMessageAttribute {
+	@interface ConstraintWithoutMessageAttribute {
 
 		Class<?>[] groups() default { };
 
@@ -44,9 +43,9 @@ public interface ConstraintsWithWrongMessageAttribute {
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = { DummyValidator.class })
-	public @interface ConstraintWithMessageAttributeWithWrongReturnType {
+	@interface ConstraintWithMessageAttributeWithWrongReturnType {
 
-		public int message();
+		int message();
 
 		Class<?>[] groups() default { };
 
@@ -59,7 +58,7 @@ public interface ConstraintsWithWrongMessageAttribute {
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = { DummyValidator.class })
-	public @interface ConstraintWithMessageAttribute {
+	@interface ConstraintWithMessageAttribute {
 
 		String message() default "";
 
@@ -68,5 +67,4 @@ public interface ConstraintsWithWrongMessageAttribute {
 		Class<? extends Payload>[] payload() default { };
 
 	}
-
 }

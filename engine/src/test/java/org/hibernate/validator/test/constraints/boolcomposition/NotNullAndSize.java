@@ -46,9 +46,9 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 @Retention(RUNTIME)
 @Constraint(validatedBy = { })
 public @interface NotNullAndSize {
-	public abstract String message() default "AND";
+	String message() default "AND";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }

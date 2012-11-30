@@ -270,13 +270,14 @@
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <violationSeverity>error</violationSeverity>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <!-- These classes are imported from other sources and are not re-formatted-->
-                        <excludes>**/ConcurrentReferenceHashMap.java,**/TypeHelper.java</excludes>
+                        <excludes>**/ConcurrentReferenceHashMap.java,**/TypeHelper*.java</excludes>
                     </configuration>
                     <executions>
                         <execution>
                             <id>check-style</id>
-                            <phase>compile</phase>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>checkstyle</goal>
                             </goals>

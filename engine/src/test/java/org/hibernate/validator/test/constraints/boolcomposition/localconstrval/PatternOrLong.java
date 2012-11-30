@@ -46,9 +46,9 @@ import static org.hibernate.validator.constraints.CompositionType.OR;
 @Retention(RUNTIME)
 @Constraint(validatedBy = { LongStringValidator.class })
 public @interface PatternOrLong {
-	public abstract String message() default "Both Pattern and LongString failed";
+	String message() default "Both Pattern and LongString failed";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }
