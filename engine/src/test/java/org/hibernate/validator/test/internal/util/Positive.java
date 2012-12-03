@@ -33,6 +33,6 @@ import javax.validation.Constraint;
 @Retention(RUNTIME)
 @Documented
 public @interface Positive {
-	public abstract String message() default "{validation.positive}";
-	public abstract Class<?>[] groups() default {};
+	String message() default "{validation.positive}";
+	Class<?>[] groups() default {};
 }

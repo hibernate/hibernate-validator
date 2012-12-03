@@ -35,7 +35,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 	private java.util.regex.Pattern pattern;
 
 	public void initialize(Pattern parameters) {
-		Pattern.Flag flags[] = parameters.flags();
+		Pattern.Flag[] flags = parameters.flags();
 		int intFlag = 0;
 		for ( Pattern.Flag flag : flags ) {
 			intFlag = intFlag | flag.getValue();

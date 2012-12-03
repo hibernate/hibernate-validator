@@ -70,6 +70,7 @@ public class MessageInterpolationTest {
 						new ResourceBundleMessageInterpolator(
 								new ResourceBundleLocator() {
 
+									@Override
 									public ResourceBundle getResourceBundle(
 											Locale locale) {
 										return bundle;
@@ -107,16 +108,16 @@ public class MessageInterpolationTest {
 		assertEquals( violation.getMessage(), "Message is [bar, baz, qux]" );
 	}
 
-	public static interface Bar {
+	public interface Bar {
 	}
 
-	public static interface Baz {
+	public interface Baz {
 	}
 
-	public static interface Buz {
+	public interface Buz {
 	}
 
-	public static interface Qux {
+	public interface Qux {
 	}
 
 	@Target(METHOD)
@@ -136,10 +137,12 @@ public class MessageInterpolationTest {
 
 		private List<String> values;
 
+		@Override
 		public void initialize(AllowedValues values) {
 			this.values = Arrays.asList( values.values() );
 		}
 
+		@Override
 		public boolean isValid(String value, ConstraintValidatorContext context) {
 			if ( value == null ) {
 				return true;

@@ -47,10 +47,10 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
 @Constraint(validatedBy = { })
 @Blacklist
 public @interface AllowedSSN {
-	public abstract String message() default "Invalid or blacklisted social security number";
+	String message() default "Invalid or blacklisted social security number";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
 }

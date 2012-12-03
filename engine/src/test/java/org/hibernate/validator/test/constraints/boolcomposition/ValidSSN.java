@@ -47,10 +47,10 @@ import static org.hibernate.validator.constraints.CompositionType.OR;
 @Constraint(validatedBy = { })
 @TemporarySSN
 public @interface ValidSSN {
-	public abstract String message() default "Not a valid social security number";
+	String message() default "Not a valid social security number";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
 }

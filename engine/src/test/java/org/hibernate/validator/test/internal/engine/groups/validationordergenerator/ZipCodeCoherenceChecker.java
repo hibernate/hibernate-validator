@@ -33,7 +33,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Constraint(validatedBy = ZipCodeCoherenceValidator.class)
 public @interface ZipCodeCoherenceChecker {
-	public abstract String message() default "{validator.zipCodeCoherenceChecker}";
+	String message() default "{validator.zipCodeCoherenceChecker}";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 }

@@ -49,9 +49,9 @@ import static org.hibernate.validator.constraints.CompositionType.OR;
 @Retention(RUNTIME)
 @Constraint(validatedBy = { })
 public @interface PatternOrSize {
-	public abstract String message() default "OR";
+	String message() default "OR";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }

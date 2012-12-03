@@ -332,17 +332,19 @@ public class ElementDescriptorFromNodeTest {
 	@Retention(RUNTIME)
 	@Constraint(validatedBy = { CustomConstraintValidator.class })
 	public @interface CustomConstraint {
-		public String message() default "custom constraint";
+		String message() default "custom constraint";
 
-		public Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	public static class CustomConstraintValidator implements ConstraintValidator<CustomConstraint, Object> {
+		@Override
 		public void initialize(CustomConstraint constraintAnnotation) {
 		}
 
+		@Override
 		public boolean isValid(Object o, ConstraintValidatorContext context) {
 			return false;
 		}

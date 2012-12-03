@@ -31,13 +31,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = { MarathonConstraintValidator.class })
 public @interface MarathonConstraint {
-	public String message() default "invalid name";
+	String message() default "invalid name";
 
-	public Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
-	public int minRunner();
+	int minRunner();
 }
 
 

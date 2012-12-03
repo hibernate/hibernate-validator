@@ -33,11 +33,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)
 public @interface InvocationCounting {
-	public abstract String message() default "my custom constraint";
+	String message() default "my custom constraint";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)

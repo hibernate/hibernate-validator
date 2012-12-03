@@ -175,7 +175,7 @@ public class EmailValidatorTest {
 	}
 
 	@SuppressWarnings("unused")
-	private static abstract class EmailContainer {
+	private abstract static class EmailContainer {
 		public String email;
 
 		public void setEmail(String email) {
@@ -188,6 +188,7 @@ public class EmailValidatorTest {
 	}
 
 	private static class EmailContainerAnnotated extends EmailContainer {
+		@Override
 		@Email(regexp = EmailValidatorTest.noOrgEmailAddressRegexp, message = "ORG addresses are not valid")
 		public String getEmail() {
 			return email;

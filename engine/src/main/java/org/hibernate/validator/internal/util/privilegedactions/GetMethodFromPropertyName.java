@@ -38,7 +38,7 @@ public final class GetMethodFromPropertyName implements PrivilegedAction<Method>
 
 	public Method run() {
 		try {
-			char string[] = property.toCharArray();
+			char[] string = property.toCharArray();
 			string[0] = Character.toUpperCase( string[0] );
 			String fullMethodName = new String( string );
 			try {

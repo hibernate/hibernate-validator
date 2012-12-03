@@ -41,7 +41,7 @@ public class MaxValidatorForStringTest {
 	public void testIsValidMax() {
 
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
-		descriptor.setValue( "value", 15l );
+		descriptor.setValue( "value", 15L );
 		descriptor.setValue( "message", "{validator.max}" );
 		Max m = AnnotationFactory.create( descriptor );
 

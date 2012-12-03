@@ -47,8 +47,10 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 
 	void cascadingParameter(@NotNull @Valid Customer param1, @NotNull @Valid Customer param2);
 
+	@Override
 	void foo(Long id);
 
+	@Override
 	void bar(Customer customer);
 
 	void boz();
@@ -68,10 +70,12 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	@Valid
 	Customer[] cascadingArrayReturnValue();
 
+	@Override
 	Customer overriddenMethodWithCascadingReturnValue();
 
 	void parameterConstraintInGroup(@NotNull(groups = { ValidationGroup.class }) String name);
 
+	@Override
 	@Min(10)
 	int overriddenMethodWithReturnValueConstraint();
 

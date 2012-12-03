@@ -110,15 +110,15 @@ public final class PathImpl implements Path, Serializable {
 		return new PathImpl( path, elementDescriptors );
 	}
 
-	public final boolean isRootPath() {
+	public boolean isRootPath() {
 		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
 	}
 
-	public final PathImpl getPathWithoutLeafNode() {
+	public PathImpl getPathWithoutLeafNode() {
 		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ) );
 	}
 
-	public final NodeImpl addNode(String nodeName) {
+	public NodeImpl addNode(String nodeName) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
@@ -126,7 +126,7 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public final NodeImpl makeLeafNodeIterable() {
+	public NodeImpl makeLeafNodeIterable() {
 		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, null );
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
@@ -134,7 +134,7 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public final NodeImpl setLeafNodeIndex(Integer index) {
+	public NodeImpl setLeafNodeIndex(Integer index) {
 		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, index, null );
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
@@ -142,7 +142,7 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public final NodeImpl setLeafNodeMapKey(Object key) {
+	public NodeImpl setLeafNodeMapKey(Object key) {
 		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, key );
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
@@ -150,12 +150,12 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public final NodeImpl getLeafNode() {
+	public NodeImpl getLeafNode() {
 		return currentLeafNode;
 	}
 
 	@Override
-	public final Iterator<Path.Node> iterator() {
+	public Iterator<Path.Node> iterator() {
 		if ( nodeList.size() == 0 ) {
 			return Collections.<Path.Node>emptyList().iterator();
 		}
@@ -165,7 +165,7 @@ public final class PathImpl implements Path, Serializable {
 		return nodeList.subList( 1, nodeList.size() ).iterator();
 	}
 
-	public final String asString() {
+	public String asString() {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 		for ( int i = 1; i < nodeList.size(); i++ ) {

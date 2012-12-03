@@ -21,8 +21,8 @@ import javax.validation.constraints.Size;
 
 interface A {
 	@Min(5)
-	public Integer getInteger();
+	Integer getInteger();
 
 	@Size(min = 2)
-	public String getString();
+	String getString();
 }

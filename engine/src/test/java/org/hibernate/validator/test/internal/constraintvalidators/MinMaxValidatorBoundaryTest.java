@@ -40,18 +40,18 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  * @author Hardy Ferentschik
  */
 public class MinMaxValidatorBoundaryTest {
-	@Min(value = 9223372036854775807l)
+	@Min(value = 9223372036854775807L)
 	public long min;
 
-	@Max(value = 9223372036854775806l)
+	@Max(value = 9223372036854775806L)
 	public long max;
 
 	@Test
 	public void testMinBoundaryValue() {
 		Validator validator = ValidatorUtil.getValidator();
 
-		this.min = 9223372036854775806l;
-		this.max = 0l;
+		this.min = 9223372036854775806L;
+		this.max = 0L;
 
 		// Current min value is smaller, should fail, but it doesn't
 		Set<ConstraintViolation<MinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );
@@ -64,7 +64,7 @@ public class MinMaxValidatorBoundaryTest {
 		Validator validator = ValidatorUtil.getValidator();
 
 		this.min = Long.MAX_VALUE;
-		this.max = 9223372036854775807l;
+		this.max = 9223372036854775807L;
 
 		// Current max value is bigger, should fail, but it doesn't
 		Set<ConstraintViolation<MinMaxValidatorBoundaryTest>> constraintViolations = validator.validate( this );

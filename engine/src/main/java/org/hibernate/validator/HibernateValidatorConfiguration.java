@@ -35,7 +35,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * Property corresponding to the {@link #failFast} method.
 	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
 	 */
-	final static String FAIL_FAST = "hibernate.validator.fail_fast";
+	String FAIL_FAST = "hibernate.validator.fail_fast";
 
 	/**
 	 * <p>

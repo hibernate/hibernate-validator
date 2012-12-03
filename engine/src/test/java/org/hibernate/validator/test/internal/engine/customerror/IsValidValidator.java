@@ -1,5 +1,4 @@
 /*
- *
  * JBoss, Home of Professional Open Source
  * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
@@ -28,9 +27,11 @@ public class IsValidValidator implements ConstraintValidator<IsValid, DummyTestC
 	public static final String message = "Custom error message";
 
 
+	@Override
 	public void initialize(IsValid isValid) {
 	}
 
+	@Override
 	public boolean isValid(DummyTestClass dummyTestClass, ConstraintValidatorContext constraintValidatorContext) {
 		constraintValidatorContext.disableDefaultConstraintViolation();
 		constraintValidatorContext.buildConstraintViolationWithTemplate( message )

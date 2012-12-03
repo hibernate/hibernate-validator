@@ -217,7 +217,7 @@ public class URLValidatorTest {
 
 	}
 
-	private static abstract class URLContainer {
+	private abstract static class URLContainer {
 		public String url;
 
 		public void setUrl(String url) {
@@ -231,6 +231,7 @@ public class URLValidatorTest {
 	}
 
 	private static class URLContainerAnnotated extends URLContainer {
+		@Override
 		@URL(regexp = "^http://\\S+[\\.htm|\\.html]{1}$")
 		public String getUrl() {
 			return url;
@@ -239,6 +240,7 @@ public class URLValidatorTest {
 
 	private static class CaseInsensitiveURLContainerAnnotated extends URLContainer {
 
+		@Override
 		@URL(regexp = "^http://\\S+[\\.htm|\\.html]{1}$", flags = Flag.CASE_INSENSITIVE)
 		public String getUrl() {
 			return url;

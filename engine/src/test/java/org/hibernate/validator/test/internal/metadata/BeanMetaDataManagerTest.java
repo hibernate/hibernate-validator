@@ -80,7 +80,7 @@ public class BeanMetaDataManagerTest {
 		 * Classes from this name space will be loaded by this class loader, all
 		 * others will be loaded by the default loader.
 		 */
-		private final static String PACKAGE_PREFIX = "org.hibernate.validator.test";
+		private static final String PACKAGE_PREFIX = "org.hibernate.validator.test";
 
 		public CustomClassLoader() {
 			super( CustomClassLoader.class.getClassLoader() );
@@ -107,7 +107,7 @@ public class BeanMetaDataManagerTest {
 		}
 
 		public Class<?> myFindClass(String className) {
-			byte classByte[];
+			byte[] classByte;
 			Class<?> result;
 
 			try {
@@ -128,7 +128,7 @@ public class BeanMetaDataManagerTest {
 			File f;
 			f = new File( className );
 			int size = (int) f.length();
-			byte buff[] = new byte[size];
+			byte[] buff = new byte[size];
 			FileInputStream fis = new FileInputStream( f );
 			DataInputStream dis = new DataInputStream( fis );
 			dis.readFully( buff );

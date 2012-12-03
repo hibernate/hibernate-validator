@@ -41,7 +41,7 @@ public class MinValidatorForStringTest {
 	@Test
 	public void testIsValidMinValidator() {
 		AnnotationDescriptor<Min> descriptor = new AnnotationDescriptor<Min>( Min.class );
-		descriptor.setValue( "value", 15l );
+		descriptor.setValue( "value", 15L );
 		descriptor.setValue( "message", "{validator.min}" );
 		Min m = AnnotationFactory.create( descriptor );
 

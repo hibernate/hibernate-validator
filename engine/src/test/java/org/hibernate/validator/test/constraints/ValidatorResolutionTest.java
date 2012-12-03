@@ -91,9 +91,9 @@ public class ValidatorResolutionTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 
 		Coordinate[] boundingBox = new Coordinate[3];
-		boundingBox[0] = new Coordinate( 0l, 0l );
-		boundingBox[1] = new Coordinate( 0l, 1l );
-		boundingBox[2] = new Coordinate( 1l, 0l );
+		boundingBox[0] = new Coordinate( 0L, 0L );
+		boundingBox[1] = new Coordinate( 0L, 1L );
+		boundingBox[2] = new Coordinate( 1L, 0L );
 		suburb.setBoundingBox( boundingBox );
 		constraintViolations = validator.validate( suburb );
 		assertNumberOfViolations( constraintViolations, 1 );
@@ -106,10 +106,10 @@ public class ValidatorResolutionTest {
 		);
 
 		boundingBox = new Coordinate[4];
-		boundingBox[0] = new Coordinate( 0l, 0l );
-		boundingBox[1] = new Coordinate( 0l, 1l );
-		boundingBox[2] = new Coordinate( 1l, 0l );
-		boundingBox[3] = new Coordinate( 1l, 1l );
+		boundingBox[0] = new Coordinate( 0L, 0L );
+		boundingBox[1] = new Coordinate( 0L, 1L );
+		boundingBox[2] = new Coordinate( 1L, 0L );
+		boundingBox[3] = new Coordinate( 1L, 1L );
 		suburb.setBoundingBox( boundingBox );
 		constraintViolations = validator.validate( suburb );
 		assertNumberOfViolations( constraintViolations, 0 );
@@ -158,10 +158,10 @@ public class ValidatorResolutionTest {
 	@SuppressWarnings("unused")
 	public class Foo {
 		@org.hibernate.validator.test.constraints.Object
-		private org.hibernate.validator.test.constraints.Object[] objectArray;
+		private final org.hibernate.validator.test.constraints.Object[] objectArray;
 
 		@org.hibernate.validator.test.constraints.Object
-		private int[] intArray;
+		private final int[] intArray;
 
 		public Foo(org.hibernate.validator.test.constraints.Object[] objectArray, int[] intArray) {
 			this.objectArray = objectArray;
@@ -172,10 +172,10 @@ public class ValidatorResolutionTest {
 	@SuppressWarnings("unused")
 	public class Bar {
 		@org.hibernate.validator.test.constraints.Cloneable
-		private org.hibernate.validator.test.constraints.Object[] objectArray;
+		private final org.hibernate.validator.test.constraints.Object[] objectArray;
 
 		@org.hibernate.validator.test.constraints.Cloneable
-		private int[] intArray;
+		private final int[] intArray;
 
 		public Bar(org.hibernate.validator.test.constraints.Object[] objectArray, int[] intArray) {
 			this.objectArray = objectArray;
@@ -186,10 +186,10 @@ public class ValidatorResolutionTest {
 	@SuppressWarnings("unused")
 	public class Fubar {
 		@Serializable
-		private org.hibernate.validator.test.constraints.Object[] objectArray;
+		private final org.hibernate.validator.test.constraints.Object[] objectArray;
 
 		@Serializable
-		private int[] intArray;
+		private final int[] intArray;
 
 		public Fubar(org.hibernate.validator.test.constraints.Object[] objectArray, int[] intArray) {
 			this.objectArray = objectArray;
@@ -200,7 +200,7 @@ public class ValidatorResolutionTest {
 	@SuppressWarnings("unused")
 	public class SubTypeEntity {
 		@SuperTypeArray
-		private SubType[] subTypeArray;
+		private final SubType[] subTypeArray;
 
 		public SubTypeEntity(SubType[] subTypeArray) {
 			this.subTypeArray = subTypeArray;

@@ -31,7 +31,7 @@ import org.hibernate.validator.constraints.ScriptAssert;
 @ScriptAssert(lang = "javascript", script = "some script")
 public class CustomerRepository {
 
-	public static interface ValidationGroup {
+	public interface ValidationGroup {
 	}
 
 	public Customer createCustomer(CharSequence firstName, @NotNull String lastName) {

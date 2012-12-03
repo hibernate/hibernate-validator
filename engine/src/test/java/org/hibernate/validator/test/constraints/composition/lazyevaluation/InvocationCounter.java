@@ -33,7 +33,8 @@ public class InvocationCounter {
 		Integer count = countsPerInstance.get( o );
 		if(count == null) {
 			countsPerInstance.put( o, 1 );
-		} else {
+		}
+		else {
 			countsPerInstance.put( o, count + 1 );
 		}
 	}

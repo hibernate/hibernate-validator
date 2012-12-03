@@ -150,6 +150,7 @@ public class ConstraintValidatorCachingTest {
 		OnceInstanceOnlyConstraintValidatorFactory() {
 		}
 
+		@Override
 		public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 			T constraintValidator = factory.getInstance( key );
 			if ( instantiatedConstraintValidatorClasses.containsKey( key ) ) {
@@ -255,11 +256,11 @@ public class ConstraintValidatorCachingTest {
 	@Retention(RUNTIME)
 	@Documented
 	public @interface A {
-		public abstract String message() default "A";
+		String message() default "A";
 
-		public abstract Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public abstract Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	@Size(max = 10, message = "size 10")
@@ -268,11 +269,11 @@ public class ConstraintValidatorCachingTest {
 	@Retention(RUNTIME)
 	@Documented
 	public @interface B {
-		public abstract String message() default "B";
+		String message() default "B";
 
-		public abstract Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public abstract Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	@A
@@ -282,11 +283,11 @@ public class ConstraintValidatorCachingTest {
 	@Retention(RUNTIME)
 	@Documented
 	public @interface C {
-		public abstract String message() default "C";
+		String message() default "C";
 
-		public abstract Class<?>[] groups() default { };
+		Class<?>[] groups() default { };
 
-		public abstract Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	class Foo {

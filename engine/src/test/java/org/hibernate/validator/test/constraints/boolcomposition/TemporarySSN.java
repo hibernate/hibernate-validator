@@ -45,10 +45,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Pattern(regexp = "[0-9]{6}")
 @ReportAsSingleViolation
 public @interface TemporarySSN {
-	public abstract String message() default "Not a temporary social security number";
+	String message() default "Not a temporary social security number";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
 }

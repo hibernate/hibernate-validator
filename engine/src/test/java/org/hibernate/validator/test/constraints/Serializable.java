@@ -35,9 +35,9 @@ import javax.validation.Payload;
 @Retention(RUNTIME)
 @Documented
 public @interface Serializable {
-	public abstract String message() default "{org.hibernate.validator.constraints.Serializable.message}";
+	String message() default "{org.hibernate.validator.constraints.Serializable.message}";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }

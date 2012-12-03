@@ -43,9 +43,9 @@ import javax.validation.constraints.Pattern;
 @ReportAsSingleViolation
 public @interface Email {
 
-	public abstract String message() default "{org.hibernate.validator.internal.engine.serialization.Email.message}";
+	String message() default "{org.hibernate.validator.internal.engine.serialization.Email.message}";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }

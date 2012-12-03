@@ -45,10 +45,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ReportAsSingleViolation
 @Pattern(regexp = "[0-9]{11}")
 public @interface SSN {
-	public abstract String message() default "{org.hibernate.validator.test.constraints.boolcomposition.Blacklist.message}";
+	String message() default "{org.hibernate.validator.test.constraints.boolcomposition.Blacklist.message}";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 
 }

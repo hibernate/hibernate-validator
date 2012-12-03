@@ -892,10 +892,12 @@ public class TypeHelperTest {
 	private static WildcardType wildcardType(final Type[] upperBounds, final Type[] lowerBounds) {
 		return new WildcardType() {
 
+			@Override
 			public Type[] getUpperBounds() {
 				return upperBounds;
 			}
 
+			@Override
 			public Type[] getLowerBounds() {
 				return lowerBounds;
 			}
@@ -906,6 +908,7 @@ public class TypeHelperTest {
 											 final String name,
 											 final Type... bounds) {
 		return new TypeVariable() {
+			@Override
 			public Type[] getBounds() {
 				if ( bounds == null || bounds.length == 0 ) {
 					return new Type[] { Object.class };
@@ -913,10 +916,12 @@ public class TypeHelperTest {
 				return bounds;
 			}
 
+			@Override
 			public GenericDeclaration getGenericDeclaration() {
 				return declaration;
 			}
 
+			@Override
 			public String getName() {
 				return name;
 			}

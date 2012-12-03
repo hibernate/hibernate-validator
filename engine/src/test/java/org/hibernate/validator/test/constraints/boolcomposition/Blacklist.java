@@ -50,9 +50,9 @@ import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 		@Pattern(regexp = "123456")
 })
 public @interface Blacklist {
-	public abstract String message() default "Blacklisted SSN";
+	String message() default "Blacklisted SSN";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default { };
 }

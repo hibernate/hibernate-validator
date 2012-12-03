@@ -41,26 +41,30 @@ import javax.validation.ConstraintValidatorContext;
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)
 public @interface PostCodeList {
-	public abstract String message() default "foobar";
+	String message() default "foobar";
 
-	public abstract Class<?>[] groups() default { };
+	Class<?>[] groups() default { };
 
-	public abstract Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 
 	public class PostCodeListValidatorForNumber
 			implements ConstraintValidator<PostCodeList, Collection<? extends Number>> {
+		@Override
 		public void initialize(PostCodeList constraintAnnotation) {
 		}
 
+		@Override
 		public boolean isValid(Collection<? extends Number> value, ConstraintValidatorContext constraintValidatorContext) {
 			return true;
 		}
 	}
 
 	public class PostCodeListValidatorForString implements ConstraintValidator<PostCodeList, Collection<String>> {
+		@Override
 		public void initialize(PostCodeList constraintAnnotation) {
 		}
 
+		@Override
 		public boolean isValid(Collection<String> value, ConstraintValidatorContext constraintValidatorContext) {
 			if ( value == null ) {
 				return true;
