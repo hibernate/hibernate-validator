@@ -11,7 +11,7 @@ few pre-requisite steps:
 
 * Make sure you have a [Hibernate Jira account](https://hibernate.onjira.com)
 * Make sure you have a [GitHub account](https://github.com/signup/free)
-* [Fork](http://help.github.com/fork-a-repo) the Hibernate Validator [repository|https://github.com/hibernate/hibernate-validator].
+* [Fork](http://help.github.com/fork-a-repo) the Hibernate Validator [repository](https://github.com/hibernate/hibernate-validator).
 As discussed in the linked page, this also includes:
     * [Setting](https://help.github.com/articles/set-up-git) up your local git install
     * Cloning your fork
