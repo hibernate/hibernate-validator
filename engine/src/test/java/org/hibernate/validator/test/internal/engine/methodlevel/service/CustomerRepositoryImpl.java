@@ -56,62 +56,77 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	public CustomerRepositoryImpl(@Valid Customer customer) {
 	}
 
+	@Override
 	public Customer findCustomerByName(String name) {
 		return null;
 	}
 
+	@Override
 	public void persistCustomer(Customer customer) {
 
 	}
 
+	@Override
 	public void cascadingMapParameter(Map<String, Customer> customer) {
 
 	}
 
+	@Override
 	public void cascadingIterableParameter(List<Customer> customer) {
 
 	}
 
+	@Override
 	public void cascadingArrayParameter(Customer... customer) {
 
 	}
 
+	@Override
 	public void findCustomerByAgeAndName(Integer age, String name) {
 
 	}
 
+	@Override
 	public void cascadingParameter(Customer param1, Customer param2) {
 
 	}
 
+	@Override
 	public Customer findById(Long id) {
 		return null;
 	}
 
+	@Override
 	public void foo(Long id) {
 
 	}
 
+	@Override
 	public void bar(Customer customer) {
 
 	}
 
+	@Override
 	public void boz() {
 
 	}
 
+	@Override
 	public int baz() {
 		return 9;
 	}
 
+	@Override
 	public Customer cascadingReturnValue() {
 		return new Customer( null );
 	}
 
+	@Override
 	public List<Customer> cascadingIterableReturnValue() {
 		return Arrays.asList( null, new Customer( null ) );
 	}
 
+	@Override
 	public Map<String, Customer> cascadingMapReturnValue() {
 
 		Map<String, Customer> theValue = newHashMap();
@@ -119,33 +134,41 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 		return theValue;
 	}
 
+	@Override
 	public Customer[] cascadingArrayReturnValue() {
 		return new Customer[] { null, new Customer( null ) };
 	}
 
+	@Override
 	public Customer overriddenMethodWithCascadingReturnValue() {
 		return new Customer( null );
 	}
 
+	@Override
 	public void parameterConstraintInGroup(String name) {
 
 	}
 
+	@Override
 	public int overriddenMethodWithReturnValueConstraint() {
 		return 3;
 	}
 
+	@Override
 	public void voidMethodWithIllegalReturnValueConstraint() {
 	}
 
+	@Override
 	public int getFoo(int i) {
 		return 0;
 	}
 
+	@Override
 	public int getFoo(String s) {
 		return 0;
 	}
 
+	@Override
 	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
 	}
 
@@ -163,9 +186,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	public static class ValidB2BRepositoryValidator
 			implements ConstraintValidator<ValidB2BRepository, CustomerRepositoryImpl> {
 
+		@Override
 		public void initialize(ValidB2BRepository annotation) {
 		}
 
+		@Override
 		public boolean isValid(CustomerRepositoryImpl repository, ConstraintValidatorContext context) {
 			return false;
 		}
