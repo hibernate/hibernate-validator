@@ -210,7 +210,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 
 	private boolean isReturnValueValidation(ValueContext<?, ?> localContext) {
 		for ( Path.Node node : localContext.getPropertyPath() ) {
-			if ( node.getName().equals( PathImpl.RETURN_VALUE_NODE_NAME ) ) {
+			if ( PathImpl.RETURN_VALUE_NODE_NAME.equals( node.getName() ) ) {
 				return true;
 			}
 		}
