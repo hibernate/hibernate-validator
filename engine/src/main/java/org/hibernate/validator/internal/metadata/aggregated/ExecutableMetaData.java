@@ -349,18 +349,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return parameterMetaDataList.get( parameterIndex );
 	}
 
-	/**
-	 * Returns meta data for all parameters of the represented executable.
-	 *
-	 * @return A list with parameter meta data. The length corresponds to the
-	 *         number of parameters of the executable represented by this meta data
-	 *         object, so an empty list may be returned (in case of a
-	 *         parameterless executable), but never <code>null</code>.
-	 */
-	public List<ParameterMetaData> getAllParameterMetaData() {
-		return parameterMetaDataList;
-	}
-
 	public Class<?>[] getParameterTypes() {
 		return parameterTypes;
 	}
