@@ -14,16 +14,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
 import javax.validation.GroupSequence;
 
-import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
 
 /**
  * @author Gunnar Morling
  */
-@GroupSequence( { ValidationGroup1.class, CustomerRepositoryWithRedefinedDefaultGroupImpl.class })
+@GroupSequence({ ValidationGroup1.class, CustomerRepositoryWithRedefinedDefaultGroupImpl.class })
 public class CustomerRepositoryWithRedefinedDefaultGroupImpl implements CustomerRepositoryWithRedefinedDefaultGroup {
 
 	public void noConstraintInDefaultGroup(String name) {

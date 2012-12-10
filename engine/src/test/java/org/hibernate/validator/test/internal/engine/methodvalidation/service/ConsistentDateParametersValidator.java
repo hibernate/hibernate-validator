@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -45,6 +45,6 @@ public class ConsistentDateParametersValidator implements ConstraintValidator<Co
 			throw new IllegalArgumentException( "Unexpected method signature" );
 		}
 
-		return ( ( DateMidnight ) value[0] ).isBefore( ( DateMidnight ) value[1] );
+		return ( (DateMidnight) value[0] ).isBefore( (DateMidnight) value[1] );
 	}
 }

@@ -14,41 +14,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.model;
+package org.hibernate.validator.test.internal.engine.methodvalidation.model;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
  * @author Gunnar Morling
- *
  */
-public class Customer {
+public class Address {
+	private final String city;
 
-	public final String name;
-	
-	private final Address address;
+	public Address(String city) {
 
-	public Customer(String name) {
-
-		this(name, null);
-	}
-	
-	public Customer(String name, Address address) {
-
-		this.name = name;
-		this.address = address;
+		this.city = city;
 	}
 
 	@NotNull
-	public String getName() {
-		return name;
+	public String getCity() {
+		return city;
 	}
-
-	@Valid
-	public Address getAddress() {
-		return address;
-	}
-	
-	
 }

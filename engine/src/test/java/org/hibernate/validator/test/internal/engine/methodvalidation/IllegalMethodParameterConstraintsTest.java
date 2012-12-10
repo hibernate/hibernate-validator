@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel;
+package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
@@ -27,7 +27,7 @@ import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.ConsistentDateParameters;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;

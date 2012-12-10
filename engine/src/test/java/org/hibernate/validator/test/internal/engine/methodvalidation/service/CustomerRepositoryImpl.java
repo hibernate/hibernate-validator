@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
 
 import org.joda.time.DateMidnight;
 
-import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.TYPE;
