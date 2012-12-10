@@ -14,37 +14,36 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.model;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
 
 /**
  * @author Gunnar Morling
  */
-public interface RepositoryBase<T> {
-	/**
-	 * Used to test, that constraints at methods from base interfaces/classes are evaluated.
-	 */
-	T findById(@NotNull Long id);
+public class Customer {
+	public final String name;
+	private final Address address;
 
-	/**
-	 * Used to test, that constraints at overridden methods from base interfaces/classes are evaluated.
-	 */
-	void foo(@NotNull Long id);
+	public Customer(String name) {
 
-	void bar(@NotNull @Valid Customer customer);
+		this( name, null );
+	}
 
-	/**
-	 * Used to test, that in an inheritance hierarchy multiple return value
-	 * constraints for an overridden method are joined.
-	 */
-	@Min(5)
-	int overriddenMethodWithReturnValueConstraint();
+	public Customer(String name, Address address) {
+
+		this.name = name;
+		this.address = address;
+	}
+
+	@NotNull
+	public String getName() {
+		return name;
+	}
 
 	@Valid
-	Customer overriddenMethodWithCascadingReturnValue();
+	public Address getAddress() {
+		return address;
+	}
 }

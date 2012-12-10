@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,25 +14,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.model;
-
-import javax.validation.constraints.NotNull;
+package org.hibernate.validator.test.internal.engine.methodvalidation.returnvaluevalidation;
 
 /**
- * @author Gunnar Morling
- *
+ * @author Hardy Ferentschik
  */
-public class Address {
-
-	private final String city;
-	
-	public Address(String city) {
-		
-		this.city = city; 
-	}
-	
-	@NotNull
-	public String getCity() {
-		return city;
+public class ContactServiceImpl implements ContactService {
+	@Override
+	public void validateValidBeanParamConstraint(ContactBean bean) {
 	}
 }
+
+

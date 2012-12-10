@@ -14,33 +14,43 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.returnvaluevalidation;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.validation.CrossParameterConstraint;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
-
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.METHOD;
+import javax.validation.constraints.NotNull;
 
 /**
- * Cross-parameter constraint that checks that two date parameters are in the
- * correct order. Applies to methods with the signature
- * {@code methodName(DateMidnight start, DateMidnight end)}.
- *
- * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
-@Target({ METHOD, ANNOTATION_TYPE })
+@NotNull
+@Constraint(validatedBy = AtLeastOneContactProvided.AtLeastOneContactProvidedValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
-@CrossParameterConstraint(validatedBy = ConsistentDateParametersValidator.class)
-@Documented
-public @interface ConsistentDateParameters {
-	String message() default "{ConsistentDateParameters.message}";
+public @interface AtLeastOneContactProvided {
+
+	String message() default "none or more than one contact";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
+	public class AtLeastOneContactProvidedValidator
+			implements ConstraintValidator<AtLeastOneContactProvided, ContactBean> {
+
+		@Override
+		public void initialize(final AtLeastOneContactProvided nonRecursive) {
+		}
+
+		@Override
+		public boolean isValid(final ContactBean bean, final ConstraintValidatorContext constraintValidatorContext) {
+			if ( bean.getEmail() == null && bean.getPhone() == null ) {
+				return false;
+			}
+			return bean.getEmail() != null || bean.getPhone() != null;
+		}
+	}
 }

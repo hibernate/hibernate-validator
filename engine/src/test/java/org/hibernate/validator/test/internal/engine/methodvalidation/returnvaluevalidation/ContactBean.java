@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,41 +14,39 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.model;
+package org.hibernate.validator.test.internal.engine.methodvalidation.returnvaluevalidation;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Email;
 
 /**
- * @author Gunnar Morling
- *
+ * @author Hardy Ferentschik
  */
-public class Customer {
+@AtLeastOneContactProvided
+public class ContactBean {
 
-	public final String name;
-	
-	private final Address address;
+	@Email(regexp = "[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}")
+	private String email;
 
-	public Customer(String name) {
+	@Pattern(regexp = "[0-9]{3,9}")
+	private String phone;
 
-		this(name, null);
-	}
-	
-	public Customer(String name, Address address) {
-
-		this.name = name;
-		this.address = address;
+	public String getEmail() {
+		return email;
 	}
 
-	@NotNull
-	public String getName() {
-		return name;
+	public void setEmail(final String email) {
+		this.email = email;
 	}
 
-	@Valid
-	public Address getAddress() {
-		return address;
+	public String getPhone() {
+		return phone;
 	}
-	
-	
+
+	public void setPhone(final String phone) {
+		this.phone = phone;
+	}
 }
+
+

@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel;
+package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -25,9 +25,9 @@ import javax.validation.metadata.ElementDescriptor.Kind;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl.ValidB2BRepository;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;

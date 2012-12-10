@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
 import org.joda.time.DateMidnight;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 
 /**
  * @author Gunnar Morling

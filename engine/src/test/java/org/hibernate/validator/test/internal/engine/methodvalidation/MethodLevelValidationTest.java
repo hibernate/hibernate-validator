@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel;
+package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -34,12 +34,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.test.internal.engine.methodlevel.model.Address;
-import org.hibernate.validator.test.internal.engine.methodlevel.model.Customer;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.ConsistentDateParameters;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepository;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryImpl;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.RepositoryBase;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 

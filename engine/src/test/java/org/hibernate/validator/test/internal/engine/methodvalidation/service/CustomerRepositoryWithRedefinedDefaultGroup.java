@@ -14,40 +14,40 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodlevel.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
 import javax.validation.GroupSequence;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Min.List;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
-import org.hibernate.validator.test.internal.engine.methodlevel.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup1;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroup.ValidationGroup2;
 
 /**
  * @author Gunnar Morling
  */
-@GroupSequence( { ValidationGroup1.class, ValidationGroup2.class, CustomerRepositoryWithRedefinedDefaultGroup.class })
+@GroupSequence({ ValidationGroup1.class, ValidationGroup2.class, CustomerRepositoryWithRedefinedDefaultGroup.class })
 public interface CustomerRepositoryWithRedefinedDefaultGroup {
 
 	void noConstraintInDefaultGroup(@NotNull(groups = ValidationGroup3.class) String name);
 
 	void constraintInDefaultGroup(@NotNull(groups = ValidationGroup1.class) String name);
 
-	void constraintInLaterPartOfDefaultSequence(@List( {
+	void constraintInLaterPartOfDefaultSequence(@List({
 			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
 	}) int param);
 
-	void constraintInLaterPartOfDefaultSequenceAtDifferentParameters(@List( {
+	void constraintInLaterPartOfDefaultSequenceAtDifferentParameters(@List({
 			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
 	}) int param1, @Min(groups = ValidationGroup1.class, value = 7) int param2);
 
 
-	void constraintInLaterPartOfGroupSequence(@List( {
+	void constraintInLaterPartOfGroupSequence(@List({
 			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
 	}) int param);
 
-	void constraintInLaterPartOfGroupSequenceAtDifferentParameters(@List( {
+	void constraintInLaterPartOfGroupSequenceAtDifferentParameters(@List({
 			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
 	}) int param1, @Min(groups = ValidationGroup2.class, value = 7) int param2);
 
@@ -59,12 +59,12 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 	@NotNull(groups = ValidationGroup1.class)
 	String constraintInDefaultGroupAtReturnValue();
 
-	@List( {
+	@List({
 			@Min(groups = ValidationGroup1.class, value = 5), @Min(groups = ValidationGroup2.class, value = 10)
 	})
 	int constraintsInAllPartOfDefaultSequence();
 
-	@List( {
+	@List({
 			@Min(groups = ValidationGroup2.class, value = 5), @Min(groups = ValidationGroup3.class, value = 10)
 	})
 	int constraintsInAllPartsOfGroupSequence();
@@ -79,7 +79,7 @@ public interface CustomerRepositoryWithRedefinedDefaultGroup {
 	public interface ValidationGroup3 {
 	}
 
-	@GroupSequence( { ValidationGroup2.class, ValidationGroup3.class })
+	@GroupSequence({ ValidationGroup2.class, ValidationGroup3.class })
 	public interface ValidationSequence {
 	}
 
