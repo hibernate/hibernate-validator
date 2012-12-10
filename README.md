@@ -5,14 +5,14 @@
 
 ## What is it?
 
-This is the reference implementation of JSR-349 - Bean Validation 1.1.
+This is the reference implementation of [JSR-349 - Bean Validation 1.1](http://www.beanvalidation.org/).
 Bean Validation defines a metadata model and API for JavaBean validation. 
 The default metadata source is annotations, with the ability to override and extend 
 the meta-data through the use of XML validation descriptors.
 
 ## Documentation
 
-The documentation for this release is included in the docs directory of distribution package or can be accessed [online](  http://www.hibernate.org/subprojects/validator/docs.html).
+The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](http://www.hibernate.org/subprojects/validator/docs.html).
 
 ## Release Notes
 
@@ -24,13 +24,13 @@ JDK 1.6 or above.
 
 ## Using Hibernate Validator
 
-* In case you use the distribution archive from the download site, copy dist/hibernate-validator-<version>.jar together with all
-jar files from dist/lib/required into the classpath of your application. For the purposes of logging, Hibernate Validator uses
+* In case you use the distribution archive from the download site, copy _dist/hibernate-validator-&lt;version&gt;.jar_ together with all
+jar files from _dist/lib/required_ into the classpath of your application. For the purposes of logging, Hibernate Validator uses
 the JBoss Logging API, an abstraction layer which supports several logging solutions such (e.g. log4j or the logging framework
-provided by the JDK) as implementation. Just add a supported logging library to the classpath (e.g. log4j-<version>.jar) and JBoss
+provided by the JDK) as implementation. Just add a supported logging library to the classpath (e.g. _log4j-&lt;version&gt;.jar_) and JBoss
 Logging will delegate any log requests to that provider.
 
-* Add the following to your maven or ivy dependency list (Hibernate Validator can be found in the [JBoss Maven repository](http://repository.jboss.org/nexus/content/groups/public-jboss)):
+* Add the following to your Maven or Ivy dependency list (Hibernate Validator can be found in the [JBoss Maven repository](http://repository.jboss.org/nexus/content/groups/public-jboss)):
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -38,10 +38,9 @@ Logging will delegate any log requests to that provider.
             <version>5.0.0.Alpha2</version>
         </dependency>
 
-
-*hibernate-validator-annotation-processor-<version>.jar* is an optional jar which can be integrated with your build
-environment respectively IDE to verify that constraint annotations are correctly used. Refer to the online
-documentation for more information.
+* _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
+environment respectively IDE to verify that constraint annotations are correctly used. Refer to the [online
+documentation](http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html/validator-annotation-processor.html) for more information.
 
 ## Licensing
 
@@ -50,7 +49,7 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 
 ## Build from Source
 
-You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git
+You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git.
 You will also need a JDK 6 or 7 and a Maven 3. With these prerequisites in place you can compile the source via
 
     mvn clean install -s settings-example.xml
