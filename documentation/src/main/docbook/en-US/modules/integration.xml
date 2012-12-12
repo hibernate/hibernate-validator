@@ -31,75 +31,88 @@
   <section id="validator-osgi">
     <title>OSGi</title>
 
-    <para>The Hibernate Validator jar file is conform to the OSGi specification
-    and can be used within any OSGi container. The following lists represent the
-    packages imported and exported by Hibernate Validator. The classes within the
-    exported packages are considered part of Hibernate Validator public API.</para>
+    <para>The Hibernate Validator jar file is conform to the OSGi
+    specification and can be used within any OSGi container. The following
+    lists represent the packages imported and exported by Hibernate Validator.
+    The classes within the exported packages are considered part of Hibernate
+    Validator public API.</para>
 
     <tip>
-        <para>The Java Service Provider mechanism used by Bean Validation to automatically
-        discover validation providers doesn't work in an OSGi environment. To solve this,
-        you have to provide a custom <classname>ValidationProviderResolver</classname>. See
-        <xref linkend="section-validation-provider-resolver"/></para>
+      <para>The Java Service Provider mechanism used by Bean Validation to
+      automatically discover validation providers doesn't work in an OSGi
+      environment. To solve this, you have to provide a custom
+      <classname>ValidationProviderResolver</classname>. See <xref
+      linkend="section-validation-provider-resolver"/></para>
     </tip>
 
     <itemizedlist>
-        <title>Exported packages</title>
-        <listitem>
-            <para><package>org.hibernate.validator</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.constraints</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.cfg</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.cfg.context</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.cfg.defs</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.group</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.messageinterpolation</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.method</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.method.metadata</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.hibernate.validator.resourceloading</package></para>
-        </listitem>
+      <title>Exported packages</title>
+
+      <listitem>
+        <para><package>org.hibernate.validator</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.hibernate.validator.cfg.*</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.hibernate.validator.constraints.*</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.hibernate.validator.group</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.hibernate.validator.messageinterpolation</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.hibernate.validator.resourceloading</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.hibernate.validator.spi.*</package></para>
+      </listitem>
     </itemizedlist>
 
     <itemizedlist>
-        <title>Imported packages</title>
-        <listitem>
-            <para><package>javax.persistence.*</package>, [2.0.0,3.0.0), optional</para>
-        </listitem>
-        <listitem>
-            <para><package>javax.validation.*</package>, [1.0.0,2.0.0)</para>
-        </listitem>
-        <listitem>
-            <para><package>javax.xml.*</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.xml.sax.*</package></para>
-        </listitem>
-        <listitem>
-            <para><package>org.jboss.logging.*</package>, [3.1.0,4.0.0)</para>
-        </listitem>
-        <listitem>
-            <para><package>org.joda.time.*</package>, [1.6.0,2.0.0), optional</para>
-        </listitem>
-        <listitem>
-            <para><package>org.jsoup.*</package>, [1.5.2,2.0.0), optional</para>
-        </listitem>
+      <title>Imported packages</title>
+
+      <listitem>
+        <para><package>javax.persistence.*</package>, [2.0.0,3.0.0),
+        optional</para>
+      </listitem>
+
+      <listitem>
+        <para><package>javax.validation.*</package>, [1.0.0,2.0.0)</para>
+      </listitem>
+
+      <listitem>
+        <para><package>javax.xml.*</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.xml.sax.*</package></para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.jboss.logging.*</package>, [3.1.0,4.0.0)</para>
+      </listitem>
+
+      <listitem>
+        <para><package>com.fasterxml.classmate.*</package>, 0.8.0</para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.joda.time.*</package>, [1.6.0,2.0.0),
+        optional</para>
+      </listitem>
+
+      <listitem>
+        <para><package>org.jsoup.*</package>, [1.5.2,2.0.0), optional</para>
+      </listitem>
     </itemizedlist>
   </section>
 
@@ -115,7 +128,8 @@
     <para>If, for some reason, the feature needs to be disabled, set
     <literal>hibernate.validator.apply_to_ddl</literal> to
     <literal>false</literal>. See also <xref
-    linkend="table-builtin-constraints" />.</para>
+    linkend="table-spec-constraints"/> and <xref
+    linkend="table-custom-constraints"/>.</para>
 
     <para>You can also limit the DDL constraint generation to a subset of the
     defined constraints by setting the property
@@ -160,8 +174,8 @@
       <property>javax.persistence.validation.group.pre-remove</property>. The
       values of these properties are the comma-separated, fully specified
       class names of the groups to validate. <xref
-      linkend="example-beanvalidationeventlistener-config" /> shows the
-      default values for these properties. In this case they could also be
+      linkend="example-beanvalidationeventlistener-config"/> shows the default
+      values for these properties. In this case they could also be
       omitted.</para>
 
       <para>On constraint violation, the event will raise a runtime
@@ -219,7 +233,7 @@
       <property>javax.persistence.validation.group.pre-update</property> and
       <property>javax.persistence.validation.group.pre-remove</property> as
       described in <xref
-      linkend="validator-checkconstraints-orm-hibernateevent" /> can in this
+      linkend="validator-checkconstraints-orm-hibernateevent"/> can in this
       case be configured in <filename>persistence.xml</filename>.
       <filename>persistence.xml</filename> also defines a node validation-mode
       which can be set to <constant>AUTO</constant>,
@@ -230,7 +244,7 @@
       Validator yourself. In case you are using Hibernate EntityManager you
       can add a customized version of the
       <classname>BeanValidationEventListener</classname> described in <xref
-      linkend="validator-checkconstraints-orm-hibernateevent" /> to your
+      linkend="validator-checkconstraints-orm-hibernateevent"/> to your
       project and register it manually.</para>
     </section>
   </section>
@@ -241,7 +255,7 @@
     <para>When working with JSF2 or <productname>JBoss Seam</productname> and
     Hibernate Validator (Bean Validation) is present in the runtime
     environment validation is triggered for every field in the application.
-    <xref linkend="example-jsf2" /> shows an example of the f:validateBean tag
+    <xref linkend="example-jsf2"/> shows an example of the f:validateBean tag
     in a JSF page. For more information refer to the Seam documentation or the
     JSF 2 specification.</para>
 
