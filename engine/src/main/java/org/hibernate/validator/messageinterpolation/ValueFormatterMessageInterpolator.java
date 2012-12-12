@@ -33,6 +33,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * To interpolate the validated value add <code>&#123;validatedValue&#125;</code> into the message. To specify a format
  * pattern use <code>$&#123;validatedValue:[format string]&#125;</code>, e.g. <code>$&#123;validatedValue:%1$ty&#125;</code>.
  *
+ * @deprecated Deprecated since Hibernate Validator 5. Interpolation of validated value is since Bean Validation 1.1
+ * part of the default message interpolation algorithm.
+ *
  * @author Hardy Ferentschik
  */
 public class ValueFormatterMessageInterpolator implements MessageInterpolator {
@@ -64,8 +67,8 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 	}
 
 	public String interpolate(String message, Context context, Locale locale) {
-		String tmp = delegate.interpolate( message, context, locale );
-		return interpolateMessage( tmp, context.getValidatedValue(), locale );
+		String tmp = interpolateMessage( message, context.getValidatedValue(), locale );
+		return delegate.interpolate( tmp, context, locale );
 	}
 
 	/**

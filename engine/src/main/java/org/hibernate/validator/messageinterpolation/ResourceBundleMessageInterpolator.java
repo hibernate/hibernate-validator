@@ -16,9 +16,7 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
-import java.util.Arrays;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
+import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
@@ -51,9 +51,14 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	public static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
 
 	/**
-	 * Regular expression used to do message interpolation.
+	 * Regular expression used to do locating message parameters.
 	 */
-	private static final Pattern MESSAGE_PARAMETER_PATTERN = Pattern.compile( "(\\{[^\\}]+?\\})" );
+	private static final Pattern MESSAGE_PARAMETER_PATTERN = Pattern.compile( "((\\\\*)\\{[^\\}]+?\\})" );
+
+	/**
+	 * Regular expression used to do locating message expressions.
+	 */
+	private static final Pattern MESSAGE_EXPRESSION_PATTERN = Pattern.compile( "((\\\\*)\\$?\\{[^\\}]+?\\})" );
 
 	/**
 	 * The default locale in the current JVM.
@@ -73,7 +78,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * Step 1-3 of message interpolation can be cached. We do this in this map.
 	 */
-	private final ConcurrentMap<LocalisedMessage, String> resolvedMessages = new ConcurrentHashMap<LocalisedMessage, String>();
+	private final ConcurrentMap<LocalizedMessage, String> resolvedMessages = new ConcurrentHashMap<LocalizedMessage, String>();
 
 	/**
 	 * Flag indicating whether this interpolator should chance some of the interpolation steps.
@@ -81,7 +86,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final boolean cacheMessages;
 
 	public ResourceBundleMessageInterpolator() {
-		this( (ResourceBundleLocator) null );
+		this( null );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
@@ -89,7 +94,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cacheMessages) {
-
 		defaultLocale = Locale.getDefault();
 
 		if ( userResourceBundleLocator == null ) {
@@ -106,28 +110,28 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	public String interpolate(String message, Context context) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparison has to be based on == and not equals though
-		return interpolateMessage( message, context.getConstraintDescriptor().getAttributes(), defaultLocale );
+		return interpolateMessage( message, context, defaultLocale );
 	}
 
 	public String interpolate(String message, Context context, Locale locale) {
-		return interpolateMessage( message, context.getConstraintDescriptor().getAttributes(), locale );
+		return interpolateMessage( message, context, locale );
 	}
 
 	/**
-	 * Runs the message interpolation according to algorithm specified in JSR 303.
+	 * Runs the message interpolation according to algorithm specified in the Bean Validation specification.
 	 * <br/>
 	 * Note:
 	 * <br/>
 	 * Look-ups in user bundles is recursive whereas look-ups in default bundle are not!
 	 *
 	 * @param message the message to interpolate
-	 * @param annotationParameters the parameters of the annotation for which to interpolate this message
+	 * @param context the context for this interpolation
 	 * @param locale the {@code Locale} to use for the resource bundle.
 	 *
 	 * @return the interpolated message.
 	 */
-	private String interpolateMessage(String message, Map<String, Object> annotationParameters, Locale locale) {
-		LocalisedMessage localisedMessage = new LocalisedMessage( message, locale );
+	private String interpolateMessage(String message, Context context, Locale locale) {
+		LocalizedMessage localisedMessage = new LocalizedMessage( message, locale );
 		String resolvedMessage = null;
 
 		if ( cacheMessages ) {
@@ -146,7 +150,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			boolean evaluatedDefaultBundleOnce = false;
 			do {
 				// search the user bundle recursive (step1)
-				userBundleResolvedMessage = replaceVariables(
+				userBundleResolvedMessage = interpolateBundleMessage(
 						resolvedMessage, userResourceBundle, locale, true
 				);
 
@@ -158,7 +162,12 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				}
 
 				// search the default bundle non recursive (step2)
-				resolvedMessage = replaceVariables( userBundleResolvedMessage, defaultResourceBundle, locale, false );
+				resolvedMessage = interpolateBundleMessage(
+						userBundleResolvedMessage,
+						defaultResourceBundle,
+						locale,
+						false
+				);
 				evaluatedDefaultBundleOnce = true;
 			} while ( true );
 		}
@@ -172,7 +181,10 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		}
 
 		// resolve annotation attributes (step 4)
-		resolvedMessage = replaceAnnotationAttributes( resolvedMessage, annotationParameters );
+		resolvedMessage = interpolateExpression( resolvedMessage, MESSAGE_PARAMETER_PATTERN, context, locale );
+
+		// resolve annotation attributes (step 5)
+		resolvedMessage = interpolateExpression( resolvedMessage, MESSAGE_EXPRESSION_PATTERN, context, locale );
 
 		// last but not least we have to take care of escaped literals
 		resolvedMessage = resolvedMessage.replace( "\\{", "{" );
@@ -185,7 +197,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return !origMessage.equals( newMessage );
 	}
 
-	private String replaceVariables(String message, ResourceBundle bundle, Locale locale, boolean recurse) {
+	private String interpolateBundleMessage(String message, ResourceBundle bundle, Locale locale, boolean recurse) {
 		Matcher matcher = MESSAGE_PARAMETER_PATTERN.matcher( message );
 		StringBuffer sb = new StringBuffer();
 		String resolvedParameterValue;
@@ -201,26 +213,18 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return sb.toString();
 	}
 
-	private String replaceAnnotationAttributes(String message, Map<String, Object> annotationParameters) {
-		Matcher matcher = MESSAGE_PARAMETER_PATTERN.matcher( message );
+	private String interpolateExpression(String message, Pattern pattern, Context context, Locale locale) {
+		Matcher matcher = pattern.matcher( message );
 		StringBuffer sb = new StringBuffer();
+
 		while ( matcher.find() ) {
-			String resolvedParameterValue;
-			String parameter = matcher.group( 1 );
-			Object variable = annotationParameters.get( removeCurlyBrace( parameter ) );
-			if ( variable != null ) {
-				if ( variable.getClass().isArray() ) {
-					resolvedParameterValue = Arrays.toString( (Object[]) variable );
-				}
-				else {
-					resolvedParameterValue = variable.toString();
-				}
+			String match = matcher.group( 1 );
+			InterpolationTerm expression = new InterpolationTerm( match, locale );
+			if ( expression.needsEvaluation() ) {
+				String resolvedExpression = expression.interpolate( context );
+				resolvedExpression = Matcher.quoteReplacement( resolvedExpression );
+				matcher.appendReplacement( sb, resolvedExpression );
 			}
-			else {
-				resolvedParameterValue = parameter;
-			}
-			resolvedParameterValue = Matcher.quoteReplacement( resolvedParameterValue );
-			matcher.appendReplacement( sb, resolvedParameterValue );
 		}
 		matcher.appendTail( sb );
 		return sb.toString();
@@ -230,9 +234,9 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		String parameterValue;
 		try {
 			if ( bundle != null ) {
-				parameterValue = bundle.getString( removeCurlyBrace( parameterName ) );
+				parameterValue = bundle.getString( removeCurlyBraces( parameterName ) );
 				if ( recurse ) {
-					parameterValue = replaceVariables( parameterValue, bundle, locale, recurse );
+					parameterValue = interpolateBundleMessage( parameterValue, bundle, locale, recurse );
 				}
 			}
 			else {
@@ -246,45 +250,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return parameterValue;
 	}
 
-	private String removeCurlyBrace(String parameter) {
+	private String removeCurlyBraces(String parameter) {
 		return parameter.substring( 1, parameter.length() - 1 );
-	}
-
-	private static class LocalisedMessage {
-		private final String message;
-		private final Locale locale;
-
-		LocalisedMessage(String message, Locale locale) {
-			this.message = message;
-			this.locale = locale;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || getClass() != o.getClass() ) {
-				return false;
-			}
-
-			LocalisedMessage that = (LocalisedMessage) o;
-
-			if ( locale != null ? !locale.equals( that.locale ) : that.locale != null ) {
-				return false;
-			}
-			if ( message != null ? !message.equals( that.message ) : that.message != null ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		public int hashCode() {
-			int result = message != null ? message.hashCode() : 0;
-			result = 31 * result + ( locale != null ? locale.hashCode() : 0 );
-			return result;
-		}
 	}
 }

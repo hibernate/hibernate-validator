@@ -462,4 +462,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 128,
 			value = "Annotation type %s is no constraint annotation. It needs to be annotated with @Constraint or @CrossParameterConstraint.")
 	ConstraintDefinitionException getAnnotationIsNoConstraintTypeException(Class<? extends Annotation> annotationType);
+
+	@LogMessage(level = WARN)
+	@Message(id = 129, value = "EL expression '%s' references an unknown property")
+	void unknownPropertyInExpressionLanguage(String expression, @Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 130, value = "Error in EL expression '%s'")
+	void errorInExpressionLanguage(String expression, @Cause Exception e);
 }
