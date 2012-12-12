@@ -67,6 +67,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		messageInterpolator( factoryMessageInterpolator );
 		traversableResolver( factoryTraversableResolver );
 		constraintValidatorFactory( factoryConstraintValidatorFactory );
+		parameterNameProvider( factoryParameterNameProvider );
 	}
 
 	@Override
