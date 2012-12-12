@@ -71,7 +71,7 @@
     <para>In order to use Hibernate Validator within an existing Maven
     project, simply add the following dependency to your
     <filename>pom.xml</filename>:<example>
-        <title>Maven dependency of Hibernate Validator</title>
+        <title>Hibernate Validator Maven dependency</title>
 
         <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
@@ -79,28 +79,6 @@
     &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
       </example></para>
-
-    <para>Alternatively, you can start by creating a sample project using
-    Hibernate Validator's Quickstart Maven archetype as follows:</para>
-
-    <para><example>
-        <title>Using Maven's archetype plugin to create a sample project using
-        Hibernate Validator</title>
-
-        <programlisting>mvn archetype:generate -DarchetypeGroupId=org.hibernate \
-                       -DarchetypeArtifactId=hibernate-validator-quickstart-archetype \
-                       -DarchetypeVersion=&version; \
-                       -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public-jboss/ \
-                       -DgroupId=com.mycompany \
-                       -DartifactId=hv-quickstart</programlisting>
-      </example></para>
-
-    <para>Maven will create your project in the directory hv-quickstart.
-    Change into this directory and run:</para>
-
-    <para><programlisting>mvn test</programlisting> Maven will compile the
-    example code and run the implemented unit tests. Let's have a look at the
-    actual code in the next section.</para>
 
     <tip>
       <para>For the purposes of logging, Hibernate Validator uses the JBoss
@@ -120,8 +98,8 @@
   <section id="validator-gettingstarted-createmodel">
     <title>Applying constraints</title>
 
-    <para>Open the project in the IDE of your choice and have a look at the
-    class <classname>Car</classname>:</para>
+    <para>Lets dive directly into an example to see how to apply
+    constraints.</para>
 
     <example id="example-class-car">
       <title>Class Car annotated with constraints</title>
@@ -179,8 +157,8 @@ public class Car {
     <title>Validating constraints</title>
 
     <para>To perform a validation of these constraints, we use a
-    <classname>Validator</classname> instance. Let's have a look at the
-    <classname>CarTest</classname> class:</para>
+    <classname>Validator</classname> instance. Let's have a look at a unit
+    test for <classname>Car</classname>:</para>
 
     <example>
       <title>Class CarTest showing validation examples</title>
