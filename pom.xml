@@ -77,7 +77,6 @@
         <module>tck-runner</module>
         <module>integration</module>
         <module>annotation-processor</module>
-        <module>archetype</module>
         <module>performance</module>
     </modules>
 
@@ -377,35 +376,6 @@
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.3.7</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-archetype-plugin</artifactId>
-                    <version>2.2</version>
-                    <executions>
-                        <execution>
-                            <id>generate-archetype-install</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>create-from-project</goal>
-                            </goals>
-                            <configuration>
-                                <archetypePostPhase>install</archetypePostPhase>
-                                <propertyFile>archetype.properties</propertyFile>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>generate-archetype-deploy</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>create-from-project</goal>
-                            </goals>
-                            <configuration>
-                                <archetypePostPhase>deploy</archetypePostPhase>
-                                <propertyFile>archetype.properties</propertyFile>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
