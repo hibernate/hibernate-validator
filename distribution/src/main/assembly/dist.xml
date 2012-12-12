@@ -45,6 +45,7 @@
             <includes>
                 <include>javax.validation:validation-api</include>
                 <include>org.jboss.logging:jboss-logging</include>
+                <include>com.fasterxml:classmate</include>
             </includes>
         </dependencySet>
         <dependencySet>
