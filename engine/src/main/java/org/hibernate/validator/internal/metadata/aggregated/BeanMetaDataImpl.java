@@ -260,7 +260,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<String, PropertyDescriptor> theValue = newHashMap();
 
 		for ( Entry<String, PropertyMetaData> oneProperty : propertyMetaData.entrySet() ) {
-			if ( oneProperty.getValue().isConstrained() ) {
+			if ( oneProperty.getValue().isConstrained() && oneProperty.getValue().getName() != null ) {
 				theValue.put(
 						oneProperty.getKey(),
 						oneProperty.getValue()
