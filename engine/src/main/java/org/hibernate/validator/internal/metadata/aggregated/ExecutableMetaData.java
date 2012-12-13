@@ -38,7 +38,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -152,12 +151,17 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public boolean accepts(ConstrainedElement constrainedElement) {
-			return
-					kind == constrainedElement.getKind() &&
-							ReflectionHelper.haveSameSignature(
-									location.getExecutableElement(),
-									( (ConstrainedExecutable) constrainedElement ).getLocation().getExecutableElement()
-							);
+			if ( kind != constrainedElement.getKind() ) {
+				return false;
+			}
+
+			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getLocation()
+					.getExecutableElement();
+
+			//does one of the executables override the other one?
+			return location.getExecutableElement().overrides( executableElement ) || executableElement.overrides(
+					location.getExecutableElement()
+			);
 		}
 
 		@Override
@@ -172,6 +176,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public ExecutableMetaData build() {
+
 			ExecutableElement executableElement = location.getExecutableElement();
 
 			return new ExecutableMetaData(
