@@ -27,6 +27,7 @@ import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
 
@@ -277,6 +278,14 @@ public class BeanDescriptorTest {
 		assertThat( constructorDescriptor ).isNull();
 	}
 
+	@Test
+	public void testGetConstrainedPropertiesForTypeWithClassLevelConstraint() {
+		BeanDescriptor descriptor = getBeanDescriptor( ClassLevelConstrainedType.class );
+		Set<PropertyDescriptor> constrainedProperties = descriptor.getConstrainedProperties();
+
+		assertThat( constrainedProperties ).isEmpty();
+	}
+
 	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {
 		Set<String> methodNames = newHashSet();
 
@@ -368,5 +377,9 @@ public class BeanDescriptorTest {
 		@Override
 		public void foo(String foo) {
 		}
+	}
+
+	@ScriptAssert(lang = "", script = "")
+	private static class ClassLevelConstrainedType {
 	}
 }
