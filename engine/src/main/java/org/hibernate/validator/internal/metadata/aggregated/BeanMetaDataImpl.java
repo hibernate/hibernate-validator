@@ -259,12 +259,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, PropertyDescriptor> getConstrainedPropertiesAsDescriptors() {
 		Map<String, PropertyDescriptor> theValue = newHashMap();
 
-		for ( Entry<String, PropertyMetaData> oneProperty : propertyMetaData.entrySet() ) {
-			if ( oneProperty.getValue().isConstrained() ) {
+		for ( Entry<String, PropertyMetaData> entry : propertyMetaData.entrySet() ) {
+			if ( entry.getValue().isConstrained() && entry.getValue().getName() != null ) {
 				theValue.put(
-						oneProperty.getKey(),
-						oneProperty.getValue()
-								.asDescriptor( defaultGroupSequenceIsRedefined(), getDefaultGroupSequence( null ) )
+						entry.getKey(),
+						entry.getValue().asDescriptor(
+								defaultGroupSequenceIsRedefined(),
+								getDefaultGroupSequence( null )
+						)
 				);
 			}
 		}

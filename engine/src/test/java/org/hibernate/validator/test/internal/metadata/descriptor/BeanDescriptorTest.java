@@ -36,6 +36,7 @@ import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -279,6 +280,7 @@ public class BeanDescriptorTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-660")
 	public void testGetConstrainedPropertiesForTypeWithClassLevelConstraint() {
 		BeanDescriptor descriptor = getBeanDescriptor( ClassLevelConstrainedType.class );
 		Set<PropertyDescriptor> constrainedProperties = descriptor.getConstrainedProperties();
