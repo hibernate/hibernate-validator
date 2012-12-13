@@ -591,25 +591,6 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Checks, whether the given methods have the same signature, which is the
-	 * case if they have the same name, parameter count and types.
-	 *
-	 * @param method1 A first method.
-	 * @param method2 A second method.
-	 *
-	 * @return True, if the methods have the same signature, false otherwise.
-	 */
-	public static boolean haveSameSignature(ExecutableElement method1, ExecutableElement method2) {
-
-		Contracts.assertValueNotNull( method1, "method1" );
-		Contracts.assertValueNotNull( method2, "method2" );
-
-		return
-				method1.getMember().getName().equals( method2.getMember().getName() ) &&
-						Arrays.equals( method1.getGenericParameterTypes(), method2.getGenericParameterTypes() );
-	}
-
-	/**
 	 * Returns the auto-boxed type of a primitive type.
 	 *
 	 * @param primitiveType the primitive type
