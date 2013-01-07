@@ -33,7 +33,10 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.testutil.TestForIssue;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotSame;
@@ -41,6 +44,7 @@ import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ConstraintValidatorManagerTest {
 	private ConstraintValidatorManager constraintValidatorManager;
@@ -107,7 +111,8 @@ public class ConstraintValidatorManagerTest {
 		);
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	@Test(expectedExceptions = UnexpectedTypeException.class,
+			expectedExceptionsMessageRegExp = "HV000030.*")
 	public void testUnexpectedTypeException() {
 		ConstraintDescriptor<?> constraintDescriptor = getConstraintDescriptorForProperty( "s2" );
 
@@ -144,7 +149,11 @@ public class ConstraintValidatorManagerTest {
 				"Constraint Validator Factory should be part of the cache key"
 		);
 
-		assertNotSame( constraintValidator1, constraintValidator2, "The validator instances should not be the same" );
+		assertNotSame(
+				constraintValidator1,
+				constraintValidator2,
+				"The validator instances should not be the same"
+		);
 	}
 
 	@Test
@@ -172,11 +181,92 @@ public class ConstraintValidatorManagerTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-662")
+	public void testValidatorsAreCachedPerConstraint() {
+
+		Validator validator = getConfiguration()
+				.addMapping(
+						ConstraintValidatorManagerTest.class.getResourceAsStream(
+								"hv-662-mapping.xml"
+						)
+				)
+				.buildValidatorFactory()
+				.getValidator();
+
+		ConstraintDescriptor<?> notNullOnFirstNameDescriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "firstName"
+		);
+		ConstraintDescriptor<?> notNullOnLastNameDescriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "lastName"
+		);
+
+		ConstraintValidator<?, Object> notNullValidatorForFirstName1 = constraintValidatorManager.getInitializedValidator(
+				String.class, notNullOnFirstNameDescriptor, constraintValidatorFactory
+		);
+		ConstraintValidator<?, Object> notNullValidatorForFirstName2 = constraintValidatorManager.getInitializedValidator(
+				String.class, notNullOnFirstNameDescriptor, constraintValidatorFactory
+		);
+		ConstraintValidator<?, Object> notNullValidatorForLastName = constraintValidatorManager.getInitializedValidator(
+				String.class, notNullOnLastNameDescriptor, constraintValidatorFactory
+		);
+
+		assertThat( notNullValidatorForFirstName1 ).isSameAs( notNullValidatorForFirstName2 );
+		assertThat( notNullValidatorForFirstName1 ).isSameAs( notNullValidatorForLastName );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-662")
+	public void testValidatorsAreCachedPerConstraintAndAnnotationMembers() {
+
+		Validator validator = getConfiguration()
+				.addMapping(
+						ConstraintValidatorManagerTest.class.getResourceAsStream(
+								"hv-662-mapping.xml"
+						)
+				)
+				.buildValidatorFactory()
+				.getValidator();
+
+		ConstraintDescriptor<?> sizeOnMiddleNameDescriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "middleName"
+		);
+		ConstraintDescriptor<?> sizeOnAddress1Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address1"
+		);
+		ConstraintDescriptor<?> sizeOnAddress2Descriptor = getSingleConstraintDescriptorForProperty(
+				validator, User.class, "address2"
+		);
+
+		ConstraintValidator<?, Object> sizeValidatorForMiddleName = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnMiddleNameDescriptor, constraintValidatorFactory
+		);
+		ConstraintValidator<?, Object> sizeValidatorForAddress1 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress1Descriptor, constraintValidatorFactory
+		);
+		ConstraintValidator<?, Object> sizeValidatorForAddress2 = constraintValidatorManager.getInitializedValidator(
+				String.class, sizeOnAddress2Descriptor, constraintValidatorFactory
+		);
+
+		assertThat( sizeValidatorForMiddleName ).isNotSameAs( sizeValidatorForAddress1 );
+		assertThat( sizeValidatorForAddress1 ).isSameAs( sizeValidatorForAddress2 );
+	}
+
 	private ConstraintDescriptor<?> getConstraintDescriptorForProperty(String propertyName) {
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Foo.class );
-		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
+		return getSingleConstraintDescriptorForProperty( validator, Foo.class, propertyName );
+	}
+
+	private ConstraintDescriptor<?> getSingleConstraintDescriptorForProperty(Validator validator, Class<?> clazz, String propertyName) {
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
+		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty(
+				propertyName
+		);
 		Set<ConstraintDescriptor<?>> constraintDescriptorSet = propertyDescriptor.getConstraintDescriptors();
-		assertEquals( constraintDescriptorSet.size(), 1, "There should be only one constraint descriptor" );
+		assertEquals(
+				constraintDescriptorSet.size(),
+				1,
+				"There should be only one constraint descriptor"
+		);
 		return constraintDescriptorSet.iterator().next();
 	}
 
@@ -205,7 +295,4 @@ public class ConstraintValidatorManagerTest {
 			delegate.releaseInstance( instance );
 		}
 	}
-
 }
-
-
