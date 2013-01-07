@@ -16,12 +16,17 @@
 */
 package org.hibernate.validator.internal.util.annotationfactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -42,16 +47,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * default value for that element from the annotation interface, if it exists.
  * If no default exists, it will throw an exception.
  * <p/>
- * Warning: this class does not implement <code>hashCode()</code> and
- * <code>equals()</code> - it just uses the ones it inherits from <code>Object</code>.
- * This means that an <code>AnnotationProxy</code> does <i>not</i> follow the
- * recommendations of the <code>Annotation</code> javadoc about these two
- * methods. That's why you should never mix <code>AnnotationProxies</code>
- * with "real" annotations. For example, don't put them into the same
- * <code>Collection</code>.
  *
  * @author Paolo Perrotta
  * @author Davide Marchignoli
+ * @author Gunnar Morling
+ *
  * @see java.lang.annotation.Annotation
  */
 public class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
@@ -61,14 +61,16 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 
 	private final Class<? extends Annotation> annotationType;
 	private final Map<String, Object> values;
+	private final int hashCode;
 
 	public AnnotationProxy(AnnotationDescriptor<?> descriptor) {
 		this.annotationType = descriptor.type();
-		values = getAnnotationValues( descriptor );
+		values = Collections.unmodifiableMap( getAnnotationValues( descriptor ) );
+		this.hashCode = calculateHashCode();
 	}
 
 	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = newHashMap();
 		int processedValuesFromDescriptor = 0;
 		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : declaredMethods ) {
@@ -99,6 +101,23 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		return result;
 	}
 
+	private Object getAnnotationMemberValue(Annotation annotation, String name) {
+		try {
+			return ReflectionHelper.getDeclaredMethod( annotation.annotationType(), name )
+					.invoke( annotation );
+		}
+		catch ( IllegalAccessException e ) {
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
+		}
+		catch ( IllegalArgumentException e ) {
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
+		}
+		catch ( InvocationTargetException e ) {
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
+		}
+	}
+
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		if ( values.containsKey( method.getName() ) ) {
 			return values.get( method.getName() );
@@ -106,10 +125,89 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		return method.invoke( this, args );
 	}
 
+	@Override
 	public Class<? extends Annotation> annotationType() {
 		return annotationType;
 	}
 
+	/**
+	 * Performs an equality check as described in {@link Annotation#equals(Object)}.
+	 *
+	 * @param obj The object to compare
+	 *
+	 * @return Whether the given object is equal to this annotation proxy or not
+	 *
+	 * @see Annotation#equals(Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( !annotationType.isInstance( obj ) ) {
+			return false;
+		}
+
+		Annotation other = annotationType.cast( obj );
+
+		//compare annotation member values
+		for ( Entry<String, Object> member : values.entrySet() ) {
+
+			Object value = member.getValue();
+			Object otherValue = getAnnotationMemberValue( other, member.getKey() );
+
+			if ( !areEqual( value, otherValue ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Calculates the hash code of this annotation proxy as described in
+	 * {@link Annotation#hashCode()}.
+	 *
+	 * @return The hash code of this proxy.
+	 *
+	 * @see Annotation#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return hashCode;
+	}
+
+	private int calculateHashCode() {
+
+		int hashCode = 0;
+
+		for ( Entry<String, Object> member : values.entrySet() ) {
+			Object value = member.getValue();
+
+			int nameHashCode = member.getKey().hashCode();
+
+			int valueHashCode =
+					!value.getClass().isArray() ? value.hashCode() :
+					value.getClass() == boolean[].class ? Arrays.hashCode( (boolean[]) value ) :
+					value.getClass() == byte[].class ? Arrays.hashCode( (byte[]) value ) :
+					value.getClass() == char[].class ? Arrays.hashCode( (char[]) value ) :
+					value.getClass() == double[].class ? Arrays.hashCode( (double[]) value ) :
+					value.getClass() == float[].class ? Arrays.hashCode( (float[]) value ) :
+					value.getClass() == int[].class ? Arrays.hashCode( (int[]) value ) :
+					value.getClass() == long[].class ? Arrays.hashCode( (long[]) value ) :
+					value.getClass() == short[].class ? Arrays.hashCode( (short[]) value ) :
+					Arrays.hashCode( (Object[]) value );
+
+			hashCode += 127 * nameHashCode ^ valueHashCode;
+		}
+
+		return hashCode;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		result.append( '@' ).append( annotationType.getName() ).append( '(' );
@@ -132,5 +230,19 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		SortedSet<String> result = new TreeSet<String>();
 		result.addAll( values.keySet() );
 		return result;
+	}
+
+	private boolean areEqual(Object o1, Object o2) {
+		return
+				!o1.getClass().isArray() ? o1.equals( o2 ) :
+				o1.getClass() == boolean[].class ? Arrays.equals( (boolean[]) o1, (boolean[]) o2 ) :
+				o1.getClass() == byte[].class ? Arrays.equals( (byte[]) o1, (byte[]) o2 ) :
+				o1.getClass() == char[].class ? Arrays.equals( (char[]) o1, (char[]) o2 ) :
+				o1.getClass() == double[].class ? Arrays.equals( (double[]) o1, (double[]) o2 ) :
+				o1.getClass() == float[].class ? Arrays.equals( (float[]) o1, (float[]) o2 ) :
+				o1.getClass() == int[].class ? Arrays.equals( (int[]) o1, (int[]) o2 ) :
+				o1.getClass() == long[].class ? Arrays.equals( (long[]) o1, (long[]) o2 ) :
+				o1.getClass() == short[].class ? Arrays.equals( (short[]) o1, (short[]) o2 ) :
+				Arrays.equals( (Object[]) o1, (Object[]) o2 );
 	}
 }
