@@ -366,7 +366,7 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.constraint( new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ) );
 		config.addMapping( mapping );
-		config.buildValidatorFactory();
+		config.buildValidatorFactory().getValidator();
 	}
 
 	@Test

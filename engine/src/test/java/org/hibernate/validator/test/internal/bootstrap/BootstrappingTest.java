@@ -117,7 +117,7 @@ public class BootstrappingTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HV-656")
+	@TestForIssue(jiraKey = "HV-659")
 	public void testParameterNameProviderConfiguredViaContext() throws Exception {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory

@@ -16,8 +16,11 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -28,6 +31,7 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -38,6 +42,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is Hibernate Validator default
@@ -52,27 +57,71 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static final Log log = LoggerFactory.make();
 
+	/**
+	 * The default message interpolator for this factory.
+	 */
 	private final MessageInterpolator messageInterpolator;
+
+	/**
+	 * The default traversable resolver for this factory.
+	 */
 	private final TraversableResolver traversableResolver;
+
+	/**
+	 * The default parameter name provider for this factory.
+	 */
 	private final ParameterNameProvider parameterNameProvider;
-	private final BeanMetaDataManager metaDataManager;
+
+	/**
+	 * The default constraint validator factory for this factory.
+	 */
 	private final ConstraintValidatorManager constraintValidatorManager;
+
+	/**
+	 * Programmatic constraints passed via the Hibernate Validator specific API. Empty if there are
+	 * no programmatic constraints
+	 */
+	private final Set<ConstraintMapping> constraintMappings;
+
+	/**
+	 * Helper for dealing with built-in validators and determining custom constraint annotations.
+	 */
+	private final ConstraintHelper constraintHelper;
+
+	/**
+	 * Hibernate Validator specific flag to abort validation on first constraint violation.
+	 */
 	private final boolean failFast;
+
+	/**
+	 * Metadata provider for XML configuration.
+	 */
+	private final XmlMetaDataProvider xmlMetaDataProvider;
+
+	/**
+	 * Prior to the introduction of {@code ParameterNameProvider} all the bean meta data was static and could be
+	 * cached for all created {@code Validator}s. {@code ParameterNameProvider} makes parts of the meta data and
+	 * Bean Validation element descriptors dynamic, since depending of the used provider different parameter names
+	 * could be used. To still have the metadata static we create a {@code BeanMetaDataManager} per parameter name
+	 * provider. See also HV-659.
+	 */
+	private final Map<ParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = configurationState.getParameterNameProvider();
-		ConstraintHelper constraintHelper = new ConstraintHelper();
-
-		List<MetaDataProvider> metaDataProviders = newArrayList();
+		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ParameterNameProvider, BeanMetaDataManager>() );
+		this.constraintHelper = new ConstraintHelper();
+		this.constraintMappings = newHashSet();
 
 		// HV-302; don't load XmlMappingParser if not necessary
-		if ( !configurationState.getMappingStreams().isEmpty() ) {
-			metaDataProviders.add(
-					new XmlMetaDataProvider(
-							constraintHelper, configurationState.getMappingStreams()
-					)
+		if ( configurationState.getMappingStreams().isEmpty() ) {
+			this.xmlMetaDataProvider = null;
+		}
+		else {
+			this.xmlMetaDataProvider = new XmlMetaDataProvider(
+					constraintHelper, configurationState.getMappingStreams()
 			);
 		}
 
@@ -83,13 +132,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
 			if ( hibernateSpecificConfig.getProgrammaticMappings().size() > 0 ) {
-				metaDataProviders.add(
-						new ProgrammaticMetaDataProvider(
-								constraintHelper,
-								parameterNameProvider,
-								hibernateSpecificConfig.getProgrammaticMappings()
-						)
-				);
+				constraintMappings.addAll(hibernateSpecificConfig.getProgrammaticMappings());
 			}
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
@@ -98,13 +141,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				properties, tmpFailFast
 		);
 		this.failFast = tmpFailFast;
-		metaDataManager = new BeanMetaDataManager( constraintHelper, parameterNameProvider, metaDataProviders );
-		constraintValidatorManager = new ConstraintValidatorManager(configurationState.getConstraintValidatorFactory());
+		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
 
 	@Override
 	public Validator getValidator() {
-		return usingContext().getValidator();
+		return createValidator(
+				constraintValidatorManager.getDefaultConstraintValidatorFactory(),
+				messageInterpolator,
+				traversableResolver,
+				parameterNameProvider,
+				failFast
+		);
 	}
 
 	@Override
@@ -123,6 +171,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	@Override
+	public ParameterNameProvider getParameterNameProvider() {
+		return parameterNameProvider;
+	}
+
+	@Override
 	public <T> T unwrap(Class<T> type) {
 		if ( HibernateValidatorFactory.class.equals( type ) ) {
 			return type.cast( this );
@@ -132,25 +185,61 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public HibernateValidatorContext usingContext() {
-		return new ValidatorContextImpl(
-				messageInterpolator,
-				traversableResolver,
-				parameterNameProvider,
-				metaDataManager,
-				constraintValidatorManager,
-				failFast
-		);
-	}
-
-	@Override
-	public ParameterNameProvider getParameterNameProvider() {
-		return parameterNameProvider;
+		return new ValidatorContextImpl( this );
 	}
 
 	@Override
 	public void close() {
 		constraintValidatorManager.clear();
-		metaDataManager.clear();
+		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagerMap.values() ) {
+			beanMetaDataManager.clear();
+		}
+	}
+
+	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
+							  MessageInterpolator messageInterpolator,
+							  TraversableResolver traversableResolver,
+							  ParameterNameProvider parameterNameProvider,
+							  boolean failFast) {
+		BeanMetaDataManager beanMetaDataManager;
+		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
+			beanMetaDataManager = new BeanMetaDataManager(
+					constraintHelper,
+					parameterNameProvider,
+					buildDataProviders( parameterNameProvider )
+			);
+			beanMetaDataManagerMap.put( parameterNameProvider, beanMetaDataManager );
+		}
+		else {
+			beanMetaDataManager = beanMetaDataManagerMap.get( parameterNameProvider );
+		}
+
+		return new ValidatorImpl(
+				constraintValidatorFactory,
+				messageInterpolator,
+				traversableResolver,
+				beanMetaDataManager,
+				constraintValidatorManager,
+				failFast
+		);
+	}
+
+	private List<MetaDataProvider> buildDataProviders(ParameterNameProvider parameterNameProvider) {
+		List<MetaDataProvider> metaDataProviders = newArrayList();
+		if ( xmlMetaDataProvider != null ) {
+			metaDataProviders.add( xmlMetaDataProvider );
+		}
+
+		if ( !constraintMappings.isEmpty() ) {
+			metaDataProviders.add(
+					new ProgrammaticMetaDataProvider(
+							constraintHelper,
+							parameterNameProvider,
+							constraintMappings
+					)
+			);
+		}
+		return metaDataProviders;
 	}
 
 	private boolean checkPropertiesForFailFast(Map<String, String> properties, boolean programmaticConfiguredFailFast) {

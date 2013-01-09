@@ -174,8 +174,8 @@ public class ConstraintValidatorCachingTest {
 
 		public void assertSize(int size) {
 			assertEquals(
-					size,
 					instantiatedConstraintValidatorClasses.size(),
+					size,
 					"Wrong number of already cached constraint validator instances"
 			);
 		}
