@@ -51,13 +51,11 @@ public class ParameterMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
-
 		beanMetaData = new BeanMetaDataManager( new ConstraintHelper() ).getBeanMetaData( CustomerRepository.class );
 	}
 
 	@Test
 	public void constrainedParameterMetaData() throws Exception {
-
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
@@ -75,7 +73,6 @@ public class ParameterMetaDataTest {
 
 	@Test
 	public void cascadingParameterMetaData() throws Exception {
-
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
@@ -90,7 +87,6 @@ public class ParameterMetaDataTest {
 
 	@Test
 	public void unconstrainedParameterMetaData() throws Exception {
-
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
@@ -103,7 +99,6 @@ public class ParameterMetaDataTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void illegalParameterIndexCausesException() throws Exception {
-
 		Method method = CustomerRepository.class.getMethod( "foo" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
@@ -112,7 +107,6 @@ public class ParameterMetaDataTest {
 
 	@Test
 	public void locallyDefinedGroupConversion() throws Exception {
-
 		Method method = CustomerRepository.class.getMethod( "methodWithParameterGroupConversion", Set.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 

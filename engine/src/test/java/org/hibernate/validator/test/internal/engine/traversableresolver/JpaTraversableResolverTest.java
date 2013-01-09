@@ -25,6 +25,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.testng.Assert.assertTrue;
@@ -46,6 +47,7 @@ public class JpaTraversableResolverTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-305")
 	public void testWithBooks() {
 		Author author = new Author();
 		author.books.add( new Book() );
@@ -54,6 +56,7 @@ public class JpaTraversableResolverTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-305")
 	public void testWithoutBooks() {
 		Author author = new Author();
 

@@ -61,8 +61,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
-;
-
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
  *
@@ -424,14 +422,12 @@ public class AnnotationMetaDataProviderTest {
 	}
 
 	private static class Foo {
-
 		@NotNull
 		public Foo(@NotNull String foo) {
 		}
 	}
 
 	private static class Calendar {
-
 		@ConsistentDateParameters
 		public void createEvent(DateMidnight start, DateMidnight end) {
 		}

@@ -39,7 +39,6 @@ public class ConstructorValidationTest {
 
 	@Test
 	public void constructorParameterValidationYieldsConstraintViolation() throws Exception {
-
 		MethodValidator methodValidator = getValidator().forMethods();
 
 		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorParameters(
@@ -65,13 +64,10 @@ public class ConstructorValidationTest {
 		assertThat( parameterNode.getName() ).isEqualTo( "arg0" );
 
 		assertThat( pathIterator.hasNext() ).isFalse();
-
-		//TODO HV-571: Add more assertions
 	}
 
 	@Test
 	public void cascadedConstructorParameterValidationYieldsConstraintViolation() throws Exception {
-
 		MethodValidator methodValidator = getValidator().forMethods();
 
 		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorParameters(
@@ -106,13 +102,10 @@ public class ConstructorValidationTest {
 		assertThat( nameNode.getName() ).isEqualTo( "name" );
 
 		assertThat( pathIterator.hasNext() ).isFalse();
-
-		//TODO HV-571: Add more assertions
 	}
 
 	@Test
 	public void constructorReturnValueValidationYieldsConstraintViolation() throws Exception {
-
 		MethodValidator methodValidator = getValidator().forMethods();
 
 		CustomerRepositoryImpl customerRepository = new CustomerRepositoryImpl();
@@ -142,8 +135,6 @@ public class ConstructorValidationTest {
 		assertThat( parameterNode.getName() ).isEqualTo( "$retval" );
 
 		assertThat( pathIterator.hasNext() ).isFalse();
-
-		//TODO HV-571: Add more assertions
 	}
 
 	@Test
@@ -184,7 +175,5 @@ public class ConstructorValidationTest {
 		assertThat( nameNode.getName() ).isEqualTo( "customer" );
 
 		assertThat( pathIterator.hasNext() ).isFalse();
-
-		//TODO HV-571: Add more assertions
 	}
 }

@@ -184,7 +184,6 @@ public class ConstraintValidatorManagerTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-662")
 	public void testValidatorsAreCachedPerConstraint() {
-
 		Validator validator = getConfiguration()
 				.addMapping(
 						ConstraintValidatorManagerTest.class.getResourceAsStream(
@@ -218,7 +217,6 @@ public class ConstraintValidatorManagerTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-662")
 	public void testValidatorsAreCachedPerConstraintAndAnnotationMembers() {
-
 		Validator validator = getConfiguration()
 				.addMapping(
 						ConstraintValidatorManagerTest.class.getResourceAsStream(
@@ -292,7 +290,6 @@ public class ConstraintValidatorManagerTest {
 
 		@Override
 		public void releaseInstance(ConstraintValidator<?, ?> instance) {
-			delegate.releaseInstance( instance );
-		}
+			delegate.releaseInstance( instance );		}
 	}
 }

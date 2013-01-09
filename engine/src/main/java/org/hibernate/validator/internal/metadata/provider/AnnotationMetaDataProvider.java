@@ -86,7 +86,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final ParameterNameProvider parameterNameProvider;
 
-	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, AnnotationProcessingOptions annotationProcessingOptions) {
+	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
+									  ParameterNameProvider parameterNameProvider,
+									  AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.parameterNameProvider = parameterNameProvider;
 		this.annotationProcessingOptions = annotationProcessingOptions;

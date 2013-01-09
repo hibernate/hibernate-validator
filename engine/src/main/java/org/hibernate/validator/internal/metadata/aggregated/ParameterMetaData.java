@@ -132,7 +132,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 		@Override
 		public ParameterMetaData build() {
-
 			return new ParameterMetaData(
 					parameterIndex,
 					name,

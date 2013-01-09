@@ -413,13 +413,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		List<ParameterDescriptor> theValue = newArrayList();
+		List<ParameterDescriptor> parameterDescriptorList = newArrayList();
 
 		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
-			theValue.add( parameterMetaData.asDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ) );
+			parameterDescriptorList.add( parameterMetaData.asDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ) );
 		}
 
-		return theValue;
+		return parameterDescriptorList;
 	}
 
 	private ReturnValueDescriptor returnValueAsDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {

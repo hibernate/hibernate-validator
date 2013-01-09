@@ -28,7 +28,6 @@ import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLo
  * @author Gunnar Morling
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
-
 	private final String name;
 
 	/**
@@ -43,8 +42,12 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
 	 */
-	public ConstrainedParameter(ConfigurationSource source, ExecutableConstraintLocation location, String name, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions, boolean isCascading) {
-
+	public ConstrainedParameter(ConfigurationSource source,
+								ExecutableConstraintLocation location,
+								String name,
+								Set<MetaConstraint<?>> constraints,
+								Map<Class<?>, Class<?>> groupConversions,
+								boolean isCascading) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
@@ -68,7 +71,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	@Override
 	public String toString() {
-
 		//display short annotation type names
 		StringBuilder sb = new StringBuilder();
 
