@@ -23,8 +23,6 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 
 /**
  * @author Emmanuel Bernard
@@ -34,12 +32,7 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
-	private final MessageInterpolator factoryMessageInterpolator;
-	private final TraversableResolver factoryTraversableResolver;
-	private final ConstraintValidatorFactory factoryConstraintValidatorFactory;
-	private final ParameterNameProvider factoryParameterNameProvider;
-	private final BeanMetaDataManager beanMetaDataManager;
-	private final ConstraintValidatorManager constraintValidatorManager;
+	private final ValidatorFactoryImpl validatorFactory;
 
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
@@ -48,31 +41,18 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	private boolean failFast;
 
-	public ValidatorContextImpl(
-			MessageInterpolator factoryMessageInterpolator,
-			TraversableResolver factoryTraversableResolver,
-			ParameterNameProvider factoryParameterNameProvider,
-			BeanMetaDataManager beanMetaDataManager,
-			ConstraintValidatorManager constraintValidatorManager,
-			boolean failFast
-	) {
-		this.factoryConstraintValidatorFactory = constraintValidatorManager.getDefaultConstraintValidatorFactory();
-		this.factoryMessageInterpolator = factoryMessageInterpolator;
-		this.factoryTraversableResolver = factoryTraversableResolver;
-		this.factoryParameterNameProvider = factoryParameterNameProvider;
-		this.beanMetaDataManager = beanMetaDataManager;
-		this.constraintValidatorManager = constraintValidatorManager;
-		this.failFast = failFast;
-
-		messageInterpolator( factoryMessageInterpolator );
-		traversableResolver( factoryTraversableResolver );
-		constraintValidatorFactory( factoryConstraintValidatorFactory );
+	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
+		this.validatorFactory = validatorFactory;
+		this.messageInterpolator = validatorFactory.getMessageInterpolator();
+		this.traversableResolver = validatorFactory.getTraversableResolver();
+		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
+		this.parameterNameProvider = validatorFactory.getParameterNameProvider();
 	}
 
 	@Override
 	public HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator) {
 		if ( messageInterpolator == null ) {
-			this.messageInterpolator = factoryMessageInterpolator;
+			this.messageInterpolator = validatorFactory.getMessageInterpolator();
 		}
 		else {
 			this.messageInterpolator = messageInterpolator;
@@ -83,7 +63,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	@Override
 	public HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver) {
 		if ( traversableResolver == null ) {
-			this.traversableResolver = factoryTraversableResolver;
+			this.traversableResolver = validatorFactory.getTraversableResolver();
 		}
 		else {
 			this.traversableResolver = traversableResolver;
@@ -94,7 +74,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	@Override
 	public HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory) {
 		if ( factory == null ) {
-			this.constraintValidatorFactory = factoryConstraintValidatorFactory;
+			this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		}
 		else {
 			this.constraintValidatorFactory = factory;
@@ -105,7 +85,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	@Override
 	public HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
 		if ( parameterNameProvider == null ) {
-			this.parameterNameProvider = factoryParameterNameProvider;
+			this.parameterNameProvider = validatorFactory.getParameterNameProvider();
 		}
 		else {
 			this.parameterNameProvider = parameterNameProvider;
@@ -121,12 +101,11 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public Validator getValidator() {
-		return new ValidatorImpl(
+		return validatorFactory.createValidator(
 				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
-				beanMetaDataManager,
-				constraintValidatorManager,
+				parameterNameProvider,
 				failFast
 		);
 	}

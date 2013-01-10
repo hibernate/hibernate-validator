@@ -92,7 +92,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	}
 
 	private <T> void initClass(Class<T> clazz, ConstraintMappingContext context) {
-
 		Set<ConstrainedElement> constrainedElements =
 				retrievePropertyMetaData(
 						context.getConstraintConfig().get( clazz ),
@@ -122,7 +121,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	}
 
 	private <T> DefaultGroupSequenceProvider<? super T> getDefaultGroupSequenceProvider(Class<T> beanType, ConstraintMappingContext context) {
-
 		Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = context.getDefaultGroupSequenceProvider(
 				beanType
 		);
@@ -138,7 +136,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private Set<ConstrainedElement> retrievePropertyMetaData(
 			Set<ConfiguredConstraint<?, BeanConstraintLocation>> constraints,
 			Set<BeanConstraintLocation> cascades) {
-
 		Map<BeanConstraintLocation, Set<ConfiguredConstraint<?, BeanConstraintLocation>>> constraintsByLocation = partition(
 				constraints,
 				constraintsByLocation()
@@ -177,8 +174,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		return allPropertyMetaData;
 	}
 
-	private Set<ConstrainedElement> retrieveMethodMetaData(Set<ExecutableConstraintLocation> methodCascades, Set<ConfiguredConstraint<?, ExecutableConstraintLocation>> methodConstraints) {
-
+	private Set<ConstrainedElement> retrieveMethodMetaData(Set<ExecutableConstraintLocation> methodCascades,
+														   Set<ConfiguredConstraint<?, ExecutableConstraintLocation>> methodConstraints) {
 		Map<Method, Set<ExecutableConstraintLocation>> cascadesByMethod = partition(
 				methodCascades, cascadesByMethod()
 		);
@@ -190,25 +187,24 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		allConfiguredMethods.addAll( constraintsByMethod.keySet() );
 		Set<ConstrainedElement> allMethodMetaData = newHashSet();
 
-		for ( Method oneMethod : allConfiguredMethods ) {
-
-			String[] parameterNames = parameterNameProvider.getParameterNames( oneMethod );
+		for ( Method method : allConfiguredMethods ) {
+			String[] parameterNames = parameterNameProvider.getParameterNames( method );
 
 			Map<Integer, Set<ExecutableConstraintLocation>> cascadesByParameter = partition(
 					cascadesByMethod.get(
-							oneMethod
+							method
 					), cascadesByParameterIndex()
 			);
 			Map<Integer, Set<ConfiguredConstraint<?, ExecutableConstraintLocation>>> constraintsByParameter = partition(
-					constraintsByMethod.get( oneMethod ), constraintsByParameterIndex()
+					constraintsByMethod.get( method ), constraintsByParameterIndex()
 			);
 			List<ConstrainedParameter> parameterMetaDataList = newArrayList();
 
-			for ( int i = 0; i < oneMethod.getParameterTypes().length; i++ ) {
+			for ( int i = 0; i < method.getParameterTypes().length; i++ ) {
 				parameterMetaDataList.add(
 						new ConstrainedParameter(
 								ConfigurationSource.API,
-								new ExecutableConstraintLocation( oneMethod, i ),
+								new ExecutableConstraintLocation( method, i ),
 								parameterNames[i],
 								asMetaConstraints( constraintsByParameter.get( i ) ),
 								Collections.<Class<?>, Class<?>>emptyMap(),
@@ -219,7 +215,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 			ConstrainedExecutable methodMetaData = new ConstrainedExecutable(
 					ConfigurationSource.API,
-					new ExecutableConstraintLocation( oneMethod ),
+					new ExecutableConstraintLocation( method ),
 					parameterMetaDataList,
 					Collections.<MetaConstraint<?>>emptySet(),
 					asMetaConstraints( constraintsByParameter.get( null ) ),
@@ -232,7 +228,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	}
 
 	private Set<MetaConstraint<?>> asMetaConstraints(Set<? extends ConfiguredConstraint<?, ?>> constraints) {
-
 		if ( constraints == null ) {
 			return Collections.emptySet();
 		}
@@ -247,7 +242,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	}
 
 	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A, ? extends ConstraintLocation> config) {
-
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				config.createAnnotationProxy(),
 				constraintHelper,

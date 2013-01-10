@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.bootstrap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -35,7 +36,7 @@ public class Customer {
 	@Valid
 	private Set<Order> orders = new HashSet<Order>();
 
-	public void addOrder(Order order) {
+	public void addOrder(@NotNull Order order) {
 		orders.add( order );
 	}
 
