@@ -31,7 +31,7 @@
     <description>Aggregates dependencies and runs the JSR-303 TCK</description>
 
     <properties>
-        <tck.version>1.1.0.Beta2</tck.version>
+        <tck.version>1.1.0-SNAPSHOT</tck.version>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
         <jbossas.version>7.1.1.Final</jbossas.version>
@@ -216,7 +216,7 @@
                         <executions>
                             <execution>
                                 <id>unpack</id>
-                                <phase>process-test-resources</phase>
+                                <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
@@ -235,7 +235,7 @@
                             </execution>
                             <execution>
                                 <id>copy-beanvalidation-api</id>
-                                <phase>generate-test-sources</phase>
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
@@ -243,7 +243,7 @@
                                     <outputDirectory>
                                         ${project.build.directory}/jboss-as-${jbossas.version}/modules/javax/validation/api/main
                                     </outputDirectory>
-                                    <stripVersion>true</stripVersion>
+                                    <stripVersion>false</stripVersion>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>javax.validation</groupId>
@@ -254,7 +254,7 @@
                             </execution>
                             <execution>
                                 <id>copy-hv</id>
-                                <phase>generate-test-sources</phase>
+                                <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
@@ -262,7 +262,7 @@
                                     <outputDirectory>
                                         ${project.build.directory}/jboss-as-${jbossas.version}/modules/org/hibernate/validator/main
                                     </outputDirectory>
-                                    <stripVersion>true</stripVersion>
+                                    <stripVersion>false</stripVersion>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
@@ -271,26 +271,84 @@
                                     </artifactItems>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>copy-classmate</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>
+                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/com/fasterxml/main
+                                    </outputDirectory>
+                                    <stripVersion>false</stripVersion>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.fasterxml</groupId>
+                                            <artifactId>classmate</artifactId>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>2.6</version>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>copy-resources</id>
-                                <phase>generate-test-sources</phase>
+                                <id>copy-modules</id>
+                                <phase>generate-test-resources</phase>
                                 <goals>
-                                    <goal>copy-resources</goal>
+                                    <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.directory}/jboss-as-${jbossas.version}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/test/modules</directory>
-                                            <filtering>false</filtering>
-                                        </resource>
-                                    </resources>
+                                    <source>
+                                        println "[INFO] ------------------------------------------------------------------------";
+                                        println "[INFO] TCK SETUP BUILD INFO                                                    ";
+                                        println "[INFO] ------------------------------------------------------------------------";
+                                        println "[INFO] Updating default JBoss AS modules                                       ";
+                                        println "[INFO] ------------------------------------------------------------------------";
+
+                                        def toDir = new File(project.properties['jbossTargetDir'], 'modules/javax/validation')
+                                        def fromDir = new File(project.basedir, 'src/as7config/modules/javax/validation')
+
+                                        log.info('Deleting old Bean Validation 1.0 module from ' + fromDir )
+                                        ant.delete(dir : toDir)
+
+                                        log.info('Copying Bean Validation 1.1 module from ' + fromDir + ' to ' + toDir)
+                                        ant.copy(todir: toDir, filtering: true) {
+                                           fileset(dir: fromDir)
+                                           filterset() {
+                                              filter(token:'BV-API-VERSION', value:project.properties['bv.api.version'])
+                                           }
+                                        }
+
+                                        toDir = new File(project.properties['jbossTargetDir'], 'modules/org/hibernate/validator')
+                                        fromDir = new File(project.basedir, 'src/as7config/modules/org/hibernate/validator')
+
+                                        log.info('Deleting old Hibernate Validator module from ' + fromDir )
+                                        ant.delete(dir : toDir)
+
+                                        log.info('Copying updated Hibernate Validator module from ' + fromDir + ' to ' + toDir)
+                                        ant.copy(todir: toDir, filtering: true) {
+                                           fileset(dir: fromDir)
+                                           filterset() {
+                                              filter(token:'HV-VERSION', value:project.version)
+                                           }
+                                        }
+
+                                        toDir = new File(project.properties['jbossTargetDir'], 'modules/com/fasterxml')
+                                        fromDir = new File(project.basedir, 'src/as7config/modules/com/fasterxml')
+
+                                        log.info('Copying classmate module from ' + fromDir + ' to ' + toDir)
+                                        ant.copy(todir: toDir, filtering: true) {
+                                           fileset(dir: fromDir)
+                                           filterset() {
+                                              filter(token:'CLASSMATE-VERSION', value:project.properties['classmate.version'])
+                                           }
+                                        }
+                                    </source>
                                 </configuration>
                             </execution>
                         </executions>
