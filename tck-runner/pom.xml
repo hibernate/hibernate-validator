@@ -279,7 +279,7 @@
                                 </goals>
                                 <configuration>
                                     <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/com/fasterxml/main
+                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/com/fasterxml/classmate/main
                                     </outputDirectory>
                                     <stripVersion>false</stripVersion>
                                     <artifactItems>

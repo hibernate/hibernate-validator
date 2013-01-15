@@ -15,7 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<module xmlns="urn:jboss:module:1.1" name="com.fasterxml">
+<module xmlns="urn:jboss:module:1.1" name="com.fasterxml.classmate">
     <resources>
         <resource-root path="classmate-@CLASSMATE-VERSION@.jar"/>
     </resources>
