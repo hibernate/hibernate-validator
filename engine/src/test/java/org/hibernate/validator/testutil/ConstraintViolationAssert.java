@@ -24,9 +24,12 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import static org.hibernate.validator.internal.engine.path.PathImpl.createPathFromString;
+import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -184,7 +187,26 @@ public final class ConstraintViolationAssert {
 	 * @param numberOfViolations The expected number of violation.
 	 */
 	public static void assertNumberOfViolations(Set<? extends ConstraintViolation<?>> violations, int numberOfViolations) {
-		assertEquals( violations.size(), numberOfViolations, "Wrong number of constraint violations" );
+		assertEquals(
+				violations.size(),
+				numberOfViolations,
+				"Wrong number of constraint violations"
+		);
+	}
+
+	public static void assertConstraintTypes(Set<ConstraintDescriptor<?>> descriptors, Class<?>... expectedConstraintTypes) {
+		Set<Class<?>> expectedTypes = asSet( expectedConstraintTypes );
+		Set<Class<?>> actualConstraintTypes = newHashSet();
+
+		for ( ConstraintDescriptor<?> descriptor : descriptors ) {
+			actualConstraintTypes.add( descriptor.getAnnotation().annotationType() );
+		}
+
+		assertEquals(
+				actualConstraintTypes,
+				expectedTypes,
+				"Set of constraint descriptors doesn't contain the expected constraint annotation types"
+		);
 	}
 
 	/**

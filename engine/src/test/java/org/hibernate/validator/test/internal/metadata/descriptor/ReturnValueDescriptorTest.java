@@ -16,16 +16,23 @@
 */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
+import javax.validation.metadata.Scope;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
+import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
+import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
+import static org.hibernate.validator.testutil.ValidatorUtil.getMethodReturnValueDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -38,25 +45,37 @@ public class ReturnValueDescriptorTest {
 
 	@Test
 	public void testElementDescriptorType() {
-		ElementDescriptor elementDescriptor = getReturnValueDescriptorFor( "foo" );
+		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"foo"
+		);
 		assertEquals( elementDescriptor.getKind(), ElementDescriptor.Kind.RETURN_VALUE );
 	}
 
 	@Test
 	public void testIsCascaded() {
-		ElementDescriptor elementDescriptor = getReturnValueDescriptorFor( "foo" );
+		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"foo"
+		);
 		assertTrue( elementDescriptor.as( ReturnValueDescriptor.class ).isCascaded() );
 	}
 
 	@Test
 	public void testIsNotCascaded() {
-		ElementDescriptor elementDescriptor = getReturnValueDescriptorFor( "bar" );
+		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"bar"
+		);
 		assertFalse( elementDescriptor.as( ReturnValueDescriptor.class ).isCascaded() );
 	}
 
 	@Test
 	public void testNarrowDescriptor() {
-		ElementDescriptor elementDescriptor = getReturnValueDescriptorFor( "bar" );
+		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"bar"
+		);
 
 		ReturnValueDescriptor returnValueDescriptor = elementDescriptor.as( ReturnValueDescriptor.class );
 		assertTrue( returnValueDescriptor != null );
@@ -65,14 +84,101 @@ public class ReturnValueDescriptorTest {
 		assertTrue( returnValueDescriptor != null );
 	}
 
-	@Test(expectedExceptions = ClassCastException.class, expectedExceptionsMessageRegExp = "HV000118.*")
+	@Test(expectedExceptions = ClassCastException.class,
+			expectedExceptionsMessageRegExp = "HV000118.*")
 	public void testUnableToNarrowDescriptor() {
-		ElementDescriptor elementDescriptor = getReturnValueDescriptorFor( "bar" );
+		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"bar"
+		);
 		elementDescriptor.as( MethodDescriptor.class );
 	}
 
-	private ElementDescriptor getReturnValueDescriptorFor(String method) {
-		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepository.class, method );
-		return methodDescriptor.getReturnValueDescriptor();
+	@Test
+	public void testHasConstraints() {
+		ReturnValueDescriptor unconstrainedReturnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"foo"
+		);
+		assertFalse( unconstrainedReturnValueDescriptor.hasConstraints() );
+
+		ReturnValueDescriptor constrainedReturnDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"bar"
+		);
+		assertTrue( constrainedReturnDescriptor.hasConstraints() );
+	}
+
+	@Test
+	public void testHasConstraintsConsidersConstraintsFromSuperType() {
+		ReturnValueDescriptor constrainedReturnDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepositoryExt.class,
+				"bar"
+		);
+		assertTrue( constrainedReturnDescriptor.hasConstraints() );
+	}
+
+	@Test
+	public void testGetConstraintDescriptors() {
+		ReturnValueDescriptor unconstrainedReturnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"foo"
+		);
+		assertTrue( unconstrainedReturnValueDescriptor.getConstraintDescriptors().isEmpty() );
+
+		ReturnValueDescriptor constrainedReturnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepository.class,
+				"bar"
+		);
+		assertConstraintTypes(
+				constrainedReturnValueDescriptor.getConstraintDescriptors(),
+				NotNull.class
+		);
+	}
+
+	@Test
+	public void testGetConstraintDescriptorsConsidersConstraintsFromSuperType() {
+		ReturnValueDescriptor returnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepositoryExt.class,
+				"baz"
+		);
+		assertConstraintTypes(
+				returnValueDescriptor.getConstraintDescriptors(),
+				Min.class,
+				NotNull.class
+		);
+	}
+
+	@TestForIssue(jiraKey = "HV-443")
+	@Test
+	public void testConstraintsLookingAt() {
+		ReturnValueDescriptor returnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepositoryExt.class,
+				"baz"
+		);
+
+		assertConstraintTypes(
+				returnValueDescriptor.findConstraints()
+						.lookingAt( Scope.LOCAL_ELEMENT )
+						.getConstraintDescriptors(), Min.class
+		);
+		assertConstraintTypes(
+				returnValueDescriptor.findConstraints()
+						.lookingAt( Scope.HIERARCHY )
+						.getConstraintDescriptors(), Min.class, NotNull.class
+		);
+	}
+
+	@Test
+	public void testFindConstraintMatchingGroups() {
+		ReturnValueDescriptor returnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepositoryExt.class,
+				"baz"
+		);
+		assertConstraintTypes(
+				returnValueDescriptor.findConstraints()
+						.unorderedAndMatchingGroups( ValidationGroup.class )
+						.getConstraintDescriptors(), NotNull.class
+		);
 	}
 }

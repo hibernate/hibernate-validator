@@ -97,7 +97,7 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public void zap(@Min(0) int i) {
 	}
 
-	@ConsistentDateParameters
+	@Override
 	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
 	}
 

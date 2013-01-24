@@ -23,6 +23,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
+import org.joda.time.DateMidnight;
+
 import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
@@ -66,6 +68,10 @@ public class CustomerRepository {
 	}
 
 	public void zap(@Max(1) int i) {
+	}
+
+	@ConsistentDateParameters(groups = ValidationGroup.class)
+	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
 	}
 
 	public void methodWithParameterGroupConversion(

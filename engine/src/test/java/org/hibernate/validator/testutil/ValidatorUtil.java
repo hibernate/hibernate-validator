@@ -27,6 +27,7 @@ import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
+import javax.validation.metadata.ReturnValueDescriptor;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
@@ -172,12 +173,34 @@ public final class ValidatorUtil {
 	 * @return an instance of {@code ParameterDescriptor}.
 	 */
 	public static ParameterDescriptor getParameterDescriptor(Class<?> clazz, String methodName, Class<?>[] parameterTypes, int parameterIndex) {
-		final MethodDescriptor methodDescriptor = getMethodDescriptor( clazz, methodName, parameterTypes );
+		final MethodDescriptor methodDescriptor = getMethodDescriptor(
+				clazz,
+				methodName,
+				parameterTypes
+		);
 		assertNotNull(
 				methodDescriptor,
 				"No method with the given signature is declared in " + clazz + " or its super class"
 		);
 		return methodDescriptor.getParameterDescriptors().get( parameterIndex );
+	}
+
+	/**
+	 * Returns the {@code ReturnValueDescriptor} for the given method signature in the given class.
+	 *
+	 * @param clazz The class.
+	 * @param methodName The method name.
+	 * @param parameterTypes The method parameter types.
+	 *
+	 * @return an instance of {@code ReturnValueDescriptor} for the given method signature or {@code null} if no such method exists or
+	 *         the method has no return value.
+	 */
+	public static ReturnValueDescriptor getMethodReturnValueDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		MethodDescriptor methodDescriptor = getBeanDescriptor( clazz ).getConstraintsForMethod(
+				methodName,
+				parameterTypes
+		);
+		return methodDescriptor != null ? methodDescriptor.getReturnValueDescriptor() : null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -206,6 +229,11 @@ public final class ValidatorUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T, I extends T> T getValidatingProxy(I implementor, Validator methodValidator, Class<?>... validationGroups) {
-		return getValidatingProxy( implementor, implementor.getClass().getInterfaces(), methodValidator, validationGroups );
+		return getValidatingProxy(
+				implementor,
+				implementor.getClass().getInterfaces(),
+				methodValidator,
+				validationGroups
+		);
 	}
 }
