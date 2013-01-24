@@ -30,7 +30,8 @@ import javax.validation.metadata.ReturnValueDescriptor;
  *
  * @author Gunnar Morling
  */
-public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements ConstructorDescriptor, MethodDescriptor {
+public class ExecutableDescriptorImpl extends ElementDescriptorImpl
+		implements ConstructorDescriptor, MethodDescriptor {
 	private final Kind kind;
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
@@ -40,12 +41,17 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements C
 			Kind kind,
 			Type returnType,
 			String name,
-			Set<ConstraintDescriptorImpl<?>> returnValueConstraints,
+			Set<ConstraintDescriptorImpl<?>> crossParameterValueConstraints,
 			ReturnValueDescriptor returnValueDescriptor,
 			List<ParameterDescriptor> parameters,
 			boolean defaultGroupSequenceRedefined,
 			List<Class<?>> defaultGroupSequence) {
-		super( returnType, returnValueConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
+		super(
+				returnType,
+				crossParameterValueConstraints,
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
+		);
 
 		this.kind = kind;
 		this.name = name;
@@ -85,6 +91,10 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements C
 
 	@Override
 	public boolean areParametersConstrained() {
+		if ( hasConstraints() ) {
+			return true;
+		}
+
 		for ( ParameterDescriptor oneParameter : parameters ) {
 			if ( oneParameter.hasConstraints() || oneParameter.isCascaded() ) {
 				return true;
@@ -96,6 +106,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl implements C
 
 	@Override
 	public boolean isReturnValueConstrained() {
-		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints() || returnValueDescriptor.isCascaded() );
+		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints() || returnValueDescriptor
+				.isCascaded() );
 	}
 }

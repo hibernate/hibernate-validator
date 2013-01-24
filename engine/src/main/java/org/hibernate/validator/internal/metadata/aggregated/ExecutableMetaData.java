@@ -159,7 +159,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					.getExecutableElement();
 
 			//does one of the executables override the other one?
-			return location.getExecutableElement().overrides( executableElement ) || executableElement.overrides(
+			return location.getExecutableElement()
+					.overrides( executableElement ) || executableElement.overrides(
 					location.getExecutableElement()
 			);
 		}
@@ -269,7 +270,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				);
 			}
 
-			ConstrainedExecutable constrainedExecutable = executablesWithParameterConstraints.iterator().next();
+			ConstrainedExecutable constrainedExecutable = executablesWithParameterConstraints.iterator()
+					.next();
 
 			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
 
@@ -278,7 +280,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					return new ConstraintDeclarationException(
 							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
 									"The following method itself has no parameter constraints but it is not defined on a sub-type of " +
-									constrainedExecutable.getLocation().getBeanClass() + ": " + oneExecutable
+									constrainedExecutable.getLocation()
+											.getBeanClass() + ": " + oneExecutable
 					);
 				}
 			}
@@ -331,7 +334,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * @throws ConstraintDeclarationException In case the represented method has an illegal parameter
 	 * constraint.
 	 */
-	public void assertCorrectnessOfMethodParameterConstraints() throws ConstraintDeclarationException {
+	public void assertCorrectnessOfMethodParameterConstraints()
+			throws ConstraintDeclarationException {
 
 		if ( parameterConstraintDeclarationException != null ) {
 			throw parameterConstraintDeclarationException;
@@ -376,7 +380,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 *         method or constructor. May be empty but will never be
 	 *         {@code null}.
 	 */
-	public Iterable<MetaConstraint<?>> getCrossParameterConstraints() {
+	public Set<MetaConstraint<?>> getCrossParameterConstraints() {
 		return crossParameterConstraints;
 	}
 
@@ -404,7 +408,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				getKind() == ConstraintMetaDataKind.METHOD ? Kind.METHOD : Kind.CONSTRUCTOR,
 				getType(),
 				getName(),
-				asDescriptors( getConstraints() ),
+				asDescriptors( getCrossParameterConstraints() ),
 				returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				defaultGroupSequenceRedefined,
@@ -416,7 +420,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		List<ParameterDescriptor> parameterDescriptorList = newArrayList();
 
 		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
-			parameterDescriptorList.add( parameterMetaData.asDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ) );
+			parameterDescriptorList.add(
+					parameterMetaData.asDescriptor(
+							defaultGroupSequenceRedefined,
+							defaultGroupSequence
+					)
+			);
 		}
 
 		return parameterDescriptorList;

@@ -80,7 +80,8 @@ public class BeanDescriptorTest {
 		assertTrue( beanDescriptor != null );
 	}
 
-	@Test(expectedExceptions = ClassCastException.class, expectedExceptionsMessageRegExp = "HV000118.*")
+	@Test(expectedExceptions = ClassCastException.class,
+			expectedExceptionsMessageRegExp = "HV000118.*")
 	public void testUnableToNarrowDescriptor() {
 		ElementDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		descriptor.as( MethodDescriptor.class );
@@ -158,7 +159,10 @@ public class BeanDescriptorTest {
 		Set<ConstraintDescriptor<?>> constraintDescriptors = descriptor.getConstraintDescriptors();
 
 		assertEquals( constraintDescriptors.size(), 1 );
-		assertEquals( constraintDescriptors.iterator().next().getAnnotation().annotationType(), ScriptAssert.class );
+		assertEquals(
+				constraintDescriptors.iterator().next().getAnnotation().annotationType(),
+				ScriptAssert.class
+		);
 	}
 
 	@Test
@@ -193,7 +197,10 @@ public class BeanDescriptorTest {
 	@Test
 	public void testGetConstraintsForMethodFromBaseType() throws Exception {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
-		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "qax", Integer.class );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod(
+				"qax",
+				Integer.class
+		);
 
 		assertNotNull( methodDescriptor );
 	}
@@ -223,6 +230,7 @@ public class BeanDescriptorTest {
 				"baz",
 				"zap",
 				"qax",
+				"methodWithCrossParameterConstraint",
 				"methodWithParameterGroupConversion",
 				"methodWithReturnValueGroupConversion"
 		);
