@@ -179,7 +179,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	@Override
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
-
 		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
 
 		sanityCheckPropertyPath( propertyName );
@@ -200,19 +199,35 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	@Override
 	public <T> Set<ConstraintViolation<T>> validateParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
-
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
+		Contracts.assertNotNull( parameterValues, MESSAGES.validatedParameterArrayMustNotBeNull() );
 
 		return validateParameters( object, ExecutableElement.forMethod( method ), parameterValues, groups );
 	}
 
 	@Override
 	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<T> constructor, Object[] parameterValues, Class<?>... groups) {
-
 		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
+		Contracts.assertNotNull( parameterValues, MESSAGES.validatedParameterArrayMustNotBeNull() );
 
 		return validateParameters( null, ExecutableElement.forConstructor( constructor ), parameterValues, groups );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<T> constructor, T createdObject, Class<?>... groups) {
+		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
+		Contracts.assertNotNull( createdObject, MESSAGES.validatedConstructorCreatedInstanceMustNotBeNull() );
+
+		return validateReturnValue( null, ExecutableElement.forConstructor( constructor ), createdObject, groups );
+	}
+
+	@Override
+	public <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
+		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
+		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
+
+		return validateReturnValue( object, ExecutableElement.forMethod( method ), returnValue, groups );
 	}
 
 	private <T> Set<ConstraintViolation<T>> validateParameters(T object, ExecutableElement executable, Object[] parameterValues, Class<?>... groups) {
@@ -240,24 +255,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return context.getFailingConstraints();
 	}
 
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<T> constructor, T createdObject, Class<?>... groups) {
-
-		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
-
-		return validateReturnValue( null, ExecutableElement.forConstructor( constructor ), createdObject, groups );
-	}
-
-	@Override
-	public <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
-
-		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
-
-		return validateReturnValue( object, ExecutableElement.forMethod( method ), returnValue, groups );
-	}
-
 	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, ExecutableElement executable, Object returnValue, Class<?>... groups) {
-
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
@@ -303,6 +301,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private ValidationOrder determineGroupValidationOrder(Class<?>[] groups) {
 		Contracts.assertNotNull( groups, MESSAGES.groupMustNotBeNull() );
+		for ( Class clazz : groups ) {
+			if ( clazz == null ) {
+			  throw new IllegalArgumentException( MESSAGES.groupMustNotBeNull() );
+			}
+		}
 
 		Class<?>[] tmpGroups = groups;
 		// if no groups is specified use the default

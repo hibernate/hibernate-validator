@@ -77,6 +77,12 @@ public interface Messages {
 
 	@Message(value = "The constructor to be validated must not be null.", format = Message.Format.NO_FORMAT)
 	String validatedConstructorMustNotBeNull();
+
+	@Message(value = "The method parameter array cannot not be null.", format = Message.Format.NO_FORMAT)
+	String validatedParameterArrayMustNotBeNull();
+
+	@Message(value = "The created instance must not be null.", format = Message.Format.NO_FORMAT)
+	String validatedConstructorCreatedInstanceMustNotBeNull();
 }
 
 

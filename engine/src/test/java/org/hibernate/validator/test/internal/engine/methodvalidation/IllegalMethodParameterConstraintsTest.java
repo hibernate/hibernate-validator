@@ -41,12 +41,25 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 @Test
 public class IllegalMethodParameterConstraintsTest {
 
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullParameterArrayThrowsException() {
+		getValidator().forExecutables().validateParameters(
+				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }, (Class<?>) null
+		);
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullGroupsVarargThrowsException() {
+		getValidator().forExecutables().validateParameters(
+				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], null
+		);
+	}
+
 	@Test(
 			expectedExceptions = ConstraintDeclarationException.class,
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
 	)
 	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
-
 		getValidator().forExecutables().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
@@ -57,7 +70,6 @@ public class IllegalMethodParameterConstraintsTest {
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
 	)
 	public void atValidAddedInSubTypeCausesDeclarationException() {
-
 		getValidator().forExecutables().validateParameters(
 				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
@@ -68,7 +80,6 @@ public class IllegalMethodParameterConstraintsTest {
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, but there are.*"
 	)
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
-
 		getValidator().forExecutables().validateParameters(
 				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
@@ -79,7 +90,6 @@ public class IllegalMethodParameterConstraintsTest {
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
 	)
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
-
 		getValidator().forExecutables().validateParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
@@ -91,7 +101,6 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	//TODO HV-632: Add more tests
 	public void crossParameterConstraintStrengtheningInSubTypeCausesDeclarationException() {
-
 		getValidator().forExecutables().validateParameters(
 				new ZipImpl(), ZipImpl.class.getDeclaredMethods()[0], new Object[2]
 		);
@@ -103,7 +112,6 @@ public class IllegalMethodParameterConstraintsTest {
 			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints.*"
 	)
 	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() throws Exception {
-
 		QuxImpl qux = new QuxImpl();
 
 		//validating a property is fine
@@ -117,12 +125,10 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private interface Foo {
-
 		void foo(String s);
 	}
 
 	private static class FooImpl implements Foo {
-
 		/**
 		 * Adds constraints to an un-constrained method from a super-type, which is not allowed.
 		 */
@@ -132,12 +138,10 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private interface Bar {
-
 		void bar(@NotNull String s);
 	}
 
 	private static class BarImpl implements Bar {
-
 		/**
 		 * Adds constraints to a constrained method from a super-type, which is not allowed.
 		 */
@@ -147,17 +151,14 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private interface Baz1 {
-
 		void baz(String s);
 	}
 
 	private interface Baz2 {
-
 		void baz(@Size(min = 3) String s);
 	}
 
 	private static class BazImpl implements Baz1, Baz2 {
-
 		/**
 		 * Implements a method defined by two interfaces (one with parameter constraints), which is not allowed.
 		 */
@@ -167,7 +168,6 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private interface Qux {
-
 		@NotNull
 		String getQux();
 
@@ -175,7 +175,6 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private static class QuxImpl implements Qux {
-
 		@Override
 		public String getQux() {
 			return null;
@@ -187,12 +186,10 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private interface Zap {
-
 		void zap(String s);
 	}
 
 	private static class ZapImpl implements Zap {
-
 		/**
 		 * Adds @Valid to an un-constrained method from a super-type, which is not allowed.
 		 */
@@ -202,12 +199,10 @@ public class IllegalMethodParameterConstraintsTest {
 	}
 
 	private interface Zip {
-
 		void zip(DateMidnight start, DateMidnight end);
 	}
 
 	private static class ZipImpl implements Zip {
-
 		/**
 		 * Adds cross-parameter constraint to an un-constrained method from a super-type, which is not allowed.
 		 */
@@ -216,5 +211,4 @@ public class IllegalMethodParameterConstraintsTest {
 		public void zip(DateMidnight start, DateMidnight end) {
 		}
 	}
-
 }

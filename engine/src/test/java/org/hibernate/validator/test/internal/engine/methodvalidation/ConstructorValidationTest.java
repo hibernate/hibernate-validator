@@ -175,4 +175,29 @@ public class ConstructorValidationTest {
 
 		assertThat( pathIterator.hasNext() ).isFalse();
 	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullParameterArrayThrowsException() throws Exception {
+		getValidator().forExecutables().validateConstructorParameters(
+				CustomerRepositoryImpl.class.getConstructor( Customer.class ),
+				null
+		);
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullGroupsVarargThrowsException() throws Exception {
+		getValidator().forExecutables().validateConstructorParameters(
+				CustomerRepositoryImpl.class.getConstructor( String.class ),
+				new String[] { "foo" },
+				(Class<?>) null
+		);
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testPassingNullAsConstructorReturnValueThrowsException() throws Exception {
+		getValidator().forExecutables().validateConstructorReturnValue(
+				CustomerRepositoryImpl.class.getConstructor(),
+				null
+		);
+	}
 }

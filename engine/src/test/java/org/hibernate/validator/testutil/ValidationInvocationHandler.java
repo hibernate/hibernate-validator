@@ -38,18 +38,16 @@ public class ValidationInvocationHandler implements InvocationHandler {
 	private final Class<?>[] groups;
 
 	public ValidationInvocationHandler(Object wrapped, Validator validator, Class<?>... groups) {
-
 		this.wrapped = wrapped;
 		this.validator = validator;
 		this.groups = groups;
 	}
 
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
 		Set<ConstraintViolation<Object>> constraintViolations = validator.forExecutables().validateParameters(
 				wrapped,
 				method,
-				args,
+				args == null ? new Object[] { } : args,
 				groups
 		);
 
