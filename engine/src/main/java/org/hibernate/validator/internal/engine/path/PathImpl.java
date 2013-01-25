@@ -34,6 +34,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
+ * Default implementation of {@code javax.validation.Path}.
+ *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
@@ -43,10 +45,7 @@ public final class PathImpl implements Path, Serializable {
 	private static final Log log = LoggerFactory.make();
 
 	public static final String PROPERTY_PATH_SEPARATOR = ".";
-
-	//TODO HV-571: The spec currently says "In the return value case, the name of the node is null".
-	//But maybe a reserved name like this is actually better. Need to discuss with EG.
-	public static final String RETURN_VALUE_NODE_NAME = "$retval";
+	public static final String RETURN_VALUE_NODE_NAME = null;
 
 	/**
 	 * Regular expression used to split a string path into its elements.
@@ -170,12 +169,17 @@ public final class PathImpl implements Path, Serializable {
 		boolean first = true;
 		for ( int i = 1; i < nodeList.size(); i++ ) {
 			NodeImpl nodeImpl = (NodeImpl) nodeList.get( i );
-			if ( nodeImpl.getName() != null ) {
-				if ( !first ) {
-					builder.append( PROPERTY_PATH_SEPARATOR );
-				}
-				builder.append( nodeImpl.asString() );
+			String name = nodeImpl.asString();
+			if ( name.isEmpty() ) {
+				// skip the node if it does not contribute to the string representation of the path, eg class level constraints
+				continue;
 			}
+
+			if ( !first ) {
+				builder.append( PROPERTY_PATH_SEPARATOR );
+			}
+
+			builder.append( nodeImpl.asString() );
 
 			first = false;
 		}

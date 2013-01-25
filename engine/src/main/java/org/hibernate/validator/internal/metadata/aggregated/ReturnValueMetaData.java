@@ -28,10 +28,7 @@ import java.util.Map;
  */
 public class ReturnValueMetaData implements Validatable {
 
-	//TODO HV-571: The spec currently says "In the return value case, the name of the node is null".
-	//But maybe a reserved name like this is actually better. Need to discuss with EG.
-	public static final String RETURN_VALUE_NODE_NAME = "$retval";
-
+	public static final String RETURN_VALUE_NODE_NAME = null;
 
 	private final Map<Class<?>, Class<?>> groupConversions;
 
