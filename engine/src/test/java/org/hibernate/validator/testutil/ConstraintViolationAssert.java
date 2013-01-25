@@ -25,12 +25,14 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 
 import static org.hibernate.validator.internal.engine.path.PathImpl.createPathFromString;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -207,6 +209,60 @@ public final class ConstraintViolationAssert {
 				expectedTypes,
 				"Set of constraint descriptors doesn't contain the expected constraint annotation types"
 		);
+	}
+
+	/**
+	 * Asserts that the nodes in the path have the specified kinds.
+	 *
+	 * @param path The path under test
+	 * @param kinds The node kinds
+	 */
+	public static void assertDescriptorKinds(Path path, ElementDescriptor.Kind... kinds) {
+
+		Iterator<Path.Node> pathIterator = path.iterator();
+
+		for ( ElementDescriptor.Kind kind : kinds ) {
+			assertTrue( pathIterator.hasNext() );
+			assertEquals( pathIterator.next().getElementDescriptor().getKind(), kind );
+		}
+
+		assertFalse( pathIterator.hasNext() );
+	}
+
+	/**
+	 * Asserts that the nodes in the path have the specified names.
+	 *
+	 * @param path The path under test
+	 * @param names The node names
+	 */
+	public static void assertNodeNames(Path path, String... names) {
+
+		Iterator<Path.Node> pathIterator = path.iterator();
+
+		for ( String name : names ) {
+			assertTrue( pathIterator.hasNext() );
+			assertEquals( pathIterator.next().getName(), name );
+		}
+
+		assertFalse( pathIterator.hasNext() );
+	}
+
+	/**
+	 * Asserts that the nodes in the path have the specified element classes.
+	 *
+	 * @param path The path under test
+	 * @param elementClasses The element classes
+	 */
+	public static void assertElementClasses(Path path, Class<?>... elementClasses) {
+
+		Iterator<Path.Node> pathIterator = path.iterator();
+
+		for ( Class<?> clazz : elementClasses ) {
+			assertTrue( pathIterator.hasNext() );
+			assertEquals( pathIterator.next().getElementDescriptor().getElementClass(), clazz );
+		}
+
+		assertFalse( pathIterator.hasNext() );
 	}
 
 	/**
