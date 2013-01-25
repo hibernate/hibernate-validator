@@ -103,10 +103,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ConfigurationImpl() {
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES );
-		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
 		this.defaultTraversableResolver = new DefaultTraversableResolver();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
+		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
 	}
 
 	public final HibernateValidatorConfiguration ignoreXmlConfiguration() {
