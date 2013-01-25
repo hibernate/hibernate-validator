@@ -18,7 +18,7 @@ package org.hibernate.validator.integration.util;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
-import javax.validation.MethodValidator;
+import javax.validation.ExecutableValidator;
 import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
 
@@ -48,7 +48,7 @@ public class MyValidator implements Validator {
 	}
 
 	@Override
-	public MethodValidator forMethods() {
+	public ExecutableValidator forExecutables() {
 		throw new UnsupportedOperationException();
 	}
 

@@ -24,7 +24,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
-import javax.validation.MethodValidator;
+import javax.validation.ExecutableValidator;
 import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -124,9 +124,9 @@ public class BootstrappingTest {
 				.usingContext()
 				.parameterNameProvider( new DummyParameterNameProvider() )
 				.getValidator();
-		MethodValidator methodValidator = validator.forMethods();
+		ExecutableValidator executableValidator = validator.forExecutables();
 		Method addOrderMethod = Customer.class.getMethod( "addOrder", Order.class );
-		Set<ConstraintViolation<Customer>> constraintViolations = methodValidator.validateParameters(
+		Set<ConstraintViolation<Customer>> constraintViolations = executableValidator.validateParameters(
 				new Customer(),
 				addOrderMethod,
 				new Object[] { null }

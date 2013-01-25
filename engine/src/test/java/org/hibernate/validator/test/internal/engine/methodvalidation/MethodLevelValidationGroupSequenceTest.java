@@ -46,7 +46,7 @@ public class MethodLevelValidationGroupSequenceTest {
 	private CustomerRepositoryWithRedefinedDefaultGroup customerRepository;
 
 	@BeforeMethod
-	public void setUpDefaultMethodValidator() {
+	public void setUpDefaultExecutableValidator() {
 		setUpValidatorForGroups();
 	}
 

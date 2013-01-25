@@ -68,7 +68,7 @@ public class ValidationInterceptor implements Serializable {
 	 */
 	@AroundInvoke
 	public Object validateMethodInvocation(InvocationContext ctx) throws Exception {
-		Set<ConstraintViolation<Object>> violations = validator.forMethods().validateParameters(
+		Set<ConstraintViolation<Object>> violations = validator.forExecutables().validateParameters(
 				ctx.getTarget(),
 				ctx.getMethod(),
 				ctx.getParameters()
@@ -83,7 +83,7 @@ public class ValidationInterceptor implements Serializable {
 
 		Object result = ctx.proceed();
 
-		violations = validator.forMethods().validateReturnValue(
+		violations = validator.forExecutables().validateReturnValue(
 				ctx.getTarget(),
 				ctx.getMethod(),
 				result

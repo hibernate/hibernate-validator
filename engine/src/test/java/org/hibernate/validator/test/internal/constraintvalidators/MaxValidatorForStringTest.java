@@ -27,6 +27,7 @@ import org.hibernate.validator.internal.constraintvalidators.DecimalMaxValidator
 import org.hibernate.validator.internal.constraintvalidators.MaxValidatorForCharSequence;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -47,7 +48,7 @@ public class MaxValidatorForStringTest {
 
 		MaxValidatorForCharSequence constraint = new MaxValidatorForCharSequence();
 		constraint.initialize( m );
-		testMaxValidator( constraint );
+		testMaxValidator( constraint, true );
 	}
 
 	@Test
@@ -60,7 +61,7 @@ public class MaxValidatorForStringTest {
 
 		DecimalMaxValidatorForCharSequence constraint = new DecimalMaxValidatorForCharSequence();
 		constraint.initialize( m );
-		testMaxValidator( constraint );
+		testMaxValidator( constraint, true );
 	}
 
 	@Test
@@ -81,10 +82,32 @@ public class MaxValidatorForStringTest {
 		}
 	}
 
-	private void testMaxValidator(ConstraintValidator<?, CharSequence> constraint) {
+	@Test
+	@TestForIssue(jiraKey = "HV-256")
+	public void testIsValidDecimalMaxExclusive() {
+		boolean inclusive = false;
+		AnnotationDescriptor<DecimalMax> descriptor = new AnnotationDescriptor<DecimalMax>( DecimalMax.class );
+		descriptor.setValue( "value", "15.0E0" );
+		descriptor.setValue( "inclusive", inclusive );
+		descriptor.setValue( "message", "{validator.max}" );
+		DecimalMax m = AnnotationFactory.create( descriptor );
+
+		DecimalMaxValidatorForCharSequence constraint = new DecimalMaxValidatorForCharSequence();
+		constraint.initialize( m );
+		testMaxValidator( constraint, inclusive );
+	}
+
+	private void testMaxValidator(ConstraintValidator<?, CharSequence> constraint, boolean inclusive) {
+		if ( inclusive ) {
+			assertTrue( constraint.isValid( "15", null ) );
+			assertTrue( constraint.isValid( "15.0", null ) );
+		}
+		else {
+			assertFalse( constraint.isValid( "15", null ) );
+			assertFalse( constraint.isValid( "15.0", null ) );
+		}
+
 		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( "15", null ) );
-		assertTrue( constraint.isValid( "15.0", null ) );
 		assertTrue( constraint.isValid( "10", null ) );
 		assertTrue( constraint.isValid( "14.99", null ) );
 		assertTrue( constraint.isValid( "-14.99", null ) );

@@ -19,7 +19,7 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 import java.util.Iterator;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
-import javax.validation.MethodValidator;
+import javax.validation.ExecutableValidator;
 import javax.validation.Path.Node;
 import javax.validation.metadata.ElementDescriptor.Kind;
 
@@ -39,9 +39,9 @@ public class ConstructorValidationTest {
 
 	@Test
 	public void constructorParameterValidationYieldsConstraintViolation() throws Exception {
-		MethodValidator methodValidator = getValidator().forMethods();
+		ExecutableValidator executableValidator = getValidator().forExecutables();
 
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorParameters(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = executableValidator.validateConstructorParameters(
 				CustomerRepositoryImpl.class.getConstructor( String.class ),
 				new String[] { null }
 		);
@@ -68,9 +68,9 @@ public class ConstructorValidationTest {
 
 	@Test
 	public void cascadedConstructorParameterValidationYieldsConstraintViolation() throws Exception {
-		MethodValidator methodValidator = getValidator().forMethods();
+		ExecutableValidator executableValidator = getValidator().forExecutables();
 
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorParameters(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = executableValidator.validateConstructorParameters(
 				CustomerRepositoryImpl.class.getConstructor( Customer.class ),
 				new Customer[] { new Customer( null ) }
 		);
@@ -106,10 +106,10 @@ public class ConstructorValidationTest {
 
 	@Test
 	public void constructorReturnValueValidationYieldsConstraintViolation() throws Exception {
-		MethodValidator methodValidator = getValidator().forMethods();
+		ExecutableValidator executableValidator = getValidator().forExecutables();
 
 		CustomerRepositoryImpl customerRepository = new CustomerRepositoryImpl();
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorReturnValue(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = executableValidator.validateConstructorReturnValue(
 				CustomerRepositoryImpl.class.getConstructor(),
 				customerRepository
 		);
@@ -139,11 +139,10 @@ public class ConstructorValidationTest {
 
 	@Test
 	public void cascadedConstructorReturnValueValidationYieldsConstraintViolation() throws Exception {
-
-		MethodValidator methodValidator = getValidator().forMethods();
+		ExecutableValidator executableValidator = getValidator().forExecutables();
 
 		CustomerRepositoryImpl customerRepository = new CustomerRepositoryImpl();
-		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = methodValidator.validateConstructorReturnValue(
+		Set<ConstraintViolation<CustomerRepositoryImpl>> violations = executableValidator.validateConstructorReturnValue(
 				CustomerRepositoryImpl.class.getConstructor( String.class ),
 				customerRepository
 		);
@@ -175,5 +174,30 @@ public class ConstructorValidationTest {
 		assertThat( nameNode.getName() ).isEqualTo( "customer" );
 
 		assertThat( pathIterator.hasNext() ).isFalse();
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullParameterArrayThrowsException() throws Exception {
+		getValidator().forExecutables().validateConstructorParameters(
+				CustomerRepositoryImpl.class.getConstructor( Customer.class ),
+				null
+		);
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNullGroupsVarargThrowsException() throws Exception {
+		getValidator().forExecutables().validateConstructorParameters(
+				CustomerRepositoryImpl.class.getConstructor( String.class ),
+				new String[] { "foo" },
+				(Class<?>) null
+		);
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testPassingNullAsConstructorReturnValueThrowsException() throws Exception {
+		getValidator().forExecutables().validateConstructorReturnValue(
+				CustomerRepositoryImpl.class.getConstructor(),
+				null
+		);
 	}
 }

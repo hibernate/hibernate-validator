@@ -225,7 +225,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testMultipleParameterConstraintsAtSameParameter() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
@@ -254,7 +253,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testMultipleParameterConstraintsAtDifferentParameters() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class, String.class )
@@ -284,7 +282,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testProgrammaticAndAnnotationParameterConstraintsAddUp() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "sayHello", String.class )
@@ -312,7 +309,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testConstraintAtCascadedParameter() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
@@ -348,7 +344,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testReturnValueConstraint() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
@@ -374,7 +369,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testMultipleReturnValueConstraints() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
@@ -403,7 +397,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testGenericReturnValueConstraint() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
@@ -431,7 +424,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void testProgrammaticAndAnnotationReturnValueConstraintsAddUp() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class, String.class )
@@ -459,7 +451,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void constraintConfiguredOnPropertyIsEvaluatedByMethodValidation() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.property( "hello", ElementType.METHOD )
@@ -486,7 +477,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void cascadeConfiguredOnPropertyIsEvaluatedByMethodValidation() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.property( "user", ElementType.METHOD )
@@ -513,7 +503,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void constraintConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
 				.property( "hello", ElementType.FIELD )
@@ -526,7 +515,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void cascadeConfiguredOnFieldIsNotEvaluatedByMethodValidation() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
 				.property( "user", ElementType.FIELD )
@@ -539,7 +527,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void constraintConfiguredOnMethodIsEvaluatedByPropertyValidation() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "getHello" )
@@ -558,7 +545,6 @@ public class MethodConstraintMappingTest {
 
 	@Test
 	public void cascadeConfiguredOnMethodIsEvaluatedByPropertyValidation() {
-
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "getUser" )

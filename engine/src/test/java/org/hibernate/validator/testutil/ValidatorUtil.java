@@ -204,9 +204,9 @@ public final class ValidatorUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T, I extends T> T getValidatingProxy(I implementor, Class<?>[] interfaces, Validator methodValidator, Class<?>... validationGroups) {
+	public static <T, I extends T> T getValidatingProxy(I implementor, Class<?>[] interfaces, Validator executableValidator, Class<?>... validationGroups) {
 		InvocationHandler handler = new ValidationInvocationHandler(
-				implementor, methodValidator, validationGroups
+				implementor, executableValidator, validationGroups
 		);
 
 		return (T) Proxy.newProxyInstance(
@@ -222,17 +222,17 @@ public final class ValidatorUtil {
 	 * @param <T> The type to which the proxy shall be casted. Must be an interface.
 	 * @param <I> The type of the object to be proxied.
 	 * @param implementor The object to be proxied.
-	 * @param methodValidator The validator to use for method validation.
+	 * @param executableValidator The validator to use for method validation.
 	 * @param validationGroups Optionally the groups which shall be evaluated.
 	 *
 	 * @return A proxy performing an automatic method validation.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T, I extends T> T getValidatingProxy(I implementor, Validator methodValidator, Class<?>... validationGroups) {
+	public static <T, I extends T> T getValidatingProxy(I implementor, Validator executableValidator, Class<?>... validationGroups) {
 		return getValidatingProxy(
 				implementor,
 				implementor.getClass().getInterfaces(),
-				methodValidator,
+				executableValidator,
 				validationGroups
 		);
 	}

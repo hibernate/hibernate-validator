@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,29 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
-package org.hibernate.validator.cfg.defs;
-
-import javax.validation.constraints.DecimalMax;
-
-import org.hibernate.validator.cfg.ConstraintDef;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import javax.el.ValueExpression;
+import javax.el.VariableMapper;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DecimalMaxDef extends ConstraintDef<DecimalMaxDef, DecimalMax> {
+public class MapBasedVariableMapper extends VariableMapper {
+	private Map<String, ValueExpression> map = Collections.emptyMap();
 
-	public DecimalMaxDef() {
-		super( DecimalMax.class );
+	@Override
+	public ValueExpression resolveVariable(String variable) {
+		return map.get( variable );
 	}
 
-	public DecimalMaxDef value(String max) {
-		addParameter( "value", max );
-		return this;
-	}
-
-	public DecimalMaxDef inclusive(boolean inclusive) {
-		addParameter( "inclusive", inclusive );
-		return this;
+	@Override
+	public ValueExpression setVariable(String variable, ValueExpression expression) {
+		if ( map.isEmpty() ) {
+			map = new HashMap<String, ValueExpression>();
+		}
+		return map.put( variable, expression );
 	}
 }
+
+

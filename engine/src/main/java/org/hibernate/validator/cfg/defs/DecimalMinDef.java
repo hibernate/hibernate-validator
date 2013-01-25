@@ -33,4 +33,9 @@ public class DecimalMinDef extends ConstraintDef<DecimalMinDef, DecimalMin> {
 		addParameter( "value", min );
 		return this;
 	}
+
+	public DecimalMinDef inclusive(boolean inclusive) {
+		addParameter( "inclusive", inclusive );
+		return this;
+	}
 }

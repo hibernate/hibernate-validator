@@ -118,13 +118,13 @@ public class DefaultGroupSequenceProviderTest {
 		C c = new CImpl();
 		Method fooMethod = C.class.getDeclaredMethod( "foo", String.class );
 
-		Set<ConstraintViolation<C>> violations = validator.forMethods().validateReturnValue(
+		Set<ConstraintViolation<C>> violations = validator.forExecutables().validateReturnValue(
 				c, fooMethod, c.foo( null )
 		);
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 
-		violations = validator.forMethods().validateReturnValue( c, fooMethod, c.foo( "foo" ) );
+		violations = validator.forExecutables().validateReturnValue( c, fooMethod, c.foo( "foo" ) );
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectConstraintViolationMessages( violations, "length must be between 10 and 20" );
 	}

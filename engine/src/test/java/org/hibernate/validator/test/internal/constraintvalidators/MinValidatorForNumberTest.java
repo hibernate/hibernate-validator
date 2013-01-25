@@ -22,15 +22,17 @@ import javax.validation.ConstraintValidator;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.constraintvalidators.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.MinValidatorForNumber;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.testutil.TestForIssue;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * @author Alaa Nassef
@@ -47,7 +49,7 @@ public class MinValidatorForNumberTest {
 
 		MinValidatorForNumber constraint = new MinValidatorForNumber();
 		constraint.initialize( m );
-		testMinValidator( constraint );
+		testMinValidator( constraint, true );
 	}
 
 	@Test
@@ -59,12 +61,11 @@ public class MinValidatorForNumberTest {
 
 		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
 		constraint.initialize( m );
-		testMinValidator( constraint );
+		testMinValidator( constraint, true );
 	}
 
 	@Test
 	public void testInitializeDecimalMaxWithInvalidValue() {
-
 		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
 		descriptor.setValue( "value", "foobar" );
 		descriptor.setValue( "message", "{validator.min}" );
@@ -80,15 +81,39 @@ public class MinValidatorForNumberTest {
 		}
 	}
 
-	private void testMinValidator(ConstraintValidator<?, Number> constraint) {
+	@Test
+	@TestForIssue( jiraKey = "HV-256")
+	public void testIsValidDecimalMinExclusive() {
+		boolean inclusive = false;
+		AnnotationDescriptor<DecimalMin> descriptor = new AnnotationDescriptor<DecimalMin>( DecimalMin.class );
+		descriptor.setValue( "value", "1500E-2" );
+		descriptor.setValue( "inclusive", inclusive );
+		descriptor.setValue( "message", "{validator.min}" );
+		DecimalMin m = AnnotationFactory.create( descriptor );
+
+		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
+		constraint.initialize( m );
+		testMinValidator( constraint, inclusive );
+	}
+
+	private void testMinValidator(ConstraintValidator<?, Number> constraint, boolean inclusive) {
 		byte b = 1;
 		Byte bWrapper = 127;
+
+		if ( inclusive ) {
+			assertTrue( constraint.isValid( 15L, null ) );
+			assertTrue( constraint.isValid( 15, null ) );
+			assertTrue( constraint.isValid( 15.0, null ) );
+		}
+		else {
+			assertFalse( constraint.isValid( 15L, null ) );
+			assertFalse( constraint.isValid( 15, null ) );
+			assertFalse( constraint.isValid( 15.0, null ) );
+		}
+
 		assertTrue( constraint.isValid( null, null ) );
 		assertTrue( constraint.isValid( bWrapper, null ) );
 		assertTrue( constraint.isValid( 20, null ) );
-		assertTrue( constraint.isValid( 15L, null ) );
-		assertTrue( constraint.isValid( 15, null ) );
-		assertTrue( constraint.isValid( 15.0, null ) );
 		assertTrue( constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ) );
 		assertTrue( constraint.isValid( BigInteger.valueOf( 10000000L ), null ) );
 		assertFalse( constraint.isValid( b, null ) );
