@@ -16,11 +16,10 @@
 */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import java.util.Iterator;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.MethodValidator;
-import javax.validation.Path.Node;
+import javax.validation.Path;
 import javax.validation.metadata.ElementDescriptor.Kind;
 
 import org.testng.annotations.Test;
@@ -30,10 +29,14 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertDescriptorKinds;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertElementClasses;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public class ConstructorValidationTest {
 
@@ -53,17 +56,8 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
-		Iterator<Node> pathIterator = constraintViolation.getPropertyPath().iterator();
-
-		Node constructorNode = pathIterator.next();
-		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
-
-		Node parameterNode = pathIterator.next();
-		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
-		assertThat( parameterNode.getName() ).isEqualTo( "arg0" );
-
-		assertThat( pathIterator.hasNext() ).isFalse();
+		assertDescriptorKinds( constraintViolation.getPropertyPath(), Kind.CONSTRUCTOR, Kind.PARAMETER );
+		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", "arg0" );
 	}
 
 	@Test
@@ -82,26 +76,10 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
-		Iterator<Node> pathIterator = constraintViolation.getPropertyPath().iterator();
-
-		Node constructorNode = pathIterator.next();
-		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat( constructorNode.getElementDescriptor().getElementClass() ).isEqualTo(
-				CustomerRepositoryImpl.class
-		);
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
-
-		Node parameterNode = pathIterator.next();
-		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PARAMETER );
-		assertThat( parameterNode.getElementDescriptor().getElementClass() ).isEqualTo( Customer.class );
-		assertThat( parameterNode.getName() ).isEqualTo( "arg0" );
-
-		Node nameNode = pathIterator.next();
-		assertThat( nameNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PROPERTY );
-		assertThat( nameNode.getElementDescriptor().getElementClass() ).isEqualTo( String.class );
-		assertThat( nameNode.getName() ).isEqualTo( "name" );
-
-		assertThat( pathIterator.hasNext() ).isFalse();
+		Path path = constraintViolation.getPropertyPath();
+		assertDescriptorKinds( path, Kind.CONSTRUCTOR, Kind.PARAMETER, Kind.PROPERTY );
+		assertNodeNames( path, "CustomerRepositoryImpl", "arg0", "name" );
+		assertElementClasses( path, CustomerRepositoryImpl.class, Customer.class, String.class );
 	}
 
 	@Test
@@ -124,17 +102,8 @@ public class ConstructorValidationTest {
 				ValidB2BRepository.class
 		);
 
-		Iterator<Node> pathIterator = constraintViolation.getPropertyPath().iterator();
-
-		Node constructorNode = pathIterator.next();
-		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
-
-		Node parameterNode = pathIterator.next();
-		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
-		assertThat( parameterNode.getName() ).isEqualTo( "$retval" );
-
-		assertThat( pathIterator.hasNext() ).isFalse();
+		assertDescriptorKinds( constraintViolation.getPropertyPath(), Kind.CONSTRUCTOR, Kind.RETURN_VALUE );
+		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", null );
 	}
 
 	@Test
@@ -155,25 +124,9 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
-		Iterator<Node> pathIterator = constraintViolation.getPropertyPath().iterator();
-
-		Node constructorNode = pathIterator.next();
-		assertThat( constructorNode.getElementDescriptor().getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-		assertThat( constructorNode.getElementDescriptor().getElementClass() ).isEqualTo(
-				CustomerRepositoryImpl.class
-		);
-		assertThat( constructorNode.getName() ).isEqualTo( "CustomerRepositoryImpl" );
-
-		Node parameterNode = pathIterator.next();
-		assertThat( parameterNode.getElementDescriptor().getKind() ).isEqualTo( Kind.RETURN_VALUE );
-		assertThat( parameterNode.getElementDescriptor().getElementClass() ).isEqualTo( CustomerRepositoryImpl.class );
-		assertThat( parameterNode.getName() ).isEqualTo( "$retval" );
-
-		Node nameNode = pathIterator.next();
-		assertThat( nameNode.getElementDescriptor().getKind() ).isEqualTo( Kind.PROPERTY );
-		assertThat( nameNode.getElementDescriptor().getElementClass() ).isEqualTo( Customer.class );
-		assertThat( nameNode.getName() ).isEqualTo( "customer" );
-
-		assertThat( pathIterator.hasNext() ).isFalse();
+		Path path = constraintViolation.getPropertyPath();
+		assertDescriptorKinds( path, Kind.CONSTRUCTOR, Kind.RETURN_VALUE, Kind.PROPERTY );
+		assertNodeNames( path, "CustomerRepositoryImpl", null, "customer" );
+		assertElementClasses( path, CustomerRepositoryImpl.class, CustomerRepositoryImpl.class, Customer.class );
 	}
 }
