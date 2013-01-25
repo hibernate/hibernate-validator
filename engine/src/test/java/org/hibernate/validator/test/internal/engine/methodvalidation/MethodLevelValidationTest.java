@@ -68,7 +68,7 @@ public class MethodLevelValidationTest {
 	private RepositoryBase<Customer> repositoryBase;
 
 	@BeforeMethod
-	public void setUpDefaultMethodValidator() {
+	public void setUpDefaultExecutableValidator() {
 		setUpValidator();
 	}
 

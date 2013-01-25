@@ -110,7 +110,7 @@ public class CascadingWithConstraintMappingTest {
 		b.c = new C();
 		Method method = ReflectionHelper.getMethod( B.class, "getC" );
 
-		Set<ConstraintViolation<B>> violations = validator.forMethods().validateReturnValue(
+		Set<ConstraintViolation<B>> violations = validator.forExecutables().validateReturnValue(
 				b, method, b.getC()
 		);
 

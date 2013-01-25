@@ -65,7 +65,7 @@ public class GroupConversionTest {
 	@Test
 	public void groupConversionOnParameter() throws Exception {
 
-		Set<ConstraintViolation<User6>> violations = getValidator().forMethods().validateParameters(
+		Set<ConstraintViolation<User6>> violations = getValidator().forExecutables().validateParameters(
 				new User6(),
 				User6.class.getMethod( "setAddresses", List.class ),
 				new List<?>[] { Arrays.asList( new Address() ) }
@@ -77,7 +77,7 @@ public class GroupConversionTest {
 	@Test
 	public void groupConversionOnReturnValue() throws Exception {
 
-		Set<ConstraintViolation<User7>> violations = getValidator().forMethods().validateReturnValue(
+		Set<ConstraintViolation<User7>> violations = getValidator().forExecutables().validateReturnValue(
 				new User7(),
 				User7.class.getMethod( "findAddresses" ),
 				Arrays.asList( new Address() )

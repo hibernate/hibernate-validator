@@ -47,7 +47,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
 
-		getValidator().forMethods().validateParameters(
+		getValidator().forExecutables().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -58,7 +58,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void atValidAddedInSubTypeCausesDeclarationException() {
 
-		getValidator().forMethods().validateParameters(
+		getValidator().forExecutables().validateParameters(
 				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -69,7 +69,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
 
-		getValidator().forMethods().validateParameters(
+		getValidator().forExecutables().validateParameters(
 				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -80,7 +80,7 @@ public class IllegalMethodParameterConstraintsTest {
 	)
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
 
-		getValidator().forMethods().validateParameters(
+		getValidator().forExecutables().validateParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
@@ -92,7 +92,7 @@ public class IllegalMethodParameterConstraintsTest {
 	//TODO HV-632: Add more tests
 	public void crossParameterConstraintStrengtheningInSubTypeCausesDeclarationException() {
 
-		getValidator().forMethods().validateParameters(
+		getValidator().forExecutables().validateParameters(
 				new ZipImpl(), ZipImpl.class.getDeclaredMethods()[0], new Object[2]
 		);
 	}
@@ -111,7 +111,7 @@ public class IllegalMethodParameterConstraintsTest {
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
 
 		//but method validation fails due to illegal parameter constraints being defined
-		getValidator().forMethods().validateParameters(
+		getValidator().forExecutables().validateParameters(
 				qux, QuxImpl.class.getDeclaredMethod( "qux", String.class ), new Object[] { }
 		);
 	}
