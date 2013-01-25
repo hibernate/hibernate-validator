@@ -34,4 +34,9 @@ public class DecimalMaxDef extends ConstraintDef<DecimalMaxDef, DecimalMax> {
 		addParameter( "value", max );
 		return this;
 	}
+
+	public DecimalMaxDef inclusive(boolean inclusive) {
+		addParameter( "inclusive", inclusive );
+		return this;
+	}
 }

@@ -21,6 +21,8 @@ import java.util.Set;
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -118,6 +120,45 @@ public class MessageInterpolationWithDefaultBundleTest {
 		assertCorrectConstraintViolationMessages(
 				constraintViolations, "not a well-formed email address", "must be between 18 and 21"
 		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-256")
+	public void testConditionalDecimalMinMessageDependingOnInclusiveFlag() {
+		Configuration<?> config = ValidatorUtil.getConfiguration( Locale.ENGLISH );
+		config.messageInterpolator( new ResourceBundleMessageInterpolator() );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+
+		Set<ConstraintViolation<DoubleHolder>> constraintViolations = validator.validate( new DoubleHolder() );
+		assertNumberOfViolations( constraintViolations, 4 );
+		assertCorrectConstraintViolationMessages(
+				constraintViolations,
+				"must be greater than or equal to 1.0",
+				"must be greater than 1.0",
+				"must be less than or equal to 1.0",
+				"must be less than 1.0"
+		);
+	}
+
+	private static class DoubleHolder {
+		@DecimalMax(value = "1.0")
+		private final double inclusiveMaxDouble;
+		@DecimalMax(value = "1.0", inclusive = false)
+		private final double exclusiveMaxDouble;
+
+		@DecimalMin(value = "1.0")
+		private final double inclusiveMinDouble;
+		@DecimalMin(value = "1.0", inclusive = false)
+		private final double exclusiveMinDouble;
+
+		private DoubleHolder() {
+			this.inclusiveMaxDouble = 1.1;
+			this.exclusiveMaxDouble = 1.0;
+
+			this.inclusiveMinDouble = 0.9;
+			this.exclusiveMinDouble = 1.0;
+		}
 	}
 
 	/**

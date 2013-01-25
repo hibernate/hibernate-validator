@@ -36,6 +36,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 	private static final Log log = LoggerFactory.make();
 
 	private BigDecimal maxValue;
+	private boolean inclusive;
 
 	public void initialize(DecimalMax maxValue) {
 		try {
@@ -44,6 +45,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 		catch ( NumberFormatException nfe ) {
 			throw log.getInvalidBigDecimalFormatException( maxValue.value(), nfe );
 		}
+		this.inclusive = maxValue.inclusive();
 	}
 
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
@@ -52,17 +54,19 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 			return true;
 		}
 
+		int comparisonResult;
 		if ( value instanceof BigDecimal ) {
-			return ( (BigDecimal) value ).compareTo( maxValue ) != 1;
+			comparisonResult = ( (BigDecimal) value ).compareTo( maxValue );
 		}
 		else if ( value instanceof BigInteger ) {
-			return ( new BigDecimal( (BigInteger) value ) ).compareTo( maxValue ) != 1;
+			comparisonResult = ( new BigDecimal( (BigInteger) value ) ).compareTo( maxValue );
 		}
 		else if ( value instanceof Long ) {
-			return ( BigDecimal.valueOf( value.longValue() ).compareTo( maxValue ) ) != 1;
+			comparisonResult = ( BigDecimal.valueOf( value.longValue() ).compareTo( maxValue ) );
 		}
 		else {
-			return ( BigDecimal.valueOf( value.doubleValue() ).compareTo( maxValue ) ) != 1;
+			comparisonResult = ( BigDecimal.valueOf( value.doubleValue() ).compareTo( maxValue ) );
 		}
+		return inclusive ? comparisonResult <= 0 : comparisonResult < 0;
 	}
 }

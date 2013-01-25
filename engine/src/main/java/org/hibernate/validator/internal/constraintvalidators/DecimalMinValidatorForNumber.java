@@ -36,6 +36,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 	private static final Log log = LoggerFactory.make();
 
 	private BigDecimal minValue;
+	private boolean inclusive;
 
 	public void initialize(DecimalMin minValue) {
 		try {
@@ -44,6 +45,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		catch ( NumberFormatException nfe ) {
 			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
+		this.inclusive = minValue.inclusive();
 	}
 
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
@@ -53,17 +55,19 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 			return true;
 		}
 
+		int comparisonResult;
 		if ( value instanceof BigDecimal ) {
-			return ( (BigDecimal) value ).compareTo( minValue ) != -1;
+			comparisonResult = ( (BigDecimal) value ).compareTo( minValue );
 		}
 		else if ( value instanceof BigInteger ) {
-			return ( new BigDecimal( (BigInteger) value ) ).compareTo( minValue ) != -1;
+			comparisonResult = ( new BigDecimal( (BigInteger) value ) ).compareTo( minValue );
 		}
 		if ( value instanceof Long ) {
-			return ( BigDecimal.valueOf( value.longValue() ).compareTo( minValue ) ) != -1;
+			comparisonResult = ( BigDecimal.valueOf( value.longValue() ).compareTo( minValue ) );
 		}
 		else {
-			return ( BigDecimal.valueOf( value.doubleValue() ).compareTo( minValue ) ) != -1;
+			comparisonResult = ( BigDecimal.valueOf( value.doubleValue() ).compareTo( minValue ) );
 		}
+		return inclusive ? comparisonResult >= 0 : comparisonResult > 0;
 	}
 }

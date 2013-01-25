@@ -30,8 +30,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class DecimalMinValidatorForCharSequence implements ConstraintValidator<DecimalMin, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();
-	
+
 	private BigDecimal minValue;
+	private boolean inclusive;
 
 	public void initialize(DecimalMin minValue) {
 		try {
@@ -40,6 +41,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 		catch ( NumberFormatException nfe ) {
 			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
+		this.inclusive = minValue.inclusive();
 	}
 
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
@@ -48,7 +50,8 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 			return true;
 		}
 		try {
-			return new BigDecimal( value.toString() ).compareTo( minValue ) != -1;
+			int comparisonResult = new BigDecimal( value.toString() ).compareTo( minValue );
+			return inclusive ? comparisonResult >= 0 : comparisonResult > 0;
 		}
 		catch ( NumberFormatException nfe ) {
 			return false;
