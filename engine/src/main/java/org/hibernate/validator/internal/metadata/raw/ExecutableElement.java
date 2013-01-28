@@ -129,7 +129,9 @@ public abstract class ExecutableElement {
 			return false;
 		}
 
-		if ( !other.getMember().getDeclaringClass().isAssignableFrom( getMember().getDeclaringClass() ) ) {
+		if ( !other.getMember()
+				.getDeclaringClass()
+				.isAssignableFrom( getMember().getDeclaringClass() ) ) {
 			return false;
 		}
 
@@ -150,7 +152,11 @@ public abstract class ExecutableElement {
 
 		MemberResolver memberResolver = new MemberResolver( typeResolver );
 		memberResolver.setMethodFilter( new SimpleMethodFilter( subTypeMethod, superTypeMethod ) );
-		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve( resolvedSubType, null, null );
+		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve(
+				resolvedSubType,
+				null,
+				null
+		);
 
 		ResolvedMethod[] resolvedMethods = typeWithMembers.getMemberMethods();
 
@@ -165,7 +171,8 @@ public abstract class ExecutableElement {
 		// types (which are resolved) of the two filtered member methods.
 		for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
 
-			if ( !resolvedMethods[0].getArgumentType( i ).equals( resolvedMethods[1].getArgumentType( i ) ) ) {
+			if ( !resolvedMethods[0].getArgumentType( i )
+					.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
 				return false;
 			}
 		}
@@ -188,7 +195,24 @@ public abstract class ExecutableElement {
 
 		@Override
 		public Annotation[][] getParameterAnnotations() {
-			return constructor.getParameterAnnotations();
+			//contains no element for synthetic parameters
+			Annotation[][] parameterAnnotations = constructor.getParameterAnnotations();
+			//the no. of parameters, including synthetic ones
+			int parameterCount = constructor.getParameterTypes().length;
+
+			if ( parameterAnnotations.length == parameterCount ) {
+				return parameterAnnotations;
+			}
+			//if the constructor has synthetic parameters, return an array matching the
+			//parameter count, with empty Annotation[]s padded at the beginning representing
+			//any synthetic parameters
+			else {
+				return paddedLeft(
+						parameterAnnotations,
+						new Annotation[parameterCount][],
+						new Annotation[0]
+				);
+			}
 		}
 
 		@Override
@@ -235,6 +259,27 @@ public abstract class ExecutableElement {
 		@Override
 		public String toString() {
 			return constructor.toGenericString();
+		}
+
+		/**
+		 * Copies the values from the source array to the end of the destination
+		 * array, inserting the given filling element on the beginning as often
+		 * as required.
+		 *
+		 * @param src The source array
+		 * @param dest The destination array
+		 * @param fillElement The filling element
+		 *
+		 * @return The modified destination array
+		 */
+		private <T> T[] paddedLeft(T[] src, T[] dest, T fillElement) {
+			int originalCount = src.length;
+			int targetCount = dest.length;
+
+			System.arraycopy( src, 0, dest, targetCount - originalCount, originalCount );
+			Arrays.fill( dest, 0, targetCount - originalCount, fillElement );
+
+			return dest;
 		}
 	}
 
@@ -318,7 +363,8 @@ public abstract class ExecutableElement {
 
 		@Override
 		public boolean include(RawMethod element) {
-			return element.getRawMember().equals( method1 ) || element.getRawMember().equals( method2 );
+			return element.getRawMember().equals( method1 ) || element.getRawMember()
+					.equals( method2 );
 		}
 	}
 }
