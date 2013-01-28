@@ -1101,11 +1101,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 			}
 
-			//stop processing after first group with errors occurred
-			if ( numberOfViolationsOfCurrentGroup > 0 ) {
-				break;
-			}
-
 			// cascaded validation if required
 			if ( executableMetaData.isCascading() && value != null ) {
 
@@ -1117,6 +1112,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				cascadingvalueContext.setCurrentGroup( oneGroup );
 
 				validateCascadedConstraints( validationContext, cascadingvalueContext );
+			}
+
+			//stop processing after first group with errors occurred
+			if ( numberOfViolationsOfCurrentGroup > 0 ) {
+				break;
 			}
 		}
 
