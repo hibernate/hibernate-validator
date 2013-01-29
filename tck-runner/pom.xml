@@ -248,6 +248,7 @@
                                         <artifactItem>
                                             <groupId>javax.validation</groupId>
                                             <artifactId>validation-api</artifactId>
+                                            <destFileName>validation-api-${bv.api.version}.jar</destFileName>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
