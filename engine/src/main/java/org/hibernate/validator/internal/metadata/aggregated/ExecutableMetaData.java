@@ -406,17 +406,16 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return crossParameterConstraints;
 	}
 
-	public ParameterListMetaData getParameterListMetaData() {
-
+	public ValidatableParametersMetaData getValidatableParametersMetaData() {
 		Set<ParameterMetaData> cascadedParameters = newHashSet();
 
-		for ( ParameterMetaData oneParameter : parameterMetaDataList ) {
-			if ( oneParameter.isCascading() ) {
-				cascadedParameters.add( oneParameter );
+		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
+			if ( parameterMetaData.isCascading() ) {
+				cascadedParameters.add( parameterMetaData );
 			}
 		}
 
-		return new ParameterListMetaData( cascadedParameters );
+		return new ValidatableParametersMetaData( cascadedParameters );
 	}
 
 	public ReturnValueMetaData getReturnValueMetaData() {
