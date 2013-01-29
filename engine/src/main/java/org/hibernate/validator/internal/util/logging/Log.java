@@ -470,4 +470,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 130, value = "Error in EL expression '%s'")
 	void errorInExpressionLanguage(String expression, @Cause Exception e);
+
+	@Message(id = 131,
+			value = "A method return value must not be marked for cascaded validation more than once in a class hierarchy, but the following two methods are marked as such: %s, %s.")
+	ConstraintDeclarationException methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(Member member1, Member member2);
 }

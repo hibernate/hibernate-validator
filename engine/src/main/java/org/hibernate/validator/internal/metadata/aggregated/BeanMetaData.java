@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.util.List;
 import java.util.Set;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -91,8 +92,11 @@ public interface BeanMetaData<T> extends Validatable {
 	 * @return An aggregated view on the constraint related meta data from the
 	 *         given method all the methods from super-types which it overrides
 	 *         or implements.
+	 *
+	 * @throws ConstraintDeclarationException In case any of the rules for the declaration of method
+	 * constraints described in the Bean Validation specification is violated.
 	 */
-	ExecutableMetaData getMetaDataFor(ExecutableElement method);
+	ExecutableMetaData getMetaDataFor(ExecutableElement method) throws ConstraintDeclarationException;
 
 	/**
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the
