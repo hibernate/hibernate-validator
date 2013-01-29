@@ -303,7 +303,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( groups, MESSAGES.groupMustNotBeNull() );
 		for ( Class clazz : groups ) {
 			if ( clazz == null ) {
-			  throw new IllegalArgumentException( MESSAGES.groupMustNotBeNull() );
+				throw new IllegalArgumentException( MESSAGES.groupMustNotBeNull() );
 			}
 		}
 
@@ -879,10 +879,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 												 ValidationOrder validationOrder) {
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
-
-		//assert that there are no illegal method parameter constraints
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
-		methodMetaData.assertCorrectnessOfMethodParameterConstraints();
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( object ) );

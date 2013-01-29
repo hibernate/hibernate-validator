@@ -78,6 +78,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 */
 	private final ConstraintDeclarationException parameterConstraintDeclarationException;
 
+	private final ConstraintDeclarationException returnValueConstraintDeclarationException;
+
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
 
 	/**
@@ -96,6 +98,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			ConstraintDeclarationException parameterConstraintDeclarationException,
+			ConstraintDeclarationException returnValueConstraintDeclarationException,
 			boolean isCascading,
 			boolean isConstrained,
 			Map<Class<?>, Class<?>> returnValueGroupConversions) {
@@ -112,6 +115,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
+		this.returnValueConstraintDeclarationException = returnValueConstraintDeclarationException;
 		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
 		this.returnValueGroupConversions = returnValueGroupConversions;
 		this.identifier = name + Arrays.toString( parameterTypes );
@@ -189,6 +193,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					findParameterMetaData(),
 					crossParameterConstraints,
 					checkParameterConstraints(),
+					checkReturnValueConfiguration(),
 					isCascading(),
 					isConstrained,
 					getGroupConversions()
@@ -289,6 +294,24 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			return null;
 		}
 
+		private ConstraintDeclarationException checkReturnValueConfiguration() {
+			ConstrainedExecutable methodWithCascadingReturnValue = null;
+
+			for ( ConstrainedExecutable executable : constrainedExecutables ) {
+				if ( executable.isCascading() ) {
+					if ( methodWithCascadingReturnValue != null ) {
+						return log.methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(
+								methodWithCascadingReturnValue.getLocation().getMember(),
+								executable.getLocation().getMember()
+						);
+					}
+					methodWithCascadingReturnValue = executable;
+				}
+			}
+
+			return null;
+		}
+
 		/**
 		 * Returns a set with those executables from the given pile of executables that have
 		 * at least one constrained parameter or at least one parameter annotated
@@ -313,32 +336,28 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	/**
 	 * <p>
-	 * Checks the parameter constraints of this method for correctness.
+	 * Checks the configuration of this method for correctness as per the rules
+	 * outlined in the Bean Validation specification, section 4.5.5
+	 * ("Method constraints in inheritance hierarchies").
 	 * </p>
 	 * <p>
-	 * The following rules apply for this check:
+	 * In particular, overriding methods in sub-types may not add parameter
+	 * constraints and the return value of an overriding method may not be
+	 * marked as cascaded if the return value is marked as cascaded already on
+	 * the overridden method.
 	 * </p>
-	 * <ul>
-	 * <li>Only the root method of an overridden method in an inheritance
-	 * hierarchy may be annotated with parameter constraints in order to avoid
-	 * the strengthening of a method's preconditions by additional parameter
-	 * constraints defined at sub-types. If the root method itself has no
-	 * parameter constraints, also no parameter constraints may be added in
-	 * sub-types.</li>
-	 * <li>If there are multiple root methods for an method in an inheritance
-	 * hierarchy (e.g. by implementing two interfaces defining the same method)
-	 * no parameter constraints for this method are allowed at all in order to
-	 * avoid a strengthening of a method's preconditions in parallel types.</li>
-	 * </ul>
 	 *
-	 * @throws ConstraintDeclarationException In case the represented method has an illegal parameter
-	 * constraint.
+	 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
+	 * violated.
 	 */
-	public void assertCorrectnessOfMethodParameterConstraints()
+	public void assertCorrectnessOfConfiguration()
 			throws ConstraintDeclarationException {
 
 		if ( parameterConstraintDeclarationException != null ) {
 			throw parameterConstraintDeclarationException;
+		}
+		if ( returnValueConstraintDeclarationException != null ) {
+			throw returnValueConstraintDeclarationException;
 		}
 	}
 
