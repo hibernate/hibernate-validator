@@ -175,6 +175,8 @@
                                     <artifactId>validation-api</artifactId>
                                     <version>${bv.api.version}</version>
                                     <overWrite>true</overWrite>
+                                    <destFileName>validation-api-${bv.api.version}.jar</destFileName>
+                                    <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                             <stripVersion>true</stripVersion>
