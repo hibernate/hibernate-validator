@@ -17,6 +17,6 @@
   -->
 <module xmlns="urn:jboss:module:1.1" name="com.fasterxml.classmate">
     <resources>
-        <resource-root path="classmate-@CLASSMATE-VERSION@.jar"/>
+        <resource-root path="classmate-@VERSION@.jar"/>
     </resources>
 </module>
