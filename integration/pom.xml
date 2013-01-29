@@ -157,9 +157,9 @@
                                     <version>${jbossas.version}</version>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -175,9 +175,10 @@
                                     <artifactId>validation-api</artifactId>
                                     <version>${bv.api.version}</version>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
+                            <stripVersion>true</stripVersion>
+                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -212,13 +213,13 @@
                                 ant.copy(todir: toDir, filtering: true) {
                                     fileset(dir: fromDir)
                                     filterset() {
-                                        filter(token:'BV-API-VERSION', value:project.properties['bv.api.version'])
+                                       filter(token:'BV-API-VERSION', value:project.properties['bv.api.version'])
                                     }
                                 }
 
                                 def apiDependencyDir = new File(project.basedir, 'target/dependencies')
                                 def apiTargetDir = new File(project.properties['jbossTargetDir'], 'modules/javax/validation/api/main')
-                                log.info('Copying Bean Validation 1.1 jar from ' + apiDependencyDir + ' to ' + toDir)
+                                log.info('Copying Bean Validation ' + project.properties['bv.api.version'] + ' jar from ' + apiDependencyDir + ' to ' + toDir)
                                 ant.copy( todir: apiTargetDir) {
                                     fileset(dir: apiDependencyDir)
                                 }

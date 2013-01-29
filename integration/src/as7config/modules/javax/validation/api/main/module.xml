@@ -17,8 +17,8 @@
   -->
 <module xmlns="urn:jboss:module:1.1" name="javax.validation.api">
     <resources>
-        <resource-root path="validation-api-@BV-API-VERSION@.jar"/>
-        <!-- Insert resources here -->
+        <!-- Used BV API version @BV-API-VERSION@ -->
+        <resource-root path="validation-api.jar"/>
     </resources>
 
   <dependencies>
