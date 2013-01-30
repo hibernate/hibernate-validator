@@ -498,6 +498,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			builders.add(
 					new BuilderDelegate(
+							beanClass,
 							constrainableElement,
 							constraintHelper
 					)
@@ -527,17 +528,20 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private static class BuilderDelegate {
+		private final Class<?> beanClass;
 		private final ConstraintHelper constraintHelper;
 		private MetaDataBuilder propertyBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
 
-		public BuilderDelegate(ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
+		public BuilderDelegate(Class<?> beanClass, ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
+			this.beanClass = beanClass;
 			this.constraintHelper = constraintHelper;
 
 			switch ( constrainedElement.getKind() ) {
 				case FIELD:
 					ConstrainedField constrainedField = (ConstrainedField) constrainedElement;
 					propertyBuilder = new PropertyMetaData.Builder(
+							beanClass,
 							constrainedField,
 							constraintHelper
 					);
@@ -546,12 +550,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				case METHOD:
 					ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
+							beanClass,
 							constrainedExecutable,
 							constraintHelper
 					);
 
 					if ( constrainedExecutable.isGetterMethod() ) {
 						propertyBuilder = new PropertyMetaData.Builder(
+								beanClass,
 								constrainedExecutable,
 								constraintHelper
 						);
@@ -560,6 +566,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				case TYPE:
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
 					propertyBuilder = new PropertyMetaData.Builder(
+							beanClass,
 							constrainedType,
 							constraintHelper
 					);
@@ -581,6 +588,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				if ( added == false && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
 					ConstrainedExecutable constrainedMethod = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
+							beanClass,
 							constrainedMethod,
 							constraintHelper
 					);

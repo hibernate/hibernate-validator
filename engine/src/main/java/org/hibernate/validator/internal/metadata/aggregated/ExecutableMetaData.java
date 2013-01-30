@@ -145,8 +145,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * executable with a given signature within a type hierarchy.
 		 * @param constraintHelper the constraint helper
 		 */
-		public Builder(ConstrainedExecutable constrainedExecutable, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedExecutable, ConstraintHelper constraintHelper) {
+			super( beanClass, constraintHelper );
 
 			kind = constrainedExecutable.getKind();
 			location = constrainedExecutable.getLocation();
@@ -189,9 +189,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					executableElement.getReturnType(),
 					executableElement.getParameterTypes(),
 					kind == ConstrainedElementKind.CONSTRUCTOR ? ConstraintMetaDataKind.CONSTRUCTOR : ConstraintMetaDataKind.METHOD,
-					adaptOriginsAndImplicitGroups( location.getBeanClass(), getConstraints() ),
+					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
-					crossParameterConstraints,
+					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
 					checkParameterConstraints(),
 					checkReturnValueConfiguration(),
 					isCascading(),

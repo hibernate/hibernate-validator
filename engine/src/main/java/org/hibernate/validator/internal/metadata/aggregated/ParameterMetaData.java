@@ -96,15 +96,13 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	public static class Builder extends MetaDataBuilder {
-		private final Class<?> rootClass;
 		private final Class<?> parameterType;
 		private final int parameterIndex;
 		private String name;
 
-		public Builder(Class<?> rootClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
+			super( beanClass, constraintHelper );
 
-			this.rootClass = rootClass;
 			this.parameterType = constrainedParameter.getLocation().getParameterType();
 			this.parameterIndex = constrainedParameter.getLocation().getParameterIndex();
 
@@ -136,7 +134,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterIndex,
 					name,
 					parameterType,
-					adaptOriginsAndImplicitGroups( rootClass, getConstraints() ),
+					adaptOriginsAndImplicitGroups( getConstraints() ),
 					isCascading(),
 					getGroupConversions()
 			);
