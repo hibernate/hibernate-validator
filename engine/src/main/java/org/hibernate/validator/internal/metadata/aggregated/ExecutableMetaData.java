@@ -191,7 +191,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					kind == ConstrainedElementKind.CONSTRUCTOR ? ConstraintMetaDataKind.CONSTRUCTOR : ConstraintMetaDataKind.METHOD,
 					adaptOriginsAndImplicitGroups( location.getBeanClass(), getConstraints() ),
 					findParameterMetaData(),
-					crossParameterConstraints,
+					adaptOriginsAndImplicitGroups( location.getBeanClass(), crossParameterConstraints ),
 					checkParameterConstraints(),
 					checkReturnValueConfiguration(),
 					isCascading(),
