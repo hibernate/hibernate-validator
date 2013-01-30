@@ -153,33 +153,29 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				ConstrainedElementKind.METHOD
 		);
 
-		private final Class<?> beanClass;
 		private final String propertyName;
 		private final Type propertyType;
 		private Member cascadingMember;
 
-		public Builder(ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
+			super( beanClass, constraintHelper );
 
-			this.beanClass = constrainedField.getLocation().getBeanClass();
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
 			this.propertyType = ( (Field) constrainedField.getLocation().getMember() ).getGenericType();
 			add( constrainedField );
 		}
 
-		public Builder(ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
+			super( beanClass, constraintHelper );
 
-			this.beanClass = constrainedType.getLocation().getBeanClass();
 			this.propertyName = null;
 			this.propertyType = null;
 			add( constrainedType );
 		}
 
-		public Builder(ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper) {
-			super( constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper) {
+			super( beanClass, constraintHelper );
 
-			this.beanClass = constrainedMethod.getLocation().getBeanClass();
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
 			this.propertyType = constrainedMethod.getLocation().typeOfAnnotatedElement();
 			add( constrainedMethod );
@@ -217,7 +213,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			return new PropertyMetaData(
 					propertyName,
 					propertyType,
-					adaptOriginsAndImplicitGroups( beanClass, getConstraints() ),
+					adaptOriginsAndImplicitGroups( getConstraints() ),
 					getGroupConversions(),
 					cascadingMember
 			);

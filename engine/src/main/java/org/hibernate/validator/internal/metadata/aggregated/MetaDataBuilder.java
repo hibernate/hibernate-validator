@@ -46,11 +46,13 @@ public abstract class MetaDataBuilder {
 
 	protected final ConstraintHelper constraintHelper;
 
+	private final Class<?> beanClass;
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
 
-	protected MetaDataBuilder(ConstraintHelper constraintHelper) {
+	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
+		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
 	}
 
@@ -133,22 +135,16 @@ public abstract class MetaDataBuilder {
 	 *
 	 * @return A constraint adapted to the given bean type.
 	 */
-	protected Set<MetaConstraint<?>> adaptOriginsAndImplicitGroups(Class<?> beanClass,
-																   Set<MetaConstraint<?>> constraints) {
+	protected Set<MetaConstraint<?>> adaptOriginsAndImplicitGroups(Set<MetaConstraint<?>> constraints) {
 		Set<MetaConstraint<?>> adaptedConstraints = newHashSet();
 
 		for ( MetaConstraint<?> oneConstraint : constraints ) {
-			adaptedConstraints.add(
-					adaptOriginAndImplicitGroup(
-							beanClass, oneConstraint
-					)
-			);
+			adaptedConstraints.add( adaptOriginAndImplicitGroup( oneConstraint ) );
 		}
 		return adaptedConstraints;
 	}
 
-	private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(
-			Class<?> beanClass, MetaConstraint<A> constraint) {
+	private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(MetaConstraint<A> constraint) {
 
 		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
 
