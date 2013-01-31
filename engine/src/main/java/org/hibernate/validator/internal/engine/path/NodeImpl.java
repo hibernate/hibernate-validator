@@ -42,14 +42,6 @@ public class NodeImpl implements Path.Node, Serializable {
 
 	private String asString;
 
-	public NodeImpl(NodeImpl oldNode, NodeImpl parent, ElementDescriptor elementDescriptor) {
-		this( oldNode.name, parent, oldNode.isIterable, oldNode.index, oldNode.key, elementDescriptor );
-	}
-
-	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key) {
-		this( name, parent, indexable, index, key, null );
-	}
-
 	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementDescriptor descriptor) {
 		this.name = name;
 		this.parent = parent;
@@ -60,10 +52,12 @@ public class NodeImpl implements Path.Node, Serializable {
 		this.elementDescriptor = descriptor;
 	}
 
+	@Override
 	public final String getName() {
 		return name;
 	}
 
+	@Override
 	public final boolean isInIterable() {
 		return parent != null && parent.isIterable();
 	}
@@ -72,6 +66,7 @@ public class NodeImpl implements Path.Node, Serializable {
 		return isIterable;
 	}
 
+	@Override
 	public final Integer getIndex() {
 		if ( parent == null ) {
 			return null;
@@ -81,6 +76,7 @@ public class NodeImpl implements Path.Node, Serializable {
 		}
 	}
 
+	@Override
 	public final Object getKey() {
 		if ( parent == null ) {
 			return null;

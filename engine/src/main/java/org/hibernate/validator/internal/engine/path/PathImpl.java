@@ -26,7 +26,9 @@ import java.util.regex.Pattern;
 import javax.validation.Path;
 import javax.validation.metadata.ElementDescriptor;
 
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -79,20 +81,24 @@ public final class PathImpl implements Path, Serializable {
 	 * {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
+		return createPathFromString( propertyPath, null, null );
+	}
+
+	public static PathImpl createPathFromString(String propertyPath, BeanMetaDataManager metaDataManager, Class<?> rootBeanClass) {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
 			return createNewPath( null );
 		}
 
-		return parseProperty( propertyPath );
+		return parseProperty( propertyPath, metaDataManager, rootBeanClass );
 	}
 
-	public static PathImpl createPathForExecutable(ExecutableElement executable) {
+	public static PathImpl createPathForExecutable(ExecutableMetaData executable) {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
 		PathImpl path = createRootPath();
-		path.addNode( executable.getSimpleName() );
+		path.addNode( executable.getName(), executable.getDescriptor() );
 
 		return path;
 	}
@@ -105,10 +111,6 @@ public final class PathImpl implements Path, Serializable {
 		return new PathImpl( path );
 	}
 
-	public static PathImpl createCopyWithElementDescriptorsAttached(PathImpl path, List<ElementDescriptor> elementDescriptors) {
-		return new PathImpl( path, elementDescriptors );
-	}
-
 	public boolean isRootPath() {
 		return nodeList.size() == 1 && nodeList.get( 0 ).getName() == null;
 	}
@@ -118,15 +120,26 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl addNode(String nodeName) {
+		return addNode( nodeName, null );
+	}
+
+	public NodeImpl addNode(String nodeName, ElementDescriptor descriptor) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
+		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null, descriptor );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterable() {
-		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, null );
+		currentLeafNode = new NodeImpl(
+				currentLeafNode.getName(),
+				currentLeafNode.getParent(),
+				true,
+				null,
+				null,
+				currentLeafNode.getElementDescriptor()
+		);
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -134,7 +147,14 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl setLeafNodeIndex(Integer index) {
-		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, index, null );
+		currentLeafNode = new NodeImpl(
+				currentLeafNode.getName(),
+				currentLeafNode.getParent(),
+				true,
+				index,
+				null,
+				currentLeafNode.getElementDescriptor()
+		);
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -142,7 +162,14 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl setLeafNodeMapKey(Object key) {
-		currentLeafNode = new NodeImpl( currentLeafNode.getName(), currentLeafNode.getParent(), true, null, key );
+		currentLeafNode = new NodeImpl(
+				currentLeafNode.getName(),
+				currentLeafNode.getParent(),
+				true,
+				null,
+				key,
+				currentLeafNode.getElementDescriptor()
+		);
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -248,19 +275,6 @@ public final class PathImpl implements Path, Serializable {
 		currentLeafNode = (NodeImpl) nodeList.get( nodeList.size() - 1 );
 	}
 
-	private PathImpl(PathImpl path, List<ElementDescriptor> elementDescriptors) {
-		this();
-		NodeImpl parent = addNode( null );
-		int i = 0;
-		for ( Path.Node node : path ) {
-			NodeImpl oldNode = (NodeImpl) node;
-			NodeImpl newNode = new NodeImpl( oldNode, parent, elementDescriptors.get( i ) );
-			nodeList.add( newNode );
-			parent = newNode;
-			i++;
-		}
-	}
-
 	private PathImpl() {
 		nodeList = new ArrayList<Node>();
 	}
@@ -269,9 +283,9 @@ public final class PathImpl implements Path, Serializable {
 		this.nodeList = new ArrayList<Node>( nodeList );
 	}
 
-	private static PathImpl parseProperty(String property) {
+	private static PathImpl parseProperty(String propertyName, BeanMetaDataManager metaDataManager, Class<?> parentType) {
 		PathImpl path = createNewPath( null );
-		String tmp = property;
+		String tmp = propertyName;
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );
 			if ( matcher.matches() ) {
@@ -282,7 +296,18 @@ public final class PathImpl implements Path, Serializable {
 				}
 
 				// create the node
-				path.addNode( value );
+				if ( parentType != null ) {
+					PropertyMetaData property = metaDataManager.getBeanMetaData( parentType ).getMetaDataFor( value );
+					if ( property == null ) {
+						throw log.getUnableToParsePropertyPathException( propertyName );
+					}
+
+					path.addNode( property.getName(), property.getDescriptor() );
+					parentType = property.getRawType();
+				}
+				else {
+					path.addNode( value );
+				}
 
 				// is the node indexable
 				if ( matcher.group( INDEXED_GROUP ) != null ) {
@@ -305,7 +330,7 @@ public final class PathImpl implements Path, Serializable {
 				tmp = matcher.group( REMAINING_STRING_GROUP );
 			}
 			else {
-				throw log.getUnableToParsePropertyPathException( property );
+				throw log.getUnableToParsePropertyPathException( propertyName );
 			}
 		} while ( tmp != null );
 

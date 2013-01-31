@@ -16,31 +16,17 @@
 */
 package org.hibernate.validator.internal.engine;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
-import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.ExecutableDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.path.BeanMetaDataLocator;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
-import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * A {@link ValidationContext} implementation which creates and manages
@@ -57,18 +43,12 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 	 */
 	private final ExecutableElement method;
 
-	/**
-	 * The index of the parameter to validate if this context is used for validation of a single parameter, {@code null} otherwise.
-	 */
-	private final Object[] parameterValues;
-
 	protected MethodValidationContext(
 			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			Class<T> rootBeanClass,
 			T rootBean,
 			ExecutableElement method,
-			Object[] parameterValues,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
@@ -86,7 +66,6 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		);
 
 		this.method = method;
-		this.parameterValues = parameterValues;
 	}
 
 	public ExecutableElement getExecutable() {
@@ -104,7 +83,7 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
 
-		Path path = createPathWithElementDescriptors( messageAndPath.getPath(), localContext );
+		Path path = messageAndPath.getPath();
 
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
@@ -117,126 +96,5 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 				descriptor,
 				localContext.getElementType()
 		);
-	}
-
-	private Path createPathWithElementDescriptors(Path path, ValueContext<?, ?> localContext) {
-		List<ElementDescriptor> elementDescriptors = new ArrayList<ElementDescriptor>();
-
-		// first node in method level validation is the method and its descriptor
-		ExecutableDescriptor executableDescriptor = getMethodDescriptor();
-		elementDescriptors.add( getMethodDescriptor() );
-
-		Object value = null;
-		if ( isReturnValueValidation( localContext ) ) {
-			// add the return value descriptor
-			elementDescriptors.add( executableDescriptor.getReturnValueDescriptor() );
-			value = localContext.getCurrentBean();
-
-			if ( value != null && ReflectionHelper.isIterable( value.getClass() ) ) {
-				value = ReflectionHelper.getIndexedValue( value, getIterableIndex( path ) );
-			}
-		}
-		else if ( localContext.getParameterIndex() != null ) {
-			// add the parameter descriptor
-			Integer parameterIndex = localContext.getParameterIndex();
-			ParameterDescriptor parameterDescriptor = executableDescriptor.getParameterDescriptors()
-					.get( parameterIndex );
-			elementDescriptors.add( parameterDescriptor );
-
-			value = parameterValues[localContext.getParameterIndex()];
-
-			if ( value != null && ReflectionHelper.isIterable( value.getClass() ) ) {
-				value = ReflectionHelper.getIndexedValue( value, getIterableIndex( path ) );
-			}
-		}
-
-		// if the value is not null we have a cascaded validation and the rest of the path is property path as in
-		// bean validation
-		if ( value != null ) {
-			addDescriptorsForPropertyPart( path, elementDescriptors, value );
-		}
-
-		return PathImpl.createCopyWithElementDescriptorsAttached(
-				(PathImpl) path,
-				elementDescriptors
-		);
-	}
-
-	private void addDescriptorsForPropertyPart(Path path, List<ElementDescriptor> elementDescriptors, Object value) {
-		BeanMetaDataLocator traverser = BeanMetaDataLocator.createBeanMetaDataLocatorForBeanValidation(
-				value,
-				value.getClass(),
-				getBeanMetaDataManager()
-		);
-
-		// need to sync up the two iterators
-		Iterator<BeanMetaData<?>> beanMetaDataIterator = traverser.beanMetaDataIterator(
-				advanceIteratorToCascadedNode(
-						path
-				)
-		);
-		Iterator<Path.Node> nodeIterator = advanceIteratorToCascadedNode( path );
-		while ( nodeIterator.hasNext() ) {
-			Path.Node node = nodeIterator.next();
-			BeanMetaData<?> beanMetaData = beanMetaDataIterator.next();
-			if ( isClassLevelConstraintNode( node.getName() ) ) {
-				BeanDescriptor beanDescriptor = beanMetaData.getBeanDescriptor();
-				elementDescriptors.add( beanDescriptor );
-			}
-			else {
-				PropertyDescriptor propertyDescriptor = beanMetaData.getBeanDescriptor()
-						.getConstraintsForProperty( node.getName() );
-
-				elementDescriptors.add( propertyDescriptor );
-			}
-		}
-	}
-
-	private Iterator<Path.Node> advanceIteratorToCascadedNode(Path path) {
-		Iterator<Path.Node> nodeIterator = path.iterator();
-		nodeIterator.next();
-		nodeIterator.next();
-		return nodeIterator;
-	}
-
-	private int getIterableIndex(Path path) {
-		// assuming we have an iterable return value or parameter we get the index of the validated instance
-		Iterator<Path.Node> nodeIterator = path.iterator();
-		nodeIterator.next(); // method node
-		nodeIterator.next(); // return value or parameter node
-		Path.Node node = nodeIterator.next(); // this node contains the index
-		return node.getIndex();
-	}
-
-	private boolean isReturnValueValidation(ValueContext<?, ?> localContext) {
-		for ( Path.Node node : localContext.getPropertyPath() ) {
-			if ( node.getName() == null ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private ExecutableDescriptor getMethodDescriptor() {
-		BeanMetaData<?> rootMetaData = getBeanMetaDataManager().getBeanMetaData( getRootBeanClass() );
-		ExecutableMetaData methodMetaData = rootMetaData.getMetaDataFor( method );
-		BeanDescriptor beanDescriptor = rootMetaData.getBeanDescriptor();
-
-		if ( methodMetaData.getKind() == ConstraintMetaDataKind.METHOD ) {
-			return beanDescriptor.getConstraintsForMethod(
-					method.getMember().getName(),
-					methodMetaData.getParameterTypes()
-			);
-		}
-		else {
-			return beanDescriptor.getConstraintsForConstructor(
-					methodMetaData.getParameterTypes()
-			);
-		}
-	}
-
-	private boolean isClassLevelConstraintNode(String name) {
-		return name == null;
 	}
 }

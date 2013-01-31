@@ -16,6 +16,9 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.facets.Validatable;
+
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**

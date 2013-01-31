@@ -19,6 +19,11 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.Map;
+import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.ReturnValueDescriptor;
+
+import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.facets.Validatable;
 
 /**
  * Represents the constraint related meta data of the return value of a method
@@ -26,47 +31,46 @@ import java.util.Map;
  *
  * @author Gunnar Morling
  */
-public class ReturnValueMetaData implements Validatable {
+public class ReturnValueMetaData implements Validatable, Cascadable {
 
 	public static final String RETURN_VALUE_NODE_NAME = null;
 
-	private final Map<Class<?>, Class<?>> groupConversions;
+	private final GroupConverter groupConverter;
 
-	public ReturnValueMetaData(Map<Class<?>, Class<?>> groupConversions) {
-		this.groupConversions = groupConversions;
+	private final ReturnValueDescriptor descriptor;
+
+	public ReturnValueMetaData(Map<Class<?>, Class<?>> groupConversions, ReturnValueDescriptor descriptor) {
+		this.groupConverter = new GroupConverter( groupConversions );
+		this.descriptor = descriptor;
 	}
 
 	@Override
 	public Iterable<Cascadable> getCascadables() {
-		return Arrays.<Cascadable>asList( new ReturnValueCascadable( groupConversions ) );
+		return Arrays.<Cascadable>asList( this );
 	}
 
-	private class ReturnValueCascadable implements Cascadable {
+	@Override
+	public Class<?> convertGroup(Class<?> originalGroup) {
+		return groupConverter.convertGroup( originalGroup );
+	}
 
-		private final GroupConverter groupConverter;
+	@Override
+	public ElementType getElementType() {
+		return ElementType.METHOD;
+	}
 
-		public ReturnValueCascadable(Map<Class<?>, Class<?>> groupConversions) {
-			this.groupConverter = new GroupConverter( groupConversions );
-		}
+	@Override
+	public Object getValue(Object parent) {
+		return parent;
+	}
 
-		@Override
-		public String getName() {
-			return RETURN_VALUE_NODE_NAME;
-		}
+	@Override
+	public String getName() {
+		return RETURN_VALUE_NODE_NAME;
+	}
 
-		@Override
-		public Class<?> convertGroup(Class<?> originalGroup) {
-			return groupConverter.convertGroup( originalGroup );
-		}
-
-		@Override
-		public ElementType getElementType() {
-			return ElementType.METHOD;
-		}
-
-		@Override
-		public Object getValue(Object parent) {
-			return parent;
-		}
+	@Override
+	public ElementDescriptor getDescriptor() {
+		return descriptor;
 	}
 }

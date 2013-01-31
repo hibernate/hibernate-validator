@@ -16,25 +16,15 @@
 */
 package org.hibernate.validator.internal.engine;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
-import javax.validation.Path;
 import javax.validation.TraversableResolver;
-import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.path.BeanMetaDataLocator;
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 
 /**
  * A {@link ValidationContext} implementation which creates and manages violations of type {@link ConstraintViolation}.
@@ -78,8 +68,6 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
 		);
 
-		Path path = createPathWithElementDescriptors( messageAndPath.getPath() );
-
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				interpolatedMessage,
@@ -87,42 +75,9 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 				getRootBean(),
 				localContext.getCurrentBean(),
 				localContext.getCurrentValidatedValue(),
-				path,
+				messageAndPath.getPath(),
 				descriptor,
 				localContext.getElementType()
 		);
-	}
-
-	private Path createPathWithElementDescriptors(Path path) {
-		BeanMetaDataLocator traverser = BeanMetaDataLocator.createBeanMetaDataLocatorForBeanValidation(
-				getRootBean(),
-				getRootBeanClass(),
-				getBeanMetaDataManager()
-		);
-		Iterator<BeanMetaData<?>> beanMetaDataIterator = traverser.beanMetaDataIterator( path.iterator() );
-
-		List<ElementDescriptor> elementDescriptors = new ArrayList<ElementDescriptor>();
-		for ( Path.Node node : path ) {
-			BeanMetaData beanMetaData = beanMetaDataIterator.next();
-			if ( isClassLevelConstraintNode( node.getName() ) ) {
-				BeanDescriptor beanDescriptor = beanMetaData.getBeanDescriptor();
-				elementDescriptors.add( beanDescriptor );
-			}
-			else {
-				PropertyDescriptor propertyDescriptor = beanMetaData.getBeanDescriptor()
-						.getConstraintsForProperty( node.getName() );
-
-				elementDescriptors.add( propertyDescriptor );
-			}
-		}
-
-		return PathImpl.createCopyWithElementDescriptorsAttached(
-				(PathImpl) path,
-				elementDescriptors
-		);
-	}
-
-	private boolean isClassLevelConstraintNode(String name) {
-		return name == null;
 	}
 }

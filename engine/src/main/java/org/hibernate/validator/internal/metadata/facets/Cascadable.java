@@ -14,9 +14,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.metadata.aggregated;
+package org.hibernate.validator.internal.metadata.facets;
 
 import java.lang.annotation.ElementType;
+import javax.validation.metadata.ElementDescriptor;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -27,8 +28,6 @@ import java.lang.annotation.ElementType;
  * @author Gunnar Morling
  */
 public interface Cascadable {
-
-	String getName();
 
 	/**
 	 * Converts the given validation group as per the group conversion
@@ -52,4 +51,18 @@ public interface Cascadable {
 	 * @return This element's value.
 	 */
 	Object getValue(Object parent);
+
+	/**
+	 * Returns the name of this cascadable element.
+	 *
+	 * @return The name of this cascadable element.
+	 */
+	String getName();
+
+	/**
+	 * Returns a BV meta-data API descriptor representing this element
+	 *
+	 * @return A descriptor representing this element.
+	 */
+	ElementDescriptor getDescriptor();
 }

@@ -21,7 +21,9 @@ import java.lang.reflect.Type;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.aggregated.Validatable;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.facets.Validatable;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -40,18 +42,6 @@ public class ValueContext<T, V> {
 	 * The class of the current bean.
 	 */
 	private final Class<T> currentBeanType;
-
-	/**
-	 * The index of the currently validated parameter if this context is used for a method parameter validation, null
-	 * in all other cases (standard bean validation, return value validation).
-	 */
-	private Integer parameterIndex;
-
-	/**
-	 * The name of the currently validated parameter if this context is used for a method parameter validation, null
-	 * in all other cases (standard bean validation, return value validation).
-	 */
-	private String parameterName;
 
 	/**
 	 * The current property path we are validating.
@@ -117,22 +107,6 @@ public class ValueContext<T, V> {
 		return currentValidatable;
 	}
 
-	public Integer getParameterIndex() {
-		return parameterIndex;
-	}
-
-	public void setParameterIndex(Integer parameterIndex) {
-		this.parameterIndex = parameterIndex;
-	}
-
-	public String getParameterName() {
-		return parameterName;
-	}
-
-	public void setParameterName(String parameterName) {
-		this.parameterName = parameterName;
-	}
-
 	public final V getCurrentValidatedValue() {
 		return currentValue;
 	}
@@ -141,9 +115,14 @@ public class ValueContext<T, V> {
 		this.propertyPath = propertyPath;
 	}
 
-	public final void appendNode(String node) {
+	public final void appendNode(Cascadable node) {
 		propertyPath = PathImpl.createCopy( propertyPath );
-		propertyPath.addNode( node );
+		propertyPath.addNode( node.getName(), node.getDescriptor() );
+	}
+
+	public final void appendNode(BeanMetaData<?> node) {
+		propertyPath = PathImpl.createCopy( propertyPath );
+		propertyPath.addNode( null, node.getDescriptor() );
 	}
 
 	public final void markCurrentPropertyAsIterable() {
@@ -192,8 +171,6 @@ public class ValueContext<T, V> {
 		sb.append( "ValueContext" );
 		sb.append( "{currentBean=" ).append( currentBean );
 		sb.append( ", currentBeanType=" ).append( currentBeanType );
-		sb.append( ", parameterIndex=" ).append( parameterIndex );
-		sb.append( ", parameterName='" ).append( parameterName ).append( '\'' );
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );

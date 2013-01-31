@@ -19,6 +19,8 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.util.Collections;
 import java.util.Map;
 
+import org.hibernate.validator.internal.metadata.facets.Cascadable;
+
 /**
  * Provides group conversion functionality to {@link Cascadable}s.
  *
