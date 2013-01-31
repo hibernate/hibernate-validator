@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.metadata.aggregated;
+package org.hibernate.validator.internal.metadata.facets;
 
 /**
  * Provides a unified view on validatable elements of all kinds, be it Java

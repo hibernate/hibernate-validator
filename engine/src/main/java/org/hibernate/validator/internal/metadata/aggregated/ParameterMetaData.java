@@ -17,14 +17,17 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
+import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -93,6 +96,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);
+	}
+
+	@Override
+	public ElementDescriptor getDescriptor() {
+		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	public static class Builder extends MetaDataBuilder {

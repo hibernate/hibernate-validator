@@ -29,6 +29,9 @@ import javax.validation.constraints.NotNull;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
@@ -178,10 +181,18 @@ public class PathImplTest {
 
 	@Test
 	public void testCreationOfExecutablePath() throws Exception {
-
-		PathImpl methodParameterPath = PathImpl.createPathForExecutable(
-				ExecutableElement.forMethod( Container.class.getMethod( "addItem", Key.class, Item.class ) )
+		ExecutableElement executable = ExecutableElement.forMethod(
+				Container.class.getMethod(
+						"addItem",
+						Key.class,
+						Item.class
+				)
 		);
+		ExecutableMetaData executableMetaData = new BeanMetaDataManager( new ConstraintHelper() ).getBeanMetaData(
+				Container.class
+		).getMetaDataFor( executable );
+
+		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );
 
 		assertEquals( methodParameterPath.toString(), "addItem" );
 	}

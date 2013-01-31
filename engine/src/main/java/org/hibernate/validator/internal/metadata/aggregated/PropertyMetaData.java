@@ -20,14 +20,17 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.metadata.ElementDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
+import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -117,6 +120,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);
+	}
+
+	@Override
+	public ElementDescriptor getDescriptor() {
+		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	@Override

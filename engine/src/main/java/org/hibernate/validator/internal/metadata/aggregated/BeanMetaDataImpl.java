@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -35,6 +36,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -247,6 +249,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public List<Class<?>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
+	}
+
+	@Override
+	public ElementDescriptor getDescriptor() {
+		return getBeanDescriptor();
 	}
 
 	private Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors() {

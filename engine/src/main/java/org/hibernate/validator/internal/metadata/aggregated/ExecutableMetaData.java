@@ -417,7 +417,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	public ReturnValueMetaData getReturnValueMetaData() {
-		return new ReturnValueMetaData( returnValueGroupConversions );
+		return new ReturnValueMetaData(
+				returnValueGroupConversions,
+				returnValueAsDescriptor( false, Collections.<Class<?>>emptyList() )
+		);
 	}
 
 	@Override
@@ -433,6 +436,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);
+	}
+
+	public ElementDescriptor getDescriptor() {
+		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
