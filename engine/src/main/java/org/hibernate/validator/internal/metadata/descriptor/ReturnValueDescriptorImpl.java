@@ -19,6 +19,7 @@ package org.hibernate.validator.internal.metadata.descriptor;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
+import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 /**
@@ -39,6 +40,11 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl implements 
 	@Override
 	public boolean isCascaded() {
 		return cascaded;
+	}
+
+	@Override
+	public Set<GroupConversionDescriptor> getGroupConversions() {
+		return null; // TODO - https://hibernate.onjira.com/browse/HV-692.
 	}
 
 	@Override

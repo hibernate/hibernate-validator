@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.BootstrapConfiguration;
+import javax.validation.executable.ExecutableType;
 
 /**
  * Wrapper class for the bootstrap parameters defined in <i>validation.xml</i>
@@ -90,6 +91,11 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	@Override
 	public Set<String> getConstraintMappingResourcePaths() {
 		return constraintMappingResourcePaths;
+	}
+
+	@Override
+	public Set<ExecutableType> getValidatedExecutableTypes() {
+		return null;  // TODO - https://hibernate.onjira.com/browse/HV-692
 	}
 
 	@Override

@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
-import javax.validation.ConvertGroup;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;

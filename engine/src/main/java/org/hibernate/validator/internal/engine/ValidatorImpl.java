@@ -215,7 +215,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	@Override
-	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<T> constructor, Object[] parameterValues, Class<?>... groups) {
+	public <T> Set<ConstraintViolation<T>> validateConstructorParameters(Constructor<? extends T> constructor, Object[] parameterValues, Class<?>... groups) {
 		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
 		Contracts.assertNotNull( parameterValues, MESSAGES.validatedParameterArrayMustNotBeNull() );
 
@@ -223,7 +223,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	@Override
-	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<T> constructor, T createdObject, Class<?>... groups) {
+	public <T> Set<ConstraintViolation<T>> validateConstructorReturnValue(Constructor<? extends T> constructor, T createdObject, Class<?>... groups) {
 		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
 		Contracts.assertNotNull( createdObject, MESSAGES.validatedConstructorCreatedInstanceMustNotBeNull() );
 

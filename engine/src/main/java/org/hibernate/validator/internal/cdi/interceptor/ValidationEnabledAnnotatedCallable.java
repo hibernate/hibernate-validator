@@ -25,7 +25,6 @@ import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.util.AnnotationLiteral;
-import javax.validation.spi.MethodValidated;
 
 /**
  * @author Hardy Ferentschik

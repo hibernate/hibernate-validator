@@ -36,9 +36,9 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.spi.MethodValidated;
 
 import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.Contracts;

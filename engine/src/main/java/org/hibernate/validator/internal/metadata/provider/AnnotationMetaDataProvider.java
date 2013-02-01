@@ -29,10 +29,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConvertGroup;
 import javax.validation.GroupSequence;
 import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;

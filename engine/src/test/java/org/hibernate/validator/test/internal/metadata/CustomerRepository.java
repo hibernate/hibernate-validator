@@ -17,10 +17,10 @@
 package org.hibernate.validator.test.internal.metadata;
 
 import java.util.Set;
-import javax.validation.ConvertGroup;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import org.joda.time.DateMidnight;

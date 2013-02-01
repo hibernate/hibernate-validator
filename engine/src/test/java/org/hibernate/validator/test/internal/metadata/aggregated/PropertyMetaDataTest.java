@@ -18,7 +18,7 @@ package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConvertGroup;
+import javax.validation.groups.ConvertGroup;
 import javax.validation.Valid;
 import javax.validation.groups.Default;
 

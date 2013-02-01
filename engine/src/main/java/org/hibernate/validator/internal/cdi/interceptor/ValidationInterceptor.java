@@ -31,7 +31,6 @@ import javax.validation.Path;
 import javax.validation.Validator;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.spi.MethodValidated;
 
 /**
  * An interceptor which performs a validation of the Bean Validation constraints specified at the parameters and/or return

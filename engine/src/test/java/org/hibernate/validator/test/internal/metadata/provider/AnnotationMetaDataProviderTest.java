@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.Constraint;
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConvertGroup;
 import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 

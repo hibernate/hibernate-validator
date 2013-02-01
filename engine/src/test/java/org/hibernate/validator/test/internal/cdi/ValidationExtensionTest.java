@@ -36,7 +36,6 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
-import javax.validation.spi.MethodValidated;
 
 import org.easymock.Capture;
 import org.testng.annotations.BeforeMethod;
@@ -46,6 +45,7 @@ import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.cdi.ValidationExtension;
 import org.hibernate.validator.internal.cdi.ValidatorBean;
 import org.hibernate.validator.internal.cdi.ValidatorFactoryBean;
+import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 
