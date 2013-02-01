@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -305,50 +307,7 @@
                                 </goals>
                                 <configuration>
                                     <source>
-                                        println "[INFO] ------------------------------------------------------------------------";
-                                        println "[INFO] TCK SETUP BUILD INFO                                                    ";
-                                        println "[INFO] ------------------------------------------------------------------------";
-                                        println "[INFO] Updating default JBoss AS modules                                       ";
-                                        println "[INFO] ------------------------------------------------------------------------";
-
-                                        def toDir = new File(project.properties['jbossTargetDir'], 'modules/javax/validation')
-                                        def fromDir = new File(project.basedir, 'src/as7config/modules/javax/validation')
-
-                                        log.info('Deleting old Bean Validation 1.0 module from ' + fromDir )
-                                        ant.delete(dir : toDir)
-
-                                        log.info('Copying Bean Validation 1.1 module from ' + fromDir + ' to ' + toDir)
-                                        ant.copy(todir: toDir, filtering: true) {
-                                           fileset(dir: fromDir)
-                                           filterset() {
-                                              filter(token:'BV-API-VERSION', value:project.properties['bv.api.version'])
-                                           }
-                                        }
-
-                                        toDir = new File(project.properties['jbossTargetDir'], 'modules/org/hibernate/validator')
-                                        fromDir = new File(project.basedir, 'src/as7config/modules/org/hibernate/validator')
-
-                                        log.info('Deleting old Hibernate Validator module from ' + fromDir )
-                                        ant.delete(dir : toDir)
-
-                                        log.info('Copying updated Hibernate Validator module from ' + fromDir + ' to ' + toDir)
-                                        ant.copy(todir: toDir, filtering: true) {
-                                           fileset(dir: fromDir)
-                                           filterset() {
-                                              filter(token:'HV-VERSION', value:project.version)
-                                           }
-                                        }
-
-                                        toDir = new File(project.properties['jbossTargetDir'], 'modules/com/fasterxml')
-                                        fromDir = new File(project.basedir, 'src/as7config/modules/com/fasterxml')
-
-                                        log.info('Copying classmate module from ' + fromDir + ' to ' + toDir)
-                                        ant.copy(todir: toDir, filtering: true) {
-                                           fileset(dir: fromDir)
-                                           filterset() {
-                                              filter(token:'CLASSMATE-VERSION', value:project.properties['classmate.version'])
-                                           }
-                                        }
+                                        ${pom.basedir}/src/script/setupAsModules.groovy
                                     </source>
                                 </configuration>
                             </execution>
@@ -365,7 +324,6 @@
                             </suiteXmlFiles>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
-                                <validation.provider>${validation.provider}</validation.provider>
                                 <includeIntegrationTests>true</includeIntegrationTests>
                             </systemPropertyVariables>
                         </configuration>
