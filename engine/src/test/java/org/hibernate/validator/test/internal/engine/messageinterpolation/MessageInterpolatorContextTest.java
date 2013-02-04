@@ -18,10 +18,11 @@
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
 import java.util.Set;
-
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.MessageInterpolator.Context;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
@@ -80,6 +81,12 @@ public class MessageInterpolatorContextTest {
 
 		// verify that the right context was passed
 		verify( mock );
+	}
+
+	@Test(expectedExceptions = ValidationException.class)
+	public void testUnwrapToUnsupportedClassCausesValidationException() {
+		Context context = new MessageInterpolatorContext( null, null );
+		context.unwrap( Object.class );
 	}
 
 	private static class TestBean {
