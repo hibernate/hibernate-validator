@@ -16,12 +16,14 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Wrapper class for the bootstrap parameters defined in <i>validation.xml</i>
@@ -36,6 +38,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final String parameterNameProviderClassName;
 	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
+	private final Set<ExecutableType> validatedExecutableTypes;
 
 	public BootstrapConfigurationImpl() {
 		this.defaultProviderClassName = null;
@@ -43,22 +46,25 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.messageInterpolatorClassName = null;
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
-		this.constraintMappingResourcePaths = new HashSet<String>();
-		this.properties = new HashMap<String, String>();
+		this.validatedExecutableTypes = newHashSet();
+		this.constraintMappingResourcePaths = newHashSet();
+		this.properties = newHashMap();
 	}
 
 	public BootstrapConfigurationImpl(String defaultProviderClassName,
-											String constraintValidatorFactoryClassName,
-											String messageInterpolatorClassName,
-											String traversableResolverClassName,
-											String parameterNameProviderClassName,
-											Set<String> constraintMappingResourcePaths,
-											Map<String, String> properties) {
+									  String constraintValidatorFactoryClassName,
+									  String messageInterpolatorClassName,
+									  String traversableResolverClassName,
+									  String parameterNameProviderClassName,
+									  EnumSet<ExecutableType> validatedExecutableTypes,
+									  Set<String> constraintMappingResourcePaths,
+									  Map<String, String> properties) {
 		this.defaultProviderClassName = defaultProviderClassName;
 		this.constraintValidatorFactoryClassName = constraintValidatorFactoryClassName;
 		this.messageInterpolatorClassName = messageInterpolatorClassName;
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
+		this.validatedExecutableTypes = validatedExecutableTypes;
 		this.constraintMappingResourcePaths = constraintMappingResourcePaths;
 		this.properties = properties;
 	}
@@ -90,17 +96,17 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
 	@Override
 	public Set<String> getConstraintMappingResourcePaths() {
-		return constraintMappingResourcePaths;
+		return newHashSet( constraintMappingResourcePaths );
 	}
 
 	@Override
 	public Set<ExecutableType> getValidatedExecutableTypes() {
-		return null;  // TODO - https://hibernate.onjira.com/browse/HV-692
+		return newHashSet( validatedExecutableTypes );
 	}
 
 	@Override
 	public Map<String, String> getProperties() {
-		return properties;
+		return newHashMap( properties );
 	}
 
 	@Override
@@ -114,11 +120,10 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		sb.append( ", messageInterpolatorClassName='" ).append( messageInterpolatorClassName ).append( '\'' );
 		sb.append( ", traversableResolverClassName='" ).append( traversableResolverClassName ).append( '\'' );
 		sb.append( ", parameterNameProviderClassName='" ).append( parameterNameProviderClassName ).append( '\'' );
-		sb.append( ", constraintMappingResourcePaths=" ).append( constraintMappingResourcePaths );
+		sb.append( ", validatedExecutableTypes='" ).append( validatedExecutableTypes ).append( '\'' );
+		sb.append( ", constraintMappingResourcePaths=" ).append( constraintMappingResourcePaths ).append( '\'' );
 		sb.append( ", properties=" ).append( properties );
 		sb.append( '}' );
 		return sb.toString();
 	}
 }
-
-
