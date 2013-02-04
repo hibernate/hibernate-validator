@@ -27,10 +27,10 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Path.ParameterNode;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.joda.time.DateMidnight;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.ValidatorImpl;
@@ -41,7 +41,6 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -60,19 +59,20 @@ import static org.testng.Assert.fail;
  * @author Hardy Ferentschik
  */
 @Test
-public class MethodLevelValidationTest {
-	private CustomerRepository customerRepository;
-	private RepositoryBase<Customer> repositoryBase;
+public abstract class AbstractMethodValidationTest {
+	protected CustomerRepository customerRepository;
+	protected RepositoryBase<Customer> repositoryBase;
+	protected Validator validator;
 
-	@BeforeMethod
-	public void setUpDefaultExecutableValidator() {
-		setUpValidator();
-	}
+	protected abstract void setUp();
 
-	private void setUpValidator(Class<?>... groups) {
-		repositoryBase = customerRepository = getValidatingProxy(
-				new CustomerRepositoryImpl(), ValidatorUtil.getValidator(), groups
+	protected abstract String messagePrefix();
+
+	protected void createProxy(Class<?>... groups) {
+		customerRepository = getValidatingProxy(
+				new CustomerRepositoryImpl(), validator, groups
 		);
+		repositoryBase = customerRepository;
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class MethodLevelValidationTest {
 
 			assertConstraintViolation(
 					constraintViolation,
-					"may not be null",
+					messagePrefix() + "may not be null",
 					CustomerRepositoryImpl.class,
 					null
 			);
@@ -121,7 +121,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "findCustomerByAgeAndName", Integer.class, String.class );
 			assertParameterIndex( constraintViolation, 1 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -142,7 +142,9 @@ public class MethodLevelValidationTest {
 		catch ( ConstraintViolationException e ) {
 			assertEquals( e.getConstraintViolations().size(), 2 );
 			assertCorrectConstraintViolationMessages(
-					e.getConstraintViolations(), "may not be null", "must be greater than or equal to 5"
+					e.getConstraintViolations(),
+					messagePrefix() + "may not be null",
+					messagePrefix() + "must be greater than or equal to 5"
 			);
 		}
 	}
@@ -158,7 +160,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "persistCustomer", Customer.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -185,7 +187,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "persistCustomer", Customer.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -214,7 +216,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "cascadingMapParameter", Map.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -241,7 +243,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "cascadingIterableParameter", List.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -268,7 +270,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "cascadingArrayParameter", Customer[].class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -293,7 +295,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "findById", Long.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -311,7 +313,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "foo", Long.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -329,7 +331,7 @@ public class MethodLevelValidationTest {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "bar", Customer.class );
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
@@ -353,8 +355,7 @@ public class MethodLevelValidationTest {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-
-			assertEquals( constraintViolation.getMessage(), "must be greater than or equal to 10" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must be greater than or equal to 10" );
 			assertMethod( constraintViolation, "baz" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -375,8 +376,7 @@ public class MethodLevelValidationTest {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "cascadingReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -400,10 +400,10 @@ public class MethodLevelValidationTest {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "overriddenMethodWithCascadingReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
+
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
@@ -417,17 +417,15 @@ public class MethodLevelValidationTest {
 
 	@Test
 	public void cascadingIterableReturnValue() {
-
 		try {
 			customerRepository.cascadingIterableReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {
-
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "cascadingIterableReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
@@ -443,17 +441,15 @@ public class MethodLevelValidationTest {
 
 	@Test
 	public void cascadingMapReturnValue() {
-
 		try {
 			customerRepository.cascadingMapReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {
-
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "cascadingMapReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
@@ -469,17 +465,15 @@ public class MethodLevelValidationTest {
 
 	@Test
 	public void cascadingArrayReturnValue() {
-
 		try {
 			customerRepository.cascadingArrayReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {
-
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "may not be null" );
+			assertEquals( constraintViolation.getMessage(), messagePrefix() + "may not be null" );
 			assertMethod( constraintViolation, "cascadingArrayReturnValue" );
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
@@ -495,34 +489,30 @@ public class MethodLevelValidationTest {
 
 	@Test
 	public void overridingMethodStrengthensReturnValueConstraint() {
-
 		try {
 			customerRepository.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {
-
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
-					"must be greater than or equal to 5",
-					"must be greater than or equal to 10"
+					messagePrefix() + "must be greater than or equal to 5",
+					messagePrefix() + "must be greater than or equal to 10"
 			);
 		}
 	}
 
 	@Test
 	public void runtimeTypeDefinesConstraintsToApply() {
-
 		try {
 			repositoryBase.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {
-
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
-					"must be greater than or equal to 5",
-					"must be greater than or equal to 10"
+					messagePrefix() + "must be greater than or equal to 5",
+					messagePrefix() + "must be greater than or equal to 10"
 			);
 		}
 	}
@@ -534,7 +524,7 @@ public class MethodLevelValidationTest {
 
 	@Test(expectedExceptions = ConstraintViolationException.class)
 	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
-		setUpValidator( CustomerRepository.ValidationGroup.class );
+		createProxy( CustomerRepository.ValidationGroup.class );
 		customerRepository.parameterConstraintInGroup( null );
 	}
 
@@ -567,7 +557,7 @@ public class MethodLevelValidationTest {
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
-					"{ConsistentDateParameters.message}"
+					messagePrefix() + "{ConsistentDateParameters.message}"
 			);
 			assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo(
 					ConsistentDateParameters.class

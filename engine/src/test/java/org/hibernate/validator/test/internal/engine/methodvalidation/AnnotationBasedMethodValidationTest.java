@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
+* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,34 +14,28 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodvalidation.model;
+package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import org.testng.annotations.BeforeMethod;
+
+import org.hibernate.validator.testutil.ValidatorUtil;
 
 /**
- * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
-public class Customer {
-	public final String name;
-	private final Address address;
+public class AnnotationBasedMethodValidationTest extends AbstractMethodValidationTest {
 
-	public Customer(String name) {
-		this( name, null );
+	@Override
+	@BeforeMethod
+	protected void setUp() {
+		validator = ValidatorUtil.getValidator();
+		createProxy();
 	}
 
-	public Customer(String name, Address address) {
-		this.name = name;
-		this.address = address;
-	}
-
-	@NotNull
-	public String getName() {
-		return name;
-	}
-
-	@Valid
-	public Address getAddress() {
-		return address;
+	@Override
+	protected String messagePrefix() {
+		return "";
 	}
 }
+
+

@@ -265,7 +265,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
-
 		List<ExecutableElement> declaredConstructors = ExecutableElement.forConstructors(
 				ReflectionHelper.getDeclaredConstructors( clazz )
 		);
@@ -274,7 +273,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
-
 		List<ExecutableElement> declaredMethods = ExecutableElement.forMethods(
 				ReflectionHelper.getDeclaredMethods( clazz )
 		);
@@ -286,7 +284,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<ConstrainedExecutable> executableMetaData = newHashSet();
 
 		for ( ExecutableElement executable : executableElements ) {
-
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
 			Member member = executable.getMember();
@@ -312,7 +309,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *         given element.
 	 */
 	private ConstrainedExecutable findExecutableMetaData(ExecutableElement executable) {
-
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
 		boolean isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
 		AccessibleObject member = executable.getAccessibleObject();
@@ -340,7 +336,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
-				new ExecutableConstraintLocation( executable, null ),
+				new ExecutableConstraintLocation( executable ),
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -547,7 +543,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member, null ) );
+		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member, ConstraintDescriptorImpl<A> descriptor) {

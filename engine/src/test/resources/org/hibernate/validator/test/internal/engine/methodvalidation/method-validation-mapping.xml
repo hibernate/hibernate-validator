@@ -1,0 +1,213 @@
+<constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation=
+                "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd" version="1.1">
+
+    <default-package>org.hibernate.validator.test.internal.engine.methodvalidation.service</default-package>
+
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer"
+          ignore-annotations="true">
+        <getter name="name">
+            <constraint annotation="javax.validation.constraints.NotNull">
+                <message>[XML] - may not be null</message>
+            </constraint>
+        </getter>
+        <getter name="address">
+            <valid/>
+        </getter>
+    </bean>
+
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.model.Address"
+          ignore-annotations="true">
+        <getter name="city">
+            <constraint annotation="javax.validation.constraints.NotNull">
+                <message>[XML] - may not be null</message>
+            </constraint>
+        </getter>
+    </bean>
+
+    <bean class="RepositoryBase" ignore-annotations="true">
+        <method name="overriddenMethodWithReturnValueConstraint">
+            <return-value>
+                <constraint annotation="javax.validation.constraints.Min">
+                    <message>[XML] - must be greater than or equal to 5</message>
+                    <element name="value">5</element>
+                </constraint>
+            </return-value>
+        </method>
+
+        <method name="foo">
+            <parameter type="java.lang.Long">
+                <valid/>
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+        </method>
+
+        <method name="findById">
+            <parameter type="java.lang.Long">
+                <valid/>
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+        </method>
+
+        <method name="bar">
+            <parameter type="org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer">
+                <valid/>
+                <constraint annotation="javax.validation.constraints.NotNull"/>
+            </parameter>
+        </method>
+
+        <method name="overriddenMethodWithCascadingReturnValue">
+            <return-value>
+                <valid/>
+            </return-value>
+        </method>
+    </bean>
+
+    <bean class="CustomerRepository"
+          ignore-annotations="true">
+        <method name="persistCustomer">
+            <parameter type="org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer">
+                <valid/>
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+        </method>
+
+        <method name="findCustomerByName">
+            <parameter type="java.lang.String">
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+            <return-value>
+                <valid/>
+            </return-value>
+        </method>
+
+        <method name="findCustomerByAgeAndName">
+            <parameter type="java.lang.Integer">
+                <constraint annotation="javax.validation.constraints.Min">
+                    <message>[XML] - must be greater than or equal to 5</message>
+                    <element name="value">5</element>
+                </constraint>
+            </parameter>
+            <parameter type="java.lang.String">
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+        </method>
+
+        <method name="voidMethodWithIllegalReturnValueConstraint">
+            <return-value>
+                <constraint annotation="javax.validation.constraints.Min">
+                    <message>[XML] - must be greater than or equal to 10</message>
+                    <element name="value">10</element>
+                </constraint>
+            </return-value>
+        </method>
+
+        <method name="methodWithCrossParameterConstraint">
+            <parameter type="org.joda.time.DateMidnight">
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+            <parameter type="org.joda.time.DateMidnight">
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+            <cross-parameter-constraint annotation="ConsistentDateParameters">
+                <message>[XML] - {ConsistentDateParameters.message}</message>
+            </cross-parameter-constraint>
+        </method>
+
+        <method name="getFoo">
+            <parameter type="java.lang.String">
+                <constraint annotation="org.hibernate.validator.constraints.NotEmpty">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+        </method>
+
+        <method name="overriddenMethodWithReturnValueConstraint">
+            <return-value>
+                <constraint annotation="javax.validation.constraints.Min">
+                    <message>[XML] - must be greater than or equal to 10</message>
+                    <element name="value">10</element>
+                </constraint>
+            </return-value>
+        </method>
+
+        <method name="baz">
+            <return-value>
+                <constraint annotation="javax.validation.constraints.Min">
+                    <message>[XML] - must be greater than or equal to 10</message>
+                    <element name="value">10</element>
+                </constraint>
+            </return-value>
+        </method>
+
+        <method name="cascadingReturnValue">
+            <return-value>
+                <valid/>
+            </return-value>
+        </method>
+
+        <method name="cascadingMapReturnValue">
+            <return-value>
+                <valid/>
+            </return-value>
+        </method>
+
+        <method name="cascadingIterableReturnValue">
+            <return-value>
+                <valid/>
+            </return-value>
+        </method>
+
+        <method name="cascadingArrayReturnValue">
+            <return-value>
+                <valid/>
+            </return-value>
+        </method>
+
+        <method name="cascadingMapParameter">
+            <parameter type="java.util.Map">
+                <valid/>
+            </parameter>
+        </method>
+
+        <method name="cascadingArrayParameter">
+            <parameter type="[Lorg.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;">
+                <valid/>
+            </parameter>
+        </method>
+
+        <method name="cascadingIterableParameter">
+            <parameter type="java.util.List">
+                <valid/>
+            </parameter>
+        </method>
+
+        <method name="parameterConstraintInGroup">
+            <parameter type="java.lang.String">
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                    <groups>
+                        <value>org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository$ValidationGroup</value>
+                    </groups>
+                </constraint>
+            </parameter>
+        </method>
+    </bean>
+
+</constraint-mappings>

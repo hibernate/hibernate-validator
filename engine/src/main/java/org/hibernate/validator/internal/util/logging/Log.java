@@ -380,7 +380,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 102, value = "%s is not a constraint validator class.")
 	ValidationException getIsNotAConstraintValidatorClassException(Class<?> validatorClass);
 
-	@Message(id = 103, value = "%s has already be configured in xml.")
+	@Message(id = 103, value = "%s is configured at least twice in xml.")
 	ValidationException getBeanClassHasAlreadyBeConfiguredInXmlException(String beanClassName);
 
 	@Message(id = 104, value = "%1$s is defined twice in mapping xml for bean %2$s.")
@@ -478,4 +478,16 @@ public interface Log extends BasicLogger {
 	@Message(id = 132,
 			value = "Void methods must not be constrained or marked for cascaded validation, but method %s is.")
 	ConstraintDeclarationException voidMethodsMustNotBeConstrained(Member member);
+
+	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
+	ValidationException getBeanDoesNotContainConstructorException(String beanClassName, List<Class<?>> parameterTypes);
+
+	@Message(id = 134, value = "Unable to load parameter of type '%1$s' in %2$s.")
+	ValidationException getInvalidParameterTypeException(String type, String beanClassName);
+
+	@Message(id = 135, value = "%1$s does not contain a method with the name '%2$s' and parameter types %3$s.")
+	ValidationException getBeanDoesNotContainMethodException(String beanClassName, String methodName, List<Class<?>> parameterTypes);
+
+	@Message(id = 136, value = "The specified constraint annotation class %1$s cannot be loaded.")
+	ValidationException unableToLoadConstraintAnnotationClassException(String constraintAnnotationClass, @Cause Exception e);
 }

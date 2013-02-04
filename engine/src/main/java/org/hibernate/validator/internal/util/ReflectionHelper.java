@@ -73,9 +73,8 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 public final class ReflectionHelper {
 
 	private static final Log log = LoggerFactory.make();
-
-	private static String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
-
+	private static final String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
+	private static final String PACKAGE_SEPARATOR = ".";
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
 
 	static {
@@ -110,6 +109,21 @@ public final class ReflectionHelper {
 
 	public static Class<?> loadClass(String className, Class<?> caller) {
 		return run( LoadClass.action( className, caller ) );
+	}
+
+	public static  Class<?> loadClass(String clazz, String defaultPackage) {
+		String fullyQualifiedClass;
+		if ( isQualifiedClass( clazz ) ) {
+			fullyQualifiedClass = clazz;
+		}
+		else {
+			fullyQualifiedClass = defaultPackage + PACKAGE_SEPARATOR + clazz;
+		}
+		return ReflectionHelper.loadClass( fullyQualifiedClass, ReflectionHelper.class );
+	}
+
+	public static  boolean isQualifiedClass(String clazz) {
+		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
 	public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... params) {
@@ -190,7 +204,6 @@ public final class ReflectionHelper {
 	 * @return the member which matching the name and type or {@code null} if no such member exists.
 	 */
 	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
-
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
@@ -273,7 +286,6 @@ public final class ReflectionHelper {
 	 * @return The erased type.
 	 */
 	public static Type typeOf(ExecutableElement executable, int parameterIndex) {
-
 		Type type = executable.getGenericParameterTypes()[parameterIndex];
 
 		if ( type instanceof TypeVariable ) {
@@ -471,18 +483,6 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the specified class contains a declared field with the given name.
-	 *
-	 * @param clazz The class to check.
-	 * @param fieldName The field name.
-	 *
-	 * @return Returns {@code true} if the field exists, {@code false} otherwise.
-	 */
-	public static boolean containsDeclaredField(Class<?> clazz, String fieldName) {
-		return getDeclaredField( clazz, fieldName ) != null;
-	}
-
-	/**
 	 * Returns the fields of the specified class.
 	 *
 	 * @param clazz The class for which to retrieve the fields.
@@ -504,18 +504,6 @@ public final class ReflectionHelper {
 	 */
 	public static Method getMethodFromPropertyName(Class<?> clazz, String methodName) {
 		return run( GetMethodFromPropertyName.action( clazz, methodName ) );
-	}
-
-	/**
-	 * Checks whether the specified class contains a method for the specified property.
-	 *
-	 * @param clazz The class to check.
-	 * @param property The property name.
-	 *
-	 * @return Returns {@code true} if the method exists, {@code false} otherwise.
-	 */
-	public static boolean containsMethodWithPropertyName(Class<?> clazz, String property) {
-		return getMethodFromPropertyName( clazz, property ) != null;
 	}
 
 	/**

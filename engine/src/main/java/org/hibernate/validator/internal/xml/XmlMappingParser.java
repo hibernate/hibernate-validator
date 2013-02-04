@@ -19,9 +19,8 @@ package org.hibernate.validator.internal.xml;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -34,7 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
-import javax.validation.Payload;
+import javax.validation.ParameterNameProvider;
+import javax.validation.ValidationException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -44,13 +44,17 @@ import javax.xml.validation.Schema;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.CrossParameterConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -59,15 +63,13 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
+ * XML parser for validation-mapping files.
+ *
  * @author Hardy Ferentschik
  */
 public class XmlMappingParser {
 
 	private static final Log log = LoggerFactory.make();
-	private static final String MESSAGE_PARAM = "message";
-	private static final String GROUPS_PARAM = "groups";
-	private static final String PAYLOAD_PARAM = "payload";
-	private static final String PACKAGE_SEPARATOR = ".";
 
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
@@ -75,8 +77,10 @@ public class XmlMappingParser {
 	private final Map<Class<?>, Set<MetaConstraint<?>>> constraintMap;
 	private final Map<Class<?>, List<Member>> cascadedMembers;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
+	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
 
-	private final XmlParserHelper xmlParserHelper = new XmlParserHelper();
+	private final XmlParserHelper xmlParserHelper;
+	private final ParameterNameProvider parameterNameProvider;
 
 	private static final ConcurrentMap<String, String> SCHEMAS_BY_VERSION = new ConcurrentHashMap<String, String>(
 			2,
@@ -89,12 +93,15 @@ public class XmlMappingParser {
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
 	}
 
-	public XmlMappingParser(ConstraintHelper constraintHelper) {
+	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptions();
 		this.constraintMap = newHashMap();
 		this.cascadedMembers = newHashMap();
 		this.defaultSequences = newHashMap();
+		this.constrainedElements = newHashMap();
+		this.xmlParserHelper = new XmlParserHelper();
+		this.parameterNameProvider = parameterNameProvider;
 	}
 
 	/**
@@ -104,12 +111,10 @@ public class XmlMappingParser {
 	 * @param mappingStreams The streams to parse. Must support the mark/reset contract.
 	 */
 	public final void parse(Set<InputStream> mappingStreams) {
-
 		try {
 			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
 
 			for ( InputStream in : mappingStreams ) {
-
 				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", in );
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
 				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
@@ -123,15 +128,17 @@ public class XmlMappingParser {
 				parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
 
 				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
+					Class<?> beanClass = ReflectionHelper.loadClass( bean.getClazz(), defaultPackage );
 					checkClassHasNotBeenProcessed( processedClasses, beanClass );
 					annotationProcessingOptions.ignoreAnnotationConstraintForClass(
 							beanClass,
 							bean.getIgnoreAnnotations()
 					);
-					parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
-					parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
-					parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
+					parseClassLevelConstraints( bean.getClassType(), beanClass, defaultPackage );
+					parseFieldLevelConstraints( bean.getField(), beanClass, defaultPackage );
+					parsePropertyLevelConstraints( bean.getGetter(), beanClass, defaultPackage );
+					parseConstructorConstraints( bean.getConstructor(), beanClass, defaultPackage );
+					parseMethodConstraints( bean.getMethod(), beanClass, defaultPackage );
 					processedClasses.add( beanClass );
 				}
 			}
@@ -150,7 +157,6 @@ public class XmlMappingParser {
 	}
 
 	public final <T> Set<MetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
-
 		Set<MetaConstraint<?>> theValue = constraintMap.get( beanClass );
 
 		return theValue != null ? theValue : Collections.<MetaConstraint<?>>emptySet();
@@ -165,6 +171,15 @@ public class XmlMappingParser {
 		}
 	}
 
+	public final Set<ConstrainedElement> getConstrainedElementsForClass(Class<?> beanClass) {
+		if ( constrainedElements.containsKey( beanClass ) ) {
+			return constrainedElements.get( beanClass );
+		}
+		else {
+			return Collections.emptySet();
+		}
+	}
+
 	public final List<Class<?>> getDefaultSequenceForClass(Class<?> beanClass) {
 		return defaultSequences.get( beanClass );
 	}
@@ -174,7 +189,7 @@ public class XmlMappingParser {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
 
-			Class<?> clazz = getClass( annotationClassName, defaultPackage );
+			Class<?> clazz = ReflectionHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
 				throw log.getIsNotAnAnnotationException( annotationClassName );
 			}
@@ -225,7 +240,7 @@ public class XmlMappingParser {
 		}
 	}
 
-	private void parseFieldLevelOverrides(List<FieldType> fields, Class<?> beanClass, String defaultPackage) {
+	private void parseFieldLevelConstraints(List<FieldType> fields, Class<?> beanClass, String defaultPackage) {
 		List<String> fieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
 			String fieldName = fieldType.getName();
@@ -235,11 +250,11 @@ public class XmlMappingParser {
 			else {
 				fieldNames.add( fieldName );
 			}
-			final boolean containsField = ReflectionHelper.containsDeclaredField( beanClass, fieldName );
-			if ( !containsField ) {
+
+			final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
+			if ( field == null ) {
 				throw log.getBeanDoesNotContainTheFieldException( beanClass.getName(), fieldName );
 			}
-			final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
 
 			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.getIgnoreAnnotations() == null ? false : fieldType.getIgnoreAnnotations();
@@ -262,7 +277,7 @@ public class XmlMappingParser {
 		}
 	}
 
-	private void parsePropertyLevelOverrides(List<GetterType> getters, Class<?> beanClass, String defaultPackage) {
+	private void parsePropertyLevelConstraints(List<GetterType> getters, Class<?> beanClass, String defaultPackage) {
 		List<String> getterNames = newArrayList();
 		for ( GetterType getterType : getters ) {
 			String getterName = getterType.getName();
@@ -272,11 +287,11 @@ public class XmlMappingParser {
 			else {
 				getterNames.add( getterName );
 			}
-			boolean containsMethod = ReflectionHelper.containsMethodWithPropertyName( beanClass, getterName );
-			if ( !containsMethod ) {
+
+			final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
+			if ( method == null ) {
 				throw log.getBeanDoesNotContainThePropertyException( beanClass.getName(), getterName );
 			}
-			final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
 
 			// ignore annotations
 			boolean ignoreGetterAnnotation = getterType.getIgnoreAnnotations() == null ? false : getterType.getIgnoreAnnotations();
@@ -299,7 +314,195 @@ public class XmlMappingParser {
 		}
 	}
 
-	private void parseClassLevelOverrides(ClassType classType, Class<?> beanClass, String defaultPackage) {
+	private void parseMethodConstraints(List<MethodType> methods, Class<?> beanClass, String defaultPackage) {
+		for ( MethodType methodType : methods ) {
+			// parse the parameters
+			List<Class<?>> parameterTypes = createParameterTypes(
+					methodType.getParameter(),
+					beanClass,
+					defaultPackage
+			);
+
+			String methodName = methodType.getName();
+
+			final Method method = ReflectionHelper.getDeclaredMethod(
+					beanClass,
+					methodName,
+					parameterTypes.toArray( new Class[parameterTypes.size()] )
+			);
+
+			if ( method == null ) {
+				throw log.getBeanDoesNotContainMethodException(
+						beanClass.getName(),
+						methodName,
+						parameterTypes
+				);
+			}
+
+			ExecutableElement constructorExecutableElement = ExecutableElement.forMethod( method );
+
+			parseExecutableType(
+					beanClass,
+					defaultPackage,
+					methodType.getParameter(),
+					methodType.getCrossParameterConstraint(),
+					methodType.getReturnValue(),
+					constructorExecutableElement
+			);
+
+			// ignore annotations
+			boolean ignoreConstructorAnnotations = methodType.getIgnoreAnnotations() == null ? false : methodType
+					.getIgnoreAnnotations();
+			if ( ignoreConstructorAnnotations ) {
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMethod( method );
+			}
+		}
+	}
+
+	private void parseConstructorConstraints(List<ConstructorType> constructors, Class<?> beanClass, String defaultPackage) {
+		for ( ConstructorType constructorType : constructors ) {
+			// parse the parameters
+			List<Class<?>> constructorParameterTypes = createParameterTypes(
+					constructorType.getParameter(),
+					beanClass,
+					defaultPackage
+			);
+
+			final Constructor constructor = ReflectionHelper.getConstructor(
+					beanClass,
+					constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
+			);
+			if ( constructor == null ) {
+				throw log.getBeanDoesNotContainConstructorException( beanClass.getName(), constructorParameterTypes );
+			}
+
+			ExecutableElement constructorExecutableElement = ExecutableElement.forConstructor( constructor );
+
+			parseExecutableType(
+					beanClass,
+					defaultPackage,
+					constructorType.getParameter(),
+					constructorType.getCrossParameterConstraint(),
+					constructorType.getReturnValue(),
+					constructorExecutableElement
+			);
+
+			// ignore annotations
+			boolean ignoreConstructorAnnotations = constructorType.getIgnoreAnnotations() == null ? false : constructorType
+					.getIgnoreAnnotations();
+			if ( ignoreConstructorAnnotations ) {
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnConstructor( constructor );
+			}
+		}
+	}
+
+	private void parseExecutableType(Class<?> beanClass,
+									 String defaultPackage,
+									 List<ParameterType> parameterTypeList,
+									 List<ConstraintType> crossParameterConstraintList,
+									 ReturnValueType returnValueType,
+									 ExecutableElement executableElement) {
+		List<ConstrainedParameter> parameterMetaData = ConstraintParameterBuilder.buildParameterConstraints(
+				parameterTypeList,
+				executableElement,
+				defaultPackage,
+				constraintHelper,
+				parameterNameProvider
+		);
+
+		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
+		CrossParameterConstraintLocation constraintLocation = new CrossParameterConstraintLocation(
+				executableElement
+		);
+		for ( ConstraintType constraintType : crossParameterConstraintList ) {
+			ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintBuilder.buildConstraintDescriptor(
+					constraintType,
+					executableElement.getElementType(),
+					defaultPackage,
+					constraintHelper
+			);
+			@SuppressWarnings("unchecked")
+			MetaConstraint<?> metaConstraint = new MetaConstraint( constraintDescriptor, constraintLocation );
+			crossParameterConstraints.add( metaConstraint );
+		}
+
+		// parse the return value
+		Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
+		Map<Class<?>, Class<?>> groupConversions = newHashMap();
+		boolean isCascaded = parseReturnValueType(
+				returnValueType,
+				executableElement,
+				returnValueConstraints,
+				groupConversions,
+				defaultPackage
+		);
+
+		ConstrainedExecutable constrainedExecutable = new ConstrainedExecutable(
+				ConfigurationSource.XML,
+				new ExecutableConstraintLocation( executableElement ),
+				parameterMetaData,
+				crossParameterConstraints,
+				returnValueConstraints,
+				groupConversions,
+				isCascaded
+		);
+
+		addConstrainedElement( beanClass, constrainedExecutable );
+	}
+
+	private boolean parseReturnValueType(ReturnValueType returnValueType,
+										 ExecutableElement executableElement,
+										 Set<MetaConstraint<?>> returnValueConstraints,
+										 Map<Class<?>, Class<?>> groupConversions,
+										 String defaultPackage) {
+		if ( returnValueType == null ) {
+			return false;
+		}
+
+		ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation(
+				executableElement
+		);
+		for ( ConstraintType constraintType : returnValueType.getConstraint() ) {
+			ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintBuilder.buildConstraintDescriptor(
+					constraintType,
+					executableElement.getElementType(),
+					defaultPackage,
+					constraintHelper
+			);
+			@SuppressWarnings("unchecked")
+			MetaConstraint<?> metaConstraint = new MetaConstraint( constraintDescriptor, constraintLocation );
+			returnValueConstraints.add( metaConstraint );
+		}
+		groupConversions.putAll(
+				GroupConversionBuilder.buildGroupConversionMap(
+						returnValueType.getConvertGroup(),
+						defaultPackage
+				)
+		);
+
+		return returnValueType.getValid() != null;
+	}
+
+	private List<Class<?>> createParameterTypes(List<ParameterType> parameterList,
+												Class<?> beanClass,
+												String defaultPackage) {
+		List<Class<?>> parameterTypes = newArrayList();
+		for ( ParameterType parameterType : parameterList ) {
+			String type = null;
+			try {
+				type = parameterType.getType();
+				Class<?> parameterClass = ReflectionHelper.loadClass( type, defaultPackage );
+				parameterTypes.add( parameterClass );
+			}
+			catch ( ValidationException e ) {
+				throw log.getInvalidParameterTypeException( type, beanClass.getName() );
+			}
+		}
+
+		return parameterTypes;
+	}
+
+	private void parseClassLevelConstraints(ClassType classType, Class<?> beanClass, String defaultPackage) {
 		if ( classType == null ) {
 			return;
 		}
@@ -347,44 +550,32 @@ public class XmlMappingParser {
 		}
 	}
 
+	private void addConstrainedElement(Class<?> beanClass, ConstrainedElement constrainedElement) {
+		if ( constrainedElements.containsKey( beanClass ) ) {
+			constrainedElements.get( beanClass ).add( constrainedElement );
+		}
+		else {
+			Set<ConstrainedElement> tmpList = newHashSet();
+			tmpList.add( constrainedElement );
+			constrainedElements.put( beanClass, tmpList );
+		}
+	}
+
 	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
 		List<Class<?>> groupSequence = newArrayList();
 		if ( groupSequenceType != null ) {
 			for ( String groupName : groupSequenceType.getValue() ) {
-				Class<?> group = getClass( groupName, defaultPackage );
+				Class<?> group = ReflectionHelper.loadClass( groupName, defaultPackage );
 				groupSequence.add( group );
 			}
 		}
 		return groupSequence;
 	}
 
-	private <A extends Annotation, T> MetaConstraint<?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, Member member, String defaultPackage) {
-		@SuppressWarnings("unchecked")
-		Class<A> annotationClass = (Class<A>) getClass( constraint.getAnnotation(), defaultPackage );
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
-
-		if ( constraint.getMessage() != null ) {
-			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
-		}
-		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
-		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
-
-		for ( ElementType elementType : constraint.getElement() ) {
-			String name = elementType.getName();
-			checkNameIsValid( name );
-			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
-			Object elementValue = getElementValue( elementType, returnType );
-			annotationDescriptor.setValue( name, elementValue );
-		}
-
-		A annotation;
-		try {
-			annotation = AnnotationFactory.create( annotationDescriptor );
-		}
-		catch ( RuntimeException e ) {
-			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
-		}
-
+	private <A extends Annotation, T> MetaConstraint<?> createMetaConstraint(ConstraintType constraint,
+																			 Class<T> beanClass,
+																			 Member member,
+																			 String defaultPackage) {
 		java.lang.annotation.ElementType type = java.lang.annotation.ElementType.TYPE;
 		if ( member instanceof Method ) {
 			type = java.lang.annotation.ElementType.METHOD;
@@ -393,224 +584,14 @@ public class XmlMappingParser {
 			type = java.lang.annotation.ElementType.FIELD;
 		}
 
-		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
-		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
-		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
+		ConstraintDescriptorImpl<A> constraintDescriptor = ConstraintBuilder.buildConstraintDescriptor(
+				constraint,
+				type,
+				defaultPackage,
+				constraintHelper
 		);
 
 		return new MetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
-	}
-
-	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-		Method m = ReflectionHelper.getMethod( annotationClass, name );
-		if ( m == null ) {
-			throw log.getAnnotationDoesNotContainAParameterException( annotationClass.getName(), name );
-		}
-		return m.getReturnType();
-	}
-
-	private Object getElementValue(ElementType elementType, Class<?> returnType) {
-		removeEmptyContentElements( elementType );
-
-		boolean isArray = returnType.isArray();
-		if ( !isArray ) {
-			if ( elementType.getContent().size() != 1 ) {
-				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
-			}
-			return getSingleValue( elementType.getContent().get( 0 ), returnType );
-		}
-		else {
-			List<Object> values = newArrayList();
-			for ( Serializable s : elementType.getContent() ) {
-				values.add( getSingleValue( s, returnType.getComponentType() ) );
-			}
-			return values.toArray( (Object[]) Array.newInstance( returnType.getComponentType(), values.size() ) );
-		}
-	}
-
-	private void removeEmptyContentElements(ElementType elementType) {
-		List<Serializable> contentToDelete = newArrayList();
-		for ( Serializable content : elementType.getContent() ) {
-			if ( content instanceof String && ( (String) content ).matches( "[\\n ].*" ) ) {
-				contentToDelete.add( content );
-			}
-		}
-		elementType.getContent().removeAll( contentToDelete );
-	}
-
-	private Object getSingleValue(Serializable serializable, Class<?> returnType) {
-
-		Object returnValue;
-		if ( serializable instanceof String ) {
-			String value = (String) serializable;
-			returnValue = convertStringToReturnType( returnType, value );
-		}
-		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
-				.equals( String.class ) ) {
-			JAXBElement<?> elem = (JAXBElement<?>) serializable;
-			String value = (String) elem.getValue();
-			returnValue = convertStringToReturnType( returnType, value );
-		}
-		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
-				.equals( AnnotationType.class ) ) {
-			JAXBElement<?> elem = (JAXBElement<?>) serializable;
-			AnnotationType annotationType = (AnnotationType) elem.getValue();
-			try {
-				@SuppressWarnings("unchecked")
-				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = createAnnotation( annotationType, annotationClass );
-			}
-			catch ( ClassCastException e ) {
-				throw log.getUnexpectedParameterValueException( e );
-			}
-		}
-		else {
-			throw log.getUnexpectedParameterValueException();
-		}
-		return returnValue;
-
-	}
-
-	private <A extends Annotation> Annotation createAnnotation(AnnotationType annotationType, Class<A> returnType) {
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
-		for ( ElementType elementType : annotationType.getElement() ) {
-			String name = elementType.getName();
-			Class<?> parameterType = getAnnotationParameterType( returnType, name );
-			Object elementValue = getElementValue( elementType, parameterType );
-			annotationDescriptor.setValue( name, elementValue );
-		}
-		return AnnotationFactory.create( annotationDescriptor );
-	}
-
-	private Object convertStringToReturnType(Class<?> returnType, String value) {
-		Object returnValue;
-		if ( returnType.getName().equals( byte.class.getName() ) ) {
-			try {
-				returnValue = Byte.parseByte( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "byte", e );
-			}
-		}
-		else if ( returnType.getName().equals( short.class.getName() ) ) {
-			try {
-				returnValue = Short.parseShort( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "short", e );
-			}
-		}
-		else if ( returnType.getName().equals( int.class.getName() ) ) {
-			try {
-				returnValue = Integer.parseInt( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "int", e );
-			}
-		}
-		else if ( returnType.getName().equals( long.class.getName() ) ) {
-			try {
-				returnValue = Long.parseLong( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "long", e );
-			}
-		}
-		else if ( returnType.getName().equals( float.class.getName() ) ) {
-			try {
-				returnValue = Float.parseFloat( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "float", e );
-			}
-		}
-		else if ( returnType.getName().equals( double.class.getName() ) ) {
-			try {
-				returnValue = Double.parseDouble( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "double", e );
-			}
-		}
-		else if ( returnType.getName().equals( boolean.class.getName() ) ) {
-			returnValue = Boolean.parseBoolean( value );
-		}
-		else if ( returnType.getName().equals( char.class.getName() ) ) {
-			if ( value.length() != 1 ) {
-				throw log.getInvalidCharValueException( value );
-			}
-			returnValue = value.charAt( 0 );
-		}
-		else if ( returnType.getName().equals( String.class.getName() ) ) {
-			returnValue = value;
-		}
-		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, this.getClass() );
-		}
-		else {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<Enum> enumClass = (Class<Enum>) returnType;
-				returnValue = Enum.valueOf( enumClass, value );
-			}
-			catch ( ClassCastException e ) {
-				throw log.getInvalidReturnTypeException( returnType, e );
-			}
-		}
-		return returnValue;
-	}
-
-	private void checkNameIsValid(String name) {
-		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw log.getReservedParameterNamesException( MESSAGE_PARAM, GROUPS_PARAM, PAYLOAD_PARAM );
-		}
-	}
-
-	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
-		if ( groupsType == null ) {
-			return new Class[] { };
-		}
-
-		List<Class<?>> groupList = newArrayList();
-		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( getClass( groupClass, defaultPackage ) );
-		}
-		return groupList.toArray( new Class[groupList.size()] );
-	}
-
-	@SuppressWarnings("unchecked")
-	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
-		if ( payloadType == null ) {
-			return new Class[] { };
-		}
-
-		List<Class<? extends Payload>> payloadList = newArrayList();
-		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = getClass( groupClass, defaultPackage );
-			if ( !Payload.class.isAssignableFrom( payload ) ) {
-				throw log.getWrongPayloadClassException( payload.getName() );
-			}
-			else {
-				payloadList.add( (Class<? extends Payload>) payload );
-			}
-		}
-		return payloadList.toArray( new Class[payloadList.size()] );
-	}
-
-	private Class<?> getClass(String clazz, String defaultPackage) {
-		String fullyQualifiedClass;
-		if ( isQualifiedClass( clazz ) ) {
-			fullyQualifiedClass = clazz;
-		}
-		else {
-			fullyQualifiedClass = defaultPackage + PACKAGE_SEPARATOR + clazz;
-		}
-		return ReflectionHelper.loadClass( fullyQualifiedClass, this.getClass() );
-	}
-
-	private boolean isQualifiedClass(String clazz) {
-		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
 	private ConstraintMappingsType getValidationConfig(InputStream in, Unmarshaller unmarshaller) {

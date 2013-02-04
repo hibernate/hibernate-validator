@@ -16,8 +16,10 @@
 */
 package org.hibernate.validator.internal.metadata.core;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import java.util.Map;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
@@ -56,6 +59,16 @@ public class AnnotationProcessingOptions {
 	 */
 	private final Map<Class<?>, Boolean> classConstraintAnnotationIgnores = newHashMap();
 
+	/**
+	 * Keeps track of explicitly excluded constructor constraints
+	 */
+	private final Map<Class<?>, List<Constructor>> constructorAnnotationIgnores = newHashMap();
+
+	/**
+	 * Keeps track of explicitly excluded method constraints
+	 */
+	private final Map<Class<?>, List<Method>> methodAnnotationIgnores = newHashMap();
+
 	public void ignoreAnnotationConstraintForClass(Class<?> clazz, Boolean b) {
 		if ( b == null ) {
 			ignoreAnnotationDefaults.put( clazz, Boolean.TRUE );
@@ -78,6 +91,30 @@ public class AnnotationProcessingOptions {
 		}
 		else {
 			propertyConstraintAnnotationIgnores.get( beanClass ).add( member );
+		}
+	}
+
+	public void ignoreConstraintAnnotationsOnConstructor(Constructor constructor) {
+		Class<?> beanClass = constructor.getDeclaringClass();
+		if ( constructorAnnotationIgnores.get( beanClass ) == null ) {
+			List<Constructor> tmpList = newArrayList();
+			tmpList.add( constructor );
+			constructorAnnotationIgnores.put( beanClass, tmpList );
+		}
+		else {
+			constructorAnnotationIgnores.get( beanClass ).add( constructor );
+		}
+	}
+
+	public void ignoreConstraintAnnotationsOnMethod(Method method) {
+		Class<?> beanClass = method.getDeclaringClass();
+		if ( methodAnnotationIgnores.get( beanClass ) == null ) {
+			List<Method> tmpList = newArrayList();
+			tmpList.add( method );
+			methodAnnotationIgnores.put( beanClass, tmpList );
+		}
+		else {
+			methodAnnotationIgnores.get( beanClass ).add( method );
 		}
 	}
 
@@ -124,7 +161,7 @@ public class AnnotationProcessingOptions {
 	}
 
 	private void logMessage(Member member, Class<?> clazz) {
-		if ( log.isDebugEnabled() ) {
+		if ( log.isTraceEnabled() ) {
 			String type;
 			if ( member instanceof Field ) {
 				type = "Field";

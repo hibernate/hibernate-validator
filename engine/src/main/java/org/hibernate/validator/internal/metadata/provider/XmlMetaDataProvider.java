@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -31,6 +32,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -57,30 +59,34 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 	 * @param constraintHelper the constraint helper
 	 * @param mappingStreams the input stream for the xml configuration
 	 */
-	public XmlMetaDataProvider(ConstraintHelper constraintHelper, Set<InputStream> mappingStreams) {
+	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
+							   ParameterNameProvider parameterNameProvider,
+							   Set<InputStream> mappingStreams) {
 		super( constraintHelper );
 
-		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper );
+		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper, parameterNameProvider );
 		mappingParser.parse( mappingStreams );
 
 		for ( Class<?> clazz : mappingParser.getXmlConfiguredClasses() ) {
-
 			Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation = partition(
 					mappingParser.getConstraintsForClass( clazz ), byLocation()
 			);
 			Set<ConstraintLocation> cascades = getCascades( mappingParser, clazz );
 
+			// TODO HV-373 - refactor
 			Set<ConstrainedElement> constrainedElements = getConstrainedElements( constraintsByLocation, cascades );
+			constrainedElements.addAll( mappingParser.getConstrainedElementsForClass( clazz ) );
 
+			BeanConfiguration<?> beanConfiguration = createBeanConfiguration(
+					ConfigurationSource.XML,
+					clazz,
+					constrainedElements,
+					mappingParser.getDefaultSequenceForClass( clazz ),
+					null
+			);
 			addBeanConfiguration(
 					clazz,
-					createBeanConfiguration(
-							ConfigurationSource.XML,
-							clazz,
-							constrainedElements,
-							mappingParser.getDefaultSequenceForClass( clazz ),
-							null
-					)
+					beanConfiguration
 			);
 		}
 
@@ -92,45 +98,44 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		return annotationProcessingOptions;
 	}
 
-	private Set<ConstrainedElement> getConstrainedElements(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation, Set<ConstraintLocation> cascades) {
-
+	private Set<ConstrainedElement> getConstrainedElements(Map<ConstraintLocation, Set<MetaConstraint<?>>> constraintsByLocation,
+														   Set<ConstraintLocation> cascades) {
 		Set<ConstraintLocation> configuredLocations = new HashSet<ConstraintLocation>( cascades );
 		configuredLocations.addAll( constraintsByLocation.keySet() );
 
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
-		for ( ConstraintLocation oneConfiguredLocation : configuredLocations ) {
-			if ( oneConfiguredLocation.getElementType() == ElementType.FIELD ) {
+		for ( ConstraintLocation constraintLocation : configuredLocations ) {
+			if ( constraintLocation.getElementType() == ElementType.FIELD ) {
 				propertyMetaData.add(
 						new ConstrainedField(
 								ConfigurationSource.XML,
-								(BeanConstraintLocation) oneConfiguredLocation,
-								constraintsByLocation.get( oneConfiguredLocation ),
+								(BeanConstraintLocation) constraintLocation,
+								constraintsByLocation.get( constraintLocation ),
 								Collections.<Class<?>, Class<?>>emptyMap(),
-								cascades.contains( oneConfiguredLocation )
+								cascades.contains( constraintLocation )
 						)
 				);
 			}
-			else if ( oneConfiguredLocation.getElementType() == ElementType.METHOD ) {
+			else if ( constraintLocation.getElementType() == ElementType.METHOD ) {
 				propertyMetaData.add(
 						new ConstrainedExecutable(
 								ConfigurationSource.XML,
-								new ExecutableConstraintLocation( (Method) oneConfiguredLocation.getMember() ),
-								constraintsByLocation.get( oneConfiguredLocation ),
-								cascades.contains( oneConfiguredLocation )
+								new ExecutableConstraintLocation( (Method) constraintLocation.getMember() ),
+								constraintsByLocation.get( constraintLocation ),
+								cascades.contains( constraintLocation )
 						)
 				);
 			}
-			else if ( oneConfiguredLocation.getElementType() == ElementType.TYPE ) {
+			else if ( constraintLocation.getElementType() == ElementType.TYPE ) {
 				propertyMetaData.add(
 						new ConstrainedType(
 								ConfigurationSource.XML,
-								(BeanConstraintLocation) oneConfiguredLocation,
-								constraintsByLocation.get( oneConfiguredLocation )
+								(BeanConstraintLocation) constraintLocation,
+								constraintsByLocation.get( constraintLocation )
 						)
 				);
 			}
-
 		}
 
 		return propertyMetaData;
@@ -143,7 +148,6 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 	 * @return returns a set of cascaded constraints
 	 */
 	private Set<ConstraintLocation> getCascades(XmlMappingParser mappingParser, Class<?> clazz) {
-
 		Set<ConstraintLocation> cascadedConstraintSet = newHashSet();
 
 		for ( Member member : mappingParser.getCascadedMembersForClass( clazz ) ) {
