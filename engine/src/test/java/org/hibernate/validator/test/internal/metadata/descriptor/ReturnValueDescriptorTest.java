@@ -16,9 +16,11 @@
 */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 import javax.validation.metadata.Scope;
@@ -26,12 +28,18 @@ import javax.validation.metadata.Scope;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
+import org.hibernate.validator.test.internal.metadata.Customer;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtBasic;
+import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtReturnValueComplex;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
+import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodReturnValueDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -179,6 +187,25 @@ public class ReturnValueDescriptorTest {
 				returnValueDescriptor.findConstraints()
 						.unorderedAndMatchingGroups( ValidationGroup.class )
 						.getConstraintDescriptors(), NotNull.class
+		);
+	}
+
+	@Test
+	public void testGetGroupConversions() {
+		ReturnValueDescriptor returnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepositoryExt.class, "modifyCustomer", Customer.class
+		);
+
+		Set<GroupConversionDescriptor> groupConversions = returnValueDescriptor.getGroupConversions();
+
+		assertThat( groupConversions ).hasSize( 2 );
+		assertThat( groupConversions ).containsConversion(
+				CustomerRepositoryExtBasic.class,
+				CustomerBasic.class
+		);
+		assertThat( groupConversions ).containsConversion(
+				CustomerRepositoryExtReturnValueComplex.class,
+				CustomerComplex.class
 		);
 	}
 }

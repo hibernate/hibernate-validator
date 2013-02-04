@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,12 +25,10 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.ElementDescriptor.Kind;
 import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
-import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
@@ -87,7 +84,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 */
 	private final String identifier;
 
-	private final Map<Class<?>, Class<?>> returnValueGroupConversions;
+	private final ReturnValueMetaData returnValueMetaData;
 
 	private ExecutableMetaData(
 			String name,
@@ -117,8 +114,14 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
 		this.returnValueConstraintDeclarationException = returnValueConstraintDeclarationException;
 		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
-		this.returnValueGroupConversions = returnValueGroupConversions;
 		this.identifier = name + Arrays.toString( parameterTypes );
+
+		this.returnValueMetaData = new ReturnValueMetaData(
+				returnType,
+				returnValueConstraints,
+				isCascading,
+				returnValueGroupConversions
+		);
 	}
 
 	/**
@@ -417,10 +420,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	public ReturnValueMetaData getReturnValueMetaData() {
-		return new ReturnValueMetaData(
-				returnValueGroupConversions,
-				returnValueAsDescriptor( false, Collections.<Class<?>>emptyList() )
-		);
+		return returnValueMetaData;
 	}
 
 	@Override
@@ -431,7 +431,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				getType(),
 				getName(),
 				asDescriptors( getCrossParameterConstraints() ),
-				returnValueAsDescriptor( defaultGroupSequenceRedefined, defaultGroupSequence ),
+				returnValueMetaData.asDescriptor(
+						defaultGroupSequenceRedefined,
+						defaultGroupSequence
+				),
 				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
@@ -455,18 +458,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		return parameterDescriptorList;
-	}
-
-	private ReturnValueDescriptor returnValueAsDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		Type returnType = getType();
-
-		return returnType.equals( void.class ) ? null : new ReturnValueDescriptorImpl(
-				returnType,
-				asDescriptors( getConstraints() ),
-				isCascading(),
-				defaultGroupSequenceRedefined,
-				defaultGroupSequence
-		);
 	}
 
 	@Override

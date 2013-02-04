@@ -17,11 +17,18 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 
@@ -31,17 +38,24 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
  *
  * @author Gunnar Morling
  */
-public class ReturnValueMetaData implements Validatable, Cascadable {
+public class ReturnValueMetaData extends AbstractConstraintMetaData
+		implements Validatable, Cascadable {
 
 	public static final String RETURN_VALUE_NODE_NAME = null;
 
-	private final GroupConverter groupConverter;
+	private final GroupConversionHelper groupConversionHelper;
 
-	private final ReturnValueDescriptor descriptor;
+	public ReturnValueMetaData(Type type, Set<MetaConstraint<?>> constraints, boolean isCascading, Map<Class<?>, Class<?>> groupConversions) {
+		super(
+				RETURN_VALUE_NODE_NAME,
+				type,
+				constraints,
+				ConstraintMetaDataKind.RETURN_VALUE,
+				isCascading,
+				!constraints.isEmpty() || isCascading
+		);
 
-	public ReturnValueMetaData(Map<Class<?>, Class<?>> groupConversions, ReturnValueDescriptor descriptor) {
-		this.groupConverter = new GroupConverter( groupConversions );
-		this.descriptor = descriptor;
+		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 	}
 
 	@Override
@@ -51,7 +65,12 @@ public class ReturnValueMetaData implements Validatable, Cascadable {
 
 	@Override
 	public Class<?> convertGroup(Class<?> originalGroup) {
-		return groupConverter.convertGroup( originalGroup );
+		return groupConversionHelper.convertGroup( originalGroup );
+	}
+
+	@Override
+	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
+		return groupConversionHelper.asDescriptors();
 	}
 
 	@Override
@@ -65,12 +84,21 @@ public class ReturnValueMetaData implements Validatable, Cascadable {
 	}
 
 	@Override
-	public String getName() {
-		return RETURN_VALUE_NODE_NAME;
+	public ElementDescriptor getDescriptor() {
+		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	@Override
-	public ElementDescriptor getDescriptor() {
-		return descriptor;
+	public ReturnValueDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		Type returnType = getType();
+
+		return returnType.equals( void.class ) ? null : new ReturnValueDescriptorImpl(
+				returnType,
+				asDescriptors( getConstraints() ),
+				isCascading(),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence,
+				groupConversionHelper.asDescriptors()
+		);
 	}
 }

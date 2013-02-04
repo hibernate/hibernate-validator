@@ -18,8 +18,10 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import java.util.Set;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.Scope;
@@ -29,9 +31,13 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtComplex;
 
+import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getParameterDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -44,14 +50,27 @@ import static org.testng.Assert.assertTrue;
 public class ParameterDescriptorTest {
 	private ParameterDescriptor createCustomerParameter1;
 	private ParameterDescriptor createCustomerParameter2;
+	private ParameterDescriptor parameterWithConversions;
 
 	@BeforeMethod
 	public void setUpDescriptors() {
 		createCustomerParameter1 = getParameterDescriptor(
-				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { CharSequence.class, String.class }, 0
+				CustomerRepositoryExt.class,
+				"createCustomer",
+				new Class<?>[] { CharSequence.class, String.class },
+				0
 		);
 		createCustomerParameter2 = getParameterDescriptor(
-				CustomerRepositoryExt.class, "createCustomer", new Class<?>[] { CharSequence.class, String.class }, 1
+				CustomerRepositoryExt.class,
+				"createCustomer",
+				new Class<?>[] { CharSequence.class, String.class },
+				1
+		);
+		parameterWithConversions = getParameterDescriptor(
+				CustomerRepositoryExt.class,
+				"modifyCustomer",
+				new Class<?>[] { Customer.class },
+				0
 		);
 	}
 
@@ -93,7 +112,11 @@ public class ParameterDescriptorTest {
 
 		assertEquals( createCustomerParameter2.getConstraintDescriptors().size(), 1 );
 		assertEquals(
-				createCustomerParameter2.getConstraintDescriptors().iterator().next().getAnnotation().annotationType(),
+				createCustomerParameter2.getConstraintDescriptors()
+						.iterator()
+						.next()
+						.getAnnotation()
+						.annotationType(),
 				NotNull.class
 		);
 	}
@@ -101,7 +124,9 @@ public class ParameterDescriptorTest {
 	@Test(enabled = false, description = "Temporarily disabled due to HV-443")
 	public void testFindConstraintLookingAtLocalElement() {
 		Set<ConstraintDescriptor<?>> constraintDescriptors =
-				createCustomerParameter2.findConstraints().lookingAt( Scope.LOCAL_ELEMENT ).getConstraintDescriptors();
+				createCustomerParameter2.findConstraints()
+						.lookingAt( Scope.LOCAL_ELEMENT )
+						.getConstraintDescriptors();
 
 		assertEquals(
 				constraintDescriptors.size(),
@@ -110,7 +135,10 @@ public class ParameterDescriptorTest {
 		);
 
 		ParameterDescriptor createCustomerParameter2OnBaseType = getParameterDescriptor(
-				CustomerRepository.class, "createCustomer", new Class<?>[] { CharSequence.class, String.class }, 1
+				CustomerRepository.class,
+				"createCustomer",
+				new Class<?>[] { CharSequence.class, String.class },
+				1
 		);
 
 		constraintDescriptors =
@@ -128,7 +156,9 @@ public class ParameterDescriptorTest {
 	@Test
 	public void testFindConstraintLookingAtHierarchy() {
 		Set<ConstraintDescriptor<?>> constraintDescriptors =
-				createCustomerParameter2.findConstraints().lookingAt( Scope.HIERARCHY ).getConstraintDescriptors();
+				createCustomerParameter2.findConstraints()
+						.lookingAt( Scope.HIERARCHY )
+						.getConstraintDescriptors();
 
 		assertEquals(
 				constraintDescriptors.size(),
@@ -157,5 +187,17 @@ public class ParameterDescriptorTest {
 				CustomerRepositoryExt.class, "saveCustomer", new Class<?>[] { Customer.class }, 0
 		);
 		assertTrue( saveCustomerParameter.isCascaded() );
+	}
+
+	@Test
+	public void testGetGroupConversions() {
+		Set<GroupConversionDescriptor> groupConversions = parameterWithConversions.getGroupConversions();
+
+		assertThat( groupConversions ).hasSize( 2 );
+		assertThat( groupConversions ).containsConversion( Default.class, CustomerBasic.class );
+		assertThat( groupConversions ).containsConversion(
+				CustomerRepositoryExtComplex.class,
+				CustomerComplex.class
+		);
 	}
 }

@@ -17,7 +17,10 @@
 package org.hibernate.validator.internal.metadata.facets;
 
 import java.lang.annotation.ElementType;
+import java.util.Set;
+
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -40,6 +43,15 @@ public interface Cascadable {
 	 *         conversion is to be performed.
 	 */
 	Class<?> convertGroup(Class<?> originalGroup);
+
+	/**
+	 * Returns a set with {@link GroupConversionDescriptor}s representing the
+	 * group conversions of this cascadable.
+	 *
+	 * @return A set with group conversion descriptors. May be empty, but never
+	 *         {@code null}.
+	 */
+	Set<GroupConversionDescriptor> getGroupConversionDescriptors();
 
 	ElementType getElementType();
 

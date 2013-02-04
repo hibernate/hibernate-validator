@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
@@ -32,6 +33,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	private final int index;
 	private final String name;
 	private final boolean cascaded;
+	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public ParameterDescriptorImpl(Type type,
 								   int index,
@@ -39,11 +41,13 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 								   Set<ConstraintDescriptorImpl<?>> constraints,
 								   boolean isCascaded,
 								   boolean defaultGroupSequenceRedefined,
-								   List<Class<?>> defaultGroupSequence) {
+								   List<Class<?>> defaultGroupSequence,
+								   Set<GroupConversionDescriptor> groupConversions) {
 		super( type, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 		this.index = index;
 		this.name = name;
 		this.cascaded = isCascaded;
+		this.groupConversions = Collections.unmodifiableSet( groupConversions );
 	}
 
 	@Override
@@ -53,7 +57,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 
 	@Override
 	public Set<GroupConversionDescriptor> getGroupConversions() {
-		return null;  // TODO - https://hibernate.onjira.com/browse/HV-692
+		return groupConversions;
 	}
 
 	@Override

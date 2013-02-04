@@ -16,9 +16,15 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 
 /**
@@ -26,11 +32,11 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
  *
  * @author Gunnar Morling
  */
-public class GroupConverter {
+public class GroupConversionHelper {
 
 	private final Map<Class<?>, Class<?>> groupConversions;
 
-	public GroupConverter(Map<Class<?>, Class<?>> groupConversions) {
+	public GroupConversionHelper(Map<Class<?>, Class<?>> groupConversions) {
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 	}
 
@@ -45,8 +51,29 @@ public class GroupConverter {
 	 *         conversion is to be performed.
 	 */
 	public Class<?> convertGroup(Class<?> from) {
-
 		Class<?> to = groupConversions.get( from );
 		return to != null ? to : from;
+	}
+
+	/**
+	 * Returns a set with {@link GroupConversionDescriptor}s representing the
+	 * underlying group conversions.
+	 *
+	 * @return A set with group conversion descriptors. May be empty, but never
+	 *         {@code null}.
+	 */
+	public Set<GroupConversionDescriptor> asDescriptors() {
+		Set<GroupConversionDescriptor> descriptors = newHashSet( groupConversions.size() );
+
+		for ( Entry<Class<?>, Class<?>> conversion : groupConversions.entrySet() ) {
+			descriptors.add(
+					new GroupConversionDescriptorImpl(
+							conversion.getKey(),
+							conversion.getValue()
+					)
+			);
+		}
+
+		return Collections.unmodifiableSet( descriptors );
 	}
 }

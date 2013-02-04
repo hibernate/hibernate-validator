@@ -244,6 +244,7 @@ public class BeanDescriptorTest {
 		assertThat( getMethodNames( constrainedMethods ) ).containsOnly(
 				"createCustomer",
 				"saveCustomer",
+				"modifyCustomer",
 				"foo",
 				"bar",
 				"baz",
