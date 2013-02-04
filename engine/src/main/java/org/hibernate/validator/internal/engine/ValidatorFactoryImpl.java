@@ -121,7 +121,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, configurationState.getMappingStreams()
+					constraintHelper, parameterNameProvider, configurationState.getMappingStreams()
 			);
 		}
 

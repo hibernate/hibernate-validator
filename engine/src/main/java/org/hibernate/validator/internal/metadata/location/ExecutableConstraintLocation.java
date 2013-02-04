@@ -36,7 +36,7 @@ public class ExecutableConstraintLocation implements ConstraintLocation {
 	private final Integer parameterIndex;
 
 	public ExecutableConstraintLocation(Method method) {
-		this( ExecutableElement.forMethod( method ), null );
+		this( ExecutableElement.forMethod( method ) );
 	}
 
 	/**
@@ -47,6 +47,10 @@ public class ExecutableConstraintLocation implements ConstraintLocation {
 	 */
 	public ExecutableConstraintLocation(Method method, Integer parameterIndex) {
 		this( ExecutableElement.forMethod( method ), parameterIndex );
+	}
+
+	public ExecutableConstraintLocation(ExecutableElement executableElement) {
+		this( executableElement, null );
 	}
 
 	public ExecutableConstraintLocation(ExecutableElement executableElement, Integer parameterIndex) {

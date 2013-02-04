@@ -50,10 +50,10 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<?> oneHierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+		for ( Class<?> clazz : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
 			@SuppressWarnings("unchecked")
 			BeanConfiguration<? super T> configuration = (BeanConfiguration<? super T>) getBeanConfiguration(
-					oneHierarchyClass
+					clazz
 			);
 			if ( configuration != null ) {
 				configurations.add( configuration );
@@ -74,13 +74,13 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 
 	protected <T> BeanConfiguration<T> createBeanConfiguration(ConfigurationSource source,
 															   Class<T> beanClass,
-															   Set<? extends ConstrainedElement> constrainableElements,
+															   Set<? extends ConstrainedElement> constrainedElements,
 															   List<Class<?>> defaultGroupSequence,
 															   DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
 		return new BeanConfiguration<T>(
 				source,
 				beanClass,
-				constrainableElements,
+				constrainedElements,
 				defaultGroupSequence,
 				defaultGroupSequenceProvider
 		);

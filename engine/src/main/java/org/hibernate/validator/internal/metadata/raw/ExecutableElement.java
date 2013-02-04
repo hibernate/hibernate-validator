@@ -57,7 +57,6 @@ public abstract class ExecutableElement {
 	}
 
 	public static List<ExecutableElement> forConstructors(Constructor<?>[] constructors) {
-
 		List<ExecutableElement> executableElements = newArrayList( constructors.length );
 
 		for ( Constructor<?> constructor : constructors ) {
@@ -72,7 +71,6 @@ public abstract class ExecutableElement {
 	}
 
 	public static List<ExecutableElement> forMethods(Method[] methods) {
-
 		List<ExecutableElement> executableElements = newArrayList( methods.length );
 
 		for ( Method method : methods ) {
@@ -118,7 +116,6 @@ public abstract class ExecutableElement {
 	 *         {@code false} otherwise.
 	 */
 	public boolean overrides(ExecutableElement other) {
-
 		Contracts.assertValueNotNull( other, "other" );
 
 		if ( !getMember().getName().equals( other.getMember().getName() ) ) {
