@@ -16,8 +16,8 @@
 */
 package org.hibernate.validator.internal.engine;
 
-import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.MessageInterpolator;
+import javax.validation.metadata.ConstraintDescriptor;
 
 /**
  * Implementation of the context used during message interpolation.
@@ -34,12 +34,19 @@ public class MessageInterpolatorContext implements MessageInterpolator.Context {
 		this.validatedValue = validatedValue;
 	}
 
+	@Override
 	public ConstraintDescriptor<?> getConstraintDescriptor() {
 		return constraintDescriptor;
 	}
 
+	@Override
 	public Object getValidatedValue() {
 		return validatedValue;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> type) {
+		return null; // TODO - https://hibernate.onjira.com/browse/HV-69
 	}
 
 	@Override
@@ -51,7 +58,7 @@ public class MessageInterpolatorContext implements MessageInterpolator.Context {
 			return false;
 		}
 
-		MessageInterpolatorContext that = ( MessageInterpolatorContext ) o;
+		MessageInterpolatorContext that = (MessageInterpolatorContext) o;
 
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;

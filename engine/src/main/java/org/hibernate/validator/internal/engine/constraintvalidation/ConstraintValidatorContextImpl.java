@@ -43,16 +43,24 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		this.constraintDescriptor = constraintDescriptor;
 	}
 
+	@Override
 	public final void disableDefaultConstraintViolation() {
 		defaultDisabled = true;
 	}
 
+	@Override
 	public final String getDefaultConstraintMessageTemplate() {
 		return (String) constraintDescriptor.getAttributes().get( "message" );
 	}
 
+	@Override
 	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new ErrorBuilderImpl( messageTemplate, PathImpl.createCopy( basePath ) );
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> type) {
+		return null;  // TODO - https://hibernate.onjira.com/browse/HV-692
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {
