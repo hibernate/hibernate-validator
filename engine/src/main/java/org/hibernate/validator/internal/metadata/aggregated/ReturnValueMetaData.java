@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -42,7 +43,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 	public static final String RETURN_VALUE_NODE_NAME = null;
 
-	private final GroupConverter groupConverter;
+	private final GroupConversionHelper groupConversionHelper;
 
 	public ReturnValueMetaData(Type type, Set<MetaConstraint<?>> constraints, boolean isCascading, Map<Class<?>, Class<?>> groupConversions) {
 		super(
@@ -54,7 +55,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				!constraints.isEmpty() || isCascading
 		);
 
-		this.groupConverter = new GroupConverter( groupConversions );
+		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 	}
 
 	@Override
@@ -64,7 +65,12 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 	@Override
 	public Class<?> convertGroup(Class<?> originalGroup) {
-		return groupConverter.convertGroup( originalGroup );
+		return groupConversionHelper.convertGroup( originalGroup );
+	}
+
+	@Override
+	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
+		return groupConversionHelper.asDescriptors();
 	}
 
 	@Override
@@ -91,7 +97,8 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				asDescriptors( getConstraints() ),
 				isCascading(),
 				defaultGroupSequenceRedefined,
-				defaultGroupSequence
+				defaultGroupSequence,
+				groupConversionHelper.asDescriptors()
 		);
 	}
 }

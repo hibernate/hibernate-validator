@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -63,7 +64,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 	private final ElementType elementType;
 
-	private final GroupConverter groupConverter;
+	private final GroupConversionHelper groupConversionHelper;
 
 	private PropertyMetaData(String propertyName,
 							 Type type,
@@ -79,7 +80,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				cascadingMember != null || !constraints.isEmpty()
 		);
 
-		this.groupConverter = new GroupConverter( groupConversions );
+		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 
 		if ( cascadingMember != null ) {
 			this.cascadingMember = cascadingMember;
@@ -107,7 +108,12 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 	@Override
 	public Class<?> convertGroup(Class<?> from) {
-		return groupConverter.convertGroup( from );
+		return groupConversionHelper.convertGroup( from );
+	}
+
+	@Override
+	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
+		return groupConversionHelper.asDescriptors();
 	}
 
 	@Override
@@ -118,7 +124,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				asDescriptors( getConstraints() ),
 				isCascading(),
 				defaultGroupSequenceRedefined,
-				defaultGroupSequence
+				defaultGroupSequence,
+				getGroupConversionDescriptors()
 		);
 	}
 

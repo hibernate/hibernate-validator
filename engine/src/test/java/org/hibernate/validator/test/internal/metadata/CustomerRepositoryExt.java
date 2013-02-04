@@ -25,8 +25,13 @@ import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 
 import org.joda.time.DateMidnight;
+
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.TYPE;
@@ -36,6 +41,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Gunnar Morling
  */
 public class CustomerRepositoryExt extends CustomerRepository {
+
+	public interface CustomerRepositoryExtBasic {
+	}
+
+	public interface CustomerRepositoryExtComplex {
+	}
+
+	public interface CustomerRepositoryExtReturnValueComplex {
+	}
 
 	public static class CustomerExtension extends Customer {
 	}
@@ -62,6 +76,23 @@ public class CustomerRepositoryExt extends CustomerRepository {
 
 	@Override
 	public void updateCustomer(Customer customer) {
+	}
+
+	@Valid
+	@ConvertGroup.List({
+			@ConvertGroup(from = CustomerRepositoryExtBasic.class, to = CustomerBasic.class),
+			@ConvertGroup(from = CustomerRepositoryExtReturnValueComplex.class,
+					to = CustomerComplex.class)
+	})
+	public Customer modifyCustomer(
+			@Valid
+			@ConvertGroup.List({
+					@ConvertGroup(from = Default.class, to = CustomerBasic.class),
+					@ConvertGroup(from = CustomerRepositoryExtComplex.class,
+							to = CustomerComplex.class)
+			})
+			Customer customer) {
+		return null;
 	}
 
 	@Override

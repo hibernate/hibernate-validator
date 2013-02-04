@@ -22,6 +22,13 @@ import javax.validation.constraints.NotNull;
  * @author Hardy Ferentschik
  */
 public class Order {
+
+	public interface OrderBasic {
+	}
+
+	public interface OrderComplex {
+	}
+
 	@NotNull(message = "Order number must be specified")
 	Integer orderNumber;
 

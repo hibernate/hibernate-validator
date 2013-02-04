@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -41,7 +42,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
  */
 public class ParameterMetaData extends AbstractConstraintMetaData implements Cascadable {
 
-	private final GroupConverter groupConverter;
+	private final GroupConversionHelper groupConversionHelper;
 	private final int index;
 
 	/**
@@ -62,7 +63,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				!constraints.isEmpty() || isCascading
 		);
 
-		this.groupConverter = new GroupConverter( groupConversions );
+		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.index = index;
 	}
 
@@ -72,7 +73,12 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 	@Override
 	public Class<?> convertGroup(Class<?> originalGroup) {
-		return groupConverter.convertGroup( originalGroup );
+		return groupConversionHelper.convertGroup( originalGroup );
+	}
+
+	@Override
+	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
+		return groupConversionHelper.asDescriptors();
 	}
 
 	@Override
@@ -94,7 +100,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				asDescriptors( getConstraints() ),
 				isCascading(),
 				defaultGroupSequenceRedefined,
-				defaultGroupSequence
+				defaultGroupSequence,
+				getGroupConversionDescriptors()
 		);
 	}
 

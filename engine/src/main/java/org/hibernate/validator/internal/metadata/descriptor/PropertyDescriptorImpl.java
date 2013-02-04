@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
@@ -31,16 +32,19 @@ import javax.validation.metadata.PropertyDescriptor;
 public class PropertyDescriptorImpl extends ElementDescriptorImpl implements PropertyDescriptor {
 	private final boolean cascaded;
 	private final String property;
+	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public PropertyDescriptorImpl(Type returnType,
 								  String propertyName,
 								  Set<ConstraintDescriptorImpl<?>> constraints,
 								  boolean cascaded,
 								  boolean defaultGroupSequenceRedefined,
-								  List<Class<?>> defaultGroupSequence) {
+								  List<Class<?>> defaultGroupSequence, Set<GroupConversionDescriptor> groupConversions) {
 		super( returnType, constraints, defaultGroupSequenceRedefined, defaultGroupSequence );
+
 		this.property = propertyName;
 		this.cascaded = cascaded;
+		this.groupConversions = Collections.unmodifiableSet( groupConversions );
 	}
 
 	@Override
@@ -50,7 +54,7 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 
 	@Override
 	public Set<GroupConversionDescriptor> getGroupConversions() {
-		return null;  // TODO - https://hibernate.onjira.com/browse/HV-692
+		return groupConversions;
 	}
 
 	@Override
