@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.testutil;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,9 +29,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 
 import static org.hibernate.validator.internal.engine.path.PathImpl.createPathFromString;
-import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -57,7 +56,6 @@ public final class ConstraintViolationAssert {
 	 * @param expectedMessages The expected constraint violation messages.
 	 */
 	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations, String... expectedMessages) {
-
 		List<String> expectedMessagesAsList = Arrays.asList( expectedMessages );
 
 		List<String> actualMessages = newArrayList();
@@ -83,23 +81,12 @@ public final class ConstraintViolationAssert {
 	 * @param expectedConstraintTypes The expected constraint types.
 	 */
 	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations, Class<?>... expectedConstraintTypes) {
-
-		List<String> expectedConstraintTypeNames = newArrayList();
-		for ( Class<?> oneExpectedConstraintType : expectedConstraintTypes ) {
-			expectedConstraintTypeNames.add( oneExpectedConstraintType.getName() );
-		}
-
-		List<String> actualConstraintTypeNames = newArrayList();
+		List<Class<? extends Annotation>> actualConstraintTypes = newArrayList();
 		for ( ConstraintViolation<?> violation : violations ) {
-			actualConstraintTypeNames.add(
-					violation.getConstraintDescriptor().getAnnotation().annotationType().getName()
-			);
+			actualConstraintTypes.add( violation.getConstraintDescriptor().getAnnotation().annotationType() );
 		}
 
-		Collections.sort( expectedConstraintTypeNames );
-		Collections.sort( actualConstraintTypeNames );
-
-		assertEquals( actualConstraintTypeNames, expectedConstraintTypeNames );
+		assertCorrectConstraintTypes( actualConstraintTypes, expectedConstraintTypes );
 	}
 
 	/**
@@ -109,7 +96,6 @@ public final class ConstraintViolationAssert {
 	 * @param expectedPropertyPaths The expected property paths.
 	 */
 	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations, String... expectedPropertyPaths) {
-
 		List<String> expectedPathsAsList = Arrays.asList( expectedPropertyPaths );
 
 		List<String> actualPaths = newArrayList();
@@ -197,18 +183,13 @@ public final class ConstraintViolationAssert {
 	}
 
 	public static void assertConstraintTypes(Set<ConstraintDescriptor<?>> descriptors, Class<?>... expectedConstraintTypes) {
-		Set<Class<?>> expectedTypes = asSet( expectedConstraintTypes );
-		Set<Class<?>> actualConstraintTypes = newHashSet();
+		List<Class<? extends Annotation>> actualConstraintTypes = newArrayList();
 
 		for ( ConstraintDescriptor<?> descriptor : descriptors ) {
 			actualConstraintTypes.add( descriptor.getAnnotation().annotationType() );
 		}
 
-		assertEquals(
-				actualConstraintTypes,
-				expectedTypes,
-				"Set of constraint descriptors doesn't contain the expected constraint annotation types"
-		);
+		assertCorrectConstraintTypes( actualConstraintTypes, expectedConstraintTypes );
 	}
 
 	/**
@@ -218,7 +199,6 @@ public final class ConstraintViolationAssert {
 	 * @param kinds The node kinds
 	 */
 	public static void assertDescriptorKinds(Path path, ElementDescriptor.Kind... kinds) {
-
 		Iterator<Path.Node> pathIterator = path.iterator();
 
 		for ( ElementDescriptor.Kind kind : kinds ) {
@@ -236,7 +216,6 @@ public final class ConstraintViolationAssert {
 	 * @param names The node names
 	 */
 	public static void assertNodeNames(Path path, String... names) {
-
 		Iterator<Path.Node> pathIterator = path.iterator();
 
 		for ( String name : names ) {
@@ -254,7 +233,6 @@ public final class ConstraintViolationAssert {
 	 * @param elementClasses The element classes
 	 */
 	public static void assertElementClasses(Path path, Class<?>... elementClasses) {
-
 		Iterator<Path.Node> pathIterator = path.iterator();
 
 		for ( Class<?> clazz : elementClasses ) {
@@ -318,5 +296,40 @@ public final class ConstraintViolationAssert {
 		}
 
 		return !p2Iterator.hasNext();
+	}
+
+	/**
+	 * <p>
+	 * Asserts that the two given collections contain the same constraint types.
+	 * </p>
+	 * <p>
+	 * Multiset semantics is used for the comparison, i.e. the same constraint
+	 * type can be contained several times in the compared collections, but the
+	 * order doesn't matter. The comparison is done using the class names, since
+	 * {@link Class} doesn't implement {@link Comparable}.
+	 * </p>
+	 *
+	 * @param actualConstraintTypes The actual constraint types.
+	 * @param expectedConstraintTypes The expected constraint types.
+	 */
+	private static <T> void assertCorrectConstraintTypes(Iterable<Class<? extends Annotation>> actualConstraintTypes, Class<?>... expectedConstraintTypes) {
+		List<String> expectedConstraintTypeNames = newArrayList();
+		for ( Class<?> expectedConstraintType : expectedConstraintTypes ) {
+			expectedConstraintTypeNames.add( expectedConstraintType.getName() );
+		}
+
+		List<String> actualConstraintTypeNames = newArrayList();
+		for ( Class<?> actualConstraintType : actualConstraintTypes ) {
+			actualConstraintTypeNames.add( actualConstraintType.getName() );
+		}
+
+		Collections.sort( expectedConstraintTypeNames );
+		Collections.sort( actualConstraintTypeNames );
+
+		assertEquals(
+				actualConstraintTypeNames,
+				expectedConstraintTypeNames,
+				String.format( "Expected %s, but got %s", expectedConstraintTypeNames, actualConstraintTypeNames )
+		);
 	}
 }
