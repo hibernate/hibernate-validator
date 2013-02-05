@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
 import java.util.Set;
+import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.MessageInterpolator.Context;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.defs.MinDef;
+import org.testng.annotations.Test;
+
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
-import static java.lang.annotation.ElementType.FIELD;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -43,31 +43,24 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests for HV-333
- *
  * @author Hardy Ferentschik
  */
 public class MessageInterpolatorContextTest {
 
-	@org.testng.annotations.Test
-	public void testInterpolatorContext() throws Exception {
-		// use programmatic mapping api to configure constraint
-		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
-		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( Test.class )
-				.property( "test", FIELD )
-				.constraint( new MinDef().value( 10 ).message( "{foo}" ) );
+	private static final String MESSAGE = "{foo}";
 
-		// use a easy mock message interpolator to verify the right for verifying that the right MessageInterpolatorContext
+	@Test
+	@TestForIssue(jiraKey = "HV-333")
+	public void testContextWithRightDescriptorAndValueIsPassedToMessageInterpolator() {
+
+		// use a easy mock message interpolator for verifying that the right MessageInterpolatorContext
 		// will be passed
 		MessageInterpolator mock = createMock( MessageInterpolator.class );
-		config.messageInterpolator( mock );
-		config.addMapping( mapping );
+		Configuration<?> config = ValidatorUtil.getConfiguration().messageInterpolator( mock );
 
-		ValidatorFactory factory = config.buildValidatorFactory();
-		Validator validator = factory.getValidator();
+		Validator validator = config.buildValidatorFactory().getValidator();
 
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Test.class );
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( TestBean.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "test" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = propertyDescriptor.getConstraintDescriptors();
 		assertTrue( constraintDescriptors.size() == 1 );
@@ -76,31 +69,31 @@ public class MessageInterpolatorContextTest {
 		String validatedValue = "value";
 		expect(
 				mock.interpolate(
-						"{foo}",
+						MESSAGE,
 						new MessageInterpolatorContext( constraintDescriptors.iterator().next(), validatedValue )
 				)
-		).andReturn( "{foo}" );
+		)
+				.andReturn( "invalid" );
 		replay( mock );
 
-		Set<ConstraintViolation<Test>> violations = validator.validate( new Test( validatedValue ) );
+		Set<ConstraintViolation<TestBean>> violations = validator.validate( new TestBean( validatedValue ) );
 		assertNumberOfViolations( violations, 1 );
 
-		// verify that the right validatedValue was passed
+		// verify that the right context was passed
 		verify( mock );
 	}
 
-	public static class Test {
-		private String test;
+	@Test(expectedExceptions = ValidationException.class)
+	public void testUnwrapToUnsupportedClassCausesValidationException() {
+		Context context = new MessageInterpolatorContext( null, null );
+		context.unwrap( Object.class );
+	}
 
-		public Test(String test) {
-			this.test = test;
-		}
+	private static class TestBean {
+		@Size(min = 10, message = MESSAGE)
+		private final String test;
 
-		public String getTest() {
-			return test;
-		}
-
-		public void setTest(String test) {
+		public TestBean(String test) {
 			this.test = test;
 		}
 	}

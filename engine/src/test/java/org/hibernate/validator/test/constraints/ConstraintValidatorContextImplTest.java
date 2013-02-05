@@ -17,6 +17,8 @@
 package org.hibernate.validator.test.constraints;
 
 import java.util.List;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
 
 import org.testng.annotations.Test;
 
@@ -146,6 +148,12 @@ public class ConstraintValidatorContextImplTest {
 		assertTrue( messageAndPathList.size() == 2 );
 		assertMessageAndPath( messageAndPathList.get( 0 ), message1, "foo[key].bar" );
 		assertMessageAndPath( messageAndPathList.get( 1 ), message2, "" );
+	}
+
+	@Test(expectedExceptions = ValidationException.class)
+	public void testUnwrapToUnsupportedClassCausesValidationException() {
+		ConstraintValidatorContext context = createEmptyConstraintValidatorContextImpl();
+		context.unwrap( Object.class );
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {

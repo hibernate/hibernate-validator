@@ -19,6 +19,9 @@ package org.hibernate.validator.internal.engine;
 import javax.validation.MessageInterpolator;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * Implementation of the context used during message interpolation.
  *
@@ -26,6 +29,9 @@ import javax.validation.metadata.ConstraintDescriptor;
  * @author Hardy Ferentschik
  */
 public class MessageInterpolatorContext implements MessageInterpolator.Context {
+
+	private static final Log log = LoggerFactory.make();
+
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
 
@@ -46,7 +52,7 @@ public class MessageInterpolatorContext implements MessageInterpolator.Context {
 
 	@Override
 	public <T> T unwrap(Class<T> type) {
-		return null; // TODO - https://hibernate.onjira.com/browse/HV-69
+		throw log.getTypeNotSupportedException( type );
 	}
 
 	@Override

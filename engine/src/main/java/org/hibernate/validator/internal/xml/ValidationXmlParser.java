@@ -18,12 +18,14 @@ package org.hibernate.validator.internal.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.validation.BootstrapConfiguration;
+import javax.validation.executable.ExecutableType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -52,7 +54,7 @@ public class ValidationXmlParser {
 			1
 	);
 
-	private XmlParserHelper xmlParserHelper = new XmlParserHelper();
+	private final XmlParserHelper xmlParserHelper = new XmlParserHelper();
 
 	static {
 		SCHEMAS_BY_VERSION.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
@@ -150,8 +152,54 @@ public class ValidationXmlParser {
 				config.getMessageInterpolator(),
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
+				getValidatedExecutableTypes( config.getValidatedExecutables() ),
 				new HashSet<String>( config.getConstraintMapping() ),
 				properties
 		);
+	}
+
+	/**
+	 * Returns an enum set with the executable types corresponding to the given
+	 * XML configuration.
+	 *
+	 * @param validatedExecutablesType Schema type with executable types.
+	 *
+	 * @return An enum set representing the given executable types.
+	 */
+	private EnumSet<ExecutableType> getValidatedExecutableTypes(ValidatedExecutablesType validatedExecutablesType) {
+		if( validatedExecutablesType == null ) {
+			return EnumSet.noneOf( ExecutableType.class );
+		}
+
+		EnumSet<ExecutableType> executableTypes = parseExecutableTypeNames( validatedExecutablesType.getExecutableType() );
+
+		if ( executableTypes.contains( ExecutableType.ALL ) ) {
+			return EnumSet.complementOf( EnumSet.of( ExecutableType.ALL, ExecutableType.NONE ) );
+		}
+		else if ( executableTypes.contains( ExecutableType.NONE ) ) {
+			return EnumSet.noneOf( ExecutableType.class );
+		}
+		else {
+			return executableTypes;
+		}
+	}
+
+	private EnumSet<ExecutableType> parseExecutableTypeNames(Iterable<String> validatedExecutableTypeNames) {
+		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
+
+		for ( String executableTypeName : validatedExecutableTypeNames ) {
+			//TODO: Remove mappings once BVAL-378 is resolved
+			if ( "CONSTRUCTOR".equals( executableTypeName ) ) {
+				executableTypes.add( ExecutableType.CONSTRUCTORS );
+			}
+			else if ( "NO_GETTER_METHODS".equals( executableTypeName ) ) {
+				executableTypes.add( ExecutableType.NON_GETTER_METHODS );
+			}
+			else {
+				executableTypes.add( ExecutableType.valueOf( executableTypeName ) );
+			}
+		}
+
+		return executableTypes;
 	}
 }
