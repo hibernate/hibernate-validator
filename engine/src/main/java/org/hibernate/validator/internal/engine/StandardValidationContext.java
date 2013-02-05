@@ -65,7 +65,11 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
-				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
+				new MessageInterpolatorContext(
+						descriptor,
+						localContext.getCurrentValidatedValue(),
+						getRootBeanClass()
+				)
 		);
 
 		return new ConstraintViolationImpl<T>(

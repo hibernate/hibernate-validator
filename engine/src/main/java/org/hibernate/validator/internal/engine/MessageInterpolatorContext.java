@@ -16,28 +16,31 @@
 */
 package org.hibernate.validator.internal.engine;
 
-import javax.validation.MessageInterpolator;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 
 /**
  * Implementation of the context used during message interpolation.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
-public class MessageInterpolatorContext implements MessageInterpolator.Context {
+public class MessageInterpolatorContext implements HibernateMessageInterpolatorContext {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
+	private final Class<?> rootBeanType;
 
-	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor, Object validatedValue) {
+	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor, Object validatedValue, Class<?> rootBeanType) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
+		this.rootBeanType = rootBeanType;
 	}
 
 	@Override
@@ -51,7 +54,16 @@ public class MessageInterpolatorContext implements MessageInterpolator.Context {
 	}
 
 	@Override
+	public Class<?> getRootBeanType() {
+		return rootBeanType;
+	}
+
+	@Override
 	public <T> T unwrap(Class<T> type) {
+		//allow unwrapping into the public types
+		if ( type.isAssignableFrom( HibernateMessageInterpolatorContext.class ) ) {
+			return type.cast( this );
+		}
 		throw log.getTypeNotSupportedException( type );
 	}
 
@@ -69,6 +81,9 @@ public class MessageInterpolatorContext implements MessageInterpolator.Context {
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;
 		}
+		if ( rootBeanType != null ? !rootBeanType.equals( that.rootBeanType ) : that.rootBeanType != null ) {
+			return false;
+		}
 		if ( validatedValue != null ? !validatedValue.equals( that.validatedValue ) : that.validatedValue != null ) {
 			return false;
 		}
@@ -80,6 +95,7 @@ public class MessageInterpolatorContext implements MessageInterpolator.Context {
 	public int hashCode() {
 		int result = constraintDescriptor != null ? constraintDescriptor.hashCode() : 0;
 		result = 31 * result + ( validatedValue != null ? validatedValue.hashCode() : 0 );
+		result = 31 * result + ( rootBeanType != null ? rootBeanType.hashCode() : 0 );
 		return result;
 	}
 

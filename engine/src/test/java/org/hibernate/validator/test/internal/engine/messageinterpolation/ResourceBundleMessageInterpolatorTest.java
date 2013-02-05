@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescrip
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertEquals;
 
@@ -79,7 +80,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 		String expected = "message interpolation successful";
 		String actual = interpolator.interpolate( "{simple.key}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
@@ -99,11 +100,10 @@ public class ResourceBundleMessageInterpolatorTest {
 
 	@Test
 	public void testMessageLiterals() {
-
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "{";
 		String actual = interpolator.interpolate( "\\{", context );
@@ -123,7 +123,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "foo";  // missing {}
 		String actual = interpolator.interpolate( "foo", context );
@@ -139,7 +139,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "{bar}";  // unknown token {}
 		String actual = interpolator.interpolate( "{bar}", context );
@@ -151,7 +151,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "message interpolation successful";  // unknown token {}
 		String actual = interpolator.interpolate( "{key-with-dashes}", context );
@@ -163,7 +163,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "message interpolation successful";  // unknown token {}
 		String actual = interpolator.interpolate( "{key with spaces}", context );
@@ -175,14 +175,14 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "may not be null";
 		String actual = interpolator.interpolate( notNull.message(), context );
 		assertEquals( actual, expected, "Wrong substitution" );
 
 		expected = "size must be between 0 and 2147483647";  // unknown token {}
-		context = new MessageInterpolatorContext( sizeDescriptor, null );
+		context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 		actual = interpolator.interpolate( size.message(), context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -192,7 +192,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator();
 
 		String expected = "darf nicht null sein";
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 		String actual = interpolator.interpolate( notNull.message(), context, Locale.GERMAN );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
@@ -200,23 +200,20 @@ public class ResourceBundleMessageInterpolatorTest {
 	@Test
 	public void testUserResourceBundle() {
 		interpolator = new ResourceBundleMessageInterpolator();
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "no puede ser null";
 		String actual = interpolator.interpolate( notNull.message(), context, new Locale( "es", "ES" ) );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
 
-	/**
-	 * HV-102
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-102")
 	public void testRecursiveMessageInterpolation() {
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
 		descriptor.setValue( "message", "{replace.in.user.bundle1}" );
 		descriptor.setValue( "value", 10L );
 		Max max = AnnotationFactory.create( descriptor );
-
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
 				max, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
@@ -225,7 +222,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator()
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null, null );
 
 		String expected = "{replace.in.default.bundle2}";
 		String actual = interpolator.interpolate( max.message(), context );
@@ -234,10 +231,8 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 	}
 
-	/**
-	 * HV-182
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-182")
 	public void testCorrectMessageInterpolationIfParameterCannotBeReplaced() {
 		AnnotationDescriptor<Max> descriptor = new AnnotationDescriptor<Max>( Max.class );
 		String message = "Message should stay unchanged since {fubar} is not replaceable";
@@ -254,7 +249,7 @@ public class ResourceBundleMessageInterpolatorTest {
 				new TestResourceBundleLocator()
 		);
 
-		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( constraintDescriptor, null, null );
 
 		String actual = interpolator.interpolate( max.message(), context );
 		assertEquals(
@@ -262,18 +257,15 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 	}
 
-	/**
-	 * HV-330
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-330")
 	public void testMessageCaching() {
-
 		// do the whole tests first with caching enabled
 		TestResourceBundle testBundle = new TestResourceBundle();
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator( testBundle )
 		);
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "{hv-330}";
 		String actual = interpolator.interpolate( "{hv-330}", context );
@@ -293,7 +285,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		interpolator = new ResourceBundleMessageInterpolator(
 				new TestResourceBundleLocator( testBundle ), false
 		);
-		context = new MessageInterpolatorContext( notNullDescriptor, null );
+		context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		expected = "{hv-330}";
 		actual = interpolator.interpolate( "{hv-330}", context );

@@ -70,7 +70,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 	public void testExpressionLanguageGraphNavigation() {
 		User user = new User();
 		user.setAge( 18 );
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, user );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, user, null );
 
 		String expected = "18";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
@@ -79,7 +79,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testUnknownPropertyInExpressionLanguageGraphNavigation() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, new User() );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, new User(), null );
 
 		String expected = "${validatedValue.foo}";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.foo}", context );
@@ -88,7 +88,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testNullValidatedValue() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
 
 		String expected = "Validated value was null";
 		String actual = interpolatorUnderTest.interpolate(
@@ -100,7 +100,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testExpressionAndParameterInterpolationInSameMessageDescriptor() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
 		String expected = "2 0 2147483647";
 		String actual = interpolatorUnderTest.interpolate( "${1+1} {min} {max}", context );
@@ -109,7 +109,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testEscapedExpressionLanguage() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
 		String expected = "\\${1+1}";
 		String actual = interpolatorUnderTest.interpolate( "\\${1+1}", context );
@@ -118,7 +118,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testTernaryExpressionLanguageOperator() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "${min == 0 ? 'foo' : 'bar'}", context );
@@ -127,7 +127,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testParameterFormatting() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
 		String expected = "Max 2147483647, min 0";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format('Max %s, min %s', max, min)}", context );
@@ -136,7 +136,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testLiteralStaysUnchanged() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "foo", context );
@@ -145,7 +145,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testLiteralBackslash() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
 		String expected = "\\foo";
 		String actual = interpolatorUnderTest.interpolate( "\\foo", context );
@@ -154,7 +154,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testPrecedenceOfParameterInterpolation() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
 		String expected = "$0";
 		String actual = interpolatorUnderTest.interpolate( "${min}", context );
@@ -163,7 +163,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testLocaleBasedFormatting() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, 42.00000d );
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, 42.00000d, null );
 
 		// german locale
 		String expected = "42,00";
