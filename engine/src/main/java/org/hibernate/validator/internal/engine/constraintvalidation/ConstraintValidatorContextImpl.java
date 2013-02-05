@@ -60,7 +60,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	@Override
 	public <T> T unwrap(Class<T> type) {
-		return null;  // TODO - https://hibernate.onjira.com/browse/HV-692
+		throw log.getTypeNotSupportedException( type );
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {
@@ -82,7 +82,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	}
 
 	class ErrorBuilderImpl implements ConstraintViolationBuilder {
-		private String messageTemplate;
+		private final String messageTemplate;
 		private PathImpl propertyPath;
 
 		ErrorBuilderImpl(String template, PathImpl path) {
@@ -90,6 +90,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath = path;
 		}
 
+		@Override
 		public NodeBuilderDefinedContext addNode(String name) {
 			// in case we are in a class level constraint and we want to add a node we drop the node representing the
 			// class level (HF)
@@ -100,6 +101,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
+		@Override
 		public ConstraintValidatorContext addConstraintViolation() {
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
@@ -115,10 +117,12 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath = path;
 		}
 
+		@Override
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
 		}
 
+		@Override
 		public ConstraintValidatorContext addConstraintViolation() {
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
@@ -136,16 +140,19 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			this.leafNodeName = nodeName;
 		}
 
+		@Override
 		public ConstraintViolationBuilder.NodeContextBuilder inIterable() {
 			this.propertyPath.makeLeafNodeIterable();
 			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath, leafNodeName );
 		}
 
+		@Override
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			propertyPath.addNode( leafNodeName );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
 		}
 
+		@Override
 		public ConstraintValidatorContext addConstraintViolation() {
 			propertyPath.addNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
@@ -164,23 +171,27 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			this.leafNodeName = nodeName;
 		}
 
+		@Override
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atKey(Object key) {
 			propertyPath.setLeafNodeMapKey( key );
 			propertyPath.addNode( leafNodeName );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
+		@Override
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atIndex(Integer index) {
 			propertyPath.setLeafNodeIndex( index );
 			propertyPath.addNode( leafNodeName );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
+		@Override
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			propertyPath.addNode( leafNodeName );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
 		}
 
+		@Override
 		public ConstraintValidatorContext addConstraintViolation() {
 			propertyPath.addNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
