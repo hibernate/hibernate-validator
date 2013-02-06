@@ -33,6 +33,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -53,20 +54,71 @@ import org.hibernate.validator.internal.util.Contracts;
  */
 public class ValidationExtension implements Extension {
 	private final ConstraintHelper constraintHelper = new ConstraintHelper();
+	private boolean validatorRegisteredUnderDefaultQualifier = false;
+	private boolean validatorRegisteredUnderHibernateQualifier = false;
 
+	/**
+	 * Registers the Hibernate specific {@code ValidatorFactory} and {@code Validator}. The qualifiers used for registration
+	 * depend on which other beans have already registered these type of beans.
+	 *
+	 * @param afterBeanDiscoveryEvent event fired after the bean discovery phase.
+	 * @param beanManager the bean manager.
+	 */
 	public void afterBeanDiscovery(@Observes AfterBeanDiscovery afterBeanDiscoveryEvent, BeanManager beanManager) {
 		Contracts.assertNotNull( afterBeanDiscoveryEvent, "The AfterBeanDiscovery event cannot be null" );
 		Contracts.assertNotNull( beanManager, "The BeanManager cannot be null" );
 
-		addValidatorFactoryIfRequired( afterBeanDiscoveryEvent, beanManager );
-		addValidatorIfRequired( afterBeanDiscoveryEvent, beanManager );
+		Set<Annotation> missingQualifiers = determineMissingQualifiers();
+		if ( missingQualifiers.isEmpty() ) {
+			return;
+		}
+
+		afterBeanDiscoveryEvent.addBean( new ValidatorFactoryBean( beanManager, missingQualifiers ) );
+		afterBeanDiscoveryEvent.addBean( new ValidatorBean( beanManager, missingQualifiers ) );
 	}
 
+	/**
+	 * Watches the {@code ProcessBean} event in order to determine whether and under which qualifiers {@code ValidatorFactory}s
+	 * and {@code Validator}s get registered.
+	 *
+	 * @param processBeanEvent event fired for each enabled bean.
+	 */
+	public void processBean(@Observes ProcessBean processBeanEvent) {
+		Contracts.assertNotNull( processBeanEvent, "The ProcessBean event cannot be null" );
+
+		Bean<?> bean = processBeanEvent.getBean();
+		if ( !bean.getTypes().contains( ValidatorFactory.class ) && !bean.getTypes().contains( Validator.class ) ) {
+			return;
+		}
+		if ( bean instanceof ValidatorFactoryBean || bean instanceof ValidatorBean ) {
+			return;
+		}
+		for ( Annotation annotation : bean.getQualifiers() ) {
+			if ( HibernateValidator.class.equals( annotation.annotationType() ) ) {
+				validatorRegisteredUnderHibernateQualifier = true;
+			}
+			if ( Default.class.equals( annotation.annotationType() ) ) {
+				validatorRegisteredUnderDefaultQualifier = true;
+			}
+		}
+	}
+
+	/**
+	 * Used to register the method validation interceptor binding annotation.
+	 *
+	 * @param beforeBeanDiscoveryEvent event fired before the bean discovery process starts
+	 * @param beanManager the bean manager.
+	 */
 	public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery beforeBeanDiscoveryEvent, final BeanManager beanManager) {
 		Contracts.assertNotNull( beforeBeanDiscoveryEvent, "The BeforeBeanDiscovery event cannot be null" );
 		beforeBeanDiscoveryEvent.addInterceptorBinding( MethodValidated.class );
 	}
 
+	/**
+	 * Used to register the method validation interceptor bindings.
+	 *
+	 * @param processAnnotatedTypeEvent event fired for each annotated type
+	 */
 	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
 		final AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
@@ -121,51 +173,24 @@ public class ValidationExtension implements Extension {
 		return false;
 	}
 
-	private void addValidatorFactoryIfRequired(AfterBeanDiscovery afterBeanDiscovery, final BeanManager beanManager) {
-		Set<Annotation> missingQualifiers = determineMissingQualifiers(
-				beanManager,
-				ValidatorFactory.class
-		);
-		if ( missingQualifiers.isEmpty() ) {
-			return;
-		}
-
-		afterBeanDiscovery.addBean( new ValidatorFactoryBean( beanManager, missingQualifiers ) );
-	}
-
-	private void addValidatorIfRequired(AfterBeanDiscovery afterBeanDiscovery, final BeanManager beanManager) {
-		Set<Annotation> missingQualifiers = determineMissingQualifiers( beanManager, Validator.class );
-		if ( missingQualifiers.isEmpty() ) {
-			return;
-		}
-
-		afterBeanDiscovery.addBean( new ValidatorBean( beanManager, missingQualifiers ) );
-	}
-
-	private Set<Annotation> determineMissingQualifiers(BeanManager beanManager, Class<?> clazz) {
+	/**
+	 * The set of qualifier this extension should bind its {@code ValidatorFactory} and {@code Validator}
+	 * under. This set is based on the observed registered beans via the {@code ProcessBean} event.
+	 *
+	 * @return Returns the set of qualifier this extension should bind its {@code ValidatorFactory} and {@code Validator}
+	 *         under.
+	 */
+	private Set<Annotation> determineMissingQualifiers() {
 		Set<Annotation> annotations = new HashSet<Annotation>( 2 );
-		Set<Bean<?>> beans = beanManager.getBeans( clazz );
-		boolean containsDefaultQualifier = false;
-		boolean containsHibernateQualifier = false;
-		for ( Bean<?> bean : beans ) {
-			for ( Annotation annotation : bean.getQualifiers() ) {
-				if ( HibernateValidator.class.equals( annotation.annotationType() ) ) {
-					containsHibernateQualifier = true;
-				}
-				if ( Default.class.equals( annotation.annotationType() ) ) {
-					containsDefaultQualifier = true;
-				}
-			}
-		}
 
-		if ( !containsDefaultQualifier ) {
+		if ( !validatorRegisteredUnderDefaultQualifier ) {
 			annotations.add(
 					new AnnotationLiteral<Default>() {
 					}
 			);
 		}
 
-		if ( !containsHibernateQualifier ) {
+		if ( !validatorRegisteredUnderHibernateQualifier ) {
 			annotations.add(
 					new AnnotationLiteral<HibernateValidator>() {
 					}
