@@ -80,7 +80,11 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(
 				messageTemplate,
-				new MessageInterpolatorContext( descriptor, localContext.getCurrentValidatedValue() )
+				new MessageInterpolatorContext(
+						descriptor,
+						localContext.getCurrentValidatedValue(),
+						getRootBeanClass()
+				)
 		);
 
 		Path path = messageAndPath.getPath();
