@@ -49,13 +49,11 @@ public class JPATraversableResolver implements TraversableResolver {
 			);
 		}
 
-		// we have to check traversableProperty.getName() against null to check the root gets validated (see HV-266)
-		if ( traversableObject == null || traversableProperty.getName() == null ) {
+		if ( traversableObject == null ) {
 			return true;
 		}
-		else {
-			return Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
-		}
+
+		return Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
 	}
 
 	public final boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {

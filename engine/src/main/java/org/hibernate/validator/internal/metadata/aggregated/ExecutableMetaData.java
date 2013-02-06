@@ -301,6 +301,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			ConstrainedExecutable methodWithCascadingReturnValue = null;
 
 			for ( ConstrainedExecutable executable : constrainedExecutables ) {
+				if ( executable.getLocation().getExecutableElement().getReturnType() == void.class &&
+						( !executable.getConstraints().isEmpty() || executable.isCascading() ) ) {
+					return log.voidMethodsMustNotBeConstrained( executable.getLocation().getMember() );
+				}
+
 				if ( executable.isCascading() ) {
 					if ( methodWithCascadingReturnValue != null ) {
 						return log.methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(
@@ -406,17 +411,16 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return crossParameterConstraints;
 	}
 
-	public ParameterListMetaData getParameterListMetaData() {
-
+	public ValidatableParametersMetaData getValidatableParametersMetaData() {
 		Set<ParameterMetaData> cascadedParameters = newHashSet();
 
-		for ( ParameterMetaData oneParameter : parameterMetaDataList ) {
-			if ( oneParameter.isCascading() ) {
-				cascadedParameters.add( oneParameter );
+		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
+			if ( parameterMetaData.isCascading() ) {
+				cascadedParameters.add( parameterMetaData );
 			}
 		}
 
-		return new ParameterListMetaData( cascadedParameters );
+		return new ValidatableParametersMetaData( cascadedParameters );
 	}
 
 	public ReturnValueMetaData getReturnValueMetaData() {

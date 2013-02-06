@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
-import javax.validation.UnexpectedTypeException;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
@@ -541,7 +541,7 @@ public class MethodLevelValidationTest {
 		customerRepository.parameterConstraintInGroup( null );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000132.*")
 	public void voidMethodWithReturnValueConstraintCausesUnexpectedTypeException() {
 		customerRepository.voidMethodWithIllegalReturnValueConstraint();
 	}

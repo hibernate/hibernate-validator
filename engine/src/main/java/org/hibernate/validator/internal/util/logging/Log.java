@@ -474,4 +474,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 131,
 			value = "A method return value must not be marked for cascaded validation more than once in a class hierarchy, but the following two methods are marked as such: %s, %s.")
 	ConstraintDeclarationException methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(Member member1, Member member2);
+
+	@Message(id = 132,
+			value = "Void methods must not be constrained or marked for cascaded validation, but method %s is.")
+	ConstraintDeclarationException voidMethodsMustNotBeConstrained(Member member);
 }

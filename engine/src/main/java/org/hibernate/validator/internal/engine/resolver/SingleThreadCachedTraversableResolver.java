@@ -23,9 +23,9 @@ import javax.validation.Path;
 import javax.validation.TraversableResolver;
 
 /**
- * Cache results of a delegated traversable resovler to optimize calls
+ * Cache results of a delegated traversable resolver to optimize calls.
  * It works only for a single validate* call and should not be used if
- * the TraversableResolver is accessed concurrently
+ * the TraversableResolver is accessed concurrently.
  *
  * @author Emmanuel Bernard
  */

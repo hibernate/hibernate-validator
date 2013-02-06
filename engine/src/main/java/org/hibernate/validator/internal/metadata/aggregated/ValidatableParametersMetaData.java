@@ -27,11 +27,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public class ParameterListMetaData implements Validatable {
+public class ValidatableParametersMetaData implements Validatable {
 
 	private final Iterable<Cascadable> cascadables;
 
-	public ParameterListMetaData(Iterable<? extends Cascadable> cascadables) {
+	public ValidatableParametersMetaData(Iterable<? extends Cascadable> cascadables) {
 		this.cascadables = newHashSet( cascadables );
 	}
 

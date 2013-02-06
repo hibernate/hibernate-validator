@@ -35,6 +35,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ElementDescriptor;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -508,12 +509,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Class<?> originalGroup = valueContext.getCurrentGroup();
 
 		for ( Cascadable cascadable : validatable.getCascadables() ) {
-
 			valueContext.appendNode( cascadable );
 			valueContext.setCurrentGroup( cascadable.convertGroup( originalGroup ) );
 
 			ElementType elementType = cascadable.getElementType();
-			if ( isCascadeRequired( validationContext, valueContext, elementType ) ) {
+			if ( isCascadeRequired(
+					validationContext,
+					valueContext.getCurrentBean(),
+					valueContext.getPropertyPath(),
+					elementType
+			) ) {
 				Object value = cascadable.getValue(
 						valueContext.getCurrentBean()
 				);
@@ -532,6 +537,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					}
 				}
 			}
+
 			// reset the path
 			valueContext.setPropertyPath( originalPath );
 			valueContext.setCurrentGroup( originalGroup );
@@ -612,6 +618,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			if ( !context.isAlreadyValidated(
 					value, valueContext.getCurrentGroup(), valueContext.getPropertyPath()
 			) ) {
+				@SuppressWarnings("unchecked")
 				ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
 						Arrays.<Class<?>>asList( valueContext.getCurrentGroup() )
 				);
@@ -818,6 +825,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
+			@SuppressWarnings("unchecked")
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
@@ -874,7 +882,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 												 T object,
 												 Object[] parameterValues,
 												 ValidationOrder validationOrder) {
-
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
 
@@ -893,7 +900,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValueContext<Object[], ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
 				parameterValues,
-				executableMetaData.getParameterListMetaData(),
+				executableMetaData.getValidatableParametersMetaData(),
 				PathImpl.createPathForExecutable( executableMetaData )
 		);
 
@@ -946,7 +953,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// the inheritance tree?
 		// For now a redefined default sequence will only be considered if specified at the bean
 		// hosting the validated itself, but no other default sequence from parent types
-
 		List<Class<?>> groupList;
 		if ( group.isDefaultGroup() ) {
 			groupList = beanMetaData.getDefaultGroupSequence( object );
@@ -956,12 +962,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		//the only case where we can have multiple groups here is a redefined default group sequence
-		for ( Class<?> oneGroup : groupList ) {
-
+		for ( Class<?> currentValidatedGroup : groupList ) {
 			int numberOfViolationsOfCurrentGroup = 0;
 
 			ValueContext<T, Object> valueContext = getExecutableValueContext(
-					object, validationContext.getRootBeanClass(), executableMetaData, oneGroup
+					object, validationContext.getRootBeanClass(), executableMetaData, currentValidatedGroup
 			);
 			valueContext.setCurrentValidatedValue( parameterValues );
 
@@ -1144,15 +1149,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private <T> int validateConstraintsForGroup(MethodValidationContext<T> validationContext,
-												ValueContext<T, ?> valueContext, Iterable<MetaConstraint<?>> constraints) {
-
+												ValueContext<T, ?> valueContext,
+												Iterable<MetaConstraint<?>> constraints) {
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
-
-			if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
+			if ( !isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 				continue;
 			}
+
 			metaConstraint.validateConstraint( validationContext, valueContext );
 			if ( shouldFailFast( validationContext ) ) {
 				break;
@@ -1240,77 +1245,86 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 			return false;
 		}
+		return isReachable(
+				validationContext,
+				valueContext.getCurrentBean(),
+				valueContext.getPropertyPath(),
+				metaConstraint.getElementType()
+		);
+	}
 
-		// HV-524 - class level constraints are reachable
-		if ( ElementType.TYPE.equals( metaConstraint.getElementType() ) ) {
+	private boolean isReachable(ValidationContext<?, ?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
+		if ( needToCallTraversableResolver( path, type ) ) {
 			return true;
 		}
 
-		boolean isReachable;
-		PathImpl path = valueContext.getPropertyPath();
 		Path pathToObject = path.getPathWithoutLeafNode();
-
 		try {
-			isReachable = validationContext.getTraversableResolver().isReachable(
-					valueContext.getCurrentBean(),
+			return validationContext.getTraversableResolver().isReachable(
+					traversableObject,
 					path.getLeafNode(),
 					validationContext.getRootBeanClass(),
 					pathToObject,
-					metaConstraint.getElementType()
+					type
 			);
 		}
 		catch ( RuntimeException e ) {
 			throw log.getErrorDuringCallOfTraversableResolverIsReachableException( e );
 		}
-
-		return isReachable;
 	}
 
-	private boolean isCascadeRequired(ValidationContext<?, ?> validationContext, ValueContext<?, ?> valueContext, ElementType type) {
-		boolean isReachable;
-		boolean isCascadable;
+	private boolean needToCallTraversableResolver(PathImpl path, ElementType type) {
+		// as the TraversableResolver interface is designed right now it does not make sense to call it when
+		// there is no traversable object hosting the property to be accessed. For this reason we don't call the resolver
+		// for class level constraints (ElementType.TYPE) or top level method parameters or return values.
+		// see also BV expert group discussion - http://lists.jboss.org/pipermail/beanvalidation-dev/2013-January/000722.html
+		return isClassLevelConstraint( type )
+				|| isCrossParameterValidation( path )
+				|| isParameterValidation( path )
+				|| isReturnValueValidation( path );
+	}
 
-		PathImpl path = valueContext.getPropertyPath();
+	private boolean isCascadeRequired(ValidationContext<?, ?> validationContext, Object traversableObject, PathImpl path, ElementType type) {
+		if ( needToCallTraversableResolver( path, type ) ) {
+			return true;
+		}
+
+		boolean isReachable = isReachable( validationContext, traversableObject, path, type );
+		if ( !isReachable ) {
+			return false;
+		}
+
 		Path pathToObject = path.getPathWithoutLeafNode();
+		try {
+			return validationContext.getTraversableResolver().isCascadable(
+					traversableObject,
+					path.getLeafNode(),
+					validationContext.getRootBeanClass(),
+					pathToObject,
+					type
+			);
+		}
+		catch ( RuntimeException e ) {
+			throw log.getErrorDuringCallOfTraversableResolverIsCascadableException( e );
+		}
+	}
 
-		// HV-524 - class level constraints are reachable
-		if ( ElementType.TYPE.equals( type ) ) {
-			isReachable = true;
-		}
-		else {
-			try {
-				isReachable = validationContext.getTraversableResolver().isReachable(
-						valueContext.getCurrentBean(),
-						path.getLeafNode(),
-						validationContext.getRootBeanClass(),
-						pathToObject,
-						type
-				);
-			}
-			catch ( RuntimeException e ) {
-				throw log.getErrorDuringCallOfTraversableResolverIsReachableException( e );
-			}
-		}
+	private boolean isClassLevelConstraint(ElementType type) {
+		return ElementType.TYPE.equals( type );
+	}
 
-		if ( ElementType.TYPE.equals( type ) ) {
-			isCascadable = true;
-		}
-		else {
-			try {
-				isCascadable = validationContext.getTraversableResolver().isCascadable(
-						valueContext.getCurrentBean(),
-						path.getLeafNode(),
-						validationContext.getRootBeanClass(),
-						pathToObject,
-						type
-				);
-			}
-			catch ( RuntimeException e ) {
-				throw log.getErrorDuringCallOfTraversableResolverIsCascadableException( e );
-			}
-		}
+	private boolean isCrossParameterValidation(PathImpl path) {
+		return path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.METHOD ||
+				path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.CONSTRUCTOR;
 
-		return isReachable && isCascadable;
+	}
+
+	private boolean isParameterValidation(PathImpl path) {
+		return path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.PARAMETER;
+	}
+
+	private boolean isReturnValueValidation(PathImpl path) {
+		return path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.RETURN_VALUE;
 	}
 
 	private boolean shouldFailFast(ValidationContext context) {
