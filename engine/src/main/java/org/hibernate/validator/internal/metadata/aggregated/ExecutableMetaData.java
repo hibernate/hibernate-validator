@@ -301,6 +301,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			ConstrainedExecutable methodWithCascadingReturnValue = null;
 
 			for ( ConstrainedExecutable executable : constrainedExecutables ) {
+				if ( executable.getLocation().getExecutableElement().getReturnType() == void.class &&
+						( !executable.getConstraints().isEmpty() || executable.isCascading() ) ) {
+					return log.voidMethodsMustNotBeConstrained( executable.getLocation().getMember() );
+				}
+
 				if ( executable.isCascading() ) {
 					if ( methodWithCascadingReturnValue != null ) {
 						return log.methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(
