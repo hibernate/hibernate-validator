@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.internal.cdi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -65,11 +67,14 @@ import static org.testng.Assert.assertTrue;
 public class ValidationExtensionTest<T> {
 	private ValidationExtension extension;
 	private AfterBeanDiscovery afterBeanDiscoveryMock;
+	private ProcessBean processBeanMock;
 	private BeforeBeanDiscovery beforeBeanDiscoveryMock;
 	private ProcessAnnotatedType<T> processAnnotatedTypeMock;
 	private AnnotatedType<T> annotatedTypeMock;
 	private AnnotatedMethod<T> annotatedMethodMock;
 	private AnnotatedConstructor<T> annotatedConstructorMock;
+	private Bean<ValidatorFactory> validatorFactoryBeanMock;
+	private Bean<Validator> validatorBeanMock;
 	private BeanManager beanManagerMock;
 
 	@SuppressWarnings("unchecked")
@@ -77,12 +82,15 @@ public class ValidationExtensionTest<T> {
 	public void setUp() {
 		extension = new ValidationExtension();
 		afterBeanDiscoveryMock = createMock( AfterBeanDiscovery.class );
+		processBeanMock = createMock( ProcessBean.class );
 		beforeBeanDiscoveryMock = createMock( BeforeBeanDiscovery.class );
 		processAnnotatedTypeMock = createMock( ProcessAnnotatedType.class );
 		annotatedTypeMock = createMock( AnnotatedType.class );
 		annotatedMethodMock = createMock( AnnotatedMethod.class );
 		annotatedConstructorMock = createMock( AnnotatedConstructor.class );
 		beanManagerMock = createMock( BeanManager.class );
+		validatorFactoryBeanMock = createMock( Bean.class );
+		validatorBeanMock = createMock( Bean.class );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -108,32 +116,28 @@ public class ValidationExtensionTest<T> {
 				new AnnotationLiteral<HibernateValidator>() {
 				}
 		);
-		Set<Bean<?>> beans = new HashSet<Bean<?>>();
-		beans.add( new ValidatorBean( beanManagerMock, qualifiers ) );
-		beans.add( new ValidatorFactoryBean( beanManagerMock, qualifiers ) );
-		expect( beanManagerMock.getBeans( ValidatorFactory.class ) ).andReturn( beans );
-		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
 
-		expect( beanManagerMock.getBeans( Validator.class ) ).andReturn( beans );
+		expect( processBeanMock.getBean() ).andReturn( new ValidatorFactoryBean( beanManagerMock, qualifiers ) );
+		expect( processBeanMock.getBean() ).andReturn( new ValidatorBean( beanManagerMock, qualifiers ) );
+
+		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
 		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
 
 		// get the mocks ready
-		replay( afterBeanDiscoveryMock, beanManagerMock );
+		replay( processBeanMock, afterBeanDiscoveryMock, beanManagerMock );
 
 		// run the code
+		extension.processBean( processBeanMock );
+		extension.processBean( processBeanMock );
 		extension.afterBeanDiscovery( afterBeanDiscoveryMock, beanManagerMock );
 
 		// verify the mocks
-		verify( afterBeanDiscoveryMock, beanManagerMock );
+		verify( processBeanMock, afterBeanDiscoveryMock, beanManagerMock );
 	}
 
 	@Test
 	public void testRegisterBeanWithCustomQualifier() {
-		// setup the mocks
-		expect( beanManagerMock.getBeans( ValidatorFactory.class ) ).andReturn( new HashSet<Bean<?>>() );
 		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
-
-		expect( beanManagerMock.getBeans( Validator.class ) ).andReturn( new HashSet<Bean<?>>() );
 		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
 
 		// get the mocks ready
@@ -158,20 +162,32 @@ public class ValidationExtensionTest<T> {
 				new AnnotationLiteral<Default>() {
 				}
 		);
-		Set<Bean<?>> beans = new HashSet<Bean<?>>();
-		beans.add( new ValidatorBean( beanManagerMock, qualifiers ) );
-		beans.add( new ValidatorFactoryBean( beanManagerMock, qualifiers ) );
-		expect( beanManagerMock.getBeans( ValidatorFactory.class ) ).andReturn( beans );
-		expect( beanManagerMock.getBeans( Validator.class ) ).andReturn( beans );
+
+		Set<Type> validatorFactoryBeanTypes = new HashSet<Type>();
+		validatorFactoryBeanTypes.add( ValidatorFactory.class );
+
+		Set<Type> validatorBeanTypes = new HashSet<Type>();
+		validatorBeanTypes.add( Validator.class );
+
+		expect( processBeanMock.getBean() ).andReturn( validatorFactoryBeanMock );
+		expect( validatorFactoryBeanMock.getTypes() ).andReturn( validatorFactoryBeanTypes );
+		expect( validatorFactoryBeanMock.getQualifiers() ).andReturn( qualifiers );
+
+		expect( processBeanMock.getBean() ).andReturn( validatorBeanMock );
+		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
+		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
+		expect( validatorBeanMock.getQualifiers() ).andReturn( qualifiers );
 
 		// get the mocks ready
-		replay( afterBeanDiscoveryMock, beanManagerMock );
+		replay( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );
 
 		// run the code
+		extension.processBean( processBeanMock );
+		extension.processBean( processBeanMock );
 		extension.afterBeanDiscovery( afterBeanDiscoveryMock, beanManagerMock );
 
 		// verify the mocks
-		verify( afterBeanDiscoveryMock, beanManagerMock );
+		verify( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
