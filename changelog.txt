@@ -1,6 +1,46 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.0.Beta1 (06.02.2013)
+------------------------
+
+** Bug
+    * [HV-618] - Unable to validate methods in complex inheritance hierarchy
+    * [HV-646] - Shouldn't access the index for non-indexable types
+    * [HV-656] - MethodValidationContext.isReturnValueValidation throws NPE
+    * [HV-657] - Remove tests in BeanMetaDataImplTest
+    * [HV-658] - Escape special characters in README.md
+    * [HV-659] - ValidatorContextImpl ignores custom ParameterNameProvider
+    * [HV-660] - BeanDescriptor#getConstrainedProperties() must return no elements for class-level constraints
+    * [HV-662] - ConstraintValidatorManager caching fails for XML-defined constraints
+    * [HV-663] - ParameterNameProviders passed via ValidatorFactory#usingContext() are ignored
+    * [HV-664] - Path nodes representing executable return values must return null as name
+    * [HV-665] - Consider concerned constraint in identity of constraint violations
+    * [HV-666] - ExecutableDescriptorImpl#areParametersConstrained() must consider cross-parameter constraints
+    * [HV-668] - ExecutableDescriptorImpl must honor contract for hasConstrained() etc.
+    * [HV-675] - Method return values must not be marked with @Valid if the super-type/interface method is marked
+    * [HV-676] - Implement EL expression interpolation in message interpolation
+    * [HV-677] - ElementDescriptor is null for property nodes reached via traversing a Map- or array-typed parameter
+    * [HV-679] - Must pass Default group to cascaded object when validating object with redefined default group sequence
+    * [HV-680] - No cascaded validation is performed when return value constraints are failing
+    * [HV-681] - Throw IllegalArgumentExceptions in ExecutableValidator methods as described in API
+    * [HV-682] - ExecutableDescriptor#findConstraints() returns constraints with wrong scope
+    * [HV-685] - The tck runner setup fails to run in container
+    * [HV-692] - Implement missing functionality after latest  BV 1.1 changes
+    * [HV-695] - CDI extension throws exception due to calling BeanManager#getBeans during AfterBeanDiscovery event processing
+    * [HV-700] - Update dependency to TCK, include JUEL in distribution
+
+** Improvement
+    * [HV-256] - Add 'exclusive' boolean attribute to @DecimalMin/@DecimalMax constraints
+    * [HV-576] - Consistently apply coding guidelines throughout the code base
+    * [HV-661] - Make sure Hibernate Validator can be used on Java 6 < 1.6.0_18
+    * [HV-673] - JPATraversableResolver must handle method parameters when invoked during method validation
+    * [HV-687] - Constraints for non overridden super-type method have wrong scope
+
+** New Feature
+    * [HV-697] - Create HV-specific MessageInterpolator.Context extension exposing the root bean type
+
+
 5.0.0.Alpha2 (28.11.2012)
 -------------------------
 
