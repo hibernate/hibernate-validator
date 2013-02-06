@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
@@ -25,7 +26,7 @@ import javax.validation.metadata.ConstraintDescriptor;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.io.Serializable {
+public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Serializable {
 
 	private static final long serialVersionUID = -4970067626703103139L;
 
@@ -53,34 +54,42 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 		this.elementType = elementType;
 	}
 
+	@Override
 	public final String getMessage() {
 		return interpolatedMessage;
 	}
 
+	@Override
 	public final String getMessageTemplate() {
 		return messageTemplate;
 	}
 
+	@Override
 	public final T getRootBean() {
 		return rootBean;
 	}
 
+	@Override
 	public final Class<T> getRootBeanClass() {
 		return rootBeanClass;
 	}
 
+	@Override
 	public final Object getLeafBean() {
 		return leafBeanInstance;
 	}
 
+	@Override
 	public final Object getInvalidValue() {
 		return value;
 	}
 
+	@Override
 	public final Path getPropertyPath() {
 		return propertyPath;
 	}
 
+	@Override
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {
 		return this.constraintDescriptor;
 	}
@@ -91,11 +100,11 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 		if ( this == o ) {
 			return true;
 		}
-		if ( !( o instanceof ConstraintViolationImpl ) ) {
+		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
 
-		ConstraintViolationImpl<?> that = ( ConstraintViolationImpl<?> ) o;
+		ConstraintViolationImpl<?> that = (ConstraintViolationImpl<?>) o;
 
 		if ( interpolatedMessage != null ? !interpolatedMessage.equals( that.interpolatedMessage ) : that.interpolatedMessage != null ) {
 			return false;
@@ -109,7 +118,16 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 		if ( leafBeanInstance != null ? !leafBeanInstance.equals( that.leafBeanInstance ) : that.leafBeanInstance != null ) {
 			return false;
 		}
+		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
+			return false;
+		}
 		if ( elementType != null ? !elementType.equals( that.elementType ) : that.elementType != null ) {
+			return false;
+		}
+		if ( messageTemplate != null ? !messageTemplate.equals( that.messageTemplate ) : that.messageTemplate != null ) {
+			return false;
+		}
+		if ( rootBeanClass != null ? !rootBeanClass.equals( that.rootBeanClass ) : that.rootBeanClass != null ) {
 			return false;
 		}
 		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
@@ -126,6 +144,9 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, java.
 		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
 		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );
+		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
+		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
+		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
 		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
 		return result;
 	}
